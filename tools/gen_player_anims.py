@@ -605,6 +605,119 @@ def space_closure_cast():
                ({'pitch': 10, 'yaw': 0, 'roll': 4, 'bend': 12}, {'pitch': -12, 'yaw': 0, 'roll': -4, 'bend': 6}), 0.0)
 
 
+# ---------------------------------------------------------------- Появление Ковена (60 с)
+# Задание: docs/specs/coven_arrival_spec.md. Без посоха (предметы в руках прячет HiddenHands).
+#   0–5 с   арена, заклинатель в кадре нет: спокойная стойка, взгляд вниз
+#   5–10 с  у заклинателя: жест открытия портала за спиной, на 9.2–10 с шаг назад в портал
+#   10–25 с заклинатель невидим внутри портала на арене: нейтральная поза
+#   25–32 с выходит из портала: медленный величественный шаг; тело смещается от -2 блоков (в портале) к 0.
+#           Сервер в 25 с ставит заклинателя в конечную точку перед порталом, анимация «доводит» его туда.
+#   32–38 с реплика: левая рука за спиной, правая ладонью вверх — жест «и вы тоже»
+#   38–42 с титр: обе руки за спиной, голова чуть вверх
+#   42–50 с ритуал: руки медленно поднимаются в стороны и вверх
+#   50–56 с купол: руки широкой дугой разводятся вниз и в стороны, ладонями наружу
+#   56–60 с руки опускаются к телу, стойка
+COVEN_WALK_FROM = -2.0       # блоков назад от конечной точки (внутри портала)
+
+
+def _walk(a, t0, t1, step, body_from, body_to):
+    """Медленный шаг на месте с переносом тела по z: ноги и руки в противофазе, корпус чуть качается."""
+    t, k, n = t0, 0, int(round((t1 - t0) / step))
+    for i in range(n + 1):
+        t = t0 + i * step
+        f = i / max(1, n)
+        side = 1 if i % 2 == 0 else -1
+        last = i == n
+        leg = 0 if last else 22
+        a.pose(t, rightLeg={'pitch': -leg * side, 'yaw': 0, 'roll': 1, 'bend': 0 if last else (14 if side < 0 else 4)},
+               leftLeg={'pitch': leg * side, 'yaw': 0, 'roll': -1, 'bend': 0 if last else (14 if side > 0 else 4)},
+               body={'y': 0 if last else -0.02, 'z': body_from + (body_to - body_from) * f},
+               torso={'pitch': 2, 'yaw': 0 if last else 3 * side, 'roll': 0, 'bend': 0})
+
+
+def coven_arrival_cast():
+    T = 60.0
+    a, r = Anim('pohsmp_coven_arrival_cast', T), Rig()
+    _start(a)
+    a.pose(0, body={'y': 0, 'z': 0})
+    calm_r, calm_l = _fk(roll=4, bend=-10), mirror(_fk(roll=4, bend=-10))
+    a.pose(1.5, rightArm=calm_r, leftArm=calm_l, head={'pitch': 10, 'yaw': 0, 'roll': 0})
+    a.sway(1.5, 5.0, 2.4, 'torso', {'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0}, 'pitch', 1.0)
+    # 5–10 с: правая рука поднимается и чертит круг в воздухе за плечом — портал раскрывается за спиной
+    a.pose(5.8, rightArm=_fk(pitch=-120, roll=40, bend=-25), head={'pitch': -6, 'yaw': 12, 'roll': 0},
+           torso={'pitch': -2, 'yaw': 10, 'roll': 0, 'bend': -2})
+    a.pose(6.6, rightArm=_fk(pitch=-150, roll=95, bend=-20))
+    a.pose(7.4, rightArm=_fk(pitch=-60, roll=110, bend=-15))
+    a.pose(8.2, rightArm=_fk(pitch=-25, roll=60, bend=-12), torso={'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0},
+           head={'pitch': 0, 'yaw': 0, 'roll': 0})
+    # 9.2–10 с: шаг назад в портал
+    a.pose(9.2, rightArm=calm_r, leftArm=calm_l, body={'y': 0, 'z': 0},
+           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.pose(9.6, rightLeg={'pitch': 18, 'yaw': 0, 'roll': 1, 'bend': 10}, body={'y': -0.02, 'z': -0.4})
+    a.pose(10.0, rightLeg=ZERO_LEG, body={'y': 0, 'z': -0.9})
+    # 10–25 с: невидим в портале — нейтральная поза, тело уже стоит «внутри портала»
+    a.pose(10.05, body={'y': 0, 'z': COVEN_WALK_FROM}, head={'pitch': 0, 'yaw': 0, 'roll': 0})
+    a.pose(25.0, rightArm=calm_r, leftArm=calm_l, body={'y': 0, 'z': COVEN_WALK_FROM},
+           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG, head={'pitch': 4, 'yaw': 0, 'roll': 0})
+    # 25–32 с: выход из портала медленным шагом, руки слегка в противофазе
+    _walk(a, 25.6, 31.4, 0.9, COVEN_WALK_FROM, 0.0)
+    for i, t in enumerate([25.6 + 0.9 * k for k in range(7)]):
+        side = 1 if i % 2 == 0 else -1
+        a.pose(t, rightArm=_fk(pitch=10 * side, roll=4, bend=-12), leftArm=mirror(_fk(pitch=-10 * side, roll=4, bend=-12)))
+    a.pose(31.4, rightArm=calm_r, leftArm=calm_l, head={'pitch': -4, 'yaw': 0, 'roll': 0})
+    # 32–38 с: реплика — левая за спиной, правая ладонью вверх перед собой
+    behind_l = r.L(1.4, 12.6, -3.6)
+    present_r = r.R(-5.5, 17.0, 7.0, staff=(0, 1, 0))
+    a.pose(33.0, leftArm=behind_l, rightArm=present_r, head={'pitch': 2, 'yaw': -6, 'roll': -3},
+           torso={'pitch': -1, 'yaw': -5, 'roll': 0, 'bend': 0})
+    a.pose(35.5, rightArm=r.R(-6.5, 17.6, 7.4, staff=(0, 1, 0)), head={'pitch': 0, 'yaw': -3, 'roll': -4})
+    a.pose(37.6, rightArm=present_r, head={'pitch': 4, 'yaw': 0, 'roll': 0})
+    # 38–42 с: титр — обе руки за спиной, голова чуть вверх
+    behind_r = r.R(-1.4, 12.6, -3.6)
+    a.pose(39.0, rightArm=behind_r, leftArm=behind_l, head={'pitch': -6, 'yaw': 0, 'roll': 0},
+           torso={'pitch': -3, 'yaw': 0, 'roll': 0, 'bend': -2})
+    a.sway(39.0, 42.0, 1.5, 'torso', {'pitch': -3, 'yaw': 0, 'roll': 0, 'bend': -2}, 'pitch', 0.8)
+    # 42–50 с: ритуал — руки медленно поднимаются в стороны и вверх
+    side_up = _fk(pitch=-10, roll=95, bend=-10)
+    v_up = _fk(pitch=-18, roll=150, bend=-12)
+    a.pose(44.5, rightArm=side_up, leftArm=mirror(side_up), head={'pitch': -14, 'yaw': 0, 'roll': 0},
+           torso={'pitch': -2, 'yaw': 0, 'roll': 0, 'bend': -2})
+    a.pose(48.0, rightArm=v_up, leftArm=mirror(v_up), head={'pitch': -32, 'yaw': 0, 'roll': 0},
+           torso={'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6},
+           rightLeg={'pitch': 0, 'yaw': 0, 'roll': 4, 'bend': 0}, leftLeg={'pitch': 0, 'yaw': 0, 'roll': -4, 'bend': 0})
+    a.sway(48.0, 50.0, 0.8, 'torso', {'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6}, 'roll', 1.2)
+    # 50–56 с: купол — руки широкой дугой вниз и в стороны, ладонями наружу
+    a.pose(51.2, 'easeOutCubic', rightArm=_fk(pitch=-12, roll=118, bend=-8), leftArm=mirror(_fk(pitch=-12, roll=118, bend=-8)),
+           head={'pitch': -10, 'yaw': 0, 'roll': 0})
+    dome = _fk(pitch=-14, roll=58, bend=-6)
+    a.pose(53.0, rightArm=dome, leftArm=mirror(dome), torso={'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 2},
+           head={'pitch': 2, 'yaw': 0, 'roll': 0})
+    a.sway(53.0, 56.0, 1.5, 'torso', {'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 2}, 'pitch', 1.0)
+    # 56–60 с: руки опускаются, стойка
+    a.pose(58.0, rightArm=calm_r, leftArm=calm_l, torso={'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0},
+           head={'pitch': -2, 'yaw': 0, 'roll': 0}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.pose(T, rightArm=calm_r, leftArm=calm_l, head={'pitch': -2, 'yaw': 0, 'roll': 0}, body={'y': 0, 'z': 0})
+    return a, (calm_r, calm_l, None, None, 0.0)
+
+
+def coven_ritual():
+    """Поза ритуала для свиты-игроков: запускается в 42 с ролика, 14 с, после — руки опускаются."""
+    a = Anim('pohsmp_coven_ritual', 14.0, hold=False)
+    _start(a)
+    side_up = _fk(pitch=-10, roll=95, bend=-10)
+    v_up = _fk(pitch=-18, roll=150, bend=-12)
+    a.pose(2.5, rightArm=side_up, leftArm=mirror(side_up), head={'pitch': -14, 'yaw': 0, 'roll': 0})
+    a.pose(6.0, rightArm=v_up, leftArm=mirror(v_up), head={'pitch': -32, 'yaw': 0, 'roll': 0},
+           torso={'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6})
+    dome = _fk(pitch=-14, roll=58, bend=-6)
+    a.pose(9.2, 'easeOutCubic', rightArm=_fk(pitch=-12, roll=118, bend=-8), leftArm=mirror(_fk(pitch=-12, roll=118, bend=-8)),
+           head={'pitch': -10, 'yaw': 0, 'roll': 0})
+    a.pose(11.0, rightArm=dome, leftArm=mirror(dome), torso={'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 2},
+           head={'pitch': 2, 'yaw': 0, 'roll': 0})
+    a.pose(14.0, rightArm=ZERO_LEG, leftArm=ZERO_LEG, torso=ZERO_T, head=ZERO_H)
+    return a
+
+
 def _pair(fn, finish_name):
     """Анимация каста и финал из её последней позы."""
     def cast():
@@ -620,9 +733,10 @@ _MW = _pair(milky_way_cast, 'pohsmp_milky_way_finish')
 _SD = _pair(soul_devour_cast, 'pohsmp_soul_devour_finish')
 _TB = _pair(taboo_cast, 'pohsmp_taboo_finish')
 _SC = _pair(space_closure_cast, 'pohsmp_space_closure_finish')
+_CA = _pair(coven_arrival_cast, 'pohsmp_coven_arrival_finish')
 
 
-ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC]
+ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual]
 
 
 def main():

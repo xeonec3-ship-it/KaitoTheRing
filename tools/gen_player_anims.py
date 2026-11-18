@@ -180,8 +180,7 @@ class Anim:
             for tick, ch, ease in ks:
                 # углы частей тела берём ближайшие к предыдущему ключу; у предмета в руке — как задано (там +360 = оборот)
                 if part not in ('rightItem', 'leftItem'):
-                    ch = {c: (v + 360 * round((prev[c] - v) / 360)) if c in ('pitch', 'yaw', 'roll') and c in prev else v
-                          for c, v in ch.items()}
+                    ch = _nearest_euler(prev, ch)
                 prev.update(ch)
                 moves.append({'tick': tick, 'easing': ease, part: {c: round(float(v), 2) for c, v in ch.items()}})
         moves.sort(key=lambda m: m['tick'])
@@ -190,6 +189,26 @@ class Anim:
         if self.hold:
             emote.update({'isLoop': True, 'returnTick': self.end})
         return {'version': 3, 'name': self.name, 'author': 'pohsmp_core', 'emote': emote}
+
+
+def _nearest_euler(prev, ch):
+    """
+    Одна и та же ориентация записывается двумя наборами углов: (p, y, r) и (p+180, -180-y, r-180), плюс любые ±360.
+    Берём запись, ближайшую к предыдущему ключу: иначе между ключами часть тела крутится длинным путём.
+    """
+    if not all(c in ch for c in ('pitch', 'yaw', 'roll')) or not all(c in prev for c in ('pitch', 'yaw', 'roll')):
+        return {c: (v + 360 * round((prev[c] - v) / 360)) if c in ('pitch', 'yaw', 'roll') and c in prev else v
+                for c, v in ch.items()}
+    p, y, r = ch['pitch'], ch['yaw'], ch['roll']
+    best = None
+    for cand in ((p, y, r), (p + 180, -180 - y, r - 180)):
+        w = [v + 360 * round((prev[c] - v) / 360) for v, c in zip(cand, ('pitch', 'yaw', 'roll'))]
+        d = sum(abs(a - prev[c]) for a, c in zip(w, ('pitch', 'yaw', 'roll')))
+        if best is None or d < best[0]:
+            best = (d, w)
+    out = dict(ch)
+    out['pitch'], out['yaw'], out['roll'] = best[1]
+    return out
 
 
 class Rig:
@@ -375,6 +394,16 @@ def _finish(name, from_r, from_l, torso=None, head=None, legs=None, body_y=0.0, 
 # ---------------------------------------------------------------- Млечный Путь (10 с)
 # Планы: облёт за спиной -> снизу сбоку, взгляд вверх -> сверху, вращение -> облёт на уровне груди ->
 # из-за плеча по направлению потока -> спереди, тряска (поток уходит из ладони).
+def _fk(pitch=0.0, yaw=0.0, roll=0.0, bend=0.0):
+    """Рука углами суставов (без обратной кинематики): правая; левая — mirror()."""
+    return {'pitch': pitch, 'yaw': yaw, 'roll': roll, 'bend': bend}
+
+
+def mirror(q):
+    """Та же поза для другой руки: yaw и roll с обратным знаком."""
+    return {'pitch': q['pitch'], 'yaw': -q['yaw'], 'roll': -q['roll'], 'bend': q['bend']}
+
+
 def milky_way_cast():
     T = 10.0
     c = _shots(T)
@@ -385,39 +414,48 @@ def milky_way_cast():
     a.pose(c[1] * 0.55, rightArm=cup_r, leftArm=cup_l, torso={'pitch': 6, 'yaw': 0, 'roll': 0, 'bend': 6},
            head={'pitch': 24, 'yaw': 0, 'roll': 0})
     a.pose(c[1], rightArm=r.R(-1.8, 15.2, 5.4), leftArm=r.L(1.8, 15.2, 5.4))
+    # дальше руки почти прямые и широко разведены — их задаём углами суставов, чтобы переходы были плавными:
     # руки медленно расходятся и поднимаются — галактика растёт; взгляд вверх (камера снизу)
-    a.pose(c[1] + 0.9, rightArm=r.R(-7.5, 21.0, 6.0), leftArm=r.L(7.5, 21.0, 6.0),
+    rise = _fk(pitch=-95, roll=38, bend=-30)
+    a.pose(c[1] + 0.9, rightArm=rise, leftArm=mirror(rise),
            torso={'pitch': -2, 'yaw': 0, 'roll': 0, 'bend': -2}, head={'pitch': -8, 'yaw': 0, 'roll': 0})
-    a.pose(c[2], rightArm=r.R(-10.5, 27.5, 2.5), leftArm=r.L(10.5, 27.5, 2.5),
+    v_up = _fk(pitch=-25, roll=140, bend=-14)
+    a.pose(c[2], rightArm=v_up, leftArm=mirror(v_up),
            torso={'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6}, head={'pitch': -32, 'yaw': 0, 'roll': 0})
-    # сверху: руки в стороны, корпус медленно закручивает спираль
-    t_r, t_l = r.R(-13.5, 22.5, 1.5), r.L(13.5, 22.5, 1.5)
-    a.pose(c[2] + 0.6, rightArm=t_r, leftArm=t_l, head={'pitch': -10, 'yaw': 0, 'roll': 0},
-           torso={'pitch': 0, 'yaw': -22, 'roll': 0, 'bend': 0})
-    a.pose((c[2] + c[3]) / 2 + 0.3, torso={'pitch': 0, 'yaw': 18, 'roll': 0, 'bend': 0},
-           rightArm=r.R(-13.0, 24.0, -1.5), leftArm=r.L(13.0, 20.5, 4.0))
-    a.pose(c[3], torso={'pitch': 0, 'yaw': -10, 'roll': 0, 'bend': 0}, rightArm=r.R(-13.0, 20.5, 4.0),
-           leftArm=r.L(13.0, 24.0, -1.5))
-    # облёт: руки рисуют рукава спирали — правая дугой над головой, левая внизу
-    a.pose(c[3] + 0.9, rightArm=r.R(-6.0, 30.0, 3.0), leftArm=r.L(9.5, 14.0, 3.5),
+    # сверху: руки опускаются в стороны, корпус закручивает спираль, руки качаются, как рукава галактики
+    t_pose = _fk(pitch=-8, roll=88, bend=-8)
+    a.pose(c[2] + 0.7, rightArm=t_pose, leftArm=mirror(t_pose), head={'pitch': -10, 'yaw': 0, 'roll': 0},
+           torso={'pitch': 0, 'yaw': -20, 'roll': 0, 'bend': 0})
+    tilt_a, tilt_b = _fk(pitch=-12, roll=118, bend=-10), _fk(pitch=-4, roll=62, bend=-6)
+    a.pose(c[2] + 1.35, rightArm=tilt_a, leftArm=mirror(tilt_b), torso={'pitch': 0, 'yaw': 16, 'roll': -3, 'bend': 0},
+           head={'pitch': -8, 'yaw': 8, 'roll': 0})
+    a.pose(c[3], rightArm=tilt_b, leftArm=mirror(tilt_a), torso={'pitch': 0, 'yaw': -12, 'roll': 3, 'bend': 0},
+           head={'pitch': -8, 'yaw': -6, 'roll': 0})
+    # облёт: правая дугой над головой, левая низко в сторону — рукава спирали
+    over = _fk(pitch=-30, roll=158, bend=-38)
+    low = _fk(pitch=-18, roll=38, bend=-10)
+    a.pose(c[3] + 0.9, rightArm=over, leftArm=mirror(low),
            torso={'pitch': -3, 'yaw': 12, 'roll': -4, 'bend': -2}, head={'pitch': -14, 'yaw': 10, 'roll': 0})
-    a.pose(c[4], rightArm=r.R(5.0, 26.0, 7.0), leftArm=r.L(9.0, 17.0, -3.0),
+    sweep = _fk(pitch=-78, roll=12, bend=-30)          # правая проходит перед грудью
+    out_l = _fk(pitch=12, roll=62, bend=-10)
+    a.pose(c[4], rightArm=sweep, leftArm=mirror(out_l),
            torso={'pitch': 2, 'yaw': -16, 'roll': 3, 'bend': 2}, head={'pitch': 0, 'yaw': -12, 'roll': 0})
-    # из-за плеча: собирает силу — правая отведена к боку, левая вытянута вперёд, ладонь к цели
-    gather_r, aim_l = r.R(-6.5, 17.5, -1.5), r.L(4.0, 21.0, 8.4)
-    a.pose(c[4] + 0.7, 'easeOutCubic', rightArm=gather_r, leftArm=aim_l,
+    # из-за плеча: собирает силу — правая отведена назад к боку, левая вытянута вперёд, ладонь к цели
+    gather = _fk(pitch=28, roll=14, bend=-70)
+    aim = _fk(pitch=-86, yaw=-8, roll=4, bend=-6)
+    a.pose(c[4] + 0.7, 'easeOutCubic', rightArm=gather, leftArm=mirror(aim),
            torso={'pitch': 0, 'yaw': -14, 'roll': 0, 'bend': 0}, head={'pitch': -2, 'yaw': -6, 'roll': 0},
            rightLeg={'pitch': 8, 'yaw': 0, 'roll': 3, 'bend': 10}, leftLeg={'pitch': -10, 'yaw': 0, 'roll': -3, 'bend': 6})
-    a.pose(c[5], rightArm=r.R(-6.8, 17.0, -2.4), torso={'pitch': -2, 'yaw': -20, 'roll': 0, 'bend': -2})
+    a.pose(c[5], rightArm=_fk(pitch=34, roll=16, bend=-78), torso={'pitch': -2, 'yaw': -20, 'roll': 0, 'bend': -2})
     # спереди: правая ладонь бьёт вперёд — поток уходит из руки; левая отходит назад
-    a.pose(c[5] + 0.9, 'easeInCubic', rightArm=r.R(-6.4, 17.6, -1.8), leftArm=r.L(6.0, 19.5, 6.0))
-    thrust_r, back_l = r.R(-2.5, 21.5, 9.0), r.L(8.5, 16.0, -2.0)
-    a.pose(c[5] + 1.2, 'easeOutBack', rightArm=thrust_r, leftArm=back_l,
+    a.pose(c[5] + 0.9, 'easeInCubic', rightArm=_fk(pitch=30, roll=16, bend=-74), leftArm=mirror(_fk(pitch=-70, roll=10, bend=-20)))
+    thrust, back = _fk(pitch=-88, yaw=6, roll=-4, bend=-6), mirror(_fk(pitch=30, roll=18, bend=-12))
+    a.pose(c[5] + 1.2, 'easeOutBack', rightArm=thrust, leftArm=back,
            torso={'pitch': 8, 'yaw': 14, 'roll': 0, 'bend': 4}, head={'pitch': 0, 'yaw': 4, 'roll': 0})
-    a.pose(T, rightArm=thrust_r, leftArm=back_l, torso={'pitch': 6, 'yaw': 12, 'roll': 0, 'bend': 3},
+    a.pose(T, rightArm=thrust, leftArm=back, torso={'pitch': 6, 'yaw': 12, 'roll': 0, 'bend': 3},
            head={'pitch': 0, 'yaw': 4, 'roll': 0},
            rightLeg={'pitch': 8, 'yaw': 0, 'roll': 3, 'bend': 10}, leftLeg={'pitch': -10, 'yaw': 0, 'roll': -3, 'bend': 6})
-    return a, (thrust_r, back_l, {'pitch': 6, 'yaw': 12, 'roll': 0, 'bend': 3},
+    return a, (thrust, back, {'pitch': 6, 'yaw': 12, 'roll': 0, 'bend': 3},
                ({'pitch': 8, 'yaw': 0, 'roll': 3, 'bend': 10}, {'pitch': -10, 'yaw': 0, 'roll': -3, 'bend': 6}), 0.0)
 
 
@@ -491,7 +529,8 @@ def taboo_cast():
     # сложенные руки медленно поднимаются над головой
     a.pose(c[1] + 1.4, rightArm=r.R(-0.6, 24.5, 6.5), leftArm=r.L(0.6, 24.5, 6.5),
            torso={'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0}, head={'pitch': 0, 'yaw': 0, 'roll': 0})
-    a.pose(c[2], rightArm=r.R(-1.0, 30.5, 2.5), leftArm=r.L(1.0, 30.5, 2.5),
+    joined = _fk(pitch=-168, roll=-12, bend=-18)          # руки вверх, кисти сходятся над головой
+    a.pose(c[2], rightArm=joined, leftArm=mirror(joined),
            torso={'pitch': -4, 'yaw': 0, 'roll': 0, 'bend': -5}, head={'pitch': -34, 'yaw': 0, 'roll': 0})
     # руки раскрываются V — держит печать на ладонях
     v_r, v_l = r.R(-9.5, 29.0, 2.0), r.L(9.5, 29.0, 2.0)
@@ -512,7 +551,7 @@ def taboo_cast():
     a.pose(c[5] + 1.8, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG, body={'y': 0},
            torso={'pitch': -2, 'yaw': 0, 'roll': 0, 'bend': -2}, head={'pitch': -12, 'yaw': 0, 'roll': 0},
            rightArm=r.R(-6.0, 19.0, 6.0), leftArm=r.L(1.5, 19.0, 4.8))
-    decree_r, chest_l = r.R(-5.6, 31.0, 1.2), r.L(1.5, 19.0, 4.8)
+    decree_r, chest_l = _fk(pitch=-8, roll=168, bend=-4), r.L(1.5, 19.0, 4.8)   # рука вертикально вверх, чуть наружу
     a.pose(T - 0.6, 'easeOutBack', rightArm=decree_r, leftArm=chest_l,
            torso={'pitch': -5, 'yaw': 4, 'roll': 2, 'bend': -4}, head={'pitch': -28, 'yaw': 0, 'roll': 0})
     a.pose(T, rightArm=decree_r, leftArm=chest_l, torso={'pitch': -5, 'yaw': 4, 'roll': 2, 'bend': -4},
@@ -534,7 +573,8 @@ def space_closure_cast():
            head={'pitch': 14, 'yaw': 0, 'roll': 0})
     a.sway(1.4, c[1], 1.6, 'head', {'pitch': 14, 'yaw': 0, 'roll': 0}, 'pitch', 3)
     # руки вверх, ладонями к печати
-    up_r, up_l = r.R(-3.5, 30.5, 3.0), r.L(3.5, 30.5, 3.0)
+    up_r = _fk(pitch=-20, roll=152, bend=-12)                 # руки вверх и в стороны, ладонями к печати
+    up_l = mirror(up_r)
     a.pose(c[1] + 1.2, rightArm=up_r, leftArm=up_l, torso={'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6},
            head={'pitch': -36, 'yaw': 0, 'roll': 0})
     a.sway(c[1] + 1.2, c[2], 1.4, 'torso', {'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6}, 'pitch', 1.5)

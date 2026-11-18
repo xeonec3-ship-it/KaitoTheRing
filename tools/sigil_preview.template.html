@@ -401,8 +401,9 @@ class Portal {
 
 
 // ---------------------------------------------------------------- мини-движок эффектов (fx/*.json): sigil, curtain, column, beam, flash, sprites
+const tintLayer = (() => { const d = document.createElement("div"); d.style.cssText = "position:absolute;inset:0;opacity:0;pointer-events:none;mix-blend-mode:multiply"; stage.appendChild(d); return d; })();
 const screenFlash = (() => { const d = document.createElement("div"); d.style.cssText = "position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none"; stage.appendChild(d); return d; })();
-const FIG = { caster: new THREE.Vector3(0, 0, -9), target: new THREE.Vector3(0, 0, 0) };
+const FIG = { caster: new THREE.Vector3(0, 0, -11), target: new THREE.Vector3(0, 0, 0) };
 let targetFig = null;
 function anchor(str) {   // "caster+1,2,3": смещение в осях взгляда кастера (смотрит в +Z, вправо = -X)
   const [base, off] = str.split("+"), p = (FIG[base] || FIG.caster).clone();
@@ -428,10 +429,21 @@ class FxRun {
     const e = it.e, g = new THREE.Group(); this.root.add(g); it.g = g; it.made = true;
     if (e.type === "curtain") {
       it.lines = [];
+      const rnd = (v, i, salt) => Array.isArray(v) ? v[0] + (v[1] - v[0]) * hash(i, salt) : v;
+      const p = anchor(e.at);
       for (let i = 0; i < e.count; i++) {
-        const geo = new THREE.BoxGeometry(e.width, 1, e.width); geo.translate(0, 0.5, 0);
-        const m = new THREE.Mesh(geo, addMat(this.col(e.color))), a = 2 * Math.PI * i / e.count;
-        const p = anchor(e.at); m.position.set(p.x + Math.cos(a) * e.radius, p.y, p.z + Math.sin(a) * e.radius); g.add(m); it.lines.push(m);
+        const w = rnd(e.width, i, 11), a = 2 * Math.PI * i / e.count + (e.fromTop ? hash(i, 5) * 6.28 : 0);
+        const r = Array.isArray(e.radius) ? Math.sqrt(rnd([e.radius[0] ** 2, e.radius[1] ** 2], i, 7)) : e.radius;
+        const lg = new THREE.Group(); lg.position.set(p.x + Math.cos(a) * r, p.y, p.z + Math.sin(a) * r); g.add(lg);
+        const mm = addMat(this.col(e.color));
+        if (e.texture) { mm.map = TEX[e.texture]; }
+        for (const rotY of e.texture ? [0, Math.PI / 2] : [0]) {   // два скрещённых плана — объём луча с затуханием кверху
+          const geo = e.texture ? new THREE.PlaneGeometry(w * 2.2, 1) : new THREE.BoxGeometry(w, 1, w);
+          geo.translate(0, e.fromTop ? -0.5 : 0.5, 0);
+          const m = new THREE.Mesh(geo, mm); m.rotation.y = rotY; lg.add(m);
+        }
+        lg.userData.bright = rnd(e.brightness ?? 1, i, 3); lg.userData.mat = mm;
+        it.lines.push(lg);
       }
     } else if (e.type === "column") {
       const p = anchor(e.at);
@@ -467,7 +479,7 @@ class FxRun {
   }
   stop(t) { if (this.stopAt === null) { this.stopAt = t; this.sigils.forEach((s) => s.stop(t)); } }
   done(t) { return t > this.def.duration + 20; }
-  dispose() { scene.remove(this.root); this.sigils.forEach((s) => s.dispose()); screenFlash.style.opacity = 0; if (targetFig) targetFig.visible = false; caster.position.set(0, 0, 0); }
+  dispose() { scene.remove(this.root); this.sigils.forEach((s) => s.dispose()); screenFlash.style.opacity = 0; tintLayer.style.opacity = 0; if (targetFig) targetFig.visible = false; caster.position.set(0, 0, 0); }
   update(t, dt) {
     const lt = t - this.t0;
     // цель приподнята и висит; исчезает в момент удара
@@ -481,19 +493,24 @@ class FxRun {
         continue;
       }
       if (k < 0) continue;
+      if (e.type === "tint") {   // цвет мира: мягкое наложение на весь кадр
+        const inK = ease(e.in?.easing || "linear", k / (e.in?.duration || 1)), outK = 1 - ease(e.out?.easing || "linear", (k - (e.duration - (e.out?.duration || 0))) / (e.out?.duration || 1));
+        tintLayer.style.background = this.col(e.color); tintLayer.style.opacity = String(k > e.duration ? 0 : Math.min(inK, outK) * (e.strength || 0.3));
+        continue;
+      }
       if (!it.made) this.make(it);
       const dur = e.duration || 1, end = k > dur;
       const outD = e.out?.duration || 0, outK = outD ? clamp01((k - (dur - outD)) / outD) : (end ? 1 : 0);
       const life = end ? 0 : (1 - ease(e.out?.easing || "linear", outK));
       if (e.type === "curtain") {
         const grow = clamp01(k / (e.grow || 1)), fadeIn = clamp01(k / 10);
-        it.lines.forEach((m, i) => { m.scale.y = Math.max(0.0001, e.height * ease("easeOutCubic", grow)); m.material.opacity = life * fadeIn * (e.brightness ?? 1) * (1 - (e.flicker || 0) * hash(i, lt / 2)); });
+        it.lines.forEach((m, i) => { m.scale.y = Math.max(0.0001, e.height * ease("easeOutCubic", grow)); m.userData.mat.opacity = life * fadeIn * m.userData.bright * (1 - (e.flicker || 0) * hash(i, lt / 2)); });
       } else if (e.type === "column") {
         const inK = clamp01(k / 3), op = life * inK;
         it.cyl.material.opacity = Math.min(1, op * (e.fill ? 0.55 : 0.8)); it.core.material.opacity = Math.min(1, op * (e.fill ? 0.9 : 0.5));
         it.rings.forEach((r, i) => {
-          const y = ((i / e.rings + k * (e.ringSpeed || 0) / e.height) % 1 + 1) % 1;
-          r.position.set(it.base.x, it.base.y + y * e.height, it.base.z); r.material.opacity = op * 0.9;
+          const y = e.ringHeights ? e.ringHeights[i] : (((i / e.rings + k * (e.ringSpeed || 0) / e.height) % 1 + 1) % 1) * e.height;
+          r.position.set(it.base.x, it.base.y + y, it.base.z); r.material.opacity = op * (0.8 + 0.2 * Math.sin(lt * 0.6 + i));
         });
       } else if (e.type === "beam") {
         it.m.material.opacity = life * clamp01(k / 4) * (1 - (e.flicker || 0) * hash(3, lt));
@@ -567,7 +584,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], dis: [0.75, -0.1, 14, 4.6], disUp: [0.4, -0.55, 9, 6.2] };
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

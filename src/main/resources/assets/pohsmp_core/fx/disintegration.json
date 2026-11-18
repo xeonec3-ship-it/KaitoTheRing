@@ -1,8 +1,26 @@
 {
-  "comment": "Дезинтеграция по канону «О моём перерождении в слизь» (Хината против Римуру, Шуна): печать под целью, стопка горизонтальных печатей над ней и башня из ярусов над верхней (солнце, волнистое кольцо, рама с крестами, венец из звёзд, вершина), завеса вертикальных лучей между ними, молитва заклинателя и вертикальная печать перед ним, на «Disintegration!» — вспышка, свет заливает цилиндр сплошным столбом, после — тонкий столб с кольцами. Каст 200 тиков, удар в 200.",
+  "comment": "Дезинтеграция по канону «О моём перерождении в слизь» (Хината против Римуру, Шуна). Широкий цилиндр (радиус ≈ высоте): большая печать под целью, средняя и верхняя печати почти того же размера, над верхней — крупная башня из ярусов; завеса лучей разной толщины уходит выше верхней печати; мир краснеет; заклинатель молится, перед ним печать почти в рост и X-образные лучи; перед ударом — ливень толстых лучей сверху, удар — сплошной столб с неподвижными кольцами на высотах печатей, засветка; после — тонкий столб с кольцами-бусинами. Каст 200 тиков, удар в 200.",
   "style": "divine",
   "duration": 300,
   "elements": [
+    {
+      "type": "tint",
+      "delay": 0,
+      "duration": 200,
+      "at": "target",
+      "radius": 48,
+      "color": "#FF4A1A",
+      "strength": 0.4,
+      "in": {
+        "duration": 30,
+        "easing": "easeOutCubic"
+      },
+      "out": {
+        "duration": 12,
+        "easing": "easeInSine"
+      },
+      "comment": "мир у всех рядом уходит в красно-оранжевый (как фон в аниме); к удару возвращается — столб должен быть жёлто-белым"
+    },
     {
       "type": "sigil",
       "id": "disintegration_field",
@@ -14,23 +32,30 @@
       "type": "sigil",
       "id": "disintegration_top",
       "delay": 20,
-      "at": "target+0,5.2,0",
+      "at": "target+0,4.8,0",
       "until": 230
     },
     {
       "type": "curtain",
-      "delay": 40,
-      "duration": 160,
+      "delay": 34,
+      "duration": 166,
       "at": "target",
-      "radius": 2.85,
-      "count": 40,
-      "height": 5.2,
+      "radius": 4.35,
+      "count": 64,
+      "height": 6.6,
       "grow": 30,
-      "width": 0.05,
-      "flicker": 0.35,
-      "color": "@primary",
-      "brightness": 0.8,
-      "comment": "завеса: тонкие вертикальные лучи по окружности печати, растут снизу вверх до верхней печати"
+      "width": [
+        0.04,
+        0.18
+      ],
+      "texture": "beam_fade",
+      "flicker": 0.3,
+      "brightness": [
+        0.5,
+        1.0
+      ],
+      "color": "#FFB02E",
+      "comment": "завеса: лучи разной толщины по окружности, растут снизу и уходят выше верхней печати, гаснут кверху"
     },
     {
       "type": "sprites",
@@ -38,126 +63,155 @@
       "duration": 160,
       "at": "target",
       "texture": "spark_soft",
-      "count": 400,
-      "rate": 3,
-      "area": 2.6,
-      "speed": 0.03,
+      "count": 600,
+      "rate": 4,
+      "area": 4.0,
+      "speed": 0.035,
       "gravity": -0.006,
       "size": [
-        0.16,
+        0.18,
         0.04
       ],
-      "life": 60,
-      "color": "@secondary",
-      "comment": "искры поднимаются внутри цилиндра"
+      "life": 70,
+      "color": "#FFD23A",
+      "comment": "густые золотые искры поднимаются внутри цилиндра"
     },
     {
       "type": "sigil",
       "id": "disintegration_tier",
-      "delay": 60,
-      "at": "target+0,2.6,0",
+      "delay": 56,
+      "at": "target+0,2.4,0",
       "until": 230
     },
     {
       "type": "sigil",
       "id": "disintegration_sunburst",
-      "delay": 84,
-      "at": "target+0,5.65,0",
+      "delay": 80,
+      "at": "target+0,5.6,0",
       "until": 230,
-      "comment": "башня над верхней печатью: ярусы сужаются кверху и появляются снизу вверх"
+      "comment": "башня над верхней печатью: крупные ярусы снизу вверх"
     },
     {
       "type": "sigil",
       "id": "disintegration_wave",
-      "delay": 96,
-      "at": "target+0,6.1,0",
+      "delay": 92,
+      "at": "target+0,6.4,0",
       "until": 230
     },
     {
       "type": "sigil",
       "id": "disintegration_frame",
-      "delay": 108,
-      "at": "target+0,6.6,0",
+      "delay": 104,
+      "at": "target+0,7.2,0",
       "until": 230
     },
     {
       "type": "sigil",
       "id": "disintegration_crown",
-      "delay": 120,
-      "at": "target+0,7.1,0",
+      "delay": 116,
+      "at": "target+0,8.0,0",
       "until": 230
     },
     {
       "type": "sigil",
       "id": "disintegration_apex",
-      "delay": 132,
-      "at": "target+0,7.6,0",
+      "delay": 128,
+      "at": "target+0,8.7,0",
       "until": 230
     },
     {
       "type": "sigil",
       "id": "disintegration_caster",
       "delay": 140,
-      "at": "caster+0,1.25,0.55",
+      "at": "caster+0,1.3,0.7",
       "until": 206
     },
     {
       "type": "beam",
       "delay": 150,
       "duration": 50,
-      "at": "caster+0,1.25,0.6",
-      "to": "caster+-3,4,8",
-      "width": 0.06,
-      "flicker": 0.5,
-      "color": "@core"
+      "at": "caster+-2.8,4.1,0.75",
+      "to": "caster+2.8,-1.5,0.75",
+      "width": 0.07,
+      "flicker": 0.4,
+      "color": "#FFE08A"
     },
     {
       "type": "beam",
-      "delay": 156,
-      "duration": 44,
-      "at": "caster+0,1.25,0.6",
-      "to": "caster+3,-1,8",
-      "width": 0.06,
-      "flicker": 0.5,
-      "color": "@core",
-      "comment": "перекрещивающиеся лучи сквозь печать заклинателя"
+      "delay": 152,
+      "duration": 48,
+      "at": "caster+2.8,4.1,0.75",
+      "to": "caster+-2.8,-1.5,0.75",
+      "width": 0.07,
+      "flicker": 0.4,
+      "color": "#FFE08A",
+      "comment": "два длинных луча крест-накрест через печать заклинателя"
+    },
+    {
+      "type": "curtain",
+      "delay": 170,
+      "duration": 30,
+      "at": "target+0,4.8,0",
+      "fromTop": true,
+      "radius": [
+        0.6,
+        3.8
+      ],
+      "count": 28,
+      "height": 4.8,
+      "grow": 10,
+      "width": [
+        0.15,
+        0.45
+      ],
+      "texture": "beam_fade",
+      "brightness": [
+        0.7,
+        1.0
+      ],
+      "color": "#FFE08A",
+      "comment": "перед ударом с верхних печатей вниз обрушивается ливень толстых лучей"
     },
     {
       "type": "flash",
       "delay": 192,
       "duration": 10,
-      "at": "caster+0,1.25,0.6",
-      "size": 3,
-      "anamorphic": 10,
+      "at": "caster+0,1.3,0.7",
+      "size": 3.5,
+      "anamorphic": 12,
       "rays": 8,
       "screen": 0.6,
-      "color": "@core",
-      "comment": "«Disintegration!» — засветка экрана у зрителей рядом"
+      "color": "#FFFFFF",
+      "comment": "«Disintegration!» — засветка у зрителей рядом"
     },
     {
       "type": "column",
       "delay": 200,
       "duration": 40,
       "at": "target",
-      "radius": 2.7,
-      "height": 7.0,
-      "rings": 4,
-      "ringSpeed": -0.12,
+      "radius": 4.3,
+      "height": 6.6,
+      "rings": 3,
+      "ringHeights": [
+        0.1,
+        2.4,
+        4.8
+      ],
       "fill": 4,
-      "color": "@core",
+      "color": "#FFE08A",
       "out": {
         "duration": 16,
         "easing": "easeInSine"
       },
-      "comment": "удар: свет заливает цилиндр сплошным столбом, внутри скользят вниз кольца"
+      "comment": "удар: сплошной столб, неподвижные кольца на высотах печатей"
     },
     {
       "type": "flash",
       "delay": 202,
-      "duration": 14,
-      "at": "target+0,2.6,0",
-      "size": 9,
-      "screen": 0.85,
+      "duration": 16,
+      "at": "target+0,2.4,0",
+      "size": 12,
+      "screen": 0.9,
       "color": "#FFFFFF"
     },
     {
@@ -166,17 +220,17 @@
       "duration": 4,
       "at": "target+0,0.9,0",
       "texture": "spark_soft",
-      "count": 160,
-      "rate": 160,
+      "count": 200,
+      "rate": 200,
       "spread": 0.6,
-      "speed": 0.3,
+      "speed": 0.32,
       "gravity": -0.004,
       "size": [
-        0.22,
+        0.24,
         0.02
       ],
       "life": 40,
-      "color": "@core",
+      "color": "#FFFFFF",
       "comment": "цель распадается на частицы"
     },
     {
@@ -184,17 +238,22 @@
       "delay": 236,
       "duration": 64,
       "at": "target",
-      "radius": 0.28,
-      "height": 9.0,
-      "rings": 5,
-      "ringSpeed": 0.03,
+      "radius": 0.3,
+      "height": 12.0,
+      "rings": 4,
+      "ringHeights": [
+        0.4,
+        0.9,
+        1.4,
+        1.9
+      ],
       "fill": 0,
-      "color": "@primary",
+      "color": "#FFD23A",
       "out": {
         "duration": 30,
         "easing": "easeInSine"
       },
-      "comment": "послевкусие: тонкий столб с кольцами-бусинами"
+      "comment": "послевкусие: тонкий столб до неба, у основания кольца-бусины"
     }
   ]
 }

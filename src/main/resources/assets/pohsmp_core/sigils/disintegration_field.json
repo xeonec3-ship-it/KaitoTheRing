@@ -1,15 +1,116 @@
 {
-  "comment": "Дезинтеграция (канон «Слизи»): большая печать под целью — основание цилиндра света. Прорисовывается, кольцо рун, медленное вращение.",
-  "size": 3.0, "color": "#FFC94A", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "comment": "Дезинтеграция: основание цилиндра под целью — большая яркая печать (радиус ≈ высоте цилиндра, как в аниме).",
+  "size": 4.5,
+  "color": "#FFC94A",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
   "layers": [
-    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.0, "heightOffset": 0.0, "color": "#FF8A1E", "brightness": 0.6,
-      "appear": { "delay": 0, "duration": 20, "easing": "easeOutCubic", "modes": ["fade"] }, "pulse": { "amp": 0.2, "period": 30 } },
-    { "id": "seal", "type": "disc", "texture": "holy_seal", "radius": 0.82, "heightOffset": 0.01, "color": "#FFF2C8",
-      "appear": { "delay": 0, "duration": 24, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90 }, "rotation": { "speed": 6 } },
-    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.0, "inner": 0.86, "repeat": 8, "heightOffset": 0.02, "color": "#FF9A2E",
-      "appear": { "delay": 8, "duration": 20, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90, "direction": -1 }, "rotation": { "speed": -4 } },
-    { "id": "rim", "type": "disc", "texture": "rim", "radius": 1.04, "heightOffset": 0.03,
-      "appear": { "delay": 18, "duration": 10, "easing": "easeOutCubic", "modes": ["fade"] } }
+    {
+      "id": "glow",
+      "type": "disc",
+      "texture": "glow",
+      "radius": 1.05,
+      "heightOffset": 0.0,
+      "color": "#FFB02E",
+      "brightness": 0.85,
+      "appear": {
+        "delay": 0,
+        "duration": 16,
+        "easing": "easeOutCubic",
+        "modes": [
+          "fade"
+        ]
+      },
+      "pulse": {
+        "amp": 0.15,
+        "period": 30
+      }
+    },
+    {
+      "id": "seal",
+      "type": "disc",
+      "texture": "holy_seal",
+      "radius": 0.8,
+      "heightOffset": 0.01,
+      "color": "#FFF2C8",
+      "appear": {
+        "delay": 0,
+        "duration": 22,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ],
+        "startAngle": 90
+      },
+      "rotation": {
+        "speed": 4
+      }
+    },
+    {
+      "id": "dodeca",
+      "type": "disc",
+      "texture": "dodeca_ring",
+      "radius": 0.55,
+      "heightOffset": 0.015,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 6,
+        "duration": 14,
+        "easing": "easeOutBack",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": -8
+      }
+    },
+    {
+      "id": "runes",
+      "type": "band",
+      "texture": "rune_band",
+      "radius": 1.0,
+      "inner": 0.88,
+      "repeat": 10,
+      "heightOffset": 0.02,
+      "color": "#FF8A2E",
+      "appear": {
+        "delay": 8,
+        "duration": 18,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ],
+        "startAngle": 90,
+        "direction": -1
+      },
+      "rotation": {
+        "speed": -3
+      }
+    },
+    {
+      "id": "rim",
+      "type": "disc",
+      "texture": "rim",
+      "radius": 1.03,
+      "heightOffset": 0.03,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 16,
+        "duration": 10,
+        "easing": "easeOutCubic",
+        "modes": [
+          "fade"
+        ]
+      }
+    }
   ],
-  "dissolve": { "modes": ["fade"], "duration": 30 }
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 30
+  }
 }

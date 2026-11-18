@@ -1,14 +1,80 @@
 {
-  "comment": "Дезинтеграция: средняя горизонтальная печать в стопке над целью — обод с рунами и двенадцатиугольник.",
-  "size": 2.5, "color": "#FFC94A", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "comment": "Дезинтеграция: средняя печать — двойной двенадцатиугольник, кольцо рун, около 0.75 основания.",
+  "size": 3.4,
+  "color": "#FFC94A",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
   "layers": [
-    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.0, "inner": 0.84, "repeat": 7, "heightOffset": 0.0, "color": "#FF9A2E",
-      "appear": { "delay": 0, "duration": 16, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 0 }, "rotation": { "speed": 10 } },
-    { "id": "seal", "type": "disc", "texture": "holy_seal", "radius": 0.8, "heightOffset": 0.01, "color": "#FFF2C8",
-      "appear": { "delay": 6, "duration": 12, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": -14 } },
-    { "id": "rim", "type": "disc", "texture": "thin_ring", "radius": 0.5, "heightOffset": 0.02,
-      "appear": { "delay": 10, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "fade"] } }
+    {
+      "id": "dodeca",
+      "type": "disc",
+      "texture": "dodeca_ring",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 0,
+        "duration": 14,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ]
+      }
+    },
+    {
+      "id": "runes",
+      "type": "band",
+      "texture": "rune_band",
+      "radius": 0.66,
+      "inner": 0.84,
+      "repeat": 8,
+      "heightOffset": 0.01,
+      "color": "#FF8A2E",
+      "appear": {
+        "delay": 6,
+        "duration": 14,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ],
+        "direction": -1
+      },
+      "rotation": {
+        "speed": 10
+      }
+    },
+    {
+      "id": "seal",
+      "type": "disc",
+      "texture": "holy_seal",
+      "radius": 0.5,
+      "heightOffset": 0.02,
+      "color": "#FFF2C8",
+      "appear": {
+        "delay": 10,
+        "duration": 12,
+        "easing": "easeOutBack",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": -12
+      }
+    }
   ],
-  "formedFlash": { "color": "#FFF2C8", "size": 1.15, "duration": 8, "sparks": 10 },
-  "dissolve": { "modes": ["fade"], "duration": 20 }
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 16
+  },
+  "formedFlash": {
+    "color": "#FFF2C8",
+    "size": 1.1,
+    "duration": 8,
+    "sparks": 14
+  }
 }

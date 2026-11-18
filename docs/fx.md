@@ -81,6 +81,9 @@
 | `aura` | `target`, `thickness`, `pulse` |
 | `decal` | `texture` (трещины, выжженный след…), `radius`, `fadeOut` (тики) |
 | `wings` / `halo` | `size`, `flap` (амплитуда и период взмаха), `offset` |
+| `curtain` | завеса из вертикальных лучей: `count`, `radius` (или кольцо `[от, до]`), `height`, `grow`, `width` и `brightness` — число или `[от, до]`, `texture` (`beam_fade` гаснет кверху), `fromTop` (растут сверху вниз), `flicker` |
+| `column` | сплошной столб: `radius`, `height`, ядро ярче краёв; кольца неподвижные на `ringHeights` или скользящие (`rings`, `ringSpeed`); `fill` |
+| `tint` | цвет мира у игроков в `radius`: `color`, `strength`, плавные `in`/`out` (пост-эффект, без шейдерпаков) |
 | `mesh` | `model` (сгенерированная модель), `appear`: `grow`, `fall` (с неба), `rise`; `break` (разлом на осколки) |
 
 ## Код (готово в чате идей)

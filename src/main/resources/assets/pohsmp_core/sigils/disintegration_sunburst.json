@@ -1,6 +1,6 @@
 {
-  "comment": "Башня Дезинтеграции, ярус 1 (над верхней печатью): кольцо-солнце с лучами.",
-  "size": 2.1,
+  "comment": "Башня, ярус 1: кольцо-солнце с лучами, почти во всю ширину.",
+  "size": 3.4,
   "color": "#FFE08A",
   "orientation": "ground",
   "lifetime": -1,
@@ -12,7 +12,7 @@
       "texture": "glow",
       "radius": 0.8,
       "heightOffset": -0.01,
-      "color": "#FF9A2E",
+      "color": "#FF8A2E",
       "brightness": 0.6,
       "appear": {
         "delay": 0,
@@ -39,7 +39,7 @@
         ]
       },
       "rotation": {
-        "speed": 16
+        "speed": 14
       }
     },
     {
@@ -67,8 +67,8 @@
   },
   "formedFlash": {
     "color": "#FFF2C8",
-    "size": 1.2,
+    "size": 1.15,
     "duration": 6,
-    "sparks": 8
+    "sparks": 10
   }
 }

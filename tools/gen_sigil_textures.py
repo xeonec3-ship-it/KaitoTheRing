@@ -461,6 +461,65 @@ def star_ring():
     save(img, 'star_ring')
 
 
+def tooth_band():
+    """Полоса жёлтых брусьев-зубьев для колеса верхней печати Дезинтеграции (слой band)."""
+    bw, bh = 1024 * SS, 128 * SS
+    img = canvas(bw, bh)
+    d = ImageDraw.Draw(img)
+    n = 16
+    cell = bw / n
+    for i in range(n):
+        x0 = i * cell + cell * 0.18
+        d.rectangle([x0, bh * 0.12, x0 + cell * 0.5, bh * 0.88], fill=255)
+    d.line([0, bh * 0.04, bw, bh * 0.04], fill=180, width=3 * SS)
+    d.line([0, bh * 0.96, bw, bh * 0.96], fill=180, width=3 * SS)
+    save(img, 'tooth_band', (1024, 128))
+
+
+def dodeca_ring():
+    """Двойной двенадцатиугольник с кругом внутри — средняя печать Дезинтеграции."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    for r, w in ((0.95, 5), (0.86, 3)):
+        pts = [polar(C * r, 2 * math.pi * k / 12 + math.pi / 12) for k in range(13)]
+        d.line(pts, fill=255, width=w * SS, joint='curve')
+    ring(d, C * 0.74, 3 * SS)
+    ring(d, C * 0.68, 2 * SS)
+    for k in range(12):
+        a = 2 * math.pi * k / 12 + math.pi / 12
+        d.line([*polar(C * 0.74, a), *polar(C * 0.86, a)], fill=200, width=2 * SS)
+    save(img, 'dodeca_ring')
+
+
+def hex_ring():
+    """Кольцо шести шестиугольников с волной-цепью — печать заклинателя Дезинтеграции."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    ring(d, C * 0.97, 4 * SS)
+    pts = [polar(C * (0.8 + 0.035 * math.sin(2 * math.pi * k / 720 * 30)), 2 * math.pi * k / 720) for k in range(721)]
+    d.line(pts, fill=230, width=4 * SS, joint='curve')
+    for k in range(6):
+        cx, cy = polar(C * 0.8, 2 * math.pi * k / 6 + math.pi / 6)
+        r = C * 0.12
+        hp = [(cx + r * math.cos(2 * math.pi * j / 6), cy + r * math.sin(2 * math.pi * j / 6)) for j in range(7)]
+        d.polygon(hp, fill=0)
+        d.line(hp, fill=255, width=5 * SS, joint='curve')
+    ring(d, C * 0.62, 3 * SS)
+    save(img, 'hex_ring')
+
+
+def beam_fade():
+    """Вертикальная полоса луча: яркая внизу, гаснет кверху (64×256)."""
+    y = np.linspace(0, 1, 256)[:, None]
+    x = np.linspace(-1, 1, 64)[None, :]
+    a = np.clip(1 - np.abs(x) ** 2, 0, 1) * np.clip(1 - y ** 1.6, 0, 1)
+    rgba = Image.new('RGBA', (64, 256), (255, 255, 255, 0))
+    rgba.putalpha(Image.fromarray((a[::-1] * 255).astype(np.uint8), 'L'))
+    os.makedirs(OUT, exist_ok=True)
+    rgba.save(os.path.join(OUT, 'beam_fade.png'))
+    print('wrote beam_fade')
+
+
 def chain_band():
     """Запретная: полоса из звеньев цепи для слоя band (1024×128), звенья чередуются плашмя и ребром."""
     bw, bh = 1024 * SS, 128 * SS
@@ -578,3 +637,7 @@ if __name__ == '__main__':
     wave_ring()
     cross_spikes()
     star_ring()
+    tooth_band()
+    dodeca_ring()
+    hex_ring()
+    beam_fade()

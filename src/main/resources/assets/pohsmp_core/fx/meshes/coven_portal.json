@@ -1,0 +1,563 @@
+{
+ "comment": "Портал Ковена. Сгенерировано tools/gen_coven_portal.py — правки вносить в генератор.",
+ "style": "coven",
+ "center": 2.9,
+ "formedAt": 80,
+ "collapse": {
+  "duration": 24,
+  "easing": "easeInCubic"
+ },
+ "parts": [
+  {
+   "type": "seed",
+   "shape": "octahedron",
+   "radius": 0.35,
+   "spin": [
+    40,
+    70,
+    0
+   ],
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutBack"
+   },
+   "vanish": {
+    "delay": 34,
+    "duration": 10
+   }
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.35,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.35
+    ]
+   ],
+   "to": [
+    [
+     2.575776136641468,
+     1.0669214094338704,
+     0
+    ],
+    [
+     1.923009457607401,
+     1.0415674543211717,
+     0
+    ],
+    [
+     2.096272437773768,
+     0.6232736177463478,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 30,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     0.0,
+     0.35,
+     0.0
+    ],
+    [
+     -0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.35
+    ]
+   ],
+   "to": [
+    [
+     1.0669214094338706,
+     2.575776136641468,
+     0
+    ],
+    [
+     0.623273617746348,
+     2.096272437773768,
+     0
+    ],
+    [
+     1.0415674543211717,
+     1.923009457607401,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 32,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     -0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     -0.35,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.35
+    ]
+   ],
+   "to": [
+    [
+     -1.0669214094338704,
+     2.575776136641468,
+     0
+    ],
+    [
+     -1.0415674543211717,
+     1.923009457607401,
+     0
+    ],
+    [
+     -0.6232736177463478,
+     2.096272437773768,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 34,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     0.0,
+     -0.35,
+     0.0
+    ],
+    [
+     0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.35
+    ]
+   ],
+   "to": [
+    [
+     -2.575776136641468,
+     1.0669214094338708,
+     0
+    ],
+    [
+     -2.096272437773768,
+     0.6232736177463482,
+     0
+    ],
+    [
+     -1.923009457607401,
+     1.041567454321172,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 36,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     0.0,
+     0.35,
+     0.0
+    ],
+    [
+     0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     -0.35
+    ]
+   ],
+   "to": [
+    [
+     -2.575776136641468,
+     -1.0669214094338701,
+     0
+    ],
+    [
+     -1.923009457607401,
+     -1.0415674543211715,
+     0
+    ],
+    [
+     -2.096272437773768,
+     -0.6232736177463476,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 38,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     -0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.35,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     -0.35
+    ]
+   ],
+   "to": [
+    [
+     -1.066921409433872,
+     -2.575776136641467,
+     0
+    ],
+    [
+     -0.6232736177463492,
+     -2.0962724377737674,
+     0
+    ],
+    [
+     -1.0415674543211728,
+     -1.9230094576074,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 40,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     0.0,
+     -0.35,
+     0.0
+    ],
+    [
+     -0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     -0.35
+    ]
+   ],
+   "to": [
+    [
+     1.066921409433871,
+     -2.5757761366414673,
+     0
+    ],
+    [
+     1.0415674543211721,
+     -1.9230094576074006,
+     0
+    ],
+    [
+     0.6232736177463485,
+     -2.096272437773768,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 42,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "facet",
+   "from": [
+    [
+     0.35,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     -0.35,
+     0.0
+    ],
+    [
+     0.0,
+     0.0,
+     -0.35
+    ]
+   ],
+   "to": [
+    [
+     2.575776136641467,
+     -1.0669214094338721,
+     0
+    ],
+    [
+     2.096272437773767,
+     -0.6232736177463494,
+     0
+    ],
+    [
+     1.9230094576074,
+     -1.0415674543211728,
+     0
+    ]
+   ],
+   "color": "@core",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 44,
+    "duration": 22,
+    "easing": "easeInOutCubic"
+   },
+   "spinOnFly": 360
+  },
+  {
+   "type": "ring",
+   "radius": 2.6,
+   "thickness": 0.07,
+   "color": "@primary",
+   "tiltAxis": [
+    1,
+    0,
+    0
+   ],
+   "tiltTurns": 360,
+   "spin": 18,
+   "appear": {
+    "delay": 12,
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "ring",
+   "radius": 2.418,
+   "thickness": 0.03,
+   "color": "@secondary",
+   "tiltAxis": [
+    0,
+    1,
+    0
+   ],
+   "tiltTurns": -540,
+   "spin": -10,
+   "appear": {
+    "delay": 17,
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "ring",
+   "radius": 2.028,
+   "thickness": 0.05,
+   "color": "@primary",
+   "tiltAxis": [
+    1,
+    1,
+    0
+   ],
+   "tiltTurns": 450,
+   "spin": 24,
+   "appear": {
+    "delay": 22,
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "ring",
+   "radius": 1.612,
+   "thickness": 0.035,
+   "color": "@secondary",
+   "tiltAxis": [
+    1,
+    -1,
+    0
+   ],
+   "tiltTurns": -360,
+   "spin": -30,
+   "appear": {
+    "delay": 27,
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "ring",
+   "radius": 1.1700000000000002,
+   "thickness": 0.04,
+   "color": "@primary",
+   "tiltAxis": [
+    0,
+    1,
+    0
+   ],
+   "tiltTurns": 720,
+   "spin": 40,
+   "appear": {
+    "delay": 32,
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "polygon",
+   "sides": 6,
+   "radius": 2.236,
+   "rotation": 0,
+   "thickness": 0.035,
+   "color": "@primary",
+   "spin": 6,
+   "appear": {
+    "delay": 46,
+    "duration": 16,
+    "easing": "easeOutBack"
+   }
+  },
+  {
+   "type": "polygon",
+   "sides": 3,
+   "radius": 1.8199999999999998,
+   "rotation": 90,
+   "thickness": 0.035,
+   "color": "@primary",
+   "spin": -12,
+   "appear": {
+    "delay": 54,
+    "duration": 16,
+    "easing": "easeOutBack"
+   }
+  },
+  {
+   "type": "polygon",
+   "sides": 3,
+   "radius": 1.8199999999999998,
+   "rotation": -90,
+   "thickness": 0.035,
+   "color": "@primary",
+   "spin": 12,
+   "appear": {
+    "delay": 58,
+    "duration": 16,
+    "easing": "easeOutBack"
+   }
+  },
+  {
+   "type": "polygon",
+   "sides": 6,
+   "radius": 0.9359999999999999,
+   "rotation": 30,
+   "thickness": 0.035,
+   "color": "@primary",
+   "spin": -20,
+   "appear": {
+    "delay": 62,
+    "duration": 16,
+    "easing": "easeOutBack"
+   }
+  },
+  {
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.612,
+   "color": "@shadow",
+   "brightness": 1.0,
+   "blend": "translucent",
+   "appear": {
+    "delay": 40,
+    "duration": 24,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "disc",
+   "texture": "constellation",
+   "radius": 1.508,
+   "color": "@secondary",
+   "brightness": 0.9,
+   "spin": 4,
+   "appear": {
+    "delay": 48,
+    "duration": 24,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

@@ -312,6 +312,92 @@ class Sigil {
   }
 }
 
+
+// ---------------------------------------------------------------- объёмная структура (элемент mesh): портал Ковена
+function styleColor(style, c) {
+  if (typeof c === "string" && c.startsWith("@")) return (DATA.styles[style]?.palette || {})[c.slice(1)] || "#FFFFFF";
+  return c || "#FFFFFF";
+}
+function lit(color, blend) {
+  return new THREE.MeshBasicMaterial({ color: new THREE.Color(color), transparent: true, opacity: 0, side: THREE.DoubleSide, depthWrite: false,
+    blending: blend === "translucent" ? THREE.NormalBlending : THREE.AdditiveBlending });
+}
+class Portal {
+  constructor(id, origin) {
+    this.id = id; this.def = DATA.meshes[id]; this.t0 = 0; this.stopAt = null; this.isMesh = true;
+    this.T = { layersEnd: this.def.formedAt, expandStart: this.def.formedAt, formedAt: this.def.formedAt };
+    this.root = new THREE.Group(); this.root.position.copy(origin).add(new THREE.Vector3(0, this.def.center, 0)); scene.add(this.root);
+    this.parts = this.def.parts.map((p) => this.make(p));
+  }
+  make(p) {
+    const color = styleColor(this.def.style, p.color), g = new THREE.Group(), P = { def: p, g, rot: 0, mats: [] };
+    this.root.add(g);
+    const add = (geo, m) => { const mesh = new THREE.Mesh(geo, m); P.mats.push(m); g.add(mesh); return mesh; };
+    if (p.type === "seed") {
+      const geo = new THREE.OctahedronGeometry(p.radius);
+      add(geo, lit(styleColor(this.def.style, "@primary")));
+      const edges = new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending }));
+      P.mats.push(edges.material); g.add(edges);
+    } else if (p.type === "ring") {
+      add(new THREE.TorusGeometry(p.radius, p.thickness, 8, 128), lit(color));
+    } else if (p.type === "polygon") {
+      const m = lit(color), n = p.sides, r = p.radius, rot = (p.rotation || 0) * D2R;
+      for (let i = 0; i < n; i++) {
+        const a0 = rot + 2 * Math.PI * i / n, a1 = rot + 2 * Math.PI * (i + 1) / n;
+        const x0 = Math.cos(a0) * r, y0 = Math.sin(a0) * r, x1 = Math.cos(a1) * r, y1 = Math.sin(a1) * r;
+        const len = Math.hypot(x1 - x0, y1 - y0), bar = add(new THREE.BoxGeometry(len, p.thickness, p.thickness), m);
+        bar.position.set((x0 + x1) / 2, (y0 + y1) / 2, 0); bar.rotation.z = Math.atan2(y1 - y0, x1 - x0);
+      }
+    } else if (p.type === "facet") {
+      const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(new Array(9).fill(0), 3));
+      P.mesh = add(geo, lit(color));
+    } else if (p.type === "disc") {
+      const m = lit(color, p.blend); m.map = TEX[p.texture]; add(discGeo(2 * Math.PI, 0), m); g.scale.setScalar(p.radius);
+    }
+    return P;
+  }
+  stop(t) { if (this.stopAt === null) this.stopAt = t; }
+  done(t) { return this.stopAt !== null && t > this.stopAt + this.def.collapse.duration + 2; }
+  dispose() { scene.remove(this.root); }
+  update(t, dt) {
+    const lt = t - this.t0;
+    const col = this.stopAt === null ? 1 : 1 - ease(this.def.collapse.easing, (t - this.stopAt) / this.def.collapse.duration);
+    this.root.scale.setScalar(Math.max(0.0001, col));
+    for (const P of this.parts) {
+      const p = P.def, ap = p.appear || { delay: 0, duration: 1 }, k = clamp01((lt - ap.delay) / ap.duration), e = ease(ap.easing, k);
+      let alpha = lt >= ap.delay ? clamp01(k * 3) : 0;
+      if (p.type === "seed") {
+        const v = p.vanish ? clamp01((lt - p.vanish.delay) / p.vanish.duration) : 0;
+        alpha = (lt >= ap.delay ? 1 : 0) * (1 - v);
+        P.g.scale.setScalar(Math.max(0.0001, e));
+        P.g.rotation.x += (p.spin[0] || 0) * D2R * dt / TPS; P.g.rotation.y += (p.spin[1] || 0) * D2R * dt / TPS;
+        P.mats[0].opacity = alpha * 0.35; P.mats[1].opacity = alpha;
+        continue;
+      }
+      if (p.type === "facet") {
+        const pos = P.mesh.geometry.attributes.position, c = [0, 0, 0], v = [];
+        for (let i = 0; i < 3; i++) { v.push(p.from[i].map((a, j) => a + (p.to[i][j] - a) * e)); for (let j = 0; j < 3; j++) c[j] += v[i][j] / 3; }
+        const sp = (p.spinOnFly || 0) * D2R * e, cs = Math.cos(sp), sn = Math.sin(sp);
+        v.forEach((q, i) => { const x = q[0] - c[0], y = q[1] - c[1]; pos.setXYZ(i, c[0] + x * cs - y * sn, c[1] + x * sn + y * cs, q[2]); });
+        pos.needsUpdate = true; P.mesh.geometry.computeBoundingSphere();
+        P.mats[0].opacity = alpha * (p.brightness ?? 1);
+        continue;
+      }
+      P.rot += (p.spin || 0) * dt / TPS;
+      if (p.type === "ring") {
+        P.g.setRotationFromAxisAngle(new THREE.Vector3(...p.tiltAxis).normalize(), (p.tiltTurns || 0) * (1 - e) * D2R);
+        P.g.rotateZ(P.rot * D2R); P.g.scale.setScalar(Math.max(0.0001, e));
+      } else if (p.type === "polygon") {
+        P.g.rotation.set(0, 0, P.rot * D2R); P.g.scale.setScalar(Math.max(0.0001, e));
+      } else if (p.type === "disc") {
+        P.g.rotation.set(0, 0, P.rot * D2R);
+      }
+      P.mats.forEach((m) => (m.opacity = (p.type === "disc" ? clamp01(e) : alpha) * (p.brightness ?? 1)));
+    }
+    if (autoStop && this.stopAt === null && lt >= this.def.formedAt + 140) this.stop(t);
+  }
+}
+
 // ---------------------------------------------------------------- сцены превью
 const SCENES = {
   "Silent Gate: земля и небо": () => [new Sigil("silent_gate_ground", new THREE.Vector3(0, 0.02, 0)), new Sigil("silent_gate_sky", new THREE.Vector3(0, 9, 0), { t0: 24 })],
@@ -324,12 +410,13 @@ const SCENES = {
   "Божественная: солнце": () => [new Sigil("divine_sun", new THREE.Vector3(0, 8, 0))],
   "Высшая: трещины и клинки": () => [new Sigil("higher_blades", new THREE.Vector3(0, 0.02, 0))],
   "Запретная: цепи": () => [new Sigil("forbidden_chains", new THREE.Vector3(0, 0.02, 0))],
+  "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
 };
 const MAIN_ID = { "Silent Gate: земля и небо": "silent_gate_sky", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
-  "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains" };
+  "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal" };
 const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
-  "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above" };
+  "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
 const sel = $("scene");
@@ -337,10 +424,11 @@ for (const k of Object.keys(SCENES)) { const o = document.createElement("option"
 function start() {
   INST.forEach((s) => s.dispose()); INST = SCENES[cur](); t = 0;
   $("sceneName").textContent = cur;
-  const id = MAIN_ID[cur];
-  $("jsonTitle").textContent = id + ".json"; $("jsonView").textContent = JSON.stringify(DATA.sigils[id], null, 2);
+  const id = MAIN_ID[cur], src = DATA.sigils[id] || DATA.meshes[id];
+  $("jsonTitle").textContent = id + ".json"; $("jsonView").textContent = JSON.stringify(src, null, 2);
   const L = $("layers"); L.innerHTML = "";
-  for (const l of DATA.sigils[id].layers) {
+  const rows = DATA.sigils[id] ? DATA.sigils[id].layers : DATA.meshes[id].parts.map((p, i) => ({ id: p.type + " " + (i + 1), type: p.type, appear: p.appear || {} }));
+  for (const l of rows) {
     const li = document.createElement("li"), a = l.appear || {};
     li.innerHTML = `<span class="t">${((a.delay || 0) / TPS).toFixed(2)} с</span><span class="d"></span><span class="p">0%</span>`;
     li.querySelector(".d").textContent = `${l.id} · ${l.type} · ${(a.modes || []).join("+")}`;
@@ -357,7 +445,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0] };
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];
@@ -377,8 +465,9 @@ function frame(now) {
     const lt = t - main.t0, T = main.T;
     let st = lt < 0 ? "ожидание" : lt < T.layersEnd ? "формирование" : lt < T.formedAt ? "рост" : main.stopAt === null ? "удержание" : "разборка";
     $("stateChip").textContent = st;
+    const rowsDef = main.isMesh ? main.def.parts : main.def.layers;
     [...$("layers").children].forEach((li, i) => {
-      const a = main.def.layers[i].appear || {}, p = clamp01((lt - (a.delay || 0)) / Math.max(1, a.duration || 1));
+      const a = rowsDef[i].appear || {}, p = clamp01((lt - (a.delay || 0)) / Math.max(1, a.duration || 1));
       li.classList.toggle("on", p > 0 && p < 1); li.querySelector(".p").textContent = Math.round(p * 100) + "%";
     });
   }

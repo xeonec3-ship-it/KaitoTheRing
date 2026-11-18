@@ -1,0 +1,11 @@
+{
+  "comment": "Дезинтеграция: венец над верхней печатью — меньший круг с зубцами-лучами, быстро вращается.",
+  "size": 1.4, "color": "#FFE08A", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "spokes", "type": "spokes", "texture": "spokes", "radius": 1.0, "heightOffset": 0.0,
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": 40 } },
+    { "id": "core", "type": "disc", "texture": "core", "radius": 0.6, "heightOffset": 0.01, "color": "#FFFFFF",
+      "appear": { "delay": 4, "duration": 10, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "rotation": { "speed": -30 } }
+  ],
+  "dissolve": { "modes": ["fade"], "duration": 16 }
+}

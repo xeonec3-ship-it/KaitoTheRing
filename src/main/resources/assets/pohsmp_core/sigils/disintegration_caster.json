@@ -1,13 +1,14 @@
 {
-  "comment": "Дезинтеграция: печать под заклинателем — золотая, спокойная.",
-  "size": 1.6, "color": "#FFD36B", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "comment": "Дезинтеграция: вертикальная печать перед грудью заклинателя (руки сложены в молитве). Появляется в конце каста, сквозь неё проходят лучи.",
+  "size": 1.05, "color": "#FFC94A", "orientation": "facing", "lifetime": -1, "hold": -1,
   "layers": [
-    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.8, "heightOffset": 0.0, "brightness": 0.4,
-      "appear": { "delay": 0, "duration": 14, "easing": "easeOutCubic", "modes": ["fade"] } },
-    { "id": "core", "type": "disc", "texture": "core", "radius": 0.6, "heightOffset": 0.01,
-      "appear": { "delay": 0, "duration": 14, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": 20 } },
-    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.0, "inner": 0.84, "repeat": 6, "heightOffset": 0.02,
-      "appear": { "delay": 6, "duration": 16, "easing": "easeInOutSine", "modes": ["draw"] }, "rotation": { "speed": -10 } }
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.2, "heightOffset": -0.01, "color": "#FF5A1E", "brightness": 0.7,
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutCubic", "modes": ["fade"] }, "pulse": { "amp": 0.3, "period": 10 } },
+    { "id": "seal", "type": "disc", "texture": "holy_seal", "radius": 0.8, "heightOffset": 0.0, "color": "#FFE08A",
+      "appear": { "delay": 0, "duration": 12, "easing": "easeOutBack", "modes": ["unfold", "grow"] }, "rotation": { "speed": 30, "boost": 3 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.0, "inner": 0.82, "repeat": 5, "heightOffset": 0.01, "color": "#FF7A2E",
+      "appear": { "delay": 6, "duration": 12, "easing": "easeInOutSine", "modes": ["draw"] }, "rotation": { "speed": -16 } }
   ],
-  "dissolve": { "modes": ["fade"], "duration": 20 }
+  "formedFlash": { "color": "#FFFFFF", "size": 1.6, "duration": 8, "sparks": 16 },
+  "dissolve": { "modes": ["collapse"], "duration": 8 }
 }

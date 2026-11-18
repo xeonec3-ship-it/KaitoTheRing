@@ -1,0 +1,17 @@
+{
+  "comment": "Дезинтеграция: верхняя печать — крышка цилиндра, самая сложная. Дуги смыкаются, звезда прорисовывается, кольцо рун, «солнечные» зубцы; после формирования — 4 малых круга по ободу.",
+  "size": 3.0, "color": "#FFC94A", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "arcs", "type": "arcs", "texture": "arc_strip", "radius": 1.0, "width": 0.035, "heightOffset": 0.0, "count": 4, "arcLength": 60,
+      "appear": { "delay": 0, "duration": 16, "easing": "easeInOutCubic", "modes": ["assemble", "fade"] }, "rotation": { "speed": 20, "boost": 4 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 0.94, "inner": 0.82, "repeat": 8, "heightOffset": 0.01, "color": "#FF9A2E",
+      "appear": { "delay": 8, "duration": 16, "easing": "easeInOutSine", "modes": ["draw"] }, "rotation": { "speed": -8 } },
+    { "id": "teeth", "type": "disc", "texture": "divine_sun", "radius": 0.74, "heightOffset": 0.02, "color": "#FFE08A",
+      "appear": { "delay": 14, "duration": 12, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": 12 } },
+    { "id": "seal", "type": "disc", "texture": "holy_seal", "radius": 0.5, "heightOffset": 0.03, "color": "#FFFFFF",
+      "appear": { "delay": 20, "duration": 12, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": -90 }, "rotation": { "speed": -20 } }
+  ],
+  "formedFlash": { "color": "#FFF2C8", "size": 1.2, "duration": 10, "sparks": 24 },
+  "onFormed": [ { "id": "disintegration_bead", "arc": { "count": 4, "radius": 3.0, "angle": 270, "height": 0.0, "behind": false, "stagger": 3 } } ],
+  "dissolve": { "modes": ["fade"], "duration": 20 }
+}

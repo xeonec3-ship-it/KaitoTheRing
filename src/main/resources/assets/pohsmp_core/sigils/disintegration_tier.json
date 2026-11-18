@@ -1,0 +1,14 @@
+{
+  "comment": "Дезинтеграция: средняя горизонтальная печать в стопке над целью — обод с рунами и двенадцатиугольник.",
+  "size": 2.5, "color": "#FFC94A", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.0, "inner": 0.84, "repeat": 7, "heightOffset": 0.0, "color": "#FF9A2E",
+      "appear": { "delay": 0, "duration": 16, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 0 }, "rotation": { "speed": 10 } },
+    { "id": "seal", "type": "disc", "texture": "holy_seal", "radius": 0.8, "heightOffset": 0.01, "color": "#FFF2C8",
+      "appear": { "delay": 6, "duration": 12, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": -14 } },
+    { "id": "rim", "type": "disc", "texture": "thin_ring", "radius": 0.5, "heightOffset": 0.02,
+      "appear": { "delay": 10, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "fade"] } }
+  ],
+  "formedFlash": { "color": "#FFF2C8", "size": 1.15, "duration": 8, "sparks": 10 },
+  "dissolve": { "modes": ["fade"], "duration": 20 }
+}

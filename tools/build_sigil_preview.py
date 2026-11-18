@@ -11,11 +11,13 @@ import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core')
 
-data = {'sigils': {}, 'textures': {}, 'meshes': {}, 'styles': {}}
+data = {'sigils': {}, 'textures': {}, 'meshes': {}, 'styles': {}, 'fx': {}}
 for f in sorted(glob.glob(os.path.join(ASSETS, 'sigils', '*.json'))):
     data['sigils'][os.path.splitext(os.path.basename(f))[0]] = json.load(open(f, encoding='utf-8'))
 for f in sorted(glob.glob(os.path.join(ASSETS, 'fx', 'meshes', '*.json'))):
     data['meshes'][os.path.splitext(os.path.basename(f))[0]] = json.load(open(f, encoding='utf-8'))
+for f in sorted(glob.glob(os.path.join(ASSETS, 'fx', '*.json'))):
+    data['fx'][os.path.splitext(os.path.basename(f))[0]] = json.load(open(f, encoding='utf-8'))
 for f in sorted(glob.glob(os.path.join(ASSETS, 'fx', 'styles', '*.json'))):
     data['styles'][os.path.splitext(os.path.basename(f))[0]] = json.load(open(f, encoding='utf-8'))
 for f in sorted(glob.glob(os.path.join(ASSETS, 'textures', 'sigil', '*.png'))):

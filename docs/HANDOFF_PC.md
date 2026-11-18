@@ -168,3 +168,11 @@ tasks.named('test', Test).configure { useJUnitPlatform() }
 
 После копирования: `gradlew test` — должно пройти 16 тестов (`SigilTimelineTest` и `FxTest`). Логику печатей сразу использовать в отрисовщике
 (задание `docs/specs/sigils_spec.md`, формат — `docs/sigils.md`). Задание на заклинание — `docs/specs/coven_arrival_spec.md`.
+
+### Дезинтеграция (аниме)
+
+- Анимации `pohsmp_disintegration_cast` / `_finish` (папка `player_animation`).
+- Печати `sigils/disintegration_*.json`, эффект `fx/disintegration.json`, текстура `textures/sigil/holy_seal.png`.
+- **Точечная правка `DisintegrationSpell.java`:** заменить две строки `ANIMATION_LONG_CAST` / `ANIMATION_LONG_CAST_FINISH`
+  на `CastAnims.of("disintegration_cast")` / `CastAnims.of("disintegration_finish")` и добавить `onClientPreCast` с
+  `CastAnims.hideHands(...)` — как у четырёх заклинаний из раздела 3. Задание на остальное — `docs/specs/disintegration_spec.md`.

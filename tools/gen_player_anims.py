@@ -776,6 +776,32 @@ def coven_ritual():
     return a
 
 
+# ---------------------------------------------------------------- Дезинтеграция (10 с), канон «Слизи»
+# Хината и Шуна кастуют её, сложив ладони в молитве у лица; на «Disintegration!» ладони толкаются вперёд.
+#   0–1.5 с   ладони сходятся у подбородка, голова склоняется (глаза закрыты)
+#   1.5–7 с   молитва: дыхание, лёгкое покачивание
+#   7–9.4 с   голова поднимается (перед заклинателем встаёт печать), корпус чуть вперёд
+#   9.4–9.8 с толчок ладонями вперёд — в 10 с удар
+def disintegration_cast():
+    T = 10.0
+    a, r = Anim('pohsmp_disintegration_cast', T), Rig()
+    _start(a)
+    pray_r, pray_l = r.R(-0.55, 23.4, 4.6), r.L(0.55, 23.4, 4.6)
+    a.pose(1.5, rightArm=pray_r, leftArm=pray_l, head={'pitch': 14, 'yaw': 0, 'roll': 0},
+           torso={'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 4})
+    a.sway(1.5, 7.0, 2.0, 'torso', {'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 4}, 'pitch', 1.2)
+    a.pose(7.0, rightArm=r.R(-0.55, 23.0, 5.0), leftArm=r.L(0.55, 23.0, 5.0))
+    a.pose(8.4, head={'pitch': -4, 'yaw': 0, 'roll': 0}, torso={'pitch': 5, 'yaw': 0, 'roll': 0, 'bend': 5},
+           rightLeg={'pitch': 6, 'yaw': 0, 'roll': 3, 'bend': 6}, leftLeg={'pitch': -8, 'yaw': 0, 'roll': -3, 'bend': 4})
+    a.pose(9.4, rightArm=r.R(-0.6, 22.2, 4.2), leftArm=r.L(0.6, 22.2, 4.2), head={'pitch': -2, 'yaw': 0, 'roll': 0})
+    push_r, push_l = r.R(-1.6, 21.6, 9.0), r.L(1.6, 21.6, 9.0)
+    a.pose(9.8, 'easeOutBack', rightArm=push_r, leftArm=push_l, torso={'pitch': 9, 'yaw': 0, 'roll': 0, 'bend': 6},
+           head={'pitch': 0, 'yaw': 0, 'roll': 0})
+    a.pose(T, rightArm=push_r, leftArm=push_l, torso={'pitch': 9, 'yaw': 0, 'roll': 0, 'bend': 6})
+    return a, (push_r, push_l, {'pitch': 9, 'yaw': 0, 'roll': 0, 'bend': 6},
+               ({'pitch': 6, 'yaw': 0, 'roll': 3, 'bend': 6}, {'pitch': -8, 'yaw': 0, 'roll': -3, 'bend': 4}), 0.0)
+
+
 def _pair(fn, finish_name):
     """Анимация каста и финал из её последней позы."""
     def cast():
@@ -792,9 +818,10 @@ _SD = _pair(soul_devour_cast, 'pohsmp_soul_devour_finish')
 _TB = _pair(taboo_cast, 'pohsmp_taboo_finish')
 _SC = _pair(space_closure_cast, 'pohsmp_space_closure_finish')
 _CA = _pair(coven_arrival_cast, 'pohsmp_coven_arrival_finish')
+_DI = _pair(disintegration_cast, 'pohsmp_disintegration_finish')
 
 
-ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual]
+ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI]
 
 
 def main():

@@ -169,19 +169,60 @@ tasks.named('test', Test).configure { useJUnitPlatform() }
 После копирования: `gradlew test` — должно пройти 16 тестов (`SigilTimelineTest` и `FxTest`). Логику печатей сразу использовать в отрисовщике
 (задание `docs/specs/sigils_spec.md`, формат — `docs/sigils.md`). Задание на заклинание — `docs/specs/coven_arrival_spec.md`.
 
-### Дезинтеграция (аниме)
+### Дезинтеграция (аниме) и Дезинтеграция: Реплика
 
-- Анимации `pohsmp_disintegration_cast` / `_finish` (папка `player_animation`).
-- Печати `sigils/disintegration_*.json`, эффект `fx/disintegration.json`, текстура `textures/sigil/holy_seal.png`.
-- **Точечная правка `DisintegrationSpell.java`:** заменить две строки `ANIMATION_LONG_CAST` / `ANIMATION_LONG_CAST_FINISH`
-  на `CastAnims.of("disintegration_cast")` / `CastAnims.of("disintegration_finish")` и добавить `onClientPreCast` с
-  `CastAnims.hideHands(...)` — как у четырёх заклинаний из раздела 3. Задание на остальное — `docs/specs/disintegration_spec.md`.
-- **Урон оригинала теперь 100% и убивает всегда** (`strike()`, конфиг `alwaysKill`). Лучи крест-накрест у заклинателя убраны.
+Задания: [`docs/specs/disintegration_spec.md`](specs/disintegration_spec.md) и
+[`docs/specs/disintegration_replica_spec.md`](specs/disintegration_replica_spec.md). Ниже — что именно перенести.
 
-### Дезинтеграция: Реплика (Высшая)
+**Решения владельца (18.11):**
+- Оригинал (Божественная): урон **100% макс. здоровья, убивает всегда** — поглощение, сопротивление и тотем не спасают;
+  творческий режим и наблюдатели не трогаются.
+- Реплика (Высшая): та же сцена **алая**, молитва вслух (4 строки), урон **90% макс. здоровья, сквозь броню, не убивает** (остаётся 1 HP).
+- **Лучей крест-накрест у заклинателя нет** ни в одной версии.
 
-- Новые файлы целиком: `spell/DisintegrationReplicaSpell.java`, `data/pohsmp_core/damage_type/replica_magic.json`,
-  `sigils/disintegration_replica_*.json`, `fx/disintegration_replica.json`, `tools/gen_replica_fx.py`.
-- Заменить целиком (общий каркас): `spell/DisintegrationSpell.java`, `client/DisintegrationFx.java`.
-- Точечно: `Reg` (HIGHER_SPELLS + регистрация), `PohCore` (Events), `ServerConfig` (`REPLICA_PERCENT`, `DIS_KILL`, новые значения по умолчанию),
-  `net/Net` (комментарий к `Fx.type`), тег `bypasses_armor`, `lang`. Задание — `docs/specs/disintegration_replica_spec.md`.
+**Новые файлы — копировать целиком:**
+
+| Что | Путь |
+|---|---|
+| Анимации молитвы | `assets/irons_spellbooks/player_animation/pohsmp_disintegration_cast.json`, `_finish.json` |
+| Печати оригинала (обновлены: крупные круги, башня, 6 бусин) | `assets/pohsmp_core/sigils/disintegration_*.json` (10 шт., без `_replica`) |
+| Печати Реплики | `assets/pohsmp_core/sigils/disintegration_replica_*.json` (10 шт.) |
+| Эффекты | `assets/pohsmp_core/fx/disintegration.json`, `fx/disintegration_replica.json` |
+| Текстуры | `textures/sigil/holy_seal.png`, `tooth_band.png`, `dodeca_ring.png`, `hex_ring.png`, `beam_fade.png` |
+| Заклинание | `src/main/java/ru/pohsmp/core/spell/DisintegrationReplicaSpell.java` |
+| Тип урона | `data/pohsmp_core/damage_type/replica_magic.json` |
+| Генераторы | `tools/gen_replica_fx.py` (алые копии из оригинала), `tools/gen_sigil_textures.py` |
+
+**Точечные правки в существующих файлах ПК** (файлы ПК не перезаписывать; эталон — эти же файлы в репозитории):
+
+1. `spell/DisintegrationSpell.java` — сделать общим каркасом:
+   - поле `id` вместо константы в `getSpellResource()`; `config` строить в конструкторе;
+   - `public DisintegrationSpell() { this(ID, Reg.DIVINE_ID, 0); }` и `protected DisintegrationSpell(ResourceLocation id, ResourceLocation school, int variant)`;
+   - поля `variant`, `primary`, `core` (частицы: золото/белый при 0, алый/розово-белый при 1) вместо `GOLD`/`WHITE` в `tickHold` и `finish`;
+   - все `new Net.Fx(k, …)` → `fx(k, …)`, где `type = k | variant << 4`;
+   - крючок `protected void chant(ServerLevel, LivingEntity caster, int age)` — вызывать в `tickHold` сразу после `h.age++`;
+   - крючок `protected void strike(ServerLevel, LivingEntity caster, LivingEntity target)` — туда вынести урон из `finish()`.
+     По умолчанию: `maxHP * damagePercent + damageFlat` типом `divine_magic`, затем при `alwaysKill`, если цель жива и не
+     творческий/наблюдатель: `setAbsorptionAmount(0)`, `setHealth(0)`, `die(src)`;
+   - анимации: `CastAnims.of("disintegration_cast")` / `CastAnims.of("disintegration_finish")` и `onClientPreCast` с `CastAnims.hideHands(...)`;
+   - `getUniqueInfo`: при `alwaysKill` — одна строка `ui.pohsmp_core.disintegration.kill`.
+2. `ServerConfig`: в `[disintegration]` по умолчанию `damagePercent 1.0`, `damageFlat 0`, новое `alwaysKill true` (`DIS_KILL`);
+   новая секция `[disintegration_replica] damagePercent 0.9` (`REPLICA_PERCENT`).
+   **На сервере в `world/serverconfig/pohsmp_core-server.toml` остались 0.5 / 40 — поправить руками или удалить файл.**
+3. `Reg`: `DisintegrationReplicaSpell.PATH` в конец `HIGHER_SPELLS` и `SPELLS.register(PATH, DisintegrationReplicaSpell::new)`
+   (вкладка и ступень Высшая подтянутся сами).
+4. `PohCore`: `MinecraftForge.EVENT_BUS.register(DisintegrationReplicaSpell.Events.class)` — это обрезка урона, без неё Реплика убивает.
+5. `net/Net.Fx`: в `type` младшие 4 бита — событие, старшие — вариант.
+6. `client/DisintegrationFx` (пока нет системы эффектов): в `handle` брать `kind = type & 15`, `variant = (type & 0xFF) >> 4`,
+   хранить `variant` в `Active`/`Burst`, перед отрисовкой ставить флаг `scarlet`, в `quad()` перекрашивать (формула в файле репозитория).
+7. Тег `data/minecraft/tags/damage_type/bypasses_armor.json` — добавить `pohsmp_core:replica_magic`.
+8. `lang/ru_ru.json`, `en_us.json` — ключи `spell.pohsmp_core.disintegration_replica(.guide)`, `ui.pohsmp_core.disintegration_replica.*`,
+   `ui.pohsmp_core.disintegration.kill`, `death.attack.replica_magic(.player)`.
+9. Команда выдачи Реплики — `docs/give_commands.txt`.
+
+**Отрисовка новыми эффектами.** В эффектах используются новые типы элементов `curtain` (завеса лучей), `column` (столб с кольцами)
+и `tint` (цвет мира) — описаны в `docs/fx.md`, эталон отрисовки — `tools/sigil_preview.template.html` (`FxRun`).
+Пока системы эффектов нет, в игре работает старая `DisintegrationFx`.
+
+**Проверить в игре:** оригинал убивает моба 1000 HP в незерите, игрока с тотемом и с золотым яблоком; Реплика — 4 строки молитвы
+на 0.5 / 3.5 / 6.5 / 9.6 с, 90% урона, цель с поглощением и с 5 HP остаётся жива с 1 HP; у обеих — нет лучей у заклинателя, предметы в руках скрыты.

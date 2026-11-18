@@ -1,0 +1,16 @@
+{
+  "comment": "Высшая: алые трещины и клинки, резкое появление с перелётом (easeOutBack), быстрое вращение, разлёт при разборке.",
+  "size": 2.6, "color": "#FF2A3A", "orientation": "ground", "lifetime": -1, "hold": 100,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.6, "heightOffset": 0.0, "color": "#7A0A1E", "brightness": 0.9,
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "cracks", "type": "disc", "texture": "higher_cracks", "radius": 1.0, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutBack", "modes": ["grow"] }, "rotation": { "speed": 0 } },
+    { "id": "blades", "type": "disc", "texture": "rim", "radius": 0.9, "heightOffset": 0.02, "color": "#FFFFFF", "brightness": 0.8,
+      "appear": { "delay": 4, "duration": 6, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": 120, "boost": 3 } },
+    { "id": "core", "type": "disc", "texture": "spokes", "radius": 0.5, "heightOffset": 0.03, "color": "#FFFFFF",
+      "appear": { "delay": 6, "duration": 4, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "rotation": { "speed": -200 } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.5, "duration": 6, "sparks": 30 },
+  "dissolve": { "modes": ["shatter"], "duration": 10 }
+}

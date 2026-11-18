@@ -1,0 +1,16 @@
+{
+  "comment": "Запретная: кольцо цепей и разлом в центре, тяжёлое медленное движение, золото на тёмном.",
+  "size": 3.0, "color": "#D4A017", "orientation": "ground", "lifetime": -1, "hold": 140,
+  "layers": [
+    { "id": "dark", "type": "disc", "texture": "glow", "radius": 0.7, "heightOffset": 0.0, "color": "#5A0E14", "brightness": 1.0,
+      "appear": { "delay": 0, "duration": 20, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.25, "period": 60 } },
+    { "id": "rift", "type": "disc", "texture": "higher_cracks", "radius": 0.55, "heightOffset": 0.01, "color": "#FFF0C0",
+      "appear": { "delay": 6, "duration": 14, "easing": "easeInOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "chains", "type": "band", "texture": "chain_band", "radius": 0.92, "inner": 0.86, "repeat": 6, "heightOffset": 0.02,
+      "appear": { "delay": 10, "duration": 24, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": -90 }, "rotation": { "speed": 3 } },
+    { "id": "rim", "type": "disc", "texture": "rim", "radius": 1.0, "heightOffset": 0.03,
+      "appear": { "delay": 26, "duration": 12, "easing": "easeOutCubic", "modes": ["fade"] }, "rotation": { "speed": -2 } }
+  ],
+  "formedFlash": { "color": "#FFF0C0", "size": 1.15, "duration": 16, "sparks": 16 },
+  "dissolve": { "modes": ["reverse", "collapse"], "duration": 26, "stagger": 4 }
+}

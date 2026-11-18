@@ -235,6 +235,171 @@ def arc_strip():
     print('wrote arc_strip')
 
 
+# ------------------------------------------------------------------ тематические печати по школам
+def roman(n):
+    vals = [(10, 'X'), (9, 'IX'), (5, 'V'), (4, 'IV'), (1, 'I')]
+    out = ''
+    for v, sym in vals:
+        while n >= v:
+            out += sym
+            n -= v
+    return out
+
+
+def draw_roman(d, cx, cy, h, text, ang, width):
+    """Римские цифры штрихами (без шрифтов), повёрнуты к центру циферблата."""
+    w = h * 0.5
+    total = len(text) * w * 0.9
+    ux, uy = math.cos(ang + math.pi / 2), math.sin(ang + math.pi / 2)    # вдоль строки
+    vx, vy = -math.cos(ang), -math.sin(ang)                                # «вверх» буквы — к центру
+    x0 = -total / 2
+    for ch in text:
+        def P(a, b):
+            return (cx + ux * (x0 + a * w) + vx * (b * h - h / 2), cy + uy * (x0 + a * w) + vy * (b * h - h / 2))
+        if ch == 'I':
+            d.line([P(0.4, 0), P(0.4, 1)], fill=255, width=width)
+        elif ch == 'V':
+            d.line([P(0, 1), P(0.4, 0), P(0.8, 1)], fill=255, width=width)
+        elif ch == 'X':
+            d.line([P(0, 0), P(0.8, 1)], fill=255, width=width)
+            d.line([P(0.8, 0), P(0, 1)], fill=255, width=width)
+        x0 += w * 0.9
+
+
+def clock_face():
+    """Время: циферблат с римскими цифрами, засечками минут и внутренним кольцом."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    ring(d, C * 0.97, 5 * SS)
+    ring(d, C * 0.9, 2 * SS)
+    ring(d, C * 0.58, 3 * SS)
+    ring(d, C * 0.08, 4 * SS)
+    for i in range(60):
+        a = 2 * math.pi * i / 60 - math.pi / 2
+        big = i % 5 == 0
+        d.line([*polar(C * (0.9 if big else 0.92), a), *polar(C * 0.97, a)], fill=255, width=(5 if big else 2) * SS)
+    for h in range(1, 13):
+        a = 2 * math.pi * h / 12 - math.pi / 2
+        x, y = polar(C * 0.74, a)
+        draw_roman(d, x, y, C * 0.13, roman(h), a, 4 * SS)
+    save(img, 'clock_face')
+
+
+def clock_hand(name, length, width, tail):
+    """Стрелка из центра вверх (на 12 часов): ромбовидная, с хвостом и кольцом у оси."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    tip, back = (C, C - C * length), (C, C + C * tail)
+    wd = C * width
+    d.polygon([tip, (C + wd, C - C * 0.12), back, (C - wd, C - C * 0.12)], fill=255)
+    r = C * 0.06
+    d.ellipse([C - r, C - r, C + r, C + r], outline=255, width=3 * SS)
+    save(img, name)
+
+
+def gear():
+    """Шестерёнка: зубья по ободу, спицы и ступица (кладётся слоями поверх циферблата)."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    n = 18
+    pts = []
+    for k in range(n * 4):
+        a = 2 * math.pi * k / (n * 4)
+        r = C * (0.95 if (k % 4) in (1, 2) else 0.82)
+        pts.append(polar(r, a))
+    d.line(pts + [pts[0]], fill=255, width=4 * SS)
+    ring(d, C * 0.7, 3 * SS)
+    ring(d, C * 0.18, 4 * SS)
+    for k in range(6):
+        a = 2 * math.pi * k / 6
+        d.line([*polar(C * 0.18, a), *polar(C * 0.7, a)], fill=255, width=4 * SS)
+    save(img, 'gear')
+
+
+def constellation():
+    """Звёзды: орбиты-эллипсы, созвездия из точек и линий по кольцу."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    ring(d, C * 0.96, 3 * SS)
+    for k in range(3):                                           # наклонённые орбиты
+        rot = k * math.pi / 3
+        pts = [(C + C * 0.82 * math.cos(t) * math.cos(rot) - C * 0.32 * math.sin(t) * math.sin(rot),
+                C + C * 0.82 * math.cos(t) * math.sin(rot) + C * 0.32 * math.sin(t) * math.cos(rot))
+               for t in [2 * math.pi * i / 180 for i in range(181)]]
+        d.line(pts, fill=200, width=2 * SS)
+    rng = random.Random(11)
+    for g in range(7):                                           # 7 созвездий по кольцу
+        base = 2 * math.pi * g / 7
+        stars = [polar(C * (0.6 + 0.3 * rng.random()), base + (rng.random() - 0.5) * 0.7) for _ in range(rng.randint(4, 6))]
+        stars.sort(key=lambda p: math.atan2(p[1] - C, p[0] - C))
+        d.line(stars, fill=170, width=2 * SS)
+        for (x, y) in stars:
+            r = C * (0.012 + 0.018 * rng.random())
+            d.polygon(star(4, r * 0.4, r * 2.2, rng.random()) if False else [(x - r, y), (x, y - r * 2), (x + r, y), (x, y + r * 2)], fill=255)
+            d.polygon([(x - r * 2, y), (x, y - r), (x + r * 2, y), (x, y + r)], fill=255)
+    r = C * 0.06
+    d.ellipse([C - r, C - r, C + r, C + r], fill=255)
+    save(img, 'constellation')
+
+
+def divine_sun():
+    """Божественная: солнце — лучи-клинья чередуются с тонкими, двойной нимб, перья-лепестки внутри."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    for k in range(24):
+        a = 2 * math.pi * k / 24
+        if k % 2 == 0:
+            d.polygon([polar(C * 0.6, a - 0.07), polar(C * 0.98, a), polar(C * 0.6, a + 0.07)], fill=255)
+        else:
+            d.line([*polar(C * 0.62, a), *polar(C * 0.86, a)], fill=200, width=3 * SS)
+    ring(d, C * 0.58, 5 * SS)
+    ring(d, C * 0.52, 2 * SS)
+    for k in range(12):                                          # лепестки-перья
+        a = 2 * math.pi * k / 12
+        d.line([polar(C * 0.16, a - 0.18), polar(C * 0.46, a), polar(C * 0.16, a + 0.18)], fill=255, width=3 * SS)
+    ring(d, C * 0.14, 4 * SS)
+    save(img, 'divine_sun')
+
+
+def higher_cracks():
+    """Высшая: рваные трещины от центра, остриё-клинки по кольцу."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    rng = random.Random(5)
+    for k in range(9):
+        a = 2 * math.pi * k / 9 + rng.random() * 0.3
+        pts, r = [(C, C)], 0.0
+        while r < 0.9:
+            r += 0.08 + rng.random() * 0.12
+            a += (rng.random() - 0.5) * 0.5
+            pts.append(polar(C * r, a))
+            if rng.random() < 0.3 and r > 0.3:                   # ответвление
+                b = a + (0.4 if rng.random() < 0.5 else -0.4)
+                d.line([pts[-1], polar(C * min(0.95, r + 0.18), b)], fill=200, width=2 * SS)
+        d.line(pts, fill=255, width=4 * SS, joint='curve')
+    for k in range(12):                                          # клинки по кольцу
+        a = 2 * math.pi * k / 12
+        d.polygon([polar(C * 0.78, a - 0.05), polar(C * 0.98, a + 0.08), polar(C * 0.84, a + 0.03)], fill=255)
+    ring(d, C * 0.78, 3 * SS)
+    save(img, 'higher_cracks')
+
+
+def chain_band():
+    """Запретная: полоса из звеньев цепи для слоя band (1024×128), звенья чередуются плашмя и ребром."""
+    bw, bh = 1024 * SS, 128 * SS
+    img = canvas(bw, bh)
+    d = ImageDraw.Draw(img)
+    n = 10
+    cell = bw / n
+    for i in range(n):
+        x = i * cell
+        if i % 2 == 0:                                           # плашмя: овал
+            d.ellipse([x - cell * 0.1, bh * 0.25, x + cell * 1.1, bh * 0.75], outline=255, width=7 * SS)
+        else:                                                    # ребром: перемычка
+            d.line([x - cell * 0.15, bh / 2, x + cell * 1.15, bh / 2], fill=255, width=9 * SS)
+    save(img, 'chain_band', (1024, 128))
+
+
 # ------------------------------------------------------------------ спрайты частиц для эффектов (textures/fx/)
 FX_OUT = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core', 'textures', 'fx')
 
@@ -324,3 +489,11 @@ if __name__ == '__main__':
     rune_band()
     arc_strip()
     fx_sprites()
+    clock_face()
+    clock_hand('clock_hand_hour', 0.45, 0.05, 0.08)
+    clock_hand('clock_hand_minute', 0.72, 0.035, 0.12)
+    gear()
+    constellation()
+    divine_sun()
+    higher_cracks()
+    chain_band()

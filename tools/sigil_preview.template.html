@@ -91,6 +91,7 @@ code { font-family: var(--f-mono); font-size: 13px; }
         <button type="button" data-view="low">Снизу</button>
         <button type="button" data-view="top">Сверху</button>
         <button type="button" data-view="close">Близко</button>
+        <button type="button" data-view="above">Сверху близко</button>
       </div>
       <span class="label">Слои главной печати</span>
       <ol class="layers" id="layers"></ol>
@@ -318,10 +319,17 @@ const SCENES = {
   "Земная печать + золотые круги": () => [new Sigil("silent_gate_ground", new THREE.Vector3(0, 0.02, 0))],
   "Золотой круг": () => [new Sigil("golden_halo", new THREE.Vector3(0, 1.4, -1.2))],
   "Печать Ковена": () => [new Sigil("coven_seal", new THREE.Vector3(0, 10, 0))],
+  "Время: циферблат": () => [new Sigil("time_clock", new THREE.Vector3(0, 2.2, 2.4))],
+  "Звёзды: созвездия": () => [new Sigil("stars_orbit", new THREE.Vector3(0, 0.02, 0))],
+  "Божественная: солнце": () => [new Sigil("divine_sun", new THREE.Vector3(0, 8, 0))],
+  "Высшая: трещины и клинки": () => [new Sigil("higher_blades", new THREE.Vector3(0, 0.02, 0))],
+  "Запретная: цепи": () => [new Sigil("forbidden_chains", new THREE.Vector3(0, 0.02, 0))],
 };
 const MAIN_ID = { "Silent Gate: земля и небо": "silent_gate_sky", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
-  "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal" };
-const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low" };
+  "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
+  "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains" };
+const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
+  "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
 const sel = $("scene");
@@ -349,7 +357,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1] };
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

@@ -1,0 +1,16 @@
+{
+  "comment": "Звёзды: созвездия и наклонённые орбиты, кольцо рун, медленное вращение в разные стороны.",
+  "size": 3.2, "color": "#B9A8FF", "orientation": "ground", "lifetime": -1, "hold": 140,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.5, "heightOffset": 0.0, "color": "#D8DCFF", "brightness": 0.6,
+      "appear": { "delay": 0, "duration": 14, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.3, "period": 40 } },
+    { "id": "stars", "type": "disc", "texture": "constellation", "radius": 0.9, "heightOffset": 0.01, "color": "#D8DCFF",
+      "appear": { "delay": 4, "duration": 18, "easing": "easeOutCubic", "modes": ["fade", "twist"], "twist": 90 }, "rotation": { "speed": 6 } },
+    { "id": "orbit", "type": "arcs", "texture": "arc_strip", "radius": 1.0, "width": 0.03, "heightOffset": 0.02, "count": 3, "arcLength": 70,
+      "appear": { "delay": 10, "duration": 18, "easing": "easeInOutCubic", "modes": ["assemble", "fade"] }, "rotation": { "speed": -10, "boost": 4 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.08, "inner": 0.9, "repeat": 8, "heightOffset": 0.03,
+      "appear": { "delay": 20, "duration": 14, "easing": "easeInOutSine", "modes": ["draw"] }, "rotation": { "speed": 4 } }
+  ],
+  "formedFlash": { "color": "#E6E8FF", "size": 1.2, "duration": 14, "sparks": 40 },
+  "dissolve": { "modes": ["fade"], "duration": 24 }
+}

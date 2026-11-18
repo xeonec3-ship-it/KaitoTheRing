@@ -131,3 +131,38 @@ public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, In
 
 Записать в `CLAUDE.md` проекта: какая версия собрана, что анимации игрока теперь свои, где генератор
 и что bendy-lib нужен клиентам. Результаты проверки в игре сообщить мне в облачную сессию.
+
+## 7. Добавлено позже (чат идей, 18.11)
+
+Всё ниже — новые файлы: копировать целиком. Существующие файлы мода на ПК по-прежнему не перезаписывать.
+
+| Что | Откуда (`SRC`) | Куда |
+|---|---|---|
+| Анимации «Появления Ковена» (90 с, финал, ритуал свиты) | `src\main\resources\assets\irons_spellbooks\player_animation\pohsmp_coven_*.json` | `MOD\src\main\resources\assets\irons_spellbooks\player_animation\` |
+| Демо-печати | `src\main\resources\assets\pohsmp_core\sigils\*.json` | `MOD\src\main\resources\assets\pohsmp_core\sigils\` |
+| Текстуры печатей | `src\main\resources\assets\pohsmp_core\textures\sigil\*.png` | `MOD\src\main\resources\assets\pohsmp_core\textures\sigil\` |
+| Спрайты частиц | `src\main\resources\assets\pohsmp_core\textures\fx\*.png` | `MOD\src\main\resources\assets\pohsmp_core\textures\fx\` |
+| Стили школ и демо-эффект | `src\main\resources\assets\pohsmp_core\fx\**` | `MOD\src\main\resources\assets\pohsmp_core\fx\` |
+| Логика печатей (без Minecraft) | `src\main\java\ru\pohsmp\core\fx\sigil\*.java` | `MOD\src\main\java\ru\pohsmp\core\fx\sigil\` |
+| Тесты логики | `src\test\java\ru\pohsmp\core\fx\sigil\SigilTimelineTest.java` | `MOD\src\test\java\ru\pohsmp\core\fx\sigil\` |
+| Генераторы и превью | `tools\gen_player_anims.py`, `tools\gen_sigil_textures.py`, `tools\build_sigil_preview.py`, `tools\*preview*.html` | `cnpc-project\tools\` |
+| Документы | `docs\sigils.md`, `docs\fx.md`, `docs\specs\`, `docs\ideas\`, `docs\references\` | рядом с проектом, для чтения |
+
+**Правка в `build.gradle` на ПК** (точечно, для `gradlew test`):
+
+```gradle
+repositories {
+    // … что уже есть …
+    mavenCentral()
+}
+dependencies {
+    // … что уже есть …
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'com.google.code.gson:gson:2.10.1'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+tasks.named('test', Test).configure { useJUnitPlatform() }
+```
+
+После копирования: `gradlew test` — должно пройти 10 тестов `SigilTimelineTest`. Логику печатей сразу использовать в отрисовщике
+(задание `docs/specs/sigils_spec.md`, формат — `docs/sigils.md`). Задание на заклинание — `docs/specs/coven_arrival_spec.md`.

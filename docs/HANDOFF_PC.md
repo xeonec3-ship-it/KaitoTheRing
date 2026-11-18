@@ -164,5 +164,5 @@ dependencies {
 tasks.named('test', Test).configure { useJUnitPlatform() }
 ```
 
-После копирования: `gradlew test` — должно пройти 10 тестов `SigilTimelineTest`. Логику печатей сразу использовать в отрисовщике
+После копирования: `gradlew test` — должно пройти 16 тестов (`SigilTimelineTest` и `FxTest`). Логику печатей сразу использовать в отрисовщике
 (задание `docs/specs/sigils_spec.md`, формат — `docs/sigils.md`). Задание на заклинание — `docs/specs/coven_arrival_spec.md`.

@@ -235,7 +235,7 @@ class Sigil {
         const rank = n - 1 - i, span = Math.max(1, dis.duration - stagger * (n - 1));
         a *= 1 - clamp01((t - this.stopAt - rank * stagger) / span);
       }
-      if (modes.includes("shatter") && this.stopAt !== null) sc *= 1 + dd * 0.8;
+      if (modes.includes("shatter") && this.stopAt !== null) { sc *= 1 + dd * 0.8; a *= 1 - dd; }
       // вращение: скорость (°/с), быстрее, пока слой появляется (boost)
       const rot = l.rotation || {};
       L.rot += (rot.speed || 0) * (1 + (rot.boost || 0) * (1 - clamp01(e))) * dt / TPS;

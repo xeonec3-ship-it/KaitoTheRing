@@ -1,0 +1,145 @@
+package ru.pohsmp.core.fx.sigil;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+/**
+ * A sigil definition read from assets/pohsmp_core/sigils/&lt;id&gt;.json. Format: docs/sigils.md.
+ * Pure data: no Minecraft classes, so the server can read it for timings and tests can run without the game.
+ * Times are ticks, angles degrees, sizes blocks.
+ */
+public record SigilDef(String id, double size, int color, Orientation orientation, int lifetime, int hold,
+                       List<Layer> layers, Expand expand, Flash formedFlash, List<Child> onFormed, Dissolve dissolve) {
+
+    public enum Orientation { GROUND, SKY, FACING, BILLBOARD }
+
+    public enum LayerType { DISC, BAND, ARCS, SPOKES }
+
+    public enum AppearMode { GROW, FADE, DRAW, TWIST, UNFOLD, ASSEMBLE }
+
+    public enum DissolveMode { REVERSE, COLLAPSE, FADE, SHATTER }
+
+    public record Appear(int delay, int duration, Easing easing, Set<AppearMode> modes, double startAngle, int direction, double twist) {
+        public int end() {
+            return delay + duration;
+        }
+    }
+
+    public record Rotation(double speed, double boost) {
+        public static final Rotation NONE = new Rotation(0, 0);
+    }
+
+    public record Pulse(double amp, double period) {}
+
+    public record Layer(String id, LayerType type, String texture, double radius, double heightOffset, int color, double brightness,
+                        double inner, int repeat, int count, double arcLength, double width,
+                        Appear appear, Rotation rotation, Pulse pulse) {}
+
+    public record Expand(double scale, int delay, int duration, Easing easing) {}
+
+    public record Flash(int color, double size, int duration, int sparks) {}
+
+    /** Child sigils spawned when the parent is formed; arc == null means "at the parent's centre". */
+    public record Child(String id, boolean anchorCaster, Arc arc) {}
+
+    public record Arc(int count, double radius, double angle, double height, boolean behind, int stagger) {}
+
+    public record Dissolve(Set<DissolveMode> modes, int duration, int stagger) {
+        public static final Dissolve DEFAULT = new Dissolve(EnumSet.of(DissolveMode.FADE), 20, 0);
+    }
+
+    // ------------------------------------------------------------------ parsing
+
+    public static SigilDef parse(String id, String json) {
+        return parse(id, JsonParser.parseString(json).getAsJsonObject());
+    }
+
+    public static SigilDef parse(String id, JsonObject o) {
+        int color = color(str(o, "color", "#FFFFFF"));
+        List<Layer> layers = new ArrayList<>();
+        for (JsonElement e : arr(o, "layers")) layers.add(layer(e.getAsJsonObject(), color));
+        Expand expand = null;
+        if (o.has("expand")) {
+            JsonObject x = o.getAsJsonObject("expand");
+            expand = new Expand(num(x, "scale", 1), (int) num(x, "delay", 0), (int) num(x, "duration", 0), Easing.byName(str(x, "easing", null)));
+        }
+        Flash flash = null;
+        if (o.has("formedFlash")) {
+            JsonObject f = o.getAsJsonObject("formedFlash");
+            flash = new Flash(color(str(f, "color", "#FFFFFF")), num(f, "size", 1.2), (int) num(f, "duration", 10), (int) num(f, "sparks", 0));
+        }
+        List<Child> children = new ArrayList<>();
+        for (JsonElement e : arr(o, "onFormed")) {
+            JsonObject c = e.getAsJsonObject();
+            Arc arc = null;
+            if (c.has("arc")) {
+                JsonObject a = c.getAsJsonObject("arc");
+                arc = new Arc((int) num(a, "count", 1), num(a, "radius", 1), num(a, "angle", 0), num(a, "height", 0),
+                        bool(a, "behind", false), (int) num(a, "stagger", 0));
+            }
+            children.add(new Child(str(c, "id", ""), "caster".equals(str(c, "anchor", "")), arc));
+        }
+        Dissolve dissolve = Dissolve.DEFAULT;
+        if (o.has("dissolve")) {
+            JsonObject d = o.getAsJsonObject("dissolve");
+            Set<DissolveMode> modes = EnumSet.noneOf(DissolveMode.class);
+            for (JsonElement m : arr(d, "modes")) modes.add(DissolveMode.valueOf(m.getAsString().toUpperCase(Locale.ROOT)));
+            if (d.has("mode")) modes.add(DissolveMode.valueOf(str(d, "mode", "fade").toUpperCase(Locale.ROOT)));
+            if (modes.isEmpty()) modes.add(DissolveMode.FADE);
+            dissolve = new Dissolve(modes, (int) num(d, "duration", 20), (int) num(d, "stagger", 0));
+        }
+        return new SigilDef(id, num(o, "size", 1), color, Orientation.valueOf(str(o, "orientation", "ground").toUpperCase(Locale.ROOT)),
+                (int) num(o, "lifetime", -1), (int) num(o, "hold", -1), List.copyOf(layers), expand, flash, List.copyOf(children), dissolve);
+    }
+
+    private static Layer layer(JsonObject l, int defColor) {
+        JsonObject ap = l.has("appear") ? l.getAsJsonObject("appear") : new JsonObject();
+        Set<AppearMode> modes = EnumSet.noneOf(AppearMode.class);
+        for (JsonElement m : arr(ap, "modes")) modes.add(AppearMode.valueOf(m.getAsString().toUpperCase(Locale.ROOT)));
+        if (modes.isEmpty()) modes.add(AppearMode.FADE);
+        Appear appear = new Appear((int) num(ap, "delay", 0), Math.max(1, (int) num(ap, "duration", 1)), Easing.byName(str(ap, "easing", null)),
+                modes, num(ap, "startAngle", 0), (int) num(ap, "direction", 1), num(ap, "twist", -120));
+        Rotation rot = Rotation.NONE;
+        if (l.has("rotation")) {
+            JsonObject r = l.getAsJsonObject("rotation");
+            rot = new Rotation(num(r, "speed", 0), num(r, "boost", 0));
+        }
+        Pulse pulse = null;
+        if (l.has("pulse")) {
+            JsonObject p = l.getAsJsonObject("pulse");
+            pulse = new Pulse(num(p, "amp", 0), Math.max(1, num(p, "period", 20)));
+        }
+        return new Layer(str(l, "id", ""), LayerType.valueOf(str(l, "type", "disc").toUpperCase(Locale.ROOT)), str(l, "texture", "core"),
+                num(l, "radius", 1), num(l, "heightOffset", 0), l.has("color") ? color(str(l, "color", "#FFFFFF")) : defColor,
+                num(l, "brightness", 1), num(l, "inner", 0.85), (int) num(l, "repeat", 6), (int) num(l, "count", 4),
+                num(l, "arcLength", 45), num(l, "width", 0.05), appear, rot, pulse);
+    }
+
+    static int color(String hex) {
+        String h = hex.startsWith("#") ? hex.substring(1) : hex;
+        return Integer.parseInt(h, 16) & 0xFFFFFF;
+    }
+
+    private static JsonArray arr(JsonObject o, String k) {
+        return o.has(k) && o.get(k).isJsonArray() ? o.getAsJsonArray(k) : new JsonArray();
+    }
+
+    private static double num(JsonObject o, String k, double d) {
+        return o.has(k) ? o.get(k).getAsDouble() : d;
+    }
+
+    private static String str(JsonObject o, String k, String d) {
+        return o.has(k) ? o.get(k).getAsString() : d;
+    }
+
+    private static boolean bool(JsonObject o, String k, boolean d) {
+        return o.has(k) ? o.get(k).getAsBoolean() : d;
+    }
+}

@@ -1,0 +1,336 @@
+<title>Анимации каста PohSMP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a stage-first viewer — the 3D stage on top, transport and timeline under it, notes last; one column on phones, stage + side panel on wide screens. */
+:root {
+  --bg: #f3f0f7;
+  --panel: #ffffff;
+  --line: #ddd5e8;
+  --fg: #1d1626;
+  --muted: #6b6178;
+  --gold: #9a6a00;
+  --gold-soft: #f3e2b4;
+  --rift: #6b2fb3;
+  --stage-top: #e9e2f2;
+  --stage-bot: #cfc2e0;
+  --grid: #b9a9cf;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #100c16; --panel: #18121f; --line: #2c2238; --fg: #ece6f3; --muted: #a497b3;
+    --gold: #f0c35a; --gold-soft: #3a2c10; --rift: #b07cf0;
+    --stage-top: #1c1426; --stage-bot: #07050b; --grid: #3a2c4c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #100c16; --panel: #18121f; --line: #2c2238; --fg: #ece6f3; --muted: #a497b3;
+  --gold: #f0c35a; --gold-soft: #3a2c10; --rift: #b07cf0;
+  --stage-top: #1c1426; --stage-bot: #07050b; --grid: #3a2c4c; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 32px;
+}
+.wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--rift); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(22px, 5vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 65ch; }
+.main { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .main { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; } }
+.stage {
+  position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+  background: linear-gradient(var(--stage-top), var(--stage-bot)); aspect-ratio: 4 / 5; max-width: 100%; max-height: 72vh; width: 100%;
+  touch-action: none;
+}
+@media (min-width: 900px) { .stage { aspect-ratio: 4 / 3; } }
+.stage canvas { display: block; width: 100%; height: 100%; }
+.hud {
+  position: absolute; left: 12px; top: 12px; right: 12px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none;
+  font-family: var(--f-mono); font-size: 12px; color: var(--fg);
+}
+.chip { background: color-mix(in srgb, var(--panel) 82%, transparent); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+.chip.phase { color: var(--gold); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+.hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--muted); pointer-events: none; }
+.controls { display: grid; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button, select {
+  font: inherit; font-size: 14px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 12px; cursor: pointer; min-height: 40px;
+}
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--rift); outline-offset: 2px; }
+button.primary { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; min-width: 96px; }
+button[aria-pressed="true"] { border-color: var(--rift); color: var(--rift); font-weight: 600; }
+.time { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); margin-left: auto; }
+.tl { position: relative; display: grid; gap: 6px; }
+input[type=range] { width: 100%; accent-color: var(--gold); margin: 0; }
+.marks { position: relative; height: 22px; }
+.mark {
+  position: absolute; top: 0; transform: translateX(-50%); font-family: var(--f-mono); font-size: 11px; color: var(--muted);
+  white-space: nowrap; border: 0; background: none; padding: 0 2px; min-height: 0; cursor: pointer;
+}
+.mark::before { content: ""; display: block; width: 1px; height: 6px; background: var(--grid); margin: 0 auto 2px; }
+.label { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.phases { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.phases li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+.phases li.on { background: var(--gold-soft); }
+.phases .t { font-family: var(--f-mono); font-size: 12px; color: var(--gold); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.phases .d { min-width: 0; }
+.notes { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 8px; }
+.notes p { margin: 0; max-width: 70ch; }
+code { font-family: var(--f-mono); font-size: 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">pohsmp_core · анимации игрока</span>
+    <h1>Низвержение: каст 25 секунд</h1>
+    <p class="sub">Так игрок двигается, пока кастует Низвержение. Хореография взята из присланного видео: рука к сердцу, взмах посохом, посох поперёк груди, затем посох над головой до самого конца.</p>
+  </header>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Модель игрока, проигрывающая анимацию"></canvas>
+      <div class="hud"><span class="chip" id="animName">pohsmp_downfall_cast</span><span class="chip phase" id="phaseChip">—</span></div>
+      <div class="hint">Тяните, чтобы повернуть камеру</div>
+    </div>
+
+    <div class="controls">
+      <div class="row">
+        <button class="primary" id="play" type="button">Пауза</button>
+        <select id="anim" aria-label="Анимация"></select>
+        <span class="time" id="time">0.00 / 25.00 с</span>
+      </div>
+      <div class="tl">
+        <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Время">
+        <div class="marks" id="marks"></div>
+      </div>
+      <div class="row" role="group" aria-label="Скорость">
+        <span class="label">Скорость</span>
+        <button type="button" data-speed="0.25">×¼</button>
+        <button type="button" data-speed="0.5">×½</button>
+        <button type="button" data-speed="1" aria-pressed="true">×1</button>
+        <button type="button" data-speed="2">×2</button>
+      </div>
+      <div class="row" role="group" aria-label="Камера">
+        <span class="label">Камера</span>
+        <button type="button" data-view="front" aria-pressed="true">Спереди</button>
+        <button type="button" data-view="side">Сбоку</button>
+        <button type="button" data-view="back">Сзади</button>
+      </div>
+      <span class="label">Фазы</span>
+      <ol class="phases" id="phases"></ol>
+    </div>
+  </div>
+
+  <section class="notes">
+    <span class="label">Как это устроено</span>
+    <p>Анимация лежит в <code>assets/irons_spellbooks/player_animation/pohsmp_core_casting.json</code>. Это формат GeckoLib, его читает PlayerAnimator, библиотека Iron's. Заклинание включает её через <code>new AnimationHolder("pohsmp_downfall_cast", true)</code>.</p>
+    <p>Позы задаются в <code>tools/gen_player_anims.py</code> направлениями руки и посоха, а не углами. После правки запустите генератор: он пересоберёт JSON и эту страницу.</p>
+    <p>Превью приблизительное: посох нарисован условно, повороты корпуса могут чуть отличаться от игры. В игре нужно проверить, в какую сторону идёт поворот торса.</p>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const DATA = /*ANIMS*/null;
+const META = {
+  pohsmp_downfall_cast: [
+    [0, "Рука к сердцу, голова опущена"], [1.6, "Замах: посох низко слева"], [2.5, "Дуга вправо и вверх"],
+    [3.0, "Посох над головой"], [3.8, "Посох поперёк груди, ждём"], [10, "Открывается разлом"],
+    [15, "Посох вверх, золотая нить к разлому"], [20, "Тянется выше, дрожь"], [24.2, "Посох вперёд, к разлому"]
+  ],
+  pohsmp_downfall_finish: [[0, "Толчок посохом"], [0.45, "Возврат в покой"]]
+};
+
+const $ = (id) => document.getElementById(id);
+const css = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const D2R = Math.PI / 180;
+const ease = {
+  linear: (t) => t,
+  easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2,
+  easeInSine: (t) => 1 - Math.cos((t * Math.PI) / 2),
+  easeOutSine: (t) => Math.sin((t * Math.PI) / 2),
+};
+
+function sample(ch, t) {
+  if (!ch) return [0, 0, 0];
+  if (Array.isArray(ch.vector) || ch.vector) return ch.vector;
+  const keys = Object.keys(ch).map((k) => [parseFloat(k), ch[k]]).sort((a, b) => a[0] - b[0]);
+  if (t <= keys[0][0]) return keys[0][1].vector;
+  for (let i = 1; i < keys.length; i++) {
+    if (t <= keys[i][0]) {
+      const [t0, a] = keys[i - 1], [t1, b] = keys[i];
+      const f = (ease[b.easing] || ease.linear)((t - t0) / Math.max(1e-6, t1 - t0));
+      return a.vector.map((v, j) => v + (b.vector[j] - v) * f);
+    }
+  }
+  return keys[keys.length - 1][1].vector;
+}
+
+// ---- scene
+const cv = $("cv"), stage = $("stage");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(35, 1, 0.1, 200);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x40304f, 0.95));
+const sun = new THREE.DirectionalLight(0xffffff, 0.6); sun.position.set(3, 6, 5); scene.add(sun);
+const S = 1 / 16;
+
+function box(w, h, d, color, oy) {
+  const g = new THREE.BoxGeometry(w * S, h * S, d * S);
+  g.translate(0, oy * S, 0);
+  return new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color }));
+}
+function face() {
+  const c = document.createElement("canvas"); c.width = c.height = 8;
+  const x = c.getContext("2d");
+  x.fillStyle = "#c9956b"; x.fillRect(0, 0, 8, 8);
+  x.fillStyle = "#2b1c3a"; x.fillRect(0, 0, 8, 3); x.fillRect(0, 3, 1, 2); x.fillRect(7, 3, 1, 2);
+  x.fillStyle = "#ffffff"; x.fillRect(1, 4, 2, 1); x.fillRect(5, 4, 2, 1);
+  x.fillStyle = "#3d6fd6"; x.fillRect(2, 4, 1, 1); x.fillRect(5, 4, 1, 1);
+  x.fillStyle = "#8a5a3c"; x.fillRect(3, 6, 2, 1);
+  const t = new THREE.CanvasTexture(c); t.magFilter = THREE.NearestFilter; return t;
+}
+const skin = 0xc9956b, robe = 0x3b2a55, robe2 = 0x2a1d3d, trim = 0xd8a93b;
+
+const root = new THREE.Group(); scene.add(root);           // bone "body"
+const torso = new THREE.Group(); torso.position.y = 12 * S; root.add(torso);
+const chest = box(8, 12, 4, robe, 6); torso.add(chest);
+const belt = box(8.2, 1.2, 4.2, trim, 1.2); torso.add(belt);
+const head = new THREE.Group(); head.position.y = 12 * S; torso.add(head);
+const hm = box(8, 8, 8, skin, 4);
+hm.material = [0, 1, 2, 3, 4, 5].map((i) => new THREE.MeshLambertMaterial(i === 4 ? { map: face() } : { color: i === 2 ? 0x2b1c3a : skin }));
+head.add(hm);
+const hair = box(8.4, 2.4, 8.4, 0x2b1c3a, 7.2); head.add(hair);
+
+function arm(side) {           // side: -1 right (player's right = -X), +1 left
+  const g = new THREE.Group(); g.position.set(side * 5 * S, 10 * S, 0); torso.add(g);
+  const m = box(4, 12, 4, robe2, -4); m.position.x = side * 1 * S; g.add(m);
+  const hand = box(4.05, 3, 4.05, skin, -8.5); hand.position.x = side * 1 * S; g.add(hand);
+  return g;
+}
+const rArm = arm(-1), lArm = arm(1);
+function leg(side) {
+  const g = new THREE.Group(); g.position.set(side * 1.9 * S, 12 * S, 0); root.add(g);
+  g.add(box(4, 12, 4, 0x241a33, -6)); return g;
+}
+const rLeg = leg(-1), lLeg = leg(1);
+
+// staff in the right hand: along the arm's local +Z, gripped near its lower third
+const staff = new THREE.Group(); staff.position.set(-1 * S, -10 * S, 0); rArm.add(staff);
+const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.6 * S, 0.6 * S, 30 * S, 8), new THREE.MeshLambertMaterial({ color: 0xc89b3c }));
+shaft.rotation.x = Math.PI / 2; shaft.position.z = 8 * S; staff.add(shaft);
+const ring = new THREE.Mesh(new THREE.TorusGeometry(3.2 * S, 0.5 * S, 8, 24), new THREE.MeshLambertMaterial({ color: 0xf0c35a, emissive: 0x6b4a00 }));
+ring.position.z = 24 * S; staff.add(ring);
+const gem = new THREE.Mesh(new THREE.OctahedronGeometry(1.4 * S), new THREE.MeshLambertMaterial({ color: 0xb07cf0, emissive: 0x5a1fa0 }));
+gem.position.z = 24 * S; staff.add(gem);
+
+// ground circle
+const disc = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.6, 64), new THREE.MeshBasicMaterial({ color: 0xf0c35a, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
+disc.rotation.x = -Math.PI / 2; disc.position.y = 0.002; scene.add(disc);
+const grid = new THREE.GridHelper(6, 12); grid.material.transparent = true; grid.material.opacity = 0.35; scene.add(grid);
+
+function applyRot(obj, v) { obj.rotation.set(v[0] * D2R, -v[1] * D2R, -v[2] * D2R, "ZYX"); }
+function applyPos(obj, base, v) { obj.position.set(base[0] - v[0] * S, base[1] + v[1] * S, base[2] + v[2] * S); }
+const BASE = {
+  right_arm: [rArm, [-5 * S, 10 * S, 0]], left_arm: [lArm, [5 * S, 10 * S, 0]], head: [head, [0, 12 * S, 0]],
+  torso: [torso, [0, 12 * S, 0]], right_leg: [rLeg, [-1.9 * S, 12 * S, 0]], left_leg: [lLeg, [1.9 * S, 12 * S, 0]], body: [root, [0, 0, 0]]
+};
+function pose(anim, t) {
+  for (const k in BASE) {
+    const [o, b] = BASE[k], bone = anim.bones[k] || {};
+    applyRot(o, bone.rotation ? sample(bone.rotation, t) : [0, 0, 0]);
+    applyPos(o, b, bone.position ? sample(bone.position, t) : [0, 0, 0]);
+  }
+  const g = 0.35 + 0.25 * Math.sin(t * 3);
+  disc.material.opacity = g;
+}
+
+// ---- camera orbit
+let yaw = 0.35, pitch = 0.12, dist = 5.2, drag = null;
+function placeCam() {
+  const tgt = new THREE.Vector3(0, 1.15, 0);
+  cam.position.set(tgt.x + dist * Math.sin(yaw) * Math.cos(pitch), tgt.y + dist * Math.sin(pitch), tgt.z + dist * Math.cos(yaw) * Math.cos(pitch));
+  cam.lookAt(tgt);
+}
+stage.addEventListener("pointerdown", (e) => { drag = [e.clientX, e.clientY, yaw, pitch]; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener("pointermove", (e) => {
+  if (!drag) return;
+  yaw = drag[2] - (e.clientX - drag[0]) * 0.01;
+  pitch = Math.max(-0.3, Math.min(1.2, drag[3] + (e.clientY - drag[1]) * 0.006));
+  setView(null);
+});
+stage.addEventListener("pointerup", () => (drag = null));
+stage.addEventListener("pointercancel", () => (drag = null));
+const VIEWS = { front: 0.35, side: Math.PI / 2, back: Math.PI + 0.2 };
+function setView(v) {
+  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  if (v) { yaw = VIEWS[v]; pitch = 0.12; }
+}
+document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+
+// ---- transport
+let cur = Object.keys(DATA.animations)[0], t = 0, playing = !window.matchMedia("(prefers-reduced-motion: reduce)").matches, speed = 1, last = performance.now();
+const sel = $("anim");
+for (const k of Object.keys(DATA.animations)) { const o = document.createElement("option"); o.value = k; o.textContent = k; sel.appendChild(o); }
+sel.addEventListener("change", () => { cur = sel.value; t = 0; build(); });
+$("play").addEventListener("click", () => { playing = !playing; if (playing && t >= len()) t = 0; syncBtn(); });
+function syncBtn() { $("play").textContent = playing ? "Пауза" : "Играть"; }
+document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("click", () => {
+  speed = parseFloat(b.dataset.speed);
+  document.querySelectorAll("[data-speed]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+}));
+const len = () => DATA.animations[cur].animation_length;
+$("scrub").addEventListener("input", (e) => { t = (e.target.value / 1000) * len(); playing = false; syncBtn(); });
+
+function build() {
+  $("animName").textContent = cur;
+  const ph = META[cur] || [], marks = $("marks"), list = $("phases");
+  marks.innerHTML = ""; list.innerHTML = "";
+  ph.forEach(([at, text], i) => {
+    const m = document.createElement("button"); m.type = "button"; m.className = "mark";
+    m.style.left = (at / len()) * 100 + "%"; m.textContent = at % 1 ? at.toFixed(1) : String(at);
+    if (i % 2 && ph.length > 6 && at < 4) m.textContent = "";
+    m.addEventListener("click", () => jump(at)); marks.appendChild(m);
+    const li = document.createElement("li"); li.tabIndex = 0;
+    li.innerHTML = `<span class="t">${at.toFixed(1)} с</span><span class="d"></span>`;
+    li.querySelector(".d").textContent = text;
+    li.addEventListener("click", () => jump(at)); li.addEventListener("keydown", (e) => { if (e.key === "Enter") jump(at); });
+    list.appendChild(li);
+  });
+}
+function jump(at) { t = at; playing = true; syncBtn(); }
+
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  const L = len();
+  if (playing) { t += dt * speed; if (t > L + 0.8) t = 0; }
+  const tt = Math.min(t, L);
+  pose(DATA.animations[cur], tt);
+  $("scrub").value = Math.round((tt / L) * 1000);
+  $("time").textContent = `${tt.toFixed(2)} / ${L.toFixed(2)} с`;
+  const ph = META[cur] || []; let idx = 0;
+  ph.forEach(([at], i) => { if (tt >= at) idx = i; });
+  $("phaseChip").textContent = ph[idx] ? ph[idx][1] : "—";
+  [...$("phases").children].forEach((li, i) => li.classList.toggle("on", i === idx));
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (cv.width !== Math.round(w * renderer.getPixelRatio()) || cv.height !== Math.round(h * renderer.getPixelRatio())) {
+    renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  grid.material.color.set(css("--grid") || "#3a2c4c");
+  placeCam();
+  renderer.render(scene, cam);
+  requestAnimationFrame(frame);
+}
+build(); syncBtn(); requestAnimationFrame(frame);
+</script>

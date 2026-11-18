@@ -1,0 +1,8 @@
+{
+  "comment": "Скалк: тёмно-бирюзовый и чёрный; души-огоньки, звуковые кольца, щупальца-ленты, тусклое пульсирующее свечение.",
+  "palette": { "primary": "#1FB7B0", "secondary": "#0B4F57", "core": "#BFFFF8", "shadow": "#020A0C" },
+  "textures": { "sparks": "soul_mote", "runes": "rune_band", "shards": "spark_soft", "sigil": "thin_ring" },
+  "blend": "translucent",
+  "motion": { "rotationScale": 0.4, "jitter": 0.1, "easing": "easeInOutSine", "pulse": { "amp": 0.35, "period": 40 } },
+  "sigilTheme": "звуковые кольца, щупальца"
+}

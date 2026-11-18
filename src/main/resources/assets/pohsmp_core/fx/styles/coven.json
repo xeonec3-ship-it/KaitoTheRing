@@ -1,0 +1,8 @@
+{
+  "comment": "Ковен: фиолетовый и лиловый, светлое ядро; геометрия, сферы, многогранники, ровное размеренное движение.",
+  "palette": { "primary": "#B49BFF", "secondary": "#5B3FB0", "core": "#F1ECFF", "shadow": "#1A0F33" },
+  "textures": { "sparks": "spark_soft", "runes": "rune_band", "shards": "shard", "sigil": "coven_geo" },
+  "blend": "additive",
+  "motion": { "rotationScale": 0.8, "jitter": 0.0, "easing": "easeInOutSine" },
+  "sigilTheme": "геометрия, сферы"
+}

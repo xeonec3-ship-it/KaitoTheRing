@@ -1,0 +1,8 @@
+{
+  "comment": "Запретная (Низвержение): золото на чёрном, багровые разломы; цепи, трещины в воздухе, тяжёлое медленное движение.",
+  "palette": { "primary": "#D4A017", "secondary": "#5A0E14", "core": "#FFF0C0", "shadow": "#050303" },
+  "textures": { "sparks": "spark_sharp", "runes": "rune_band", "shards": "shard", "sigil": "rim" },
+  "blend": "additive",
+  "motion": { "rotationScale": 0.5, "jitter": 0.15, "easing": "easeInOutCubic" },
+  "sigilTheme": "разлом, цепи"
+}

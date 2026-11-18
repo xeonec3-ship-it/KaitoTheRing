@@ -1,0 +1,90 @@
+# Эффекты: формат JSON (черновик)
+
+Черновик схемы для общей системы эффектов из [`specs/fx_spec.md`](specs/fx_spec.md). Печати — один из её элементов,
+их формат описан в [`sigils.md`](sigils.md). Готовые данные: стили школ (`assets/pohsmp_core/fx/styles/`),
+спрайты частиц (`assets/pohsmp_core/textures/fx/`, генератор `tools/gen_sigil_textures.py`),
+демо-эффект `assets/pohsmp_core/fx/light_rain.json`. Код в игре ещё не написан — это задача основного чата.
+
+Время — в **тиках**, углы — в **градусах**, размеры — в **блоках**.
+
+## Эффект
+
+```json
+{
+  "style": "divine",
+  "duration": 200,
+  "elements": [
+    { "type": "sigil", "id": "silent_gate_sky", "delay": 0, "at": "caster+0,9,0" },
+    { "type": "beam_rain", "delay": 40, "duration": 120, "area": 12, "count": 30, "color": "@primary" }
+  ]
+}
+```
+
+| Поле | Что это |
+|---|---|
+| `style` | стиль школы по умолчанию (`styles/<имя>.json`); при вызове можно подменить |
+| `duration` | общая длина эффекта; `-1` — пока его не остановят (для канальных заклинаний) |
+| `elements` | элементы на общей временной шкале |
+
+Вызов из Java: `Fx.play(level, "light_rain", ctx)`, где `ctx` — кастер, цель, точки, направление, масштаб, seed. Возвращает id экземпляра:
+его можно остановить (`Fx.stop`) или обновить (`Fx.update`) для канальных заклинаний.
+
+## Общие поля элемента
+
+| Поле | Что это |
+|---|---|
+| `type` | тип элемента (таблица ниже) |
+| `delay`, `duration` | когда начинается и сколько длится (тики от старта эффекта) |
+| `at` | привязка: `caster`, `target`, `point:<имя>` (точка из ctx), `caster.hand` (правая рука кастера), `caster.eyes`, `look:<дальность>` (точка взгляда); можно добавить смещение `+x,y,z` в осях взгляда кастера (x — вправо, y — вверх, z — вперёд) |
+| `to` | вторая точка для элементов «между двумя точками» (`beam`, `lightning`, `chains`) |
+| `follow` | `true` — элемент следует за точкой привязки (иначе остаётся там, где появился) |
+| `color` | цвет: `#RRGGBB` или ссылка на палитру стиля: `@primary`, `@secondary`, `@core`, `@shadow` |
+| `brightness` | множитель яркости |
+| `in`, `out` | плавность появления и исчезновения: `{ "duration": 6, "easing": "easeOutCubic" }` |
+| `scale` | множитель размера элемента |
+| `seed` | фиксированный seed случайностей (иначе берётся из ctx) — все игроки видят одно и то же |
+
+Цвет `@…` берётся из палитры стиля, поэтому один эффект перекрашивается под школу заменой `style`.
+
+## Стиль школы
+
+```json
+{
+  "palette": { "primary": "#FFD36B", "secondary": "#FFF4D6", "core": "#FFFFFF", "shadow": "#8A6420" },
+  "textures": { "sparks": "spark_soft", "runes": "rune_band", "shards": "feather", "sigil": "core" },
+  "blend": "additive",
+  "motion": { "rotationScale": 0.6, "jitter": 0.0, "easing": "easeOutSine" }
+}
+```
+
+- `textures` — текстуры по умолчанию: элемент может написать `"texture": "@shards"` и получить перья у Божественной и осколки у Высшей.
+- `blend` — `additive` (свет) или `translucent` (дым, тени).
+- `motion` — характер движения: `rotationScale` умножает скорости вращения, `jitter` — рваность (0 — плавно, 1 — резко),
+  `easing` — плавность по умолчанию, `pulse` — пульсация по умолчанию.
+
+Готовые стили: `divine` (Божественная), `higher` (Высшая), `sculk` (Скалк), `coven` (Ковен), `forbidden` (Запретная).
+
+## Типы элементов
+
+| type | Ключевые параметры |
+|---|---|
+| `sigil` | `id` печати, `orientation`, `scale` — см. [`sigils.md`](sigils.md) |
+| `beam` | `at` → `to` (или `fromSky`: высота), `width`, `core` (доля ширины яркого ядра), `taper` (сужение к концу), `scroll` (скорость прокрутки текстуры), `grow` (тики роста от начала к концу), `flicker` |
+| `beam_rain` | `area` (радиус), `count`, `interval` (тики между лучами), `width`, `height`, `impact` (id печати или вспышки на месте удара) |
+| `wave` | `shape`: `ring` (по земле, `followTerrain`) или `sphere` (пузырь); `radius`, `speed`, `thickness`, `rim` (яркость края сферы) |
+| `flash` | `size`, `anamorphic` (длина горизонтального блика), `rays` (число лучиков), `screen` (засветка экрана у кастера: сила 0–1) |
+| `trail` / `ribbon` | `width`, `length` (тики памяти), `fade`; `slash`: `radius`, `arc` (°), `thickness`, `bend`, `secondary` (тонкая вторая дуга) |
+| `sprites` | `texture` (`@shards`, `feather`…), `count`, `rate`, `spread`, `speed`, `gravity`, `spin`, `tumble`, `sway` (покачивание при падении — для перьев), `size` (`[от, до]` по времени), `life` |
+| `lightning` | `at` → `to`, `branches`, `jaggedness`, `regen` (перегенерация формы каждые N тиков), `width` |
+| `vortex` | `radius`, `height`, `arms`, `speed`, `pull` (к центру, минус — выброс), `texture` |
+| `chains` | `at` → `to`, `link` (размер звена), `sag` (провис), `tension` |
+| `aura` | `target`, `thickness`, `pulse` |
+| `decal` | `texture` (трещины, выжженный след…), `radius`, `fadeOut` (тики) |
+| `wings` / `halo` | `size`, `flap` (амплитуда и период взмаха), `offset` |
+| `mesh` | `model` (сгенерированная модель), `appear`: `grow`, `fall` (с неба), `rise`; `break` (разлом на осколки) |
+
+## Как добавить эффект
+
+1. Если нужен новый спрайт — добавить функцию в `tools/gen_sigil_textures.py` (раздел спрайтов) и запустить его.
+2. Создать `assets/pohsmp_core/fx/<id>.json` по этой схеме, цвета — ссылками на палитру `@…`.
+3. В игре: `/pohsmp fx reload`, `/pohsmp fx play <id> [стиль]` — проверить со стилями разных школ.

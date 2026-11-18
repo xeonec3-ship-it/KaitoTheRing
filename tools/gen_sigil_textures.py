@@ -235,6 +235,84 @@ def arc_strip():
     print('wrote arc_strip')
 
 
+# ------------------------------------------------------------------ спрайты частиц для эффектов (textures/fx/)
+FX_OUT = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core', 'textures', 'fx')
+
+
+def save_fx(img, name, size=128, blur=0.0):
+    small = img.resize((size, size), Image.LANCZOS)
+    if blur:
+        small = small.filter(ImageFilter.GaussianBlur(blur))
+    rgba = Image.new('RGBA', (size, size), (255, 255, 255, 0))
+    rgba.putalpha(small)
+    os.makedirs(FX_OUT, exist_ok=True)
+    rgba.save(os.path.join(FX_OUT, name + '.png'))
+    print('wrote fx/' + name)
+
+
+def star(points, inner, outer, rot=0.0):
+    pts = []
+    for k in range(points * 2):
+        r = outer if k % 2 == 0 else inner
+        a = rot + math.pi * k / points
+        pts.append(polar(r, a))
+    return pts
+
+
+def fx_sprites():
+    # мягкая искра: четырёхлучевая звезда с ореолом
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    d.polygon(star(4, C * 0.12, C * 0.95, -math.pi / 2), fill=255)
+    halo = Image.new('L', (W, W), 0)
+    ImageDraw.Draw(halo).ellipse([C - C * 0.45, C - C * 0.45, C + C * 0.45, C + C * 0.45], fill=110)
+    halo = halo.filter(ImageFilter.GaussianBlur(C * 0.18))
+    img = Image.fromarray(np.maximum(np.array(img), np.array(halo)))
+    save_fx(img, 'spark_soft', blur=0.6)
+    # острая искра: тонкие длинные лучи
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    d.polygon(star(4, C * 0.05, C * 0.98, -math.pi / 2), fill=255)
+    d.polygon(star(4, C * 0.04, C * 0.5, -math.pi / 4), fill=200)
+    save_fx(img, 'spark_sharp')
+    # перо: изогнутый стержень, асимметричное опахало (узкое и широкое), пушистое основание
+    img = canvas()
+    d = ImageDraw.Draw(img)
+
+    def shaft(t):                                                # t: 0 — основание, 1 — кончик; лёгкий изгиб
+        return (C + C * 0.28 * math.sin(t * 1.4) - C * 0.1, C * 1.92 - C * 1.82 * t)
+    d.line([shaft(k / 40) for k in range(41)], fill=255, width=5 * SS, joint='curve')
+    for k in range(34):
+        t = 0.18 + 0.8 * k / 33
+        x, y = shaft(t)
+        env = math.sin(math.pi * min(1, (t - 0.12) / 0.86)) ** 0.7
+        wl, wr = C * 0.24 * env, C * 0.4 * env                   # левое опахало уже правого
+        d.line([x, y, x - wl, y - C * 0.2], fill=235, width=3 * SS)
+        d.line([x, y, x + wr, y - C * 0.12], fill=235, width=3 * SS)
+    rng = random.Random(3)
+    for k in range(18):                                          # пух у основания
+        t = 0.04 + 0.14 * rng.random()
+        x, y = shaft(t)
+        a0 = math.pi * (0.9 + 0.8 * rng.random()) * (1 if rng.random() < 0.5 else -1)
+        L = C * (0.08 + 0.12 * rng.random())
+        d.line([x, y, x + L * math.cos(a0), y + L * math.sin(a0) - C * 0.05], fill=150, width=2 * SS)
+    save_fx(img, 'feather', blur=0.3)
+    # осколок: вытянутый кристалл с яркой гранью
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    shard = [(C, C * 0.06), (C + C * 0.32, C * 0.8), (C + C * 0.12, C * 1.94), (C - C * 0.3, C * 1.1)]
+    d.polygon(shard, fill=150)
+    d.line([shard[0], shard[1], shard[2]], fill=255, width=7 * SS)
+    d.line([shard[0], (C - C * 0.02, C * 1.3)], fill=255, width=4 * SS)
+    save_fx(img, 'shard')
+    # огонёк души: капля-пламя, ярче к низу
+    y, x = np.mgrid[0:W, 0:W].astype(np.float32)
+    nx, ny = (x - C) / C, (y - C) / C
+    body = np.clip(1 - np.hypot(nx * (1.6 + ny * 0.9), (ny - 0.25) * 1.25), 0, 1)
+    img = Image.fromarray((np.clip(body * 1.4, 0, 1) ** 1.3 * 255).astype(np.uint8), 'L')
+    save_fx(img, 'soul_mote', blur=0.8)
+
+
 if __name__ == '__main__':
     glow()
     thin_ring()
@@ -245,3 +323,4 @@ if __name__ == '__main__':
     coven_geo()
     rune_band()
     arc_strip()
+    fx_sprites()

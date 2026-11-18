@@ -1,0 +1,18 @@
+{
+  "comment": "Демо «Ливень света» (Божественная): печать в небе, ливень лучей, перья, вспышки на земле. Пример формата из docs/fx.md.",
+  "style": "divine",
+  "duration": 220,
+  "elements": [
+    { "type": "sigil", "id": "silent_gate_ground", "delay": 0, "at": "caster" },
+    { "type": "sigil", "id": "silent_gate_sky", "delay": 16, "at": "caster+0,10,0", "color": "@primary" },
+    { "type": "wave", "shape": "sphere", "delay": 50, "duration": 24, "at": "caster", "radius": 2.4, "rim": 0.9, "color": "@secondary",
+      "in": { "duration": 6, "easing": "easeOutCubic" }, "out": { "duration": 10, "easing": "easeInSine" } },
+    { "type": "flash", "delay": 66, "duration": 8, "at": "caster+0,10,0", "size": 6, "anamorphic": 14, "rays": 8, "screen": 0.25, "color": "@core" },
+    { "type": "beam_rain", "delay": 72, "duration": 120, "at": "caster", "area": 14, "count": 36, "interval": 3,
+      "width": 0.35, "height": 10, "color": "@primary", "impact": "golden_halo" },
+    { "type": "sprites", "delay": 60, "duration": 150, "at": "caster+0,8,0", "texture": "@shards", "count": 60, "rate": 2,
+      "spread": 10, "speed": 0.02, "gravity": 0.004, "spin": 40, "tumble": 0.6, "sway": 0.8, "size": [0.35, 0.2], "life": 120,
+      "color": "@secondary" },
+    { "type": "decal", "delay": 190, "duration": 30, "at": "caster", "texture": "core", "radius": 3, "fadeOut": 30, "color": "@primary" }
+  ]
+}

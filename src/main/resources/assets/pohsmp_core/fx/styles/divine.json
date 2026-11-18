@@ -1,0 +1,8 @@
+{
+  "comment": "Божественная: золото и белый, тёплое ядро; перья, нимбы, столбы света, мягкие вспышки, спокойное вращение.",
+  "palette": { "primary": "#FFD36B", "secondary": "#FFF4D6", "core": "#FFFFFF", "shadow": "#8A6420" },
+  "textures": { "sparks": "spark_soft", "runes": "rune_band", "shards": "feather", "sigil": "core" },
+  "blend": "additive",
+  "motion": { "rotationScale": 0.6, "jitter": 0.0, "easing": "easeOutSine" },
+  "sigilTheme": "солнце, нимб, крылья"
+}

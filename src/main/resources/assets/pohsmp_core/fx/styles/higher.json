@@ -1,0 +1,8 @@
+{
+  "comment": "Высшая: алый и тёмно-багровый, белое ядро; острые осколки, резкие разрезы, трещины, быстрые рваные движения.",
+  "palette": { "primary": "#FF2A3A", "secondary": "#7A0A1E", "core": "#FFFFFF", "shadow": "#2A0008" },
+  "textures": { "sparks": "spark_sharp", "runes": "rune_band", "shards": "shard", "sigil": "rim" },
+  "blend": "additive",
+  "motion": { "rotationScale": 1.8, "jitter": 0.35, "easing": "easeOutCubic" },
+  "sigilTheme": "алые трещины, клинки"
+}

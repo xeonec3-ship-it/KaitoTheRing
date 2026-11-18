@@ -1,0 +1,29 @@
+{
+  "comment": "Дезинтеграция (как у Хинаты в «О моём перерождении в слизь»): святое поле, клетка из 12 печатей в три яруса сжимается вокруг цели, частицы цели поднимаются, огромная печать сверху, столб света. Каст 200 тиков, удар в 200.",
+  "style": "divine",
+  "duration": 260,
+  "elements": [
+    { "type": "sigil", "id": "disintegration_caster", "delay": 0, "at": "caster", "until": 210 },
+    { "type": "sigil", "id": "disintegration_field", "delay": 0, "at": "target", "until": 200 },
+    { "type": "wave", "shape": "sphere", "delay": 4, "duration": 196, "at": "target+0,0.9,0", "radius": 4.2, "rim": 0.55, "color": "@secondary",
+      "brightness": 0.35, "in": { "duration": 20, "easing": "easeOutCubic" }, "out": { "duration": 4, "easing": "linear" } },
+    { "type": "sigil_ring", "id": "disintegration_cage", "delay": 30, "duration": 170, "at": "target",
+      "tiers": [ { "height": 0.35, "count": 4, "phase": 0 }, { "height": 1.25, "count": 4, "phase": 45 }, { "height": 2.15, "count": 4, "phase": 0 } ],
+      "stagger": 7, "radius": { "from": 3.4, "to": 1.5, "start": 120, "end": 180, "easing": "easeInOutCubic" },
+      "orbit": [ 18, -24, 18 ], "face": "center", "tiltToCenter": { "start": 120, "end": 180, "angle": 25 } },
+    { "type": "beam", "delay": 125, "duration": 75, "at": "ring", "to": "target+0,0.9,0", "width": 0.06, "core": 0.5, "flicker": 0.3,
+      "color": "@core", "comment": "нити света от каждой печати клетки к центру цели" },
+    { "type": "sprites", "delay": 130, "duration": 70, "at": "target+0,0.9,0", "texture": "spark_soft", "count": 120, "rate": 2,
+      "spread": 0.5, "speed": 0.05, "gravity": -0.012, "spin": 0, "size": [0.18, 0.04], "life": 30, "color": "@core",
+      "comment": "духовные частицы цели поднимаются вверх — она начинает распадаться" },
+    { "type": "sigil", "id": "disintegration_sky", "delay": 176, "at": "target+0,9,0", "until": 214 },
+    { "type": "flash", "delay": 199, "duration": 10, "at": "target+0,0.9,0", "size": 7, "anamorphic": 18, "rays": 12, "screen": 0.35, "color": "@core" },
+    { "type": "beam", "delay": 200, "duration": 40, "at": "target+0,9,0", "to": "target+0,-1,0", "width": 1.6, "core": 0.45, "taper": 0,
+      "grow": 3, "flicker": 0.15, "color": "@core", "out": { "duration": 30, "easing": "easeInSine" },
+      "comment": "столб света: в момент удара бьёт с неба сквозь цель" },
+    { "type": "sprites", "delay": 200, "duration": 6, "at": "target+0,0.9,0", "texture": "spark_soft", "count": 160, "rate": 160,
+      "spread": 0.6, "speed": 0.35, "gravity": -0.004, "size": [0.25, 0.02], "life": 40, "color": "@core" },
+    { "type": "wave", "shape": "ring", "delay": 200, "duration": 24, "at": "target", "radius": 9, "thickness": 0.6, "color": "@primary" },
+    { "type": "decal", "delay": 200, "duration": 60, "at": "target", "texture": "holy_seal", "radius": 2.2, "fadeOut": 60, "color": "@primary" }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "comment": "Дезинтеграция: святое поле под целью — печать прорисовывается, кольцо рун, медленное вращение.",
+  "size": 3.4, "color": "#FFF2C8", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.9, "heightOffset": 0.0, "color": "#FFE7A0", "brightness": 0.45,
+      "appear": { "delay": 0, "duration": 20, "easing": "easeOutCubic", "modes": ["fade"] }, "pulse": { "amp": 0.2, "period": 30 } },
+    { "id": "seal", "type": "disc", "texture": "holy_seal", "radius": 0.84, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 24, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90 }, "rotation": { "speed": 6 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.0, "inner": 0.88, "repeat": 8, "heightOffset": 0.02,
+      "appear": { "delay": 10, "duration": 20, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90, "direction": -1 }, "rotation": { "speed": -4 } }
+  ],
+  "dissolve": { "modes": ["shatter"], "duration": 12 }
+}

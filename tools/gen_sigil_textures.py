@@ -384,6 +384,32 @@ def higher_cracks():
     save(img, 'higher_cracks')
 
 
+def holy_seal():
+    """Святая печать (Дезинтеграция): двенадцатиконечная звезда из двух шестиугольников, кольцо рун-засечек, крест в центре."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    ring(d, C * 0.97, 4 * SS)
+    ring(d, C * 0.92, 2 * SS)
+    for k in range(48):                                          # засечки между ободами
+        a = 2 * math.pi * k / 48
+        d.line([*polar(C * 0.92, a), *polar(C * (0.97 if k % 4 == 0 else 0.945), a)], fill=255, width=2 * SS)
+    for rot in (0, math.pi / 6):                                 # двенадцатиконечная звезда: два шестиугольных «звёздных» хода
+        pts = [polar(C * 0.86, rot + 2 * math.pi * k * 5 / 12) for k in range(13)]
+        d.line(pts, fill=255, width=3 * SS, joint='curve')
+    ring(d, C * 0.5, 4 * SS)
+    ring(d, C * 0.44, 2 * SS)
+    for k in range(4):                                           # крест
+        a = math.pi / 2 * k
+        d.polygon([polar(C * 0.08, a - 0.4), polar(C * 0.42, a), polar(C * 0.08, a + 0.4)], fill=255)
+    r = C * 0.06
+    d.ellipse([C - r, C - r, C + r, C + r], fill=255)
+    for k in range(12):                                          # точки на концах лучей
+        x, y = polar(C * 0.86, 2 * math.pi * k / 12)
+        rr = C * 0.022
+        d.ellipse([x - rr, y - rr, x + rr, y + rr], fill=255)
+    save(img, 'holy_seal')
+
+
 def chain_band():
     """Запретная: полоса из звеньев цепи для слоя band (1024×128), звенья чередуются плашмя и ребром."""
     bw, bh = 1024 * SS, 128 * SS
@@ -497,3 +523,4 @@ if __name__ == '__main__':
     divine_sun()
     higher_cracks()
     chain_band()
+    holy_seal()

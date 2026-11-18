@@ -1,0 +1,13 @@
+{
+  "comment": "Дезинтеграция: печать под заклинателем — золотая, спокойная.",
+  "size": 1.6, "color": "#FFD36B", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.8, "heightOffset": 0.0, "brightness": 0.4,
+      "appear": { "delay": 0, "duration": 14, "easing": "easeOutCubic", "modes": ["fade"] } },
+    { "id": "core", "type": "disc", "texture": "core", "radius": 0.6, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 14, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": 20 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.0, "inner": 0.84, "repeat": 6, "heightOffset": 0.02,
+      "appear": { "delay": 6, "duration": 16, "easing": "easeInOutSine", "modes": ["draw"] }, "rotation": { "speed": -10 } }
+  ],
+  "dissolve": { "modes": ["fade"], "duration": 20 }
+}

@@ -144,7 +144,9 @@ public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, In
 | Спрайты частиц | `src\main\resources\assets\pohsmp_core\textures\fx\*.png` | `MOD\src\main\resources\assets\pohsmp_core\textures\fx\` |
 | Стили школ и демо-эффект | `src\main\resources\assets\pohsmp_core\fx\**` | `MOD\src\main\resources\assets\pohsmp_core\fx\` |
 | Логика печатей (без Minecraft) | `src\main\java\ru\pohsmp\core\fx\sigil\*.java` | `MOD\src\main\java\ru\pohsmp\core\fx\sigil\` |
-| Тесты логики | `src\test\java\ru\pohsmp\core\fx\sigil\SigilTimelineTest.java` | `MOD\src\test\java\ru\pohsmp\core\fx\sigil\` |
+| Тесты логики | `src\test\java\ru\pohsmp\core\fx\**` (печати и эффекты) | `MOD\src\test\java\ru\pohsmp\core\fx\` |
+| Логика эффектов (без Minecraft) | `src\main\java\ru\pohsmp\core\fx\*.java` (`FxDef`, `FxStyle`, `FxMath`) | `MOD\src\main\java\ru\pohsmp\core\fx\` |
+| Портал Ковена | `src\main\resources\assets\pohsmp_core\fx\meshes\coven_portal.json`, генератор `tools\gen_coven_portal.py` | `MOD\src\main\resources\assets\pohsmp_core\fx\meshes\`, `cnpc-project\tools\` |
 | Генераторы и превью | `tools\gen_player_anims.py`, `tools\gen_sigil_textures.py`, `tools\build_sigil_preview.py`, `tools\*preview*.html` | `cnpc-project\tools\` |
 | Документы | `docs\sigils.md`, `docs\fx.md`, `docs\specs\`, `docs\ideas\`, `docs\references\` | рядом с проектом, для чтения |
 

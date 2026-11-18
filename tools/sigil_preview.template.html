@@ -92,6 +92,7 @@ code { font-family: var(--f-mono); font-size: 13px; }
         <button type="button" data-view="top">Сверху</button>
         <button type="button" data-view="close">Близко</button>
         <button type="button" data-view="above">Сверху близко</button>
+        <button type="button" data-view="disUp">Снизу вверх</button>
       </div>
       <span class="label">Слои главной печати</span>
       <ol class="layers" id="layers"></ol>
@@ -566,7 +567,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], dis: [0.75, -0.1, 14, 4.0] };
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], dis: [0.75, -0.1, 14, 4.6], disUp: [0.4, -0.55, 9, 6.2] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

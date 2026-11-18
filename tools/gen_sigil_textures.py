@@ -410,6 +410,57 @@ def holy_seal():
     save(img, 'holy_seal')
 
 
+def wave_ring():
+    """Волнистое (зубчатое) кольцо: двойная синусоида по окружности, как в башне Дезинтеграции."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    for base, amp, w in ((0.86, 0.06, 5), (0.8, 0.04, 2)):
+        pts = []
+        for k in range(721):
+            a = 2 * math.pi * k / 720
+            pts.append(polar(C * (base + amp * math.sin(a * 24)), a))
+        d.line(pts, fill=255, width=w * SS, joint='curve')
+    ring(d, C * 0.7, 2 * SS)
+    save(img, 'wave_ring')
+
+
+def cross_spikes():
+    """Двенадцатиугольная рама с четырьмя шипами наружу, на концах — кресты."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    pts = [polar(C * 0.62, 2 * math.pi * k / 12 + math.pi / 12) for k in range(13)]
+    d.line(pts, fill=255, width=4 * SS, joint='curve')
+    ring(d, C * 0.56, 2 * SS)
+    for k in range(4):
+        a = math.pi / 4 + k * math.pi / 2
+        d.line([*polar(C * 0.62, a), *polar(C * 0.92, a)], fill=255, width=4 * SS)
+        cx, cy = polar(C * 0.86, a)
+        t = (math.cos(a + math.pi / 2), math.sin(a + math.pi / 2))
+        L = C * 0.07
+        d.line([cx - t[0] * L, cy - t[1] * L, cx + t[0] * L, cy + t[1] * L], fill=255, width=4 * SS)
+        rr = C * 0.025
+        x2, y2 = polar(C * 0.95, a)
+        d.ellipse([x2 - rr, y2 - rr, x2 + rr, y2 + rr], fill=255)
+    save(img, 'cross_spikes')
+
+
+def star_ring():
+    """Кольцо из двенадцати четырёхконечных звёзд — венец башни."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    ring(d, C * 0.62, 2 * SS)
+    for k in range(12):
+        x, y = polar(C * 0.78, 2 * math.pi * k / 12)
+        r = C * 0.11
+        pts = []
+        for j in range(8):
+            rr = r if j % 2 == 0 else r * 0.28
+            a = j * math.pi / 4 - math.pi / 2
+            pts.append((x + rr * math.cos(a), y + rr * math.sin(a)))
+        d.polygon(pts, fill=255)
+    save(img, 'star_ring')
+
+
 def chain_band():
     """Запретная: полоса из звеньев цепи для слоя band (1024×128), звенья чередуются плашмя и ребром."""
     bw, bh = 1024 * SS, 128 * SS
@@ -524,3 +575,6 @@ if __name__ == '__main__':
     higher_cracks()
     chain_band()
     holy_seal()
+    wave_ring()
+    cross_spikes()
+    star_ring()

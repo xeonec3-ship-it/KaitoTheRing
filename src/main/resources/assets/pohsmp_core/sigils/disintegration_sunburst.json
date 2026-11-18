@@ -1,0 +1,74 @@
+{
+  "comment": "Башня Дезинтеграции, ярус 1 (над верхней печатью): кольцо-солнце с лучами.",
+  "size": 2.1,
+  "color": "#FFE08A",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    {
+      "id": "glow",
+      "type": "disc",
+      "texture": "glow",
+      "radius": 0.8,
+      "heightOffset": -0.01,
+      "color": "#FF9A2E",
+      "brightness": 0.6,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeOutCubic",
+        "modes": [
+          "fade"
+        ]
+      }
+    },
+    {
+      "id": "rays",
+      "type": "spokes",
+      "texture": "divine_sun",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeOutBack",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 16
+      }
+    },
+    {
+      "id": "ring",
+      "type": "disc",
+      "texture": "thin_ring",
+      "radius": 0.6,
+      "heightOffset": 0.01,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 4,
+        "duration": 8,
+        "easing": "easeOutCubic",
+        "modes": [
+          "grow"
+        ]
+      }
+    }
+  ],
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 16
+  },
+  "formedFlash": {
+    "color": "#FFF2C8",
+    "size": 1.2,
+    "duration": 6,
+    "sparks": 8
+  }
+}

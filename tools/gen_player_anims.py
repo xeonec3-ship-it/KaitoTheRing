@@ -61,12 +61,17 @@ def _perp(v, ref):
     return _n(r)
 
 
-def arm(side, hand, staff=None, elbow_out=1.0):
+ITEM_FIX_MAX = 25.0   # на сколько градусов разрешено докручивать посох в кисти (rightItem roll) в статичных позах
+
+
+def arm(side, hand, staff=None, elbow_out=1.0, fore=None):
     """
-    Кисть в точке hand (пиксели модели), посох в этой руке смотрит по staff.
+    Кисть в точке hand (пиксели модели), посох в этой руке смотрит по staff, предплечье — примерно по fore.
     Перебираем, куда отвести локоть, и берём вариант, где посох ближе к нужному направлению,
     а локоть выглядит естественно: ниже кисти, снаружи от корпуса.
-    Возвращает ({'pitch','yaw','roll','bend'}, направление посоха).
+    Возвращает ({'pitch','yaw','roll','bend'}, info), где info: 'staff' — куда смотрит посох без докрутки,
+    'fore' — направление предплечья, 'twist' — на сколько градусов докрутить посох вокруг предплечья
+    (rightItem roll, плюс — против часовой, если смотреть со стороны локтя на кисть... см. item_twist).
     """
     sx = -1.0 if side == 'right' else 1.0
     h = np.asarray(hand, dtype=float) - SHOULDER[side]
@@ -96,14 +101,35 @@ def arm(side, hand, staff=None, elbow_out=1.0):
         e_abs = SHOULDER[side] + elbow
         score = 0.0
         if staff is not None:
-            score += 4.0 * float(np.dot(st, _n(staff)))
+            score += 4.0 * float(np.dot(st, _n(staff))) - 2.0 * abs(float(np.dot(f, _n(staff))))
+        if fore is not None:
+            score += 3.0 * float(np.dot(f, _n(fore)))
         score += elbow_out * (0.6 * (-u[1]) + 0.5 * (e_abs[0] * sx - BODY_X) / 4.0)
         if e_abs[0] * sx < BODY_X - 0.5 and e_abs[2] < 2.5:      # локоть внутри корпуса
             score -= 3.0
         if best is None or score > best[0]:
-            best = (score, up, st)
+            best = (score, up, st, f)
     p, y, r = _euler(best[1])
-    return {'pitch': p, 'yaw': y, 'roll': r, 'bend': math.degrees(bend)}, best[2]
+    info = {'staff': best[2], 'fore': best[3], 'twist': 0.0}
+    if staff is not None:
+        info['twist'] = item_twist(best[3], best[2], staff)
+    return {'pitch': p, 'yaw': y, 'roll': r, 'bend': math.degrees(bend)}, info
+
+
+def item_twist(fore, cur, want):
+    """
+    Угол (градусы) поворота предмета вокруг предплечья, который переводит посох из cur в want.
+    rightItem roll крутит предмет вокруг оси «от кисти к локтю» (-fore) по правилу правой руки:
+    если смотреть игроку в спину при предплечье вперёд, плюс — против часовой стрелки.
+    """
+    ax = -_n(fore)
+    w = np.asarray(want, dtype=float)
+    w = w - np.dot(w, ax) * ax
+    c = cur - np.dot(cur, ax) * ax
+    if np.linalg.norm(w) < 1e-6 or np.linalg.norm(c) < 1e-6:
+        return 0.0
+    w, c = _n(w), _n(c)
+    return math.degrees(math.atan2(float(np.dot(np.cross(c, w), ax)), float(np.dot(c, w))))
 
 
 def grip(hand, staff, dist):
@@ -113,6 +139,11 @@ def grip(hand, staff, dist):
 
 def _a(side, hand, staff=None, **kw):
     return arm(side, hand, staff, **kw)[0]
+
+
+def _fix(info):
+    """Небольшая докрутка посоха в кисти для статичной позы (не больше ITEM_FIX_MAX)."""
+    return max(-ITEM_FIX_MAX, min(ITEM_FIX_MAX, info['twist']))
 
 
 # ------------------------------------------------------------------ дорожки и вывод
@@ -145,8 +176,10 @@ class Anim:
             ks.sort(key=lambda k: k[0])
             prev = {}
             for tick, ch, ease in ks:
-                ch = {c: (v + 360 * round((prev[c] - v) / 360)) if c in ('pitch', 'yaw', 'roll') and c in prev else v
-                      for c, v in ch.items()}
+                # углы частей тела берём ближайшие к предыдущему ключу; у предмета в руке — как задано (там +360 = оборот)
+                if part not in ('rightItem', 'leftItem'):
+                    ch = {c: (v + 360 * round((prev[c] - v) / 360)) if c in ('pitch', 'yaw', 'roll') and c in prev else v
+                          for c, v in ch.items()}
                 prev.update(ch)
                 moves.append({'tick': tick, 'easing': ease, part: {c: round(float(v), 2) for c, v in ch.items()}})
         moves.sort(key=lambda m: m['tick'])
@@ -165,29 +198,31 @@ def merge(*dicts):
 
 
 # ================================================================== Низвержение
-# Каст 25 с (DownfallSpell.CAST = 500 тиков). Хореография по разбору видео:
+# Каст 25 с (DownfallSpell.CAST = 500 тиков). Хореография по видео (камера там смотрит игроку в спину):
 #   0      — стоит неподвижно, руки вдоль тела; посох висит в воздухе справа (клиентский эффект, не эта анимация)
-#   4а     — «Сосредоточение»: правая кисть у груди и подбородка, предплечье поперёк корпуса, голова опущена
-#   4б     — посох в руках по диагонали поперёк тела: навершие вверху слева над головой, низ справа
-#   4в     — прокрутка ~1.4 с: диагональ -> горизонталь у груди -> почти вертикаль -> горизонталь
-#   4г     — «Активация»: посох горизонтально перед грудью, навершием влево, двумя руками, как преграда
-#   10, 15 с — толчки заклинания (разлом, нить): игрок упирается, посох чуть подаётся вперёд
-# Навершие — конец посоха по направлению staff.
+#   4а     — «Сосредоточение»: правая кисть у подбородка, предплечье поперёк корпуса, голова опущена
+#   4б     — кисть падает влево вниз, посох появляется там и взмахом встаёт по диагонали: навершие вверху слева
+#   4в     — посох встаёт горизонтально и делает полный оборот вокруг кисти перед грудью, во фронтальной
+#            плоскости, как жезл (~0.75 с, медленнее в начале и в конце); кисть почти неподвижна
+#   4г     — «Активация»: посох замирает горизонтально перед грудью навершием влево, левая рука берётся за древко
+#   10, 15 с — толчки заклинания (разлом, нить): игрок упирается, посох подаётся вперёд
+# Оборот делается поворотом предмета в кисти (rightItem roll) ровно на 360°: куда бы ни шло вращение в игре,
+# посох закончит его там же, где начал.
 
-T_FOCUS, T_FOCUS_END, T_DIAG = 1.2, 2.5, 2.9
-T_SPIN = (2.9, 3.35, 3.8, 4.25)
-T_HOLD = 4.6
+T_FOCUS, T_FOCUS_END = 1.2, 2.45
+T_DROP, T_DIAG, T_FLAT = 2.65, 2.95, 3.12       # кисть влево вниз -> диагональ -> горизонталь
+T_TWIRL_END = 3.87                               # полный оборот за 0.75 с
+T_GRAB, T_HOLD = 4.15, 4.4
 
-S_DIAG = (0.6, 0.78, 0.18)
-S_HORIZ = (1.0, 0.0, 0.06)
-S_VERT = (0.1, 1.0, 0.12)
+S_DROP = (0.35, 0.85, 0.4)                       # посох слева внизу, навершие вверх (входит в кадр слева)
+S_DIAG = (0.62, 0.76, 0.18)                      # навершие вверху слева
+S_HORIZ = (1.0, 0.0, 0.0)                        # навершие влево
 
-HOLD_R = (-5.9, 17.6, 6.6)           # правая кисть перед правой стороной груди (подобрано под горизонтальный посох)
-HOLD_L = grip(HOLD_R, S_HORIZ, 8.0)   # левая держит древко ближе к навершию
-DIAG_R = (-5.1, 16.3, 5.7)
-DIAG_L = grip(DIAG_R, S_DIAG, 10.5)
-SPIN_H = (-3.3, 15.2, 5.4)           # точки хвата при прокрутке: у каждой ориентации своя
-SPIN_V = (-2.8, 17.7, 6.4)
+DROP_R = (0.8, 14.6, 5.6)                        # кисть перед животом слева
+DIAG_R = (-1.4, 16.6, 5.8)
+TWIRL_R = (-5.5, 20.0, 8.5)                      # рука вперёд, кисть на уровне верха груди (подобрано перебором)
+FORE = (0.0, 0.0, 1.0)
+GRIP_L = 10.0                                    # левая рука берётся за древко на 10 px ближе к навершию
 
 REST_R = {'pitch': 0, 'yaw': 0, 'roll': 3, 'bend': -4}
 REST_L = {'pitch': 0, 'yaw': 0, 'roll': -3, 'bend': -4}
@@ -196,10 +231,21 @@ LEGS_REST = {'roll': 0, 'pitch': 0, 'bend': 0}
 BREATHE = {'pitch': -3, 'yaw': 0, 'bend': -3}
 
 
+def _twirl_pose():
+    """Рука для оборота и удержания: предплечье вперёд, посох горизонтально навершием влево."""
+    q, info = arm('right', TWIRL_R, S_HORIZ, fore=FORE)
+    staff = _n(info['staff'])
+    # после докрутки посох смотрит по S_HORIZ, спроецированному на плоскость оборота
+    ax = -_n(info['fore'])
+    flat = _n(np.asarray(S_HORIZ) - np.dot(S_HORIZ, ax) * ax)
+    return q, info['twist'], flat
+
+
 def downfall_cast():
     a = Anim('pohsmp_downfall_cast', 25.0)
     a.pose(0, rightArm=REST_R, leftArm=REST_L, torso={'pitch': 0, 'yaw': 0, 'bend': 0}, head={'pitch': 0, 'yaw': 0},
-           rightLeg={'roll': 2, 'pitch': 0, 'bend': 0}, leftLeg={'roll': -2, 'pitch': 0, 'bend': 0})
+           rightLeg={'roll': 2, 'pitch': 0, 'bend': 0}, leftLeg={'roll': -2, 'pitch': 0, 'bend': 0},
+           rightItem={'roll': 0})
     a.sway(0, T_FOCUS - 0.4, 1.6, 'torso', {'pitch': 0, 'yaw': 0, 'bend': 0}, 'pitch', 1.0)
 
     # 4а — сосредоточение
@@ -210,27 +256,37 @@ def downfall_cast():
     a.pose(T_FOCUS_END, rightArm=merge(focus_r, {'pitch': focus_r['pitch'] - 4}),
            torso={'pitch': 5, 'yaw': -4, 'bend': 8}, head={'pitch': 22, 'yaw': -6})
 
-    # 4б — посох по диагонали, двумя руками
-    a.pose(T_DIAG, 'easeOutBack', rightArm=_a('right', DIAG_R, S_DIAG), leftArm=_a('left', DIAG_L, S_DIAG))
-    a.pose(T_DIAG, 'easeOutCubic', torso={'pitch': -2, 'yaw': 8, 'bend': -2}, head={'pitch': -10, 'yaw': 6})
+    # 4б — кисть падает влево вниз (там посох появляется), взмах вверх в диагональ
+    drop_q, drop_i = arm('right', DROP_R, S_DROP)
+    diag_q, diag_i = arm('right', DIAG_R, S_DIAG, fore=FORE)
+    a.pose(T_DROP, 'easeInQuad', rightArm=drop_q, rightItem={'roll': _fix(drop_i)},
+           torso={'pitch': 3, 'yaw': -12, 'bend': 4}, head={'pitch': 10, 'yaw': -14})
+    a.pose(T_DIAG, 'easeOutCubic', rightArm=diag_q, rightItem={'roll': _fix(diag_i)},
+           torso={'pitch': -2, 'yaw': 4, 'bend': -2}, head={'pitch': -8, 'yaw': 4})
+    a.pose(T_DIAG, leftArm=_a('left', (8.0, 13.0, 2.5), elbow_out=1.4))
 
-    # 4в — прокрутка одной правой рукой, левая отпускает и уходит в сторону
-    a.pose(T_SPIN[0] + 0.25, leftArm=_a('left', (8.2, 12.5, 2.5), elbow_out=1.4))
-    for t, h, s in ((T_SPIN[1], SPIN_H, S_HORIZ), (T_SPIN[2], SPIN_V, S_VERT), (T_SPIN[3], SPIN_H, S_HORIZ)):
-        a.pose(t, 'easeInOutQuad', rightArm=_a('right', h, s))
-    a.pose(T_SPIN[1], torso={'pitch': 0, 'yaw': -5, 'bend': 0}, head={'pitch': 2, 'yaw': -3})
-    a.pose(T_SPIN[2], torso={'pitch': -2, 'yaw': 5, 'bend': -2}, head={'pitch': -6, 'yaw': 3})
-    a.pose(T_SPIN[3], torso={'pitch': 0, 'yaw': 0, 'bend': 0}, head={'pitch': 0, 'yaw': 0},
+    # 4в — горизонталь и полный оборот вокруг кисти
+    tw_q, tw_fix, _ = _twirl_pose()
+    a.pose(T_FLAT, 'easeInOutQuad', rightArm=tw_q, rightItem={'roll': tw_fix},
+           torso={'pitch': 0, 'yaw': 0, 'bend': 0}, head={'pitch': -2, 'yaw': 0})
+    a.key(T_TWIRL_END, 'rightItem', 'easeInOutSine', roll=tw_fix + 360)
+    a.pose(T_TWIRL_END, rightArm=tw_q)
+    # корпус чуть «провожает» посох
+    a.pose((T_FLAT + T_TWIRL_END) / 2, torso={'pitch': -1, 'yaw': 3, 'bend': -1}, head={'pitch': -4, 'yaw': 2})
+    a.pose(T_TWIRL_END, torso={'pitch': 0, 'yaw': 0, 'bend': 0}, head={'pitch': -2, 'yaw': 0},
            rightLeg={'roll': 2, 'pitch': 0, 'bend': 0}, leftLeg={'roll': -2, 'pitch': 0, 'bend': 0})
 
-    # 4г — активация: посох-преграда двумя руками, стойка шире
-    hold_r, hold_l = _a('right', HOLD_R, S_HORIZ), _a('left', HOLD_L, S_HORIZ)
-    a.pose(T_HOLD, 'easeOutBack', rightArm=hold_r, leftArm=hold_l)
+    # 4г — активация: левая рука берётся за древко ближе к навершию, стойка шире
+    hold_r = tw_q
+    _, _, flat = _twirl_pose()
+    hold_l_pt = grip(TWIRL_R, flat, GRIP_L)
+    hold_l = _a('left', hold_l_pt, flat)
+    a.pose(T_GRAB, 'easeOutBack', leftArm=hold_l)
     a.pose(T_HOLD, torso=BREATHE, head={'pitch': -6, 'yaw': 0}, rightLeg=STANCE_R, leftLeg=STANCE_L)
 
     # удержание: дыхание и два толчка заклинания (10 с — разлом, 15 с — нить)
-    push_r = _a('right', np.add(HOLD_R, (0, 0.4, 1.4)), S_HORIZ)
-    push_l = _a('left', np.add(HOLD_L, (0, 0.4, 1.4)), S_HORIZ)
+    push_r = _a('right', np.add(TWIRL_R, (0, 0.4, 1.4)), S_HORIZ, fore=FORE)
+    push_l = _a('left', np.add(hold_l_pt, (0, 0.4, 1.4)), flat)
     a.sway(T_HOLD, 9.6, 3.2, 'torso', BREATHE, 'pitch', 1.2)
     a.sway(11.0, 14.6, 3.2, 'torso', BREATHE, 'pitch', 1.2)
     a.sway(16.0, 25.0, 3.2, 'torso', BREATHE, 'pitch', 1.2)
@@ -239,21 +295,24 @@ def downfall_cast():
         a.pose(t, 'easeOutCubic', rightArm=push_r, leftArm=push_l, torso={'pitch': 4, 'yaw': 0, 'bend': 2},
                head={'pitch': -2, 'yaw': 0})
         a.pose(t + 1.0, rightArm=hold_r, leftArm=hold_l, torso=BREATHE, head={'pitch': -6, 'yaw': 0})
-    a.pose(25.0, rightArm=hold_r, leftArm=hold_l, head={'pitch': -6, 'yaw': 0}, rightLeg=STANCE_R, leftLeg=STANCE_L)
+    a.pose(25.0, rightArm=hold_r, leftArm=hold_l, head={'pitch': -6, 'yaw': 0}, rightLeg=STANCE_R, leftLeg=STANCE_L,
+           rightItem={'roll': tw_fix + 360})
     return a
 
 
 def downfall_finish():
     """После каста: преграда резко толкается вперёд, затем руки опускаются."""
     a = Anim('pohsmp_downfall_finish', 1.5, hold=False)
-    hold_r, hold_l = _a('right', HOLD_R, S_HORIZ), _a('left', HOLD_L, S_HORIZ)
-    a.pose(0, rightArm=hold_r, leftArm=hold_l, torso=BREATHE, head={'pitch': -6, 'yaw': 0},
-           rightLeg=STANCE_R, leftLeg=STANCE_L)
-    a.pose(0.18, 'easeOutCubic', rightArm=_a('right', np.add(HOLD_R, (0, 0.6, 3.0)), S_HORIZ),
-           leftArm=_a('left', np.add(HOLD_L, (0, 0.6, 3.0)), S_HORIZ),
+    tw_q, tw_fix, flat = _twirl_pose()
+    hold_l_pt = grip(TWIRL_R, flat, GRIP_L)
+    a.pose(0, rightArm=tw_q, leftArm=_a('left', hold_l_pt, flat), torso=BREATHE, head={'pitch': -6, 'yaw': 0},
+           rightLeg=STANCE_R, leftLeg=STANCE_L, rightItem={'roll': tw_fix})
+    a.pose(0.18, 'easeOutCubic', rightArm=_a('right', np.add(TWIRL_R, (0, 0.6, 3.0)), S_HORIZ, fore=FORE),
+           leftArm=_a('left', np.add(hold_l_pt, (0, 0.6, 3.0)), flat),
            torso={'pitch': 9, 'yaw': 0, 'bend': 4}, head={'pitch': 0, 'yaw': 0})
     a.pose(0.5, rightArm=_a('right', (-3.0, 15.5, 5.0), (0.2, 1, 0.3)),
-           leftArm={'pitch': 0, 'yaw': 0, 'roll': -6, 'bend': -6}, torso={'pitch': 2, 'yaw': 0, 'bend': 0})
+           leftArm={'pitch': 0, 'yaw': 0, 'roll': -6, 'bend': -6}, torso={'pitch': 2, 'yaw': 0, 'bend': 0},
+           rightItem={'roll': 0})
     a.pose(1.5, rightArm={'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0}, leftArm={'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0},
            torso={'pitch': 0, 'yaw': 0, 'bend': 0}, head={'pitch': 0, 'yaw': 0}, rightLeg=LEGS_REST, leftLeg=LEGS_REST)
     return a

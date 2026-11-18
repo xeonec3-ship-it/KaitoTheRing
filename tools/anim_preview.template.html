@@ -93,7 +93,7 @@ code { font-family: var(--f-mono); font-size: 13px; background: var(--bg); borde
   <header>
     <span class="eyebrow">pohsmp_core · анимации игрока</span>
     <h1>Низвержение: каст 25 секунд</h1>
-    <p class="sub">Так игрок двигается, пока кастует Низвержение. Хореография по разбору видео: стоит неподвижно, рука к груди, посох появляется по диагонали, прокручивается и замирает поперёк груди до конца каста.</p>
+    <p class="sub">Так игрок двигается, пока кастует Низвержение. Хореография по видео: стоит неподвижно, кисть к подбородку, посох появляется слева, взмахом встаёт по диагонали, делает полный оборот вокруг кисти и замирает поперёк груди. На видео камера сзади — так удобнее сравнивать.</p>
   </header>
 
   <div class="main">
@@ -145,9 +145,10 @@ code { font-family: var(--f-mono); font-size: 13px; background: var(--bg); borde
 const DATA = /*ANIMS*/null;
 const META = {
   pohsmp_downfall_cast: [
-    [0, "Стоит неподвижно, посох висит справа"], [1.2, "4а. Сосредоточение: рука к груди"],
-    [3.0, "4б. Посох в руке по диагонали"], [3.4, "4в. Прокрутка посоха"], [4.4, "4г. Активация: посох поперёк груди"],
-    [10, "Открывается разлом"], [15, "Золотая нить к разлому"], [24, "Врата"]
+    [0, "Стоит неподвижно, посох висит справа"], [1.2, "4а. Сосредоточение: кисть у подбородка"],
+    [2.65, "4б. Кисть влево вниз, посох появляется"], [2.95, "4б. Взмах: посох по диагонали"],
+    [3.12, "4в. Полный оборот посоха вокруг кисти"], [3.87, "4г. Посох горизонтально, навершие влево"],
+    [4.15, "4г. Левая рука берётся за древко"], [10, "Разлом: толчок"], [15, "Нить: толчок"]
   ],
   pohsmp_downfall_finish: [[0, "Толчок посохом-преградой"], [0.5, "Возврат в покой"]]
 };
@@ -263,7 +264,7 @@ const ghost = makeStaff();
 ghost.traverse((o) => { if (o.material) { o.material = o.material.clone(); o.material.transparent = true; o.material.opacity = 0.6; } });
 ghost.rotation.x = -Math.PI / 2;                                     // навершие вверх, наконечник вниз
 const ghostRoot = new THREE.Group(); ghostRoot.add(ghost); scene.add(ghostRoot);
-const STAFF_IN_HAND = { pohsmp_downfall_cast: 2.6 };
+const STAFF_IN_HAND = { pohsmp_downfall_cast: 2.62 };
 
 const disc = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.6, 64), new THREE.MeshBasicMaterial({ color: 0xf0c35a, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
 disc.rotation.x = -Math.PI / 2; disc.position.y = 0.002; scene.add(disc);
@@ -280,6 +281,7 @@ function pose(name, tick) {
     rot(l.top, v(part, "pitch"), v(part, "yaw"), v(part, "roll"));
     l.low.rotation.set(v(part, "bend") * D2R, 0, 0);
   }
+  staff.rotation.set(0, v("rightItem", "roll") * D2R, 0);   // поворот предмета вокруг оси «кисть -> локоть»
   const t = tick / TPS, from = STAFF_IN_HAND[name];
   const inHand = from === undefined || t >= from;
   staff.visible = inHand;

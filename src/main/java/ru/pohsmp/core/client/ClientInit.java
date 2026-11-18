@@ -1,0 +1,18 @@
+package ru.pohsmp.core.client;
+
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+
+public final class ClientInit {
+    private ClientInit() {}
+
+    public static void init(IEventBus modBus) {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+        MinecraftForge.EVENT_BUS.register(CamFixClient.class);
+        MinecraftForge.EVENT_BUS.register(TierTooltip.class);
+        MinecraftForge.EVENT_BUS.register(DisintegrationFx.class);
+        MinecraftForge.EVENT_BUS.register(HigherFx.class);
+    }
+}

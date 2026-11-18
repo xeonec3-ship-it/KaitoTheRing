@@ -1,0 +1,13 @@
+Команды выдачи свитков pohsmp_core (вставлять в чат или командный блок, @s заменить на ник).
+
+Дезинтеграция (Божественная, встроенная ступень):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:disintegration",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+
+Любое заклинание со ступенью по метке (pohsmp_tier: "higher" Высшая, "mythic" Мифическая, "divine" Божественная, "none" — без ступени):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:fireball",index:0,level:12,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b},pohsmp_tier:"mythic"} 1
+
+Без метки ступень считается по уровню выше максимума заклинания: +1..2 Высшая, +3..4 Мифическая, +5 и больше Божественная
+(у Огненного шара максимум 5, значит уровень 15 = Божественная, с аурой и отдачей).
+
+Божественная ступень: золотая аура при касте, после удачного каста отдача (по умолчанию Слабость II 15 с, Замедление II 10 с, Тошнота 5 с).
+Настройки: world/serverconfig/pohsmp_core-server.toml ([divine] aura, backlash; [disintegration] damagePercent 0.5, damageFlat 40, range 48).

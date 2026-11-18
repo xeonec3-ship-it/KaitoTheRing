@@ -1,0 +1,94 @@
+package ru.pohsmp.core.spell;
+
+import io.redspace.ironsspellbooks.api.config.DefaultConfig;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
+import io.redspace.ironsspellbooks.api.spells.SpellRarity;
+import io.redspace.ironsspellbooks.damage.DamageSources;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import ru.pohsmp.core.PohCore;
+
+/** Base of the ordinary-school spells of this mod (Iron's schools, levels 1..max, mana and cooldown as usual). */
+public abstract class PohSpell extends AbstractSpell {
+    private final ResourceLocation id;
+    private final DefaultConfig config;
+
+    protected PohSpell(String path, ResourceLocation school, SpellRarity minRarity, int maxLevel, double cooldownSec,
+                       int castTicks, int baseMana, int manaPerLevel) {
+        this.id = new ResourceLocation(PohCore.MODID, path);
+        this.config = new DefaultConfig()
+                .setMinRarity(minRarity)
+                .setSchoolResource(school)
+                .setMaxLevel(maxLevel)
+                .setCooldownSeconds(cooldownSec)
+                .setAllowCrafting(true)
+                .build();
+        this.castTime = castTicks;
+        this.baseManaCost = baseMana;
+        this.manaCostPerLevel = manaPerLevel;
+        this.baseSpellPower = 1;
+        this.spellPowerPerLevel = 0;
+    }
+
+    @Override public ResourceLocation getSpellResource() { return id; }
+    @Override public DefaultConfig getDefaultConfig() { return config; }
+    /** Black = invisible: Iron's target box is drawn additively. */
+    @Override public org.joml.Vector3f getTargetingColor() { return new org.joml.Vector3f(0, 0, 0); }
+
+    protected MutableComponent ui(String key, Object... args) {
+        return Component.translatable("ui.pohsmp_core." + id.getPath() + "." + key, args);
+    }
+
+    /** Value growing linearly from a (level 1) to b (max level). */
+    protected double lv(int level, double a, double b) {
+        int max = Math.max(2, getMaxLevel());
+        return a + (b - a) * (Math.max(1, Math.min(level, max)) - 1) / (double) (max - 1);
+    }
+
+    /** Spell power multiplier of the caster for this school (1.0 = no bonus). */
+    protected float mult(LivingEntity caster) {
+        return caster == null ? 1f : getEntityPowerMultiplier(caster);
+    }
+
+    /** School damage through Iron's (resistances, spell events). */
+    public boolean hit(LivingEntity caster, LivingEntity t, float amount) {
+        if (!t.isAlive()) return false;
+        t.invulnerableTime = 0;
+        return DamageSources.applyDamage(t, amount, getDamageSource(caster));
+    }
+
+    public static String n(double d) {
+        return d == Math.floor(d) ? String.valueOf((long) d) : String.format(java.util.Locale.ROOT, "%.1f", d);
+    }
+
+    /** Point where the caster looks: the first creature on the line (its feet), else the first block, else the end of the range. */
+    public static Vec3 lookPoint(ServerLevel sl, LivingEntity caster, double range) {
+        Vec3 eye = caster.getEyePosition();
+        Vec3 end = eye.add(caster.getLookAngle().scale(range));
+        BlockHitResult hr = sl.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
+        if (hr.getType() != HitResult.Type.MISS) end = hr.getLocation();
+        net.minecraft.world.phys.EntityHitResult eh = net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(sl, caster, eye, end,
+                new net.minecraft.world.phys.AABB(eye, end).inflate(1),
+                e -> e instanceof LivingEntity && e != caster && !e.isSpectator() && e.isPickable() && !(e instanceof net.minecraft.world.entity.decoration.ArmorStand));
+        return eh != null ? eh.getEntity().position() : end;
+    }
+
+    /** Ground under a point (down to 24 blocks). */
+    public static Vec3 ground(ServerLevel sl, Entity e, Vec3 p) {
+        BlockHitResult hr = sl.clip(new ClipContext(p.add(0, 0.5, 0), p.add(0, -24, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, e));
+        return hr.getType() == HitResult.Type.MISS ? p : hr.getLocation();
+    }
+
+    public static double hdist(Entity e, Vec3 c) {
+        double dx = e.getX() - c.x, dz = e.getZ() - c.z;
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+}

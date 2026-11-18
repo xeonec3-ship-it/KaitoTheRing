@@ -1,0 +1,37 @@
+package ru.pohsmp.core;
+
+import net.minecraftforge.common.ForgeConfigSpec;
+
+public final class ServerConfig {
+    public static final ForgeConfigSpec SPEC;
+    public static final ForgeConfigSpec.IntValue BACKLASH_SECONDS, SLOW_SECONDS, WEAK_SECONDS, NAUSEA_SECONDS;
+    public static final ForgeConfigSpec.BooleanValue BLOCK_MANA;
+    public static final ForgeConfigSpec.BooleanValue AURA;
+    public static final ForgeConfigSpec.DoubleValue DIS_PERCENT;
+    public static final ForgeConfigSpec.DoubleValue DIS_FLAT;
+    public static final ForgeConfigSpec.IntValue DIS_RANGE;
+    public static final ForgeConfigSpec.DoubleValue HIGHER_MULT;
+
+    static {
+        ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
+        b.push("divine");
+        AURA = b.comment("Golden aura around a player casting a Divine-tier scroll").define("aura", true);
+        BACKLASH_SECONDS = b.comment("Duration of the Divine Backlash effect after a successful Divine-tier scroll cast (seconds)").defineInRange("backlashSeconds", 60, 1, 3600);
+        SLOW_SECONDS = b.comment("Slowness II part, from the start of the effect (seconds, 0 = off)").defineInRange("slowSeconds", 10, 0, 3600);
+        WEAK_SECONDS = b.comment("Weakness II part, from the start of the effect (seconds, 0 = off)").defineInRange("weakSeconds", 15, 0, 3600);
+        NAUSEA_SECONDS = b.comment("Hidden nausea (no icon) put together with the effect (seconds, 0 = off)").defineInRange("nauseaSeconds", 5, 0, 3600);
+        BLOCK_MANA = b.comment("No mana gain of any kind (regeneration, potions) while the effect lasts").define("blockMana", true);
+        b.pop();
+        b.push("disintegration");
+        DIS_PERCENT = b.comment("Damage as a share of the target's max health").defineInRange("damagePercent", 0.5, 0.0, 10.0);
+        DIS_FLAT = b.comment("Flat damage added on top").defineInRange("damageFlat", 40.0, 0.0, 100000.0);
+        DIS_RANGE = b.comment("Targeting range in blocks").defineInRange("range", 48, 4, 128);
+        b.pop();
+        b.push("higher");
+        HIGHER_MULT = b.comment("Damage and healing multiplier for all Higher-school spells").defineInRange("damageMult", 1.0, 0.0, 100.0);
+        b.pop();
+        SPEC = b.build();
+    }
+
+    private ServerConfig() {}
+}

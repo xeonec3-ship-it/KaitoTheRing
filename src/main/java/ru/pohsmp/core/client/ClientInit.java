@@ -14,5 +14,6 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(TierTooltip.class);
         MinecraftForge.EVENT_BUS.register(DisintegrationFx.class);
         MinecraftForge.EVENT_BUS.register(HigherFx.class);
+        MinecraftForge.EVENT_BUS.register(HiddenHands.class);
     }
 }

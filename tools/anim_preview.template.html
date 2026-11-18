@@ -92,8 +92,8 @@ code { font-family: var(--f-mono); font-size: 13px; background: var(--bg); borde
 <div class="wrap">
   <header>
     <span class="eyebrow">pohsmp_core · анимации игрока</span>
-    <h1>Низвержение: каст 25 секунд</h1>
-    <p class="sub">Так игрок двигается, пока кастует Низвержение. Хореография по видео: стоит неподвижно, кисть к подбородку, посох появляется слева, взмахом встаёт по диагонали, делает полный оборот вокруг кисти и замирает поперёк груди. На видео камера сзади — так удобнее сравнивать.</p>
+    <h1>Анимации заклинаний с роликом</h1>
+    <p class="sub">Так игрок двигается, пока кастует заклинания с роликом камеры. Низвержение — с посохом, по видео. Млечный Путь, Пожирание душ, Табу и Закрытие Пространства — без посоха: предмет в руках на время анимации не отображается. Движения привязаны к планам камеры.</p>
   </header>
 
   <div class="main">
@@ -150,7 +150,25 @@ const META = {
     [3.12, "4в. Полный оборот посоха вокруг кисти"], [3.87, "4г. Посох горизонтально, навершие влево"],
     [4.15, "4г. Левая рука берётся за древко"], [10, "Разлом: толчок"], [15, "Нить: толчок"]
   ],
-  pohsmp_downfall_finish: [[0, "Толчок посохом-преградой"], [0.5, "Возврат в покой"]]
+  pohsmp_downfall_finish: [[0, "Толчок посохом-преградой"], [0.5, "Возврат в покой"]],
+  pohsmp_milky_way_cast: [
+    [0, "Семя галактики в ладонях"], [1.6, "Руки расходятся вверх, взгляд в небо"], [3.2, "Руки в стороны, спираль корпусом"],
+    [5.0, "Рукава спирали руками"], [6.8, "Сбор силы: левая целится"], [8.4, "Удар ладонью: поток уходит"]
+  ],
+  pohsmp_soul_devour_cast: [
+    [0, "Рука-коготь к цели"], [4.0, "Сжимает: рука дрожит"], [8.0, "Тянет душу, перехватывая руками"],
+    [17.0, "Ладони вверх: душа поднимается"], [21.0, "Дрожь"], [24.8, "Прижимает душу к груди"]
+  ],
+  pohsmp_taboo_cast: [
+    [0, "Молитва, голова склонена"], [4.0, "Сложенные руки поднимаются"], [8.0, "Руки раскрыты: печать над головой"],
+    [17.0, "На колено, ладони над землёй"], [21.0, "Встаёт"], [24.4, "Указ: рука вверх"]
+  ],
+  pohsmp_space_closure_cast: [
+    [0, "Печать у лица"], [3.2, "Руки вверх, к печати Ковена"], [6.4, "Руки рисуют купол"],
+    [10.0, "Держит купол"], [13.6, "Поворачивает купол"], [16.8, "Ладони сходятся"], [19.55, "Толчок: пространство закрыто"]
+  ],
+  pohsmp_milky_way_finish: [[0, "Руки опускаются"]], pohsmp_soul_devour_finish: [[0, "Руки опускаются"]],
+  pohsmp_taboo_finish: [[0, "Рука опускается"]], pohsmp_space_closure_finish: [[0, "Руки опускаются"]]
 };
 
 const $ = (id) => document.getElementById(id);
@@ -274,6 +292,7 @@ const rot = (o, p, y, r) => o.rotation.set(p * D2R, -y * D2R, -r * D2R, "ZYX");
 let TR = {};
 function pose(name, tick) {
   const v = (part, ch) => value(TR, part, ch, tick);
+  root.position.y = v("body", "y");
   rot(torso, v("torso", "pitch"), v("torso", "yaw"), v("torso", "roll"));
   chestG.rotation.set(v("torso", "bend") * D2R, 0, 0);
   rot(head, v("head", "pitch"), v("head", "yaw"), v("head", "roll"));
@@ -283,9 +302,10 @@ function pose(name, tick) {
   }
   staff.rotation.set(0, v("rightItem", "roll") * D2R, 0);   // поворот предмета вокруг оси «кисть -> локоть»
   const t = tick / TPS, from = STAFF_IN_HAND[name];
-  const inHand = from === undefined || t >= from;
+  const withStaff = name.startsWith("pohsmp_downfall");          // остальные — без посоха, предмет в руках спрятан
+  const inHand = withStaff && (from === undefined || t >= from);
   staff.visible = inHand;
-  ghostRoot.visible = !inHand;
+  ghostRoot.visible = withStaff && !inHand;
   ghostRoot.position.set(-1.0, 0.75 + 0.06 * Math.sin(t * 2.2), 0.15);
   ghostRoot.rotation.z = 0.06 * Math.sin(t * 1.3);
   disc.material.opacity = 0.35 + 0.25 * Math.sin(t * 3);

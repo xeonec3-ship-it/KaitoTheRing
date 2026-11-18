@@ -26,6 +26,23 @@ gradlew build
 Нужна JDK 17. До сборки положите в `libs/` jar Iron's Spells и GeckoLib. Готовый jar появится в `build/libs/pohsmp_core-<версия>.jar`.
 При каждом изменении поднимайте `mod_version` в `gradle.properties`.
 
+## Анимации игрока при касте
+
+У заклинаний с роликом камеры свои анимации игрока (формат PlayerAnimator, со сгибами локтей и колен,
+для сгибов у игроков должен стоять мод **bendy-lib**):
+
+| Заклинание | Анимация | Посох |
+|---|---|---|
+| Низвержение | `pohsmp_downfall_cast` / `_finish` | с посохом, по видео |
+| Млечный Путь | `pohsmp_milky_way_cast` / `_finish` | без посоха |
+| Пожирание душ | `pohsmp_soul_devour_cast` / `_finish` | без посоха |
+| Божественное Табу | `pohsmp_taboo_cast` / `_finish` | без посоха |
+| Закрытие Пространства | `pohsmp_space_closure_cast` / `_finish` | без посоха |
+
+В анимациях без посоха предмет в руках на время каста и финала не рисуется (`client/HiddenHands`).
+Позы задаются в `tools/gen_player_anims.py`; после правки запустите его — он пересоберёт JSON
+(`assets/irons_spellbooks/player_animation/`) и 3D-превью `tools/anim_preview.html`.
+
 ## Важно: репозиторий восстановлен из истории чатов
 
 Исходники на ПК (`cnpc-project/mods-src/pohsmp_core`) сюда напрямую не копировались. Код собран из истории сессий Claude Code:

@@ -43,6 +43,11 @@ gradlew build
 Позы задаются в `tools/gen_player_anims.py`; после правки запустите его — он пересоберёт JSON
 (`assets/irons_spellbooks/player_animation/`) и 3D-превью `tools/anim_preview.html`.
 
+## Задания и перенос на ПК
+
+Задания для основного чата лежат в [`docs/specs/`](docs/specs/README.md): печати (`sigils_spec.md`) и система эффектов (`fx_spec.md`).
+Перенос анимаций игрока на ПК: [`docs/HANDOFF_PC.md`](docs/HANDOFF_PC.md).
+
 ## Важно: репозиторий восстановлен из истории чатов
 
 Исходники на ПК (`cnpc-project/mods-src/pohsmp_core`) сюда напрямую не копировались. Код собран из истории сессий Claude Code:

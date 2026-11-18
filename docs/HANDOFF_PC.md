@@ -176,3 +176,12 @@ tasks.named('test', Test).configure { useJUnitPlatform() }
 - **Точечная правка `DisintegrationSpell.java`:** заменить две строки `ANIMATION_LONG_CAST` / `ANIMATION_LONG_CAST_FINISH`
   на `CastAnims.of("disintegration_cast")` / `CastAnims.of("disintegration_finish")` и добавить `onClientPreCast` с
   `CastAnims.hideHands(...)` — как у четырёх заклинаний из раздела 3. Задание на остальное — `docs/specs/disintegration_spec.md`.
+- **Урон оригинала теперь 100% и убивает всегда** (`strike()`, конфиг `alwaysKill`). Лучи крест-накрест у заклинателя убраны.
+
+### Дезинтеграция: Реплика (Высшая)
+
+- Новые файлы целиком: `spell/DisintegrationReplicaSpell.java`, `data/pohsmp_core/damage_type/replica_magic.json`,
+  `sigils/disintegration_replica_*.json`, `fx/disintegration_replica.json`, `tools/gen_replica_fx.py`.
+- Заменить целиком (общий каркас): `spell/DisintegrationSpell.java`, `client/DisintegrationFx.java`.
+- Точечно: `Reg` (HIGHER_SPELLS + регистрация), `PohCore` (Events), `ServerConfig` (`REPLICA_PERCENT`, `DIS_KILL`, новые значения по умолчанию),
+  `net/Net` (комментарий к `Fx.type`), тег `bypasses_armor`, `lang`. Задание — `docs/specs/disintegration_replica_spec.md`.

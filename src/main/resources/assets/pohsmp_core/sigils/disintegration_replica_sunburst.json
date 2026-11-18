@@ -1,0 +1,74 @@
+{
+  "comment": "Башня, ярус 1: кольцо-солнце с лучами, почти во всю ширину.",
+  "size": 3.4,
+  "color": "#FF6676",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    {
+      "id": "glow",
+      "type": "disc",
+      "texture": "glow",
+      "radius": 0.8,
+      "heightOffset": -0.01,
+      "color": "#FF0039",
+      "brightness": 0.6,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeOutCubic",
+        "modes": [
+          "fade"
+        ]
+      }
+    },
+    {
+      "id": "rays",
+      "type": "spokes",
+      "texture": "divine_sun",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeOutBack",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 14
+      }
+    },
+    {
+      "id": "ring",
+      "type": "disc",
+      "texture": "thin_ring",
+      "radius": 0.6,
+      "heightOffset": 0.01,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 4,
+        "duration": 8,
+        "easing": "easeOutCubic",
+        "modes": [
+          "grow"
+        ]
+      }
+    }
+  ],
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 16
+  },
+  "formedFlash": {
+    "color": "#FFB0B8",
+    "size": 1.15,
+    "duration": 6,
+    "sparks": 10
+  }
+}

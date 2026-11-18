@@ -1,0 +1,41 @@
+{
+  "comment": "Башня, ярус 3: двенадцатиугольная рама с четырьмя шипами-крестами.",
+  "size": 3.4,
+  "color": "#FFB0B8",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    {
+      "id": "frame",
+      "type": "disc",
+      "texture": "cross_spikes",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeOutBack",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 7
+      }
+    }
+  ],
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 16
+  },
+  "formedFlash": {
+    "color": "#FFFFFF",
+    "size": 1.1,
+    "duration": 6,
+    "sparks": 8
+  }
+}

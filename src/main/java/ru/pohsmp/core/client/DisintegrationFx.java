@@ -39,7 +39,7 @@ public final class DisintegrationFx {
     private static final ResourceLocation BEAM = new ResourceLocation(PohCore.MODID, "textures/fx/beam.png");
 
     private static final class Active {
-        int caster, target, duration;
+        int caster, target, duration, variant;
         long start, fadeAt = -1;
         Vec3 lastTarget;
         float targetH = 1.8f;
@@ -48,6 +48,7 @@ public final class DisintegrationFx {
     private static final class Burst {
         Vec3 pos;
         long start;
+        int variant;
     }
 
     private static final Map<Integer, Active> ACTIVE = new HashMap<>();
@@ -68,19 +69,22 @@ public final class DisintegrationFx {
         ClientLevel lvl = Minecraft.getInstance().level;
         if (lvl == null) return;
         long now = lvl.getGameTime();
-        if (m.type == 0) {
+        int kind = m.type & 15, variant = (m.type & 0xFF) >> 4;
+        if (kind == 0) {
             Active a = new Active();
             a.caster = m.caster;
             a.target = m.target;
             a.duration = Math.max(20, m.duration);
+            a.variant = variant;
             a.start = now;
             a.lastTarget = new Vec3(m.x, m.y, m.z);
             ACTIVE.put(m.caster, a);
-        } else if (m.type == 1) {
+        } else if (kind == 1) {
             ACTIVE.remove(m.caster);
             Burst b = new Burst();
             b.pos = new Vec3(m.x, m.y, m.z);
             b.start = now;
+            b.variant = variant;
             BURSTS.add(b);
         } else {
             Active a = ACTIVE.get(m.caster);
@@ -121,6 +125,7 @@ public final class DisintegrationFx {
                 it.remove();
                 continue;
             }
+            scarlet = a.variant == 1;
             drawActive(lvl, buf, pose, a, age, time, pt, cam);
         }
         Iterator<Burst> bi = BURSTS.iterator();
@@ -131,6 +136,7 @@ public final class DisintegrationFx {
                 bi.remove();
                 continue;
             }
+            scarlet = b.variant == 1;
             drawBurst(buf, pose, b, age, time, cam);
         }
         buf.endBatch();
@@ -259,7 +265,15 @@ public final class DisintegrationFx {
 
     private static final float[][] UV = {{0, 0}, {0, 1}, {1, 1}, {1, 0}};
 
+    /** Replica look: gold turns scarlet, the near-white core stays light. Set per drawn effect. */
+    private static boolean scarlet;
+
     private static void quad(VertexConsumer vc, PoseStack.Pose pose, Vector3f[] v, float r, float g, float b) {
+        if (scarlet) {
+            float w = Math.max(0f, Math.min(1f, (g / Math.max(r, 1e-4f) - 0.85f) / 0.15f)); // colors come pre-scaled by alpha: judge by g/r
+            g = g * (0.18f + 0.82f * w * w);
+            b = b * (0.25f + 0.75f * w * w);
+        }
         Matrix4f m = pose.pose();
         Matrix3f n = pose.normal();
         for (int i = 0; i < 4; i++) vert(vc, m, n, v[i], UV[i], r, g, b);

@@ -88,7 +88,7 @@ public final class Net {
                 CH.send(PacketDistributor.PLAYER.with(() -> p), msg);
     }
 
-    /** Disintegration visuals. type: 0 start, 1 finished (x y z = target center), 2 cancelled. */
+    /** Disintegration visuals. type low 4 bits: 0 start, 1 finished (x y z = target center), 2 cancelled; high bits: look (0 golden, 1 scarlet Replica). */
     public static final class Fx {
         public final byte type;
         public final int caster, target, duration;

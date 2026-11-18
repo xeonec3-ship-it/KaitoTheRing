@@ -1,0 +1,55 @@
+{
+  "comment": "Башня, ярус 4: венец из четырёхконечных звёзд.",
+  "size": 2.0,
+  "color": "#FF6676",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    {
+      "id": "stars",
+      "type": "disc",
+      "texture": "star_ring",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeOutBack",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 24
+      }
+    },
+    {
+      "id": "core",
+      "type": "disc",
+      "texture": "core",
+      "radius": 0.5,
+      "heightOffset": 0.01,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 4,
+        "duration": 8,
+        "easing": "easeOutCubic",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": -24
+      }
+    }
+  ],
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 16
+  }
+}

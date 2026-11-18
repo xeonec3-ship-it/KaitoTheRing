@@ -1,0 +1,35 @@
+{
+  "comment": "Башня, ярус 2: волнистое зубчатое кольцо — самое широкое в башне.",
+  "size": 4.0,
+  "color": "#FF1934",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    {
+      "id": "wave",
+      "type": "disc",
+      "texture": "wave_ring",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "appear": {
+        "delay": 0,
+        "duration": 12,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ],
+        "startAngle": 90
+      },
+      "rotation": {
+        "speed": -8
+      }
+    }
+  ],
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 16
+  }
+}

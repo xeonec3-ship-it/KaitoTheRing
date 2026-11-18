@@ -548,13 +548,14 @@ const SCENES = {
   "Высшая: трещины и клинки": () => [new Sigil("higher_blades", new THREE.Vector3(0, 0.02, 0))],
   "Запретная: цепи": () => [new Sigil("forbidden_chains", new THREE.Vector3(0, 0.02, 0))],
   "Дезинтеграция (аниме)": () => [new FxRun("disintegration")],
+  "Дезинтеграция: Реплика": () => [new FxRun("disintegration_replica")],
   "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
 };
 const MAIN_ID = { "Silent Gate: земля и небо": "silent_gate_sky", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
-  "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration" };
+  "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
 const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
-  "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis" };
+  "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
 const sel = $("scene");

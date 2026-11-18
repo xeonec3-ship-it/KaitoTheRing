@@ -10,6 +10,8 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue DIS_PERCENT;
     public static final ForgeConfigSpec.DoubleValue DIS_FLAT;
     public static final ForgeConfigSpec.IntValue DIS_RANGE;
+    public static final ForgeConfigSpec.BooleanValue DIS_KILL;
+    public static final ForgeConfigSpec.DoubleValue REPLICA_PERCENT;
     public static final ForgeConfigSpec.DoubleValue HIGHER_MULT;
 
     static {
@@ -23,9 +25,13 @@ public final class ServerConfig {
         BLOCK_MANA = b.comment("No mana gain of any kind (regeneration, potions) while the effect lasts").define("blockMana", true);
         b.pop();
         b.push("disintegration");
-        DIS_PERCENT = b.comment("Damage as a share of the target's max health").defineInRange("damagePercent", 0.5, 0.0, 10.0);
-        DIS_FLAT = b.comment("Flat damage added on top").defineInRange("damageFlat", 40.0, 0.0, 100000.0);
+        DIS_PERCENT = b.comment("Damage as a share of the target's max health").defineInRange("damagePercent", 1.0, 0.0, 10.0);
+        DIS_FLAT = b.comment("Flat damage added on top").defineInRange("damageFlat", 0.0, 0.0, 100000.0);
+        DIS_KILL = b.comment("The target always dies (absorption, resistances and totems do not save it; creative/spectator players are exempt)").define("alwaysKill", true);
         DIS_RANGE = b.comment("Targeting range in blocks").defineInRange("range", 48, 4, 128);
+        b.pop();
+        b.push("disintegration_replica");
+        REPLICA_PERCENT = b.comment("Disintegration: Replica — damage as a share of the target's max health, through armor; never kills (leaves 1 HP)").defineInRange("damagePercent", 0.9, 0.0, 10.0);
         b.pop();
         b.push("higher");
         HIGHER_MULT = b.comment("Damage and healing multiplier for all Higher-school spells").defineInRange("damageMult", 1.0, 0.0, 100.0);

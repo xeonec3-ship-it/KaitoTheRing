@@ -1,0 +1,121 @@
+{
+  "comment": "Дезинтеграция: вертикальная печать перед молящимся заклинателем — почти в рост, кольцо шестиугольников с цепью, руны, святая печать, лиловое кольцо.",
+  "size": 1.9,
+  "color": "#FF1934",
+  "orientation": "facing",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    {
+      "id": "glow",
+      "type": "disc",
+      "texture": "glow",
+      "radius": 1.1,
+      "heightOffset": -0.02,
+      "color": "#FF0052",
+      "brightness": 0.8,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeOutCubic",
+        "modes": [
+          "fade"
+        ]
+      },
+      "pulse": {
+        "amp": 0.3,
+        "period": 10
+      }
+    },
+    {
+      "id": "violet",
+      "type": "disc",
+      "texture": "thin_ring",
+      "radius": 1.08,
+      "heightOffset": -0.01,
+      "color": "#97FF1B",
+      "appear": {
+        "delay": 2,
+        "duration": 10,
+        "easing": "easeOutCubic",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      }
+    },
+    {
+      "id": "hex",
+      "type": "disc",
+      "texture": "hex_ring",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "color": "#FF061D",
+      "appear": {
+        "delay": 0,
+        "duration": 12,
+        "easing": "easeOutBack",
+        "modes": [
+          "unfold",
+          "grow"
+        ]
+      },
+      "rotation": {
+        "speed": 18,
+        "boost": 3
+      }
+    },
+    {
+      "id": "runes",
+      "type": "band",
+      "texture": "rune_band",
+      "radius": 0.6,
+      "inner": 0.8,
+      "repeat": 6,
+      "heightOffset": 0.01,
+      "color": "#FF0039",
+      "appear": {
+        "delay": 6,
+        "duration": 12,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ]
+      },
+      "rotation": {
+        "speed": -16
+      }
+    },
+    {
+      "id": "seal",
+      "type": "disc",
+      "texture": "holy_seal",
+      "radius": 0.45,
+      "heightOffset": 0.02,
+      "color": "#FFB0B8",
+      "appear": {
+        "delay": 10,
+        "duration": 10,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ]
+      },
+      "rotation": {
+        "speed": 24
+      }
+    }
+  ],
+  "dissolve": {
+    "modes": [
+      "collapse"
+    ],
+    "duration": 8
+  },
+  "formedFlash": {
+    "color": "#FFFFFF",
+    "size": 1.5,
+    "duration": 8,
+    "sparks": 20
+  }
+}

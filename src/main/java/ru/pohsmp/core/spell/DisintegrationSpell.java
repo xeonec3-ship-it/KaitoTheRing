@@ -46,22 +46,36 @@ import ru.pohsmp.core.ServerConfig;
 import ru.pohsmp.core.net.Net;
 
 /**
- * Divine school, level 1. 10 s long cast on a locked target: the target is frozen and lifted, magic circles close around it,
- * then it takes damagePercent * max HP + damageFlat ignoring armor. The cast cannot be interrupted by damage.
+ * Divine school, level 1 (subclass {@link DisintegrationReplicaSpell} — the Higher copy with other damage, colors and a chant). 10 s long cast on a locked target: the target is frozen and lifted, magic circles close around it,
+ * then it takes damagePercent (1.0) * max HP + damageFlat ignoring armor and, with alwaysKill (default), dies no matter what
+ * is left (absorption, resistances, totems). The cast cannot be interrupted by damage.
  */
 public class DisintegrationSpell extends AbstractSpell {
     public static final ResourceLocation ID = new ResourceLocation(PohCore.MODID, "disintegration");
     public static final int CAST_TICKS = 200;
 
-    private final DefaultConfig config = new DefaultConfig()
-            .setMinRarity(SpellRarity.LEGENDARY)
-            .setSchoolResource(Reg.DIVINE_ID)
-            .setMaxLevel(1)
-            .setCooldownSeconds(0)
-            .setAllowCrafting(false)
-            .build();
+    private final ResourceLocation id;
+    private final DefaultConfig config;
+    /** Client look: 0 golden (Divine), 1 scarlet (Replica). Sent in the high bits of {@link Net.Fx#type}. */
+    protected final int variant;
+    protected final DustParticleOptions primary, core;
 
     public DisintegrationSpell() {
+        this(ID, Reg.DIVINE_ID, 0);
+    }
+
+    protected DisintegrationSpell(ResourceLocation id, ResourceLocation school, int variant) {
+        this.id = id;
+        this.variant = variant;
+        this.config = new DefaultConfig()
+                .setMinRarity(SpellRarity.LEGENDARY)
+                .setSchoolResource(school)
+                .setMaxLevel(1)
+                .setCooldownSeconds(0)
+                .setAllowCrafting(false)
+                .build();
+        this.primary = variant == 1 ? new DustParticleOptions(new Vector3f(1f, 0.16f, 0.22f), 1.5f) : GOLD;
+        this.core = variant == 1 ? new DustParticleOptions(new Vector3f(1f, 0.85f, 0.85f), 1.2f) : WHITE;
         this.manaCostPerLevel = 0;
         this.baseSpellPower = 0;
         this.spellPowerPerLevel = 0;
@@ -69,7 +83,7 @@ public class DisintegrationSpell extends AbstractSpell {
         this.baseManaCost = 0;
     }
 
-    @Override public ResourceLocation getSpellResource() { return ID; }
+    @Override public ResourceLocation getSpellResource() { return id; }
     @Override public DefaultConfig getDefaultConfig() { return config; }
     /** Black = invisible: Iron's target box is drawn additively, the circles already mark the target. */
     @Override public Vector3f getTargetingColor() { return new Vector3f(0, 0, 0); }
@@ -92,6 +106,7 @@ public class DisintegrationSpell extends AbstractSpell {
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         int pct = (int) Math.round(ServerConfig.DIS_PERCENT.get() * 100);
+        if (ServerConfig.DIS_KILL.get()) return List.of(Component.translatable("ui.pohsmp_core.disintegration.kill"));
         return List.of(Component.translatable("ui.pohsmp_core.disintegration.damage", pct + "%", fmt(ServerConfig.DIS_FLAT.get())),
                 Component.translatable("ui.pohsmp_core.disintegration.armor"));
     }
@@ -134,9 +149,32 @@ public class DisintegrationSpell extends AbstractSpell {
         Hold h = HOLDS.remove(entity.getUUID());
         if (h != null && level instanceof ServerLevel sl) {
             release(h);
-            Net.sendNear(sl, entity.getX(), entity.getY(), entity.getZ(), h.x, h.y, h.z, new Net.Fx(2, entity.getId(), h.target.getId(), 0, h.x, h.y, h.z));
+            Net.sendNear(sl, entity.getX(), entity.getY(), entity.getZ(), h.x, h.y, h.z, fx(2, entity.getId(), h.target.getId(), 0, h.x, h.y, h.z));
         }
         super.onServerCastComplete(level, spellLevel, entity, md, cancelled);
+    }
+
+    private Net.Fx fx(int type, int caster, int target, int duration, double x, double y, double z) {
+        return new Net.Fx(type | variant << 4, caster, target, duration, x, y, z);
+    }
+
+    /** Called every hold tick (age from 1 to the cast length). Replica speaks its chant here. */
+    protected void chant(ServerLevel sl, LivingEntity caster, int age) {}
+
+    /** The hit itself, after the column. Default: share of max HP + flat (100% + 0), through armor; with alwaysKill the target dies anyway. */
+    protected void strike(ServerLevel sl, LivingEntity caster, LivingEntity t) {
+        float dmg = (float) (t.getMaxHealth() * ServerConfig.DIS_PERCENT.get() + ServerConfig.DIS_FLAT.get());
+        DamageSource src = new DamageSource(sl.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(Reg.DIVINE_DAMAGE), caster);
+        t.invulnerableTime = 0;
+        t.hurt(src, dmg);
+        boolean exempt = t instanceof Player p && (p.isCreative() || p.isSpectator());
+        if (ServerConfig.DIS_KILL.get() && t.isAlive() && !exempt) {
+            // absorption, resistance, totem or another mod kept it alive: finish it, bypassing the totem
+            t.setAbsorptionAmount(0);
+            t.setHealth(0);
+            t.die(src);
+        }
+        if (!t.isAlive() && !(t instanceof Player)) t.setInvisible(true);
     }
 
     // ---- target hold ----
@@ -168,7 +206,7 @@ public class DisintegrationSpell extends AbstractSpell {
         h.noGravity = t.isNoGravity();
         HOLDS.put(caster.getUUID(), h);
         int dur = caster instanceof Player p ? getEffectiveCastTime(1, p) : CAST_TICKS;
-        Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), h.x, h.y, h.z, new Net.Fx(0, caster.getId(), t.getId(), dur, h.x, h.y, h.z));
+        Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), h.x, h.y, h.z, fx(0, caster.getId(), t.getId(), dur, h.x, h.y, h.z));
         sl.playSound(null, h.x, h.y, h.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 2f, 0.6f);
         return h;
     }
@@ -178,11 +216,12 @@ public class DisintegrationSpell extends AbstractSpell {
         if (!t.isAlive() || t.isRemoved() || t.level() != sl) {
             HOLDS.remove(caster.getUUID());
             release(h);
-            Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), h.x, h.y, h.z, new Net.Fx(2, caster.getId(), t.getId(), 0, h.x, h.y, h.z));
+            Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), h.x, h.y, h.z, fx(2, caster.getId(), t.getId(), 0, h.x, h.y, h.z));
             if (caster instanceof ServerPlayer sp) Utils.serverSideCancelCast(sp);
             return;
         }
         h.age++;
+        chant(sl, caster, h.age);
         double lift = 0.75 * Math.min(1.0, h.age / 25.0) + 0.08 * Math.sin(h.age * 0.15);
         double y = h.y + lift;
         t.setNoGravity(true);
@@ -200,13 +239,13 @@ public class DisintegrationSpell extends AbstractSpell {
             double r = 2.6 - 2.0 * p;
             for (int i = 0; i < 3; i++) {
                 double a = h.age * 0.25 + i * Math.PI * 2 / 3;
-                DivineEvents.particle(sl, GOLD, h.x + Math.cos(a) * r, cy - 1 + ((h.age * 0.05 + i * 0.33) % 2), h.z + Math.sin(a) * r, 1, 0, 0);
+                DivineEvents.particle(sl, primary, h.x + Math.cos(a) * r, cy - 1 + ((h.age * 0.05 + i * 0.33) % 2), h.z + Math.sin(a) * r, 1, 0, 0);
             }
             DivineEvents.particle(sl, ParticleTypes.END_ROD, h.x, cy, h.z, 1, 1.2 * (1 - p) + 0.2, 0.0);
         }
         if (h.age % 40 == 0) sl.playSound(null, h.x, cy, h.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.5f + (float) p);
         if (h.age == CAST_TICKS - 40) sl.playSound(null, h.x, cy, h.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 3f, 0.5f);
-        if (p > 0.8) DivineEvents.particle(sl, WHITE, h.x, cy, h.z, 4, 0.15, 0.0);
+        if (p > 0.8) DivineEvents.particle(sl, core, h.x, cy, h.z, 4, 0.15, 0.0);
     }
 
     private static void release(Hold h) {
@@ -218,20 +257,16 @@ public class DisintegrationSpell extends AbstractSpell {
         LivingEntity t = h.target;
         release(h);
         double cx = t.getX(), cy = t.getY() + t.getBbHeight() / 2, cz = t.getZ();
-        Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), cx, cy, cz, new Net.Fx(1, caster.getId(), t.getId(), 0, cx, cy, cz));
+        Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), cx, cy, cz, fx(1, caster.getId(), t.getId(), 0, cx, cy, cz));
         sl.playSound(null, cx, cy, cz, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 4f, 0.6f);
         sl.playSound(null, cx, cy, cz, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 4f, 0.5f);
         sl.playSound(null, cx, cy, cz, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2f, 1.4f);
         DivineEvents.particle(sl, ParticleTypes.FLASH, cx, cy, cz, 2, 0, 0);
         DivineEvents.particle(sl, ParticleTypes.END_ROD, cx, cy, cz, 140, 0.2, 0.6);
-        DivineEvents.particle(sl, WHITE, cx, cy, cz, 120, t.getBbWidth() / 2 + 0.2, 0.0);
+        DivineEvents.particle(sl, core, cx, cy, cz, 120, t.getBbWidth() / 2 + 0.2, 0.0);
         DivineEvents.particle(sl, ParticleTypes.WHITE_ASH, cx, cy, cz, 200, 0.8, 0.05);
         if (!t.isAlive() || t.level() != sl) return;
-        float dmg = (float) (t.getMaxHealth() * ServerConfig.DIS_PERCENT.get() + ServerConfig.DIS_FLAT.get());
-        DamageSource src = new DamageSource(sl.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(Reg.DIVINE_DAMAGE), caster);
-        t.invulnerableTime = 0;
-        t.hurt(src, dmg);
-        if (!t.isAlive() && !(t instanceof Player)) t.setInvisible(true);
+        strike(sl, caster, t);
     }
 
     /** Safety: if the caster disappears mid-cast, free the target. */

@@ -1,0 +1,61 @@
+{
+  "comment": "Башня, вершина: святая печать.",
+  "size": 1.0,
+  "color": "#FFFFFF",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    {
+      "id": "glow",
+      "type": "disc",
+      "texture": "glow",
+      "radius": 1.4,
+      "heightOffset": -0.01,
+      "color": "#FF6676",
+      "brightness": 0.7,
+      "appear": {
+        "delay": 0,
+        "duration": 8,
+        "easing": "easeOutCubic",
+        "modes": [
+          "fade"
+        ]
+      },
+      "pulse": {
+        "amp": 0.3,
+        "period": 12
+      }
+    },
+    {
+      "id": "seal",
+      "type": "disc",
+      "texture": "holy_seal",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "appear": {
+        "delay": 0,
+        "duration": 10,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ]
+      },
+      "rotation": {
+        "speed": -36
+      }
+    }
+  ],
+  "dissolve": {
+    "modes": [
+      "fade"
+    ],
+    "duration": 16
+  },
+  "formedFlash": {
+    "color": "#FFFFFF",
+    "size": 1.6,
+    "duration": 8,
+    "sparks": 12
+  }
+}

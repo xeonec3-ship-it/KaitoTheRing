@@ -86,7 +86,7 @@ public class DownfallSpell extends PohSpell {
     @Override public boolean allowLooting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.BEACON_ACTIVATE); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
-    /** Своя анимация игрока: assets/irons_spellbooks/player_animation/pohsmp_core_casting.json (tools/gen_player_anims.py). */
+    /** Своя анимация игрока с посохом: assets/irons_spellbooks/player_animation/pohsmp_downfall_*.json (tools/gen_player_anims.py). */
     public static final AnimationHolder ANIM_CAST = new AnimationHolder("pohsmp_downfall_cast", true);
     public static final AnimationHolder ANIM_FINISH = new AnimationHolder("pohsmp_downfall_finish", true);
 

@@ -1,0 +1,30 @@
+{
+  "comment": "Земная печать под кастером: спирали проявляются с поворотом, кольцо рун прорисовывается пером, обод; после формирования — золотые круги дугой за спиной.",
+  "size": 2.6,
+  "color": "#D8FBFF",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": 120,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.9, "heightOffset": 0.0, "brightness": 0.35,
+      "appear": { "delay": 0, "duration": 16, "easing": "easeOutCubic", "modes": ["fade"] },
+      "pulse": { "amp": 0.2, "period": 50 } },
+    { "id": "spirals", "type": "disc", "texture": "spiral_ring", "radius": 0.62, "heightOffset": 0.01,
+      "appear": { "delay": 2, "duration": 16, "easing": "easeOutCubic", "modes": ["fade", "twist"], "twist": -140 },
+      "rotation": { "speed": 10 } },
+    { "id": "core", "type": "disc", "texture": "core", "radius": 0.3, "heightOffset": 0.02,
+      "appear": { "delay": 8, "duration": 10, "easing": "easeOutCubic", "modes": ["fade", "twist"], "twist": 120 },
+      "rotation": { "speed": -14 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 0.84, "inner": 0.86, "repeat": 6, "heightOffset": 0.03,
+      "appear": { "delay": 12, "duration": 20, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90 },
+      "rotation": { "speed": -8 } },
+    { "id": "rim", "type": "disc", "texture": "rim", "radius": 1.0, "heightOffset": 0.04,
+      "appear": { "delay": 26, "duration": 10, "easing": "easeOutCubic", "modes": ["fade"] },
+      "rotation": { "speed": 4 } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.15, "duration": 10, "sparks": 24 },
+  "onFormed": [
+    { "id": "golden_halo", "anchor": "caster", "arc": { "count": 6, "radius": 1.5, "angle": 150, "height": 1.55, "behind": true, "stagger": 3 } }
+  ],
+  "dissolve": { "modes": ["reverse", "fade"], "duration": 16, "stagger": 3 }
+}

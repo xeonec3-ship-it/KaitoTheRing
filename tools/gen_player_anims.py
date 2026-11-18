@@ -605,116 +605,174 @@ def space_closure_cast():
                ({'pitch': 10, 'yaw': 0, 'roll': 4, 'bend': 12}, {'pitch': -12, 'yaw': 0, 'roll': -4, 'bend': 6}), 0.0)
 
 
-# ---------------------------------------------------------------- Появление Ковена (60 с)
+# ---------------------------------------------------------------- Появление Ковена (90 с)
 # Задание: docs/specs/coven_arrival_spec.md. Без посоха (предметы в руках прячет HiddenHands).
-#   0–5 с   арена, заклинатель в кадре нет: спокойная стойка, взгляд вниз
-#   5–10 с  у заклинателя: жест открытия портала за спиной, на 9.2–10 с шаг назад в портал
-#   10–25 с заклинатель невидим внутри портала на арене: нейтральная поза
-#   25–32 с выходит из портала: медленный величественный шаг; тело смещается от -2 блоков (в портале) к 0.
-#           Сервер в 25 с ставит заклинателя в конечную точку перед порталом, анимация «доводит» его туда.
-#   32–38 с реплика: левая рука за спиной, правая ладонью вверх — жест «и вы тоже»
-#   38–42 с титр: обе руки за спиной, голова чуть вверх
-#   42–50 с ритуал: руки медленно поднимаются в стороны и вверх
-#   50–56 с купол: руки широкой дугой разводятся вниз и в стороны, ладонями наружу
-#   56–60 с руки опускаются к телу, стойка
-COVEN_WALK_FROM = -2.0       # блоков назад от конечной точки (внутри портала)
+# Все позы рук — углами суставов (без обратной кинематики): так переходы предсказуемы.
+# Руки за спину убираются в два шага: сначала прямая рука разворачивается (у прямой руки разворот не виден),
+# потом сгибается локоть; обратно — в обратном порядке.
+#   0–8 с    пролог на арене: заклинатель стоит с закрытыми глазами (голова опущена), медленно дышит
+#   8–16 с   у заклинателя: оборачивается к свите и кивает, правая рука чертит круг в воздухе, левая раскрывает портал
+#   16–19 с  два шага назад в портал
+#   19–38 с  невидим внутри портала на арене (портал формируется, выходит свита)
+#   38–48 с  выходит: левая рука за спиной, правая свободно, медленный шаг; тело от -2.5 блока к 0
+#   48–56 с  останавливается, оглядывает арену (голова влево, вправо), поправляет стойку
+#   56–64 с  реплика: «Мы тоже примем участие» — ладонь вверх, рука раскрывается к арене;
+#            «но для начала...» — пальцы сжимаются, рука опускается
+#   64–69 с  титр: обе руки за спиной, подбородок вверх
+#   69–80 с  ритуал: руки из-за спины в стороны, медленно вверх, дрожь силы
+#   80–86 с  купол: руки дугой вниз и в стороны, толчок наружу, держит
+#   86–90 с  руки опускаются, лёгкий кивок
+COVEN_T = 90.0
+COVEN_WALK_FROM = -2.5       # блоков назад от конечной точки (внутри портала)
+COVEN_RITUAL_AT = 69.0       # когда свита начинает ритуал (pohsmp_coven_ritual)
+
+CALM_R = _fk(roll=4, bend=-10)
+TWIST_R = _fk(pitch=12, yaw=-150, roll=-8, bend=-4)          # прямая рука развёрнута назад-внутрь
+BEHIND_R = _fk(pitch=14, yaw=-150, roll=-8, bend=-74)        # кисть за спиной
+T_R = _fk(pitch=-5, roll=90, bend=-8)
+V_R = _fk(pitch=-15, roll=150, bend=-12)
+DOME_HI = _fk(pitch=-10, roll=115, bend=-8)
+DOME_R = _fk(pitch=-12, roll=62, bend=-6)
+PUSH_R = _fk(pitch=-30, roll=70, bend=-2)
+HEAD0 = {'pitch': 0, 'yaw': 0, 'roll': 0}
+TORSO0 = {'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0}
 
 
-def _walk(a, t0, t1, step, body_from, body_to):
-    """Медленный шаг на месте с переносом тела по z: ноги и руки в противофазе, корпус чуть качается."""
-    t, k, n = t0, 0, int(round((t1 - t0) / step))
+def _behind(a, t, side, dur=1.2):
+    """Убрать руку за спину: разворот прямой руки, затем сгиб."""
+    tw, bh = (TWIST_R, BEHIND_R) if side == 'right' else (mirror(TWIST_R), mirror(BEHIND_R))
+    part = side + 'Arm'
+    a.key(t, part, **tw)
+    a.key(t + dur * 0.55, part, **bh)
+
+
+def _unbehind(a, t, side, to, dur=1.4):
+    """Достать руку из-за спины: выпрямить, развернуть, поставить в позу to."""
+    tw, bh = (TWIST_R, BEHIND_R) if side == 'right' else (mirror(TWIST_R), mirror(BEHIND_R))
+    part = side + 'Arm'
+    a.key(t, part, **bh)                                         # до t рука держится за спиной
+    a.key(t + dur * 0.3, part, **tw)
+    a.key(t + dur * 0.6, part, **merge(tw, {'yaw': 0, 'roll': to['roll'] * 0.3, 'pitch': 0}))
+    a.key(t + dur, part, **to)
+
+
+def _steps(a, t0, t1, step, body_from, body_to, swing_r=True):
+    """Медленный шаг: ноги в противофазе, корпус чуть качается, тело переносится по z; правая рука качается, если swing_r."""
+    n = max(1, int(round((t1 - t0) / step)))
     for i in range(n + 1):
-        t = t0 + i * step
-        f = i / max(1, n)
+        t = t0 + (t1 - t0) * i / n
+        f = i / n
         side = 1 if i % 2 == 0 else -1
         last = i == n
-        leg = 0 if last else 22
+        leg = 0 if last else 20
         a.pose(t, rightLeg={'pitch': -leg * side, 'yaw': 0, 'roll': 1, 'bend': 0 if last else (14 if side < 0 else 4)},
                leftLeg={'pitch': leg * side, 'yaw': 0, 'roll': -1, 'bend': 0 if last else (14 if side > 0 else 4)},
                body={'y': 0 if last else -0.02, 'z': body_from + (body_to - body_from) * f},
                torso={'pitch': 2, 'yaw': 0 if last else 3 * side, 'roll': 0, 'bend': 0})
+        if swing_r:
+            a.key(t, 'rightArm', **(CALM_R if last else _fk(pitch=12 * side, roll=4, bend=-12)))
 
 
 def coven_arrival_cast():
-    T = 60.0
-    a, r = Anim('pohsmp_coven_arrival_cast', T), Rig()
+    T = COVEN_T
+    a = Anim('pohsmp_coven_arrival_cast', T)
     _start(a)
     a.pose(0, body={'y': 0, 'z': 0})
-    calm_r, calm_l = _fk(roll=4, bend=-10), mirror(_fk(roll=4, bend=-10))
-    a.pose(1.5, rightArm=calm_r, leftArm=calm_l, head={'pitch': 10, 'yaw': 0, 'roll': 0})
-    a.sway(1.5, 5.0, 2.4, 'torso', {'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0}, 'pitch', 1.0)
-    # 5–10 с: правая рука поднимается и чертит круг в воздухе за плечом — портал раскрывается за спиной
-    a.pose(5.8, rightArm=_fk(pitch=-120, roll=40, bend=-25), head={'pitch': -6, 'yaw': 12, 'roll': 0},
-           torso={'pitch': -2, 'yaw': 10, 'roll': 0, 'bend': -2})
-    a.pose(6.6, rightArm=_fk(pitch=-150, roll=95, bend=-20))
-    a.pose(7.4, rightArm=_fk(pitch=-60, roll=110, bend=-15))
-    a.pose(8.2, rightArm=_fk(pitch=-25, roll=60, bend=-12), torso={'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0},
+    # 0–8: стоит с закрытыми глазами, медленно дышит
+    a.pose(1.5, rightArm=CALM_R, leftArm=mirror(CALM_R), head={'pitch': 16, 'yaw': 0, 'roll': 0})
+    a.sway(1.5, 7.6, 2.6, 'torso', {'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 2}, 'pitch', 1.4)
+    # 8–16: оборачивается к свите, кивает, чертит круг правой, раскрывает левой
+    a.pose(8.8, head={'pitch': 2, 'yaw': -38, 'roll': 0}, torso={'pitch': 0, 'yaw': -10, 'roll': 0, 'bend': 0})
+    a.pose(9.4, head={'pitch': 14, 'yaw': -38, 'roll': 0})
+    a.pose(9.9, head={'pitch': 2, 'yaw': -34, 'roll': 0})
+    a.pose(10.8, head={'pitch': -4, 'yaw': 8, 'roll': 0}, torso={'pitch': -1, 'yaw': 8, 'roll': 0, 'bend': 0},
+           rightArm=_fk(pitch=-95, roll=20, bend=-22))
+    a.pose(11.7, rightArm=_fk(pitch=-140, roll=55, bend=-15), head={'pitch': -12, 'yaw': 14, 'roll': 0})
+    a.pose(12.6, rightArm=_fk(pitch=-105, roll=108, bend=-10), head={'pitch': -6, 'yaw': 22, 'roll': 0})
+    a.pose(13.5, rightArm=_fk(pitch=-45, roll=95, bend=-10), head={'pitch': 0, 'yaw': 18, 'roll': 0})
+    a.pose(14.3, 'easeOutCubic', leftArm=mirror(_fk(pitch=-62, roll=72, bend=-14)),
+           rightArm=_fk(pitch=-62, roll=72, bend=-14), torso={'pitch': -3, 'yaw': 0, 'roll': 0, 'bend': -2},
+           head={'pitch': -6, 'yaw': 0, 'roll': 0})
+    a.pose(15.6, rightArm=_fk(pitch=-30, roll=40, bend=-12), leftArm=mirror(_fk(pitch=-30, roll=40, bend=-12)),
+           torso=TORSO0, head=HEAD0)
+    # 16–19: два шага назад в портал, руки чуть разведены
+    a.pose(16.2, rightArm=_fk(pitch=8, roll=14, bend=-10), leftArm=mirror(_fk(pitch=8, roll=14, bend=-10)),
+           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG, body={'y': 0, 'z': 0})
+    a.pose(17.0, rightLeg={'pitch': 20, 'yaw': 0, 'roll': 1, 'bend': 12}, body={'y': -0.02, 'z': -0.45})
+    a.pose(17.8, rightLeg=ZERO_LEG, leftLeg={'pitch': 20, 'yaw': 0, 'roll': -1, 'bend': 12}, body={'y': -0.02, 'z': -0.95})
+    a.pose(18.6, leftLeg=ZERO_LEG, body={'y': 0, 'z': -1.4})
+    # 19–38: невидим в портале — нейтральная поза, тело стоит «внутри портала»
+    a.pose(19.05, body={'y': 0, 'z': COVEN_WALK_FROM}, rightArm=CALM_R, leftArm=mirror(CALM_R))
+    a.pose(37.0, rightArm=CALM_R, leftArm=mirror(CALM_R), head={'pitch': 6, 'yaw': 0, 'roll': 0}, torso=TORSO0,
+           body={'y': 0, 'z': COVEN_WALK_FROM}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    # 38–48: выход — левая за спиной, правая свободно, медленный шаг
+    _behind(a, 37.6, 'left')
+    _steps(a, 38.4, 47.4, 0.95, COVEN_WALK_FROM, 0.0)
+    a.pose(47.6, head={'pitch': -4, 'yaw': 0, 'roll': 0})
+    # 48–56: оглядывает арену
+    a.pose(49.6, head={'pitch': -2, 'yaw': -40, 'roll': 0}, torso={'pitch': 0, 'yaw': -8, 'roll': 0, 'bend': 0})
+    a.pose(51.0, head={'pitch': -2, 'yaw': -40, 'roll': 0})
+    a.pose(53.2, head={'pitch': -2, 'yaw': 38, 'roll': 0}, torso={'pitch': 0, 'yaw': 8, 'roll': 0, 'bend': 0})
+    a.pose(54.6, head={'pitch': -2, 'yaw': 38, 'roll': 0})
+    a.pose(55.8, head={'pitch': -6, 'yaw': 0, 'roll': 0}, torso={'pitch': -2, 'yaw': 0, 'roll': 0, 'bend': -1},
+           rightLeg={'pitch': 0, 'yaw': 0, 'roll': 3, 'bend': 0}, leftLeg={'pitch': 0, 'yaw': 0, 'roll': -3, 'bend': 0})
+    # 56–64: реплика
+    present = _fk(pitch=-55, yaw=14, roll=8, bend=-42)          # ладонь вверх перед грудью
+    reach = _fk(pitch=-72, yaw=4, roll=48, bend=-16)            # рука раскрывается к арене
+    clench = _fk(pitch=-58, yaw=6, roll=26, bend=-62)           # «но для начала...» — сжимает
+    a.pose(57.2, rightArm=present, head={'pitch': 0, 'yaw': -6, 'roll': -3}, torso={'pitch': -1, 'yaw': -5, 'roll': 0, 'bend': 0})
+    a.pose(59.4, rightArm=reach, head={'pitch': -2, 'yaw': 10, 'roll': -2}, torso={'pitch': -1, 'yaw': 6, 'roll': 0, 'bend': 0})
+    a.pose(60.6, rightArm=reach)
+    a.pose(61.8, 'easeInOutCubic', rightArm=clench, head={'pitch': 6, 'yaw': 0, 'roll': 0}, torso={'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 1})
+    a.pose(63.2, rightArm=_fk(pitch=-20, roll=10, bend=-30))
+    # 64–69: титр — обе руки за спиной
+    a.key(63.6, 'rightArm', **_fk(pitch=4, roll=4, bend=-6))
+    _behind(a, 64.2, 'right')
+    a.pose(65.4, head={'pitch': -8, 'yaw': 0, 'roll': 0}, torso={'pitch': -3, 'yaw': 0, 'roll': 0, 'bend': -2})
+    a.sway(65.4, 68.4, 1.5, 'torso', {'pitch': -3, 'yaw': 0, 'roll': 0, 'bend': -2}, 'pitch', 0.8)
+    # 69–80: ритуал
+    _unbehind(a, 69.0, 'right', T_R, 1.8)
+    _unbehind(a, 69.0, 'left', mirror(T_R), 1.8)
+    a.pose(71.0, head={'pitch': -10, 'yaw': 0, 'roll': 0}, torso={'pitch': -1, 'yaw': 0, 'roll': 0, 'bend': -1},
+           rightLeg={'pitch': 0, 'yaw': 0, 'roll': 5, 'bend': 0}, leftLeg={'pitch': 0, 'yaw': 0, 'roll': -5, 'bend': 0})
+    a.pose(72.4, rightArm=T_R, leftArm=mirror(T_R))
+    a.pose(76.4, rightArm=V_R, leftArm=mirror(V_R), head={'pitch': -32, 'yaw': 0, 'roll': 0},
+           torso={'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6})
+    for i, t in enumerate([76.4 + 0.3 * k for k in range(12)]):          # дрожь силы
+        j = 2.5 if i % 2 else -2.5
+        a.key(t, 'rightArm', **merge(V_R, {'roll': V_R['roll'] + j}))
+        a.key(t, 'leftArm', **mirror(merge(V_R, {'roll': V_R['roll'] - j})))
+    a.pose(79.9, rightArm=V_R, leftArm=mirror(V_R))
+    # 80–86: купол — дугой вниз и в стороны, толчок наружу
+    a.pose(81.4, 'easeOutCubic', rightArm=DOME_HI, leftArm=mirror(DOME_HI), head={'pitch': -12, 'yaw': 0, 'roll': 0})
+    a.pose(82.8, rightArm=DOME_R, leftArm=mirror(DOME_R), torso={'pitch': 1, 'yaw': 0, 'roll': 0, 'bend': 1},
            head={'pitch': 0, 'yaw': 0, 'roll': 0})
-    # 9.2–10 с: шаг назад в портал
-    a.pose(9.2, rightArm=calm_r, leftArm=calm_l, body={'y': 0, 'z': 0},
+    a.pose(83.3, 'easeOutBack', rightArm=PUSH_R, leftArm=mirror(PUSH_R), torso={'pitch': 6, 'yaw': 0, 'roll': 0, 'bend': 4},
+           rightLeg={'pitch': 8, 'yaw': 0, 'roll': 5, 'bend': 10}, leftLeg={'pitch': -10, 'yaw': 0, 'roll': -5, 'bend': 6})
+    a.pose(85.6, rightArm=PUSH_R, leftArm=mirror(PUSH_R), torso={'pitch': 5, 'yaw': 0, 'roll': 0, 'bend': 3})
+    # 86–90: руки опускаются, кивок
+    a.pose(87.6, rightArm=CALM_R, leftArm=mirror(CALM_R), torso=TORSO0, head={'pitch': 10, 'yaw': 0, 'roll': 0},
            rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
-    a.pose(9.6, rightLeg={'pitch': 18, 'yaw': 0, 'roll': 1, 'bend': 10}, body={'y': -0.02, 'z': -0.4})
-    a.pose(10.0, rightLeg=ZERO_LEG, body={'y': 0, 'z': -0.9})
-    # 10–25 с: невидим в портале — нейтральная поза, тело уже стоит «внутри портала»
-    a.pose(10.05, body={'y': 0, 'z': COVEN_WALK_FROM}, head={'pitch': 0, 'yaw': 0, 'roll': 0})
-    a.pose(25.0, rightArm=calm_r, leftArm=calm_l, body={'y': 0, 'z': COVEN_WALK_FROM},
-           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG, head={'pitch': 4, 'yaw': 0, 'roll': 0})
-    # 25–32 с: выход из портала медленным шагом, руки слегка в противофазе
-    _walk(a, 25.6, 31.4, 0.9, COVEN_WALK_FROM, 0.0)
-    for i, t in enumerate([25.6 + 0.9 * k for k in range(7)]):
-        side = 1 if i % 2 == 0 else -1
-        a.pose(t, rightArm=_fk(pitch=10 * side, roll=4, bend=-12), leftArm=mirror(_fk(pitch=-10 * side, roll=4, bend=-12)))
-    a.pose(31.4, rightArm=calm_r, leftArm=calm_l, head={'pitch': -4, 'yaw': 0, 'roll': 0})
-    # 32–38 с: реплика — левая за спиной, правая ладонью вверх перед собой
-    behind_l = r.L(1.4, 12.6, -3.6)
-    present_r = r.R(-5.5, 17.0, 7.0, staff=(0, 1, 0))
-    a.pose(33.0, leftArm=behind_l, rightArm=present_r, head={'pitch': 2, 'yaw': -6, 'roll': -3},
-           torso={'pitch': -1, 'yaw': -5, 'roll': 0, 'bend': 0})
-    a.pose(35.5, rightArm=r.R(-6.5, 17.6, 7.4, staff=(0, 1, 0)), head={'pitch': 0, 'yaw': -3, 'roll': -4})
-    a.pose(37.6, rightArm=present_r, head={'pitch': 4, 'yaw': 0, 'roll': 0})
-    # 38–42 с: титр — обе руки за спиной, голова чуть вверх
-    behind_r = r.R(-1.4, 12.6, -3.6)
-    a.pose(39.0, rightArm=behind_r, leftArm=behind_l, head={'pitch': -6, 'yaw': 0, 'roll': 0},
-           torso={'pitch': -3, 'yaw': 0, 'roll': 0, 'bend': -2})
-    a.sway(39.0, 42.0, 1.5, 'torso', {'pitch': -3, 'yaw': 0, 'roll': 0, 'bend': -2}, 'pitch', 0.8)
-    # 42–50 с: ритуал — руки медленно поднимаются в стороны и вверх
-    side_up = _fk(pitch=-10, roll=95, bend=-10)
-    v_up = _fk(pitch=-18, roll=150, bend=-12)
-    a.pose(44.5, rightArm=side_up, leftArm=mirror(side_up), head={'pitch': -14, 'yaw': 0, 'roll': 0},
-           torso={'pitch': -2, 'yaw': 0, 'roll': 0, 'bend': -2})
-    a.pose(48.0, rightArm=v_up, leftArm=mirror(v_up), head={'pitch': -32, 'yaw': 0, 'roll': 0},
-           torso={'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6},
-           rightLeg={'pitch': 0, 'yaw': 0, 'roll': 4, 'bend': 0}, leftLeg={'pitch': 0, 'yaw': 0, 'roll': -4, 'bend': 0})
-    a.sway(48.0, 50.0, 0.8, 'torso', {'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6}, 'roll', 1.2)
-    # 50–56 с: купол — руки широкой дугой вниз и в стороны, ладонями наружу
-    a.pose(51.2, 'easeOutCubic', rightArm=_fk(pitch=-12, roll=118, bend=-8), leftArm=mirror(_fk(pitch=-12, roll=118, bend=-8)),
-           head={'pitch': -10, 'yaw': 0, 'roll': 0})
-    dome = _fk(pitch=-14, roll=58, bend=-6)
-    a.pose(53.0, rightArm=dome, leftArm=mirror(dome), torso={'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 2},
-           head={'pitch': 2, 'yaw': 0, 'roll': 0})
-    a.sway(53.0, 56.0, 1.5, 'torso', {'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 2}, 'pitch', 1.0)
-    # 56–60 с: руки опускаются, стойка
-    a.pose(58.0, rightArm=calm_r, leftArm=calm_l, torso={'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0},
-           head={'pitch': -2, 'yaw': 0, 'roll': 0}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
-    a.pose(T, rightArm=calm_r, leftArm=calm_l, head={'pitch': -2, 'yaw': 0, 'roll': 0}, body={'y': 0, 'z': 0})
-    return a, (calm_r, calm_l, None, None, 0.0)
+    a.pose(88.6, head={'pitch': -2, 'yaw': 0, 'roll': 0})
+    a.pose(T, rightArm=CALM_R, leftArm=mirror(CALM_R), head={'pitch': -2, 'yaw': 0, 'roll': 0}, body={'y': 0, 'z': 0})
+    return a, (CALM_R, mirror(CALM_R), None, None, 0.0)
 
 
 def coven_ritual():
-    """Поза ритуала для свиты-игроков: запускается в 42 с ролика, 14 с, после — руки опускаются."""
-    a = Anim('pohsmp_coven_ritual', 14.0, hold=False)
+    """Поза ритуала для свиты-игроков: запускать в 69 с ролика (COVEN_RITUAL_AT), 19 с; та же хореография рук, что у заклинателя."""
+    L = 19.0
+    a = Anim('pohsmp_coven_ritual', L, hold=False)
     _start(a)
-    side_up = _fk(pitch=-10, roll=95, bend=-10)
-    v_up = _fk(pitch=-18, roll=150, bend=-12)
-    a.pose(2.5, rightArm=side_up, leftArm=mirror(side_up), head={'pitch': -14, 'yaw': 0, 'roll': 0})
-    a.pose(6.0, rightArm=v_up, leftArm=mirror(v_up), head={'pitch': -32, 'yaw': 0, 'roll': 0},
+    a.pose(1.2, rightArm=_fk(pitch=-4, roll=40, bend=-8), leftArm=mirror(_fk(pitch=-4, roll=40, bend=-8)))
+    a.pose(3.4, rightArm=T_R, leftArm=mirror(T_R), head={'pitch': -10, 'yaw': 0, 'roll': 0})
+    a.pose(7.4, rightArm=V_R, leftArm=mirror(V_R), head={'pitch': -32, 'yaw': 0, 'roll': 0},
            torso={'pitch': -6, 'yaw': 0, 'roll': 0, 'bend': -6})
-    dome = _fk(pitch=-14, roll=58, bend=-6)
-    a.pose(9.2, 'easeOutCubic', rightArm=_fk(pitch=-12, roll=118, bend=-8), leftArm=mirror(_fk(pitch=-12, roll=118, bend=-8)),
-           head={'pitch': -10, 'yaw': 0, 'roll': 0})
-    a.pose(11.0, rightArm=dome, leftArm=mirror(dome), torso={'pitch': 2, 'yaw': 0, 'roll': 0, 'bend': 2},
-           head={'pitch': 2, 'yaw': 0, 'roll': 0})
-    a.pose(14.0, rightArm=ZERO_LEG, leftArm=ZERO_LEG, torso=ZERO_T, head=ZERO_H)
+    a.pose(10.9, rightArm=V_R, leftArm=mirror(V_R))
+    a.pose(12.4, 'easeOutCubic', rightArm=DOME_HI, leftArm=mirror(DOME_HI), head={'pitch': -12, 'yaw': 0, 'roll': 0})
+    a.pose(13.8, rightArm=DOME_R, leftArm=mirror(DOME_R), torso={'pitch': 1, 'yaw': 0, 'roll': 0, 'bend': 1}, head=HEAD0)
+    a.pose(14.3, 'easeOutBack', rightArm=PUSH_R, leftArm=mirror(PUSH_R), torso={'pitch': 6, 'yaw': 0, 'roll': 0, 'bend': 4})
+    a.pose(16.6, rightArm=PUSH_R, leftArm=mirror(PUSH_R))
+    a.pose(L, rightArm=ZERO_LEG, leftArm=ZERO_LEG, torso=ZERO_T, head=ZERO_H)
     return a
 
 

@@ -1,0 +1,27 @@
+{
+  "comment": "Печать Ковена (геометрия): для Появления Ковена и Закрытия Пространства.",
+  "size": 3.0,
+  "color": "#B49BFF",
+  "orientation": "sky",
+  "lifetime": -1,
+  "hold": 120,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.6, "heightOffset": -0.01, "brightness": 0.7,
+      "appear": { "delay": 0, "duration": 14, "easing": "easeOutCubic", "modes": ["grow", "fade"] },
+      "pulse": { "amp": 0.2, "period": 36 } },
+    { "id": "geo", "type": "disc", "texture": "coven_geo", "radius": 0.78, "heightOffset": 0.01,
+      "appear": { "delay": 4, "duration": 18, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": -90 },
+      "rotation": { "speed": 8 } },
+    { "id": "inner_ring", "type": "disc", "texture": "thin_ring", "radius": 0.36, "heightOffset": 0.02,
+      "appear": { "delay": 10, "duration": 8, "easing": "easeOutBack", "modes": ["grow"] },
+      "rotation": { "speed": -30 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 0.92, "inner": 0.88, "repeat": 8, "heightOffset": 0.03,
+      "appear": { "delay": 16, "duration": 14, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": -90, "direction": -1 },
+      "rotation": { "speed": -10 } },
+    { "id": "rim", "type": "disc", "texture": "thin_ring", "radius": 1.0, "heightOffset": 0.04,
+      "appear": { "delay": 24, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "fade"] } }
+  ],
+  "expand": { "scale": 2.5, "delay": 6, "duration": 24, "easing": "easeOutCubic" },
+  "formedFlash": { "color": "#E6DCFF", "size": 1.2, "duration": 12, "sparks": 30 },
+  "dissolve": { "modes": ["reverse", "collapse"], "duration": 20, "stagger": 3 }
+}

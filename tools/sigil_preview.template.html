@@ -1,0 +1,385 @@
+<title>Печати PohSMP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the 3D stage first, transport and scene controls under it, JSON of the chosen sigil last; stage + side panel on wide screens.
+   Dark-first: additive light needs a dark sky, so both themes keep a night stage; only the panels follow the theme. */
+:root {
+  --bg: #f1eef8; --panel: #ffffff; --line: #dcd4ea; --fg: #1b1526; --muted: #6a6079;
+  --accent: #0f8fa3; --accent-soft: #d6f2f6;
+  --stage-top: #141026; --stage-bot: #05040a;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #0d0b14; --panel: #16121f; --line: #2a2238; --fg: #ece7f4; --muted: #a197b0;
+    --accent: #6fe6f5; --accent-soft: #10343a; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --bg: #0d0b14; --panel: #16121f; --line: #2a2238; --fg: #ece7f4; --muted: #a197b0;
+  --accent: #6fe6f5; --accent-soft: #10343a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 32px; }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 16px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(22px, 5vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 66ch; }
+.main { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .main { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; } }
+.stage { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: linear-gradient(var(--stage-top), var(--stage-bot));
+  aspect-ratio: 4 / 5; max-height: 74vh; width: 100%; max-width: 100%; touch-action: none; }
+@media (min-width: 900px) { .stage { aspect-ratio: 4 / 3; } }
+.stage canvas { display: block; width: 100%; height: 100%; }
+.hud { position: absolute; left: 12px; right: 12px; top: 12px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none;
+  font-family: var(--f-mono); font-size: 12px; color: #e8e4f2; }
+.chip { background: rgba(10, 8, 18, .6); border: 1px solid rgba(255, 255, 255, .14); border-radius: 999px; padding: 3px 10px; }
+.chip.state { color: #8ff3ff; }
+.hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 12px; color: rgba(232, 228, 242, .6); pointer-events: none; }
+.panel { display: grid; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button, select { font: inherit; font-size: 14px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-height: 40px; cursor: pointer; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
+button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.label { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.time { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); }
+label.check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+.layers { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; font-size: 13px; }
+.layers li { display: grid; grid-template-columns: 74px minmax(0, 1fr) 44px; gap: 8px; padding: 4px 6px; border-radius: 6px; }
+.layers li.on { background: var(--accent-soft); }
+.layers .t { font-family: var(--f-mono); color: var(--accent); font-variant-numeric: tabular-nums; }
+.layers .p { font-family: var(--f-mono); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.json { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 8px; min-width: 0; }
+.json pre { margin: 0; overflow-x: auto; font-family: var(--f-mono); font-size: 12px; line-height: 1.45; max-height: 420px; }
+.notes p { margin: 0; max-width: 72ch; }
+code { font-family: var(--f-mono); font-size: 13px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">pohsmp_core · система печатей</span>
+    <h1>Печати: формирование и разборка</h1>
+    <p class="sub">Превью печатей из JSON (<code>assets/pohsmp_core/sigils/</code>). Это эталон логики для кода мода: появление слоёв, рост, вспышка, дочерние печати и разборка считаются здесь так же, как должны в игре. Фигура игрока — для масштаба.</p>
+  </header>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Печать в трёхмерной сцене"></canvas>
+      <div class="hud"><span class="chip" id="sceneName">—</span><span class="chip state" id="stateChip">—</span></div>
+      <div class="hint">Тяните, чтобы повернуть камеру</div>
+    </div>
+    <div class="panel">
+      <div class="row">
+        <select id="scene" aria-label="Сцена"></select>
+      </div>
+      <div class="row">
+        <button class="primary" id="play" type="button">Сначала</button>
+        <button id="stop" type="button">Разобрать</button>
+        <span class="time" id="time">0.00 с</span>
+      </div>
+      <label class="check"><input type="checkbox" id="auto" checked> Разбирать сама после удержания</label>
+      <div class="row" role="group" aria-label="Скорость">
+        <span class="label">Скорость</span>
+        <button type="button" data-speed="0.25">×¼</button>
+        <button type="button" data-speed="0.5">×½</button>
+        <button type="button" data-speed="1" aria-pressed="true">×1</button>
+      </div>
+      <div class="row" role="group" aria-label="Камера">
+        <span class="label">Камера</span>
+        <button type="button" data-view="side" aria-pressed="true">Сбоку</button>
+        <button type="button" data-view="low">Снизу</button>
+        <button type="button" data-view="top">Сверху</button>
+      </div>
+      <span class="label">Слои главной печати</span>
+      <ol class="layers" id="layers"></ol>
+    </div>
+  </div>
+
+  <section class="json">
+    <span class="label" id="jsonTitle">JSON</span>
+    <pre id="jsonView"></pre>
+  </section>
+  <section class="json notes">
+    <span class="label">Как читать</span>
+    <p>Время в JSON — в тиках (20 в секунду). Печать «сформирована», когда закончились появление всех слоёв и рост (<code>expand</code>): в этот момент вспышка (<code>formedFlash</code>) и дочерние печати (<code>onFormed</code>). После <code>hold</code> тиков (или по команде) — разборка (<code>dissolve</code>). Схема формата — <code>docs/sigils.md</code>.</p>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const DATA = /*DATA*/null;
+const TPS = 20, D2R = Math.PI / 180;
+const $ = (id) => document.getElementById(id);
+
+// ---------------------------------------------------------------- плавность (те же имена, что в JSON)
+const back = (t) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); };
+const EASE = {
+  linear: (t) => t, easeInSine: (t) => 1 - Math.cos(t * Math.PI / 2), easeOutSine: (t) => Math.sin(t * Math.PI / 2),
+  easeInOutSine: (t) => -(Math.cos(Math.PI * t) - 1) / 2, easeInCubic: (t) => t * t * t, easeOutCubic: (t) => 1 - Math.pow(1 - t, 3),
+  easeInOutCubic: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2), easeOutBack: back,
+};
+const ease = (name, t) => (EASE[name] || EASE.linear)(Math.min(1, Math.max(0, t)));
+const clamp01 = (x) => Math.min(1, Math.max(0, x));
+
+// ---------------------------------------------------------------- тайминги печати (эталон для Java)
+function timings(def) {
+  let layersEnd = 0;
+  for (const l of def.layers) layersEnd = Math.max(layersEnd, (l.appear?.delay || 0) + (l.appear?.duration || 0));
+  const ex = def.expand;
+  const expandStart = ex ? layersEnd + (ex.delay || 0) : layersEnd;
+  const formedAt = ex ? expandStart + (ex.duration || 0) : layersEnd;
+  return { layersEnd, expandStart, formedAt };
+}
+
+// ---------------------------------------------------------------- сцена
+const cv = $("cv"), stage = $("stage");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+const scene = new THREE.Scene();
+const cam = new THREE.PerspectiveCamera(50, 1, 0.05, 400);
+scene.add(new THREE.HemisphereLight(0xbfc7ff, 0x1a1428, 0.9));
+const grid = new THREE.GridHelper(40, 40, 0x3a3060, 0x231c3a); scene.add(grid);
+
+const TEX = {};
+const loader = new THREE.TextureLoader();
+for (const [name, uri] of Object.entries(DATA.textures)) {
+  const t = loader.load(uri); t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping; t.anisotropy = 4; TEX[name] = t;
+}
+
+function player() {   // фигура игрока 1.8 блока, лицом к +Z
+  const g = new THREE.Group(), m = (c) => new THREE.MeshLambertMaterial({ color: c });
+  const b = (w, h, d, x, y, c) => { const o = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m(c)); o.position.set(x, y, 0); g.add(o); };
+  b(0.5, 0.75, 0.25, 0, 1.125, 0x3b2a55); b(0.5, 0.5, 0.5, 0, 1.75, 0xc9956b); b(0.25, 0.75, 0.25, -0.375, 1.125, 0x2a1d3d);
+  b(0.25, 0.75, 0.25, 0.375, 1.125, 0x2a1d3d); b(0.25, 0.75, 0.25, -0.125, 0.375, 0x241a33); b(0.25, 0.75, 0.25, 0.125, 0.375, 0x241a33);
+  return g;
+}
+const caster = player(); scene.add(caster);
+
+function mat(texName, color) {
+  return new THREE.MeshBasicMaterial({ map: TEX[texName], color: new THREE.Color(color), transparent: true, opacity: 0,
+    blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+}
+// диск с прорисовкой: сектор круга с плоскими UV
+function discGeo(len, start) { return new THREE.CircleGeometry(1, 96, start, Math.max(0.0001, len)); }
+// лента: кольцо от inner до 1, u — вдоль окружности (repeat раз), v — по радиусу
+function bandGeo(inner, len, start, repeat) {
+  const seg = Math.max(2, Math.ceil(160 * len / (2 * Math.PI))), pos = [], uv = [], idx = [];
+  for (let i = 0; i <= seg; i++) {
+    const a = start + len * i / seg, c = Math.cos(a), s = Math.sin(a), u = (a - start) / (2 * Math.PI) * repeat;
+    pos.push(c * inner, s * inner, 0, c, s, 0); uv.push(u, 0, u, 1);
+    if (i < seg) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+  return g;
+}
+
+// ---------------------------------------------------------------- экземпляр печати
+let INST = [];
+class Sigil {
+  constructor(id, origin, opts = {}) {
+    this.id = id; this.def = DATA.sigils[id]; this.origin = origin.clone(); this.t0 = opts.t0 ?? 0; this.scale = opts.scale ?? 1;
+    this.orientation = opts.orientation || this.def.orientation; this.stopAt = null; this.flashed = false; this.childrenDone = false;
+    this.children = []; this.parentHold = opts.isChild;
+    this.T = timings(this.def);
+    this.root = new THREE.Group(); scene.add(this.root);
+    this.plane = new THREE.Group(); this.root.add(this.plane);          // плоскость печати: локальная XY, нормаль +Z
+    this.layers = this.def.layers.map((l) => this.makeLayer(l));
+    this.flash = null;
+  }
+  makeLayer(l) {
+    const g = new THREE.Group(); g.position.z = l.heightOffset || 0; this.plane.add(g);
+    const color = l.color || this.def.color;
+    const L = { def: l, group: g, rot: 0, meshes: [], lastLen: -1 };
+    if (l.type === "arcs") {
+      for (let i = 0; i < (l.count || 4); i++) { const m = new THREE.Mesh(new THREE.BufferGeometry(), mat(l.texture || "arc_strip", color)); g.add(m); L.meshes.push(m); }
+    } else {
+      const m = new THREE.Mesh(new THREE.BufferGeometry(), mat(l.texture, color)); g.add(m); L.meshes.push(m);
+    }
+    return L;
+  }
+  stop(t) { if (this.stopAt === null) { this.stopAt = t; this.children.forEach((c) => c.stop(t)); } }
+  done(t) { return this.stopAt !== null && t > this.stopAt + (this.def.dissolve?.duration || 20) + 2 && this.children.every((c) => c.done(t)); }
+  dispose() { scene.remove(this.root); this.children.forEach((c) => c.dispose()); if (this.flash) scene.remove(this.flash.group); }
+
+  update(t, dt) {
+    const lt = t - this.t0, def = this.def, T = this.T;
+    // ориентация
+    this.root.position.copy(this.origin);
+    if (this.orientation === "ground") this.root.rotation.set(-Math.PI / 2, 0, 0);
+    else if (this.orientation === "sky") this.root.rotation.set(Math.PI / 2, 0, 0);
+    else if (this.orientation === "billboard") this.root.quaternion.copy(cam.quaternion);
+    else this.root.rotation.set(0, 0, 0);                                // facing: смотрит по взгляду кастера (+Z)
+    this.root.visible = lt >= 0;
+    if (lt < 0) return;
+    // рост всей печати после формирования слоёв
+    let S = this.scale * def.size;
+    if (def.expand) S *= 1 + (def.expand.scale - 1) * ease(def.expand.easing, (lt - T.expandStart) / Math.max(1, def.expand.duration));
+    // разборка
+    const dis = def.dissolve || { modes: ["fade"], duration: 20 };
+    const dd = this.stopAt === null ? 0 : clamp01((t - this.stopAt) / dis.duration);
+    const modes = dis.modes || [dis.mode || "fade"];
+    if (modes.includes("collapse")) S *= 1 - ease("easeInCubic", dd);
+    let globalA = modes.includes("fade") ? 1 - dd : 1;
+    this.plane.scale.setScalar(Math.max(0.0001, S));
+    const n = this.layers.length, stagger = dis.stagger || 0;
+    this.layers.forEach((L, i) => {
+      const l = L.def, ap = l.appear || {}, p = clamp01((lt - (ap.delay || 0)) / Math.max(1, ap.duration || 1));
+      const e = ease(ap.easing, p), m = ap.modes || ["fade"];
+      let a = lt >= (ap.delay || 0) ? (m.includes("fade") ? clamp01(e) : 1) : 0;
+      let sc = m.includes("grow") ? Math.max(0.0001, e) : 1;
+      // обратный порядок: последний слой гаснет первым
+      if (this.stopAt !== null && modes.includes("reverse")) {
+        const rank = n - 1 - i, span = Math.max(1, dis.duration - stagger * (n - 1));
+        a *= 1 - clamp01((t - this.stopAt - rank * stagger) / span);
+      }
+      if (modes.includes("shatter") && this.stopAt !== null) sc *= 1 + dd * 0.8;
+      // вращение: скорость (°/с), быстрее, пока слой появляется (boost)
+      const rot = l.rotation || {};
+      L.rot += (rot.speed || 0) * (1 + (rot.boost || 0) * (1 - clamp01(e))) * dt / TPS;
+      let ang = L.rot + (m.includes("twist") ? (ap.twist || -120) * (1 - clamp01(e)) : 0);
+      L.group.rotation.set(m.includes("unfold") ? (1 - clamp01(e)) * Math.PI / 2 : 0, 0, ang * D2R);
+      L.group.scale.setScalar(sc * (l.radius || 1));
+      const pul = l.pulse ? 1 + l.pulse.amp * Math.sin(2 * Math.PI * lt / l.pulse.period) : 1;
+      const alpha = clamp01(a * globalA) * (l.brightness ?? 1) * pul;
+      // геометрия: прорисовка (draw) и сборка дуг (assemble)
+      const len = m.includes("draw") ? 2 * Math.PI * clamp01(e) : 2 * Math.PI;
+      const start = (ap.startAngle || 0) * D2R, dir = ap.direction || 1;
+      if (l.type === "arcs") {
+        const cnt = L.meshes.length, closed = 360 / cnt, asm = m.includes("assemble") ? clamp01(e) : 1;
+        const arcLen = ((l.arcLength || 45) + (closed - (l.arcLength || 45)) * asm) * D2R;
+        const rf = 1 + 0.9 * (1 - asm), w = l.width || 0.05;
+        L.meshes.forEach((mesh, k) => {
+          const off = (k * closed + (1 - asm) * (k % 2 ? 150 : -150)) * D2R;
+          mesh.geometry.dispose(); mesh.geometry = bandGeo((rf - w) / rf, arcLen, off - arcLen / 2, 1);
+          mesh.scale.setScalar(rf); mesh.material.opacity = alpha;
+        });
+      } else {
+        const key = Math.round(len * 200);
+        if (key !== L.lastLen) {
+          L.lastLen = key;
+          const s0 = dir > 0 ? start : start - len;
+          L.meshes[0].geometry.dispose();
+          L.meshes[0].geometry = l.type === "band" ? bandGeo(l.inner ?? 0.85, len, s0, l.repeat || 6) : discGeo(len, s0);
+        }
+        L.meshes[0].material.opacity = alpha;
+      }
+    });
+    // вспышка формирования и дочерние печати
+    if (!this.flashed && lt >= T.formedAt && this.stopAt === null) { this.flashed = true; this.spawnFlash(t, S); }
+    if (this.flash) this.updateFlash(t, dt);
+    if (!this.childrenDone && lt >= T.formedAt && this.stopAt === null) { this.childrenDone = true; this.spawnChildren(t); }
+    this.children.forEach((c) => c.update(t, dt));
+    // удержание
+    if (autoStop && this.stopAt === null && !this.parentHold && def.hold >= 0 && lt >= T.formedAt + def.hold) this.stop(t);
+  }
+
+  spawnFlash(t, S) {
+    const f = this.def.formedFlash; if (!f) return;
+    const group = new THREE.Group(); this.plane.add(group);
+    const ring = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("thin_ring", f.color)); group.add(ring);
+    const glow = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("glow", f.color)); group.add(glow);
+    const n = f.sparks || 0, pos = new Float32Array(n * 3), vel = [];
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, s = 0.6 + Math.random() * 0.8; vel.push([Math.cos(a) * s, Math.sin(a) * s, (Math.random() - 0.3) * 0.6]); }
+    const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: new THREE.Color(f.color), size: 0.06, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+    group.add(pts);
+    this.flash = { group, ring, glow, pts, vel, t0: t, f };
+  }
+  updateFlash(t) {
+    const F = this.flash, k = clamp01((t - F.t0) / F.f.duration), kk = clamp01((t - F.t0) / (F.f.duration * 2.5));
+    F.ring.scale.setScalar(1 + (F.f.size - 1) * ease("easeOutCubic", k)); F.ring.material.opacity = (1 - k) * 1.2;
+    F.glow.scale.setScalar(0.4 + 0.5 * k); F.glow.material.opacity = (1 - k) * 0.9;
+    const p = F.pts.geometry.attributes.position;
+    F.vel.forEach((v, i) => { const d = ease("easeOutCubic", kk) * 1.1; p.setXYZ(i, v[0] * d, v[1] * d, v[2] * d); });
+    p.needsUpdate = true; F.pts.material.opacity = 1 - kk;
+  }
+  spawnChildren(t) {
+    for (const ch of this.def.onFormed || []) {
+      const arc = ch.arc;
+      if (!arc) { this.children.push(new Sigil(ch.id, this.origin, { t0: t, isChild: true })); continue; }
+      for (let i = 0; i < arc.count; i++) {
+        const u = arc.count > 1 ? i / (arc.count - 1) : 0.5, th = (-arc.angle / 2 + arc.angle * u) * D2R;
+        // дуга за спиной кастера (кастер смотрит в +Z): точки на окружности вокруг него, центр дуги — сзади
+        const back = arc.behind ? -1 : 1, base = ch.anchor === "caster" ? caster.position : this.origin;
+        const pos = new THREE.Vector3(base.x + Math.sin(th) * arc.radius, base.y + arc.height + Math.cos(th * 2) * 0.12, base.z + back * Math.cos(th) * arc.radius);
+        this.children.push(new Sigil(ch.id, pos, { t0: t + i * (arc.stagger || 0), isChild: true }));
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------- сцены превью
+const SCENES = {
+  "Silent Gate: земля и небо": () => [new Sigil("silent_gate_ground", new THREE.Vector3(0, 0.02, 0)), new Sigil("silent_gate_sky", new THREE.Vector3(0, 9, 0), { t0: 24 })],
+  "Небесная печать": () => [new Sigil("silent_gate_sky", new THREE.Vector3(0, 9, 0))],
+  "Земная печать + золотые круги": () => [new Sigil("silent_gate_ground", new THREE.Vector3(0, 0.02, 0))],
+  "Золотой круг": () => [new Sigil("golden_halo", new THREE.Vector3(0, 1.4, -1.2))],
+  "Печать Ковена": () => [new Sigil("coven_seal", new THREE.Vector3(0, 10, 0))],
+};
+const MAIN_ID = { "Silent Gate: земля и небо": "silent_gate_sky", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
+  "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal" };
+const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Небесная печать": "low", "Земная печать + золотые круги": "side", "Золотой круг": "side", "Печать Ковена": "low" };
+
+let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
+const sel = $("scene");
+for (const k of Object.keys(SCENES)) { const o = document.createElement("option"); o.value = k; o.textContent = k; sel.appendChild(o); }
+function start() {
+  INST.forEach((s) => s.dispose()); INST = SCENES[cur](); t = 0;
+  $("sceneName").textContent = cur;
+  const id = MAIN_ID[cur];
+  $("jsonTitle").textContent = id + ".json"; $("jsonView").textContent = JSON.stringify(DATA.sigils[id], null, 2);
+  const L = $("layers"); L.innerHTML = "";
+  for (const l of DATA.sigils[id].layers) {
+    const li = document.createElement("li"), a = l.appear || {};
+    li.innerHTML = `<span class="t">${((a.delay || 0) / TPS).toFixed(2)} с</span><span class="d"></span><span class="p">0%</span>`;
+    li.querySelector(".d").textContent = `${l.id} · ${l.type} · ${(a.modes || []).join("+")}`;
+    L.appendChild(li);
+  }
+}
+sel.addEventListener("change", () => { cur = sel.value; setView(VIEW_FOR[cur]); start(); });
+$("play").addEventListener("click", start);
+$("stop").addEventListener("click", () => INST.forEach((s) => s.stop(t)));
+$("auto").addEventListener("change", (e) => { autoStop = e.target.checked; });
+document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("click", () => {
+  speed = parseFloat(b.dataset.speed); document.querySelectorAll("[data-speed]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+}));
+
+// ---------------------------------------------------------------- камера
+let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2] };
+function setView(v) {
+  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];
+}
+document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
+stage.addEventListener("pointerdown", (e) => { drag = [e.clientX, e.clientY, yaw, pitch]; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener("pointermove", (e) => { if (!drag) return; yaw = drag[2] - (e.clientX - drag[0]) * 0.008; pitch = Math.max(-0.35, Math.min(1.45, drag[3] + (e.clientY - drag[1]) * 0.005)); setView(null); });
+stage.addEventListener("pointerup", () => (drag = null)); stage.addEventListener("pointercancel", () => (drag = null));
+stage.addEventListener("wheel", (e) => { e.preventDefault(); dist = Math.max(4, Math.min(40, dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive: false });
+
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000) * TPS * speed; last = now; t += dt;
+  INST.forEach((s) => s.update(t, dt));
+  if (INST.length && INST.every((s) => s.done(t))) start();
+  const main = INST.find((s) => s.id === MAIN_ID[cur]) || INST[0];
+  if (main) {
+    const lt = t - main.t0, T = main.T;
+    let st = lt < 0 ? "ожидание" : lt < T.layersEnd ? "формирование" : lt < T.formedAt ? "рост" : main.stopAt === null ? "удержание" : "разборка";
+    $("stateChip").textContent = st;
+    [...$("layers").children].forEach((li, i) => {
+      const a = main.def.layers[i].appear || {}, p = clamp01((lt - (a.delay || 0)) / Math.max(1, a.duration || 1));
+      li.classList.toggle("on", p > 0 && p < 1); li.querySelector(".p").textContent = Math.round(p * 100) + "%";
+    });
+  }
+  $("time").textContent = (t / TPS).toFixed(2) + " с";
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (cv.width !== Math.round(w * renderer.getPixelRatio()) || cv.height !== Math.round(h * renderer.getPixelRatio())) { renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+  cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, tgtY + Math.sin(pitch) * dist, Math.cos(yaw) * Math.cos(pitch) * dist);
+  cam.lookAt(0, tgtY, 0);
+  renderer.render(scene, cam);
+  requestAnimationFrame(frame);
+}
+start(); requestAnimationFrame(frame);
+</script>

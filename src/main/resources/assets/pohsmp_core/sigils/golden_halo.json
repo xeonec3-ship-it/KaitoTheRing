@@ -1,0 +1,21 @@
+{
+  "comment": "Маленький золотой круг: дочерняя печать, раскрывается дугой за спиной кастера.",
+  "size": 0.42,
+  "color": "#FFD36B",
+  "orientation": "facing",
+  "lifetime": -1,
+  "hold": 100,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.3, "heightOffset": -0.01, "brightness": 0.45,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutCubic", "modes": ["fade"] },
+      "pulse": { "amp": 0.3, "period": 24 } },
+    { "id": "core", "type": "disc", "texture": "core", "radius": 0.62, "heightOffset": 0.0,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutBack", "modes": ["grow", "unfold"] },
+      "rotation": { "speed": 40 } },
+    { "id": "rim", "type": "disc", "texture": "rim", "radius": 1.0, "heightOffset": 0.01,
+      "appear": { "delay": 2, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "unfold"] },
+      "rotation": { "speed": -24 } }
+  ],
+  "formedFlash": { "color": "#FFF2C0", "size": 1.4, "duration": 6, "sparks": 6 },
+  "dissolve": { "modes": ["collapse"], "duration": 10 }
+}

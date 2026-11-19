@@ -61,6 +61,16 @@ public final class SigilTimeline {
         return def.dissolve().modes().contains(DissolveMode.FADE) ? 1 - dissolveProgress(def, t, stopAt) : 1;
     }
 
+    /**
+     * Strength multiplier of groundLight / blockGlow: rises with the layers (0 at start, 1 once all layers have appeared),
+     * falls with the dissolve (and the fade dissolve) to 0.
+     */
+    public static double lightLevel(SigilDef def, double t, double stopAt) {
+        if (t < 0) return 0;
+        double in = clamp01(t / Math.max(1, timings(def).layersEnd()));
+        return in * (1 - dissolveProgress(def, t, stopAt));
+    }
+
     public static double dissolveProgress(SigilDef def, double t, double stopAt) {
         if (Double.isNaN(stopAt)) return 0;
         return clamp01((t - stopAt) / Math.max(1, def.dissolve().duration()));

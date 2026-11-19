@@ -8,8 +8,8 @@
    "delay": 0,
    "at": "caster+0,3,0",
    "duration": 20,
-   "size": 26,
-   "anamorphic": 60,
+   "size": 44,
+   "anamorphic": 90,
    "rays": 16,
    "screen": 1.0,
    "color": "#FFE2B0"
@@ -19,8 +19,8 @@
    "delay": 0,
    "at": "caster",
    "duration": 50,
-   "radius": 6,
-   "height": 40,
+   "radius": 12,
+   "height": 64,
    "rings": 4,
    "ringSpeed": 12,
    "fill": 3,
@@ -36,8 +36,8 @@
    "at": "caster+0,0.5,0",
    "duration": 24,
    "shape": "sphere",
-   "radius": 19,
-   "rim": 1.6,
+   "radius": 38,
+   "rim": 2.4,
    "color": "@primary"
   },
   {
@@ -46,7 +46,7 @@
    "at": "caster",
    "duration": 30,
    "shape": "ring",
-   "radius": 24,
+   "radius": 48,
    "color": "@secondary"
   },
   {
@@ -55,7 +55,7 @@
    "at": "caster",
    "duration": 200,
    "texture": "higher_cracks",
-   "radius": 14,
+   "radius": 28,
    "fadeOut": 120,
    "color": "@primary"
   },
@@ -65,10 +65,10 @@
    "at": "caster+0,1,0",
    "duration": 4,
    "texture": "spark_sharp",
-   "count": 300,
-   "rate": 75,
-   "spread": 3,
-   "speed": 0.5,
+   "count": 700,
+   "rate": 175,
+   "spread": 6,
+   "speed": 0.8,
    "gravity": 0.02,
    "size": [
     0.5,
@@ -83,14 +83,14 @@
    "at": "caster+0,2,0",
    "duration": 60,
    "texture": "glow",
-   "count": 60,
-   "rate": 1,
-   "spread": 4,
-   "speed": 0.08,
+   "count": 90,
+   "rate": 1.5,
+   "spread": 8,
+   "speed": 0.1,
    "gravity": -0.006,
    "size": [
-    3,
-    7
+    5,
+    12
    ],
    "life": 50,
    "color": "#FF6A1E",

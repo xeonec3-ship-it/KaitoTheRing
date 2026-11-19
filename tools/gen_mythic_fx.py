@@ -651,11 +651,11 @@ def fire():
           ], flash={'color': FIRE_C, 'size': 1.15, 'duration': 12, 'sparks': 30})
     fx('heaven_fall', 'Падение небес: каст 10 с — небо закрывается четырьмя кольцами огня, мир краснеет, сыплются угли; '
                       'потом 20 с метеоритного дождя (сами метеориты — meteor).', 'pyre', 640, [
-        *[E('sigil', 50 * i, off(0, 33 + 3 * i, 0), id='heaven_fall_sky', scale=26 - 3 * i, until=620) for i in range(4)],
-        E('tint', 20, 'caster', duration=600, radius=44, color='#5A1A0A', strength=0.35, **{'in': ease(80), 'out': ease(30)}),
-        E('sprites', 0, 'caster+0,18,0', duration=600, texture='spark_sharp', count=1800, rate=3, area=21, speed=0.005, gravity=0.002,
+        *[E('sigil', 50 * i, off(0, 42 + 5 * i, 0), id='heaven_fall_sky', scale=52 - 6 * i, until=620) for i in range(4)],   # ×2 (владелец 19.11)
+        E('tint', 20, 'caster', duration=600, radius=96, color='#5A1A0A', strength=0.35, **{'in': ease(80), 'out': ease(30)}),
+        E('sprites', 0, 'caster+0,18,0', duration=600, texture='spark_sharp', count=5400, rate=9, area=42, speed=0.005, gravity=0.002,
           size=[0.18, 0.05], life=90, color='@secondary', comment='угли сыплются с неба'),
-        E('curtain', 150, 'caster', duration=470, radius=21, count=48, height=34, grow=40, fromTop=True, width=[0.08, 0.2],
+        E('curtain', 150, 'caster', duration=470, radius=42, count=96, height=44, grow=40, fromTop=True, width=[0.08, 0.2],
           brightness=[0.1, 0.3], flicker=0.4, texture='beam_fade', color='@primary'),
     ])
     sigil('meteor_mark', 'Метеорит: метка удара на земле — сужающийся огненный круг.', 3.0, FIRE, 'ground', [
@@ -674,7 +674,7 @@ def fire():
 
     rings = []
     for i in range(7):
-        rings.append(E('sigil', 37 * (i + 1), off(0, 14 + i * 2.6, 0), id='explosion_ring', scale=round(12 - i * 1.1, 2), until=310))
+        rings.append(E('sigil', 37 * (i + 1), off(0, 22 + i * 4.2, 0), id='explosion_ring', scale=round(24 - i * 2.2, 2), until=310))
     sigil('explosion_ring', 'Взрыв: один из семи кругов над целью (радиус задаёт scale): пламя, руны, обод; быстро разгоняется.',
           1.0, FIRE, 'sky', [
               L('glow', 'disc', 'glow', 0.7, -0.02, ap(0, 14, 'fade'), br=0.4, pulse=(0.2, 14)),
@@ -682,7 +682,7 @@ def fire():
               L('runes', 'band', 'rune_band', 1.0, 0.01, ap(4, 16, 'draw', startAngle=90), inner=0.88, repeat=8, rot=-14, color=FIRE_Y),
               L('flames', 'band', 'flame_band', 1.18, 0.02, ap(10, 14, 'draw'), inner=0.86, repeat=10, rot=10, color='#FF3A10'),
           ], flash={'color': FIRE_C, 'size': 1.2, 'duration': 10, 'sparks': 24}, dissolve=('shatter',), ddur=10)
-    sigil('explosion_ground', 'Взрыв: круг на земле в точке удара, прорисовывается весь каст.', 12.0, FIRE, 'ground', [
+    sigil('explosion_ground', 'Взрыв: круг на земле в точке удара, прорисовывается весь каст (радиус 24 — ×2, владелец 19.11).', 24.0, FIRE, 'ground', [
         L('cracks', 'disc', 'higher_cracks', 0.9, 0.0, ap(40, 200, 'grow', 'fade', easing='easeInSine'), color='#B0301A', br=1.2),
         L('fire', 'disc', 'sigil_fire', 0.7, 0.01, ap(0, 240, 'draw', easing='linear', startAngle=90), rot=3, br=0.9),
         L('flames', 'band', 'flame_band', 1.0, 0.02, ap(120, 120, 'draw', easing='linear'), inner=0.9, repeat=14, rot=-4, color=FIRE_Y),
@@ -691,22 +691,22 @@ def fire():
                          'пламя поднимается, мир наливается оранжевым; в конце — столб от земли к кругам.', 'pyre', 310, [
         E('sigil', 0, 'caster+0,0.05,0', id='explosion_ground', until=305),
         *rings,
-        E('sprites', 20, 'caster', duration=290, texture='spark_sharp', count=1500, rate=5, area=11, speed=0.02, gravity=-0.006,
+        E('sprites', 20, 'caster', duration=290, texture='spark_sharp', count=4500, rate=15, area=22, speed=0.02, gravity=-0.006,
           size=[0.22, 0.04], life=40, color='@primary'),
-        E('tint', 150, 'caster', duration=160, radius=48, color='#FF5A1E', strength=0.3, **{'in': ease(140, 'easeInSine')}),
-        E('beam', 260, 'caster', to='caster+0,30,0', duration=45, width=1.2, core=0.3, grow=30, flicker=0.4, color='@secondary'),
+        E('tint', 150, 'caster', duration=160, radius=96, color='#FF5A1E', strength=0.3, **{'in': ease(140, 'easeInSine')}),
+        E('beam', 260, 'caster', to='caster+0,48,0', duration=45, width=2.0, core=0.3, grow=30, flicker=0.4, color='@secondary'),
     ])
     fx('explosion_boom', 'Взрыв: удар — засветка, огненный столб, пузырь и кольцо по земле, трещины и угли.', 'pyre', 200, [
-        E('flash', 0, 'caster+0,3,0', duration=20, size=26, anamorphic=60, rays=16, screen=1.0, color='#FFE2B0'),
-        E('column', 0, 'caster', duration=50, radius=6, height=40, rings=4, ringSpeed=12, fill=3, color='@secondary',
+        E('flash', 0, 'caster+0,3,0', duration=20, size=44, anamorphic=90, rays=16, screen=1.0, color='#FFE2B0'),
+        E('column', 0, 'caster', duration=50, radius=12, height=64, rings=4, ringSpeed=12, fill=3, color='@secondary',
           **{'out': ease(30, 'easeInSine')}),
-        E('wave', 0, 'caster+0,0.5,0', duration=24, shape='sphere', radius=19, rim=1.6, color='@primary'),
-        E('wave', 2, 'caster', duration=30, shape='ring', radius=24, color='@secondary'),
-        E('decal', 0, 'caster', duration=200, texture='higher_cracks', radius=14, fadeOut=120, color='@primary'),
-        E('sprites', 0, 'caster+0,1,0', duration=4, texture='spark_sharp', count=300, rate=75, spread=3, speed=0.5, gravity=0.02,
+        E('wave', 0, 'caster+0,0.5,0', duration=24, shape='sphere', radius=38, rim=2.4, color='@primary'),
+        E('wave', 2, 'caster', duration=30, shape='ring', radius=48, color='@secondary'),
+        E('decal', 0, 'caster', duration=200, texture='higher_cracks', radius=28, fadeOut=120, color='@primary'),
+        E('sprites', 0, 'caster+0,1,0', duration=4, texture='spark_sharp', count=700, rate=175, spread=6, speed=0.8, gravity=0.02,
           size=[0.5, 0.06], life=40, color='@secondary'),
-        E('sprites', 6, 'caster+0,2,0', duration=60, texture='glow', count=60, rate=1, spread=4, speed=0.08, gravity=-0.006,
-          size=[3, 7], life=50, color='#FF6A1E', brightness=0.5, comment='огненный гриб'),
+        E('sprites', 6, 'caster+0,2,0', duration=60, texture='glow', count=90, rate=1.5, spread=8, speed=0.1, gravity=-0.006,
+          size=[5, 12], life=50, color='#FF6A1E', brightness=0.5, comment='огненный гриб'),
     ])
 
 

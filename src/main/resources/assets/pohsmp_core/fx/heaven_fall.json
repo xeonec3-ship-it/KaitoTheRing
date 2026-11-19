@@ -6,33 +6,33 @@
   {
    "type": "sigil",
    "delay": 0,
-   "at": "caster+0,33,0",
+   "at": "caster+0,42,0",
    "id": "heaven_fall_sky",
-   "scale": 26,
+   "scale": 52,
    "until": 620
   },
   {
    "type": "sigil",
    "delay": 50,
-   "at": "caster+0,36,0",
+   "at": "caster+0,47,0",
    "id": "heaven_fall_sky",
-   "scale": 23,
+   "scale": 46,
    "until": 620
   },
   {
    "type": "sigil",
    "delay": 100,
-   "at": "caster+0,39,0",
+   "at": "caster+0,52,0",
    "id": "heaven_fall_sky",
-   "scale": 20,
+   "scale": 40,
    "until": 620
   },
   {
    "type": "sigil",
    "delay": 150,
-   "at": "caster+0,42,0",
+   "at": "caster+0,57,0",
    "id": "heaven_fall_sky",
-   "scale": 17,
+   "scale": 34,
    "until": 620
   },
   {
@@ -40,7 +40,7 @@
    "delay": 20,
    "at": "caster",
    "duration": 600,
-   "radius": 44,
+   "radius": 96,
    "color": "#5A1A0A",
    "strength": 0.35,
    "in": {
@@ -58,9 +58,9 @@
    "at": "caster+0,18,0",
    "duration": 600,
    "texture": "spark_sharp",
-   "count": 1800,
-   "rate": 3,
-   "area": 21,
+   "count": 5400,
+   "rate": 9,
+   "area": 42,
    "speed": 0.005,
    "gravity": 0.002,
    "size": [
@@ -76,9 +76,9 @@
    "delay": 150,
    "at": "caster",
    "duration": 470,
-   "radius": 21,
-   "count": 48,
-   "height": 34,
+   "radius": 42,
+   "count": 96,
+   "height": 44,
    "grow": 40,
    "fromTop": true,
    "width": [

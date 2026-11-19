@@ -163,13 +163,14 @@ def scarlet_cut():
 
 
 def star_fall():
+    SF = 3   # радиус удара ×3 (владелец 19.11: 8 → 24 блока); то же в StarFallSpell.R
     E = [
         # каст 0–160: прицел на земле собирается, искры поднимаются, лучи-наводки
-        {'type': 'sigil', 'id': 'star_fall_target', 'delay': 0, 'until': 164, 'at': 'point:impact', 'comment': 'печать-прицел радиусом 8'},
-        {'type': 'sprites', 'at': 'point:impact', 'delay': 10, 'duration': 150, 'count': 300, 'rate': 2, 'area': 7.5, 'speed': 0.03, 'gravity': -0.004,
+        {'type': 'sigil', 'id': 'star_fall_target', 'delay': 0, 'until': 164, 'at': 'point:impact', 'scale': SF, 'comment': 'печать-прицел радиусом 24 (владелец 19.11: ×3, было 8)'},
+        {'type': 'sprites', 'at': 'point:impact', 'delay': 10, 'duration': 150, 'count': 900, 'rate': 6, 'area': 7.5 * SF, 'speed': 0.03, 'gravity': -0.004,
          'life': 50, 'size': [0.14, 0.02], 'texture': '@sparks', 'color': '#FF6A70', 'comment': 'искры поднимаются над прицелом'},
-        {'type': 'wave', 'at': 'point:impact', 'delay': 60, 'duration': 40, 'radius': 8, 'color': '@primary', 'brightness': 0.6},
-        {'type': 'wave', 'at': 'point:impact', 'delay': 110, 'duration': 40, 'radius': 8, 'color': '#FF6A70', 'brightness': 0.9},
+        {'type': 'wave', 'at': 'point:impact', 'delay': 60, 'duration': 40, 'radius': 8 * SF, 'color': '@primary', 'brightness': 0.6},
+        {'type': 'wave', 'at': 'point:impact', 'delay': 110, 'duration': 40, 'radius': 8 * SF, 'color': '#FF6A70', 'brightness': 0.9},
         # луч-наводка с земли убран (владелец, 19.11.2026)
         # звёздная печать в небе раскрывается, звезда вспыхивает
         {'type': 'sigil', 'id': 'star_fall_sky', 'delay': 64, 'until': 150, 'at': 'point:sky', 'orientation': 'sky'},
@@ -183,26 +184,26 @@ def star_fall():
          'width': 0.9, 'core': 0.7, 'taper': 0.6, 'head': 4.6, 'color': '#FFFFFF', 'brightness': 1.6, 'comment': 'белое ядро'},
         {'type': 'sprites', 'at': 'point:sky', 'delay': 100, 'duration': 60, 'texture': '@sparks', 'count': 400, 'rate': 7, 'spread': 2.5, 'speed': 0.05,
          'gravity': 0.01, 'size': [0.2, 0.04], 'life': 30, 'color': '#FF6A70', 'comment': 'искры с неба'},
-        {'type': 'tint', 'delay': 100, 'duration': 90, 'at': 'point:impact', 'radius': 64, 'color': '#5A0A14', 'strength': 0.3,
+        {'type': 'tint', 'delay': 100, 'duration': 90, 'at': 'point:impact', 'radius': 64 * 2, 'color': '#5A0A14', 'strength': 0.3,
          'in': {'duration': 40, 'easing': 'easeInSine'}, 'out': {'duration': 30, 'easing': 'easeOutSine'}, 'comment': 'мир краснеет к удару'},
         # удар 160
-        {'type': 'flash', 'at': 'point:impact+0,1.5,0', 'delay': 160, 'duration': 26, 'size': 18, 'rays': 14, 'anamorphic': 30, 'color': '#FFFFFF', 'screen': 0.85},
-        {'type': 'column', 'at': 'point:impact', 'delay': 160, 'duration': 18, 'radius': 4.5, 'height': 40, 'fill': 0.8, 'color': '#FF2A3A',
+        {'type': 'flash', 'at': 'point:impact+0,1.5,0', 'delay': 160, 'duration': 26, 'size': 18 * 2, 'rays': 14, 'anamorphic': 30, 'color': '#FFFFFF', 'screen': 0.85},
+        {'type': 'column', 'at': 'point:impact', 'delay': 160, 'duration': 18, 'radius': 4.5 * SF, 'height': 60, 'fill': 0.8, 'color': '#FF2A3A',
          'out': {'duration': 12, 'easing': 'easeInSine'}, 'comment': 'столб света в момент удара'},
-        {'type': 'wave', 'shape': 'sphere', 'at': 'point:impact', 'delay': 160, 'duration': 24, 'radius': 10, 'rim': 1.0, 'color': '#FF6A70'},
-        {'type': 'wave', 'at': 'point:impact', 'delay': 160, 'duration': 30, 'radius': 22, 'thickness': 1.2, 'color': '#FFFFFF', 'brightness': 1.4},
-        {'type': 'wave', 'at': 'point:impact', 'delay': 164, 'duration': 40, 'radius': 15, 'thickness': 0.8, 'color': '@primary'},
-        {'type': 'sprites', 'at': 'point:impact+0,0.5,0', 'delay': 160, 'duration': 4, 'texture': '@shards', 'count': 160, 'rate': 40, 'spread': 1.5,
+        {'type': 'wave', 'shape': 'sphere', 'at': 'point:impact', 'delay': 160, 'duration': 24, 'radius': 10 * SF, 'rim': 1.0, 'color': '#FF6A70'},
+        {'type': 'wave', 'at': 'point:impact', 'delay': 160, 'duration': 30, 'radius': 22 * SF, 'thickness': 1.2 * SF, 'color': '#FFFFFF', 'brightness': 1.4},
+        {'type': 'wave', 'at': 'point:impact', 'delay': 164, 'duration': 40, 'radius': 15 * SF, 'thickness': 0.8 * SF, 'color': '@primary'},
+        {'type': 'sprites', 'at': 'point:impact+0,0.5,0', 'delay': 160, 'duration': 4, 'texture': '@shards', 'count': 480, 'rate': 120, 'spread': 1.5 * SF,
          'speed': 0.6, 'gravity': 0.04, 'spin': 300, 'tumble': 1, 'size': [0.4, 0.14], 'life': 50, 'color': '#3A0A10', 'comment': 'обломки земли'},
-        {'type': 'sprites', 'at': 'point:impact+0,0.5,0', 'delay': 160, 'duration': 6, 'texture': '@sparks', 'count': 200, 'rate': 40, 'spread': 1.0,
+        {'type': 'sprites', 'at': 'point:impact+0,0.5,0', 'delay': 160, 'duration': 6, 'texture': '@sparks', 'count': 600, 'rate': 120, 'spread': 1.0 * SF,
          'speed': 0.5, 'gravity': 0.02, 'size': [0.22, 0.04], 'life': 30, 'color': '#FF6A70'},
         # кратер и «стекло» до 760
-        {'type': 'decal', 'at': 'point:impact', 'delay': 162, 'duration': 598, 'texture': 'glow', 'radius': 6, 'fadeOut': 120, 'color': '#2A0008',
+        {'type': 'decal', 'at': 'point:impact', 'delay': 162, 'duration': 598, 'texture': 'glow', 'radius': 6 * SF, 'fadeOut': 120, 'color': '#2A0008',
          'blend': 'translucent', 'comment': 'тёмная выжженная чаша (под трещинами)'},
-        {'type': 'decal', 'at': 'point:impact', 'delay': 162, 'duration': 598, 'texture': 'higher_cracks', 'radius': 7, 'fadeOut': 80, 'color': '#C21A2E',
+        {'type': 'decal', 'at': 'point:impact', 'delay': 162, 'duration': 598, 'texture': 'higher_cracks', 'radius': 7 * SF, 'fadeOut': 80, 'color': '#C21A2E',
          'brightness': 0.9, 'comment': 'трещины кратера'},
-        {'type': 'mesh', 'model': 'star_glass', 'delay': 164, 'until': 760, 'at': 'point:impact', 'comment': 'алое стекло-кристаллы'},
-        {'type': 'sprites', 'at': 'point:impact+0,0.3,0', 'delay': 170, 'duration': 500, 'texture': '@sparks', 'count': 400, 'rate': 0.8, 'area': 6,
+        {'type': 'mesh', 'model': 'star_glass', 'delay': 164, 'until': 760, 'at': 'point:impact', 'scale': SF, 'comment': 'алое стекло-кристаллы'},
+        {'type': 'sprites', 'at': 'point:impact+0,0.3,0', 'delay': 170, 'duration': 500, 'texture': '@sparks', 'count': 2400, 'rate': 4.8, 'area': 6 * SF,
          'speed': 0.01, 'gravity': -0.002, 'size': [0.12, 0.02], 'life': 60, 'color': '#FF6A70', 'comment': 'тлеющие искры над кратером'},
     ]
     dump('fx/star_fall.json', {

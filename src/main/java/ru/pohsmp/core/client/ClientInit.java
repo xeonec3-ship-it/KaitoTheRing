@@ -29,6 +29,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.IllusionClient.class);   // T22
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.Copies.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.ZoneDraw.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.MirrorReflections.class);   // T22 reflections in the labyrinth
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.DreamScreen.class);   // T22 dream: mirror, sky, death, waking
         MinecraftForge.EVENT_BUS.register(ScriptedWalk.class);   // Coven Arrival: the retinue players walk
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.ErasedClient.class);   // T24

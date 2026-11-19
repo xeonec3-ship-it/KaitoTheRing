@@ -25,8 +25,8 @@ import ru.pohsmp.core.illusion.Maze;
 
 /**
  * T22, what the victim's own client draws inside a zone.
- * «Зеркальный лабиринт»: the maze walls (the same Maze as on the server, by the seed) as mirror panes, cracking towards the end;
- * left and right of the movement keys swapped.
+ * «Зеркальный лабиринт»: the maze walls (the same Maze as on the server, by the seed) as mirror panes, cracking towards the end,
+ * with the caster's reflections in the nearest of them ({@link MirrorReflections}); left and right of the movement keys swapped.
  * «Кошмар наяву»: every other living thing is not drawn (and has no name) - the server puts the faceless monster (fx) on each one, only for it.
  */
 public final class ZoneDraw {
@@ -81,6 +81,7 @@ public final class ZoneDraw {
         VertexConsumer vc = buf.getBuffer(RenderType.entityTranslucent(WALL));
         for (double[] w : m.walls) pane(vc, mat, w, y0, y1, 0.9f);
         buf.endBatch(RenderType.entityTranslucent(WALL));
+        MirrorReflections.draw(ps, cp, m, z.caster(), e.getPartialTick(), e.getFrustum());   // the caster's images in the glass
         if (crack > 0) {
             VertexConsumer cc = buf.getBuffer(RenderType.entityTranslucent(CRACKS));
             for (double[] w : m.walls) pane(cc, mat, w, y0, y1, crack);
@@ -103,6 +104,26 @@ public final class ZoneDraw {
             v(vc, mat, x2, y1, z2, u, 0, a, nx, nz);
             v(vc, mat, x1, y1, z1, 0, 0, a, nx, nz);
         }
+    }
+
+    /** One face (the plane coordinate given) of a wall, the mirror texture at alpha a: the glass over a reflection. */
+    static void face(MultiBufferSource.BufferSource buf, Matrix4f mat, double[] w, boolean alongX, double plane, double y0, double y1, float a) {
+        VertexConsumer vc = buf.getBuffer(RenderType.entityTranslucent(WALL));
+        float u = (float) (Math.max(Math.abs(w[0] - w[2]), Math.abs(w[1] - w[3])) / Maze.CELL);
+        float v = (float) ((y1 - y0) / Maze.CELL);
+        double x1 = alongX ? w[0] : plane, z1 = alongX ? plane : w[1], x2 = alongX ? w[2] : plane, z2 = alongX ? plane : w[3];
+        float nx = alongX ? 0 : (float) Math.signum(plane - w[0]), nz = alongX ? (float) Math.signum(plane - w[1]) : 0;
+        v(vc, mat, x1, y0, z1, 0, v, a, nx, nz);
+        v(vc, mat, x2, y0, z2, u, v, a, nx, nz);
+        v(vc, mat, x2, y1, z2, u, 0, a, nx, nz);
+        v(vc, mat, x1, y1, z1, 0, 0, a, nx, nz);
+        buf.endBatch(RenderType.entityTranslucent(WALL));
+    }
+
+    /** The labyrinth needs the stencil buffer for the reflections: added on a tick, between frames. */
+    @SubscribeEvent
+    public static void onTick(TickEvent.ClientTickEvent e) {
+        if (e.phase == TickEvent.Phase.END && Zones.active(Zones.LABYRINTH) != null) MirrorReflections.prepare();
     }
 
     private static void v(VertexConsumer vc, Matrix4f m, double x, double y, double z, float u, float v, float a, float nx, float nz) {

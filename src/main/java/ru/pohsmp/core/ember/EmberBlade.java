@@ -112,13 +112,29 @@ public class EmberBlade extends SwordItem {
 
     /** Any melee hit of the holder with this blade in the main hand (vanilla or an Epic Fight swing). */
     public static final class Events {
-        @SubscribeEvent
+        /**
+         * Owner 19.11: the heat did not grow. The direct entity of an Epic Fight swing may not be the player himself, so any non-projectile
+         * damage by the holder counts. Temporary: each hit goes to the server log (to see in the next check whether the hits arrive).
+         */
+        @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST, receiveCanceled = true)
         public static void onHurt(LivingHurtEvent e) {
-            if (lashing || !(e.getSource().getEntity() instanceof Player p) || e.getSource().getDirectEntity() != p) return;
+            if (lashing || !(e.getSource().getEntity() instanceof Player p)) return;
             if (!(p.level() instanceof ServerLevel sl)) return;
             ItemStack s = p.getMainHandItem();
             if (!(s.getItem() instanceof EmberBlade)) return;
+            Entity direct = e.getSource().getDirectEntity();
+            ru.pohsmp.core.PohCore.LOG.info("[ember] hurt {} by {}: source {}, direct {}, amount {}, cancelled {}, heat {}",
+                    e.getEntity().getName().getString(), p.getName().getString(), e.getSource().getMsgId(),
+                    direct == null ? "null" : direct.getType().toShortString(), e.getAmount(), e.isCanceled(), heat(s));
+            if (e.isCanceled() || direct instanceof net.minecraft.world.entity.projectile.Projectile) return;
             onHit(sl, p, s, e.getEntity());
+        }
+
+        /** Temporary: a swing that hits nothing still shows in the log, to tell "no hurt event" from "no swing". */
+        @SubscribeEvent
+        public static void onAttack(net.minecraftforge.event.entity.player.AttackEntityEvent e) {
+            if (e.getEntity().getMainHandItem().getItem() instanceof EmberBlade && !e.getEntity().level().isClientSide)
+                ru.pohsmp.core.PohCore.LOG.info("[ember] attack by {} on {}", e.getEntity().getName().getString(), e.getTarget().getName().getString());
         }
     }
 

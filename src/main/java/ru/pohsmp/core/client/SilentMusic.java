@@ -34,10 +34,14 @@ public final class SilentMusic {
         private int fade = -1;
 
         Track(net.minecraft.sounds.SoundEvent music) {
+            this(music, false);
+        }
+
+        Track(net.minecraft.sounds.SoundEvent music, boolean loop) {
             super(music, SoundSource.RECORDS, RandomSource.create());
             this.relative = true;
             this.attenuation = SoundInstance.Attenuation.NONE;
-            this.looping = false;
+            this.looping = loop;
             this.delay = 0;
             this.volume = 1f;
             this.x = this.y = this.z = 0;
@@ -85,6 +89,15 @@ public final class SilentMusic {
             sm.stop(null, SoundSource.RECORDS);
         }
         track = new Track(music);
+        sm.play(track);
+    }
+
+    /** «Приказ» (Gate): the next part of the scene music at once (the wait loop, then the strike); the silence stays as it is. */
+    public static void switchTo(int k, net.minecraft.sounds.SoundEvent music, boolean loop) {
+        if (k != key || !silent) return;
+        SoundManager sm = Minecraft.getInstance().getSoundManager();
+        if (track != null) sm.stop(track);
+        track = new Track(music, loop);
         sm.play(track);
     }
 

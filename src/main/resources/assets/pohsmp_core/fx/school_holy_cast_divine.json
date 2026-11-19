@@ -1,0 +1,193 @@
+{
+ "comment": "T06, школа «Святая», ступень Божественная: печать под магом + венец над головой + дуга из 7 золотых кругов за спиной (с краёв к центру), золотые блёстки. duration -1: код останавливает эффект в конце каста. Сгенерировано tools/gen_school_themes.py.",
+ "style": "holy",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "holy_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "sigil",
+   "id": "holy_crown",
+   "delay": 10,
+   "at": "caster+0,2.55,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,3.0,0",
+   "follow": true,
+   "texture": "mote_feather",
+   "count": 2000,
+   "color": "@secondary",
+   "rate": 0.5,
+   "area": 2.2,
+   "speed": 0.0,
+   "gravity": 0.0012,
+   "sway": 1.0,
+   "tumble": 0.6,
+   "size": [
+    0.3,
+    0.22
+   ],
+   "life": 70
+  },
+  {
+   "type": "curtain",
+   "delay": 10,
+   "duration": 9999,
+   "at": "caster",
+   "count": 12,
+   "radius": [
+    1.6,
+    2.4
+   ],
+   "height": [
+    3,
+    5
+   ],
+   "grow": 20,
+   "width": [
+    0.04,
+    0.08
+   ],
+   "brightness": [
+    0.3,
+    0.6
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.2,
+   "color": "@primary",
+   "in": {
+    "duration": 20,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "duration": 10,
+   "at": "caster+0,2.55,0",
+   "size": 1.4,
+   "color": "@core",
+   "brightness": 0.6,
+   "rays": 6
+  },
+  {
+   "type": "sigil",
+   "id": "golden_halo",
+   "delay": 14,
+   "at": "caster+-1.81,1.66,-0.90",
+   "follow": true,
+   "orientation": "facing",
+   "sigilScale": 0.95
+  },
+  {
+   "type": "sigil",
+   "id": "golden_halo",
+   "delay": 17,
+   "at": "caster+-1.41,1.78,-1.31",
+   "follow": true,
+   "orientation": "facing",
+   "sigilScale": 0.95
+  },
+  {
+   "type": "sigil",
+   "id": "golden_halo",
+   "delay": 20,
+   "at": "caster+-0.77,1.87,-1.59",
+   "follow": true,
+   "orientation": "facing",
+   "sigilScale": 0.95
+  },
+  {
+   "type": "sigil",
+   "id": "golden_halo",
+   "delay": 23,
+   "at": "caster+0.00,1.90,-1.69",
+   "follow": true,
+   "orientation": "facing",
+   "sigilScale": 1.15
+  },
+  {
+   "type": "sigil",
+   "id": "golden_halo",
+   "delay": 20,
+   "at": "caster+0.77,1.87,-1.59",
+   "follow": true,
+   "orientation": "facing",
+   "sigilScale": 0.95
+  },
+  {
+   "type": "sigil",
+   "id": "golden_halo",
+   "delay": 17,
+   "at": "caster+1.41,1.78,-1.31",
+   "follow": true,
+   "orientation": "facing",
+   "sigilScale": 0.95
+  },
+  {
+   "type": "sigil",
+   "id": "golden_halo",
+   "delay": 14,
+   "at": "caster+1.81,1.66,-0.90",
+   "follow": true,
+   "orientation": "facing",
+   "sigilScale": 0.95
+  },
+  {
+   "type": "sprites",
+   "delay": 16,
+   "duration": 9999,
+   "at": "caster+0,1.6,-0.9",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 4000,
+   "rate": 1.5,
+   "spread": 1.8,
+   "speed": 0.01,
+   "gravity": -0.002,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 40,
+   "color": "#FFD36B"
+  },
+  {
+   "type": "flash",
+   "delay": 22,
+   "duration": 12,
+   "at": "caster+0,1.7,-1.0",
+   "follow": true,
+   "size": 2.4,
+   "rays": 8,
+   "color": "#FFE9A8",
+   "brightness": 0.6
+  }
+ ]
+}

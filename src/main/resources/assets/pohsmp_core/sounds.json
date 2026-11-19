@@ -54,5 +54,35 @@
         "volume": 0.7
       }
     ]
+  },
+  "music.silent_gate_intro": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.silent_gate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:music/silent_gate_intro",
+        "stream": true
+      }
+    ]
+  },
+  "music.silent_gate_wait": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.silent_gate_wait",
+    "sounds": [
+      {
+        "name": "pohsmp_core:music/silent_gate_wait",
+        "stream": true
+      }
+    ]
+  },
+  "music.silent_gate_strike": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.silent_gate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:music/silent_gate_strike",
+        "stream": true
+      }
+    ]
   }
 }

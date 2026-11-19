@@ -392,5 +392,7 @@
   "item.pohsmp_core.silent_witch_skirt.desc1": "Шаги, прыжки, приземления и плавание не звучат",
   "item.pohsmp_core.silent_witch_skirt.desc2": "Не вызывает вибраций: скалк и Хранитель вас не слышат",
   "item.pohsmp_core.silent_witch_staff.gate": "Полный комплект: открывает «Врата» посоха безмолвной ведьмы",
-  "subtitles.pohsmp_core.sigil.hit": "Звон печати от удара"
+  "subtitles.pohsmp_core.sigil.hit": "Звон печати от удара",
+  "subtitles.pohsmp_core.music.silent_gate_wait": "Врата ждут приказа",
+  "ui.pohsmp_core.silent_gate.command": "ЛКМ — приказать вратам"
 }

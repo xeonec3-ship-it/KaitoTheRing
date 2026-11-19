@@ -4,8 +4,8 @@
  "author": "pohsmp_core",
  "emote": {
   "beginTick": 0,
-  "endTick": 1000,
-  "stopTick": 1000,
+  "endTick": 992,
+  "stopTick": 992,
   "degrees": true,
   "easeBeforeKeyframe": true,
   "moves": [
@@ -652,7 +652,7 @@
     }
    },
    {
-    "tick": 991,
+    "tick": 992,
     "easing": "easeInOutSine",
     "rightArm": {
      "pitch": -172.0,
@@ -662,46 +662,7 @@
     }
    },
    {
-    "tick": 998,
-    "easing": "easeInQuad",
-    "rightArm": {
-     "pitch": -90.0,
-     "yaw": 4.0,
-     "roll": -4.0,
-     "bend": 0.0
-    }
-   },
-   {
-    "tick": 998,
-    "easing": "easeInQuad",
-    "torso": {
-     "pitch": 3.0,
-     "yaw": 0.0,
-     "roll": 0.0,
-     "bend": 2.0
-    }
-   },
-   {
-    "tick": 998,
-    "easing": "easeInQuad",
-    "head": {
-     "pitch": -4.0,
-     "yaw": 0.0,
-     "roll": 0.0
-    }
-   },
-   {
-    "tick": 1000,
-    "easing": "easeInOutSine",
-    "rightArm": {
-     "pitch": -90.0,
-     "yaw": 4.0,
-     "roll": -4.0,
-     "bend": 0.0
-    }
-   },
-   {
-    "tick": 1000,
+    "tick": 992,
     "easing": "easeInOutSine",
     "leftArm": {
      "pitch": -16.0,
@@ -709,9 +670,28 @@
      "roll": -10.0,
      "bend": -58.0
     }
+   },
+   {
+    "tick": 992,
+    "easing": "easeInOutSine",
+    "torso": {
+     "pitch": -4.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 992,
+    "easing": "easeInOutSine",
+    "head": {
+     "pitch": -24.0,
+     "yaw": 0.0,
+     "roll": 0.0
+    }
    }
   ],
   "isLoop": true,
-  "returnTick": 1000
+  "returnTick": 992
  }
 }

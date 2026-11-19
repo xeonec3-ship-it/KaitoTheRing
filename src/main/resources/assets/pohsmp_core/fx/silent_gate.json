@@ -1,12 +1,12 @@
 {
- "comment": "Эффект «Безмолвные врата» (T03) на всю шкалу под музыку (0–65 с). Сгенерировано tools/gen_silent_gate_fx.py — правьте генератор.",
+ "comment": "Эффект «Безмолвные врата» (T03), часть 1: от начала каста до приказа (0–49.9 с и ожидание ЛКМ); держится, пока код не остановит (после удара). Удар — fx/silent_gate_strike.json. Сгенерировано tools/gen_silent_gate_fx.py — правьте генератор.",
  "style": "silent",
- "duration": 1920,
+ "duration": -1,
  "elements": [
   {
    "type": "tint",
    "delay": 0,
-   "duration": 1300,
+   "duration": 12000,
    "at": "caster",
    "radius": 128,
    "color": "#1E4A5A",
@@ -14,10 +14,6 @@
    "in": {
     "duration": 120,
     "easing": "easeInOutSine"
-   },
-   "out": {
-    "duration": 50,
-    "easing": "easeInSine"
    }
   },
   {
@@ -40,183 +36,228 @@
   },
   {
    "type": "flash",
-   "size": 0.9,
-   "rays": 0,
-   "color": "#FFFFFF",
-   "brightness": 0.9,
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true,
+   "delay": 20,
+   "duration": 160,
+   "at": "caster+-0.80,1.30,0.25",
+   "size": 1.6,
+   "rays": 6,
+   "color": "@core",
+   "brightness": 0.8,
    "in": {
-    "duration": 20,
-    "easing": "easeOutCubic"
+    "duration": 16
    },
    "out": {
-    "duration": 32,
-    "easing": "easeInSine"
+    "duration": 30
    },
-   "comment": "мягкое белое ядро у кисти"
+   "comment": "яркое пятно у посоха"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 20,
+   "until": 180,
+   "at": "caster+-0.20,1.70,0.25",
+   "orientation": "billboard",
+   "scale": 0.55
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 26,
+   "until": 180,
+   "at": "caster+1.48,1.88,0.48",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 32,
+   "until": 180,
+   "at": "caster+3.16,2.06,0.62",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 38,
+   "until": 180,
+   "at": "caster+4.84,2.24,0.64",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 44,
+   "until": 180,
+   "at": "caster+6.52,2.42,0.52",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 50,
+   "until": 180,
+   "at": "caster+8.20,2.60,0.31",
+   "orientation": "billboard",
+   "scale": 0.56
   },
   {
    "type": "sprites",
+   "delay": 20,
+   "duration": 160,
+   "at": "caster+-0.80,1.30,0.25",
    "texture": "spark_soft",
-   "count": 4000,
-   "rate": 24,
-   "cone": 50,
-   "speed": 0.085,
-   "gravity": -0.0006,
-   "size": [
-    0.07,
-    0.02
-   ],
-   "life": 48,
-   "glow": 0.25,
-   "color": "#FFFFFF",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true,
-   "comment": "мельчайшие белые искры — основа потока"
-  },
-  {
-   "type": "sprites",
-   "texture": "spark_soft",
-   "count": 2200,
-   "rate": 13,
-   "cone": 62,
-   "speed": 0.065,
-   "gravity": -0.0004,
-   "size": [
-    0.09,
-    0.02
-   ],
-   "life": 56,
-   "glow": 0.3,
-   "color": "#BFF4FF",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true,
-   "comment": "бледно-бирюзовые"
-  },
-  {
-   "type": "sprites",
-   "texture": "spark_soft",
-   "count": 1200,
-   "rate": 7,
-   "cone": 74,
-   "speed": 0.05,
-   "gravity": -0.0003,
+   "count": 900,
+   "rate": 3,
+   "cone": 26,
+   "speed": 0.09,
+   "gravity": -0.0008,
    "size": [
     0.08,
     0.02
    ],
-   "life": 60,
-   "glow": 0.3,
-   "color": "#F2C6EE",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true,
-   "comment": "розово-лиловый отлив по краям"
+   "life": 70,
+   "color": "#F4E0F4",
+   "comment": "искры текут от посоха вдоль полосы"
   },
   {
    "type": "sprites",
-   "texture": "glow",
-   "count": 260,
-   "rate": 1.6,
-   "cone": 44,
-   "speed": 0.045,
-   "gravity": -0.0002,
-   "size": [
-    0.7,
-    2.4
-   ],
-   "life": 64,
-   "color": "#6E5C8E",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true,
-   "comment": "мягкие светящиеся облачка туманности (тусклые, аддитивно)"
-  },
-  {
-   "type": "sprites",
-   "texture": "glow",
-   "count": 160,
-   "rate": 1.0,
-   "cone": 36,
-   "speed": 0.055,
-   "gravity": -0.0002,
-   "size": [
-    0.5,
-    1.8
-   ],
-   "life": 56,
-   "color": "#4E7E8E",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true
-  },
-  {
-   "type": "sprites",
-   "texture": "glint4",
-   "count": 420,
-   "rate": 2.6,
-   "cone": 58,
-   "speed": 0.06,
-   "gravity": -0.0004,
-   "spin": 60,
-   "size": [
-    0.42,
-    0.06
-   ],
-   "life": 42,
-   "glow": 0.5,
-   "color": "#FFFFFF",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true,
-   "comment": "крупные четырёхлучевые звёздочки в потоке"
-  },
-  {
-   "type": "sprites",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster+0,1.6,1.5",
+   "delay": 20,
+   "duration": 160,
+   "at": "caster+3.5,2.2,0.3",
    "texture": "glint4",
    "count": 160,
-   "rate": 0.8,
-   "spread": 6,
+   "rate": 0.6,
+   "spread": 4.5,
    "speed": 0.004,
    "gravity": 0.0,
-   "spin": 30,
+   "spin": 40,
    "size": [
     0.0,
-    0.5
+    0.4
    ],
-   "life": 50,
+   "life": 46,
    "color": "#FFFFFF",
-   "comment": "редкие звёздочки, мерцающие в воздухе вокруг"
+   "comment": "мерцающие звёздочки в полосе"
   },
   {
    "type": "flash",
-   "delay": 998,
-   "duration": 12,
-   "at": "caster.hand",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster+-0.80,1.30,0.25",
    "size": 1.6,
-   "anamorphic": 4,
    "rays": 6,
-   "color": "@core"
+   "color": "@core",
+   "brightness": 0.8,
+   "in": {
+    "duration": 16
+   },
+   "out": {
+    "duration": 30
+   },
+   "comment": "яркое пятно у посоха"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 292,
+   "until": 520,
+   "at": "caster+-0.20,1.70,0.25",
+   "orientation": "billboard",
+   "scale": 0.55
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 298,
+   "until": 520,
+   "at": "caster+1.48,1.88,0.48",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 304,
+   "until": 520,
+   "at": "caster+3.16,2.06,0.62",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 310,
+   "until": 520,
+   "at": "caster+4.84,2.24,0.64",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 316,
+   "until": 520,
+   "at": "caster+6.52,2.42,0.52",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 322,
+   "until": 520,
+   "at": "caster+8.20,2.60,0.31",
+   "orientation": "billboard",
+   "scale": 0.56
+  },
+  {
+   "type": "sprites",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster+-0.80,1.30,0.25",
+   "texture": "spark_soft",
+   "count": 900,
+   "rate": 3,
+   "cone": 26,
+   "speed": 0.09,
+   "gravity": -0.0008,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 70,
+   "color": "#F4E0F4",
+   "comment": "искры текут от посоха вдоль полосы"
+  },
+  {
+   "type": "sprites",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster+3.5,2.2,0.3",
+   "texture": "glint4",
+   "count": 160,
+   "rate": 0.6,
+   "spread": 4.5,
+   "speed": 0.004,
+   "gravity": 0.0,
+   "spin": 40,
+   "size": [
+    0.0,
+    0.4
+   ],
+   "life": 46,
+   "color": "#FFFFFF",
+   "comment": "мерцающие звёздочки в полосе"
   },
   {
    "type": "sigil",
    "id": "silent_nimbus",
    "delay": 400,
-   "until": 1260,
    "at": "caster+0,65,26",
    "orientation": "sky",
    "color": "@primary",
@@ -237,7 +278,6 @@
    "type": "mesh",
    "model": "silent_gate",
    "delay": 436,
-   "until": 1260,
    "at": "caster+0,48,26",
    "yaw": 180,
    "scale": 1.5,
@@ -257,7 +297,6 @@
    "type": "mesh",
    "model": "silent_gate_door_l",
    "delay": 436,
-   "until": 1260,
    "at": "caster+0,48,26",
    "yaw": 180,
    "scale": 1.5,
@@ -289,7 +328,6 @@
    "type": "mesh",
    "model": "silent_gate_door_r",
    "delay": 436,
-   "until": 1260,
    "at": "caster+0,48,26",
    "yaw": 180,
    "scale": 1.5,
@@ -321,7 +359,6 @@
    "type": "mesh",
    "model": "silent_gate_light",
    "delay": 950,
-   "until": 1260,
    "at": "caster+0,48,26",
    "yaw": 180,
    "scale": 1.5
@@ -390,7 +427,6 @@
    "type": "sigil",
    "id": "silent_coin",
    "delay": 780,
-   "until": 1260,
    "at": "caster+-3.19,1.5,-1.24",
    "orientation": "facing",
    "color": "@gold"
@@ -399,7 +435,6 @@
    "type": "sigil",
    "id": "silent_orb",
    "delay": 800,
-   "until": 1260,
    "at": "caster+-2.70,1.5,-1.74",
    "orientation": "facing",
    "color": "@primary"
@@ -408,7 +443,6 @@
    "type": "sigil",
    "id": "silent_coin",
    "delay": 820,
-   "until": 1260,
    "at": "caster+-1.95,1.5,-2.13",
    "orientation": "facing",
    "color": "@gold"
@@ -417,7 +451,6 @@
    "type": "sigil",
    "id": "silent_orb",
    "delay": 840,
-   "until": 1260,
    "at": "caster+-1.02,1.5,-2.38",
    "orientation": "facing",
    "color": "@primary"
@@ -426,7 +459,6 @@
    "type": "sigil",
    "id": "silent_coin",
    "delay": 860,
-   "until": 1260,
    "at": "caster+0.00,1.5,-2.47",
    "orientation": "facing",
    "color": "@gold"
@@ -435,7 +467,6 @@
    "type": "sigil",
    "id": "silent_orb",
    "delay": 840,
-   "until": 1260,
    "at": "caster+1.02,1.5,-2.38",
    "orientation": "facing",
    "color": "@primary"
@@ -444,7 +475,6 @@
    "type": "sigil",
    "id": "silent_coin",
    "delay": 820,
-   "until": 1260,
    "at": "caster+1.95,1.5,-2.13",
    "orientation": "facing",
    "color": "@gold"
@@ -453,7 +483,6 @@
    "type": "sigil",
    "id": "silent_orb",
    "delay": 800,
-   "until": 1260,
    "at": "caster+2.70,1.5,-1.74",
    "orientation": "facing",
    "color": "@primary"
@@ -462,856 +491,9 @@
    "type": "sigil",
    "id": "silent_coin",
    "delay": 780,
-   "until": 1260,
    "at": "caster+3.19,1.5,-1.24",
    "orientation": "facing",
    "color": "@gold"
-  },
-  {
-   "type": "flash",
-   "delay": 1000,
-   "duration": 16,
-   "at": "caster+0,2,0",
-   "size": 4,
-   "anamorphic": 10,
-   "rays": 6,
-   "screen": 0.45,
-   "color": "@core"
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1000,
-   "until": 1256,
-   "at": "caster+-22.5,27.0,44.0",
-   "orientation": "sky",
-   "scale": 0.5213015660476795
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+-29.2,22.5,18.7",
-   "orientation": "sky",
-   "scale": 0.3788850257788827
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1011,
-   "until": 1256,
-   "at": "caster+37.8,29.5,25.6",
-   "orientation": "sky",
-   "scale": 0.4790215667965876
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1001,
-   "until": 1256,
-   "at": "caster+6.3,23.6,20.7",
-   "orientation": "sky",
-   "scale": 0.5209200225881608
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1010,
-   "until": 1256,
-   "at": "caster+-33.1,25.3,3.6",
-   "orientation": "sky",
-   "scale": 0.30053889541158735
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1011,
-   "until": 1256,
-   "at": "caster+22.0,17.2,16.6",
-   "orientation": "sky",
-   "scale": 0.41994614568401833
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1001,
-   "until": 1256,
-   "at": "caster+7.4,20.4,-13.9",
-   "orientation": "sky",
-   "scale": 0.3953789460985363
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+37.3,17.3,28.7",
-   "orientation": "sky",
-   "scale": 0.43824578107599843
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+11.8,25.8,-13.9",
-   "orientation": "sky",
-   "scale": 0.3319014345128134
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1013,
-   "until": 1256,
-   "at": "caster+27.3,30.7,43.2",
-   "orientation": "sky",
-   "scale": 0.4288567369294245
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1002,
-   "until": 1256,
-   "at": "caster+-17.5,21.6,60.7",
-   "orientation": "sky",
-   "scale": 0.391176612215167
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+-0.5,24.1,-17.4",
-   "orientation": "sky",
-   "scale": 0.29971968025312457
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1007,
-   "until": 1256,
-   "at": "caster+35.9,22.1,4.8",
-   "orientation": "sky",
-   "scale": 0.3696331874261087
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+2.0,22.1,51.3",
-   "orientation": "sky",
-   "scale": 0.4516009710940193
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1010,
-   "until": 1256,
-   "at": "caster+-8.3,30.5,8.7",
-   "orientation": "sky",
-   "scale": 0.4697680392389645
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1001,
-   "until": 1256,
-   "at": "caster+29.6,23.5,23.1",
-   "orientation": "sky",
-   "scale": 0.36990330585605824
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1016,
-   "until": 1256,
-   "at": "caster+38.3,22.3,7.9",
-   "orientation": "sky",
-   "scale": 0.37709354310395815
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1001,
-   "until": 1256,
-   "at": "caster+13.4,27.7,-1.3",
-   "orientation": "sky",
-   "scale": 0.48403545084253174
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1012,
-   "until": 1256,
-   "at": "caster+15.7,20.1,-13.0",
-   "orientation": "sky",
-   "scale": 0.5146320966554246
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+23.4,30.7,31.3",
-   "orientation": "sky",
-   "scale": 0.43583241874646383
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+-0.4,31.4,58.4",
-   "orientation": "sky",
-   "scale": 0.5298859803185261
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1000,
-   "until": 1256,
-   "at": "caster+-4.5,23.3,4.6",
-   "orientation": "sky",
-   "scale": 0.5545470737301554
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+-28.0,31.6,0.2",
-   "orientation": "sky",
-   "scale": 0.4984865134072524
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1005,
-   "until": 1256,
-   "at": "caster+-20.9,27.9,51.5",
-   "orientation": "sky",
-   "scale": 0.3984478079193969
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+-8.7,17.7,3.2",
-   "orientation": "sky",
-   "scale": 0.5437292542543136
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1011,
-   "until": 1256,
-   "at": "caster+-8.9,17.6,-2.4",
-   "orientation": "sky",
-   "scale": 0.5793114701484466
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1007,
-   "until": 1256,
-   "at": "caster+9.1,25.7,59.2",
-   "orientation": "sky",
-   "scale": 0.48259222951025094
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1009,
-   "until": 1256,
-   "at": "caster+-34.6,20.5,37.7",
-   "orientation": "sky",
-   "scale": 0.5615316656183393
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1005,
-   "until": 1256,
-   "at": "caster+-11.9,28.3,-6.7",
-   "orientation": "sky",
-   "scale": 0.31846389334108816
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1013,
-   "until": 1256,
-   "at": "caster+0.1,17.3,56.1",
-   "orientation": "sky",
-   "scale": 0.595878719650256
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1000,
-   "until": 1256,
-   "at": "caster+-25.6,22.1,0.4",
-   "orientation": "sky",
-   "scale": 0.5259768006310038
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1011,
-   "until": 1256,
-   "at": "caster+-9.8,24.3,-12.3",
-   "orientation": "sky",
-   "scale": 0.5359768488334751
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1009,
-   "until": 1256,
-   "at": "caster+21.2,27.7,1.9",
-   "orientation": "sky",
-   "scale": 0.39174913976663905
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1009,
-   "until": 1256,
-   "at": "caster+-19.2,25.8,64.0",
-   "orientation": "sky",
-   "scale": 0.558976642716327
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1002,
-   "until": 1256,
-   "at": "caster+-7.5,24.8,38.6",
-   "orientation": "sky",
-   "scale": 0.301266931628875
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1010,
-   "until": 1256,
-   "at": "caster+24.9,18.8,47.8",
-   "orientation": "sky",
-   "scale": 0.4831526225835401
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+-19.1,18.6,-1.0",
-   "orientation": "sky",
-   "scale": 0.5370627139686899
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+-14.1,20.9,-6.1",
-   "orientation": "sky",
-   "scale": 0.4305404155156525
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+29.6,23.2,43.2",
-   "orientation": "sky",
-   "scale": 0.5944558299080591
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+-9.5,22.5,7.0",
-   "orientation": "sky",
-   "scale": 0.2998897213941096
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1009,
-   "until": 1256,
-   "at": "caster+16.4,23.6,19.1",
-   "orientation": "sky",
-   "scale": 0.558662355835249
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1008,
-   "until": 1256,
-   "at": "caster+25.9,29.6,-3.2",
-   "orientation": "sky",
-   "scale": 0.34883027786160964
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+-26.9,30.3,5.8",
-   "orientation": "sky",
-   "scale": 0.3306643983089722
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1007,
-   "until": 1256,
-   "at": "caster+7.0,28.5,48.9",
-   "orientation": "sky",
-   "scale": 0.4906578777630025
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+13.9,29.5,-13.4",
-   "orientation": "sky",
-   "scale": 0.5530724316193667
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1009,
-   "until": 1256,
-   "at": "caster+4.9,18.9,4.8",
-   "orientation": "sky",
-   "scale": 0.36818740342891443
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1008,
-   "until": 1256,
-   "at": "caster+-7.6,26.9,31.5",
-   "orientation": "sky",
-   "scale": 0.5010621986190064
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1001,
-   "until": 1256,
-   "at": "caster+-13.4,22.1,67.1",
-   "orientation": "sky",
-   "scale": 0.594027203461948
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+-13.5,23.8,-7.6",
-   "orientation": "sky",
-   "scale": 0.5949478544407427
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+14.6,28.9,5.1",
-   "orientation": "sky",
-   "scale": 0.41657297339812327
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+-10.9,20.4,59.2",
-   "orientation": "sky",
-   "scale": 0.294344876451513
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1011,
-   "until": 1256,
-   "at": "caster+24.9,17.3,54.9",
-   "orientation": "sky",
-   "scale": 0.40723665549125765
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1010,
-   "until": 1256,
-   "at": "caster+-6.9,24.5,12.4",
-   "orientation": "sky",
-   "scale": 0.5005036057654484
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1013,
-   "until": 1256,
-   "at": "caster+15.3,29.4,7.9",
-   "orientation": "sky",
-   "scale": 0.37137839760047736
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1007,
-   "until": 1256,
-   "at": "caster+-21.2,23.4,3.2",
-   "orientation": "sky",
-   "scale": 0.34409607625660843
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1000,
-   "until": 1256,
-   "at": "caster+-7.4,18.6,60.4",
-   "orientation": "sky",
-   "scale": 0.49033366511759113
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1008,
-   "until": 1256,
-   "at": "caster+10.6,31.2,-14.5",
-   "orientation": "sky",
-   "scale": 0.2918502057447181
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+-13.9,28.8,-7.7",
-   "orientation": "sky",
-   "scale": 0.42083072690634254
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+18.8,20.1,-12.0",
-   "orientation": "sky",
-   "scale": 0.47202152430067656
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+16.0,27.2,17.6",
-   "orientation": "sky",
-   "scale": 0.3727689288817485
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1000,
-   "until": 1256,
-   "at": "caster+10.2,31.4,13.8",
-   "orientation": "sky",
-   "scale": 0.3701591314770327
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1013,
-   "until": 1256,
-   "at": "caster+11.7,19.5,55.6",
-   "orientation": "sky",
-   "scale": 0.40895125991646253
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1016,
-   "until": 1256,
-   "at": "caster+37.4,23.0,4.6",
-   "orientation": "sky",
-   "scale": 0.35404558548668935
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1010,
-   "until": 1256,
-   "at": "caster+25.3,22.4,8.5",
-   "orientation": "sky",
-   "scale": 0.3122749498843901
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1002,
-   "until": 1256,
-   "at": "caster+23.6,17.0,35.5",
-   "orientation": "sky",
-   "scale": 0.36405678091200644
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1009,
-   "until": 1256,
-   "at": "caster+-30.2,19.7,20.8",
-   "orientation": "sky",
-   "scale": 0.5702216307599429
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1010,
-   "until": 1256,
-   "at": "caster+29.4,22.0,29.8",
-   "orientation": "sky",
-   "scale": 0.30159399140771276
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1011,
-   "until": 1256,
-   "at": "caster+-8.1,18.1,-4.9",
-   "orientation": "sky",
-   "scale": 0.30832954902631454
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1014,
-   "until": 1256,
-   "at": "caster+-24.8,30.4,41.7",
-   "orientation": "sky",
-   "scale": 0.32651454954233095
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1012,
-   "until": 1256,
-   "at": "caster+-27.6,18.6,48.9",
-   "orientation": "sky",
-   "scale": 0.4741464033960249
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+-34.2,29.3,51.9",
-   "orientation": "sky",
-   "scale": 0.3116420534328123
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1012,
-   "until": 1256,
-   "at": "caster+-31.1,31.9,57.1",
-   "orientation": "sky",
-   "scale": 0.4708366707046905
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1002,
-   "until": 1256,
-   "at": "caster+-29.6,18.1,55.6",
-   "orientation": "sky",
-   "scale": 0.4277471573770436
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+23.4,28.8,6.7",
-   "orientation": "sky",
-   "scale": 0.28642992267397255
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1005,
-   "until": 1256,
-   "at": "caster+-17.7,19.1,-7.7",
-   "orientation": "sky",
-   "scale": 0.43851731806066496
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1005,
-   "until": 1256,
-   "at": "caster+34.1,20.8,1.8",
-   "orientation": "sky",
-   "scale": 0.43166379071802663
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1015,
-   "until": 1256,
-   "at": "caster+31.5,20.6,2.2",
-   "orientation": "sky",
-   "scale": 0.5976922068199333
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1014,
-   "until": 1256,
-   "at": "caster+-8.6,21.9,-11.7",
-   "orientation": "sky",
-   "scale": 0.5119210808872702
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1012,
-   "until": 1256,
-   "at": "caster+-16.1,21.2,-4.2",
-   "orientation": "sky",
-   "scale": 0.3441756711493704
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+1.0,31.1,39.9",
-   "orientation": "sky",
-   "scale": 0.49741302353522665
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1014,
-   "until": 1256,
-   "at": "caster+20.0,18.1,22.5",
-   "orientation": "sky",
-   "scale": 0.36620793069961205
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1007,
-   "until": 1256,
-   "at": "caster+16.4,26.1,7.1",
-   "orientation": "sky",
-   "scale": 0.2829250993764957
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1004,
-   "until": 1256,
-   "at": "caster+-7.8,18.1,54.9",
-   "orientation": "sky",
-   "scale": 0.48621246075233726
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1001,
-   "until": 1256,
-   "at": "caster+-4.0,29.1,47.5",
-   "orientation": "sky",
-   "scale": 0.5056865751407481
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1003,
-   "until": 1256,
-   "at": "caster+-37.8,26.7,16.2",
-   "orientation": "sky",
-   "scale": 0.5977731870165098
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1012,
-   "until": 1256,
-   "at": "caster+-12.5,25.9,-13.2",
-   "orientation": "sky",
-   "scale": 0.3547485931757337
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1011,
-   "until": 1256,
-   "at": "caster+-1.7,17.9,-5.5",
-   "orientation": "sky",
-   "scale": 0.47452190987889126
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_white",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+12.9,25.2,63.9",
-   "orientation": "sky",
-   "scale": 0.4955302031711607
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1008,
-   "until": 1256,
-   "at": "caster+32.4,20.4,16.9",
-   "orientation": "sky",
-   "scale": 0.41328650932740385
-  },
-  {
-   "type": "sigil",
-   "id": "silent_field_green",
-   "delay": 1006,
-   "until": 1256,
-   "at": "caster+16.6,19.8,5.6",
-   "orientation": "sky",
-   "scale": 0.5691933163461438
-  },
-  {
-   "type": "beam_rain",
-   "delay": 1010,
-   "duration": 240,
-   "at": "caster+0,0,26",
-   "area": 44,
-   "count": 400,
-   "interval": 0.6,
-   "width": 0.22,
-   "height": 40,
-   "ground": true,
-   "color": "@secondary",
-   "impact": "silent_impact"
-  },
-  {
-   "type": "flash",
-   "delay": 1256,
-   "duration": 24,
-   "at": "caster+0,55,26",
-   "size": 10,
-   "anamorphic": 12,
-   "rays": 8,
-   "screen": 0.2,
-   "color": "@core"
   }
  ]
 }

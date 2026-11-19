@@ -112,13 +112,29 @@ public class EmberBlade extends SwordItem {
 
     /** Any melee hit of the holder with this blade in the main hand (vanilla or an Epic Fight swing). */
     public static final class Events {
-        @SubscribeEvent
+        /**
+         * Owner 19.11: the heat did not grow. The direct entity of an Epic Fight swing may not be the player himself, so any non-projectile
+         * damage by the holder counts. Temporary: each hit goes to the server log (to see in the next check whether the hits arrive).
+         */
+        @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST, receiveCanceled = true)
         public static void onHurt(LivingHurtEvent e) {
-            if (lashing || !(e.getSource().getEntity() instanceof Player p) || e.getSource().getDirectEntity() != p) return;
+            if (lashing || !(e.getSource().getEntity() instanceof Player p)) return;
             if (!(p.level() instanceof ServerLevel sl)) return;
             ItemStack s = p.getMainHandItem();
             if (!(s.getItem() instanceof EmberBlade)) return;
+            Entity direct = e.getSource().getDirectEntity();
+            ru.pohsmp.core.PohCore.LOG.info("[ember] hurt {} by {}: source {}, direct {}, amount {}, cancelled {}, heat {}",
+                    e.getEntity().getName().getString(), p.getName().getString(), e.getSource().getMsgId(),
+                    direct == null ? "null" : direct.getType().toShortString(), e.getAmount(), e.isCanceled(), heat(s));
+            if (e.isCanceled() || direct instanceof net.minecraft.world.entity.projectile.Projectile) return;
             onHit(sl, p, s, e.getEntity());
+        }
+
+        /** Temporary: a swing that hits nothing still shows in the log, to tell "no hurt event" from "no swing". */
+        @SubscribeEvent
+        public static void onAttack(net.minecraftforge.event.entity.player.AttackEntityEvent e) {
+            if (e.getEntity().getMainHandItem().getItem() instanceof EmberBlade && !e.getEntity().level().isClientSide)
+                ru.pohsmp.core.PohCore.LOG.info("[ember] attack by {} on {}", e.getEntity().getName().getString(), e.getTarget().getName().getString());
         }
     }
 
@@ -213,19 +229,27 @@ public class EmberBlade extends SwordItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
         ItemStack s = p.getItemInHand(hand);
         if (hand != InteractionHand.MAIN_HAND || heat(s) < MAX_HEAT) return InteractionResultHolder.pass(s);
-        if (level instanceof ServerLevel sl && p instanceof net.minecraft.server.level.ServerPlayer sp) {
-            boolean vortex = hot(s);
-            // Epic Fight: the swing animation first; the effect and the damage wait for its strike (0 ticks without Epic Fight)
-            int delay = EmberEpicFight.playSpecial(sp, vortex);
-            set(s, 0, vortex ? HOT_AFTER : 0, vortex, sl.getGameTime());   // the heat is spent at once: no double special
-            later(delay, () -> {
-                if (!p.isAlive() || p.level() != sl) return;
-                if (vortex) fireVortex(sl, p, s);
-                else lastEmber(sl, p, s);
-            });
-            p.getCooldowns().addCooldown(this, vortex ? 24 : 40);
-        }
+        if (level instanceof ServerLevel && p instanceof net.minecraft.server.level.ServerPlayer sp) special(sp, s);
         return InteractionResultHolder.sidedSuccess(s, level.isClientSide);
+    }
+
+    /**
+     * The special attack by form (full heat): plays the Epic Fight animation, spends the heat at once and starts the effect and the
+     * damage on the strike of the animation (at once without Epic Fight). Called by the right click now; the Epic Fight weapon skill
+     * (owner 19.11: the right click should stay the block) should call this too. Returns false when the heat is not full.
+     */
+    public static boolean special(net.minecraft.server.level.ServerPlayer p, ItemStack s) {
+        if (!(s.getItem() instanceof EmberBlade item) || heat(s) < MAX_HEAT || !(p.level() instanceof ServerLevel sl)) return false;
+        boolean vortex = hot(s);
+        int delay = EmberEpicFight.playSpecial(p, vortex);
+        set(s, 0, vortex ? HOT_AFTER : 0, vortex, sl.getGameTime());   // the heat is spent at once: no double special
+        later(delay, () -> {
+            if (!p.isAlive() || p.level() != sl) return;
+            if (vortex) fireVortex(sl, p, s);
+            else lastEmber(sl, p, s);
+        });
+        p.getCooldowns().addCooldown(item, vortex ? 24 : 40);
+        return true;
     }
 
     /** Runs r after n server ticks (at once when n <= 0). */

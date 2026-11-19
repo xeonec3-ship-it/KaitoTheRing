@@ -14,7 +14,9 @@ T06. Темы печатей для школ Iron's: Огонь, Лёд, Мол�
   sigils/<школа>_seal.json, sigils/<школа>_crown.json — печати ступеней (формат docs/sigils.md)
   sigils/school_<школа>.json           — знак обычного каста (лёгкий, на новых текстурах)
   fx/school_<школа>_cast.json          — каст на ступени Высшая: печать под магом + частицы школы
-  fx/school_<школа>_cast_crown.json    — Мифическая/Божественная: то же + венец над головой
+  fx/school_<школа>_cast_crown.json    — Мифическая: то же + венец над головой
+  fx/school_<школа>_cast_divine.json   — Божественная: печать + венец + дуга из 7 золотых кругов за спиной (раскрываются с краёв
+                                         к центру, как у «Безмолвных врат»), золотые блёстки (решение владельца 19.11)
   fx/styles/<стиль>.json               — палитра, текстуры частиц, характер движения
 
 Всё рисуется белым на прозрачном (цвет задаёт JSON), в 4 раза крупнее с уменьшением — края гладкие;
@@ -1467,10 +1469,31 @@ def cast_fx(s, crown):
     if crown:
         el.insert(1, dict(type='sigil', id=s + '_crown', delay=10, at='caster+0,2.55,0', follow=True))
         el.append(dict(type='flash', delay=10, duration=10, at='caster+0,2.55,0', size=1.4, color='@core', brightness=0.6, rays=6))
-    tier = 'Мифическая/Божественная: печать + венец над головой' if crown else 'Высшая: печать под магом'
+    tier = 'Мифическая: печать + венец над головой' if crown else 'Высшая: печать под магом'
     return {'comment': 'T06, школа «%s», ступень %s + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). '
                        'Сгенерировано tools/gen_school_themes.py.' % (S['name'], tier),
             'style': S['style'], 'duration': -1, 'elements': el}
+
+
+def divine_fx(s):
+    """Божественная ступень: как у Мифической (печать + венец) и дуга из 7 золотых кругов за спиной — с краёв к центру,
+    чуть наклонены к магу; золотые блёстки поднимаются от дуги."""
+    d = cast_fx(s, True)
+    n = 7
+    for i in range(n):
+        a = math.radians(-72 + 144 * i / (n - 1))
+        x, z = 1.9 * math.sin(a), -(1.9 * math.cos(a) * 0.6 + 0.55)
+        y = 1.55 + 0.35 * math.cos(a)
+        delay = 14 + (n // 2 - abs(i - n // 2)) * 0 + abs(i - n // 2) * -3 + 9
+        d['elements'].append(dict(type='sigil', id='golden_halo', delay=delay, at='caster+%.2f,%.2f,%.2f' % (x, y, z), follow=True,
+                                  orientation='facing', sigilScale=1.15 if i == n // 2 else 0.95))
+    d['elements'].append(dict(type='sprites', delay=16, duration=9999, at='caster+0,1.6,-0.9', follow=True, texture='@sparks', count=4000,
+                              rate=1.5, spread=1.8, speed=0.01, gravity=-0.002, size=[0.1, 0.02], life=40, color='#FFD36B'))
+    d['elements'].append(dict(type='flash', delay=22, duration=12, at='caster+0,1.7,-1.0', follow=True, size=2.4, rays=8, color='#FFE9A8', brightness=0.6))
+    d['comment'] = ('T06, школа «%s», ступень Божественная: печать под магом + венец над головой + дуга из 7 золотых кругов за спиной '
+                    '(с краёв к центру), золотые блёстки. duration -1: код останавливает эффект в конце каста. Сгенерировано tools/gen_school_themes.py.'
+                    % SCHOOLS[s]['name'])
+    return d
 
 
 def ordinary_fx(s):
@@ -1545,6 +1568,7 @@ def main():
         write_json('sigils/school_%s.json' % s, ordinary_def(s))
         write_json('fx/school_%s_cast.json' % s, cast_fx(s, False))
         write_json('fx/school_%s_cast_crown.json' % s, cast_fx(s, True))
+        write_json('fx/school_%s_cast_divine.json' % s, divine_fx(s))
         write_json('fx/school_%s.json' % s, ordinary_fx(s))
         write_json('fx/styles/%s.json' % SCHOOLS[s]['style'], style_def(s))
         print('school', s)

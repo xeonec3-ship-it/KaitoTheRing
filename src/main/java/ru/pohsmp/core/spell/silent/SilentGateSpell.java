@@ -39,6 +39,7 @@ import ru.pohsmp.core.SilentWitch;
 import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.fx.FxLib;
 import ru.pohsmp.core.fx.FxMath;
+import ru.pohsmp.core.net.Net;
 import ru.pohsmp.core.spell.CastAnims;
 import ru.pohsmp.core.spell.CnpcHooks;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
@@ -57,9 +58,24 @@ import ru.pohsmp.core.spell.HigherSpell;
 public class SilentGateSpell extends SilentStaffSpell {
     public static final String PATH = "silent_gate";
     /** Ticks: cast (= 50 s in the track), first rays, last rays, crystal, end of the scene, crystal life. */
-    public static final int CAST = 1000, RAYS_FROM = 1000, RAYS_TO = 1260, END = 1300;   // no ice mountain any more (owner 19.11)
-    /** Ticks from an aimed beam's launch to its strike (fx/silent_gate_beam.json hits on the 6th tick). */
-    private static final int HIT_DELAY = 6;
+    public static final int CAST = 992;
+    /**
+     * «Приказ» (owner 19.11): after the cast the witch holds the finger up and WAITS for a left click (WAIT_MAX without one — the
+     * command comes by itself; an NPC commands at once). The strike starts STRIKE_LAG ticks after the command (the hand comes down) and
+     * is timed from there: rays STRIKE_RAYS ticks, the scene ends at STRIKE_END.
+     */
+    public static final int WAIT_MAX = 600, STRIKE_LAG = 7, STRIKE_RAYS = 260, STRIKE_END = 300;
+    /** The longest scene (camera freeze, client timers); STOP ends it earlier. */
+    public static final int SCENE_MAX = CAST + WAIT_MAX + STRIKE_LAG + STRIKE_END + 20;
+    /** HFx.ANIM b codes of the scene phases (key = the scene key, a = the caster). */
+    public static final int ANIM_WAIT = 20, ANIM_COMMAND = 21, ANIM_STRIKE = 22;
+    private static final String FX_STRIKE = "silent_gate_strike";
+    /** Ticks from an aimed shot's launch to its strike (fx/silent_gate_beam.json: the new circle forms 0-10, the beam hits on the 14th tick). */
+    private static final int HIT_DELAY = 14;
+    /** Each foe gets one shot every SHOT_MIN..SHOT_MAX ticks, on its own random rhythm; at most SHOTS_PER_TICK new shots over the whole area. */
+    private static final int SHOT_MIN = 12, SHOT_MAX = 24, SHOTS_PER_TICK = 4;
+    /** The new circle of a shot: this far to the side of the foe (0..SHOT_SIDE). */
+    private static final double SHOT_SIDE = 3;
     /**
      * No cast point (owner): the gate stands in the sky FWD blocks ahead of the caster (by the view at the cast start), GATE_H over the area;
      * the area of the rays is under it. Same numbers as tools/gen_silent_gate_fx.py (FWD, GATE_UP); the camera uses them too.
@@ -76,10 +92,14 @@ public class SilentGateSpell extends SilentStaffSpell {
         ServerLevel sl;
         Vec3 at, hit;
         float yaw;
-        int age, cutKey, scene = -1;
+        int age, cutKey, scene = -1, strikeFx = -1;
+        /** Age when the wait began / when the command came; -1 before. */
+        int waitFrom = -1, command = -1;
         boolean cast, done;
         List<UUID> watchers = new ArrayList<>();
         final Map<UUID, Integer> lastHit = new HashMap<>();
+        /** foe -> tick of its next aimed shot */
+        final Map<UUID, Integer> nextShot = new HashMap<>();
         boolean placeholder;
     }
 
@@ -97,10 +117,13 @@ public class SilentGateSpell extends SilentStaffSpell {
     /** No spell sounds: only the music (T03). */
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
-    /** The witch's gestures (tools/gen_player_anims.py): point, look up, "shh" taking the staff, finger up; the finish holds the arm out. */
-    private static final AnimationHolder ANIM_CAST = CastAnims.of("silent_gate_cast"), ANIM_FINISH = CastAnims.of("silent_gate_finish");
-    /** Length of the finish animation (the strike, 50-64 s). */
-    private static final int FINISH_TICKS = 280;
+    /**
+     * The witch's gestures (tools/gen_player_anims.py): point, look up, "shh" taking the staff, finger up. Iron's plays the "finish"
+     * when the cast ends: here it is the wait loop (finger up); the command and the strike animations come with the phase packets.
+     */
+    private static final AnimationHolder ANIM_CAST = CastAnims.of("silent_gate_cast"), ANIM_FINISH = CastAnims.of("silent_gate_wait");
+    /** The hands stay empty after the cast for the wait and the strike (the scene end shows them at once). */
+    private static final int FINISH_TICKS = WAIT_MAX + STRIKE_LAG + STRIKE_END + 40;
     @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
     @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
 
@@ -154,13 +177,13 @@ public class SilentGateSpell extends SilentStaffSpell {
         Vec3 d = c.hit.subtract(c.at);
         float ang = (float) Math.atan2(-d.z, -d.x);
         // camera + music + silence for everyone within 128 of the caster or of the strike point
-        c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.SILENT_GATE, END, c.hit, ang, Cutscene.R_GATE, sl, c.hit);
+        c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.SILENT_GATE, SCENE_MAX, c.hit, ang, Cutscene.R_GATE, sl, c.hit);
         c.placeholder = FxLib.fx(FX_SCENE) == null;
         // anchored at the caster's feet with the start yaw, not to the caster entity: its head turns would swing the whole sky.
         // The ideas chat's effect runs its own length (the crystal stays 30 s after the scene); the placeholder ends with the scene.
         Fx.Spec spec = Fx.fx(c.placeholder ? FX_SCENE + "_placeholder" : FX_SCENE).at(c.at).yaw(c.yaw).target(c.hit).point("c", c.at)
                 .point("hit", c.hit).point("gate", c.hit.add(0, GATE_H, 0));
-        c.scene = Fx.play(sl, c.placeholder ? spec.duration(END) : spec);
+        c.scene = Fx.play(sl, c.placeholder ? spec.duration(SCENE_MAX) : spec);   // fx/silent_gate.json holds (duration -1) until the code stops it
         CASTS.put(caster.getUUID(), c);
         RUNNING.add(c);
     }
@@ -181,8 +204,49 @@ public class SilentGateSpell extends SilentStaffSpell {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
         Cast c = CASTS.get(caster.getUUID());
-        if (c != null) c.cast = true;
+        if (c != null) {
+            c.cast = true;
+            startWait(c);
+        }
         super.onCast(level, spellLevel, caster, source, md);
+    }
+
+    /** The cast is done: the finger up, the gate open — wait for the command (a player) or command at once (an NPC). */
+    private static void startWait(Cast c) {
+        if (c.waitFrom >= 0) return;
+        c.waitFrom = c.age;
+        ru.pohsmp.core.PohCore.LOG.info("[gate] {} waits for the command", c.caster.getName().getString());
+        if (!(c.caster instanceof ServerPlayer)) {
+            command(c);
+            return;
+        }
+        phase(c, ANIM_WAIT);
+    }
+
+    /** Sends a phase of the scene to every watcher (music, camera, HUD, the caster's animation). */
+    private static void phase(Cast c, int code) {
+        Net.HFx m = new Net.HFx(Net.HFx.ANIM, c.cutKey, c.caster.getId(), code, 0, 0, 0, 0, 0, 0);
+        for (UUID u : c.watchers) {
+            ServerPlayer p = c.sl.getServer().getPlayerList().getPlayer(u);
+            if (p != null) Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p), m);
+        }
+    }
+
+    /** The command: the hand comes down forward, the strike follows (its effect is timed from now). */
+    private static void command(Cast c) {
+        if (c.command >= 0 || c.done) return;
+        c.command = c.age;
+        ru.pohsmp.core.PohCore.LOG.info("[gate] {} commands after {} s", c.caster.getName().getString(), (c.age - Math.max(0, c.waitFrom)) / 20);
+        phase(c, ANIM_COMMAND);
+        if (!c.placeholder && FxLib.fx(FX_STRIKE) != null)
+            c.strikeFx = Fx.play(c.sl, Fx.fx(FX_STRIKE).at(c.at).yaw(c.yaw).target(c.hit).point("c", c.at)
+                    .point("hit", c.hit).point("gate", c.hit.add(0, GATE_H, 0)));
+    }
+
+    /** Client of the caster: the left click while waiting (Net GateCommandMsg). */
+    public static void commandFrom(ServerPlayer p) {
+        for (Cast c : RUNNING)
+            if (c.caster == p && c.waitFrom >= 0 && c.command < 0) command(c);
     }
 
     @Override
@@ -199,6 +263,7 @@ public class SilentGateSpell extends SilentStaffSpell {
         c.done = true;
         RUNNING.remove(c);
         if (c.scene >= 0) Fx.stop(c.sl, c.scene, "collapse");
+        if (c.strikeFx >= 0) Fx.stop(c.sl, c.strikeFx, "collapse");
         Cutscene.end(c.sl, c.caster, c.watchers, c.cutKey);
     }
 
@@ -211,32 +276,48 @@ public class SilentGateSpell extends SilentStaffSpell {
             cancel(c);
             return;
         }
-        if (t < RAYS_FROM) return;
-        if (!c.caster.isAlive() || c.caster.level() != c.sl) {   // caster died or left during the strike: stop quietly
+        if (c.waitFrom < 0) return;
+        // after the cast: died, left, logged out, or took off the outfit / dropped the staff while waiting or striking = cancelled
+        if (!c.caster.isAlive() || c.caster.isRemoved() || c.caster.level() != c.sl || c.command < 0 && why(c.caster) != null) {
             cancel(c);
             return;
         }
-        if (t <= RAYS_TO) rays(c, t);
-        if (t >= END) {
+        if (c.command < 0) {
+            if (t - c.waitFrom >= WAIT_MAX) command(c);   // no click for 30 s: the command comes by itself
+            return;
+        }
+        int s = t - c.command - STRIKE_LAG;   // strike time
+        if (s == 0) phase(c, ANIM_STRIKE);   // the hand is down: the strike animation
+        if (s >= 0 && s <= STRIKE_RAYS) rays(c, t);
+        if (s >= STRIKE_END) {
             c.done = true;
             RUNNING.remove(c);
+            if (c.scene >= 0) Fx.stop(c.sl, c.scene, "");
+            if (c.strikeFx >= 0) Fx.stop(c.sl, c.strikeFx, "");
             Cutscene.end(c.sl, c.caster, c.watchers, c.cutKey);
         }
     }
 
     /**
-     * Aimed volleys (as in the mod video): every aimedInterval ticks each foe in the area gets 3-5 beams from different seals of the sky
-     * field; the hit (rayRadius around the foe) counts once per volley and at most once per hitCooldownTicks per creature. The random rain
-     * of the effect (beam_rain) is only a look.
+     * Aimed shots (owner 19.11: not all together): over each foe in the area a new circle appears at the height of the sky field,
+     * forms in 0.5 s and strikes it with a beam (fx/silent_gate_beam.json, hit on tick {@link #HIT_DELAY}). Each foe gets one shot every
+     * 12-24 ticks on its own random rhythm; at most {@link #SHOTS_PER_TICK} new shots per tick over the whole area (the rest wait a tick).
+     * The hit (rayRadius around the foe) counts at most once per hitCooldownTicks per creature. The rain of the effect is only a look.
      */
     private static void rays(Cast c, int t) {
-        if ((t - RAYS_FROM) % ServerConfig.GATE_AIM_INTERVAL.get() != 0) return;
         double area = ServerConfig.GATE_AREA.get();
-        int lo = ServerConfig.GATE_BEAMS_MIN.get(), hi = Math.max(lo, ServerConfig.GATE_BEAMS_MAX.get());
+        int budget = SHOTS_PER_TICK;
         for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e))) {
-            int n = lo + c.sl.random.nextInt(hi - lo + 1);
-            for (int i = 0; i < n; i++) beam(c, e);
-            // the beam (fx/silent_gate_beam.json) locks on for 4 ticks and strikes on the 6th: the damage comes then, where the foe is then
+            Integer next = c.nextShot.get(e.getUUID());
+            if (next == null) {   // newly in the area: the first shot at a random moment of the first interval, so they do not all go at once
+                c.nextShot.put(e.getUUID(), t + c.sl.random.nextInt(SHOT_MAX - SHOT_MIN + 1));
+                continue;
+            }
+            if (t < next || budget <= 0) continue;
+            budget--;
+            c.nextShot.put(e.getUUID(), t + SHOT_MIN + c.sl.random.nextInt(SHOT_MAX - SHOT_MIN + 1));
+            beam(c, e);
+            // the damage comes on the beam's strike, where the foe is then
             ru.pohsmp.core.spell.Tasks.add(new ru.pohsmp.core.spell.Tasks.Task() {
                 int left = HIT_DELAY;
 
@@ -250,10 +331,10 @@ public class SilentGateSpell extends SilentStaffSpell {
         }
     }
 
-    /** One beam from a random seal of the sky field into the foe (look only). */
+    /** One shot: a new circle over the foe (17-32 over the ground at it, 0-3 to the side) and its beam into the foe (look only). */
     private static void beam(Cast c, LivingEntity e) {
-        double a = c.sl.random.nextDouble() * Math.PI * 2, r = Math.sqrt(c.sl.random.nextDouble()) * SKY_R;
-        Vec3 from = c.hit.add(Math.cos(a) * r, SKY_LO + c.sl.random.nextDouble() * (SKY_HI - SKY_LO), Math.sin(a) * r);
+        double a = c.sl.random.nextDouble() * Math.PI * 2, r = c.sl.random.nextDouble() * SHOT_SIDE;
+        Vec3 from = e.position().add(Math.cos(a) * r, SKY_LO + c.sl.random.nextDouble() * (SKY_HI - SKY_LO), Math.sin(a) * r);
         if (c.placeholder) {
             Fx.play(c.sl, Fx.fx(FX_BEAM + "_placeholder").at(e.position()).yaw(c.yaw).point("p", e.position()).point("from", from));
             return;

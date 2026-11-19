@@ -853,7 +853,7 @@ STAFF_L = _fk(pitch=-16, yaw=-6, roll=-10, bend=-58)      # левая рука 
 
 
 def silent_gate_cast():
-    T = 50.0
+    T = 49.6
     a, r = Anim('pohsmp_silent_gate_cast', T), Rig()
     _start(a)
     calm_t = {'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0}
@@ -879,10 +879,29 @@ def silent_gate_cast():
     # 49 — палец вверх
     a.pose(48.4, rightArm=r.R(-1.0, 25.0, 3.0), head={'pitch': -14, 'yaw': 0, 'roll': 0})
     a.pose(49.1, 'easeOutBack', rightArm=SKY_R, head={'pitch': -24, 'yaw': 0, 'roll': 0}, torso={'pitch': -4, 'yaw': 0, 'roll': 0, 'bend': 0})
-    a.pose(49.55, rightArm=SKY_R)
-    a.pose(49.9, 'easeInQuad', rightArm=FWD_R, head={'pitch': -4, 'yaw': 0, 'roll': 0}, torso={'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 2})
-    a.pose(T, rightArm=FWD_R, leftArm=STAFF_L)
-    return a, (FWD_R, STAFF_L, {'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 2}, None, 0.0)
+    a.pose(T, rightArm=SKY_R, leftArm=STAFF_L, head={'pitch': -24, 'yaw': 0, 'roll': 0}, torso={'pitch': -4, 'yaw': 0, 'roll': 0, 'bend': 0})
+    return a, (SKY_R, STAFF_L, {'pitch': -4, 'yaw': 0, 'roll': 0, 'bend': 0}, None, 0.0)
+
+
+def silent_gate_wait():
+    """«Приказ» (владелец 19.11): врата готовы, ведьма держит палец вверх и ждёт ЛКМ — петля 3 с, лёгкое дыхание и покачивание кисти."""
+    a = Anim('pohsmp_silent_gate_wait', 3.0, hold=True)
+    head, torso = {'pitch': -24, 'yaw': 0, 'roll': 0}, {'pitch': -4, 'yaw': 0, 'roll': 0, 'bend': 0}
+    a.pose(0, rightArm=SKY_R, leftArm=STAFF_L, head=head, torso=torso, body={'y': 0}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.sway(0, 3.0, 1.5, 'torso', torso, 'pitch', 1.2)
+    a.sway(0, 3.0, 1.0, 'rightArm', SKY_R, 'roll', 2.5)
+    a.sway(0, 3.0, 1.5, 'leftArm', STAFF_L, 'pitch', 1.5)
+    return a
+
+
+def silent_gate_command():
+    """Приказ по ЛКМ: рука с пальцем вверх резко опускается и встаёт прямо вперёд (0.35 с), дальше — silent_gate_finish (удар)."""
+    a = Anim('pohsmp_silent_gate_command', 0.5, hold=True)
+    a.pose(0, rightArm=SKY_R, leftArm=STAFF_L, head={'pitch': -24, 'yaw': 0, 'roll': 0}, torso={'pitch': -4, 'yaw': 0, 'roll': 0, 'bend': 0},
+           body={'y': 0}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.pose(0.35, 'easeInQuad', rightArm=FWD_R, head={'pitch': -4, 'yaw': 0, 'roll': 0}, torso={'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 2})
+    a.pose(0.5, rightArm=FWD_R, leftArm=STAFF_L)
+    return a
 
 
 def silent_gate_finish():
@@ -1255,7 +1274,7 @@ _CA = _pair(coven_arrival_cast, 'pohsmp_coven_arrival_finish')
 _DI = _pair(disintegration_cast, 'pohsmp_disintegration_finish')
 
 
-ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_finish,
+ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
          scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
          silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish]
 

@@ -42,7 +42,9 @@ public final class SchoolSeals {
         if (PohSpell.sigilIndex(school) < 0) return null;
         return switch (tier) {
             case HIGHER -> "school_" + school + "_cast";
-            case MYTHIC, DIVINE -> "school_" + school + "_cast_crown";
+            case MYTHIC -> "school_" + school + "_cast_crown";
+            case DIVINE -> "school_" + school + "_cast_divine";   // owner 19.11: + an arc of 7 golden circles behind
+
             default -> null;
         };
     }

@@ -191,44 +191,59 @@ def whip():
         rx, ry, _ = rot_of(a, b)
         return rx, ry
 
-    # Лента без «огня вокруг» (владелец 19.11): сам хлыст — цвета огня с референса, детальный: плоская основа с волнистым краем,
-    # поверх — три сплетённые пряди (как струи на Ruination), по центру светлая жила; цвет идёт от тёмно-оранжевого у пяты
-    # к жёлто-белому к концу петли.
-    STEPS = 220
+    # ХЛЫСТ по референсу владельца (Naomi, 19.11): цепь из золотисто-бронзовых звеньев-шипов — каждое звено ромб с двумя шипами
+    # назад-в-стороны (как наконечник стрелы), звенья смотрят по ходу хлыста и поворачиваются по очереди на 90°; на конце — большой
+    # раздвоенный наконечник-крюк (два загнутых зубца и жало). Металл, без огня. Тоны 5–9 — бронза → золото.
+    # Вид, который понравился сценаристу (превью анимаций T14, 19.11): гладкий оранжевый хлыст — детализированный:
+    # круглое сечение (две скрещённые призмы = восьмигранник), сужается от рукояти к концу, цвет от тёмно-оранжевого к светлому,
+    # плетение — чередование тонов кольцами и косые стежки, блик сверху, на конце кисточка-хлопушка из тонких прядей.
+    STEPS = 140
     pts = [curve(i / STEPS) for i in range(STEPS + 1)]
-    def heat(t):                                   # 0 у пяты → 1 у кончика: индекс тона
-        return t
+    def norm(v):
+        l = math.sqrt(sum(c * c for c in v)) or 1
+        return tuple(c / l for c in v)
+    def cross(u, v):
+        return (u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
     for i in range(STEPS):
         t = (i + 0.5) / STEPS
         p0, p1 = pts[i], pts[i + 1]
         rx, ry, ln = rot_of(p0, p1)
         c = tuple((p0[k] + p1[k]) / 2 for k in range(3))
-        w = (0.34 * (1 - 0.7 * t ** 1.2) + 0.05) * (1 + 0.12 * math.sin(i * 0.9))   # волнистый край
-        twist = 65 * math.sin(t * 3.0 * math.pi) + 15
-        L_ = ln * 1.3
-        edge = 5 if t < 0.35 else 6
-        box(c, (w, 0.035, L_), edge, (rx, ry, twist), F)                              # основа-край
-        box(c, (w * 0.7, 0.05, L_), 6 if t < 0.45 else 7, (rx, ry, twist), F)          # тело
-        box(c, (w * 0.16, 0.065, L_), 9, (rx, ry, twist), F)                          # светлая жила
-        # три пряди, сплетённые вдоль ленты: смещение поперёк по синусу со сдвигом фаз
-        for k, ph in enumerate((0.0, 2.1, 4.2)):
-            off = math.sin(t * 26 + ph) * w * 0.38
-            tw = math.radians(twist)
-            ox, oy = off * math.cos(tw), off * math.sin(tw)
-            # смещение вдоль «ширины» ленты в её плоскости (упрощённо: в осях после поворота по yaw)
-            yr = math.radians(ry)
-            box((c[0] + ox * math.cos(yr), c[1] + oy, c[2] - ox * math.sin(yr)), (0.045, 0.08, L_ * 0.9),
-                7 if (i + k * 3) % 4 else 8, (rx, ry, twist), F)
+        w = 0.15 * (1 - t) ** 0.8 + 0.028
+        braid = (i // 2) % 2
+        base = 5 if t < 0.25 else (6 if t < 0.6 else 7)
+        tone = base + braid if base + braid <= 8 else 8
+        L_ = ln * 1.18
+        box(c, (w, w * 0.62, L_), tone, (rx, ry, 0), B)
+        box(c, (w * 0.62, w, L_), tone, (rx, ry, 0), B)
+        box(c, (w * 0.78, w * 0.78, L_), tone, (rx, ry, 45), B)
+        T_ = norm(tuple(p1[k] - p0[k] for k in range(3)))
+        S1 = norm(cross(T_, (0, 1, 0))); S2 = norm(cross(S1, T_))
+        hl = tuple(c[k] + S2[k] * w * 0.42 for k in range(3))                     # блик сверху
+        box(hl, (w * 0.22, w * 0.18, L_ * 0.9), 9 if t > 0.3 else 8, (rx, ry, 0), B)
+        if i % 3 == 0 and w > 0.05:                                               # косой стежок плетения
+            st = tuple(c[k] + S1[k] * w * 0.4 for k in range(3))
+            box(st, (w * 0.18, w * 0.9, w * 0.5), base, (rx, ry, 35), B)
+    # кисточка-хлопушка на конце: 7 тонких прядей веером
+    tip, pre = curve(1.0), curve(0.985)
+    T_ = norm(tuple(tip[k] - pre[k] for k in range(3)))
+    S1 = norm(cross(T_, (0, 1, 0))); S2 = norm(cross(S1, T_))
+    for k in range(7):
+        ang = (k - 3) * 0.22
+        d = norm(tuple(T_[j] + S1[j] * math.sin(ang) * 0.8 + S2[j] * math.cos(k * 1.7) * 0.25 for j in range(3)))
+        q = tuple(tip[j] + d[j] * (0.28 + 0.06 * (k % 3)) for j in range(3))
+        rx_, ry_, ln_ = rot_of(tip, q)
+        box(tuple((tip[j] + q[j]) / 2 for j in range(3)), (0.02, 0.02, ln_), 9 if k % 2 else 8, (rx_, ry_, 0), B)
     ys = [b[1] for b in B + F] + [b[4] for b in B + F]
-    tones = ['#1C1716', '#5A1A08', '#E04A0C', '#FFE7A0', '#FFB040', '#9E2A08', '#D24E14', '#F07A1E', '#FFA630', '#FFE08A']
+    tones = ['#1C1716', '#5A1A08', '#E04A0C', '#FFE7A0', '#FFB040', '#C2470E', '#E05A14', '#FF7A22', '#FF9A3A', '#FFC27A']
     doc = {'comment': 'Хлыст «Раскалённых углей» (T14), как на референсе Ruination: рукоять в обмотке и кольцо-навершие сзади, из пяты — широкая '
-                      'плоская лента цвета огня (без отдельного пламени): волнистый край, три сплетённые пряди, светлая жила; вперёд с провисом, S-изгибом и '
-                      'перекрутом, конец — большая петля-спираль. Как fire_whip: начало в руке, код поворачивает '
+                      'гладкий оранжевый плетёный хлыст (вид, одобренный сценаристом): сужается к концу, плетение, блик, кисточка-хлопушка; '
+                      'провис и петля-спираль. Как fire_whip: начало в руке, код поворачивает '
                       'по дуге взмаха. Сгенерировано tools/gen_ember_fx.py.',
            'style': 'pyre', 'center': 0, 'formedAt': 3, 'collapse': {'duration': 6, 'easing': 'easeInSine'},
-           'parts': [{'type': 'boxes', 'tones': tones, 'glowTones': [2, 3, 4], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': B,
+           'parts': [{'type': 'boxes', 'tones': tones, 'glowTones': [], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': B,
                       'appear': {'delay': 0, 'duration': 2, 'easing': 'easeOutCubic'}, 'bounds': [min(ys), max(ys)]},
-                     {'type': 'boxes', 'tones': tones, 'glowTones': [8, 9], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': F,
+                     {'type': 'boxes', 'tones': tones, 'glowTones': [], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': F,
                       'appear': {'delay': 0, 'duration': 3, 'easing': 'easeOutCubic'}, 'bounds': [min(ys), max(ys)]}]}
     with open(os.path.join(A, 'fx', 'meshes', 'ember_whip.json'), 'w', encoding='utf-8') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))

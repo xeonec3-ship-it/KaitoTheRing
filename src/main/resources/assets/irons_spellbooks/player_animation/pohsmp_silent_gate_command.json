@@ -1,0 +1,131 @@
+{
+ "version": 3,
+ "name": "pohsmp_silent_gate_command",
+ "author": "pohsmp_core",
+ "emote": {
+  "beginTick": 0,
+  "endTick": 10,
+  "stopTick": 10,
+  "degrees": true,
+  "easeBeforeKeyframe": true,
+  "moves": [
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "rightArm": {
+     "pitch": -172.0,
+     "yaw": 0.0,
+     "roll": -8.0,
+     "bend": -2.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "leftArm": {
+     "pitch": -16.0,
+     "yaw": -6.0,
+     "roll": -10.0,
+     "bend": -58.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "head": {
+     "pitch": -24.0,
+     "yaw": 0.0,
+     "roll": 0.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "torso": {
+     "pitch": -4.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "body": {
+     "y": 0.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "rightLeg": {
+     "pitch": 0.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "leftLeg": {
+     "pitch": 0.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 7,
+    "easing": "easeInQuad",
+    "rightArm": {
+     "pitch": -90.0,
+     "yaw": 4.0,
+     "roll": -4.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 7,
+    "easing": "easeInQuad",
+    "head": {
+     "pitch": -4.0,
+     "yaw": 0.0,
+     "roll": 0.0
+    }
+   },
+   {
+    "tick": 7,
+    "easing": "easeInQuad",
+    "torso": {
+     "pitch": 3.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 2.0
+    }
+   },
+   {
+    "tick": 10,
+    "easing": "easeInOutSine",
+    "rightArm": {
+     "pitch": -90.0,
+     "yaw": 4.0,
+     "roll": -4.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 10,
+    "easing": "easeInOutSine",
+    "leftArm": {
+     "pitch": -16.0,
+     "yaw": -6.0,
+     "roll": -10.0,
+     "bend": -58.0
+    }
+   }
+  ],
+  "isLoop": true,
+  "returnTick": 10
+ }
+}

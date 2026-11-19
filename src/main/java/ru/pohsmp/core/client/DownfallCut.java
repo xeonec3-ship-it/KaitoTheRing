@@ -118,7 +118,9 @@ public final class DownfallCut {
             look = pl[1];
             shake = pl[2].x;
         } else if (scene == ru.pohsmp.core.spell.Cutscene.SILENT_GATE) {
-            Vec3[] pl = gate(t / 20.0, c, side, baseYaw);
+            // «Приказ»: the cast as it was, then the wait camera until the hand comes down, then the strike timed from the command
+            double gs = GateOrder.sceneSeconds(key, t, mc.level.getGameTime() + pt);
+            Vec3[] pl = Double.isNaN(gs) ? gateWait(GateOrder.waitSeconds(mc.level.getGameTime() + pt), c, side) : gate(gs, c, side, baseYaw);
             pos = pl[0];
             look = pl[1];
             shake = pl[2].x;
@@ -277,6 +279,17 @@ public final class DownfallCut {
      * the row of circles from above, the finger up from below, the sky full of seals, the rays close, the wide shot, the crystal (no main beam).
      * Returns camera position, look point and (shake, roll, 0).
      */
+    /**
+     * «Приказ», the wait: the camera before the witch, a little to the right of her and low, the face and the raised finger in frame;
+     * a slow push-in over the 30 s of the wait. w: seconds of the wait.
+     */
+    private static Vec3[] gateWait(double w, Vec3 c, Vec3 side) {
+        double k = smooth(w / 30);
+        Vec3 pos = c.add(dir.scale(3.6 - 1.3 * k)).add(side.scale(0.7 - 0.2 * k)).add(0, 1.2 + 0.15 * k, 0);
+        Vec3 look = c.add(side.scale(0.15)).add(0, 1.85, 0);
+        return new Vec3[] {pos, look, new Vec3(0, 0, 0)};
+    }
+
     private static Vec3[] gate(double s, Vec3 c, Vec3 side, double yaw) {
         Vec3 f = rift, g = f.add(0, ru.pohsmp.core.spell.silent.SilentGateSpell.GATE_H, 0), face = c.add(0, 1.6, 0);
         Vec3 pos, look;
@@ -285,15 +298,14 @@ public final class DownfallCut {
             double k = smooth(s / 14), a = yaw + Math.PI + Math.toRadians(-40 + 80 * k);
             pos = c.add(Math.cos(a) * (22 - 6 * k), 9 - 3 * k, Math.sin(a) * (22 - 6 * k));
             look = c.add(0, 1.2, 0);
-        } else if (s < 22) {                            // the finger points forward and up: the hand close, the sparks wind round it
-            double k = smooth((s - 14) / 8);
-            // in front and to the side of the caster, looking back at the raised hand and the sparks around it
-            pos = c.add(dir.scale(2.2 - 0.4 * k)).add(side.scale(1.6 - 0.3 * k)).add(0, 1.3 + 0.2 * k, 0);
-            look = c.add(side.scale(0.3)).add(dir.scale(0.3)).add(0, 1.6 + 0.2 * k, 0);
-        } else if (s < 26) {                            // the gate appears out of light: from below
-            double k = smooth((s - 22) / 4);
-            pos = f.subtract(dir.scale(10 - 3 * k)).add(side.scale(3)).add(0, 1.2, 0);
-            look = g.add(0, 4 * (1 - k), 0);
+        } else if (s < 26) {
+            // the finger points forward and up, the stream of sparks goes from the hand toward the sky, the gate comes out of the
+            // circle: over the right shoulder, a little to the side, so the hand and the whole stream are in frame (owner 19.11, as
+            // in the mod's video); a slow push-in, the look follows the stream up and at the end settles on the gate
+            double k = smooth((s - 14) / 12), kg = smooth(Math.max(0, (s - 21) / 5));
+            pos = c.subtract(dir.scale(2.6 - 0.6 * k)).add(side.scale(1.35 - 0.2 * k)).add(0, 1.9 + 0.3 * k, 0);
+            Vec3 stream = c.add(dir.scale(5 + 3 * k)).add(0, 2.5 + 4 * k, 0);
+            look = stream.lerp(g, kg);
         } else if (s < 36) {                            // the gate hangs, the halo behind it: slow orbit, gentle sway
             double k = smooth((s - 26) / 10), a = yaw + Math.PI + Math.toRadians(-35 + 70 * k);
             pos = g.add(Math.cos(a) * 40, -14 + 3 * k, Math.sin(a) * 40);

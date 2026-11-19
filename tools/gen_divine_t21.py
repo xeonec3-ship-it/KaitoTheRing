@@ -597,6 +597,19 @@ def bless_fx():
              sway=1.2, tumble=0.6, size=[0.4, 0.3], life=60, color='@secondary', comment='после (10–11.5 с): перья опускаются'),
        ])
 
+    # Код (BlessingSpell.apply) запускает на 200 тике, в момент снятия дебаффов: подтверждение «сработало» — тёплое сияние на цели.
+    # Главная вспышка 9.5 с уже в blessing_cast (190); здесь — вторая, мягкая, у груди, без засветки экрана, чтобы не дублировать.
+    fx('blessing_end', 'Благословение сработало (код, 200-й тик, точки target — цель, caster — заклинатель): мягкая золотая вспышка '
+                       'у груди, свечение по контуру тела гаснет за 1.5 с, искры поднимаются, тонкое кольцо по земле.',
+       'blessing', 40, [
+           E('flash', 0, 'target+0,1.2,0', follow=True, duration=12, size=2.6, rays=8, anamorphic=4, color='#FFE9B0'),
+           E('aura', 0, 'target', target='target', duration=32, thickness=0.14, pulse=[0.15, 10], motes=24, texture='spark_soft',
+             color=B_WARM, **{'in': ease(2), 'out': ease(26, 'easeInSine')}),
+           E('sprites', 0, 'target+0,0.9,0', follow=True, duration=24, texture='spark_soft', count=70, rate=3, spread=0.4, speed=0.02,
+             gravity=-0.006, size=[0.18, 0.02], life=28, color=B_WARM, glow=0.6, comment='искры поднимаются'),
+           E('wave', 1, 'target+0,0.05,0', duration=20, shape='ring', radius=2.4, thickness=0.12, color='@primary', brightness=0.8),
+       ])
+
 
 # ================================================================== иконки
 def _hex(h, a=255):

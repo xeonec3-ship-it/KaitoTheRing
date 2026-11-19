@@ -605,6 +605,118 @@ def whip3():
     ]
 
 
+# ------------------------------------------------------------------ обычные удары формы меча (владелец 19.11: «сделай обычные, с вариациями»)
+# Серия из четырёх разных ударов + удар на бегу + удар в прыжке. Клинок задаётся направлением от хвата (dir_at: угол вокруг тела,
+# возвышение), режущая кромка — вектор edge (в осях тела: x вправо, y вперёд, z вверх).
+def sword_hand(rel, elev, ext, b_rel, b_elev, edge, pole=(0.5, -0.5, -0.5)):
+    return {'aim': (rel, elev, ext), 'aw': 1.0, 'blade': dir_at(b_rel, b_elev), 'edge': edge, 'pole': pole, 'frame': 'body'}
+
+
+SWORD_REST_B = dict(SWORD_REST_R, frame='body')
+
+
+def sword1():
+    """Горизонтальный разрез справа налево на уровне груди: клинок отведён назад за правый бок, проходит перед собой, уходит влево."""
+    return [
+        (0, _merge(STANCE_BODY, P(hand_r=SWORD_REST_B, hand_l=FREE_BODY_L))),
+        (3, P(root={'pos': (0, -0.03, -0.03), 'yaw': 28, 'roll': 2}, torso=(2, 10, 0), chest=(0, 18, 0), head=(-2, -32, 0),
+              hand_r=sword_hand(95, 12, 0.8, 160, 8, (-0.2, 0, 1)), hand_l=dict(FREE_BODY_L, pos=(-0.32, 0.22, 1.02)),
+              foot_r={'pos': (0.17, -0.06, 0), 'frame': 'body'}, foot_l={'pos': (-0.15, 0.12, 0), 'frame': 'body'})),
+        (5, P(root={'pos': (0, 0.06, -0.06), 'yaw': 0, 'roll': -1}, torso=(6, 0, 0), chest=(2, -2, 0), head=(-4, 0, 0),
+              hand_r=sword_hand(5, 6, 1.0, 0, 4, (-1, 0, 0.1)), hand_l=dict(FREE_BODY_L, pos=(-0.42, -0.02, 0.92)),
+              foot_l={'pos': (-0.16, 0.22, 0), 'frame': 'body'}), 'hit'),
+        (7, P(root={'pos': (0, 0.08, -0.07), 'yaw': -26, 'roll': -2}, torso=(8, -10, 0), chest=(4, -18, 0), head=(-4, 24, 0),
+              hand_r=sword_hand(-70, -2, 0.85, -125, -6, (-0.2, -1, 0)))),
+        (11, _merge(STANCE_BODY, P(root={'pos': (0, 0.02, 0), 'yaw': 0, 'roll': 0}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L,
+                                   foot_l={'pos': (-0.15, 0.08, 0), 'frame': 'body'}))),
+    ]
+
+
+def sword2():
+    """Обратный восходящий разрез: клинок из-за левого бедра снизу проходит вверх-вправо, корпус раскручивается."""
+    return [
+        (0, _merge(STANCE_BODY, P(hand_r=SWORD_REST_B, hand_l=FREE_BODY_L, foot_l={'pos': (-0.15, 0.08, 0), 'frame': 'body'}))),
+        (3, P(root={'pos': (0, -0.02, -0.10), 'yaw': -32, 'roll': -2}, torso=(8, -12, 0), chest=(8, -18, 0), head=(-4, 36, 0),
+              hand_r=sword_hand(-58, -38, 0.78, -110, -45, (0.6, 0.2, 0.8), pole=(0.4, -0.2, -0.9)),
+              hand_l=dict(FREE_BODY_L, pos=(-0.36, -0.12, 0.92)), foot_r={'pos': (0.18, 0.10, 0), 'frame': 'body'})),
+        (5, P(root={'pos': (0.02, 0.05, -0.05), 'yaw': 0, 'roll': 2}, torso=(2, 2, 0), chest=(0, 6, 0), head=(-4, 0, 0),
+              hand_r=sword_hand(18, 12, 1.0, 20, 28, (0.6, 0.1, 0.8)), hand_l=dict(FREE_BODY_L, pos=(-0.42, -0.06, 0.96))), 'hit'),
+        (7, P(root={'pos': (0.04, 0.05, -0.02), 'yaw': 28, 'roll': 3}, torso=(-2, 10, 0), chest=(-6, 16, 0), head=(-8, -24, 0),
+              hand_r=sword_hand(80, 48, 0.92, 115, 68, (0.2, -0.3, 1)))),
+        (12, _merge(STANCE_BODY, P(root={'pos': (0, 0, 0), 'yaw': 0, 'roll': 0}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L))),
+    ]
+
+
+def sword3():
+    """Колющий выпад: клинок отводится к правому бедру остриём вперёд, затем выпад с шагом правой — укол перед собой."""
+    tip_fwd = lambda pos: {'pos': pos, 'blade': dir_at(0, -4), 'edge': (0, 0, 1), 'pole': (0.6, -0.6, -0.3), 'frame': 'body'}
+    return [
+        (0, _merge(STANCE_BODY, P(hand_r=SWORD_REST_B, hand_l=FREE_BODY_L))),
+        (3, P(root={'pos': (0, -0.06, -0.05), 'yaw': 18}, torso=(4, 8, 0), chest=(2, 10, 0), head=(-2, -16, 0),
+              hand_r=tip_fwd((0.30, -0.12, 1.02)), hand_l=dict(FREE_BODY_L, pos=(-0.20, 0.30, 1.10)),
+              foot_r={'pos': (0.16, -0.10, 0), 'frame': 'body'}, foot_l={'pos': (-0.15, 0.16, 0), 'frame': 'body'})),
+        (5, P(root={'pos': (0, 0.20, -0.10), 'yaw': -6}, torso=(10, -4, 0), chest=(6, -4, 0), head=(-10, 4, 0),
+              hand_r=tip_fwd((0.16, 0.62, 1.20)), hand_l=dict(FREE_BODY_L, pos=(-0.44, -0.18, 0.96)),
+              foot_r={'pos': (0.17, 0.48, 0), 'frame': 'body'}, foot_l={'pos': (-0.16, -0.14, 0), 'frame': 'body'}), 'hit'),
+        (7, P(root={'pos': (0, 0.22, -0.10), 'yaw': -6}, hand_r=tip_fwd((0.16, 0.66, 1.18)))),
+        (12, _merge(STANCE_BODY, P(root={'pos': (0, 0.06, 0), 'yaw': 0}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L,
+                                   foot_r={'pos': (0.15, 0.14, 0), 'frame': 'body'}))),
+    ]
+
+
+def sword4():
+    """Добивающий удар сверху: клинок заносится за голову, шаг-подскок вперёд, рубящий удар вниз перед собой (завершает серию)."""
+    return [
+        (0, _merge(STANCE_BODY, P(hand_r=SWORD_REST_B, hand_l=FREE_BODY_L))),
+        (4, P(root={'pos': (0, -0.04, 0.02), 'pitch': -8, 'yaw': 6}, torso=(-4, 0, 0), chest=(-10, 6, 0), head=(-14, -4, 0),
+              hand_r={'pos': (0.16, -0.08, 1.88), 'blade': dir_at(180, 45), 'edge': (0, 1, 0.3), 'pole': (0.9, 0.1, 0.0), 'frame': 'body'},
+              hand_l=dict(FREE_BODY_L, pos=(-0.28, 0.22, 1.12)), foot_r={'pos': (0.15, -0.06, 0), 'frame': 'body'})),
+        (5, P(root={'pos': (0, 0.10, 0.06), 'pitch': -2}, hand_r={'pos': (0.14, 0.20, 1.92), 'blade': dir_at(0, 75), 'edge': (0, 1, -0.2),
+              'pole': (0.9, 0.0, -0.1), 'frame': 'body'}, foot_r={'pos': (0.16, 0.20, 0.10), 'frame': 'body'})),
+        (7, P(root={'pos': (0, 0.20, -0.14), 'pitch': 16}, torso=(12, 0, 0), chest=(8, 0, 0), head=(-14, 0, 0),
+              hand_r={'pos': (0.12, 0.58, 1.22), 'blade': dir_at(2, -24), 'edge': (0, -0.2, -1), 'pole': (0.8, -0.2, -0.5), 'frame': 'body'},
+              hand_l=dict(FREE_BODY_L, pos=(-0.42, -0.10, 0.88)),
+              foot_r={'pos': (0.17, 0.40, 0), 'frame': 'body'}, foot_l={'pos': (-0.16, -0.18, 0), 'frame': 'body'}), 'hit'),
+        (9, P(root={'pos': (0, 0.22, -0.18), 'pitch': 20}, torso=(14, 0, 0), chest=(10, 0, 0), head=(-16, 0, 0),
+              hand_r={'pos': (0.16, 0.50, 0.92), 'blade': dir_at(8, -58), 'edge': (0, 0.4, -1), 'pole': (0.8, -0.3, -0.4), 'frame': 'body'})),
+        (16, _merge(STANCE_BODY, P(root={'pos': (0, 0.08, 0), 'pitch': 0, 'yaw': 0}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L,
+                                   foot_r={'pos': (0.15, 0.18, 0), 'frame': 'body'}))),
+    ]
+
+
+def sword_dash():
+    """Удар на бегу: рывок вперёд с наклоном, клинок низко справа, широкий разрез справа налево на выходе из рывка."""
+    return [
+        (0, _merge(STANCE_BODY, P(root={'pos': (0, 0, -0.04), 'pitch': 10}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L,
+                                  foot_r={'pos': (0.15, 0.22, 0.05), 'frame': 'body'}, foot_l={'pos': (-0.15, -0.20, 0), 'frame': 'body'}))),
+        (3, P(root={'pos': (0, 0.20, -0.12), 'pitch': 16, 'yaw': 30}, torso=(10, 12, 0), chest=(6, 16, 0), head=(-14, -30, 0),
+              hand_r=sword_hand(110, -10, 0.85, 165, -8, (-0.2, 0, 1)), hand_l=dict(FREE_BODY_L, pos=(-0.30, 0.30, 1.00)),
+              foot_r={'pos': (0.18, 0.36, 0), 'frame': 'body'}, foot_l={'pos': (-0.16, -0.30, 0.06), 'frame': 'body'})),
+        (5, P(root={'pos': (0, 0.42, -0.14), 'pitch': 12, 'yaw': 0}, torso=(10, 0, 0), chest=(4, -2, 0), head=(-10, 0, 0),
+              hand_r=sword_hand(2, 0, 1.0, -4, -2, (-1, 0, 0.1)), hand_l=dict(FREE_BODY_L, pos=(-0.44, 0.0, 0.92)),
+              foot_r={'pos': (0.18, 0.50, 0), 'frame': 'body'}, foot_l={'pos': (-0.16, -0.18, 0), 'frame': 'body'}), 'hit'),
+        (7, P(root={'pos': (0, 0.46, -0.12), 'pitch': 8, 'yaw': -34}, torso=(8, -14, 0), chest=(4, -22, 0), head=(-6, 28, 0),
+              hand_r=sword_hand(-85, -8, 0.85, -140, -10, (-0.2, -1, 0)))),
+        (12, _merge(STANCE_BODY, P(root={'pos': (0, 0.10, 0), 'pitch': 0, 'yaw': 0}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L))),
+    ]
+
+
+def sword_air():
+    """Удар в прыжке: ноги поджаты, корпус разворачивается, клинок рубит наискось вниз; приземление в присед."""
+    tuck = {'foot_r': {'pos': (0.15, 0.10, 0.28), 'frame': 'body'}, 'foot_l': {'pos': (-0.15, -0.06, 0.22), 'frame': 'body'}}
+    return [
+        (0, _merge(STANCE_BODY, P(root={'pos': (0, 0, 0.0)}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L, **tuck))),
+        (3, P(root={'pos': (0, -0.02, 0.04), 'pitch': -6, 'yaw': 40}, torso=(-4, 14, 0), chest=(-8, 20, 0), head=(-10, -34, 0),
+              hand_r=sword_hand(120, 50, 0.9, 170, 40, (0, 0.3, 1)), hand_l=dict(FREE_BODY_L, pos=(-0.30, 0.24, 1.08)), **tuck)),
+        (5, P(root={'pos': (0, 0.08, 0.0), 'pitch': 12, 'yaw': 0}, torso=(10, 0, 0), chest=(8, -4, 0), head=(-12, 0, 0),
+              hand_r=sword_hand(10, -10, 1.0, 0, -30, (-0.8, 0, -0.6)), hand_l=dict(FREE_BODY_L, pos=(-0.42, -0.04, 0.94)), **tuck), 'hit'),
+        (7, P(root={'pos': (0, 0.12, -0.20), 'pitch': 16, 'yaw': -14}, torso=(12, -6, 0), chest=(8, -10, 0), head=(-14, 10, 0),
+              hand_r=sword_hand(-45, -45, 0.85, -60, -60, (-0.3, -0.6, -0.7)),
+              foot_r={'pos': (0.17, 0.22, 0), 'frame': 'body'}, foot_l={'pos': (-0.17, -0.20, 0), 'frame': 'body'})),
+        (12, _merge(STANCE_BODY, P(root={'pos': (0, 0.06, 0), 'pitch': 0, 'yaw': 0}, hand_r=SWORD_REST_B, hand_l=FREE_BODY_L))),
+    ]
+
+
 # ------------------------------------------------------------------ движение в форме хлыста без ударов (владелец 19.11)
 # Петли (последний ключ = первый). Рука держит рукоять хлыста; сам хлыст рисует код (физика каната) — он висит, волочится, летит следом.
 WHIP_HOLD_R = {'pos': (0.33, 0.12, 0.84), 'blade': (0.30, 0.05, -0.95), 'edge': (0, 1, 0.1), 'pole': (0.6, -0.5, -0.2), 'frame': 'body'}
@@ -664,6 +776,12 @@ TIMING = {
     'whip1': {'length': 0.6, 'antic': 0.15, 'contact': 0.30, 'recovery': 0.45, 'lash': 1},
     'whip2': {'length': 0.6, 'antic': 0.15, 'contact': 0.30, 'recovery': 0.45, 'lash': -1},
     'whip3': {'length': 0.7, 'antic': 0.20, 'contact': 0.35, 'recovery': 0.55, 'lash': 1},
+    'sword1': {'length': 0.55, 'antic': 0.15, 'contact': 0.30, 'recovery': 0.45},
+    'sword2': {'length': 0.6, 'antic': 0.15, 'contact': 0.30, 'recovery': 0.45},
+    'sword3': {'length': 0.6, 'antic': 0.15, 'contact': 0.30, 'recovery': 0.45},
+    'sword4': {'length': 0.8, 'antic': 0.25, 'contact': 0.40, 'recovery': 0.60},
+    'sword_dash': {'length': 0.6, 'antic': 0.15, 'contact': 0.30, 'recovery': 0.45},
+    'sword_air': {'length': 0.6, 'antic': 0.15, 'contact': 0.30, 'recovery': 0.45},
     'whip_idle': {'length': 3.0, 'loop': True, 'motion': 'IDLE'},
     'whip_walk': {'length': 1.0, 'loop': True, 'motion': 'WALK'},
     'whip_run': {'length': 0.6, 'loop': True, 'motion': 'RUN'},
@@ -680,6 +798,12 @@ BEATS = {
     'whip1': ('Хлёст 1', 'Справа налево на уровне груди.', [(0, 'стойка'), (3, 'замах за правое плечо'), (5, 'хлёст'), (7, 'дотяг влево'), (12, 'стойка')]),
     'whip2': ('Хлёст 2', 'Обратный: слева направо, снизу вверх.', [(0, 'стойка'), (3, 'рука у левого бедра'), (5, 'хлёст'), (7, 'дотяг вправо-вверх'), (12, 'стойка')]),
     'whip3': ('Хлёст 3', 'Щелчок сверху с шагом вперёд.', [(0, 'стойка'), (4, 'рука над головой'), (6, 'щелчок вниз'), (8, 'дотяг'), (14, 'стойка')]),
+    'sword1': ('Меч: удар 1', 'Горизонтальный разрез справа налево.', [(0, 'стойка'), (3, 'замах за правый бок'), (5, 'разрез'), (7, 'дотяг влево'), (11, 'стойка')]),
+    'sword2': ('Меч: удар 2', 'Обратный восходящий: слева снизу вправо вверх.', [(0, 'стойка'), (3, 'клинок у левого бедра'), (5, 'разрез'), (7, 'дотяг вправо-вверх'), (12, 'стойка')]),
+    'sword3': ('Меч: удар 3', 'Колющий выпад с шагом.', [(0, 'стойка'), (3, 'клинок к бедру'), (5, 'выпад, укол'), (7, 'удержание'), (12, 'стойка')]),
+    'sword4': ('Меч: удар 4', 'Добивающий сверху с подскоком.', [(0, 'стойка'), (4, 'замах за голову'), (5, 'подскок'), (7, 'рубящий вниз'), (9, 'дотяг'), (16, 'стойка')]),
+    'sword_dash': ('Меч: на бегу', 'Рывок и широкий разрез.', [(0, 'бег'), (3, 'рывок, замах'), (5, 'разрез'), (7, 'дотяг'), (12, 'стойка')]),
+    'sword_air': ('Меч: в прыжке', 'Разворот и рубящий удар наискось вниз.', [(0, 'прыжок'), (3, 'разворот, замах'), (5, 'удар'), (7, 'приземление'), (12, 'стойка')]),
     'whip_idle': ('Стойка с хлыстом', 'Рука с рукоятью опущена, кисть покачивает хлыстом.', [(0, 'стойка'), (15, 'покачивание'), (45, 'покачивание'), (60, 'стойка')]),
     'whip_walk': ('Шаг с хлыстом', 'Хлыст волочится следом.', [(0, 'правая вперёд'), (10, 'левая вперёд'), (20, 'цикл')]),
     'whip_run': ('Бег с хлыстом', 'Рука отведена, хлыст летит за спиной.', [(0, 'правая вперёд'), (6, 'левая вперёд'), (12, 'цикл')]),
@@ -690,6 +814,12 @@ ANIMS = {
     'whip1': whip1,
     'whip2': whip2,
     'whip3': whip3,
+    'sword1': sword1,
+    'sword2': sword2,
+    'sword3': sword3,
+    'sword4': sword4,
+    'sword_dash': sword_dash,
+    'sword_air': sword_air,
     'whip_idle': whip_idle,
     'whip_walk': whip_walk,
     'whip_run': whip_run,
@@ -701,6 +831,12 @@ TRAILS = {
     'whip1': [(0.12, 0.32)],
     'whip2': [(0.12, 0.32)],
     'whip3': [(0.20, 0.38)],
+    'sword1': [(0.15, 0.35)],
+    'sword2': [(0.15, 0.35)],
+    'sword3': [(0.18, 0.32)],
+    'sword4': [(0.22, 0.48)],
+    'sword_dash': [(0.15, 0.35)],
+    'sword_air': [(0.15, 0.38)],
     'whip_idle': [],
     'whip_walk': [],
     'whip_run': [],

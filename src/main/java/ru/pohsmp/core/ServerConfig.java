@@ -60,6 +60,11 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue LAB_RADIUS, LAB_SECONDS, LAB_WALL_DAMAGE, LAB_WALL_RETURN, LAB_PUSH;
     public static final ForgeConfigSpec.DoubleValue NM_RANGE, NM_SECONDS;
     public static final ForgeConfigSpec.DoubleValue BD_RADIUS, BD_SECONDS, BD_SHARE;
+    // [mythic_t23] - T23 Mythic: World Tree, Abyss Eye, Last Dawn
+    public static final ForgeConfigSpec.DoubleValue WT_RANGE, WT_RADIUS, WT_SECONDS, WT_PULL, WT_ROOT_COOLDOWN, WT_CROWN, WT_BLOOM_RADIUS;
+    public static final ForgeConfigSpec.IntValue WT_ROOT_HITS;
+    public static final ForgeConfigSpec.DoubleValue AE_RADIUS, AE_SECONDS, AE_SANITY, AE_GAZE, AE_GAZE_ANGLE, AE_GAZE_COOLDOWN;
+    public static final ForgeConfigSpec.DoubleValue LD_RADIUS, LD_SECONDS, LD_HEAL, LD_BURN, LD_MAGE_WINDOW;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -118,6 +123,33 @@ public final class ServerConfig {
         BD_RADIUS = b.comment("Enemies within this radius fall into the dream (blocks)").defineInRange("radius", 32.0, 2.0, 128.0);
         BD_SECONDS = b.comment("Dream lifetime (seconds)").defineInRange("seconds", 25.0, 1.0, 600.0);
         BD_SHARE = b.comment("Share of every hit on a dreamer that is illusory; at the wake it all becomes real at once").defineInRange("illusoryShare", 0.5, 0.0, 1.0);
+        b.pop();
+        b.pop();
+        b.comment("T23 Mythic spells. Damage is multiplied by the caster's school spell power.").push("mythic_t23");
+        b.push("world_tree");
+        WT_RANGE = b.comment("The tree grows where the caster looks, up to this far (blocks)").defineInRange("range", 32.0, 4.0, 128.0);
+        WT_RADIUS = b.comment("Roots come for enemies within this radius of the trunk (blocks)").defineInRange("radius", 24.0, 2.0, 128.0);
+        WT_SECONDS = b.comment("The tree stands this long after the cast (seconds)").defineInRange("seconds", 20.0, 1.0, 600.0);
+        WT_PULL = b.comment("A root pulls its victim to the trunk this fast (blocks per tick)").defineInRange("pull", 0.15, 0.0, 2.0);
+        WT_ROOT_HITS = b.comment("Hits a root takes before it breaks (fire counts double)").defineInRange("rootHits", 3, 1, 100);
+        WT_ROOT_COOLDOWN = b.comment("After a root breaks, a new one comes for that victim no sooner than this (seconds)").defineInRange("rootCooldown", 4.0, 0.0, 600.0);
+        WT_CROWN = b.comment("Allies within this radius of the trunk are under the crown: Regeneration II (blocks)").defineInRange("crownRadius", 16.0, 1.0, 128.0);
+        WT_BLOOM_RADIUS = b.comment("The bloom's spores: Poison II 6 s and Blindness 3 s to enemies within this radius (blocks)").defineInRange("bloomRadius", 10.0, 1.0, 128.0);
+        b.pop();
+        b.push("abyss_eye");
+        AE_RADIUS = b.comment("Enemy players under the open sky within this radius of the caster (blocks)").defineInRange("radius", 40.0, 2.0, 160.0);
+        AE_SECONDS = b.comment("The Eye stays open this long after the cast (seconds)").defineInRange("seconds", 15.0, 1.0, 600.0);
+        AE_SANITY = b.comment("Magic damage per second to the exposed").defineInRange("sanityDamage", 1.5, 0.0, 1000.0);
+        AE_GAZE = b.comment("Damage for looking at the Eye (and a 1 s freeze)").defineInRange("gazeDamage", 8.0, 0.0, 1000.0);
+        AE_GAZE_ANGLE = b.comment("Looking within this angle of the Eye counts as looking at it (degrees)").defineInRange("gazeAngle", 20.0, 1.0, 90.0);
+        AE_GAZE_COOLDOWN = b.comment("The gaze strikes the same player no more often than this (seconds)").defineInRange("gazeCooldown", 3.0, 0.0, 600.0);
+        b.pop();
+        b.push("last_dawn");
+        LD_RADIUS = b.comment("Radius of the dawn around the caster (blocks)").defineInRange("radius", 30.0, 2.0, 128.0);
+        LD_SECONDS = b.comment("The sun shines this long after the cast (seconds)").defineInRange("seconds", 12.0, 1.0, 600.0);
+        LD_HEAL = b.comment("Afterwards allies heal this share of the damage they took in the dawn").defineInRange("healShare", 0.5, 0.0, 10.0);
+        LD_BURN = b.comment("Damage per second to the undead and to Blood / Forbidden mages in the light").defineInRange("burnDamage", 1.0, 0.0, 1000.0);
+        LD_MAGE_WINDOW = b.comment("A player burns if it cast a Blood or Forbidden spell this recently (seconds)").defineInRange("mageWindow", 30.0, 0.0, 3600.0);
         b.pop();
         b.pop();
         b.push("divine");

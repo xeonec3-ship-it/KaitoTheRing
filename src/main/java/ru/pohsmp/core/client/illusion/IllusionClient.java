@@ -66,6 +66,7 @@ public final class IllusionClient {
             case IlluMsg.ZONE, IlluMsg.ZONE_END -> Zones.handle(m);
             case IlluMsg.FAKE_HP -> ZoneDraw.fakeLoss = Math.max(0, m.x);
             case IlluMsg.ERASED -> ErasedClient.set(m.ticks);
+            case IlluMsg.SKY -> ru.pohsmp.core.client.mythic.SkyClient.set(m.i, m.ticks);
             case IlluMsg.ANIM -> {
                 var lvl = Minecraft.getInstance().level;
                 if (lvl != null && lvl.getEntity(m.entity) instanceof Player p)

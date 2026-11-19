@@ -63,13 +63,16 @@ public abstract class PohSpell extends AbstractSpell {
     @Override
     public void onCast(net.minecraft.world.level.Level level, int spellLevel, LivingEntity caster, io.redspace.ironsspellbooks.api.spells.CastSource source,
                        io.redspace.ironsspellbooks.api.magic.MagicData md) {
-        if (level instanceof ServerLevel sl && caster != null) {
+        if (level instanceof ServerLevel sl && caster != null && !ownSeal()) {
             String school = getSchoolType() == null ? "" : getSchoolType().getId().getPath();
             if (SIGIL_SCHOOLS.contains(school) && !ru.pohsmp.core.SchoolSeals.shown(caster))   // T06: a tier seal is up — no second sign
                 ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx("school_" + school).at(caster.position()).caster(caster));
         }
         super.onCast(level, spellLevel, caster, source, md);
     }
+
+    /** True if the spell's own cast effect has its seal: no school sign and no tier seal (SchoolSeals) on top of it. */
+    public boolean ownSeal() { return false; }
 
     @Override public ResourceLocation getSpellResource() { return id; }
 

@@ -38,6 +38,7 @@ public final class SchoolSeals {
     /** Effect id for this spell and tier, or null (no tier seal: ordinary tier, unknown school). */
     private static String fxFor(AbstractSpell spell, Tier tier) {
         if (spell == null || tier == null || spell.getSchoolType() == null) return null;
+        if (spell instanceof ru.pohsmp.core.spell.PohSpell ps && ps.ownSeal()) return null;
         String school = spell.getSchoolType().getId().getPath();
         if (PohSpell.sigilIndex(school) < 0) return null;
         return switch (tier) {

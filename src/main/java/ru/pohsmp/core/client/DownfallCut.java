@@ -346,6 +346,12 @@ public final class DownfallCut {
             look = pl[1];
             shake = pl[2].x;
             roll = pl[2].y;
+        } else if (scene >= ru.pohsmp.core.spell.Cutscene.WORLD_TREE && scene <= ru.pohsmp.core.spell.Cutscene.LAST_DAWN) {
+            Vec3[] pl = mythic(scene, t, c, rift, dir, side);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+            roll = pl[2].y;
         } else if (scene != 0) {
             Vec3[] pl = new Vec3[2];
             double[] rs = new double[2];
@@ -735,6 +741,55 @@ public final class DownfallCut {
             if (t >= SF_CAST) shake = 0.4 * Math.max(0, 1 - (t - SF_CAST) / 18.0);
         }
         return new Vec3[] {pos, look, new Vec3(shake, 0, 0)};
+    }
+
+    private static double seg(double t, double a, double b) {
+        return smooth(Math.max(0, Math.min(1, (t - a) / (b - a))));
+    }
+
+    /**
+     * T23 Mythic scenes by the visual plan (docs/specs/tasks/T23_mythic_four.md, «Ролики»), t in ticks. c: caster, f: focus (the tree's
+     * foot / the eye over the caster / the risen sun), dir: the caster's look (for the tree: from the caster to the tree). Returns pos, look,
+     * (shake, roll).
+     */
+    private static Vec3[] mythic(int sc, double t, Vec3 c, Vec3 f, Vec3 dir, Vec3 side) {
+        Vec3 pos, look;
+        double shake = 0, roll = 0;
+        if (sc == ru.pohsmp.core.spell.Cutscene.WORLD_TREE) {
+            Vec3 toC = new Vec3(c.x - f.x, 0, c.z - f.z);
+            toC = toC.lengthSqr() < 1e-4 ? dir.scale(-1) : toC.normalize();
+            double base = Math.atan2(toC.z, toC.x);
+            if (t < 24) { pos = c.add(dir.scale(2.4)).add(side.scale(1.8)).add(0, 0.9, 0); look = c.add(side.scale(0.4)).add(0, 0.6, 0); }
+            else if (t < 60) { pos = f.add(toC.scale(4)).add(0, 1.0, 0); look = f.add(0, 0.5, 0); }
+            else if (t < 130) { double k = seg(t, 60, 130); pos = f.add(toC.scale(10)).add(0, 2 + 12 * k, 0); look = f.add(0, 2 + 18 * k, 0); }
+            else if (t < 190) { double k = seg(t, 130, 190), a = base + Math.toRadians(100 * k); pos = f.add(Math.cos(a) * 24, 10 + 12 * k, Math.sin(a) * 24); look = f.add(0, 24, 0); }
+            else if (t < 232) { double k = seg(t, 190, 232); pos = f.add(toC.scale(6 - 1.5 * k)).add(0, 1.6 + 0.8 * k, 0); look = f.add(0, 30, 0); }
+            else { pos = f.add(toC.scale(40)).add(0, 14, 0); look = f.add(0, 18, 0); if (t < 244) shake = 0.08 * (1 - seg(t, 232, 244)); }
+        } else if (sc == ru.pohsmp.core.spell.Cutscene.ABYSS_EYE) {
+            if (t < 40) { pos = c.add(dir.scale(2.2)).add(0, 1.6, 0); look = c.add(0, 1.55, 0); }
+            else if (t < 100) { pos = c.add(dir.scale(-1.5)).add(0, 1.2, 0); look = c.add(dir.scale(18)).add(0, 32, 0); }
+            else if (t < 160) {
+                double k = seg(t, 100, 160), a = Math.atan2(side.z, side.x) + Math.toRadians(30 * k);
+                pos = c.add(Math.cos(a) * 10, 1.2 + 16.8 * k, Math.sin(a) * 10);
+                look = f;
+            } else if (t < 228) { double k = seg(t, 160, 228); pos = c.add(dir.scale(3)).add(0, 1.4 + 2.6 * k, 0); look = f; }
+            else {
+                double push = t >= 230 ? 0.3 * seg(t, 230, 233) : 0;
+                pos = c.add(side.scale(0.05)).add(0, 20 - push, 0);
+                look = c;
+                if (t >= 230 && t < 246) shake = 0.1 * (1 - seg(t, 230, 246));
+            }
+        } else {   // LAST_DAWN: the sun rises 40-200 from 20 below its place
+            double sunY = f.y - 20 * (1 - seg(t, 40, 200));
+            Vec3 sun = new Vec3(f.x, sunY, f.z);
+            if (t < 30) { pos = c.add(dir.scale(2.4)).add(0, 1.6, 0); look = c.add(0, 1.5, 0); }
+            else if (t < 80) { pos = c.add(dir.scale(-3)).add(0, 1.3, 0); look = c.add(dir.scale(40)).add(0, 1.5, 0); }
+            else if (t < 150) { double k = seg(t, 80, 150); pos = c.add(dir.scale(-(3 + 3 * k))).add(0, 1.3 + 2.7 * k, 0); look = sun; }
+            else if (t < 192) { double k = seg(t, 150, 192); pos = c.add(side.scale(8 - 1.5 * k)).add(0, 2, 0); look = c.lerp(sun, 0.5).add(0, 1, 0); }
+            else if (t < 200) { pos = c.add(dir.scale(4)).add(0, 1.8, 0); look = c.add(0, 1.5, 0); }
+            else { pos = c.add(dir.scale(-18)).add(0, 12, 0); look = c.add(dir.scale(10)).add(0, 2, 0); }
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, roll, 0)};
     }
 
     /** Shot boundaries (fractions of the cast) shared by the scenes 1-3. */

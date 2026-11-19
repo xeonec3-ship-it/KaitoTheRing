@@ -69,6 +69,9 @@ public class PohCore {
         ru.pohsmp.core.spell.illusion.IllusionSpells.registerEvents();   // T22
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.Erased.class);   // T24
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.ErasedNameSpell.Events.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.mythic.MythicT23.Events.class);   // T23
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.mythic.WorldTreeSpell.Events.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.mythic.LastDawnSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.NpcCast.Events.class);
         MinecraftForge.EVENT_BUS.register(Charges.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.JointCast.class);

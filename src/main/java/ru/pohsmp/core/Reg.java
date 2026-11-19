@@ -143,7 +143,11 @@ public final class Reg {
     public static final RegistryObject<MobEffect> WAKING_NIGHTMARE = EFFECTS.register("waking_nightmare", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x3A2A5A));
     public static final RegistryObject<MobEffect> BUTTERFLY_DREAM = EFFECTS.register("butterfly_dream", () -> new PohEffect(MobEffectCategory.HARMFUL, ILLUSION_COLOR));
     /** T24 «Стёртое имя»: the icon only (the state itself lives in erased/Erased, milk does not take it off). */
-    public static final RegistryObject<MobEffect> ERASED = EFFECTS.register("erased", () -> new PohEffect(MobEffectCategory.HARMFUL, 0xE9E4D8));
+    // T23 Mythic
+    public static final RegistryObject<MobEffect> ENTANGLED = EFFECTS.register("entangled", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x5E8C31));
+    public static final RegistryObject<MobEffect> ABYSS_DREAD = EFFECTS.register("abyss_dread", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x8E5BD9));
+    public static final RegistryObject<MobEffect> DAWN_GRACE = EFFECTS.register("dawn_grace", () -> new PohEffect(MobEffectCategory.BENEFICIAL, 0xFFC860));
+    public static final RegistryObject<MobEffect> ERASED =EFFECTS.register("erased", () -> new PohEffect(MobEffectCategory.HARMFUL, 0xE9E4D8));
     public static final RegistryObject<MobEffect> BORROWED_FACE =EFFECTS.register("borrowed_face", () -> new PohEffect(MobEffectCategory.BENEFICIAL, ILLUSION_COLOR));
 
     /** Silent Witch outfit (T19): the barrier's cooldown, shown as an effect icon; milk does not remove it. */
@@ -230,8 +234,12 @@ public final class Reg {
             ru.pohsmp.core.spell.ArkSpell.PATH, ru.pohsmp.core.spell.SoulSealSpell.PATH, ru.pohsmp.core.spell.BlessingSpell.PATH);
     public static final List<String> MYTHIC_SPELLS = List.of(ru.pohsmp.core.spell.ExplosionSpell.PATH,
             ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.FrozenHourSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell.PATH,
-            ru.pohsmp.core.spell.CovenArrivalSpell.PATH, ILLUSION_MYTHIC);
+            ru.pohsmp.core.spell.CovenArrivalSpell.PATH, ILLUSION_MYTHIC, ru.pohsmp.core.mythic.WorldTreeSpell.PATH,
+            ru.pohsmp.core.mythic.AbyssEyeSpell.PATH, ru.pohsmp.core.mythic.LastDawnSpell.PATH);
     static {
+        SPELLS.register(ru.pohsmp.core.mythic.WorldTreeSpell.PATH, ru.pohsmp.core.mythic.WorldTreeSpell::new);   // T23
+        SPELLS.register(ru.pohsmp.core.mythic.AbyssEyeSpell.PATH, ru.pohsmp.core.mythic.AbyssEyeSpell::new);
+        SPELLS.register(ru.pohsmp.core.mythic.LastDawnSpell.PATH, ru.pohsmp.core.mythic.LastDawnSpell::new);
         SPELLS.register(ILLUSION_MYTHIC, () -> ru.pohsmp.core.spell.illusion.IllusionSpells.make(ILLUSION_MYTHIC));
         for (String p : ILLUSION_HIGHER) SPELLS.register(p, () -> ru.pohsmp.core.spell.illusion.IllusionSpells.make(p));
     }

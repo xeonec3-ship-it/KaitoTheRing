@@ -205,14 +205,14 @@ public final class EmberEpicFight {
             @Override
             public boolean checkExecuteCondition(yesman.epicfight.skill.SkillContainer c) {
                 Player p = (Player) c.getExecutor().getOriginal();
-                return p.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.heat(p) >= EmberBlade.MAX_HEAT;
+                return p.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.ready(p);
             }
 
             @Override
             public void executeOnServer(yesman.epicfight.skill.SkillContainer c, net.minecraft.network.FriendlyByteBuf buf) {
                 ServerPlayer p = c.getServerExecutor().getOriginal();
                 ItemStack s = p.getMainHandItem();
-                if (!(s.getItem() instanceof EmberBlade) || EmberBlade.heat(p) < EmberBlade.MAX_HEAT) return;
+                if (!(s.getItem() instanceof EmberBlade) || !EmberBlade.ready(p)) return;
                 super.executeOnServer(c, buf);
                 EmberBlade.special(p, s);
             }

@@ -33,13 +33,15 @@ import ru.pohsmp.core.spell.Tasks;
 /**
  * T14: the fire sword-whip (working name "Раскалённые угли"), handed out by an admin. Damage of a diamond sword, every hit sets
  * the target on fire. Epic Fight swings it as a sword (data/pohsmp_core/capabilities/weapons/ember_blade.json).
+ * Manager 19.11, three forms in a cycle (item property pohsmp_core:form 0/1/2, the HUD gauge over the hotbar shows the heat):
  * <ul>
- * <li>Heat (0..100) grows with hits and cools down without them; the HUD shows it over the hotbar (client/EmberHud).</li>
- * <li>Two hits in a row heat the blade into the whip form: each hit then also lashes a flaming arc 6 blocks long.
- *     Without hits for {@link #COOL_TICKS} the fire goes out.</li>
- * <li>Full heat: special attack by form, the Epic Fight weapon skill (without Epic Fight: right click). Sword form: "Last Ember" — the blade into the ground, three waves of
- *     fire pillars (3/5/7 blocks), the heat to zero, the blade cools down. Whip form: "Fire Vortex" — a full turn of the whip,
- *     a ring of fire r 5 that burns and throws everyone out; the whip stays hot.</li>
+ * <li>0 — cold sword: {@code ember.heatHitsToBurn} hits set it burning (the gauge fills towards that).</li>
+ * <li>1 — burning sword (ember_blade_hot): {@code ember.hitsToSpecial} more hits fill the heat; full heat + the weapon skill
+ *     (without Epic Fight: right click) — "Last Ember": the blade into the ground, three waves of fire pillars (3/5/7 blocks),
+ *     then the blade turns into the whip. 10 s without hits — back to cold.</li>
+ * <li>2 — whip (ember_whip_handle, Epic Fight TWO_HAND with the lashes): starts at full heat, the heat burns down
+ *     {@link #WHIP_DECAY} a second, hits add {@link #WHIP_HIT_HEAT}; "Fire Vortex" (a full turn of the whip, a ring of fire r 5)
+ *     costs {@link #VORTEX_COST}. When the heat is gone — back to the cold sword.</li>
  * </ul>
  * Looks (pillar and ring effects, HUD texture, swing animations) — the manager. The whip itself is a physics rope drawn on the
  * client (client/EmberWhipClient, ember/WhipSim): it hangs from the hilt in the whip form, follows the hand of any animation and
@@ -47,9 +49,12 @@ import ru.pohsmp.core.spell.Tasks;
  */
 public class EmberBlade extends SwordItem {
     public static final String NAME = "ember_blade";
-    public static final float MAX_HEAT = 100, HEAT_PER_HIT = 14, COOL_PER_SEC = 6;
-    /** Owner 19.11: 10 s for each phase — the whip goes back to the sword, and the heat starts to cool, 10 s after the last hit. */
-    public static final int HOT_AFTER = 2, COOL_TICKS = 200, IDLE_TICKS = 200;
+    public static final float MAX_HEAT = 100, WHIP_DECAY = 5, WHIP_HIT_HEAT = 8, VORTEX_COST = 40;
+    public static final int COLD = 0, BURNING = 1, WHIP = 2;
+    /** Owner 19.11: 10 s without hits — the burning sword goes out, the count of the cold one is lost. */
+    public static final int COOL_TICKS = 200;
+    /** Ticks of fx/ember_last_heat.json after its start when the blade has turned into the whip. */
+    static final int TO_WHIP_AFTER = 24;
     static final double WHIP_LEN = 6, WHIP_HALF = Math.toRadians(50), VORTEX_R = 5;
     static final double[] WAVES = {3, 5, 7};
 
@@ -68,9 +73,24 @@ public class EmberBlade extends SwordItem {
      */
     private static final class St {
         float heat;
-        int streak;
-        boolean hot;
+        int hits, form;
         long last;
+    }
+
+    private static int toBurn() {
+        try {
+            return ru.pohsmp.core.ServerConfig.EMBER_HITS_TO_BURN.get();
+        } catch (RuntimeException e) {   // config not loaded yet
+            return 15;
+        }
+    }
+
+    private static int toSpecial() {
+        try {
+            return ru.pohsmp.core.ServerConfig.EMBER_HITS_TO_SPECIAL.get();
+        } catch (RuntimeException e) {
+            return 5;
+        }
     }
 
     private static final St NONE = new St();
@@ -90,36 +110,47 @@ public class EmberBlade extends SwordItem {
 
     /** True: the holder's blade is in the whip form. */
     public static boolean hot(Entity holder) {
-        return st(holder).hot;
+        return st(holder).form == WHIP;
     }
 
-    private static void set(Player p, float heat, int streak, boolean hot, long last) {
+    /** The holder's form: {@link #COLD}, {@link #BURNING} or {@link #WHIP}. */
+    public static int form(Entity holder) {
+        return st(holder).form;
+    }
+
+    /** The special attack of the current form can go: Last Ember at full heat, Fire Vortex while the whip has {@link #VORTEX_COST}. */
+    public static boolean ready(Entity holder) {
+        St s = st(holder);
+        return s.form == BURNING ? s.heat >= MAX_HEAT : s.form == WHIP && s.heat >= VORTEX_COST;
+    }
+
+    private static void set(Player p, float heat, int hits, int form, long last) {
         St s = SERVER.computeIfAbsent(p.getUUID(), k -> new St());
         heat = Math.max(0, Math.min(MAX_HEAT, heat));
-        boolean changed = s.heat != heat || s.hot != hot, form = s.hot != hot;
+        boolean changed = s.heat != heat || s.form != form, formChanged = s.form != form;
         s.heat = heat;
-        s.streak = streak;
-        s.hot = hot;
+        s.hits = hits;
+        s.form = form;
         s.last = last;
         if (changed) sync(p, null);
-        // owner 19.11 «the same animations in both forms»: the stack no longer changes with the form, so Epic Fight does not
-        // re-read the style's idle/walk/run by itself — ask it to (the attack combo follows the style on each hit)
-        if (form && p instanceof net.minecraft.server.level.ServerPlayer sp) EmberEpicFight.formChanged(sp);
+        // owner 19.11 «the same animations in both forms»: the stack does not change with the form, so Epic Fight does not
+        // re-read the style's idle/walk/run by itself — ask it to on every form change (the attack combo follows the style on each hit)
+        if (formChanged && p instanceof net.minecraft.server.level.ServerPlayer sp) EmberEpicFight.formChanged(sp);
     }
 
     /** To the holder and his watchers, or only to {@code to}. */
     private static void sync(Player p, net.minecraft.server.level.ServerPlayer to) {
         St s = st(p);
-        Object msg = new ru.pohsmp.core.net.Net.EmberMsg(p.getId(), s.heat, s.hot);
+        Object msg = new ru.pohsmp.core.net.Net.EmberMsg(p.getId(), s.heat, s.form);
         if (to != null) ru.pohsmp.core.net.Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> to), msg);
         else ru.pohsmp.core.net.Net.CH.send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> p), msg);
     }
 
     /** Client: the state the server sent (Net.EmberMsg). */
-    public static void clientSet(int entity, float heat, boolean hot) {
+    public static void clientSet(int entity, float heat, int form) {
         St s = CLIENT.computeIfAbsent(entity, k -> new St());
         s.heat = heat;
-        s.hot = hot;
+        s.form = form;
     }
 
     /** Heat changes every second: the stack must not replay the re-equip animation each time. */
@@ -133,19 +164,24 @@ public class EmberBlade extends SwordItem {
         if (level.isClientSide || level.getGameTime() % 20 != 0 || !(holder instanceof Player p)) return;
         St t = SERVER.get(p.getUUID());
         if (t == null) return;
+        if (t.form == COLD && t.hits == 0 && t.heat <= 0) return;
+        if (t.last < 0) return;   // Last Ember is turning the blade into the whip
         long idle = level.getGameTime() - t.last;
         float heat = t.heat;
-        boolean hot = t.hot;
-        int streak = t.streak;
-        if (heat <= 0 && !hot && streak == 0) return;
-        if (idle >= IDLE_TICKS) heat -= COOL_PER_SEC;
-        if (idle >= COOL_TICKS) {
-            if (hot && level instanceof ServerLevel sl)
-                sl.playSound(null, holder.getX(), holder.getY(), holder.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5f, 1.4f);
-            hot = false;
-            streak = 0;
+        int form = t.form, hits = t.hits;
+        if (form == WHIP) heat -= WHIP_DECAY;   // the whip lasts while the heat does
+        else if (idle >= COOL_TICKS) {   // 10 s without hits: the count is lost, the burning sword goes out
+            heat = 0;
+            hits = 0;
+            form = COLD;
         }
-        if (heat != t.heat || hot != t.hot || streak != t.streak) set(p, heat, streak, hot, t.last);
+        if (form == WHIP && heat <= 0) {
+            form = COLD;
+            hits = 0;
+        }
+        if (form != t.form && level instanceof ServerLevel sl)
+            sl.playSound(null, holder.getX(), holder.getY(), holder.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5f, 1.4f);
+        if (heat != t.heat || form != t.form || hits != t.hits) set(p, heat, hits, form, t.last);
     }
 
     @Override
@@ -204,19 +240,26 @@ public class EmberBlade extends SwordItem {
     private static void onHit(ServerLevel sl, Player p, ItemStack s, LivingEntity target) {
         long now = sl.getGameTime();
         St t = st(p);
-        int streak = now - t.last <= COOL_TICKS ? t.streak + 1 : 1;
-        boolean wasHot = t.hot, hot = wasHot || streak >= HOT_AFTER;
-        float before = t.heat, heat = before + HEAT_PER_HIT;
-        target.setSecondsOnFire(hot ? 5 : 3);
-        set(p, heat, streak, hot, now);
-        glow(sl, p, s);
-        if (hot && !wasHot) {   // the blade catches fire
-            sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.8f);
-            DivineEvents.particle(sl, ParticleTypes.FLAME, p.getX(), p.getY() + 1.2, p.getZ(), 20, 0.4, 0.05);
-        }
-        if (heat >= MAX_HEAT && before < MAX_HEAT)
+        int form = t.form, hits = t.hits + 1;
+        float before = t.heat, heat;
+        if (t.last < 0) return;   // turning into the whip: hits of the special do not count
+        if (form == COLD) {
+            int need = toBurn();
+            if (hits >= need) {   // the blade catches fire
+                form = BURNING;
+                hits = 0;
+                heat = 0;
+                sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.8f);
+                DivineEvents.particle(sl, ParticleTypes.FLAME, p.getX(), p.getY() + 1.2, p.getZ(), 20, 0.4, 0.05);
+            } else heat = MAX_HEAT * hits / need;
+        } else if (form == BURNING) heat = Math.min(MAX_HEAT, MAX_HEAT * hits / toSpecial());
+        else heat = before + WHIP_HIT_HEAT;
+        target.setSecondsOnFire(t.form == COLD ? 2 : t.form == BURNING ? 4 : 5);
+        set(p, heat, hits, form, now);
+        if (form != COLD) glow(sl, p, s);
+        if (form == BURNING && heat >= MAX_HEAT && before < MAX_HEAT)   // Last Ember is ready
             sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BLAZE_AMBIENT, SoundSource.PLAYERS, 0.8f, 1.6f);
-        if (wasHot && !EmberEpicFight.ON) lash(sl, p, java.util.Set.of(target.getUUID()));   // with Epic Fight the lash goes on every swing
+        if (t.form == WHIP && !EmberEpicFight.ON) lash(sl, p, java.util.Set.of(target.getUUID()));   // with Epic Fight the lash goes on every swing
     }
 
     // ---------------------------------------------------------------- Epic Fight whip swings (owner 19.11: the whip hit like a plain sword)
@@ -309,7 +352,7 @@ public class EmberBlade extends SwordItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
         ItemStack s = p.getItemInHand(hand);
-        if (EmberEpicFight.ON || hand != InteractionHand.MAIN_HAND || heat(p) < MAX_HEAT) return InteractionResultHolder.pass(s);
+        if (EmberEpicFight.ON || hand != InteractionHand.MAIN_HAND || !ready(p)) return InteractionResultHolder.pass(s);
         if (level instanceof ServerLevel && p instanceof net.minecraft.server.level.ServerPlayer sp) special(sp, s);
         return InteractionResultHolder.sidedSuccess(s, level.isClientSide);
     }
@@ -317,17 +360,34 @@ public class EmberBlade extends SwordItem {
     /**
      * The special attack by form (full heat): plays the Epic Fight animation, spends the heat at once and starts the effect and the
      * damage on the strike of the animation (at once without Epic Fight). Called by the Epic Fight weapon skill
-     * (EmberEpicFight.Special), without Epic Fight by the right click. Returns false when the heat is not full.
+     * (EmberEpicFight.Special), without Epic Fight by the right click. Returns false when the form's special is not ready.
+     * Last Ember turns the burning sword into the whip at full heat when its pillars are done ({@link #TO_WHIP_AFTER}).
      */
     public static boolean special(net.minecraft.server.level.ServerPlayer p, ItemStack s) {
-        if (!(s.getItem() instanceof EmberBlade item) || heat(p) < MAX_HEAT || !(p.level() instanceof ServerLevel sl)) return false;
-        boolean vortex = hot(p);
+        if (!(s.getItem() instanceof EmberBlade item) || !ready(p) || !(p.level() instanceof ServerLevel sl)) return false;
+        St t = st(p);
+        boolean vortex = t.form == WHIP;
         int delay = EmberEpicFight.playSpecial(p, vortex);
-        set(p, 0, vortex ? HOT_AFTER : 0, vortex, sl.getGameTime());   // the heat is spent at once: no double special
+        // the heat is spent at once: no double special; last = -1 holds the burning sword (no cooling, no counting) until the whip
+        if (vortex) set(p, t.heat - VORTEX_COST, t.hits, WHIP, sl.getGameTime());
+        else set(p, 0, 0, BURNING, -1);
         later(delay, () -> {
-            if (!p.isAlive() || p.level() != sl) return;
+            if (!p.isAlive() || p.level() != sl) {
+                if (!vortex) set(p, 0, 0, COLD, sl.getGameTime());
+                return;
+            }
             if (vortex) fireVortex(sl, p, s);
-            else lastEmber(sl, p, s);
+            else {
+                lastEmber(sl, p, s);
+                later(TO_WHIP_AFTER, () -> {
+                    if (p.hasDisconnected()) return;   // logged out: the state is already dropped
+                    set(p, MAX_HEAT, 0, p.isAlive() ? WHIP : COLD, sl.getGameTime());
+                    if (p.isAlive() && p.level() == sl) {
+                        sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.6f);
+                        glow(sl, p, p.getMainHandItem());
+                    }
+                });
+            }
         });
         p.getCooldowns().addCooldown(item, vortex ? 24 : 40);
         return true;
@@ -390,12 +450,12 @@ public class EmberBlade extends SwordItem {
 
     /** Starts the glow on the holder's hand once; it watches itself and goes out when the heat is 0 or the blade leaves the hand. */
     static void glow(ServerLevel sl, Player p, ItemStack s) {
-        if (GLOW.containsKey(p.getUUID()) || heat(p) <= 0) return;
+        if (GLOW.containsKey(p.getUUID()) || form(p) == COLD || !(s.getItem() instanceof EmberBlade)) return;
         int inst = Fx.play(sl, Fx.fx("ember_heat").caster(p).scale(0.6 + 0.4 * heat(p) / MAX_HEAT));
         GLOW.put(p.getUUID(), inst);
         Tasks.add(() -> {
             ItemStack h = p.getMainHandItem();
-            if (p.isAlive() && !p.isRemoved() && p.level() == sl && h.getItem() instanceof EmberBlade && heat(p) > 0 && Fx.running(inst)) return true;
+            if (p.isAlive() && !p.isRemoved() && p.level() == sl && h.getItem() instanceof EmberBlade && form(p) != COLD && Fx.running(inst)) return true;
             Fx.stop(sl, inst, "");
             GLOW.remove(p.getUUID(), inst);
             return false;

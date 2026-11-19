@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "11";   // 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
+    private static final String V = "12";   // 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -41,28 +41,29 @@ public final class Net {
     public static final class EmberMsg {
         public final int entity;
         public final float heat;
-        public final boolean hot;
+        /** 0 cold blade, 1 burning sword, 2 whip */
+        public final int form;
 
-        public EmberMsg(int entity, float heat, boolean hot) {
+        public EmberMsg(int entity, float heat, int form) {
             this.entity = entity;
             this.heat = heat;
-            this.hot = hot;
+            this.form = form;
         }
 
         public EmberMsg(FriendlyByteBuf b) {
             entity = b.readVarInt();
             heat = b.readFloat();
-            hot = b.readBoolean();
+            form = b.readByte();
         }
 
         public void encode(FriendlyByteBuf b) {
             b.writeVarInt(entity);
             b.writeFloat(heat);
-            b.writeBoolean(hot);
+            b.writeByte(form);
         }
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
-            ru.pohsmp.core.ember.EmberBlade.clientSet(entity, heat, hot);
+            ru.pohsmp.core.ember.EmberBlade.clientSet(entity, heat, form);
         }
     }
 

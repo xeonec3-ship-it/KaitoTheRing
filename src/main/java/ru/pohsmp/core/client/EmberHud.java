@@ -15,14 +15,19 @@ import ru.pohsmp.core.ember.EmberBlade;
 /**
  * T14, client: the heat gauge over the hotbar (the manager's texture), only while the blade is in hand; pulses when full
  * (special attack ready).
- * Also the item property pohsmp_core:hot (whip form model).
+ * Also the item properties pohsmp_core:hot (whip form) and pohsmp_core:form (0/1/2, the model).
  */
 public final class EmberHud {
     private EmberHud() {}
 
     public static void setup(FMLClientSetupEvent e) {
-        e.enqueueWork(() -> ItemProperties.register(Reg.EMBER_BLADE.get(), new ResourceLocation(PohCore.MODID, "hot"),
-                (s, level, holder, seed) -> EmberBlade.hot(holder != null ? holder : Minecraft.getInstance().player) ? 1f : 0f));
+        e.enqueueWork(() -> {
+            ItemProperties.register(Reg.EMBER_BLADE.get(), new ResourceLocation(PohCore.MODID, "hot"),
+                    (s, level, holder, seed) -> EmberBlade.hot(holder != null ? holder : Minecraft.getInstance().player) ? 1f : 0f);
+            // manager 19.11: 0 cold sword, 1 burning sword (ember_blade_hot), 2 whip (ember_whip_handle) — overrides in ember_blade.json
+            ItemProperties.register(Reg.EMBER_BLADE.get(), new ResourceLocation(PohCore.MODID, "form"),
+                    (s, level, holder, seed) -> EmberBlade.form(holder != null ? holder : Minecraft.getInstance().player));
+        });
     }
 
     @SubscribeEvent
@@ -35,19 +40,23 @@ public final class EmberHud {
         int w = g.guiWidth(), h = g.guiHeight();
         float heat = Math.min(1f, EmberBlade.heat(mc.player) / EmberBlade.MAX_HEAT);
         double t = (mc.player.tickCount + e.getPartialTick()) / 10.0;
-        float alpha = heat >= 1f ? 0.65f + 0.35f * (float) Math.sin(t * Math.PI) : 1f;   // full: the fill pulses (special attack ready)
+        int form = EmberBlade.form(mc.player);
+        float alpha = EmberBlade.ready(mc.player) ? 0.65f + 0.35f * (float) Math.sin(t * Math.PI) : 1f;   // full: the fill pulses (special attack ready)
         int x0 = w / 2 - BAR_W / 2, y = mc.player.isCreative() ? h - 40 : h - 76;   // over the hotbar; in survival over hearts and armor
         int fill = Math.round(heat * BAR_W);
         com.mojang.blaze3d.systems.RenderSystem.enableBlend();
         if (fill > 0) {   // bottom half of the texture: the fill, left to right by the heat share
-            g.setColor(1f, 1f, 1f, alpha);
+            if (form == EmberBlade.COLD) g.setColor(0.55f, 0.5f, 0.5f, 0.8f);   // cold: the grey count towards the fire
+            else g.setColor(1f, 1f, 1f, alpha);
             g.blit(BAR, x0, y, 0, BAR_H, fill, BAR_H, BAR_W, BAR_H * 2);
             g.setColor(1f, 1f, 1f, 1f);
         }
         g.blit(BAR, x0, y, 0, 0, BAR_W, BAR_H, BAR_W, BAR_H * 2);   // top half: the frame
         com.mojang.blaze3d.systems.RenderSystem.disableBlend();
-        if (EmberBlade.hot(mc.player))   // a small flame mark at the right end: whip form
+        if (form != EmberBlade.COLD)   // a small flame mark at the right end: burning sword, two for the whip
             g.fill(x0 + BAR_W + 3, y + 6, x0 + BAR_W + 6, y + 10, 0xFFFF6A1A);
+        if (form == EmberBlade.WHIP)
+            g.fill(x0 + BAR_W + 8, y + 6, x0 + BAR_W + 11, y + 10, 0xFFFF3A10);
     }
 
     /** textures/gui/ember_heat_bar.png (manager): 128x32, top 16 rows the frame, bottom 16 the fill. */

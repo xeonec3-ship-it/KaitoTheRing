@@ -61,7 +61,11 @@ public class EightShieldsSpell extends PohSpell {
         return new Vec3(c.getX() + Math.cos(a) * RAD, c.getY() + SEAL_Y, c.getZ() + Math.sin(a) * RAD);
     }
 
-    private static float yaw(double a) { return (float) Math.toDegrees(Math.PI / 2 - a); }
+    /**
+     * Facing the caster at angle a of the circle (MC yaw of the direction to the centre, atan2(cos a, -sin a) = 90° + a).
+     * Was 90° - a (from Iron's shields): the seal turned the other way as it flew round — owner 19.11 saw it spin along its path.
+     */
+    private static float yaw(double a) { return (float) Math.toDegrees(Math.PI / 2 + a); }
 
     /** Damage the projectile would deal, for the pool. */
     private static float damageOf(Projectile p) {

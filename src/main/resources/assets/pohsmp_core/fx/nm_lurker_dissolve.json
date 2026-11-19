@@ -1,0 +1,47 @@
+{
+ "comment": "Тень-за-углом растворяется, когда на неё смотрят прямо (caster = она, 14 тиков; вместе с анимацией dissolve): клочья тьмы рвутся в стороны и вверх. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 14,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 6,
+   "texture": "mote_nm_ash",
+   "count": 40,
+   "rate": 8,
+   "spread": 0.9,
+   "speed": 0.08,
+   "gravity": -0.006,
+   "spin": 120,
+   "size": [
+    0.35,
+    0.0
+   ],
+   "life": 14,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 4,
+   "texture": "glow",
+   "count": 10,
+   "rate": 3,
+   "spread": 0.6,
+   "speed": 0.03,
+   "gravity": -0.004,
+   "size": [
+    1.4,
+    0.4
+   ],
+   "life": 14,
+   "color": "#06030A",
+   "brightness": 0.8,
+   "blend": "translucent"
+  }
+ ]
+}

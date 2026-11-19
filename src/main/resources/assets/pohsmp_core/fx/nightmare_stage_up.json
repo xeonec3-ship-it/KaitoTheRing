@@ -1,0 +1,58 @@
+{
+ "comment": "Погружение: стадия глубже (жертва, 24 тика): тьма схлопывается к жертве — тёмное кольцо внутрь, удар сердца (багровая вспышка на 6 тике), капли. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 6.0,
+   "color": "#07030B",
+   "brightness": 1.0,
+   "reverse": true
+  },
+  {
+   "type": "wave",
+   "delay": 2,
+   "at": "caster+0,1,0",
+   "duration": 14,
+   "shape": "sphere",
+   "radius": 3.0,
+   "rim": 1.0,
+   "color": "#07030B",
+   "brightness": 0.9
+  },
+  {
+   "type": "flash",
+   "delay": 6,
+   "at": "caster+0,1.2,0",
+   "duration": 8,
+   "size": 2.2,
+   "color": "#7A1040",
+   "brightness": 0.8,
+   "screen": 0.25
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,1.0,0",
+   "duration": 3,
+   "texture": "mote_ink",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.12,
+   "gravity": 0.01,
+   "size": [
+    0.2,
+    0.08
+   ],
+   "life": 18,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

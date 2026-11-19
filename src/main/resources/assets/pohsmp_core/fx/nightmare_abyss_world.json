@@ -1,0 +1,107 @@
+{
+ "comment": "«Пробуждение не наступит»: мир-кошмар жертвы на 5 мин (follow, 6000 тиков; гасить Fx.stop при снятии): всё стадии 3 + гуще: чернильный дождь, глаза в темноте ближе и чаще, тени у ног шире, багровый туман. Подмены мира/неба/лиц, чудовища, сны-места (дом жертвы тенями) — код. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 6000,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "duration": 6000,
+   "follow": true,
+   "texture": "nightmare_shadow_reach",
+   "radius": 11,
+   "blend": "translucent",
+   "color": "#050208",
+   "spin": 0.8,
+   "pulse": 40
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 6000,
+   "radius": 64,
+   "color": "#200208",
+   "strength": 0.42,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,10,0",
+   "duration": 6000,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 999999,
+   "rate": 2.4,
+   "area": 18,
+   "speed": 0.0,
+   "gravity": 0.014,
+   "size": [
+    0.14,
+    0.08
+   ],
+   "life": 50,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.5,0",
+   "duration": 6000,
+   "follow": true,
+   "texture": "mote_eye_n",
+   "count": 999999,
+   "rate": 0.2,
+   "area": 12,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "size": [
+    0.3,
+    0.0
+   ],
+   "life": 40,
+   "color": "#E0285A",
+   "glow": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 6000,
+   "follow": true,
+   "texture": "glow",
+   "count": 999999,
+   "rate": 0.8,
+   "area": 14,
+   "speed": 0.002,
+   "gravity": 0.0,
+   "size": [
+    2.0,
+    3.0
+   ],
+   "life": 90,
+   "color": "#18040C",
+   "brightness": 0.7,
+   "blend": "translucent"
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.08,0",
+   "follow": true,
+   "id": "nightmare_hands_ground",
+   "scale": 2.0,
+   "until": 5990
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "comment": "Метка «под кошмаром» (у заклинателя и союзников над жертвой; жертве не слать): око над головой, плачет. follow, −1 — гасить Fx.stop, когда стадия 0. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.4,0",
+   "follow": true,
+   "id": "nightmare_eye_over"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,2.25,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 99999,
+   "rate": 0.2,
+   "spread": 0.08,
+   "speed": 0.0,
+   "gravity": 0.006,
+   "size": [
+    0.08,
+    0.05
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "comment": "Рёв Пасти (caster = Пасть, 40 тиков; вместе с анимацией roar): тёмная волна-сфера r8 из пасти, брызги, у жертв — дрожь экрана (код по инструкции roar). Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 4,
+   "at": "caster+0,2.6,-1.0",
+   "duration": 24,
+   "shape": "sphere",
+   "radius": 8,
+   "rim": 1.2,
+   "color": "#07030B",
+   "brightness": 0.9
+  },
+  {
+   "type": "wave",
+   "delay": 4,
+   "at": "caster",
+   "duration": 28,
+   "shape": "ring",
+   "radius": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,2.4,-1.4",
+   "duration": 20,
+   "texture": "mote_ink",
+   "count": 60,
+   "rate": 3,
+   "spread": 0.8,
+   "speed": 0.15,
+   "gravity": 0.01,
+   "size": [
+    0.2,
+    0.08
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent",
+   "cone": 70
+  }
+ ]
+}

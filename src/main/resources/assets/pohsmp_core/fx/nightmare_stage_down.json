@@ -1,0 +1,45 @@
+{
+ "comment": "Погружение: стадия спала (жертва, 30 тиков): тьма отступает кольцом наружу, бледный вздох. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 24,
+   "shape": "ring",
+   "radius": 8.0,
+   "color": "#3A2A40",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 10,
+   "size": 1.6,
+   "color": "#E8E0D8",
+   "brightness": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 10,
+   "texture": "mote_nm_ash",
+   "count": 16,
+   "rate": 2,
+   "area": 2.0,
+   "speed": 0.03,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.0
+   ],
+   "life": 24,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

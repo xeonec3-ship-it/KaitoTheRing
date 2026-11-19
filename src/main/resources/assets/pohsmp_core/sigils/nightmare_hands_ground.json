@@ -1,0 +1,42 @@
+{
+ "comment": "Руки из земли / тени тянутся (стадия 3, «Ночь», «Руки из земли»): кольцо рук-теней к центру, тёмное, шевелится (пульс и вращение туда-обратно). Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 3.0,
+ "color": "#1A0A16",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "hands",
+   "type": "disc",
+   "texture": "nightmare_hands_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 12,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2
+   },
+   "pulse": {
+    "amp": 0.08,
+    "period": 14
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

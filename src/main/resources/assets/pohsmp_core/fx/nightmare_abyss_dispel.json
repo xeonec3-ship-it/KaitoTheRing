@@ -1,0 +1,64 @@
+{
+ "comment": "«Пробуждение не наступит»: кошмар рассеивается (заклинатель убит / «Благословение»; у каждой жертвы, 40 тиков): чернила стекают вниз и уходят в землю, бледная вспышка, тьма кольцом наружу. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "radius": 64,
+   "color": "#000000",
+   "strength": 0.6,
+   "in": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 36,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 2,
+   "at": "caster+0,1.6,0",
+   "duration": 14,
+   "size": 4,
+   "color": "#E8E0D8",
+   "brightness": 0.5,
+   "screen": 0.3
+  },
+  {
+   "type": "wave",
+   "delay": 2,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 20,
+   "color": "#C8C0D0",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3,0",
+   "duration": 10,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 120,
+   "rate": 12,
+   "area": 6,
+   "speed": 0.0,
+   "gravity": 0.05,
+   "size": [
+    0.25,
+    0.1
+   ],
+   "life": 16,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

@@ -1,0 +1,112 @@
+{
+ "comment": "T25, школа «Кошмары»: венец над головой мага (Мифическая/Божественная) — колючий обруч из язычков гребёнки и зубов, на остриях — глаза; раскрывается из ребра, оплывает. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 0.75,
+ "color": "#E0285A",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "pool",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.85,
+   "heightOffset": -0.01,
+   "color": "#1A0A16",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "crown",
+   "type": "disc",
+   "texture": "nightmare_crown",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 2,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -10,
+    "boost": 2
+   }
+  },
+  {
+   "id": "bleed",
+   "type": "disc",
+   "texture": "nightmare_crown",
+   "radius": 1.03,
+   "heightOffset": 0.012,
+   "color": "#7A1040",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 10,
+    "duration": 10,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "pulse": {
+    "amp": 0.35,
+    "period": 37
+   }
+  },
+  {
+   "id": "smear",
+   "type": "disc",
+   "texture": "nightmare_crown",
+   "radius": 1.075,
+   "heightOffset": 0.01,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 14,
+    "duration": 16,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1.0
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 53
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B01A4A",
+  "size": 1.3,
+  "duration": 8,
+  "sparks": 12
+ },
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 12,
+  "stagger": 0
+ }
+}

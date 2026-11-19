@@ -1,0 +1,139 @@
+{
+ "comment": "«Ночь без рассвета», каст (3 с): лунная печать под заклинателем — фазы луны по ободу, «съеденная» фаза, кровь стекает с диска. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 3.2,
+ "color": "#E0285A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "pool",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": -0.01,
+   "color": "#1A0A16",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "moon",
+   "type": "disc",
+   "texture": "nightmare_moon",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 34,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": 1.5
+   }
+  },
+  {
+   "id": "bleed",
+   "type": "disc",
+   "texture": "nightmare_moon",
+   "radius": 1.03,
+   "heightOffset": 0.006,
+   "color": "#7A1040",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 22,
+    "duration": 14,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "pulse": {
+    "amp": 0.35,
+    "period": 37
+   }
+  },
+  {
+   "id": "smear",
+   "type": "disc",
+   "texture": "nightmare_moon",
+   "radius": 1.075,
+   "heightOffset": 0.004,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 26,
+    "duration": 20,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1.0
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 53
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_nightmare_band",
+   "radius": 1.14,
+   "heightOffset": 0.015,
+   "color": "#E8E0D8",
+   "brightness": 0.5,
+   "inner": 0.92,
+   "repeat": 12,
+   "appear": {
+    "delay": 16,
+    "duration": 20,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -3
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B01A4A",
+  "size": 1.25,
+  "duration": 12,
+  "sparks": 22
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "fade"
+  ],
+  "duration": 14,
+  "stagger": 2
+ },
+ "groundLight": {
+  "radius": 0.75,
+  "strength": 0.3
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "comment": "Стиль школы «Кошмары» (T25): багрово-алый свет печатей на чернильной тьме; тени и чернила рисуются translucent (тёмные цвета), блики — бледные. Капли чернил (@shards = mote_ink), движение вязкое, с рывками. Сгенерировано tools/gen_nightmare_fx.py.",
+ "palette": {
+  "primary": "#E0285A",
+  "secondary": "#7A1040",
+  "core": "#E8E0D8",
+  "shadow": "#0A0610"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_nightmare_band",
+  "shards": "mote_ink",
+  "sigil": "nightmare_seal"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.6,
+  "jitter": 0.25,
+  "easing": "easeInOutSine",
+  "pulse": {
+   "amp": 0.12,
+   "period": 26
+  }
+ }
+}

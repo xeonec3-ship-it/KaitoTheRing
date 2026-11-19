@@ -1,0 +1,111 @@
+{
+ "comment": "«Ночь без рассвета», зона 2 мин (2400 тиков; caster = центр зоны, не follow; гасить Fx.stop): печать по земле r24, по краю — тёмная завеса (вертикальные струи тьмы), внутри — сумрак с красным отливом (tint r24), хлопья тьмы и капли. Вечная ночь и красная луна неба у врагов внутри — код (см. письмо); nightmare_red_moon — запасной диск в небе. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 2400,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "id": "nightmare_night_floor",
+   "until": 2390
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,40,0",
+   "id": "nightmare_red_moon",
+   "until": 2390
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "duration": 2400,
+   "count": 64,
+   "radius": 24,
+   "height": [
+    6,
+    14
+   ],
+   "grow": 40,
+   "width": [
+    0.6,
+    1.4
+   ],
+   "brightness": [
+    0.6,
+    1.0
+   ],
+   "texture": "beam_fade",
+   "color": "#07030B",
+   "flicker": 0.2,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 2400,
+   "radius": 24,
+   "color": "#1A0208",
+   "strength": 0.38,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,8,0",
+   "duration": 2400,
+   "texture": "mote_nm_ash",
+   "count": 999999,
+   "rate": 3.0,
+   "area": 24,
+   "speed": 0.0,
+   "gravity": 0.004,
+   "spin": 40,
+   "tumble": 0.8,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 120,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 2400,
+   "texture": "glow",
+   "count": 999999,
+   "rate": 1.0,
+   "area": 24,
+   "speed": 0.002,
+   "gravity": -0.0004,
+   "size": [
+    1.6,
+    2.6
+   ],
+   "life": 90,
+   "color": "#14040C",
+   "brightness": 0.6,
+   "blend": "translucent"
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "comment": "«Ночь»: каждые 8 с — «стадия глубже» (caster = центр зоны, 36 тиков): от края зоны к центру бежит тёмное кольцо (сжатие), удар сердца — багровая вспышка в центре на 20 тике. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 36,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 24,
+   "thickness": 2.5,
+   "color": "#07030B",
+   "brightness": 1.0,
+   "reverse": true,
+   "followTerrain": true
+  },
+  {
+   "type": "flash",
+   "delay": 20,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "size": 4,
+   "color": "#7A1040",
+   "brightness": 0.6
+  },
+  {
+   "type": "wave",
+   "delay": 20,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 6,
+   "color": "@secondary",
+   "brightness": 0.7
+  }
+ ]
+}

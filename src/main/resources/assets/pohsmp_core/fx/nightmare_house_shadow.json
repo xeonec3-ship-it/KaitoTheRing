@@ -1,0 +1,101 @@
+{
+ "comment": "«Дом»: тень выходит из двери (жертва; caster = точка двери на полу коридора, yaw — внутрь коридора; 40 тиков): дверь распахивается (mesh nightmare_door, петля), из проёма вытекает тьма, проступает силуэт (через 12 тиков код ставит на это место тень — модель nm_lurker с appear).  Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "nightmare_door",
+   "follow": false,
+   "until": 40,
+   "hinge": {
+    "pivot": [
+     -0.5,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      3,
+      -6,
+      "easeOutCubic"
+     ],
+     [
+      6,
+      -4,
+      "easeInOutSine"
+     ],
+     [
+      12,
+      -105,
+      "easeOutBack"
+     ],
+     [
+      36,
+      -100,
+      "easeInOutSine"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 8,
+   "at": "caster+0,0.2,0.3",
+   "duration": 20,
+   "texture": "glow",
+   "count": 40,
+   "rate": 2,
+   "area": 0.8,
+   "speed": 0.02,
+   "gravity": 0.0,
+   "size": [
+    0.8,
+    1.6
+   ],
+   "life": 26,
+   "color": "#05020A",
+   "brightness": 0.8,
+   "blend": "translucent",
+   "cone": 60
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,1.1,0.4",
+   "duration": 1,
+   "texture": "nightmare_silhouette_0",
+   "count": 1,
+   "rate": 1,
+   "spread": 0,
+   "speed": 0,
+   "gravity": 0,
+   "size": [
+    1.0,
+    2.6
+   ],
+   "life": 14,
+   "color": "#030104",
+   "blend": "translucent"
+  },
+  {
+   "type": "decal",
+   "delay": 8,
+   "at": "caster+0,0.05,0.8",
+   "duration": 32,
+   "texture": "nightmare_shadow_reach",
+   "radius": 1.6,
+   "grow": 12,
+   "blend": "translucent",
+   "color": "#050208"
+  }
+ ]
+}

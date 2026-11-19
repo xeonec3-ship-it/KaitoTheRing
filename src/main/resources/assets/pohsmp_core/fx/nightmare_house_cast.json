@@ -1,0 +1,110 @@
+{
+ "comment": "«Дом, которого нет», каст 2.5 с (50 тиков; caster + target): над целью раскрывается печать-коридор (никаких линий к цели), у ладони — око; на 44 тике печать «втягивается», на 46 — у ног цели чернила смыкаются (видят все: цель «проваливается» только для себя). Анимация pohsmp_nightmare_house_cast. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 56,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "nightmare_hand_eye",
+   "until": 46
+  },
+  {
+   "type": "sigil",
+   "delay": 4,
+   "at": "target+0,2.6,0",
+   "follow": true,
+   "id": "nightmare_house_over",
+   "until": 46
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "target+0,2.4,0",
+   "duration": 40,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 200,
+   "rate": 0.8,
+   "spread": 0.4,
+   "speed": 0.0,
+   "gravity": 0.01,
+   "size": [
+    0.12,
+    0.06
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "decal",
+   "delay": 20,
+   "at": "target+0,0.06,0",
+   "duration": 36,
+   "texture": "nightmare_shadow_reach",
+   "radius": 2.4,
+   "grow": 26,
+   "spin": 1.2,
+   "blend": "translucent",
+   "color": "#050208",
+   "follow": true
+  },
+  {
+   "type": "wave",
+   "delay": 44,
+   "at": "target+0,1,0",
+   "duration": 8,
+   "shape": "sphere",
+   "radius": 1.2,
+   "rim": 1.2,
+   "color": "#07030B",
+   "brightness": 1.0,
+   "reverse": true
+  },
+  {
+   "type": "vortex",
+   "delay": 40,
+   "at": "target+0,0.1,0",
+   "duration": 14,
+   "radius": 1.6,
+   "height": 2.4,
+   "arms": 4,
+   "speed": -18,
+   "pull": 0.6,
+   "texture": "mote_ink",
+   "color": "#07030B",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 46,
+   "at": "target+0,1,0",
+   "duration": 8,
+   "size": 1.8,
+   "color": "#7A1040",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 46,
+   "at": "target+0,0.2,0",
+   "duration": 3,
+   "texture": "mote_ink",
+   "count": 30,
+   "rate": 10,
+   "area": 1.2,
+   "speed": 0.14,
+   "gravity": 0.012,
+   "size": [
+    0.22,
+    0.08
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

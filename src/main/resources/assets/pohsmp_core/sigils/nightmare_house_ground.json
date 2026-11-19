@@ -1,0 +1,133 @@
+{
+ "comment": "«Дом, которого нет», каст (2.5 с): печать-коридор под заклинателем — проёмы прорисовываются от дальнего к ближнему, двери по бокам приоткрываются, из щели тянется рука. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 3.0,
+ "color": "#E0285A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "pool",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": -0.01,
+   "color": "#1A0A16",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 30
+   }
+  },
+  {
+   "id": "house",
+   "type": "disc",
+   "texture": "nightmare_house",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 32,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270
+   },
+   "rotation": {
+    "speed": -2
+   }
+  },
+  {
+   "id": "bleed",
+   "type": "disc",
+   "texture": "nightmare_house",
+   "radius": 1.03,
+   "heightOffset": 0.006,
+   "color": "#7A1040",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 20,
+    "duration": 14,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "pulse": {
+    "amp": 0.35,
+    "period": 37
+   }
+  },
+  {
+   "id": "smear",
+   "type": "disc",
+   "texture": "nightmare_house",
+   "radius": 1.075,
+   "heightOffset": 0.004,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 24,
+    "duration": 20,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1.0
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 53
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "nightmare_core",
+   "radius": 0.22,
+   "heightOffset": 0.012,
+   "color": "#E8E0D8",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 24,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B01A4A",
+  "size": 1.2,
+  "duration": 10,
+  "sparks": 18
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "fade"
+  ],
+  "duration": 14,
+  "stagger": 2
+ }
+}

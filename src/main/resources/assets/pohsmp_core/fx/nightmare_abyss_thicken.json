@@ -1,0 +1,75 @@
+{
+ "comment": "«Пробуждение не наступит»: каждую минуту кошмар сгущается (жертва, 60 тиков): мир на миг гаснет (tint к чёрному за 6 тиков), два удара сердца (багровые вспышки на 10 и 22 тике), тьма сжимается кольцом к жертве, глаза вокруг разом открываются. Шаги сгущения (больше галлюцинаций → союзники нападают → ники пропадают) — код; эффект один и тот же. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "radius": 64,
+   "color": "#000000",
+   "strength": 0.85,
+   "in": {
+    "duration": 6,
+    "easing": "easeInCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "at": "caster+0,1.4,0",
+   "duration": 8,
+   "size": 3,
+   "color": "#7A1040",
+   "brightness": 0.8,
+   "screen": 0.3
+  },
+  {
+   "type": "flash",
+   "delay": 22,
+   "at": "caster+0,1.4,0",
+   "duration": 8,
+   "size": 3.6,
+   "color": "#B01A4A",
+   "brightness": 0.9,
+   "screen": 0.4
+  },
+  {
+   "type": "wave",
+   "delay": 8,
+   "at": "caster",
+   "duration": 24,
+   "shape": "ring",
+   "radius": 16,
+   "thickness": 3,
+   "color": "#07030B",
+   "brightness": 1.0,
+   "reverse": true
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "at": "caster+0,1.6,0",
+   "duration": 4,
+   "texture": "mote_eye_n",
+   "count": 40,
+   "rate": 10,
+   "area": 8,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "size": [
+    0.45,
+    0.0
+   ],
+   "life": 30,
+   "color": "#E0285A",
+   "glow": 0.9
+  }
+ ]
+}

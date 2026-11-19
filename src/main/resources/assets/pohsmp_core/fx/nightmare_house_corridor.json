@@ -1,0 +1,85 @@
+{
+ "comment": "«Дом»: атмосфера коридора у жертвы (follow, 1200 тиков = 1 мин; гасить Fx.stop при выходе): пыль в луче лампы, туман у пола, капли с потолка; тени — nightmare_house_shadow. Модули — fx/meshes/nightmare_corridor (код). Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 1200,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 1200,
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 99999,
+   "rate": 0.6,
+   "area": 4,
+   "speed": 0.003,
+   "gravity": -0.0002,
+   "size": [
+    0.04,
+    0.0
+   ],
+   "life": 60,
+   "color": "#A89070",
+   "brightness": 0.4
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 1200,
+   "follow": true,
+   "texture": "glow",
+   "count": 99999,
+   "rate": 0.5,
+   "area": 4,
+   "speed": 0.003,
+   "gravity": 0.0,
+   "size": [
+    1.2,
+    2.0
+   ],
+   "life": 70,
+   "color": "#100818",
+   "brightness": 0.5,
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3.3,0",
+   "duration": 1200,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 99999,
+   "rate": 0.3,
+   "area": 3,
+   "speed": 0.0,
+   "gravity": 0.02,
+   "size": [
+    0.1,
+    0.06
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 1200,
+   "radius": 64,
+   "color": "#120A08",
+   "strength": 0.25,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

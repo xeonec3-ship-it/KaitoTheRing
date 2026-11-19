@@ -1,0 +1,26 @@
+{
+ "comment": "Мелькающий силуэт на краю зрения (жертва; caster = точка на земле, где он стоит; код выбирает точку в 8–16 бл. под углом 50–80° от взгляда). 8 тиков: проявляется за 2, стоит, гаснет; вариант 0. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 8,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.25,0",
+   "duration": 1,
+   "texture": "nightmare_silhouette_0",
+   "count": 1,
+   "rate": 1,
+   "spread": 0.0,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "size": [
+    2.6,
+    2.5
+   ],
+   "life": 8,
+   "color": "#030104",
+   "blend": "translucent"
+  }
+ ]
+}

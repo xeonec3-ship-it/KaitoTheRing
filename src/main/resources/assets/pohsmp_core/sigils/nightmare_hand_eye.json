@@ -1,0 +1,61 @@
+{
+ "comment": "Малое око у ладони заклинателя (жесты «Дома» и «Ночи»), смотрит вперёд. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 0.24,
+ "color": "#E0285A",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "pool",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.4,
+   "heightOffset": -0.01,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "eye",
+   "type": "disc",
+   "texture": "nightmare_eye",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B01A4A",
+  "size": 1.4,
+  "duration": 4,
+  "sparks": 4
+ },
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 6,
+  "stagger": 2
+ }
+}

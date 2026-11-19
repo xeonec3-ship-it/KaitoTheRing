@@ -1,0 +1,14 @@
+{
+ "comment": "«Ночь без рассвета»: печать под заклинателем на время каста (правило SchoolSeals.shown). Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "nightmare_night_ground",
+   "follow": true
+  }
+ ]
+}

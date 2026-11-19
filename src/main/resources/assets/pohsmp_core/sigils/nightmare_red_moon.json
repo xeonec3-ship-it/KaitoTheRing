@@ -1,0 +1,58 @@
+{
+ "comment": "«Ночь без рассвета»: красная луна в небе над зоной (запасной вариант, если код не подменяет луну неба): диск-печать лицом вниз высоко (≈ +40), кровь стекает. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 6.0,
+ "color": "#C8203A",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.6,
+   "heightOffset": -0.01,
+   "color": "#8A1028",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.1,
+    "period": 90
+   }
+  },
+  {
+   "id": "moon",
+   "type": "disc",
+   "texture": "nightmare_moon",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutSine",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.2
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 40,
+  "stagger": 2
+ }
+}

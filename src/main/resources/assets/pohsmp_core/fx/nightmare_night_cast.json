@@ -1,0 +1,92 @@
+{
+ "comment": "«Ночь без рассвета», каст 3 с (60 тиков): левая ладонь гасит «свет» (око у ладони), правая поднимается к небу — над заклинателем всходит красная луна (печать nightmare_red_moon, растёт), с 30 тика небо темнеет; на 56 тике — «закат навсегда»: тёмная волна по земле до r24. Анимация pohsmp_nightmare_night_cast. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 70,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "nightmare_hand_eye",
+   "until": 30
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,9,0",
+   "id": "nightmare_red_moon",
+   "scale": 0.5,
+   "until": 70
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+0,9,0",
+   "duration": 40,
+   "texture": "mote_ink",
+   "count": 200,
+   "rate": 4,
+   "spread": 1.5,
+   "speed": 0.0,
+   "gravity": 0.02,
+   "size": [
+    0.16,
+    0.08
+   ],
+   "life": 30,
+   "color": "#3A0410",
+   "blend": "translucent"
+  },
+  {
+   "type": "tint",
+   "delay": 30,
+   "at": "caster",
+   "duration": 40,
+   "radius": 30,
+   "color": "#12020A",
+   "strength": 0.4,
+   "in": {
+    "duration": 26,
+    "easing": "easeInSine"
+   },
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "wave",
+   "delay": 56,
+   "at": "caster",
+   "duration": 24,
+   "shape": "ring",
+   "radius": 24,
+   "thickness": 3,
+   "color": "#07030B",
+   "brightness": 1.0,
+   "followTerrain": true
+  },
+  {
+   "type": "wave",
+   "delay": 56,
+   "at": "caster+0,1,0",
+   "duration": 20,
+   "shape": "sphere",
+   "radius": 6,
+   "rim": 1.0,
+   "color": "#7A1040",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 56,
+   "at": "caster+0,1.4,0",
+   "duration": 10,
+   "size": 3.0,
+   "color": "#7A1040",
+   "brightness": 0.7,
+   "screen": 0.2
+  }
+ ]
+}

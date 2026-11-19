@@ -1,0 +1,58 @@
+{
+ "comment": "Кошмар-моб появляется (caster = сущность; играть вместе с её анимацией appear): лужа чернил растёт, всплеск, капли летят вверх и опадают. 24 тика. Видят только жертвы (как сам моб). Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "duration": 24,
+   "texture": "nightmare_ink_flood",
+   "radius": 1.6,
+   "grow": 8,
+   "blend": "translucent",
+   "color": "#0A0610",
+   "fadeOut": 10
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 6,
+   "texture": "mote_ink",
+   "count": 24,
+   "rate": 4,
+   "area": 1.0,
+   "speed": 0.06,
+   "gravity": 0.008,
+   "size": [
+    0.2,
+    0.06
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 10,
+   "texture": "glow",
+   "count": 10,
+   "rate": 1,
+   "area": 1.0,
+   "speed": 0.01,
+   "gravity": -0.002,
+   "size": [
+    1.2,
+    1.8
+   ],
+   "life": 20,
+   "color": "#100816",
+   "brightness": 0.7,
+   "blend": "translucent"
+  }
+ ]
+}

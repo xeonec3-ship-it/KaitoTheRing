@@ -1,0 +1,166 @@
+{
+ "comment": "T25, школа «Кошмары», ступени Высшая/Мифическая/Божественная: печать под магом на время каста (hold −1). Кольцо, с которого внутрь стекают капли чернил; венок из глаз (открытые и плачущие закрытые), сломанные гребёнки музыкальной шкатулки, ноты с переломленными штилями, кольцо зубов; ядро — око над месяцем-колыбелью. Прорисовывается от верхней точки по часовой, края оплывают багровым; распад — стекает. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 2.4,
+ "color": "#E0285A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "pool",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.02,
+   "heightOffset": -0.01,
+   "color": "#1A0A16",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "nightmare_seal",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 0,
+    "duration": 26,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270,
+    "direction": 1
+   },
+   "rotation": {
+    "speed": -5
+   }
+  },
+  {
+   "id": "bleed",
+   "type": "disc",
+   "texture": "nightmare_seal",
+   "radius": 1.03,
+   "heightOffset": 0.014,
+   "color": "#7A1040",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 18,
+    "duration": 14,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "pulse": {
+    "amp": 0.35,
+    "period": 37
+   }
+  },
+  {
+   "id": "smear",
+   "type": "disc",
+   "texture": "nightmare_seal",
+   "radius": 1.075,
+   "heightOffset": 0.012,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 22,
+    "duration": 20,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1.0
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 53
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_nightmare_band",
+   "radius": 1.2,
+   "heightOffset": 0.02,
+   "color": "#E8E0D8",
+   "brightness": 0.6,
+   "inner": 0.89,
+   "repeat": 10,
+   "appear": {
+    "delay": 12,
+    "duration": 16,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": 6,
+    "boost": 2
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "nightmare_core",
+   "radius": 0.4,
+   "heightOffset": 0.03,
+   "color": "#E8E0D8",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 22,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 24
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B01A4A",
+  "size": 1.3,
+  "duration": 10,
+  "sparks": 20
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "fade"
+  ],
+  "duration": 16,
+  "stagger": 2
+ },
+ "groundLight": {
+  "radius": 0.7,
+  "strength": 0.35
+ }
+}

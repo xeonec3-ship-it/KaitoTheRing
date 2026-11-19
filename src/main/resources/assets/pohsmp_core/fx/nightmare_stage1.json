@@ -1,0 +1,75 @@
+{
+ "comment": "Погружение, стадия 1 «Тени» (жертва, follow, до остановки): тени на земле тянутся к ногам и медленно вращаются/дышат, мир чуть темнее, в воздухе — хлопья тьмы. Мелькающие силуэты — nightmare_silhouette. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "nightmare_shadow_reach",
+   "radius": 5.0,
+   "blend": "translucent",
+   "color": "#050208",
+   "spin": 0.35,
+   "pulse": 46,
+   "grow": 30,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 20,
+   "at": "caster+0,0.07,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "nightmare_shadow_reach",
+   "radius": 3.6,
+   "blend": "translucent",
+   "color": "#050208",
+   "spin": -0.5,
+   "rotation": 40,
+   "pulse": 33,
+   "grow": 30
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 999999,
+   "radius": 4,
+   "color": "#0A0610",
+   "strength": 0.12,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,0.2,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "mote_nm_ash",
+   "count": 99999,
+   "rate": 0.25,
+   "area": 6,
+   "speed": 0.01,
+   "gravity": -0.0015,
+   "spin": 60,
+   "tumble": 0.6,
+   "size": [
+    0.18,
+    0.08
+   ],
+   "life": 60,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

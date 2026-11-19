@@ -1,0 +1,187 @@
+{
+ "comment": "«Пробуждение не наступит», каст 12 с: мифическая печать под заклинателем — руки из обода, часы без стрелок с надломленными метками, спираль закрытых плачущих глаз; прорисовывается 3 с, оплывает чернилами. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 5.0,
+ "color": "#E0285A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "pool",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.05,
+   "heightOffset": -0.01,
+   "color": "#1A0A16",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 60
+   }
+  },
+  {
+   "id": "abyss",
+   "type": "disc",
+   "texture": "nightmare_abyss",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 60,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270
+   },
+   "rotation": {
+    "speed": 0.8
+   }
+  },
+  {
+   "id": "bleed",
+   "type": "disc",
+   "texture": "nightmare_abyss",
+   "radius": 1.03,
+   "heightOffset": 0.006,
+   "color": "#7A1040",
+   "brightness": 0.45,
+   "appear": {
+    "delay": 40,
+    "duration": 30,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "pulse": {
+    "amp": 0.35,
+    "period": 37
+   }
+  },
+  {
+   "id": "smear",
+   "type": "disc",
+   "texture": "nightmare_abyss",
+   "radius": 1.075,
+   "heightOffset": 0.004,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 44,
+    "duration": 36,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1.0
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 53
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_nightmare_band",
+   "radius": 1.16,
+   "heightOffset": 0.012,
+   "color": "#E8E0D8",
+   "brightness": 0.6,
+   "inner": 0.91,
+   "repeat": 14,
+   "appear": {
+    "delay": 30,
+    "duration": 30,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": -2
+   }
+  },
+  {
+   "id": "words",
+   "type": "text",
+   "radius": 1.28,
+   "heightOffset": 0.02,
+   "color": "#E8E0D8",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 60,
+    "duration": 40,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 1.2
+   },
+   "text": "DORMI ✦ NON EXPERGISCERIS ✦ ",
+   "font": "latin",
+   "size": 0.06,
+   "repeat": 2,
+   "side": "outer"
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.36,
+   "heightOffset": 0.025,
+   "color": "#B01A4A",
+   "brightness": 0.9,
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 80,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B01A4A",
+  "size": 1.25,
+  "duration": 14,
+  "sparks": 40
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "fade"
+  ],
+  "duration": 20,
+  "stagger": 2
+ },
+ "groundLight": {
+  "radius": 0.8,
+  "strength": 0.4
+ }
+}

@@ -1,0 +1,53 @@
+{
+ "comment": "«Дом»: выход из коридора (жертва, 30 тиков): коридор растворяется чернилами вверх, свет возвращается бледной вспышкой; дальше — стадия 2 (nightmare_stage2). Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 30,
+   "radius": 64,
+   "color": "#000000",
+   "strength": 0.9,
+   "in": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 24,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.5,0",
+   "duration": 12,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 80,
+   "rate": 7,
+   "area": 4,
+   "speed": 0.02,
+   "gravity": -0.02,
+   "size": [
+    0.24,
+    0.1
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "flash",
+   "delay": 4,
+   "at": "caster+0,1.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8E0D8",
+   "brightness": 0.4
+  }
+ ]
+}

@@ -1677,6 +1677,120 @@ _T23 = (_t23(world_tree_cast, 'pohsmp_world_tree_finish', 1.5, _HL(pitch=-32)) +
         + _t23(last_dawn_cast, 'pohsmp_last_dawn_finish', 1.5, _HL(pitch=-22)))
 
 
+# ---------------------------------------------------------------- T25: школа «Кошмары»
+# Шкалы — docs/specs/tasks/T25_nightmare_school.md (раздел «Ролик») и fx/nightmare_*.json (tools/gen_nightmare_fx.py). Без посоха.
+# Касты Высших и Мифического замирают в последней позе (hold), к каждому — финал *_finish.
+HOUSE_T = 2.5
+HOUSE_KNOB_R = _fk(pitch=-80, yaw=4, roll=-6, bend=-14)          # рука к цели, ладонь вниз — «берётся за ручку двери»
+HOUSE_PULL_R = _fk(pitch=-40, yaw=-6, roll=22, bend=-62)          # рывок к себе: дверь распахнута
+HOUSE_DROP_R = _fk(pitch=-14, yaw=-4, roll=14, bend=-30)          # кисть отпущена вниз — цель «провалилась»
+
+
+def nightmare_house_cast():
+    """«Дом, которого нет» (Высшее), 2.5 с = 50 тиков: левый палец к губам («тсс», 0–0.5), правая рука к цели — берётся за невидимую
+    ручку (0.5); медленно поворачивает кисть, как ключ (0.6–1.6, у ладони — око); тянет на себя (1.6–2.2) — дверь открыта; на 2.2 с
+    (44 тик) кисть резко разжимается и падает — на 46 тике цель проваливается. Держит позу."""
+    a, r = Anim('pohsmp_nightmare_house_cast', HOUSE_T), Rig()
+    _start(a)
+    hush_l = r.L(0.3, 26.4, 8.6, elbow_out=1.3)
+    a.pose(0.45, 'easeOutCubic', leftArm=hush_l, head=_HL(pitch=6, yaw=4), torso=_TO(pitch=2))
+    a.pose(0.6, 'easeOutCubic', rightArm=HOUSE_KNOB_R, torso=_TO(pitch=3, yaw=-6), head=_HL(pitch=2, yaw=6),
+           rightLeg=_TO(pitch=-8, roll=4, bend=6), leftLeg=_TO(pitch=8, roll=-4, bend=4))
+    for k, tt in enumerate((0.85, 1.1, 1.35, 1.6)):                                  # поворот «ключа» рывками
+        a.pose(tt, 'easeInOutQuad', rightArm=merge(HOUSE_KNOB_R, {'roll': -6 - 22 * (k + 1) / 4, 'yaw': 4 + 2 * (k % 2)}))
+    a.pose(2.15, 'easeInCubic', rightArm=HOUSE_PULL_R, torso=_TO(pitch=-4, yaw=-12, bend=-2), head=_HL(pitch=-4, yaw=10))
+    a.pose(2.3, 'easeOutBack', rightArm=HOUSE_DROP_R, leftArm=_fk(pitch=8, roll=-12, bend=-14), torso=_TO(pitch=4, yaw=-6), head=_HL(pitch=10, yaw=4))
+    a.pose(HOUSE_T, rightArm=HOUSE_DROP_R, leftArm=_fk(pitch=8, roll=-12, bend=-14), torso=_TO(pitch=4, yaw=-6), head=_HL(pitch=10, yaw=4))
+    return a, (HOUSE_DROP_R, _fk(pitch=8, roll=-12, bend=-14), _TO(pitch=4, yaw=-6), (_TO(pitch=-8, roll=4, bend=6), _TO(pitch=8, roll=-4, bend=4)), 0.0)
+
+
+NIGHT_T = 3.0
+NIGHT_SKY_R = _fk(pitch=-172, yaw=0, roll=-8, bend=-6)            # правая рука к небу, ладонь вверх — «поднимает луну»
+NIGHT_SLAM_R = _fk(pitch=-20, yaw=4, roll=34, bend=-40)           # кулак вниз-в сторону — «закат навсегда»
+
+
+def nightmare_night_cast():
+    """«Ночь без рассвета» (Высшее), 3 с = 60 тиков: левая ладонь вперёд (око у ладони, 0–0.5), сжимается в кулак и уводится вниз —
+    «гасит свет» (0.6–1.4); правая медленно поднимается к небу ладонью вверх, взгляд за ней (1.0–2.6) — всходит луна; на 2.8 с
+    (56 тик) кулак правой падает вниз-в сторону, корпус клонится — тьма бежит по земле. Держит позу."""
+    a, r = Anim('pohsmp_nightmare_night_cast', NIGHT_T), Rig()
+    _start(a)
+    palm_l = r.L(2.2, 22.0, 10.4, elbow_out=1.2)
+    a.pose(0.5, 'easeOutCubic', leftArm=palm_l, torso=_TO(pitch=2, yaw=6), head=_HL(pitch=4, yaw=-4))
+    fist_l = _fk(pitch=-30, yaw=-6, roll=-18, bend=-48)
+    a.pose(1.0, 'easeInOutQuad', leftArm=merge(palm_l, {}))
+    a.pose(1.4, 'easeInCubic', leftArm=fist_l, torso=_TO(pitch=4, yaw=2), head=_HL(pitch=6))
+    a.pose(1.2, rightArm=ARM_DOWN_R)
+    a.pose(2.6, 'easeInOutSine', rightArm=NIGHT_SKY_R, torso=_TO(pitch=-8, bend=-4), head=_HL(pitch=-34), body={'y': 0.02})
+    a.sway(2.6, 2.72, 0.06, 'rightArm', NIGHT_SKY_R, 'roll', 2)
+    end_t = _TO(pitch=14, yaw=-8, bend=8)
+    legs = (_TO(pitch=-12, roll=6, bend=16), _TO(pitch=14, roll=-6, bend=8))
+    a.pose(2.82, 'easeInQuart', rightArm=NIGHT_SLAM_R, leftArm=fist_l, torso=end_t, head=_HL(pitch=-4, yaw=6), body={'y': -0.1},
+           rightLeg=legs[0], leftLeg=legs[1])
+    a.pose(NIGHT_T, rightArm=NIGHT_SLAM_R, leftArm=fist_l, torso=end_t, head=_HL(pitch=-2, yaw=6), body={'y': -0.1})
+    return a, (NIGHT_SLAM_R, fist_l, end_t, legs, -0.1)
+
+
+ABYSS_T = 12.0
+
+
+def nightmare_abyss_cast():
+    """«Пробуждение не наступит» (Мифическое), 12 с = 240 тиков (планы ролика — ТЗ T25, «Ролик»):
+    0–2 ладони зажимают уши, голова опущена, медленное покачивание, как над колыбелью (звучит сломанная колыбельная);
+    2–4 ладони сползают и опускаются вниз ладонями к земле — «поднимает» чернила: руки медленно идут вверх до пояса ладонями вверх;
+    4–6 голова запрокидывается к гаснущему небу, руки вверх широкой V;
+    6–8 руки описывают дугу вниз и обнимают себя, корпус клонится — мир тонет;
+    8–10 на 9 с удар сердца: тело дёргается, голова вскидывается, руки отброшены назад, грудь вперёд (облик меняется);
+    10–11.8 тьма: стоит неподвижно, голова неестественно наклонена набок, руки висят;
+    11.8 голова резко выпрямляется к зрителю, кисти скрючены когтями, полшага вперёд — «глаза открылись»."""
+    a, r = Anim('pohsmp_nightmare_abyss_cast', ABYSS_T), Rig()
+    _start(a)
+    ear_r, ear_l = r.R(-5.4, 28.4, 0.8, elbow_out=1.6), r.L(5.4, 28.4, 0.8, elbow_out=1.6)
+    bow = _TO(pitch=10, bend=6)
+    a.pose(0.7, 'easeInOutSine', rightArm=ear_r, leftArm=ear_l, torso=bow, head=_HL(pitch=24))
+    a.sway(0.7, 2.0, 0.65, 'torso', bow, 'roll', 3)
+    a.sway(0.7, 2.0, 0.65, 'head', _HL(pitch=24), 'roll', 5)
+    low_r, low_l = _fk(pitch=-30, yaw=-10, roll=24, bend=-10), _fk(pitch=-30, yaw=10, roll=-24, bend=-10)
+    a.pose(2.6, 'easeInOutSine', rightArm=low_r, leftArm=low_l, torso=_TO(pitch=6, bend=4), head=_HL(pitch=16))
+    lift_r, lift_l = r.R(-6.2, 17.5, 7.0, elbow_out=1.3), r.L(6.2, 17.5, 7.0, elbow_out=1.3)
+    a.pose(3.9, 'easeInOutSine', rightArm=lift_r, leftArm=lift_l, torso=_TO(pitch=0), head=_HL(pitch=0))
+    v_r = _fk(pitch=-30, yaw=0, roll=136, bend=-8)
+    a.pose(5.6, 'easeInOutSine', rightArm=v_r, leftArm=mirror(v_r), torso=_TO(pitch=-10, bend=-6), head=_HL(pitch=-40), body={'y': 0.03})
+    a.sway(5.6, 6.0, 0.2, 'rightArm', v_r, 'roll', 2)
+    hug_r, hug_l = r.R(3.4, 19.4, 5.6, elbow_out=1.5), r.L(-3.4, 19.4, 5.6, elbow_out=1.5)
+    hug_t = _TO(pitch=16, bend=12)
+    hug_legs = dict(rightLeg=_TO(pitch=-10, roll=4, bend=12), leftLeg=_TO(pitch=10, roll=-4, bend=6))
+    a.pose(7.0, 'easeInOutCubic', rightArm=hug_r, leftArm=hug_l, torso=hug_t, head=_HL(pitch=26), body={'y': -0.06}, **hug_legs)
+    a.sway(7.0, 8.8, 0.18, 'torso', hug_t, 'roll', 1.5)
+    a.pose(8.85, torso=merge(hug_t, {'pitch': 18}), head=_HL(pitch=28))
+    back_r = _fk(pitch=40, yaw=10, roll=40, bend=-12)
+    arch_t = _TO(pitch=-16, bend=-10)
+    a.pose(9.05, 'easeOutBack', rightArm=back_r, leftArm=mirror(back_r), torso=arch_t, head=_HL(pitch=-30), body={'y': 0.04},
+           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.pose(9.8, 'easeInOutSine', rightArm=merge(back_r, {'pitch': 30}), leftArm=mirror(merge(back_r, {'pitch': 30})), torso=_TO(pitch=-10, bend=-6),
+           head=_HL(pitch=-20), body={'y': 0.02})
+    hang_r, hang_l = _fk(pitch=4, yaw=0, roll=4, bend=-4), _fk(pitch=4, yaw=0, roll=-4, bend=-4)
+    still_h = _HL(pitch=6, yaw=4, roll=34)
+    a.pose(10.6, 'easeInOutSine', rightArm=hang_r, leftArm=hang_l, torso=_TO(pitch=2), head=still_h, body={'y': 0})
+    a.pose(11.75, rightArm=hang_r, leftArm=hang_l, torso=_TO(pitch=2), head=still_h)
+    claw_r, claw_l = _fk(pitch=-36, yaw=-8, roll=22, bend=-46), _fk(pitch=-36, yaw=8, roll=-22, bend=-46)
+    end_t = _TO(pitch=8, bend=4)
+    legs = (_TO(pitch=-16, roll=4, bend=10), _TO(pitch=12, roll=-4, bend=6))
+    a.pose(11.9, 'easeOutQuart', rightArm=claw_r, leftArm=claw_l, torso=end_t, head=_HL(pitch=-4), body={'y': -0.04},
+           rightLeg=legs[0], leftLeg=legs[1])
+    a.pose(ABYSS_T, rightArm=claw_r, leftArm=claw_l, torso=end_t, head=_HL(pitch=-6), body={'y': -0.04})
+    return a, (claw_r, claw_l, end_t, legs, -0.04)
+
+
+def _t25(fn, name, length, head):
+    return [lambda: fn()[0], lambda: _finish(name, *fn()[1][:3], head=head, legs=fn()[1][3], body_y=fn()[1][4], length=length)]
+
+
+_T25 = (_t25(nightmare_house_cast, 'pohsmp_nightmare_house_finish', 1.0, _HL(pitch=10, yaw=4))
+        + _t25(nightmare_night_cast, 'pohsmp_nightmare_night_finish', 1.2, _HL(pitch=-2, yaw=6))
+        + _t25(nightmare_abyss_cast, 'pohsmp_nightmare_abyss_finish', 1.5, _HL(pitch=-6)))
+
+
 def pose_gallery():
     """Только для превью: по 1.4 с на каждую позу библиотеки."""
     out = []
@@ -1713,7 +1827,7 @@ _BL = (lambda: blessing_cast()[0],
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
          scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
          silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish,
-         *_SS, *_BL, *_T22, *_T24, *_T23]
+         *_SS, *_BL, *_T22, *_T24, *_T23, *_T25]
 
 
 def main():

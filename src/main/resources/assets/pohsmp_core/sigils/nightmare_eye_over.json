@@ -1,0 +1,66 @@
+{
+ "comment": "Око над жертвой школы (метка Погружения у ЗАКЛИНАТЕЛЯ и союзников — кто под кошмаром): широко открыто, плачет чернилами, моргает пульсом. Код может показывать его только своим (жертва его не видит). Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 0.42,
+ "color": "#E0285A",
+ "orientation": "billboard",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "pool",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.2,
+   "heightOffset": -0.01,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.3,
+    "period": 16
+   }
+  },
+  {
+   "id": "eye",
+   "type": "disc",
+   "texture": "nightmare_eye",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 16
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B01A4A",
+  "size": 1.3,
+  "duration": 6,
+  "sparks": 6
+ },
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

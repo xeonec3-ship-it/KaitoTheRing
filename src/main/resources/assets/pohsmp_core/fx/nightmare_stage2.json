@@ -1,0 +1,136 @@
+{
+ "comment": "Погружение, стадия 2 «Галлюцинации» (жертва): тени гуще и ближе, в темноте на 3–9 бл. открываются и закрываются багровые глаза, чернила сочатся из земли. Фальшивые фигуры/звуки — код. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "nightmare_shadow_reach",
+   "radius": 7.0,
+   "blend": "translucent",
+   "color": "#050208",
+   "spin": 0.5,
+   "pulse": 46,
+   "grow": 30,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 20,
+   "at": "caster+0,0.07,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "nightmare_shadow_reach",
+   "radius": 5.0,
+   "blend": "translucent",
+   "color": "#050208",
+   "spin": -0.7,
+   "rotation": 40,
+   "pulse": 33,
+   "grow": 30
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 999999,
+   "radius": 6,
+   "color": "#0A0610",
+   "strength": 0.2,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,0.2,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "mote_nm_ash",
+   "count": 99999,
+   "rate": 0.45,
+   "area": 6,
+   "speed": 0.01,
+   "gravity": -0.0015,
+   "spin": 60,
+   "tumble": 0.6,
+   "size": [
+    0.18,
+    0.08
+   ],
+   "life": 60,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,1.4,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "mote_eye_n",
+   "count": 99999,
+   "rate": 0.05,
+   "area": 9,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "size": [
+    0.22,
+    0.0
+   ],
+   "life": 40,
+   "color": "#E0285A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 4000,
+   "rate": 0.35,
+   "area": 3.0,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.14,
+    0.05
+   ],
+   "life": 26,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 999999,
+   "follow": true,
+   "texture": "glow",
+   "count": 4000,
+   "rate": 0.175,
+   "area": 2.4000000000000004,
+   "speed": 0.004,
+   "gravity": -0.0008,
+   "size": [
+    0.5,
+    0.9
+   ],
+   "life": 30,
+   "color": "#120814",
+   "brightness": 0.6,
+   "blend": "translucent"
+  }
+ ]
+}

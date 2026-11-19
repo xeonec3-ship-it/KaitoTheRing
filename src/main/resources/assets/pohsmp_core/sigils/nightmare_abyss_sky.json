@@ -1,0 +1,87 @@
+{
+ "comment": "«Пробуждение не наступит»: печать-«небо» (с 4 с ролика), лицом вниз — спираль глаз; на 9 с глаза «открываются» (вспышка), на 11 с гаснет вместе с миром. Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 14.0,
+ "color": "#7A1040",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "abyss",
+   "type": "disc",
+   "texture": "nightmare_abyss",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.7,
+   "appear": {
+    "delay": 0,
+    "duration": 50,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270
+   },
+   "rotation": {
+    "speed": -0.6
+   }
+  },
+  {
+   "id": "bleed",
+   "type": "disc",
+   "texture": "nightmare_abyss",
+   "radius": 1.03,
+   "heightOffset": 0.006,
+   "color": "#7A1040",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 30,
+    "duration": 30,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "pulse": {
+    "amp": 0.35,
+    "period": 37
+   }
+  },
+  {
+   "id": "smear",
+   "type": "disc",
+   "texture": "nightmare_abyss",
+   "radius": 1.075,
+   "heightOffset": 0.004,
+   "color": "#1A0A16",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 34,
+    "duration": 36,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1.0
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 53
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

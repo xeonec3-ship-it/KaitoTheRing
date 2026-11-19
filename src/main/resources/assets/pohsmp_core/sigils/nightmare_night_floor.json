@@ -1,0 +1,61 @@
+{
+ "comment": "«Ночь без рассвета», зона r24 (2 мин): огромная бледная печать по земле — луна и кольцо рук, тянущихся к центру; почти прозрачная, медленно вращается (у врагов внутри; заклинателю — тоже, как границу). Сгенерировано tools/gen_nightmare_fx.py.",
+ "size": 24.0,
+ "color": "#7A1040",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "hands",
+   "type": "disc",
+   "texture": "nightmare_hands_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutSine",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -0.4
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 80
+   }
+  },
+  {
+   "id": "moon",
+   "type": "disc",
+   "texture": "nightmare_moon",
+   "radius": 0.45,
+   "heightOffset": 0.004,
+   "brightness": 0.25,
+   "appear": {
+    "delay": 10,
+    "duration": 40,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 0.3
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

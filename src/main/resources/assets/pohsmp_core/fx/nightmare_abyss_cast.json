@@ -1,0 +1,326 @@
+{
+ "comment": "«Пробуждение не наступит», каст 12 с = 240 тиков + хвост 20 (caster; видят все в r64 — это ролик). Шкала = ролик (ТЗ T25, «Ролик») и анимация pohsmp_nightmare_abyss_cast: 0–2 печать и чернила из трещин; 2–4 лужа до r16, капли вверх, ленты; 4–6 небо гаснет, печать-небо, тени-руки; 6–8 стена чернил r22–30, воронка; 8–10 глаза в чернилах, 9 с — удар сердца (облик мага → nm_dread у жертв); 10–11.8 тьма и тишина; 11.8 (236 тик) — вспышка, волна до r64, у всех жертв — стадия 3. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 260,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "nightmare_abyss_ground",
+   "until": 244
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "duration": 80,
+   "texture": "slash_crack",
+   "radius": 6,
+   "grow": 40,
+   "blend": "translucent",
+   "color": "#07030B",
+   "rotation": 20
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "duration": 236,
+   "follow": false,
+   "texture": "mote_ink",
+   "count": 4000,
+   "rate": 1.2,
+   "area": 5,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.14,
+    0.05
+   ],
+   "life": 26,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "duration": 236,
+   "follow": false,
+   "texture": "glow",
+   "count": 4000,
+   "rate": 0.6,
+   "area": 4.0,
+   "speed": 0.004,
+   "gravity": -0.0008,
+   "size": [
+    0.5,
+    0.9
+   ],
+   "life": 30,
+   "color": "#120814",
+   "brightness": 0.6,
+   "blend": "translucent"
+  },
+  {
+   "type": "decal",
+   "delay": 40,
+   "at": "caster+0,0.07,0",
+   "duration": 200,
+   "texture": "nightmare_ink_flood",
+   "radius": 16,
+   "grow": 50,
+   "blend": "translucent",
+   "color": "#0A0610",
+   "spin": 0.15
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "caster+0,0.3,0",
+   "duration": 80,
+   "texture": "mote_ink",
+   "count": 1200,
+   "rate": 8,
+   "area": 12,
+   "speed": 0.0,
+   "gravity": -0.02,
+   "size": [
+    0.18,
+    0.06
+   ],
+   "life": 40,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "ribbon",
+   "delay": 40,
+   "at": "caster+0,0.2,0",
+   "duration": 120,
+   "width": 0.5,
+   "length": 26,
+   "fade": 1.2,
+   "color": "#07030B",
+   "texture": "strip_soft",
+   "orbit": {
+    "radius": 4,
+    "speed": 5,
+    "rise": 1.2,
+    "risePeriod": 40,
+    "climb": 2.2
+   },
+   "count": 6
+  },
+  {
+   "type": "sigil",
+   "delay": 80,
+   "at": "caster+0,24,0",
+   "id": "nightmare_abyss_sky",
+   "until": 220
+  },
+  {
+   "type": "tint",
+   "delay": 80,
+   "at": "caster",
+   "duration": 160,
+   "radius": 64,
+   "color": "#0A0206",
+   "strength": 0.55,
+   "in": {
+    "duration": 40,
+    "easing": "easeInSine"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 80,
+   "at": "caster+0,0.09,0",
+   "duration": 140,
+   "texture": "nightmare_shadow_reach",
+   "radius": 12,
+   "grow": 30,
+   "spin": 0.6,
+   "blend": "translucent",
+   "color": "#050208"
+  },
+  {
+   "type": "curtain",
+   "delay": 120,
+   "at": "caster",
+   "duration": 100,
+   "count": 120,
+   "radius": [
+    22,
+    30
+   ],
+   "height": [
+    10,
+    40
+   ],
+   "grow": 40,
+   "width": [
+    1.2,
+    2.6
+   ],
+   "brightness": [
+    0.8,
+    1.0
+   ],
+   "texture": "beam_fade",
+   "color": "#07030B",
+   "fromTop": false
+  },
+  {
+   "type": "vortex",
+   "delay": 120,
+   "at": "caster+0,0.2,0",
+   "duration": 80,
+   "radius": 10,
+   "height": 12,
+   "arms": 6,
+   "speed": 6,
+   "pull": 0.3,
+   "texture": "mote_ink",
+   "color": "#07030B",
+   "width": 0.6,
+   "particles": 200,
+   "life": 40,
+   "size": 0.2
+  },
+  {
+   "type": "wave",
+   "delay": 120,
+   "at": "caster+0,1,0",
+   "duration": 40,
+   "shape": "sphere",
+   "radius": 8,
+   "rim": 1.0,
+   "color": "#07030B",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 160,
+   "at": "caster+0,6,0",
+   "duration": 40,
+   "texture": "mote_eye_n",
+   "count": 160,
+   "rate": 4,
+   "area": 20,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "size": [
+    0.5,
+    0.0
+   ],
+   "life": 36,
+   "color": "#E0285A",
+   "glow": 0.8
+  },
+  {
+   "type": "flash",
+   "delay": 180,
+   "at": "caster+0,1.6,0",
+   "duration": 10,
+   "size": 5,
+   "color": "#7A1040",
+   "brightness": 0.9,
+   "screen": 0.35
+  },
+  {
+   "type": "wave",
+   "delay": 180,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 20,
+   "color": "@primary",
+   "brightness": 0.8
+  },
+  {
+   "type": "tint",
+   "delay": 200,
+   "at": "caster",
+   "duration": 36,
+   "radius": 64,
+   "color": "#000000",
+   "strength": 1.0,
+   "in": {
+    "duration": 12,
+    "easing": "easeInCubic"
+   },
+   "out": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 220,
+   "at": "caster+0,1.6,0",
+   "duration": 6,
+   "size": 2.0,
+   "color": "#8A1028",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 236,
+   "at": "caster+0,1.6,0",
+   "duration": 10,
+   "size": 6,
+   "color": "#B01A4A",
+   "brightness": 1.0,
+   "screen": 0.6,
+   "rays": 8
+  },
+  {
+   "type": "wave",
+   "delay": 236,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 64,
+   "thickness": 6,
+   "color": "@primary",
+   "brightness": 0.9,
+   "followTerrain": true
+  },
+  {
+   "type": "wave",
+   "delay": 236,
+   "at": "caster+0,1,0",
+   "duration": 24,
+   "shape": "sphere",
+   "radius": 24,
+   "rim": 1.2,
+   "color": "#07030B",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 236,
+   "at": "caster+0,1.4,0",
+   "duration": 3,
+   "texture": "mote_ink",
+   "count": 80,
+   "rate": 30,
+   "spread": 1.0,
+   "speed": 0.35,
+   "gravity": 0.01,
+   "size": [
+    0.3,
+    0.1
+   ],
+   "life": 30,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

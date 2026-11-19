@@ -1,0 +1,63 @@
+{
+ "comment": "Каст обычной магии школы «Кошмары» (PohSpell.onCast): знак под магом, тьма вздрагивает (тёмная сфера), капли чернил всплывают и опадают, тихий багровый отсвет. Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 36,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "school_nightmare",
+   "follow": true
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 1.6,
+   "rim": 0.8,
+   "color": "#07030B",
+   "brightness": 0.8
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 3.0,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 8,
+   "size": 1.4,
+   "color": "#7A1040",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,0.15,0",
+   "duration": 20,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 16,
+   "rate": 1.2,
+   "area": 1.4,
+   "speed": 0.05,
+   "gravity": 0.004,
+   "size": [
+    0.16,
+    0.06
+   ],
+   "life": 20,
+   "color": "#07030B",
+   "blend": "translucent"
+  }
+ ]
+}

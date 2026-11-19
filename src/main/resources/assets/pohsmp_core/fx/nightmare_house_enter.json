@@ -1,0 +1,53 @@
+{
+ "comment": "«Дом»: вход в коридор — ТОЛЬКО ЖЕРТВЕ (follow, 30 тиков): мир тонет в черноте за 10 тиков (tint 1.0), падение (код: лёгкий крен/опускание камеры), из темноты проступает коридор (код включает модули на 20 тике). Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 30,
+   "radius": 64,
+   "color": "#000000",
+   "strength": 1.0,
+   "in": {
+    "duration": 10,
+    "easing": "easeInCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.5,0",
+   "duration": 10,
+   "follow": true,
+   "texture": "mote_ink",
+   "count": 60,
+   "rate": 6,
+   "area": 3,
+   "speed": 0.0,
+   "gravity": 0.03,
+   "size": [
+    0.3,
+    0.2
+   ],
+   "life": 14,
+   "color": "#07030B",
+   "blend": "translucent"
+  },
+  {
+   "type": "flash",
+   "delay": 18,
+   "at": "caster+0,1.4,0",
+   "duration": 6,
+   "size": 2.0,
+   "color": "#7A1040",
+   "brightness": 0.4
+  }
+ ]
+}

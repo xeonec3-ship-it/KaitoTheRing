@@ -1,0 +1,14 @@
+{
+ "comment": "«Дом, которого нет»: печать под заклинателем на время каста — играть, только если SchoolSeals.shown(caster) == false (иначе две печати). Сгенерировано tools/gen_nightmare_fx.py.",
+ "style": "nightmare",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "nightmare_house_ground",
+   "follow": true
+  }
+ ]
+}

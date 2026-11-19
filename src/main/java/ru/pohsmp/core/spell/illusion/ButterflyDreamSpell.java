@@ -135,12 +135,14 @@ public class ButterflyDreamSpell extends IllusionBase {
         c.age++;
         Vec3 a = caster.position();
         switch (c.age) {
-            case 40 -> sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 1.5f, 1.6f);
-            case 86 -> sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 2f, 0.6f);
+            // 19.11 «Небесная бабочка»: no glass sounds - soft chimes, wing strokes at 180 and 234
+            case 40 -> sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.5f, 1.6f);
+            case 86 -> sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.9f);
             case 160 -> sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 3f, 0.5f);
-            case 180 -> {
-                Cutscene.flash(sl, c.watchers, 16, Reg.ILLUSION_COLOR);
-                sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 3f, 0.4f);
+            case 180, 234 -> {
+                if (c.age == 180) Cutscene.flash(sl, c.watchers, 16, Reg.ILLUSION_COLOR);
+                sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.ELYTRA_FLYING, SoundSource.PLAYERS, 1.2f, 0.5f);
+                sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2.5f, 0.6f);
             }
             case 236 -> Cutscene.flash(sl, c.watchers, 14, 0xFFFFFF);
             default -> {}
@@ -188,7 +190,7 @@ public class ButterflyDreamSpell extends IllusionBase {
     private static final double MIN_FROM_CASTER = 12;
     /** Rework 19.11: «шёпот сна» every WHISPER_MIN..MAX ticks, WHISPERS lines; a blooming step every STEP blocks walked. */
     private static final int WHISPER_MIN = 500, WHISPER_MAX = 900, WHISPERS = 10;
-    private static final double STEP = 1.3;
+    private static final double STEP = 0.9;
 
     private static final class Dream {
         final LivingEntity caster;
@@ -209,6 +211,7 @@ public class ButterflyDreamSpell extends IllusionBase {
         final Map<UUID, Long> nextWhisper = new HashMap<>();
         final Map<UUID, Integer> cocoon = new HashMap<>();
         final Map<UUID, Vec3> lastStep = new HashMap<>();
+        int step;
         /** victim -> its dream wounds (the butterflies around it, up to 12) */
         final Map<UUID, Integer> wounds = new HashMap<>();
         final int tag;
@@ -256,9 +259,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             d.lost.put(id, 0.0);
             d.nextWhisper.put(id, now + 100 + sl.random.nextInt(200));
             d.lastStep.put(id, v.position());
-            // the cocoon: a ring of butterflies and a small Heavenly butterfly over the sleeper, for everyone but it
-            int cf = fx(sl, Fx.fx("illusion_dream_cocoon").at(v.position()).caster(v).attach(v).duration(t).not(v), "illusion_dream_cocoon");
-            if (cf >= 0) d.cocoon.put(id, cf);
+            cocoon(d, v, t);   // a ring of butterflies and a small Heavenly butterfly over the sleeper, for everyone but it
         }
         if (d.victims.isEmpty()) d.wakeAll = now + ticks;
         sl.playSound(null, caster.getX(), caster.getY() + 1, caster.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 3f, 0.5f);
@@ -278,25 +279,17 @@ public class ButterflyDreamSpell extends IllusionBase {
 
     /** A glowing flower where v stepped: it blooms and sheds its petals in a few seconds (v's dream only). */
     private static void bloom(Dream d, ServerPlayer v) {
-        Vec3 at = v.position();
-        if (fx(d.sl, Fx.fx("illusion_dream_bloom").at(at).caster(v).only(v), "illusion_dream_bloom") >= 0) return;
-        d.sl.sendParticles(v, net.minecraft.core.particles.ParticleTypes.CHERRY_LEAVES, false, at.x, at.y + 0.15, at.z, 3, 0.2, 0.05, 0.2, 0);
-        d.sl.sendParticles(v, new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(1f, 0.82f, 0.95f), 0.8f), false,
-                at.x, at.y + 0.1, at.z, 4, 0.18, 0.02, 0.18, 0);
+        // the feet take turns: 0.16 blocks to the side of the centre (visual letter 19.11)
+        Vec3 side = Vec3.directionFromRotation(0, v.getYRot() + 90).scale((d.step ^= 1) == 0 ? 0.16 : -0.16);
+        fx(d.sl, Fx.fx("illusion_dream_bloom").at(v.position().add(side)).caster(v).only(v), "illusion_dream_bloom");
     }
 
-    /** The cocoon without its fx: a turning ring of lilac and gold motes over the sleeper, for everyone but it. */
-    private static void cocoonMotes(Dream d, ServerPlayer v, long now) {
-        double y = v.getY() + v.getBbHeight() + 0.5, a0 = now * 0.12;
-        for (ServerPlayer o : d.sl.players()) {
-            if (o == v || o.distanceToSqr(v) > 64 * 64) continue;
-            for (int k = 0; k < 6; k++) {
-                double a = a0 + k * Math.PI / 3;
-                var col = k % 2 == 0 ? new org.joml.Vector3f(0.78f, 0.6f, 1f) : new org.joml.Vector3f(1f, 0.85f, 0.45f);
-                d.sl.sendParticles(o, new net.minecraft.core.particles.DustParticleOptions(col, 0.7f), false,
-                        v.getX() + Math.cos(a) * 0.8, y + Math.sin(a * 2) * 0.1, v.getZ() + Math.sin(a) * 0.8, 1, 0, 0, 0, 0);
-            }
-        }
+    /** The cocoon over v (everyone but v sees it) from now till the dream ends for it, its «death» or ticks. */
+    private static void cocoon(Dream d, ServerPlayer v, int ticks) {
+        Integer old = d.cocoon.remove(v.getUUID());
+        if (old != null) Fx.stop(d.sl, old, "");
+        int cf = fx(d.sl, Fx.fx("illusion_dream_cocoon").at(v.position()).caster(v).attach(v).duration(ticks).not(v), "illusion_dream_cocoon");
+        if (cf >= 0) d.cocoon.put(v.getUUID(), cf);
     }
 
     /** A standing place min..max blocks from around (same height +-4), or null. */
@@ -391,6 +384,8 @@ public class ButterflyDreamSpell extends IllusionBase {
         fx(d.sl, Fx.fx("illusion_dream_death").at(v.position()).caster(v).only(v), "illusion_dream_death");
         Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.DREAM_DEATH, v.getId(), DEATH_SCREEN, 0, null, "", 0, 0, 0, 0, 0));
         v.playNotifySound(SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 1f, 0.5f);
+        Integer cf = d.cocoon.remove(id);   // the cocoon goes while it is moved, and comes back at the new place
+        if (cf != null) Fx.stop(d.sl, cf, "");
         Vec3 to = respawnSpot(d, v);
         int[] t = {0};
         ru.pohsmp.core.spell.Tasks.add(() -> {
@@ -406,6 +401,8 @@ public class ButterflyDreamSpell extends IllusionBase {
             fx(d.sl, Fx.fx("illusion_dream_respawn").at(to).caster(v).attach(v).only(v), "illusion_dream_respawn");
             fakeHp(v, 0);
             d.lastStep.put(id, to);
+            Long end = d.victims.get(id);
+            if (end != null) cocoon(d, v, (int) Math.max(1, end - Illusions.now()));
             return false;
         });
     }
@@ -453,7 +450,7 @@ public class ButterflyDreamSpell extends IllusionBase {
     /** The waking (owner 19.11: «это был просто сон»): only the look of it - the shards fly into v and break; nothing is dealt. */
     private static void wakeFx(Dream d, ServerPlayer v) {
         fx(d.sl, Fx.fx("illusion_butterfly_wake_hit").at(v.position()).caster(d.caster).target(v).attach(v), "illusion_butterfly_wake_hit");
-        d.sl.playSound(null, v.getX(), v.getY() + 1, v.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.2f, 1.3f);
+        d.sl.playSound(null, v.getX(), v.getY() + 1, v.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.2f, 1.3f);
         v.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.butterfly_dream.wake")
                 .withStyle(s -> s.withColor(Reg.ILLUSION_COLOR)), true);
     }
@@ -470,11 +467,10 @@ public class ButterflyDreamSpell extends IllusionBase {
             d.nextWhisper.put(id, now + WHISPER_MIN + d.sl.random.nextInt(WHISPER_MAX - WHISPER_MIN));
         }
         Vec3 last = d.lastStep.get(id);
-        if (v.onGround() && (last == null || last.distanceToSqr(v.position()) >= STEP * STEP)) {
+        if (v.onGround() && !v.isInWater() && (last == null || last.distanceToSqr(v.position()) >= STEP * STEP)) {
             d.lastStep.put(id, v.position());
             bloom(d, v);
         }
-        if (now % 4 == 0 && !d.cocoon.containsKey(id)) cocoonMotes(d, v, now);
     }
 
     /** Hits by the caster, its allies or its copies (the illusion damage type has the caster as its source) are dream hits. */
@@ -553,9 +549,9 @@ public class ButterflyDreamSpell extends IllusionBase {
                             new IlluMsg(IlluMsg.ANIM, cp.getId(), 0, 0, null, "pohsmp_illusion_butterfly_wake", 0, 0, 0, 0, 0));
                 }
                 if (now == d.wakeAll - WAKE_SCENE) wakeScene(d, now);
-                if (now == d.wakeAll) {   // the glass breaks, loud over the zone
-                    d.sl.playSound(null, d.caster.getX(), d.caster.getY() + 1, d.caster.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 6f, 0.5f);
-                    d.sl.playSound(null, d.caster.getX(), d.caster.getY() + 1, d.caster.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 6f, 0.6f);
+                if (now == d.wakeAll) {   // the dawn over the zone (19.11: a resonance and a quiet bell instead of breaking glass)
+                    d.sl.playSound(null, d.caster.getX(), d.caster.getY() + 1, d.caster.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 6f, 0.8f);
+                    d.sl.playSound(null, d.caster.getX(), d.caster.getY() + 1, d.caster.getZ(), SoundEvents.BELL_RESONATE, SoundSource.PLAYERS, 1.5f, 1.2f);
                 }
                 for (var vi = d.victims.entrySet().iterator(); vi.hasNext(); ) {
                     var en = vi.next();

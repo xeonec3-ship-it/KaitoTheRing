@@ -92,7 +92,10 @@ public final class MeshDraw {
             JsonObject mv = r.move;
             double k = Easing.byName(str(mv, "easing", "easeOutCubic")).apply(FxDraw.clamp01((t - num(mv, "delay", 0)) / Math.max(1, num(mv, "duration", 1))));
             JsonArray from = mv.has("from") ? mv.getAsJsonArray("from") : null;
-            if (from != null && from.size() >= 3) {
+            if (mv.has("keys") && mv.get("keys").isJsonArray()) {   // 19.11: the offset by keys (its first key is the old `from`)
+                Vector3f d = moveKeys(mv.getAsJsonArray("keys"), t);
+                o = o.add(right.scale(d.x * r.scale)).add(up.scale(d.y * r.scale)).add(fwd.scale(d.z * r.scale));
+            } else if (from != null && from.size() >= 3) {
                 double q = (1 - k) * r.scale;
                 o = o.add(right.scale(from.get(0).getAsDouble() * q)).add(up.scale(from.get(1).getAsDouble() * q)).add(fwd.scale(from.get(2).getAsDouble() * q));
             }
@@ -149,6 +152,7 @@ public final class MeshDraw {
                 case "polygon" -> polygon(f, ax, p, t, e, lin, col, a);
                 case "disc" -> disc(f, ax, p, t, e, lin, col, a);
                 case "boxes" -> boxes(f, ax, p, r.style, t >= delay ? e : 0, a, hit, r.hits, t);
+                case "quad" -> quad(f, ax, p, t, p.has("appear") ? FxDraw.clamp01(e) : 1, r.style, a);
                 default -> {}
             }
         }
@@ -416,6 +420,65 @@ public final class MeshDraw {
         }
         if (sweep && e > 0 && e < 1)   // the light front sweeping down (or up: the crystal grows from the ground)
             FxDraw.line(add, f, ax.at(-6, front, 0), ax.at(6, front, 0), 0.25 * ax.s, 0xFFFFFF, 0.8 * a);
+    }
+
+    /**
+     * 19.11 (T22 «Небесная бабочка», docs/fx.md): a textured plane - 4 `corners` (model coordinates, uv (0,0) (1,0) (1,1) (0,1), v down as in
+     * the PNG), `blend` translucent/additive, `opacity`, `doubleSided` (both sides are drawn anyway: the fx render types do not cull),
+     * `hinge {origin, axis, keys}` - turned about any axis through origin by keys, `pulse [strength, period]`.
+     */
+    private static void quad(Frame f, Axes ax, JsonObject p, double t, double e, FxStyle style, double a) {
+        JsonArray cs = p.has("corners") ? p.getAsJsonArray("corners") : null;
+        if (cs == null || cs.size() < 4) return;
+        double al = a * e * num(p, "opacity", 1);
+        if (p.has("pulse") && p.get("pulse").isJsonArray()) {
+            JsonArray pu = p.getAsJsonArray("pulse");
+            double k = pu.get(0).getAsDouble(), per = pu.size() > 1 ? Math.max(1, pu.get(1).getAsDouble()) : 40;
+            al *= 1 + k * Math.sin(Math.PI * 2 * t / per);
+        }
+        if (al <= 1e-3) return;
+        Quaternionf q = null;
+        Vector3f org = null;
+        if (p.has("hinge") && p.get("hinge").isJsonObject()) {
+            JsonObject h = p.getAsJsonObject("hinge");
+            org = h.has("origin") ? vec(h.getAsJsonArray("origin")) : new Vector3f();
+            Vector3f axis = h.has("axis") ? vec(h.getAsJsonArray("axis")) : new Vector3f(0, 0, 1);
+            if (axis.lengthSquared() < 1e-8) axis.set(0, 0, 1);
+            axis.normalize();
+            double ang = h.has("keys") ? hingeKeys(h.getAsJsonArray("keys"), t) : num(h, "angle", 0);
+            q = new Quaternionf().rotationAxis((float) Math.toRadians(ang), axis);
+        }
+        Vec3[] w = new Vec3[4];
+        for (int i = 0; i < 4; i++) {
+            Vector3f v = vec(cs.get(i).getAsJsonArray());
+            if (q != null) q.transform(v.sub(org)).add(org);
+            w[i] = ax.at(v);
+        }
+        int col = p.has("color") ? style.color(p.get("color").getAsString()) : 0xFFFFFF;
+        var tex = FxDraw.tex(str(p, "texture", "glow"));
+        boolean add = "additive".equals(str(p, "blend", "translucent"));
+        VertexConsumer vc = add ? f.add(tex) : f.trans(tex);
+        double aa = add ? al : Math.min(1, al);
+        FxDraw.vert(vc, f, w[0], 0, 0, col, aa);
+        FxDraw.vert(vc, f, w[1], 1, 0, col, aa);
+        FxDraw.vert(vc, f, w[2], 1, 1, col, aa);
+        FxDraw.vert(vc, f, w[3], 0, 1, col, aa);
+    }
+
+    /** mesh.move.keys: [[tick, [x, y, z], easing], …] - as hingeKeys, per axis. */
+    static Vector3f moveKeys(JsonArray keys, double t) {
+        if (keys.size() == 0) return new Vector3f();
+        JsonArray first = keys.get(0).getAsJsonArray();
+        if (t <= first.get(0).getAsDouble()) return vec(first.get(1).getAsJsonArray());
+        for (int i = 1; i < keys.size(); i++) {
+            JsonArray a = keys.get(i - 1).getAsJsonArray(), b = keys.get(i).getAsJsonArray();
+            double t0 = a.get(0).getAsDouble(), t1 = b.get(0).getAsDouble();
+            if (t > t1) continue;
+            String ease = b.size() > 2 && !b.get(2).isJsonNull() ? b.get(2).getAsString() : "easeInOutSine";
+            float k = (float) Easing.byName(ease).apply(FxDraw.clamp01((t - t0) / Math.max(1e-6, t1 - t0)));
+            return vec(a.get(1).getAsJsonArray()).lerp(vec(b.get(1).getAsJsonArray()), k);
+        }
+        return vec(keys.get(keys.size() - 1).getAsJsonArray().get(1).getAsJsonArray());
     }
 
     private static Vector3f vec(JsonArray a) {

@@ -59,7 +59,7 @@ public final class DreamScreen {
     private static final ResourceLocation RIPPLE = tex("illusion_dream_ripple"), DEATH = tex("illusion_dream_death"), GRID = tex("illusion_wake_grid"),
             SHARDS = tex("illusion_wake_shards"), WOUND = tex("illusion_wound_butterfly");
 
-    private static final int FOLD_FROM = 2, FOLD_TO = 8, RIPPLE_TICKS = 10, BREAK = 34, WAKE_END = 50, DEATH_CAM = 24;
+    private static final int FOLD_FROM = 2, FOLD_TO = 8, RIPPLE_TICKS = 10, BREAK = 34, WAKE_END = 52, DEATH_CAM = 24;
 
     private static long enterAt = -1, exitAt = -1, deathAt = -1, wakeAt = -1;
     private static int deathLen;
@@ -195,11 +195,7 @@ public final class DreamScreen {
             int half = Math.round(Math.abs(s) * w / 2f), cx = w / 2;
             if (half > 0) copy(temp.frameBufferId, main.frameBufferId, w, h, s > 0 ? cx - half : cx + half, s > 0 ? cx + half : cx - half);
         }
-        if (wakeAt >= 0 && since(wakeAt, pt) >= BREAK && snap == null) {
-            snap = fit(null, main);
-            copy(main.frameBufferId, snap.frameBufferId, w, h, 0, w);
-        }
-        main.bindWrite(true);
+        main.bindWrite(true);   // 19.11: no frame kept for glass shards any more (the waking is a dawn flash)
     }
 
     // ---------------------------------------------------------------- the pearl sky (ClientLevelMixin) and fog
@@ -214,16 +210,16 @@ public final class DreamScreen {
 
     public static Vec3 sky(Vec3 c, float pt) {
         float k = pearl(pt);
-        return k <= 0 ? c : c.lerp(new Vec3(0xA8 / 255.0, 0x98 / 255.0, 0xDC / 255.0), k);
+        return k <= 0 ? c : c.lerp(new Vec3(0xB7 / 255.0, 0xB4 / 255.0, 0xEC / 255.0), k);   // 19.11: the dawn sky (zenith)
     }
 
     @SubscribeEvent
     public static void onFog(ViewportEvent.ComputeFogColor e) {
         float k = pearl((float) e.getPartialTick());
         if (k <= 0) return;
-        e.setRed(Mth.lerp(k, e.getRed(), 0xE2 / 255f));
+        e.setRed(Mth.lerp(k, e.getRed(), 0xF7 / 255f));   // 19.11: the dawn fog
         e.setGreen(Mth.lerp(k, e.getGreen(), 0xD6 / 255f));
-        e.setBlue(Mth.lerp(k, e.getBlue(), 0xF0 / 255f));
+        e.setBlue(Mth.lerp(k, e.getBlue(), 0xDC / 255f));
     }
 
     // ---------------------------------------------------------------- over everything
@@ -277,7 +273,29 @@ public final class DreamScreen {
         if (a > 0) g.fill(0, 0, w, h, ((int) (Mth.clamp(a, 0, 1) * 255) << 24) | 0xFFFFFF);
     }
 
+    private static final ResourceLocation DAWN = tex("illusion_dawn_flash");
+
+    /**
+     * 19.11 «Небесная бабочка»: no glass any more - at the waking's break (34) a soft dawn flash, additive, centred at (0.5, 0.46),
+     * stretched by the larger side: alpha 0 -> 0.6 by 36, held to 38, gone by 52 (easeOutSine).
+     */
     private static void wakeOverlay(GuiGraphics g, int w, int h, float t) {
+        if (t < BREAK) return;
+        float a = t < BREAK + 2 ? 0.6f * (t - BREAK) / 2 : t < BREAK + 4 ? 0.6f
+                : 0.6f * (1 - (float) Math.sin(Math.PI / 2 * Mth.clamp((t - BREAK - 4) / 14f, 0, 1)));
+        if (a <= 0.003f) return;
+        float size = Math.max(w, h);
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(com.mojang.blaze3d.platform.GlStateManager.SourceFactor.SRC_ALPHA, com.mojang.blaze3d.platform.GlStateManager.DestFactor.ONE);
+        RenderSystem.setShaderColor(1, 1, 1, a);
+        blit(g, DAWN, w * 0.5f - size / 2, h * 0.46f - size / 2, size, size);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.defaultBlendFunc();
+    }
+
+    /** The old glass waking (cracks and falling shards): no longer called. */
+    @SuppressWarnings("unused")
+    private static void glassWakeOverlay(GuiGraphics g, int w, int h, float t) {
         Shards sh = shards();
         float ix = sh == null ? 0.5f : sh.ix, iy = sh == null ? 0.46f : sh.iy;
         if (t < BREAK) {   // the cracks run out from the blow

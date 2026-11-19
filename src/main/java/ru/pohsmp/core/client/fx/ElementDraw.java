@@ -71,7 +71,7 @@ public final class ElementDraw {
             case "wave" -> wave(f, el, te, L, at, s, col, a);
             case "beam" -> beam(f, el, te, at, target(el, st, ctx, at), s, col, a);
             case "beam_rain" -> beamRain(f, run, el, st, te, L, at, s, col, a, seed);
-            case "sprites" -> sprites(f, run, el, te, L, at, s, col, a, seed);
+            case "sprites" -> sprites(f, run, el, te, L, at, s, col, a, seed, ctx);
             case "curtain" -> curtain(f, el, te, at, s, col, a, seed);
             case "column" -> column(f, el, te, at, s, col, a);
             case "tint" -> tint(el, at, col, a);
@@ -430,8 +430,20 @@ public final class ElementDraw {
 
     // ---------------------------------------------------------------- sprites
 
-    private static void sprites(Frame f, FxRun run, Element el, double te, double L, Vec3 at, double s, int col, double a, long seed) {
+    private static void sprites(Frame f, FxRun run, Element el, double te, double L, Vec3 at, double s, int col, double a, long seed, FxDef.Context ctx) {
         JsonObject p = el.params();
+        // 19.11 (T22 «Небесная бабочка», docs/fx.md): wrap - world-fixed field folded into a cube ±R round `at`; avoid - parting round
+        // the caster; path - each particle flows along a Catmull-Rom curve through anchors over its life
+        double wrap = el.num("wrap", 0) * s;
+        JsonObject avoid = p.has("avoid") && p.get("avoid").isJsonObject() ? p.getAsJsonObject("avoid") : null;
+        Vec3[] path = null;
+        if (p.has("path") && p.get("path").isJsonArray() && p.getAsJsonArray("path").size() >= 2) {
+            var arr = p.getAsJsonArray("path");
+            path = new Vec3[arr.size()];
+            for (int i = 0; i < path.length; i++) path[i] = FxRun.w(FxDef.Anchor.parse(arr.get(i).getAsString()).resolve(ctx));
+        }
+        double width = el.num("width", 0) * s;
+        Vec3 avoidAt = avoid != null && run.caster != null && run.caster.isAlive() ? run.caster.getPosition(f.pt()).add(0, 1, 0) : null;
         int count = (int) el.num("count", 30);
         double rate = el.num("rate", 0), life = Math.max(1, el.num("life", 40));
         double spread = el.num("spread", 0) * s, area = el.num("area", 0) * s, speed = el.num("speed", 0.03) * s;
@@ -484,8 +496,24 @@ public final class ElementDraw {
                 v = dir.scale(cz).add(da.scale(sz * Math.cos(ph))).add(db.scale(sz * Math.sin(ph))).scale(speed * (0.5 + r.nextDouble()));
             } else v = unit(r).scale(speed * (0.5 + r.nextDouble()));
             double phase = r.nextDouble() * Math.PI * 2;
-            Vec3 pos = p0.add(v.scale(age)).add(0, -0.5 * grav * age * age, 0);
+            Vec3 pos;
+            if (path != null) {   // along the curve, a cross offset narrowing towards the end
+                double u = Math.min(1, age / life);
+                Vec3 side = unit(r).scale(width * (1 - 0.75 * u) * Math.sqrt(r.nextDouble()));
+                pos = catmull(path, u).add(side).add(0, -0.5 * grav * age * age, 0);
+            } else if (wrap > 0) {   // a world-fixed field: the particle keeps its place, folded into the cube round the anchor
+                Vec3 rel = new Vec3((r.nextDouble() * 2 - 1) * wrap, (r.nextDouble() * 2 - 1) * wrap, (r.nextDouble() * 2 - 1) * wrap)
+                        .add(v.scale(age)).add(0, -0.5 * grav * age * age, 0);
+                pos = new Vec3(fold(rel.x, at.x, wrap), fold(rel.y, at.y, wrap), fold(rel.z, at.z, wrap));
+            } else pos = p0.add(v.scale(age)).add(0, -0.5 * grav * age * age, 0);
             if (sway > 0) pos = pos.add(Math.sin(age * 0.12 + phase) * sway * 0.5, 0, Math.cos(age * 0.09 + phase) * sway * 0.3);
+            if (avoidAt != null) {
+                double R = MeshDraw.num(avoid, "radius", 1.5), dx = pos.x - avoidAt.x, dz = pos.z - avoidAt.z, d = Math.sqrt(dx * dx + dz * dz);
+                if (d < R && Math.abs(pos.y - avoidAt.y) < R * 1.5) {
+                    double push = MeshDraw.num(avoid, "push", 1) * (1 - d / R) / Math.max(1e-3, d);
+                    pos = pos.add(dx * push, 0, dz * push);
+                }
+            }
             double k = age / life;
             double size = s0 + (s1 - s0) * k;
             double al = a * Math.min(1, age / 3) * (1 - k * k);
@@ -494,6 +522,22 @@ public final class ElementDraw {
             FxDraw.billboard(vc, f, pos, size, sy, rot, col, al);
             if (gl != null) FxDraw.billboard(gl, f, pos, size * 2.2, 0, col, al * glowK);
         }
+    }
+
+    /** The world coordinate congruent to x (mod 2R) that lies within ±R of c. */
+    private static double fold(double x, double c, double R) {
+        return c + Math.floorMod((long) Math.floor((x - c + R) * 1000), (long) (2 * R * 1000)) / 1000.0 - R;
+    }
+
+    /** Catmull-Rom through pts at u in 0..1 (ends repeated). */
+    private static Vec3 catmull(Vec3[] pts, double u) {
+        int n = pts.length - 1;
+        double x = Math.max(0, Math.min(1, u)) * n;
+        int i = Math.min(n - 1, (int) Math.floor(x));
+        double t = x - i, t2 = t * t, t3 = t2 * t;
+        Vec3 p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(n, i + 2)];
+        return p0.scale(-0.5 * t3 + t2 - 0.5 * t).add(p1.scale(1.5 * t3 - 2.5 * t2 + 1)).add(p2.scale(-1.5 * t3 + 2 * t2 + 0.5 * t))
+                .add(p3.scale(0.5 * t3 - 0.5 * t2));
     }
 
     private static Vec3 unit(SplittableRandom r) {

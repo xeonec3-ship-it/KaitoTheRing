@@ -1061,7 +1061,7 @@ public final class DownfallCut {
         if (releaseAt >= 0 && Minecraft.getInstance().level != null)   // T21: the bars go with the camera
             in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + pt - releaseAt) / RELEASE));
         int bar = (int) (h * 0.11 * in);
-        if (scene == BUTTERFLY) butterflyOverlay(g, w, h, t);
+        // 19.11 «Небесная бабочка»: no cracks over the butterfly scene any more (butterflyOverlay kept, not called)
         if (scene == ABYSS) abyssOverlay(g, w, h, t);
         g.fill(0, 0, w, bar, 0xFF000000);
         g.fill(0, h - bar, w, h, 0xFF000000);

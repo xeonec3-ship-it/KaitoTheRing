@@ -1,0 +1,280 @@
+package ru.pohsmp.core.ember;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import ru.pohsmp.core.DivineEvents;
+import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.spell.HigherSpell;
+import ru.pohsmp.core.spell.Tasks;
+import ru.pohsmp.core.spell.silent.SilentSpell;
+
+/**
+ * T14: the fire sword-whip (working name "Раскалённые угли"), handed out by an admin. Damage of a diamond sword, every hit sets
+ * the target on fire. Epic Fight swings it as a sword (data/pohsmp_core/capabilities/weapons/ember_blade.json).
+ * <ul>
+ * <li>Heat (0..100) grows with hits and cools down without them; the HUD shows it over the hotbar (client/EmberHud).</li>
+ * <li>Two hits in a row heat the blade into the whip form: each hit then also lashes a flaming arc 6 blocks long.
+ *     Without hits for {@link #COOL_TICKS} the fire goes out.</li>
+ * <li>Full heat + right click: special attack by form. Sword form: "Last Ember" — the blade into the ground, three waves of
+ *     fire pillars (3/5/7 blocks), the heat to zero, the blade cools down. Whip form: "Fire Vortex" — a full turn of the whip,
+ *     a ring of fire r 5 that burns and throws everyone out; the whip stays hot.</li>
+ * </ul>
+ * Looks (pillar and ring effects, HUD texture, swing animations) — the manager; here they are temporary particles and the
+ * fire_whip mesh of the Fire Whip spell.
+ */
+public class EmberBlade extends SwordItem {
+    public static final String NAME = "ember_blade";
+    public static final float MAX_HEAT = 100, HEAT_PER_HIT = 14, COOL_PER_SEC = 6;
+    public static final int HOT_AFTER = 2, COOL_TICKS = 100, IDLE_TICKS = 40;
+    static final double WHIP_LEN = 6, WHIP_HALF = Math.toRadians(50), VORTEX_R = 5;
+    static final double[] WAVES = {3, 5, 7};
+
+    private static final String HEAT = "Heat", STREAK = "Streak", LAST = "LastHit", HOT = "Hot";
+    private static boolean lashing;   // our own lash/special damage must not count as a new hit
+
+    public EmberBlade() {
+        super(Tiers.DIAMOND, 3, -2.4f, new Properties().stacksTo(1).fireResistant());
+    }
+
+    // ---------------------------------------------------------------- state in the stack (synced to the client with the stack)
+
+    public static float heat(ItemStack s) {
+        CompoundTag t = s.getTag();
+        return t == null ? 0 : t.getFloat(HEAT);
+    }
+
+    public static boolean hot(ItemStack s) {
+        CompoundTag t = s.getTag();
+        return t != null && t.getBoolean(HOT);
+    }
+
+    private static void set(ItemStack s, float heat, int streak, boolean hot, long last) {
+        CompoundTag t = s.getOrCreateTag();
+        t.putFloat(HEAT, Math.max(0, Math.min(MAX_HEAT, heat)));
+        t.putInt(STREAK, streak);
+        t.putBoolean(HOT, hot);
+        t.putLong(LAST, last);
+    }
+
+    /** Heat changes every second: the stack must not replay the re-equip animation each time. */
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || oldStack.getItem() != newStack.getItem();
+    }
+
+    @Override
+    public void inventoryTick(ItemStack s, Level level, Entity holder, int slot, boolean selected) {
+        if (level.isClientSide || level.getGameTime() % 20 != 0 || s.getTag() == null) return;
+        CompoundTag t = s.getTag();
+        long idle = level.getGameTime() - t.getLong(LAST);
+        float heat = t.getFloat(HEAT);
+        boolean hot = t.getBoolean(HOT);
+        int streak = t.getInt(STREAK);
+        if (idle < IDLE_TICKS || (heat <= 0 && !hot && streak == 0)) return;
+        heat -= COOL_PER_SEC;
+        if (idle >= COOL_TICKS) {
+            if (hot && level instanceof ServerLevel sl)
+                sl.playSound(null, holder.getX(), holder.getY(), holder.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5f, 1.4f);
+            hot = false;
+            streak = 0;
+        }
+        set(s, heat, streak, hot, t.getLong(LAST));
+    }
+
+    @Override
+    public void appendHoverText(ItemStack s, Level level, List<Component> tip, TooltipFlag flag) {
+        tip.add(Component.translatable("item.pohsmp_core.ember_blade.desc1").withStyle(st -> st.withColor(0xFF8A3A)));
+        tip.add(Component.translatable("item.pohsmp_core.ember_blade.desc2").withStyle(st -> st.withColor(0xB0B0B0)));
+        tip.add(Component.translatable("item.pohsmp_core.ember_blade.desc3").withStyle(st -> st.withColor(0xB0B0B0)));
+    }
+
+    // ---------------------------------------------------------------- hits
+
+    /** Any melee hit of the holder with this blade in the main hand (vanilla or an Epic Fight swing). */
+    public static final class Events {
+        @SubscribeEvent
+        public static void onHurt(LivingHurtEvent e) {
+            if (lashing || !(e.getSource().getEntity() instanceof Player p) || e.getSource().getDirectEntity() != p) return;
+            if (!(p.level() instanceof ServerLevel sl)) return;
+            ItemStack s = p.getMainHandItem();
+            if (!(s.getItem() instanceof EmberBlade)) return;
+            onHit(sl, p, s, e.getEntity());
+        }
+    }
+
+    private static void onHit(ServerLevel sl, Player p, ItemStack s, LivingEntity target) {
+        long now = sl.getGameTime();
+        CompoundTag t = s.getOrCreateTag();
+        int streak = now - t.getLong(LAST) <= COOL_TICKS ? t.getInt(STREAK) + 1 : 1;
+        boolean wasHot = t.getBoolean(HOT), hot = wasHot || streak >= HOT_AFTER;
+        float heat = t.getFloat(HEAT) + HEAT_PER_HIT;
+        target.setSecondsOnFire(hot ? 5 : 3);
+        set(s, heat, streak, hot, now);
+        if (hot && !wasHot) {   // the blade catches fire
+            sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.8f);
+            DivineEvents.particle(sl, ParticleTypes.FLAME, p.getX(), p.getY() + 1.2, p.getZ(), 20, 0.4, 0.05);
+        }
+        if (heat >= MAX_HEAT && t.getFloat(HEAT) < MAX_HEAT)
+            sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BLAZE_AMBIENT, SoundSource.PLAYERS, 0.8f, 1.6f);
+        if (wasHot) lash(sl, p, target);
+    }
+
+    private static float damage(Player p) {
+        return (float) p.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+    }
+
+    private static void hurt(ServerLevel sl, Player p, LivingEntity e, float dmg, int fire) {
+        lashing = true;
+        try {
+            e.hurt(sl.damageSources().playerAttack(p), dmg);
+        } finally {
+            lashing = false;
+        }
+        e.setSecondsOnFire(fire);
+    }
+
+    private static Vec3 flat(Vec3 v) {
+        Vec3 f = v.multiply(1, 0, 1);
+        return f.lengthSqr() < 1e-4 ? new Vec3(0, 0, 1) : f.normalize();
+    }
+
+    /** Whip form: the lash sweeps right to left over 4 ticks and burns everyone in the arc but the one already struck. */
+    private static void lash(ServerLevel sl, Player p, LivingEntity struck) {
+        Vec3 o = p.position().add(0, p.getBbHeight() * 0.6, 0), f = flat(p.getLookAngle());
+        double yaw = Math.atan2(f.z, f.x);
+        float dmg = damage(p) * 0.6f;
+        for (LivingEntity e : HigherSpell.around(sl, p.position(), WHIP_LEN + 1, e -> e != p && e != struck && !HigherSpell.friendly(p, e))) {
+            Vec3 d = e.position().subtract(p.position()).multiply(1, 0, 1);
+            double dist = d.length();
+            if (dist > WHIP_LEN + e.getBbWidth() / 2 || Math.abs(e.getY() - p.getY()) > 3) continue;
+            if (dist > 0.5 && Math.acos(Math.max(-1, Math.min(1, d.normalize().dot(f)))) > WHIP_HALF) continue;
+            hurt(sl, p, e, dmg, 4);
+        }
+        sl.playSound(null, o.x, o.y, o.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 0.7f, 1.3f);
+        sweep(sl, o, yaw, -WHIP_HALF, WHIP_HALF, 4, false);
+    }
+
+    /** Turns the fire_whip model from a0 to a1 (radians from the facing, + = left) over n ticks, flames along the arc. */
+    private static void sweep(ServerLevel sl, Vec3 o, double yaw, double a0, double a1, int n, boolean ring) {
+        int whip = Fx.play(sl, Fx.mesh("fire_whip").at(o).yaw(SilentSpell.yawOf(dir(yaw, a0))).duration(n + 15));
+        Tasks.add(new Tasks.Task() {
+            int age;
+
+            @Override
+            public boolean tick() {
+                age++;
+                double from = a0 + (a1 - a0) * (age - 1) / n, to = a0 + (a1 - a0) * age / n;
+                Fx.move(sl, whip, o, SilentSpell.yawOf(dir(yaw, to)));
+                double len = ring ? VORTEX_R : WHIP_LEN;
+                for (double a = from; Math.abs(a - from) <= Math.abs(to - from); a += Math.signum(a1 - a0) * 0.12)
+                    for (double r = 1.5; r <= len; r += 1.5) {
+                        double sag = ring ? 0 : Math.sin(r / len * Math.PI) * 0.6;
+                        Vec3 q = o.add(dir(yaw, a).scale(r));
+                        DivineEvents.particle(sl, ParticleTypes.FLAME, q.x, q.y - sag - (ring ? 0.8 : 0), q.z, 1, 0.03, 0.01);
+                    }
+                if (age >= n) {
+                    Fx.stop(sl, whip, "");
+                    return false;
+                }
+                return true;
+            }
+        });
+    }
+
+    private static Vec3 dir(double yaw, double a) {
+        return new Vec3(Math.cos(yaw + a), 0, Math.sin(yaw + a));
+    }
+
+    // ---------------------------------------------------------------- special attack (full heat + right click)
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
+        ItemStack s = p.getItemInHand(hand);
+        if (hand != InteractionHand.MAIN_HAND || heat(s) < MAX_HEAT) return InteractionResultHolder.pass(s);
+        if (level instanceof ServerLevel sl) {
+            if (hot(s)) fireVortex(sl, p, s);
+            else lastEmber(sl, p, s);
+            p.getCooldowns().addCooldown(this, 20);
+        }
+        return InteractionResultHolder.sidedSuccess(s, level.isClientSide);
+    }
+
+    /** Sword form: the blade into the ground, three waves of fire pillars spread out, then the blade cools down. */
+    private static void lastEmber(ServerLevel sl, Player p, ItemStack s) {
+        Vec3 c = p.position();
+        float dmg = damage(p) * 1.2f;
+        set(s, 0, 0, false, sl.getGameTime());
+        sl.playSound(null, c.x, c.y, c.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.6f, 0.6f);
+        Set<LivingEntity> burnt = new HashSet<>();
+        Tasks.add(new Tasks.Task() {
+            int age;
+
+            @Override
+            public boolean tick() {
+                int w = age / 8;
+                if (age % 8 == 0 && w < WAVES.length) {
+                    double r = WAVES[w];
+                    int n = (int) Math.round(Math.PI * 2 * r / 1.1);
+                    for (int i = 0; i < n; i++) {
+                        double a = i * Math.PI * 2 / n;
+                        double x = c.x + Math.cos(a) * r, z = c.z + Math.sin(a) * r;
+                        for (double h = 0; h < 3; h += 0.5)
+                            DivineEvents.particle(sl, ParticleTypes.FLAME, x, c.y + h, z, 2, 0.12, 0.02);
+                        DivineEvents.particle(sl, ParticleTypes.LAVA, x, c.y + 0.3, z, 1, 0.1, 0);
+                    }
+                    for (LivingEntity e : HigherSpell.around(sl, c, r + 1.2, e -> e != p && !HigherSpell.friendly(p, e))) {
+                        double d = Math.sqrt(e.distanceToSqr(c.x, e.getY(), c.z));
+                        if (d < r - 1.6 || burnt.contains(e) || Math.abs(e.getY() - c.y) > 3) continue;
+                        burnt.add(e);
+                        hurt(sl, p, e, dmg, 6);
+                    }
+                    sl.playSound(null, c.x, c.y, c.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.2f, 0.6f + w * 0.15f);
+                }
+                if (age >= 18 && age < 50 && age % 3 == 0) {   // the blade cools: steam and smoke from the caster's hand
+                    Vec3 h = p.position().add(0, 1.0, 0).add(flat(p.getLookAngle()).scale(0.5));
+                    DivineEvents.particle(sl, ParticleTypes.CAMPFIRE_COSY_SMOKE, h.x, h.y, h.z, 1, 0.08, 0.01);
+                    DivineEvents.particle(sl, ParticleTypes.CLOUD, h.x, h.y, h.z, 1, 0.08, 0.01);
+                }
+                if (age == 18) sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1f, 0.8f);
+                return ++age < 50;
+            }
+        });
+    }
+
+    /** Whip form: a full turn of the whip, a ring of fire r 5 burns and throws everyone out; the whip stays hot. */
+    private static void fireVortex(ServerLevel sl, Player p, ItemStack s) {
+        Vec3 c = p.position(), o = c.add(0, p.getBbHeight() * 0.6, 0), f = flat(p.getLookAngle());
+        set(s, 0, HOT_AFTER, true, sl.getGameTime());
+        float dmg = damage(p) * 1.1f;
+        for (LivingEntity e : HigherSpell.around(sl, c, VORTEX_R + 0.5, e -> e != p && !HigherSpell.friendly(p, e))) {
+            if (Math.abs(e.getY() - c.y) > 3) continue;
+            hurt(sl, p, e, dmg, 6);
+            Vec3 out = e.position().subtract(c).multiply(1, 0, 1);
+            out = out.lengthSqr() < 1e-4 ? f : out.normalize();
+            HigherSpell.push(e, out.scale(1.3).add(0, 0.4, 0));
+        }
+        sl.playSound(null, c.x, c.y, c.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.3f, 0.7f);
+        sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.6f);
+        sweep(sl, o, Math.atan2(f.z, f.x), 0, Math.PI * 2, 8, true);
+    }
+}

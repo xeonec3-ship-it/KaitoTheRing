@@ -65,6 +65,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.NpcCast.Events.class);
         MinecraftForge.EVENT_BUS.register(Charges.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.JointCast.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.ember.EmberBlade.Events.class);
         if (FMLEnvironment.dist == Dist.CLIENT) ClientInit.init(modBus);
     }
 

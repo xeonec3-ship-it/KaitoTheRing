@@ -26,5 +26,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.fx.FxClient.class);
         modBus.register(ScrollModels.class);
         modBus.addListener(TargetPoseClient::setup);
+        MinecraftForge.EVENT_BUS.register(EmberHud.class);
+        modBus.addListener(EmberHud::setup);
     }
 }

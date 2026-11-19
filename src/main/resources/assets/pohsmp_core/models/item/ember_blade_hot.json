@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "pohsmp_core:item/ember_blade_hot"
+  }
+}

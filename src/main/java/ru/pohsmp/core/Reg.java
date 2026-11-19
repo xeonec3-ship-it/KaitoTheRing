@@ -270,6 +270,8 @@ public final class Reg {
     public static final RegistryObject<Item> SILENT_WITCH_SKIRT = ITEMS.register("silent_witch_skirt",
             () -> new ru.pohsmp.core.silent.SilentWitchArmor(net.minecraft.world.item.ArmorItem.Type.LEGGINGS));
     public static final RegistryObject<Item> SILENT_WITCH_STAFF = ITEMS.register(SilentWitchStaff.NAME, SilentWitchStaff::new);
+    /** T14: the fire sword-whip (working name "Раскалённые угли"). */
+    public static final RegistryObject<Item> EMBER_BLADE = ITEMS.register(ru.pohsmp.core.ember.EmberBlade.NAME, ru.pohsmp.core.ember.EmberBlade::new);
 
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, PohCore.MODID);
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
@@ -290,6 +292,7 @@ public final class Reg {
                 out.accept(SILENT_WITCH_ROBE.get());
                 out.accept(SILENT_WITCH_SKIRT.get());
                 out.accept(SILENT_WITCH_STAFF.get());
+                out.accept(EMBER_BLADE.get());
             })
             .build());
 

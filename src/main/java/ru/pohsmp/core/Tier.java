@@ -85,6 +85,11 @@ public enum Tier {
         return null;
     }
 
+    /** The spell's own tier (built in), or null for an ordinary spell. */
+    public static Tier builtin(String spellId) {
+        return spellId == null ? null : BUILTIN.get(spellId);
+    }
+
     /** Spell id stored in a scroll, or null. */
     public static String spellIdOf(ItemStack st) {
         if (st == null || st.isEmpty() || !(st.getItem() instanceof Scroll) || !ISpellContainer.isSpellContainer(st)) return null;

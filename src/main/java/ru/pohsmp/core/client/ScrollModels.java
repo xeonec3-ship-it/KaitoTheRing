@@ -42,6 +42,8 @@ public final class ScrollModels {
         for (String p : Reg.DIVINE_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
         for (String p : Reg.HIGHER_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
         own(DisintegrationSpell.ID);
+        for (String p : Reg.ILLUSION_COMMON) own(new ResourceLocation(PohCore.MODID, p));   // T22: the higher two come with HIGHER_SPELLS
+        own(new ResourceLocation(PohCore.MODID, Reg.ILLUSION_MYTHIC));
         for (String p : List.of(SageBarrierSpell.PATH, WindSpearsSpell.PATH, SilentVolleySpell.PATH, WorganFlameSpell.PATH))
             own(new ResourceLocation(PohCore.MODID, p));
     }

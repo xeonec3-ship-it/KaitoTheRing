@@ -43,6 +43,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
+import ru.pohsmp.core.Tier;
 import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.net.Net;
 import ru.pohsmp.core.net.Net.HFx;
@@ -368,7 +369,19 @@ public class SpaceClosureSpell extends PohSpell {
                     }
                 if (e.isCanceled()) return;
             }
-            if (blocked(p)) e.setCanceled(true);
+            if (blocked(p) && !aboveBarrier(p, e.getSpellId())) e.setCanceled(true);
+        }
+
+        /**
+         * Owner 19.11: the barrier (this one and the Coven's) does not stop Higher, Mythic, Divine and Creation spells: the scroll's tier
+         * (its pohsmp_tier tag or the spell's own), for a book cast the spell's own tier. Ordinary and Unknown (Silent) spells stay forbidden.
+         */
+        private static boolean aboveBarrier(Player p, String spellId) {
+            Tier t = null;
+            if (p instanceof net.minecraft.server.level.ServerPlayer sp)
+                t = ru.pohsmp.core.DivineEvents.scrollTier(sp, io.redspace.ironsspellbooks.api.magic.MagicData.getPlayerMagicData(sp), spellId);
+            if (t == null) t = Tier.builtin(spellId);
+            return t == Tier.HIGHER || t == Tier.MYTHIC || t == Tier.DIVINE || t == Tier.CREATION;
         }
 
         /**

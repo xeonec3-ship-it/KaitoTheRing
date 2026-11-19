@@ -351,7 +351,7 @@
   "ui.pohsmp_core.soul_devour.death": "The target dies: armor and totems do not help",
   "ui.pohsmp_core.soul_devour.time": "Cast: %s s, cannot be interrupted",
   "ui.pohsmp_core.space_closure.cast": "Cast: %s s, cannot be interrupted, a cutscene for everyone within 64 blocks",
-  "ui.pohsmp_core.space_closure.magic": "Inside, only the caster can cast and drink potions",
+  "ui.pohsmp_core.space_closure.magic": "Inside, only the caster can drink potions and cast ordinary spells; Higher, Mythic, Divine and Creation spells work for everyone",
   "ui.pohsmp_core.space_closure.recast": "Casting it again lifts the dome",
   "ui.pohsmp_core.space_closure.spent": "When the dome falls, the caster is spent for %s s with no mana",
   "ui.pohsmp_core.space_closure.time": "Duration: %s min",

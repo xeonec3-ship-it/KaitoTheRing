@@ -48,7 +48,7 @@ public final class HigherFx {
     private static final int SILVER = 0xD8DCFF, VIOLET = 0x6A2AD8, GOLD = 0xFFE38A;
     private static final int ALGIZ = 14;
     private static final ResourceLocation[] SIGILS = {tex("sigil_fire"), tex("sigil_ice"), tex("sigil_lightning"), tex("sigil_nature"), tex("sigil_holy"),
-            tex("sigil_blood"), tex("sigil_ender"), tex("sigil_evocation"), tex("sigil_eldritch"), tex("sigil_wind")};
+            tex("sigil_blood"), tex("sigil_ender"), tex("sigil_evocation"), tex("sigil_eldritch"), tex("sigil_wind"), tex("sigil_illusion")};
     private static final int[] CARD_COLOR = {0xFFC94D, 0xA8C8FF, 0xFF4D4D, 0x7DFFB0};
 
     private static final class Inst {

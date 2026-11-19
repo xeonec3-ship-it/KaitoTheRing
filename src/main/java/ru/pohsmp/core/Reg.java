@@ -127,6 +127,23 @@ public final class Reg {
     public static final RegistryObject<SchoolType> SILENT = SCHOOLS.register("silent", () -> new SchoolType(SILENT_ID, SILENT_FOCUS,
             Component.translatable("school.pohsmp_core.silent").withStyle(Style.EMPTY.withColor(SILENT_COLOR)),
             SILENT_POWER, SILENT_RESIST, () -> SoundEvents.AMETHYST_BLOCK_CHIME, SILENT_DAMAGE, false, false));
+    /** T22 "Illusions" school: magic against players (docs/specs/tasks/T22_illusion_school.md); everything false is drawn by the victim's client. */
+    public static final int ILLUSION_COLOR = 0xC9A8FF;
+    public static final RegistryObject<Attribute> ILLUSION_POWER = ATTRS.register("illusion_spell_power",
+            () -> new RangedAttribute("attribute.pohsmp_core.illusion_spell_power", 1.0, 0.0, 10.0).setSyncable(true));
+    public static final RegistryObject<Attribute> ILLUSION_RESIST = ATTRS.register("illusion_magic_resist",
+            () -> new RangedAttribute("attribute.pohsmp_core.illusion_magic_resist", 1.0, -100.0, 100.0).setSyncable(true));
+    public static final ResourceKey<DamageType> ILLUSION_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, "illusion_magic"));
+    public static final TagKey<Item> ILLUSION_FOCUS = ItemTags.create(new ResourceLocation(PohCore.MODID, "illusion_focus"));
+    public static final ResourceLocation ILLUSION_ID = new ResourceLocation(PohCore.MODID, "illusion");
+    public static final RegistryObject<SchoolType> ILLUSION = SCHOOLS.register("illusion", () -> new SchoolType(ILLUSION_ID, ILLUSION_FOCUS,
+            Component.translatable("school.pohsmp_core.illusion").withStyle(Style.EMPTY.withColor(ILLUSION_COLOR)),
+            ILLUSION_POWER, ILLUSION_RESIST, () -> SoundEvents.AMETHYST_BLOCK_RESONATE, ILLUSION_DAMAGE, false, false));
+    public static final RegistryObject<MobEffect> PHANTOM_PAIN = EFFECTS.register("phantom_pain", () -> new PohEffect(MobEffectCategory.HARMFUL, 0xFFB8E6));
+    public static final RegistryObject<MobEffect> WAKING_NIGHTMARE = EFFECTS.register("waking_nightmare", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x3A2A5A));
+    public static final RegistryObject<MobEffect> BUTTERFLY_DREAM = EFFECTS.register("butterfly_dream", () -> new PohEffect(MobEffectCategory.HARMFUL, ILLUSION_COLOR));
+    public static final RegistryObject<MobEffect> BORROWED_FACE = EFFECTS.register("borrowed_face", () -> new PohEffect(MobEffectCategory.BENEFICIAL, ILLUSION_COLOR));
+
     /** Silent Witch outfit (T19): the barrier's cooldown, shown as an effect icon; milk does not remove it. */
     public static final RegistryObject<MobEffect> SILENT_BARRIER_COOLDOWN = EFFECTS.register("silent_barrier_cooldown",
             () -> new PohEffect(MobEffectCategory.NEUTRAL, SILENT_COLOR));
@@ -168,6 +185,10 @@ public final class Reg {
 
     /** Ordinary spells (levels 1-6) in tab order; wind spells only when Wind Spellbooks is installed. */
     public static final List<String> COMMON_SPELLS = new java.util.ArrayList<>();
+    /** T22: the five ordinary spells of the Illusions school (the two Higher ones are in {@link #HIGHER_SPELLS}, the Mythic one in {@link #MYTHIC_SPELLS}). */
+    public static final List<String> ILLUSION_COMMON = List.of("mirror_images", "false_step", "veil", "phantom_pain", "borrowed_face");
+    public static final List<String> ILLUSION_HIGHER = List.of("mirror_labyrinth", "waking_nightmare");
+    public static final String ILLUSION_MYTHIC = "butterfly_dream";
     private static void spell(String path, java.util.function.Supplier<AbstractSpell> s) {
         SPELLS.register(path, s);
         COMMON_SPELLS.add(path);
@@ -194,6 +215,8 @@ public final class Reg {
         spell(ru.pohsmp.core.spell.PhantomTrapSpell.PATH, ru.pohsmp.core.spell.PhantomTrapSpell::new);
         spell(ru.pohsmp.core.spell.IllusionSpell.PATH, ru.pohsmp.core.spell.IllusionSpell::new);
         spell(ru.pohsmp.core.spell.SporeCloudSpell.PATH, ru.pohsmp.core.spell.SporeCloudSpell::new);
+        for (String p : ILLUSION_COMMON) SPELLS.register(p, () -> ru.pohsmp.core.spell.illusion.IllusionSpells.make(p));
+        COMMON_SPELLS.addAll(ILLUSION_COMMON);
         if (net.minecraftforge.fml.ModList.get().isLoaded("wind_spellbooks")) {
             spell(ru.pohsmp.core.spell.GaleWardSpell.PATH, ru.pohsmp.core.spell.GaleWardSpell::new);
             spell(ru.pohsmp.core.spell.WindMarkSpell.PATH, ru.pohsmp.core.spell.WindMarkSpell::new);
@@ -205,7 +228,11 @@ public final class Reg {
             ru.pohsmp.core.spell.ArkSpell.PATH, ru.pohsmp.core.spell.SoulSealSpell.PATH, ru.pohsmp.core.spell.BlessingSpell.PATH);
     public static final List<String> MYTHIC_SPELLS = List.of(ru.pohsmp.core.spell.ExplosionSpell.PATH,
             ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.FrozenHourSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell.PATH,
-            ru.pohsmp.core.spell.CovenArrivalSpell.PATH);
+            ru.pohsmp.core.spell.CovenArrivalSpell.PATH, ILLUSION_MYTHIC);
+    static {
+        SPELLS.register(ILLUSION_MYTHIC, () -> ru.pohsmp.core.spell.illusion.IllusionSpells.make(ILLUSION_MYTHIC));
+        for (String p : ILLUSION_HIGHER) SPELLS.register(p, () -> ru.pohsmp.core.spell.illusion.IllusionSpells.make(p));
+    }
     public static final RegistryObject<AbstractSpell> COVEN_ARRIVAL = SPELLS.register(ru.pohsmp.core.spell.CovenArrivalSpell.PATH,
             ru.pohsmp.core.spell.CovenArrivalSpell::new);
     static {
@@ -247,7 +274,7 @@ public final class Reg {
             ru.pohsmp.core.spell.OblivionBladesSpell.PATH, ru.pohsmp.core.spell.WorldRiftSpell.PATH, ru.pohsmp.core.spell.MirrorPrisonSpell.PATH,
             ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell.PATH,
             ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.CountdownSpell.PATH,
-            ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH);
+            ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH, ILLUSION_HIGHER.get(0), ILLUSION_HIGHER.get(1));
     static {
         SPELLS.register(ru.pohsmp.core.spell.StarFallSpell.PATH, ru.pohsmp.core.spell.StarFallSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.ScarletCutSpell::new);
@@ -289,6 +316,14 @@ public final class Reg {
     public static final RegistryObject<Item> SILENT_WITCH_STAFF = ITEMS.register(SilentWitchStaff.NAME, SilentWitchStaff::new);
     /** T14: the fire sword-whip (working name "Раскалённые угли"). */
     public static final RegistryObject<Item> EMBER_BLADE = ITEMS.register(ru.pohsmp.core.ember.EmberBlade.NAME, ru.pohsmp.core.ember.EmberBlade::new);
+    /** T22: the focus of the Illusions school (tag illusion_focus) for the inscription table. */
+    public static final RegistryObject<Item> ILLUSION_PRISM = ITEMS.register("illusion_prism", () -> new Item(new Item.Properties().stacksTo(64)) {
+        @Override
+        public void appendHoverText(ItemStack st, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level lvl, List<Component> tip,
+                                    net.minecraft.world.item.TooltipFlag flag) {
+            tip.add(Component.translatable("item.pohsmp_core.illusion_prism.desc").withStyle(Style.EMPTY.withColor(ILLUSION_COLOR)));
+        }
+    });
 
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, PohCore.MODID);
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
@@ -310,6 +345,7 @@ public final class Reg {
                 out.accept(SILENT_WITCH_SKIRT.get());
                 out.accept(SILENT_WITCH_STAFF.get());
                 out.accept(EMBER_BLADE.get());
+                out.accept(ILLUSION_PRISM.get());
             })
             .build());
 

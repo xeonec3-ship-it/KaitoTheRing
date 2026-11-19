@@ -101,7 +101,10 @@ public final class HiddenEntities {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayer(RenderPlayerEvent.Pre e) {
-        if (hidden(e.getEntity())) e.setCanceled(true);
+        if (hidden(e.getEntity())) {
+            e.setCanceled(true);
+            zeroShadow(e.getRenderer());   // T22: a player hidden only for one viewer is not invisible on the server, so its shadow stays otherwise
+        }
     }
 
     /** Renderers that draw the name tag on their own still ask this event first. */

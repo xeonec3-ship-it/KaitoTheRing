@@ -50,7 +50,7 @@ import ru.pohsmp.core.spell.HigherSpell;
  * "Gate" (T03): Silent school, Unknown tier, only from the Silent Witch's staff and only in her full outfit (T18/T19, see {@link SilentWitch}).
  * A 50 s cast that nothing interrupts, all of it to the music track: every player within 128 blocks of the caster or of the strike point
  * hears it (not positional, client: SilentMusic) with every other game sound muted, and watches the camera scene (Cutscene 7).
- * No cast point: the gate stands in the sky 26 blocks ahead, 48 up; the area (radius 40) is under it. From 50 s (the spell is cast)
+ * No cast point: the gate stands in the sky 26 blocks ahead, 48 up; the area (radius 120, config gate area) is under it. From 50 s (the spell is cast)
  * to 63 s aimed beam volleys hit every foe in the area (no main beam - owner's decision). The scene ends at 65 s. Cancel = the track fades in 1 s.
  * Damage: Silent magic (through armor, Silent power, Silent resistance), numbers in [silent_gate]. Afterwards "Silence": the spell's own
  * cooldown, 3 min. Only hostile entities are hit (see {@link #target}); players never.
@@ -83,7 +83,7 @@ public class SilentGateSpell extends SilentStaffSpell {
      */
     public static final double FWD = 26, GATE_H = 48;
     /** Sky seals of the field the aimed beams start from (as in fx/silent_gate.json): height over the area and radius. */
-    private static final double SKY_LO = 17, SKY_HI = 32, SKY_R = 44;   // ×2 with the area (owner 19.11): the field covers the whole area
+    private static final double SKY_LO = 17, SKY_HI = 32, SKY_R = 132;   // ×3 with the area (owner 19.11): the field covers the whole area
     /** Effects of the ideas chat (T03): the whole scene and one aimed beam; placeholders while they are missing. */
     private static final String FX_SCENE = "silent_gate", FX_BEAM = "silent_gate_beam";
 
@@ -96,6 +96,8 @@ public class SilentGateSpell extends SilentStaffSpell {
         /** Age when the wait began / when the command came; -1 before. */
         int waitFrom = -1, command = -1;
         boolean cast, done, sceneOver;
+        java.util.List<LivingEntity> foes;
+        int foesAt;
         List<UUID> watchers = new ArrayList<>();
         final Map<UUID, Integer> lastHit = new HashMap<>();
         /** foe -> tick of its next aimed shot */
@@ -318,7 +320,13 @@ public class SilentGateSpell extends SilentStaffSpell {
     private static void rays(Cast c, int t) {
         double area = ServerConfig.GATE_AREA.get();
         int budget = SHOTS_PER_TICK;
-        for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e))) {
+        // owner 19.11: the area is x3 (radius 120): the foes are looked up every 5 ticks, between that the list is kept
+        if (c.foes == null || t - c.foesAt >= 5) {
+            c.foes = HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e));
+            c.foesAt = t;
+        }
+        for (LivingEntity e : c.foes) {
+            if (!e.isAlive() || e.isRemoved()) continue;
             Integer next = c.nextShot.get(e.getUUID());
             if (next == null) {   // newly in the area: the first shot at a random moment of the first interval, so they do not all go at once
                 c.nextShot.put(e.getUUID(), t + c.sl.random.nextInt(SHOT_MAX - SHOT_MIN + 1));

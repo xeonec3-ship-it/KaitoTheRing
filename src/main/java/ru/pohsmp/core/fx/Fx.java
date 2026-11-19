@@ -37,7 +37,8 @@ import ru.pohsmp.core.spell.Tasks;
 public final class Fx {
     private Fx() {}
 
-    public static final double RANGE = 160;
+    /** 224 (was 160): the Gate's field of shots is now radius 132 around a point 26 blocks ahead (owner 19.11), everyone in it must see it. */
+    public static final double RANGE = 224;
     private static int nextId = 1;
 
     /** What to start. Fluent; positions in world coordinates. */

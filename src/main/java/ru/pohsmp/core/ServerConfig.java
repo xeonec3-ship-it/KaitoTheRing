@@ -82,7 +82,7 @@ public final class ServerConfig {
         SW_GATE_MAGIC_IMMUNE = b.comment("10. Full set: no magic damage while casting the Gate").define("gateMagicImmune", true);
         b.pop();
         b.push("silent_gate");
-        GATE_AREA = b.comment("Gate: radius of the area the beams hit, under the gate (26 blocks ahead of the caster)").defineInRange("area", 40.0, 2.0, 96.0);
+        GATE_AREA = b.comment("Gate: radius of the area the beams hit, under the gate (26 blocks ahead of the caster); owner 19.11: x3").defineInRange("area", 120.0, 2.0, 384.0);
         GATE_RAY_DAMAGE = b.comment("Damage of one volley to a foe (Silent magic: through armor, scaled by Silent spell power, cut by Silent resistance)").defineInRange("rayDamage", 10.0, 0.0, 10000.0);
         GATE_RAY_RADIUS = b.comment("Radius of one ray's hit").defineInRange("rayRadius", 1.5, 0.1, 16.0);
         GATE_AIM_INTERVAL = b.comment("A volley every this many ticks: beams into every foe in the area").defineInRange("volleyInterval", 10, 1, 200);

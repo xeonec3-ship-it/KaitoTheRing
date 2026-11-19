@@ -1,13 +1,126 @@
 {
-  "comment": "Один наведённый луч «Врат» (по видео мода): из печати поля в небе (point:from) в цель (target); на месте удара — вспышка и кольцо на земле. Код пускает залпами: раз в 0.5 с в каждого врага площади 3–5 лучей из разных точек неба.",
-  "style": "silent",
-  "duration": 30,
-  "elements": [
-    { "type": "beam", "delay": 0, "duration": 9, "at": "point:from", "to": "target", "width": 0.22, "core": 0.5, "grow": 3,
-      "easing": "easeInCubic", "color": "@secondary", "out": { "duration": 5, "easing": "easeInSine" } },
-    { "type": "beam", "delay": 0, "duration": 7, "at": "point:from", "to": "target", "width": 0.5, "core": 0.0, "grow": 3,
-      "easing": "easeInCubic", "color": "@primary", "brightness": 0.45 },
-    { "type": "flash", "delay": 3, "duration": 6, "at": "target", "size": 1.6, "rays": 6, "color": "@core" },
-    { "type": "sigil", "id": "silent_impact", "delay": 3, "at": "target", "until": 24 }
-  ]
+ "comment": "Наведённый луч «Безмолвных врат» во враждебную сущность (по видео мода): метка захвата на цели (0–4 тик), из печати неба (point:from) в цель (target) падает толстый белый луч с бирюзовым ореолом (тики 3–12), удар — вспышка, кольцо, искры, осколки. Код: залпы раз в 0.5 с, 3–5 лучей в каждого врага. Случайный ливень по площади — beam_rain в silent_gate.json. Сгенерировано tools/gen_silent_gate_fx.py.",
+ "style": "silent",
+ "duration": 34,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "silent_impact",
+   "delay": 0,
+   "at": "target",
+   "follow": true,
+   "until": 6,
+   "sigilScale": 0.6,
+   "comment": "метка захвата на враге"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 4,
+   "at": "target+0,1,0",
+   "follow": true,
+   "size": 0.9,
+   "rays": 4,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 3,
+   "duration": 10,
+   "at": "point:from",
+   "to": "target+0,0.6,0",
+   "width": 0.95,
+   "core": 0.0,
+   "grow": 3,
+   "easing": "easeInCubic",
+   "color": "@primary",
+   "brightness": 0.55,
+   "out": {
+    "duration": 6,
+    "easing": "easeInSine"
+   },
+   "comment": "ореол"
+  },
+  {
+   "type": "beam",
+   "delay": 3,
+   "duration": 9,
+   "at": "point:from",
+   "to": "target+0,0.6,0",
+   "width": 0.42,
+   "core": 0.75,
+   "grow": 3,
+   "easing": "easeInCubic",
+   "color": "@core",
+   "brightness": 1.4,
+   "out": {
+    "duration": 5,
+    "easing": "easeInSine"
+   },
+   "comment": "белое ядро"
+  },
+  {
+   "type": "flash",
+   "delay": 6,
+   "duration": 8,
+   "at": "target+0,0.8,0",
+   "size": 3.2,
+   "rays": 8,
+   "anamorphic": 6,
+   "color": "@core"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_impact",
+   "delay": 6,
+   "at": "target",
+   "until": 28
+  },
+  {
+   "type": "wave",
+   "delay": 6,
+   "duration": 12,
+   "at": "target",
+   "radius": 2.6,
+   "thickness": 0.35,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "duration": 3,
+   "at": "target+0,0.6,0",
+   "texture": "@sparks",
+   "count": 26,
+   "rate": 10,
+   "spread": 0.6,
+   "speed": 0.22,
+   "gravity": 0.012,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 16,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "duration": 2,
+   "at": "target+0,0.4,0",
+   "texture": "@shards",
+   "count": 10,
+   "rate": 6,
+   "spread": 0.5,
+   "speed": 0.16,
+   "gravity": 0.03,
+   "spin": 400,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 18,
+   "color": "@secondary"
+  }
+ ]
 }

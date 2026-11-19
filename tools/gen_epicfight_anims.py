@@ -607,7 +607,8 @@ def whip3():
 
 # ------------------------------------------------------------------ движение в форме хлыста без ударов (владелец 19.11)
 # Петли (последний ключ = первый). Рука держит рукоять хлыста; сам хлыст рисует код (физика каната) — он висит, волочится, летит следом.
-WHIP_HOLD_R = {'pos': (0.33, 0.12, 0.84), 'blade': (0.25, 0.35, -0.9), 'edge': (0, 0.9, 0.4), 'pole': (0.6, -0.5, -0.2), 'frame': 'body'}
+WHIP_HOLD_R = {'pos': (0.33, 0.12, 0.84), 'blade': (0.30, 0.05, -0.95), 'edge': (0, 1, 0.1), 'pole': (0.6, -0.5, -0.2), 'frame': 'body'}
+WHIP_TRAIL_R = dict(WHIP_HOLD_R, blade=(0.25, -0.75, -0.6), edge=(0, -0.6, 0.8))   # при движении рукоять смотрит назад-вниз — хлыст тянется за игроком
 
 
 def whip_idle():
@@ -640,7 +641,7 @@ def _gait(n, stride, lift, bob, lean, hand_r_back, hand_r_fwd, arm_l, twist):
         keys.append((k * 1.0, P(root={'pos': (0, 0, -bob * abs(math.cos(2 * math.pi * ph))), 'yaw': twist * math.sin(2 * math.pi * ph), 'pitch': lean},
                                 torso=(lean * 0.4, 0, 0), chest=(0, -twist * 0.6 * math.sin(2 * math.pi * ph), 0), head=(-lean * 0.5, 0, 0),
                                 foot_r=foot('r', ph), foot_l=foot('l', (ph + 0.5) % 1.0),
-                                hand_r=dict(WHIP_HOLD_R, pos=hr), hand_l=dict(FREE_BODY_L, pos=hl))))
+                                hand_r=dict(WHIP_TRAIL_R, pos=hr), hand_l=dict(FREE_BODY_L, pos=hl))))
     return keys
 
 

@@ -319,6 +319,9 @@ function drawWhip() {
   for (let k = 0; k <= N; k++) {
     const back = k * 0.012, base = toolTipAt(t - back, 0.12), d = toolDirAt(t - back);
     const p = base.add(d.multiplyScalar(k * 0.26));
+    // шаг и бег: игрок идёт вперёд, а превью стоит на месте — точка, сошедшая с руки k шагов назад, осталась позади
+    const v = cur === "whip_walk" ? 4.3 : cur === "whip_run" ? 7.5 : 0;   // блоков/с (как в игре)
+    if (v) p.z += v * back * 3.2;
     p.y -= 0.9 * Math.pow(k / N, 2) * 0.6;
     p.y = Math.max(0.02, p.y);
     pts.push(p);

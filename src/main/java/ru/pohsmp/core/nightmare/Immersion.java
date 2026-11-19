@@ -127,6 +127,11 @@ public final class Immersion {
                 it.remove();
                 continue;
             }
+            if (s.sent > 0 && !v.hasEffect(Reg.IMMERSION.get())) {   // owner 19.11: the effect taken off (/effect clear, milk) - all of it goes
+                it.remove();
+                send(v, 0, 0);
+                continue;
+            }
             double r = Math.max(0.5, Math.min(2, resist(v)));
             long decay = Math.round(ServerConfig.get(ServerConfig.IM_DECAY) * 20 / r);
             if (now >= s.floorUntil && now - s.lastHit >= decay) {

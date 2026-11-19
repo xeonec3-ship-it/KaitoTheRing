@@ -40,6 +40,8 @@ public final class IlluMsg {
     /** T23: the sky of this client - i = SKY_DREAD (the Abyss Eye looks at you: dark edges, swaying view) or SKY_DAWN (day light, warm), for ticks; 0 = off. */
     public static final int SKY = 13;
     public static final int SKY_DREAD = 1, SKY_DAWN = 2;
+    /** «Сон бабочки»: entity is drawn see-through for ticks (it showed itself by a strike or a cast). */
+    public static final int GHOST = 14;
     /** zone kinds (i of ZONE / ZONE_END) */
     public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4;
 

@@ -36,6 +36,8 @@ public final class Copies {
         final UUID owner;
         final RemotePlayer body;
         long until;
+        boolean casting;
+        String spell = "";
 
         Copy(int id, int clientId, int ownerId, UUID owner, RemotePlayer body, long until) {
             this.id = id;
@@ -71,6 +73,10 @@ public final class Copies {
                 boolean sneak = (f & ru.pohsmp.core.illusion.Copies.SNEAK) != 0;
                 b.setShiftKeyDown(sneak);
                 b.setPose(sneak ? Pose.CROUCHING : Pose.STANDING);
+                boolean cast = (f & ru.pohsmp.core.illusion.Copies.CAST) != 0;
+                if (cast && !m.text.isEmpty()) c.spell = m.text;
+                if (!cast && c.casting) bolt(c);   // the copy's cast is over: its harmless spell flies off
+                c.casting = cast;
             }
             case IlluMsg.COPY_HURT -> {
                 Copy c = BY_ID.get(m.i);
@@ -129,7 +135,66 @@ public final class Copies {
         return e != null && BY_CLIENT_ID.containsKey(e.getId());
     }
 
+    // ---------------------------------------------------------------- the copies' false spells
+
+    private static final class Bolt {
+        Vec3 pos;
+        final Vec3 dir;
+        final org.joml.Vector3f color;
+        int age;
+
+        Bolt(Vec3 pos, Vec3 dir, org.joml.Vector3f color) {
+            this.pos = pos;
+            this.dir = dir;
+            this.color = color;
+        }
+    }
+
+    private static final java.util.List<Bolt> BOLTS = new java.util.ArrayList<>();
+    private static final int BOLT_LIFE = 30;
+
+    /** A bolt of the spell's school colour from the copy's hand along its look: it flies 1.5 s, fades and hurts no one. */
+    private static void bolt(Copy c) {
+        org.joml.Vector3f col = new org.joml.Vector3f(0.85f, 0.75f, 1f);
+        try {
+            var s = io.redspace.ironsspellbooks.api.registry.SpellRegistry.getSpell(c.spell);
+            if (s != null && s.getSchoolType() != null) {
+                var tc = s.getSchoolType().getDisplayName().getStyle().getColor();
+                if (tc != null) {
+                    int rgb = tc.getValue();
+                    col = new org.joml.Vector3f(((rgb >> 16) & 255) / 255f, ((rgb >> 8) & 255) / 255f, (rgb & 255) / 255f);
+                }
+            }
+        } catch (RuntimeException ignored) {
+        }
+        RemotePlayer b = c.body;
+        Vec3 look = Vec3.directionFromRotation(b.getXRot(), b.getYHeadRot());
+        BOLTS.add(new Bolt(b.getEyePosition().add(look.scale(0.6)).add(0, -0.25, 0), look, col));
+        if (BOLTS.size() > 24) BOLTS.remove(0);
+        c.spell = "";
+    }
+
+    private static void bolts(ClientLevel lvl) {
+        if (BOLTS.isEmpty()) return;
+        for (var it = BOLTS.iterator(); it.hasNext(); ) {
+            Bolt bo = it.next();
+            if (++bo.age > BOLT_LIFE) {
+                it.remove();
+                continue;
+            }
+            float k = 1 - bo.age / (float) BOLT_LIFE;
+            var dust = new net.minecraft.core.particles.DustParticleOptions(bo.color, 0.4f + 1.3f * k);
+            for (int i = 0; i < 3; i++) {
+                Vec3 p = bo.pos.add(bo.dir.scale(i * 0.3));
+                lvl.addParticle(dust, p.x, p.y, p.z, 0, 0, 0);
+            }
+            if (bo.age % 3 == 0 && k > 0.4) lvl.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, bo.pos.x, bo.pos.y, bo.pos.z, 0, 0, 0);
+            bo.pos = bo.pos.add(bo.dir.scale(0.9));
+        }
+    }
+
     static void tick(ClientLevel lvl) {
+        bolts(lvl);
         if (BY_ID.isEmpty()) return;
         long now = IllusionClient.now();
         for (Copy c : BY_ID.values().toArray(new Copy[0])) {
@@ -142,6 +207,7 @@ public final class Copies {
     }
 
     static void clear() {
+        BOLTS.clear();
         BY_ID.clear();
         BY_CLIENT_ID.clear();
     }

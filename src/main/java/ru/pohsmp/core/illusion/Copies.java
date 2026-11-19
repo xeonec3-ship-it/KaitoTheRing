@@ -42,7 +42,7 @@ public final class Copies {
     public enum Mode { MIRROR, RUNNER }
 
     /** One tick of the caster's moves. */
-    private record Frame(Vec3 pos, float yaw, float pitch, int flags) {}
+    private record Frame(Vec3 pos, float yaw, float pitch, int flags, String spell) {}
 
     public static final class Copy {
         public final int id;
@@ -170,7 +170,7 @@ public final class Copies {
         ArrayDeque<Frame> h = HISTORY.get(o.getUUID());
         if (h != null) {   // the copies keep their places: the history moves with the caster
             ArrayDeque<Frame> moved = new ArrayDeque<>();
-            for (Frame f : h) moved.addLast(new Frame(f.pos().add(delta), f.yaw(), f.pitch(), f.flags()));
+            for (Frame f : h) moved.addLast(new Frame(f.pos().add(delta), f.yaw(), f.pitch(), f.flags(), f.spell()));
             HISTORY.put(o.getUUID(), moved);
         }
         for (Copy x : of(o)) if (x.mode == Mode.MIRROR) x.offset = x.offset.subtract(delta);
@@ -245,7 +245,10 @@ public final class Copies {
                 continue;
             }
             ArrayDeque<Frame> h = HISTORY.computeIfAbsent(en.getKey(), k -> new ArrayDeque<>());
-            h.addFirst(new Frame(o.position(), o.getYHeadRot(), o.getXRot(), flags(o)));
+            int fl = flags(o);
+            String spell = (fl & CAST) != 0 && o instanceof ServerPlayer sp
+                    ? io.redspace.ironsspellbooks.api.magic.MagicData.getPlayerMagicData(sp).getCastingSpellId() : "";
+            h.addFirst(new Frame(o.position(), o.getYHeadRot(), o.getXRot(), fl, spell == null ? "" : spell));
             while (h.size() > HISTORY_LEN) h.removeLast();
             for (Copy c : new ArrayList<>(l)) step((ServerLevel) o.level(), c, h);
         }
@@ -258,6 +261,7 @@ public final class Copies {
             return;
         }
         int fl = 0;
+        String spell = "";
         if (c.mode == Mode.MIRROR) {
             Frame f = frame(h, c.delay);
             Vec3 want = f.pos().add(c.offset);
@@ -269,6 +273,7 @@ public final class Copies {
             c.yaw = f.yaw();
             c.pitch = f.pitch();
             fl = f.flags();
+            spell = f.spell();   // the client sends a harmless bolt of this school's colour when the copy's cast ends
         } else {
             Vec3 next = c.pos.add(c.vel.x, 0, c.vel.z);
             double fy = floor(sl, next, c.pos.y);
@@ -277,7 +282,7 @@ public final class Copies {
             fl = (c.owner.isSprinting() ? SPRINT : 0) | (c.age == c.swingAt ? SWING : 0);
         }
         for (ServerPlayer p : players(sl, c))
-            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.COPY_MOVE, c.owner.getId(), fl, c.id, null, "", c.pos.x, c.pos.y, c.pos.z, c.yaw, c.pitch));
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.COPY_MOVE, c.owner.getId(), fl, c.id, null, spell, c.pos.x, c.pos.y, c.pos.z, c.yaw, c.pitch));
         if ((fl & SWING) != 0 && c.damage > 0) strike(sl, c);
         if (!c.ghost) arrows(sl, c);
     }

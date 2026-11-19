@@ -33,6 +33,24 @@ public final class ErasedClient {
     public static void clear() {
         left = 0;
         fade = 0;
+        desaturate(Minecraft.getInstance(), false);
+    }
+
+    private static final ResourceLocation GREY = new ResourceLocation(PohCore.MODID, "shaders/post/erased.json");
+    private static boolean grey;
+
+    /** The world a quarter paler (vanilla color_convolve, saturation 0.75) while erased; another post effect taking over is left alone. */
+    private static void desaturate(Minecraft mc, boolean on) {
+        if (on == grey) return;
+        var gr = mc.gameRenderer;
+        if (on) {
+            if (gr.currentEffect() != null) return;   // the game's own (a spectated creeper...) - leave it
+            gr.loadEffect(GREY);
+            grey = true;
+        } else {
+            if (gr.currentEffect() != null && GREY.toString().equals(gr.currentEffect().getName())) gr.shutdownEffect();
+            grey = false;
+        }
     }
 
     @SubscribeEvent
@@ -40,6 +58,7 @@ public final class ErasedClient {
         if (e.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.isPaused()) return;
+        desaturate(mc, left > 0);
         if (left > 0) {
             left--;
             age++;

@@ -272,6 +272,7 @@ public class ButterflyDreamSpell extends IllusionBase {
                 ServerPlayer v = player(d, id);
                 if (v == null) continue;
                 Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(who.getId(), 0));
+                Net.CH.send(PacketDistributor.PLAYER.with(() -> v), IlluMsg.of(IlluMsg.GHOST, who.getId(), REVEAL + 2));
                 fx(d.sl, Fx.fx("illusion_butterfly_reveal").at(who.position()).caster(who).attach(who).only(v), "illusion_butterfly_reveal");
             }
         }

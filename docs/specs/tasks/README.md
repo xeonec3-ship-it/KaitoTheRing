@@ -23,9 +23,9 @@
 | T12 | [Библиотека поз игрока](T12_pose_library.md) | идеи | не начато |
 | T13 | [Реакция цели](T13_target_pose.md) — поза скованной цели | идеи → осн. | не начато |
 | T14 | [Оружие Epic Fight](T14_epicfight_weapon.md) | идеи + осн. | не начато |
-| T15 | [Совместный каст](T15_joint_cast.md) | осн. | не начато |
-| T16 | [Свитки с зарядами](T16_scroll_charges.md) | осн. | не начато |
+| T15 | [Совместный каст](T15_joint_cast.md) | осн. | **готово** (1.12.2) — `spell/JointCast`, конфиг `[joint_cast]`, двойной контур печатей; проверено в игре (GameTest + клиент) |
+| T16 | [Свитки с зарядами](T16_scroll_charges.md) | осн. | **готово** (1.12.2) — `Charges`, «Заряды: 2/3», команды в `give_commands.txt`; проверено в игре (GameTest + клиент) |
 | T18 | [Школа «Безмолвная», ступень «Неизвестная» + посох безмолвной ведьмы](T18_unknown_school_staff.md) | идеи (модель) + осн. (код) | код готов (школа, ступень, посох с 5 слотами-заглушками); модель готова по референсам владельца (`tools/gen_silent_staff.py`, превью `tools/staff_preview.html`); проверка в игре — CNPC проект |
 | T19 | [Одежда безмолвной ведьмы](T19_silent_witch_outfit.md) — капюшон, мантия, полы, 11 эффектов (в т. ч. ник скрыт даже на миникарте), кот Неро | идеи (модели) + осн. (код) | модель готова (`tools/gen_silent_outfit.py`, превью `tools/outfit_preview.html`, кости: cape, cape_low, hood_tip, hem_r/l, nero*); код — в работе |
 | T20 | [Заклинания посоха безмолвной ведьмы](T20_silent_staff_spells.md) — Ветряные копья, Безмолвный залп, Барьер, Чёрное пламя Ворганы (без комплекта) | идеи (вид) + осн. (код) | не начато |
-| T17 | [API для NPC-магов](T17_npc_cast_api.md) | осн. | **готово** (1.12.0) — `Core.cast / cancelCast / isCasting / castingSpell`, `spell/NpcCast`, описание в `MOD_README.md` и `docs/npc-cast.md`; проверено на сервере с CNPC (сервер: Дезинтеграция, Высшие, Iron's, скрипт); анимация на модели NPC в клиенте не проверялась |
+| T17 | [API для NPC-магов](T17_npc_cast_api.md) | осн. | **готово** (1.12.2) — `Core.cast / cancelCast / isCasting / castingSpell`, `spell/NpcCast`, описание в `MOD_README.md` и `docs/npc-cast.md`; на локальном тест-сервере (ПК, 19.11) у CNPC NPC падало (NPE `SyncedSpellData` в `initiateCast`) — исправлено; после исправления проверено: фаербол Iron's, Дезинтеграция, отказ `cancelCast`, `forceCancelCast`, события `cast_start/cast_end`, отказ без прямой видимости; анимация на модели NPC в клиенте не проверялась |

@@ -339,5 +339,8 @@
   "ui.pohsmp_core.wind_mark.time": "Mark: %s s",
   "ui.pohsmp_core.world_rift.length": "Length: %s blocks",
   "ui.pohsmp_core.world_rift.pillars": "Pillars of darkness: %s damage",
-  "ui.pohsmp_core.world_rift.toss": "Toss: %s damage"
+  "ui.pohsmp_core.world_rift.toss": "Toss: %s damage",
+  "tooltip.pohsmp_core.charges": "Charges: %s/%s",
+  "ui.pohsmp_core.joint_cast": "Joint cast: %s",
+  "ui.pohsmp_core.joint_cast.done": "Joint cast complete"
 }

@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "4";
+    private static final String V = "5";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -26,6 +26,7 @@ public final class Net {
         CH.messageBuilder(FxMsg.class, 2, NetworkDirection.PLAY_TO_CLIENT).encoder(FxMsg::encode).decoder(FxMsg::new).consumerMainThread(FxMsg::handle).add();
         CH.messageBuilder(HideMsg.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(HideMsg::encode).decoder(HideMsg::new).consumerMainThread(HideMsg::handle).add();
         CH.messageBuilder(NpcCastMsg.class, 4, NetworkDirection.PLAY_TO_CLIENT).encoder(NpcCastMsg::encode).decoder(NpcCastMsg::new).consumerMainThread(NpcCastMsg::handle).add();
+        CH.messageBuilder(CastTime.class, 5, NetworkDirection.PLAY_TO_CLIENT).encoder(CastTime::encode).decoder(CastTime::new).consumerMainThread(CastTime::handle).add();
     }
 
     /**
@@ -35,7 +36,8 @@ public final class Net {
     public static final class HFx {
         public static final int STOP = 0, TELE = 1, SLEEP = 2, STAR = 3, SING = 4, SEAL = 5, ASC = 6, RING = 7, BURST = 8, PILLAR = 9, SKY = 10, FLASH = 11, MOON = 12,
                 CUT = 13, DOWN = 14, RIFT = 15, TABOO = 16, SIGIL = 17, WARD = 18, MILKY = 19, GALAXY = 20, SOUL = 21, TABOO_CAST = 22, BLIZZARD = 23,
-                CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27;
+                CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27,
+                JOINT = 28;   // joint cast: a = caster, b = partner, dur, f = sigil radius, i = (school sigil << 24) | color
         public final byte kind;
         public final int key, a, b, dur, i;
         public final float x, y, z, f;
@@ -165,6 +167,30 @@ public final class Net {
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.NpcCastClient.handle(this));
+        }
+    }
+
+    /** Joint cast: the caster's own cast bar gets the new total and remaining time (ticks). */
+    public static final class CastTime {
+        public final int duration, remaining;
+
+        public CastTime(int duration, int remaining) {
+            this.duration = duration;
+            this.remaining = remaining;
+        }
+
+        public CastTime(FriendlyByteBuf b) {
+            duration = b.readVarInt();
+            remaining = b.readVarInt();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeVarInt(duration);
+            b.writeVarInt(remaining);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.JointFx.castTime(this));
         }
     }
 }

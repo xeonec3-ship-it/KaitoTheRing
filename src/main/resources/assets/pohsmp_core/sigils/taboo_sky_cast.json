@@ -1,0 +1,130 @@
+{
+ "comment": "Табу, каст: великая печать в небе рождается над столбом и к концу каста дорастает до границы зоны.",
+ "size": 51.0,
+ "color": "#FFD36B",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "rays",
+   "type": "spokes",
+   "texture": "spokes",
+   "radius": 0.6,
+   "heightOffset": -0.05,
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2
+   }
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.06,
+   "heightOffset": 0.0,
+   "count": 6,
+   "arcLength": 40,
+   "width": 0.012,
+   "appear": {
+    "delay": 0,
+    "duration": 50,
+    "easing": "easeOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 3
+   }
+  },
+  {
+   "id": "taboo",
+   "type": "disc",
+   "texture": "circle_taboo",
+   "radius": 1.0,
+   "heightOffset": 0.02,
+   "brightness": 0.95,
+   "appear": {
+    "delay": 20,
+    "duration": 110,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 1.5
+   }
+  },
+  {
+   "id": "alchemy",
+   "type": "disc",
+   "texture": "pat_alchemy",
+   "radius": 0.55,
+   "heightOffset": 0.04,
+   "color": "#FFF4D6",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 60,
+    "duration": 70,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": -90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": -2.5
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.05,
+   "heightOffset": 0.06,
+   "inner": 0.99,
+   "repeat": 1,
+   "appear": {
+    "delay": 100,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  }
+ ],
+ "expand": {
+  "scale": 2.5,
+  "delay": 0,
+  "duration": 60,
+  "easing": "easeInOutSine"
+ },
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.1,
+  "duration": 16,
+  "sparks": 80
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

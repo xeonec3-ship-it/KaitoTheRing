@@ -1,0 +1,163 @@
+{
+ "comment": "Низвержение: печать под кастером. Цепи прорисовываются, багровые трещины с перелётом, золотой обод; формируется к 4.4 с (поза «Активация»), тогда за спиной встают шесть золотых кругов.",
+ "size": 7.0,
+ "color": "#D4A017",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.8,
+   "heightOffset": -0.01,
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "cracks",
+   "type": "disc",
+   "texture": "higher_cracks",
+   "radius": 0.7,
+   "heightOffset": 0.0,
+   "color": "#8A1420",
+   "brightness": 1.2,
+   "appear": {
+    "delay": 6,
+    "duration": 24,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -4
+   }
+  },
+  {
+   "id": "circle",
+   "type": "disc",
+   "texture": "circle_a",
+   "radius": 0.62,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 14,
+    "duration": 30,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 6
+   }
+  },
+  {
+   "id": "chains",
+   "type": "band",
+   "texture": "chain_band",
+   "radius": 0.95,
+   "heightOffset": 0.02,
+   "inner": 0.84,
+   "repeat": 10,
+   "appear": {
+    "delay": 30,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": -3
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "rim",
+   "radius": 1.0,
+   "heightOffset": 0.03,
+   "color": "#FFF0C0",
+   "inner": 0.9,
+   "repeat": 1,
+   "appear": {
+    "delay": 52,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 2
+   }
+  },
+  {
+   "id": "alchemy",
+   "type": "disc",
+   "texture": "pat_alchemy",
+   "radius": 1.32,
+   "heightOffset": -0.02,
+   "brightness": 0.45,
+   "appear": {
+    "delay": 56,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   }
+  }
+ ],
+ "expand": {
+  "scale": 1.15,
+  "delay": 2,
+  "duration": 10,
+  "easing": "easeOutCubic"
+ },
+ "formedFlash": {
+  "color": "#FFF0C0",
+  "size": 1.25,
+  "duration": 12,
+  "sparks": 40
+ },
+ "onFormed": [
+  {
+   "id": "golden_halo",
+   "anchor": "caster",
+   "arc": {
+    "count": 6,
+    "radius": 1.5,
+    "angle": 150,
+    "height": 1.55,
+    "behind": true,
+    "stagger": 3
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

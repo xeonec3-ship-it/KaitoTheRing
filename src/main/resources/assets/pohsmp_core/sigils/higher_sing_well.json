@@ -1,0 +1,14 @@
+{
+  "comment": "Сингулярность: гравитационный колодец на земле под шаром, радиус притяжения 8 — кольца сгущаются к центру, сетка закручена; тонкий обод отмечает границу притяжения.",
+  "size": 8.0, "color": "#7A3ADF", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "well", "type": "disc", "texture": "gravity_well", "radius": 1.0, "heightOffset": 0.0, "brightness": 0.55,
+      "appear": { "delay": 0, "duration": 16, "easing": "easeOutCubic", "modes": ["draw", "fade"], "startAngle": 0, "direction": -1 },
+      "rotation": { "speed": -20 } },
+    { "id": "edge", "type": "disc", "texture": "thin_ring", "radius": 1.0, "heightOffset": 0.01, "color": "#C89BFF",
+      "appear": { "delay": 0, "duration": 12, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.4, "period": 20 } },
+    { "id": "center", "type": "disc", "texture": "glow", "radius": 0.3, "heightOffset": 0.02, "color": "#2A0A5A", "brightness": 1.5,
+      "appear": { "delay": 4, "duration": 12, "easing": "easeOutCubic", "modes": ["grow", "fade"] } }
+  ],
+  "dissolve": { "modes": ["collapse"], "duration": 8 }
+}

@@ -38,23 +38,32 @@ public abstract class PohSpell extends AbstractSpell {
         this.spellPowerPerLevel = 0;
     }
 
-    /** Iron's schools that have a drawn sigil (index = HFx.SIGIL b) and their colors. */
-    private static final String[] SIGIL_SCHOOLS = {"fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind"};
+    /** Iron's schools with a drawn sign: effect fx/school_&lt;school&gt;.json (sigil sigils/school_&lt;school&gt;.json, style fx/styles/&lt;school&gt;.json). */
+    private static final java.util.Set<String> SIGIL_SCHOOLS =
+            java.util.Set.of("fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind");
+
+    /** The same schools in HFx.SIGIL order (b) and their colors: the joint cast (T15) still draws its double outline through HFx. */
+    private static final String[] SIGIL_ORDER = {"fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind"};
     private static final int[] SIGIL_COLORS = {0xFF7A2A, 0x9FE0FF, 0x6BE6FF, 0x7EE04A, 0xFFE38A, 0xE0242C, 0xC060FF, 0xDDE6F0, 0x3FD6B8, 0xBFF2E8};
 
-    /** Every cast of an ordinary-school spell flashes the drawn sigil of its school under the caster. */
+    /** Index of the drawn sigil of an Iron's school (by path), -1 if it has none. */
+    public static int sigilIndex(String school) {
+        for (int i = 0; i < SIGIL_ORDER.length; i++) if (SIGIL_ORDER[i].equals(school)) return i;
+        return -1;
+    }
+
+    public static int sigilColor(int index) {
+        return SIGIL_COLORS[index];
+    }
+
+    /** Every cast of an ordinary-school spell draws the sign of its school under the caster (the spell's own visuals stay as they are). */
     @Override
     public void onCast(net.minecraft.world.level.Level level, int spellLevel, LivingEntity caster, io.redspace.ironsspellbooks.api.spells.CastSource source,
                        io.redspace.ironsspellbooks.api.magic.MagicData md) {
         if (level instanceof ServerLevel sl && caster != null) {
             String school = getSchoolType() == null ? "" : getSchoolType().getId().getPath();
-            for (int i = 0; i < SIGIL_SCHOOLS.length; i++) {
-                if (!SIGIL_SCHOOLS[i].equals(school)) continue;
-                ru.pohsmp.core.net.Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), caster.getX(), caster.getY(), caster.getZ(),
-                        new ru.pohsmp.core.net.Net.HFx(ru.pohsmp.core.net.Net.HFx.SIGIL, HigherSpell.key(), caster.getId(), i, 34,
-                                caster.getX(), caster.getY(), caster.getZ(), 1.9, SIGIL_COLORS[i]));
-                break;
-            }
+            if (SIGIL_SCHOOLS.contains(school))
+                ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx("school_" + school).at(caster.position()).caster(caster));
         }
         super.onCast(level, spellLevel, caster, source, md);
     }

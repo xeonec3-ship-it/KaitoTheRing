@@ -35,7 +35,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Divine. "The Ark": after a 5 s cast a dome of light r32 stands for 60 s at the cast point. Players inside cannot die (health stays
@@ -94,9 +94,7 @@ public class ArkSpell extends PohSpell {
             d.until = sl.getGameTime() + LIFE;
             DOMES.add(d);
             Vec3 c = d.c;
-            int ring = HigherSpell.key(), sky = HigherSpell.key();
-            HigherSpell.fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.RING, ring, -1, -1, 30, c.x, c.y, c.z, (float) R, Reg.DIVINE_COLOR));
-            HigherSpell.fx(sl, c.x, c.y + 32, c.z, new Net.HFx(Net.HFx.SKY, sky, -1, -1, LIFE, c.x, c.y + 32, c.z, 18, Reg.DIVINE_COLOR));
+            int fx = Fx.play(sl, Fx.fx("ark").at(c).yaw(caster.getYRot()).duration(LIFE));   // bubble, sun seal overhead, curtain of light, feathers
             sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 5f, 0.5f);
             sl.playSound(null, c.x, c.y, c.z, SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 5f, 0.5f);
             MobEffect silence = net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getValue(new net.minecraft.resources.ResourceLocation("mna", "silence"));
@@ -117,7 +115,7 @@ public class ArkSpell extends PohSpell {
                     if (!DOMES.contains(d)) return false;
                     if (sl.getGameTime() > d.until) {
                         DOMES.remove(d);
-                        HigherSpell.stop(sl, c.x, c.y + 32, c.z, sky);
+                        Fx.stop(sl, fx, "");
                         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 5f, 0.5f);
                         return false;
                     }

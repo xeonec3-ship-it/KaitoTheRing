@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «blood» для знаков при касте (fx/school_blood.json): кровь: капли с обода и шипы, падают капли.",
+ "palette": {
+  "primary": "#E0242C",
+  "secondary": "#FF8A8A",
+  "core": "#FFFFFF",
+  "shadow": "#4A0006"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_blood_band",
+  "shards": "drop",
+  "sigil": "sigil_blood"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

@@ -17,15 +17,20 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "4";
+    private static final String V = "7";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
         CH.messageBuilder(Fx.class, 0, NetworkDirection.PLAY_TO_CLIENT).encoder(Fx::encode).decoder(Fx::new).consumerMainThread(Fx::handle).add();
         CH.messageBuilder(HFx.class, 1, NetworkDirection.PLAY_TO_CLIENT).encoder(HFx::encode).decoder(HFx::new).consumerMainThread(HFx::handle).add();
         CH.messageBuilder(FxMsg.class, 2, NetworkDirection.PLAY_TO_CLIENT).encoder(FxMsg::encode).decoder(FxMsg::new).consumerMainThread(FxMsg::handle).add();
-        CH.messageBuilder(SilentSync.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(SilentSync::encode).decoder(SilentSync::new)
+        CH.messageBuilder(HideMsg.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(HideMsg::encode).decoder(HideMsg::new).consumerMainThread(HideMsg::handle).add();
+        CH.messageBuilder(NpcCastMsg.class, 4, NetworkDirection.PLAY_TO_CLIENT).encoder(NpcCastMsg::encode).decoder(NpcCastMsg::new).consumerMainThread(NpcCastMsg::handle).add();
+        CH.messageBuilder(CastTime.class, 5, NetworkDirection.PLAY_TO_CLIENT).encoder(CastTime::encode).decoder(CastTime::new).consumerMainThread(CastTime::handle).add();
+        CH.messageBuilder(SilentSync.class, 6, NetworkDirection.PLAY_TO_CLIENT).encoder(SilentSync::encode).decoder(SilentSync::new)
                 .consumerMainThread(SilentSync::handle).add();
+        CH.messageBuilder(NeroMsg.class, 7, NetworkDirection.PLAY_TO_CLIENT).encoder(NeroMsg::encode).decoder(NeroMsg::new)
+                .consumerMainThread(NeroMsg::handle).add();
     }
 
     /**
@@ -35,7 +40,8 @@ public final class Net {
     public static final class HFx {
         public static final int STOP = 0, TELE = 1, SLEEP = 2, STAR = 3, SING = 4, SEAL = 5, ASC = 6, RING = 7, BURST = 8, PILLAR = 9, SKY = 10, FLASH = 11, MOON = 12,
                 CUT = 13, DOWN = 14, RIFT = 15, TABOO = 16, SIGIL = 17, WARD = 18, MILKY = 19, GALAXY = 20, SOUL = 21, TABOO_CAST = 22, BLIZZARD = 23,
-                CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27;
+                CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27,
+                JOINT = 28;   // joint cast: a = caster, b = partner, dur, f = sigil radius, i = (school sigil << 24) | color
         public final byte kind;
         public final int key, a, b, dur, i;
         public final float x, y, z, f;
@@ -132,6 +138,66 @@ public final class Net {
         }
     }
 
+    /** A non-player caster (spell/NpcCast) started, finished or cancelled a cast: sound and animation on clients. */
+    public static final class NpcCastMsg {
+        public static final int START = 0, FINISH = 1, CANCEL = 2;
+        public final byte phase;
+        public final int entity, level, ticks;
+        public final String spell;
+
+        public NpcCastMsg(int phase, int entity, String spell, int level, int ticks) {
+            this.phase = (byte) phase;
+            this.entity = entity;
+            this.spell = spell;
+            this.level = level;
+            this.ticks = ticks;
+        }
+
+        public NpcCastMsg(FriendlyByteBuf b) {
+            phase = b.readByte();
+            entity = b.readVarInt();
+            spell = b.readUtf(256);
+            level = b.readVarInt();
+            ticks = b.readVarInt();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeByte(phase);
+            b.writeVarInt(entity);
+            b.writeUtf(spell, 256);
+            b.writeVarInt(level);
+            b.writeVarInt(ticks);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.NpcCastClient.handle(this));
+        }
+    }
+
+    /** Joint cast: the caster's own cast bar gets the new total and remaining time (ticks). */
+    public static final class CastTime {
+        public final int duration, remaining;
+
+        public CastTime(int duration, int remaining) {
+            this.duration = duration;
+            this.remaining = remaining;
+        }
+
+        public CastTime(FriendlyByteBuf b) {
+            duration = b.readVarInt();
+            remaining = b.readVarInt();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeVarInt(duration);
+            b.writeVarInt(remaining);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.JointFx.castTime(this));
+        }
+    }
+
     /** Silent Witch outfit: the whole map player id -&gt; name-hiding flags (ru.pohsmp.core.silent.SilentWitch.NAME_TAG / NAMELESS). */
     public static final class SilentSync {
         public final java.util.Map<java.util.UUID, Integer> flags;
@@ -156,6 +222,30 @@ public final class Net {
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
             ru.pohsmp.core.silent.SilentWitch.setClientFlags(flags);
+        }
+    }
+
+    /** Silent Witch outfit: the wearer's Nero turns into the dragon shadow for this many ticks (0 = comes back now). */
+    public static final class NeroMsg {
+        public final int entity, ticks;
+
+        public NeroMsg(int entity, int ticks) {
+            this.entity = entity;
+            this.ticks = ticks;
+        }
+
+        public NeroMsg(FriendlyByteBuf b) {
+            entity = b.readVarInt();
+            ticks = b.readVarInt();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeVarInt(entity);
+            b.writeVarInt(ticks);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.OutfitAnim.dragon(entity, ticks));
         }
     }
 }

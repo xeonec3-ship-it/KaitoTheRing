@@ -1,0 +1,112 @@
+{
+ "comment": "Млечный путь, каст 10 с (ролик камеры): звёздная печать под ногами, круг за спиной, звёзды вьются; над полем раскрывается галактика, мир темнеет в фиолетовую ночь, туманности; к концу — вспышка в руке.",
+ "style": "astral",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "milky_ground",
+   "until": 200
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,1.5,-0.5",
+   "follow": true,
+   "id": "milky_halo",
+   "until": 200
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 200,
+   "texture": "spark_sharp",
+   "count": 600,
+   "rate": 3,
+   "spread": 3.5,
+   "speed": 0.01,
+   "size": [
+    0.22,
+    0.02
+   ],
+   "spin": 180,
+   "life": 40,
+   "color": "@secondary"
+  },
+  {
+   "type": "sigil",
+   "delay": 60,
+   "at": "caster+0,20,10",
+   "id": "milky_sky",
+   "until": 200
+  },
+  {
+   "type": "tint",
+   "delay": 100,
+   "at": "caster",
+   "duration": 100,
+   "radius": 48,
+   "color": "#2A1A5A",
+   "strength": 0.4,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 90,
+   "at": "caster+0,16,10",
+   "duration": 110,
+   "texture": "glow",
+   "count": 40,
+   "rate": 1,
+   "area": 28,
+   "speed": 0.004,
+   "size": [
+    5,
+    8
+   ],
+   "life": 110,
+   "color": "#5A3AB0",
+   "brightness": 0.35,
+   "comment": "туманность: крупные мягкие пятна"
+  },
+  {
+   "type": "sprites",
+   "delay": 100,
+   "at": "caster+0,16,10",
+   "duration": 100,
+   "texture": "spark_sharp",
+   "count": 200,
+   "rate": 2,
+   "area": 30,
+   "speed": 0,
+   "size": [
+    0.5,
+    0.2
+   ],
+   "spin": 90,
+   "life": 100,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "flash",
+   "delay": 186,
+   "at": "caster.hand",
+   "duration": 14,
+   "size": 3,
+   "anamorphic": 10,
+   "rays": 10,
+   "screen": 0.3,
+   "color": "#E8DCFF"
+  }
+ ]
+}

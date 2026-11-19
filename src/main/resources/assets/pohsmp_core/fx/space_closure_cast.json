@@ -1,0 +1,279 @@
+{
+ "comment": "Закрытие пространства, каст 20 с (ролик камеры): печать Ковена, семь столбов гептаграммы, нити от столбов к великой печати в небе; в последней трети вокруг кастера рождается купол.",
+ "style": "coven",
+ "duration": 400,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "closure_ground",
+   "until": 400
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "caster",
+   "duration": 360,
+   "texture": "spark_soft",
+   "count": 1080,
+   "rate": 3,
+   "area": 3,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.18,
+    0.03
+   ],
+   "life": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "delay": 100,
+   "at": "caster+0,0.06,-8.2",
+   "id": "closure_node",
+   "until": 400
+  },
+  {
+   "type": "sigil",
+   "delay": 104,
+   "at": "caster+6.41,0.06,-5.11",
+   "id": "closure_node",
+   "until": 400
+  },
+  {
+   "type": "sigil",
+   "delay": 108,
+   "at": "caster+7.99,0.06,1.82",
+   "id": "closure_node",
+   "until": 400
+  },
+  {
+   "type": "sigil",
+   "delay": 112,
+   "at": "caster+3.56,0.06,7.39",
+   "id": "closure_node",
+   "until": 400
+  },
+  {
+   "type": "sigil",
+   "delay": 116,
+   "at": "caster+-3.56,0.06,7.39",
+   "id": "closure_node",
+   "until": 400
+  },
+  {
+   "type": "sigil",
+   "delay": 120,
+   "at": "caster+-7.99,0.06,1.82",
+   "id": "closure_node",
+   "until": 400
+  },
+  {
+   "type": "sigil",
+   "delay": 124,
+   "at": "caster+-6.41,0.06,-5.11",
+   "id": "closure_node",
+   "until": 400
+  },
+  {
+   "type": "beam",
+   "delay": 100,
+   "at": "caster+0,0,-8.2",
+   "to": "caster+0,22,-8.2",
+   "duration": 300,
+   "width": 0.5,
+   "core": 0.3,
+   "grow": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 104,
+   "at": "caster+6.41,0,-5.11",
+   "to": "caster+6.41,22,-5.11",
+   "duration": 296,
+   "width": 0.5,
+   "core": 0.3,
+   "grow": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 108,
+   "at": "caster+7.99,0,1.82",
+   "to": "caster+7.99,22,1.82",
+   "duration": 292,
+   "width": 0.5,
+   "core": 0.3,
+   "grow": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 112,
+   "at": "caster+3.56,0,7.39",
+   "to": "caster+3.56,22,7.39",
+   "duration": 288,
+   "width": 0.5,
+   "core": 0.3,
+   "grow": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 116,
+   "at": "caster+-3.56,0,7.39",
+   "to": "caster+-3.56,22,7.39",
+   "duration": 284,
+   "width": 0.5,
+   "core": 0.3,
+   "grow": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 120,
+   "at": "caster+-7.99,0,1.82",
+   "to": "caster+-7.99,22,1.82",
+   "duration": 280,
+   "width": 0.5,
+   "core": 0.3,
+   "grow": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 124,
+   "at": "caster+-6.41,0,-5.11",
+   "to": "caster+-6.41,22,-5.11",
+   "duration": 276,
+   "width": 0.5,
+   "core": 0.3,
+   "grow": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "delay": 160,
+   "at": "caster+0,40,0",
+   "id": "closure_sky",
+   "until": 400
+  },
+  {
+   "type": "beam",
+   "delay": 170,
+   "at": "caster+0,22,-8.2",
+   "to": "caster+0,40,-24.6",
+   "duration": 230,
+   "width": 0.22,
+   "core": 0.35,
+   "grow": 60,
+   "flicker": 0.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 174,
+   "at": "caster+6.41,22,-5.11",
+   "to": "caster+19.23,40,-15.34",
+   "duration": 226,
+   "width": 0.22,
+   "core": 0.35,
+   "grow": 60,
+   "flicker": 0.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 178,
+   "at": "caster+7.99,22,1.82",
+   "to": "caster+23.98,40,5.47",
+   "duration": 222,
+   "width": 0.22,
+   "core": 0.35,
+   "grow": 60,
+   "flicker": 0.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 182,
+   "at": "caster+3.56,22,7.39",
+   "to": "caster+10.67,40,22.16",
+   "duration": 218,
+   "width": 0.22,
+   "core": 0.35,
+   "grow": 60,
+   "flicker": 0.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 186,
+   "at": "caster+-3.56,22,7.39",
+   "to": "caster+-10.67,40,22.16",
+   "duration": 214,
+   "width": 0.22,
+   "core": 0.35,
+   "grow": 60,
+   "flicker": 0.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 190,
+   "at": "caster+-7.99,22,1.82",
+   "to": "caster+-23.98,40,5.47",
+   "duration": 210,
+   "width": 0.22,
+   "core": 0.35,
+   "grow": 60,
+   "flicker": 0.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 194,
+   "at": "caster+-6.41,22,-5.11",
+   "to": "caster+-19.23,40,-15.34",
+   "duration": 206,
+   "width": 0.22,
+   "core": 0.35,
+   "grow": 60,
+   "flicker": 0.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 260,
+   "at": "caster+0,0.5,0",
+   "duration": 140,
+   "shape": "sphere",
+   "radius": 26,
+   "rim": 1.2,
+   "color": "@primary",
+   "comment": "купол рождается"
+  },
+  {
+   "type": "flash",
+   "delay": 340,
+   "at": "caster+0,1.3,0",
+   "duration": 60,
+   "size": 6,
+   "color": "#D8C8FF"
+  },
+  {
+   "type": "flash",
+   "delay": 392,
+   "at": "caster+0,1.3,0",
+   "duration": 10,
+   "size": 10,
+   "rays": 14,
+   "anamorphic": 30,
+   "screen": 0.55,
+   "color": "#FFFFFF"
+  }
+ ]
+}

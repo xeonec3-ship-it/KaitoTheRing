@@ -1,0 +1,182 @@
+{
+ "comment": "Табу: великая печать над полем (радиус 128). Под ней — кольцо рун и малые круги ниже по оси; медленно дышит.",
+ "size": 128.0,
+ "color": "#FFD36B",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "taboo",
+   "type": "disc",
+   "texture": "circle_taboo",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.5
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 80
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.04,
+   "heightOffset": 0.2,
+   "brightness": 0.9,
+   "inner": 0.99,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  },
+  {
+   "id": "runes",
+   "type": "band",
+   "texture": "rune_band",
+   "radius": 0.86,
+   "heightOffset": 12,
+   "brightness": 0.8,
+   "inner": 0.9534883720930232,
+   "repeat": 24,
+   "appear": {
+    "delay": 20,
+    "duration": 60,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -0.6
+   }
+  },
+  {
+   "id": "metatron",
+   "type": "disc",
+   "texture": "pat_metatron",
+   "radius": 0.36,
+   "heightOffset": 2,
+   "brightness": 0.7,
+   "appear": {
+    "delay": 10,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1
+   }
+  },
+  {
+   "id": "circle_a",
+   "type": "disc",
+   "texture": "circle_a",
+   "radius": 0.5,
+   "heightOffset": 4,
+   "color": "#FFF4D6",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 10,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -1.4
+   }
+  },
+  {
+   "id": "circle_b",
+   "type": "disc",
+   "texture": "circle_b",
+   "radius": 0.22,
+   "heightOffset": 7,
+   "color": "#FFF4D6",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 20,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 3
+   }
+  },
+  {
+   "id": "zodiac",
+   "type": "disc",
+   "texture": "pat_zodiac",
+   "radius": 0.14,
+   "heightOffset": 10,
+   "brightness": 0.8,
+   "appear": {
+    "delay": 30,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -4
+   }
+  },
+  {
+   "id": "rays",
+   "type": "spokes",
+   "texture": "rays",
+   "radius": 0.24,
+   "heightOffset": 6,
+   "brightness": 0.5,
+   "appear": {
+    "delay": 30,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.8
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 60
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 40,
+  "stagger": 4
+ }
+}

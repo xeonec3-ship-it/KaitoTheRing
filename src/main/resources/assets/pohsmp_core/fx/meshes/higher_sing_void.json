@@ -1,0 +1,13 @@
+{
+ "comment": "Сингулярность: тёмный диск горизонта событий (затемняет, а не светит). Плоскость вертикальная, поэтому эффект ставит три таких диска под углами 0/60/120 — с любой стороны видно чёрный шар.",
+ "style": "higher",
+ "center": 0,
+ "formedAt": 12,
+ "collapse": { "duration": 6, "easing": "easeInCubic" },
+ "parts": [
+  { "type": "disc", "texture": "void", "radius": 1.25, "blend": "translucent", "color": "#FFFFFF",
+    "appear": { "delay": 0, "duration": 12, "easing": "easeOutBack" } },
+  { "type": "disc", "texture": "void", "radius": 0.8, "blend": "translucent", "color": "#FFFFFF", "spin": 40,
+    "appear": { "delay": 2, "duration": 10, "easing": "easeOutCubic" } }
+ ]
+}

@@ -1,0 +1,167 @@
+{
+ "comment": "Закрытие пространства: купол радиуса 86 на минуты. Вспышка-пузырь, решётка из шести меридианов и широт, пояс рун на экваторе, семь печатей в оболочке, печать в зените и в центре.",
+ "style": "coven",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "shape": "sphere",
+   "radius": 86,
+   "rim": 1.6,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,2,0",
+   "duration": 16,
+   "size": 14,
+   "rays": 14,
+   "anamorphic": 40,
+   "screen": 0.6,
+   "color": "#E4DAFF"
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "closure_meridian",
+   "yaw": 0
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "closure_meridian",
+   "yaw": 30
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "closure_meridian",
+   "yaw": 60
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "closure_meridian",
+   "yaw": 90
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "closure_meridian",
+   "yaw": 120
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "closure_meridian",
+   "yaw": 150
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,0.3,0",
+   "id": "closure_belt",
+   "scale": 86
+  },
+  {
+   "type": "sigil",
+   "delay": 20,
+   "at": "caster+0,29.41,0",
+   "id": "closure_lat",
+   "scale": 80.81
+  },
+  {
+   "type": "sigil",
+   "delay": 26,
+   "at": "caster+0,55.28,0",
+   "id": "closure_lat",
+   "scale": 65.88
+  },
+  {
+   "type": "sigil",
+   "delay": 32,
+   "at": "caster+0,74.48,0",
+   "id": "closure_lat",
+   "scale": 43.0
+  },
+  {
+   "type": "sigil",
+   "delay": 38,
+   "at": "caster+0,83.45,0",
+   "id": "closure_lat",
+   "scale": 20.81
+  },
+  {
+   "type": "sigil",
+   "delay": 30,
+   "at": "caster+81.79,26.58,0",
+   "id": "closure_emblem"
+  },
+  {
+   "type": "sigil",
+   "delay": 33,
+   "at": "caster+51,26.58,63.95",
+   "id": "closure_emblem"
+  },
+  {
+   "type": "sigil",
+   "delay": 36,
+   "at": "caster+-18.2,26.58,79.74",
+   "id": "closure_emblem"
+  },
+  {
+   "type": "sigil",
+   "delay": 39,
+   "at": "caster+-73.69,26.58,35.49",
+   "id": "closure_emblem"
+  },
+  {
+   "type": "sigil",
+   "delay": 42,
+   "at": "caster+-73.69,26.58,-35.49",
+   "id": "closure_emblem"
+  },
+  {
+   "type": "sigil",
+   "delay": 45,
+   "at": "caster+-18.2,26.58,-79.74",
+   "id": "closure_emblem"
+  },
+  {
+   "type": "sigil",
+   "delay": 48,
+   "at": "caster+51,26.58,-63.95",
+   "id": "closure_emblem"
+  },
+  {
+   "type": "sigil",
+   "delay": 20,
+   "at": "caster+0,85.6,0",
+   "id": "closure_zenith"
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.07,0",
+   "id": "closure_center"
+  },
+  {
+   "type": "sigil",
+   "delay": 30,
+   "at": "caster+0,4,0",
+   "id": "taboo_gyro",
+   "scale": 0.34,
+   "color": "@primary"
+  }
+ ]
+}

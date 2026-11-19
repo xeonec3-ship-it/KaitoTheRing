@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «wind» для знаков при касте (fx/school_wind.json): ветер: вихри по ободу, закрученные потоки.",
+ "palette": {
+  "primary": "#BFF2E8",
+  "secondary": "#FFFFFF",
+  "core": "#FFFFFF",
+  "shadow": "#3A7A70"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_wind_band",
+  "shards": "swirl",
+  "sigil": "sigil_wind"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

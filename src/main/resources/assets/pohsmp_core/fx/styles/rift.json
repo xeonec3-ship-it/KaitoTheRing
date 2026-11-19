@@ -1,0 +1,21 @@
+{
+ "comment": "Разлом: густой фиолетовый и чёрный, бледно-лиловое ядро.",
+ "palette": {
+  "primary": "#7A2AC8",
+  "secondary": "#2A0A44",
+  "core": "#E8D0FF",
+  "shadow": "#06020A"
+ },
+ "textures": {
+  "sparks": "spark_sharp",
+  "runes": "rune_band",
+  "shards": "shard",
+  "sigil": "higher_cracks"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.4,
+  "jitter": 0.3,
+  "easing": "easeOutSine"
+ }
+}

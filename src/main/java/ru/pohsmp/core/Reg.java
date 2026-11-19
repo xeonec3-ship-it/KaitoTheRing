@@ -109,7 +109,7 @@ public final class Reg {
     public static final RegistryObject<SchoolType> FORBIDDEN = SCHOOLS.register("forbidden", () -> new SchoolType(FORBIDDEN_ID, FORBIDDEN_FOCUS,
             Component.translatable("school.pohsmp_core.forbidden").withStyle(Style.EMPTY.withColor(FORBIDDEN_COLOR)),
             FORBIDDEN_POWER, FORBIDDEN_RESIST, () -> SoundEvents.END_PORTAL_SPAWN, FORBIDDEN_DAMAGE, false, false));
-    /** "Silent" school (T18): turquoise-green, quiet chime; spells of the Silent Witch staff. */
+    /** "Silent" school (T18): the Silent Witch's magic, cast without words. Damage goes through armor. */
     public static final int SILENT_COLOR = 0x7FFFD0;
     public static final RegistryObject<Attribute> SILENT_POWER = ATTRS.register("silent_spell_power",
             () -> new RangedAttribute("attribute.pohsmp_core.silent_spell_power", 1.0, 0.0, 10.0).setSyncable(true));
@@ -133,6 +133,8 @@ public final class Reg {
             .addAttributeModifier(Attributes.MAX_HEALTH, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a09", -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL)
             .addAttributeModifier(Attributes.MOVEMENT_SPEED, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0a", -0.35, AttributeModifier.Operation.MULTIPLY_TOTAL)
             .addAttributeModifier(Attributes.ATTACK_DAMAGE, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0b", -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL));
+    /** Black flame of Worgan: 1.5 damage a second, water does not put it out, milk does not cure it. */
+    public static final RegistryObject<MobEffect> BLACK_FLAME = EFFECTS.register("black_flame", ru.pohsmp.core.spell.silent.WorganFlameSpell.BlackFlame::new);
 
     public static final DeferredRegister<AbstractSpell> SPELLS = DeferredRegister.create(SpellRegistry.SPELL_REGISTRY_KEY, PohCore.MODID);
     public static final RegistryObject<AbstractSpell> DISINTEGRATION = SPELLS.register("disintegration", DisintegrationSpell::new);
@@ -199,13 +201,34 @@ public final class Reg {
     public static final List<String> CREATION_SPELLS = List.of(ru.pohsmp.core.spell.DownfallSpell.PATH);
     public static final RegistryObject<AbstractSpell> DOWNFALL = SPELLS.register(ru.pohsmp.core.spell.DownfallSpell.PATH, ru.pohsmp.core.spell.DownfallSpell::new);
 
+    /** "Unknown" tier: only through the Silent Witch staff, in its slot order (T18; spells - T03 Gate, T20 the other four). */
+    public static final List<String> UNKNOWN_SPELLS = List.of(ru.pohsmp.core.spell.silent.SilentGateSpell.PATH,
+            ru.pohsmp.core.spell.silent.WindSpearsSpell.PATH, ru.pohsmp.core.spell.silent.SilentVolleySpell.PATH,
+            ru.pohsmp.core.spell.silent.SageBarrierSpell.PATH, ru.pohsmp.core.spell.silent.WorganFlameSpell.PATH);
+    public static final RegistryObject<AbstractSpell> SILENT_GATE = SPELLS.register(ru.pohsmp.core.spell.silent.SilentGateSpell.PATH,
+            ru.pohsmp.core.spell.silent.SilentGateSpell::new);
+    public static final RegistryObject<AbstractSpell> WIND_SPEARS = SPELLS.register(ru.pohsmp.core.spell.silent.WindSpearsSpell.PATH,
+            ru.pohsmp.core.spell.silent.WindSpearsSpell::new);
+    public static final RegistryObject<AbstractSpell> SILENT_VOLLEY = SPELLS.register(ru.pohsmp.core.spell.silent.SilentVolleySpell.PATH,
+            ru.pohsmp.core.spell.silent.SilentVolleySpell::new);
+    public static final RegistryObject<AbstractSpell> SAGE_BARRIER = SPELLS.register(ru.pohsmp.core.spell.silent.SageBarrierSpell.PATH,
+            ru.pohsmp.core.spell.silent.SageBarrierSpell::new);
+    public static final RegistryObject<AbstractSpell> WORGAN_FLAME = SPELLS.register(ru.pohsmp.core.spell.silent.WorganFlameSpell.PATH,
+            ru.pohsmp.core.spell.silent.WorganFlameSpell::new);
+    /** Spells of the Silent Witch staff, slot by slot (same order as {@link #UNKNOWN_SPELLS}). */
+    public static final List<RegistryObject<AbstractSpell>> SILENT_STAFF_SPELLS = List.of(SILENT_GATE, WIND_SPEARS, SILENT_VOLLEY, SAGE_BARRIER, WORGAN_FLAME);
+
     /** Spells with the built-in Higher tier, in tab order. */
     public static final List<String> HIGHER_SPELLS = List.of(CradleSpell.PATH, FateStarSpell.PATH, SingularitySpell.PATH,
             SealSpell.PATH, AscensionSpell.PATH, AshlessSpell.PATH, ru.pohsmp.core.spell.BloodMoonSpell.PATH,
             ru.pohsmp.core.spell.OblivionBladesSpell.PATH, ru.pohsmp.core.spell.WorldRiftSpell.PATH, ru.pohsmp.core.spell.MirrorPrisonSpell.PATH,
             ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell.PATH,
-            ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH);
+            ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.CountdownSpell.PATH,
+            ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH);
     static {
+        SPELLS.register(ru.pohsmp.core.spell.StarFallSpell.PATH, ru.pohsmp.core.spell.StarFallSpell::new);
+        SPELLS.register(ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.ScarletCutSpell::new);
+        SPELLS.register(ru.pohsmp.core.spell.CountdownSpell.PATH, ru.pohsmp.core.spell.CountdownSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.DisintegrationReplicaSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.MilkyWaySpell::new);
         SPELLS.register(ru.pohsmp.core.spell.EternalBlizzardSpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell::new);
@@ -240,6 +263,7 @@ public final class Reg {
             () -> new ru.pohsmp.core.silent.SilentWitchArmor(net.minecraft.world.item.ArmorItem.Type.CHESTPLATE));
     public static final RegistryObject<Item> SILENT_WITCH_SKIRT = ITEMS.register("silent_witch_skirt",
             () -> new ru.pohsmp.core.silent.SilentWitchArmor(net.minecraft.world.item.ArmorItem.Type.LEGGINGS));
+    public static final RegistryObject<Item> SILENT_WITCH_STAFF = ITEMS.register(SilentWitchStaff.NAME, SilentWitchStaff::new);
 
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, PohCore.MODID);
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
@@ -259,6 +283,7 @@ public final class Reg {
                 out.accept(SILENT_WITCH_HOOD.get());
                 out.accept(SILENT_WITCH_ROBE.get());
                 out.accept(SILENT_WITCH_SKIRT.get());
+                out.accept(SILENT_WITCH_STAFF.get());
             })
             .build());
 

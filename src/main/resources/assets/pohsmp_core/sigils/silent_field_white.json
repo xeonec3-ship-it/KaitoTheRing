@@ -1,0 +1,16 @@
+{
+  "comment": "Малая печать поля над площадью («Врата», 50 с): плоская, бьёт лучом вниз. Вариант: white.",
+  "size": 0.5,
+  "color": "#DDF2FF",
+  "orientation": "sky",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.2, "brightness": 0.6, "color": "#FFFFFF",
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.2, "period": 20 } },
+    { "id": "seal", "type": "disc", "texture": "silent_nimbus", "radius": 1.0,
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutBack", "modes": ["grow", "twist", "fade"], "twist": -150 }, "rotation": { "speed": 25, "boost": 2.0 } }
+  ],
+  "expand": { "scale": 4.0, "delay": 0, "duration": 8, "easing": "easeOutCubic" },
+  "dissolve": { "modes": ["collapse"], "duration": 12 }
+}

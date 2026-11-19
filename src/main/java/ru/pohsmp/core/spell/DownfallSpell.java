@@ -53,7 +53,7 @@ import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.DownfallStaff;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * "Creation" tier, Forbidden school, only from its staff. "Downfall": a 25 s cast; every player within 64 blocks is frozen,
@@ -71,7 +71,7 @@ public class DownfallSpell extends PohSpell {
 
     private static final class Cast {
         Vec3 at, rift, normal;
-        int age, cutKey, downKey;
+        int age, cutKey, fx = -1, riftFx = -1;
         List<UUID> watchers = new ArrayList<>();
     }
 
@@ -127,10 +127,11 @@ public class DownfallSpell extends PohSpell {
         Vec3 n = c.at.subtract(c.rift).multiply(1, 0, 1);
         c.normal = n.lengthSqr() < 1e-4 ? look.scale(-1) : n.normalize();
         c.cutKey = HigherSpell.key();
-        c.downKey = HigherSpell.key();
         float ang = (float) Math.atan2(c.normal.z, c.normal.x);
         c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.DOWNFALL, CAST, c.rift, ang);
-        HigherSpell.fx(sl, c.at.x, c.at.y, c.at.z, new Net.HFx(Net.HFx.DOWN, c.downKey, caster.getId(), -1, CAST, c.rift.x, c.rift.y, c.rift.z, ang, COLOR));
+        Vec3 riftC = c.rift.add(0, RIFT_H / 2, 0);
+        c.fx = Fx.play(sl, Fx.fx("downfall_cast").at(c.at).caster(caster).point("riftc", riftC).target(c.rift));
+        c.riftFx = Fx.play(sl, Fx.fx("downfall_rift_cast").at(c.rift).yaw(faceYaw(c.normal)));
         CASTS.put(caster.getUUID(), c);
         DownfallStaff.anim(caster, "cast");
         sl.playSound(null, c.at.x, c.at.y, c.at.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 4f, 0.5f);
@@ -204,6 +205,11 @@ public class DownfallSpell extends PohSpell {
         if (t >= 440 && t % 10 == 0) bolt(sl, r.add((sl.random.nextDouble() - 0.5) * 6, 0, (sl.random.nextDouble() - 0.5) * 6));
     }
 
+    /** Yaw whose forward is n: the rift and its rings stand across n, facing the caster. */
+    private static float faceYaw(Vec3 n) {
+        return (float) Math.toDegrees(Math.atan2(-n.x, n.z));
+    }
+
     private static void bolt(ServerLevel sl, Vec3 p) {
         LightningBolt b = EntityType.LIGHTNING_BOLT.create(sl);
         if (b == null) return;
@@ -232,7 +238,8 @@ public class DownfallSpell extends PohSpell {
         Cast c = CASTS.remove(caster.getUUID());
         if (c != null && level instanceof ServerLevel sl) {
             HigherSpell.stop(sl, c.at.x, c.at.y, c.at.z, c.cutKey);
-            HigherSpell.stop(sl, c.at.x, c.at.y, c.at.z, c.downKey);
+            Fx.stop(sl, c.fx, "");
+            if (c.age <= CAST) Fx.stop(sl, c.riftFx, "");
             Cutscene.end(sl, caster, c.watchers, c.cutKey);
             if (c.age <= CAST) DownfallStaff.anim(caster, null);
         }
@@ -255,9 +262,8 @@ public class DownfallSpell extends PohSpell {
 
     private static void openRift(ServerLevel sl, Cast c) {
         Vec3 g = c.rift, n = c.normal, side = new Vec3(-n.z, 0, n.x), center = g.add(0, RIFT_H / 2, 0);
-        int key = HigherSpell.key();
-        HigherSpell.fx(sl, g.x, g.y, g.z, new Net.HFx(Net.HFx.RIFT, key, -1, -1, RIFT_TICKS, g.x, g.y, g.z, Math.atan2(n.z, n.x), COLOR));
-        HigherSpell.burst(sl, g.x, g.y + 0.1, g.z, 8, COLOR);
+        if (c.riftFx >= 0) Fx.stop(sl, c.riftFx, "");
+        int riftFx = Fx.play(sl, Fx.fx("downfall_rift").at(g).yaw(faceYaw(n)));
         DivineEvents.particle(sl, ParticleTypes.EXPLOSION_EMITTER, center.x, center.y, center.z, 1, 0, 0);
         sl.playSound(null, g.x, g.y, g.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 5f, 0.4f);
         sl.playSound(null, g.x, g.y, g.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 3f, 0.5f);
@@ -281,8 +287,7 @@ public class DownfallSpell extends PohSpell {
                 if (age % 40 == 0) sl.playSound(null, center.x, center.y, center.z, SoundEvents.PORTAL_AMBIENT, SoundSource.PLAYERS, 3f, 0.5f);
                 if (age >= 15) swallow(sl, nether, center, n, side, dest);
                 if (age >= RIFT_TICKS) {
-                    HigherSpell.stop(sl, g.x, g.y, g.z, key);
-                    HigherSpell.burst(sl, g.x, g.y + 0.1, g.z, 5, COLOR);
+                    Fx.stop(sl, riftFx, "");
                     sl.playSound(null, center.x, center.y, center.z, SoundEvents.END_PORTAL_FRAME_FILL, SoundSource.PLAYERS, 4f, 0.4f);
                     return false;
                 }

@@ -1,0 +1,16 @@
+{
+  "comment": "Звезда судьбы: печать удара на земле (радиус урона 3) — лучи и венец звёзд выстреливают с перелётом, держатся долю секунды и разлетаются.",
+  "size": 3.4, "color": "#FFFFFF", "orientation": "ground", "lifetime": -1, "hold": 12,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.9, "brightness": 1.2,
+      "appear": { "delay": 0, "duration": 4, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "rays", "type": "spokes", "texture": "spokes", "radius": 0.95, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutBack", "modes": ["grow"] }, "rotation": { "speed": 60 } },
+    { "id": "stars", "type": "disc", "texture": "star_ring", "radius": 0.8, "heightOffset": 0.02, "color": "#FFFFFF",
+      "appear": { "delay": 1, "duration": 7, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": -90, "boost": 3 } },
+    { "id": "ring", "type": "disc", "texture": "thin_ring", "radius": 1.0, "heightOffset": 0.03,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutCubic", "modes": ["grow"] } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.5, "duration": 8, "sparks": 40 },
+  "dissolve": { "modes": ["shatter"], "duration": 12 }
+}

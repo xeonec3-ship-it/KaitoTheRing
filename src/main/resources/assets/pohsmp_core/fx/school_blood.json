@@ -1,0 +1,60 @@
+{
+ "comment": "Каст обычной магии школы «blood» (PohSpell.onCast): знак под магом, его малая копия у пояса, волна, частицы школы.",
+ "style": "school_blood",
+ "duration": 36,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "school_blood",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "sigil",
+   "id": "school_blood",
+   "delay": 3,
+   "at": "caster+0,1.0,0",
+   "follow": true,
+   "scale": 0.42
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 14,
+   "at": "caster",
+   "radius": 3.0,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 8,
+   "at": "caster+0,0.3,0",
+   "size": 1.6,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "duration": 30,
+   "at": "caster+0,2.2,0",
+   "follow": true,
+   "texture": "@shards",
+   "count": 16,
+   "rate": 1.2,
+   "area": 1.6,
+   "speed": 0.02,
+   "gravity": 0.002,
+   "spin": -40,
+   "size": [
+    0.22,
+    0.1
+   ],
+   "life": 22,
+   "color": "@secondary"
+  }
+ ]
+}

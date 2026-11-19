@@ -1,0 +1,142 @@
+{
+ "comment": "Пожирание душ, каст 25 с (ролик камеры): мир темнеет, печать и клетка из лучей вокруг жертвы, огоньки души поднимаются и по бирюзовой нити тянутся к руке кастера; над жертвой — воронка; к концу — сжатие и вспышка.",
+ "style": "soul",
+ "duration": 500,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "target",
+   "duration": 500,
+   "radius": 40,
+   "color": "#06161C",
+   "strength": 0.5,
+   "in": {
+    "duration": 60,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "target+0,0.05,0",
+   "id": "soul_ground",
+   "until": 500
+  },
+  {
+   "type": "curtain",
+   "delay": 20,
+   "at": "target",
+   "duration": 480,
+   "radius": 1.5,
+   "count": 10,
+   "height": 3.4,
+   "grow": 40,
+   "width": 0.07,
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "texture": "beam",
+   "color": "@primary",
+   "comment": "клетка"
+  },
+  {
+   "type": "sigil",
+   "delay": 40,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "soul_hand",
+   "until": 500
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "target+0,1,0",
+   "duration": 460,
+   "texture": "soul_mote",
+   "count": 920,
+   "rate": 2,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.003,
+   "size": [
+    0.3,
+    0.06
+   ],
+   "life": 50,
+   "color": "@primary"
+  },
+  {
+   "type": "beam",
+   "delay": 100,
+   "at": "target+0,1.1,0",
+   "to": "caster.hand",
+   "follow": true,
+   "duration": 400,
+   "width": 0.22,
+   "core": 0.3,
+   "grow": 40,
+   "flicker": 0.4,
+   "color": "@primary"
+  },
+  {
+   "type": "chains",
+   "delay": 160,
+   "at": "target+0,1.2,0",
+   "to": "caster+0,1.2,0",
+   "follow": true,
+   "duration": 340,
+   "link": 0.3,
+   "sag": 0.5,
+   "tension": 0.4,
+   "color": "@secondary",
+   "comment": "цепи души (движок элементов)"
+  },
+  {
+   "type": "sigil",
+   "delay": 250,
+   "at": "target+0,14,0",
+   "id": "soul_sky",
+   "until": 500
+  },
+  {
+   "type": "curtain",
+   "delay": 300,
+   "at": "target",
+   "duration": 200,
+   "radius": [
+    2.5,
+    4
+   ],
+   "count": 24,
+   "height": 14,
+   "grow": 40,
+   "fromTop": true,
+   "width": [
+    0.05,
+    0.15
+   ],
+   "brightness": [
+    0.2,
+    0.5
+   ],
+   "texture": "beam_fade",
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 420,
+   "at": "target+0,1,0",
+   "duration": 80,
+   "shape": "sphere",
+   "radius": 3,
+   "rim": 1.5,
+   "color": "@primary"
+  }
+ ]
+}

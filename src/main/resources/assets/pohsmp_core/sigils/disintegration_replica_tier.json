@@ -92,6 +92,10 @@
       "rotation": {
         "speed": 10,
         "boost": 2.0
+      },
+      "pulse": {
+        "amp": 0.18,
+        "period": 22
       }
     },
     {
@@ -126,9 +130,9 @@
   },
   "formedFlash": {
     "color": "#FFFFFF",
-    "size": 1.25,
+    "size": 1.4,
     "duration": 12,
-    "sparks": 40
+    "sparks": 64
   },
   "expand": {
     "scale": 4.0,

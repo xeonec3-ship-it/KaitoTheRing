@@ -1,0 +1,58 @@
+{
+ "comment": "Закрытие пространства: широта купола (радиус задаёт scale элемента): тонкое кольцо и пунктир.",
+ "size": 1.0,
+ "color": "#8A6CFF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.9,
+   "inner": 0.996,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  },
+  {
+   "id": "dash",
+   "type": "band",
+   "texture": "orbit_dash",
+   "radius": 0.995,
+   "heightOffset": 0.0,
+   "color": "#E4DAFF",
+   "brightness": 0.6,
+   "inner": 0.985,
+   "repeat": 24,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -0.6
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

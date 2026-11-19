@@ -1,0 +1,76 @@
+{
+ "comment": "Взрыв: круг на земле в точке удара, прорисовывается весь каст.",
+ "size": 12.0,
+ "color": "#FF6A1E",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "cracks",
+   "type": "disc",
+   "texture": "higher_cracks",
+   "radius": 0.9,
+   "heightOffset": 0.0,
+   "color": "#B0301A",
+   "brightness": 1.2,
+   "appear": {
+    "delay": 40,
+    "duration": 200,
+    "easing": "easeInSine",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "fire",
+   "type": "disc",
+   "texture": "sigil_fire",
+   "radius": 0.7,
+   "heightOffset": 0.01,
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 240,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 3
+   }
+  },
+  {
+   "id": "flames",
+   "type": "band",
+   "texture": "flame_band",
+   "radius": 1.0,
+   "heightOffset": 0.02,
+   "color": "#FFC23A",
+   "inner": 0.9,
+   "repeat": 14,
+   "appear": {
+    "delay": 120,
+    "duration": 120,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -4
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "shatter"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

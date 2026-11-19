@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «evocation» для знаков при касте (fx/school_evocation.json): воплощение: шевроны и ромбы, белые искры.",
+ "palette": {
+  "primary": "#DDE6F0",
+  "secondary": "#FFFFFF",
+  "core": "#FFFFFF",
+  "shadow": "#5A6A80"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_evocation_band",
+  "shards": "spark_soft",
+  "sigil": "sigil_evocation"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

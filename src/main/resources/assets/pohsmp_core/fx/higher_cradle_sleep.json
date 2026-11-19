@@ -1,0 +1,15 @@
+{
+  "comment": "Колыбель кошмара, сон (до 4 с). Играть с caster = спящая цель: печать-колыбель под ней, лунный венец над головой (caster.eyes), фиолетовая аура, из головы всплывают полумесяцы, вокруг тела кружат тёмные огоньки. Длится, пока его не остановят.",
+  "style": "higher",
+  "duration": -1,
+  "elements": [
+    { "type": "sigil", "id": "higher_cradle_bed", "delay": 0, "at": "caster+0,0.05,0", "follow": true },
+    { "type": "sigil", "id": "higher_cradle_halo", "delay": 2, "at": "caster.eyes+0,0.75,0", "follow": true },
+    { "type": "aura", "delay": 0, "at": "caster", "follow": true, "target": "caster", "thickness": 0.18, "pulse": { "amp": 0.35, "period": 40 },
+      "color": "#6A3ADF", "in": { "duration": 10, "easing": "easeOutCubic" } },
+    { "type": "sprites", "delay": 6, "at": "caster.eyes+0.2,0.5,0", "follow": true, "texture": "crescent", "count": 400, "rate": 0.25, "spread": 0.12,
+      "speed": 0.008, "gravity": -0.0015, "spin": 20, "sway": 0.4, "size": [0.1, 0.3], "life": 40, "color": "#D8C8FF" },
+    { "type": "sprites", "delay": 0, "at": "caster", "follow": true, "texture": "soul_mote", "count": 800, "rate": 0.5, "area": 0.8, "speed": 0.006,
+      "gravity": -0.0008, "size": [0.16, 0.04], "life": 30, "color": "#5A2AAA" }
+  ]
+}

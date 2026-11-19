@@ -31,7 +31,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Mythic, level 1. "Explosion!": a 15 s chant that cannot be interrupted. Seven magic circles light up one by one in the sky above
@@ -53,8 +53,7 @@ public class ExplosionSpell extends PohSpell {
 
     private static final class Cast {
         Vec3 at;
-        int age;
-        final List<Integer> keys = new ArrayList<>();
+        int age, fx = -1;
     }
 
     private static final Map<UUID, Cast> CASTS = new HashMap<>();
@@ -96,14 +95,11 @@ public class ExplosionSpell extends PohSpell {
             c = CASTS.get(caster.getUUID());
         }
         c.age++;
+        if (c.age == 1) c.fx = Fx.play(sl, Fx.fx("explosion_cast").at(c.at).yaw(caster.getYRot()));   // seven circles light up one by one
         int step = CAST / (CIRCLES + 1);
-        if (c.age % step == 0 && c.age / step <= CIRCLES) {   // one more circle in the sky
+        if (c.age % step == 0 && c.age / step <= CIRCLES) {   // one more circle in the sky (drawn by explosion_cast)
             int i = c.age / step - 1;
-            int k = HigherSpell.key();
-            c.keys.add(k);
             double y = c.at.y + 14 + i * 2.6;
-            float rad = (float) (R - i * 1.1);
-            HigherSpell.fx(sl, c.at.x, y, c.at.z, new Net.HFx(Net.HFx.SKY, k, -1, -1, CAST + 40, c.at.x, y, c.at.z, rad, COLOR));
             sl.playSound(null, c.at.x, y, c.at.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 6f, 0.5f + i * 0.12f);
             sl.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1.5f, 0.5f + i * 0.1f);
         }
@@ -132,7 +128,7 @@ public class ExplosionSpell extends PohSpell {
             Cast c = CASTS.remove(caster.getUUID());
             if (c != null) {
                 say(sl, caster, "ВЗРЫВ!");
-                for (int k : c.keys) HigherSpell.stop(sl, c.at.x, c.at.y + 20, c.at.z, k);
+                if (c.fx >= 0) Fx.stop(sl, c.fx, "");
                 boom(sl, caster, c.at);
                 spend(caster, md);
             }
@@ -143,7 +139,7 @@ public class ExplosionSpell extends PohSpell {
     @Override
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity entity, MagicData md, boolean cancelled) {
         Cast c = CASTS.remove(entity.getUUID());
-        if (c != null && level instanceof ServerLevel sl) for (int k : c.keys) HigherSpell.stop(sl, c.at.x, c.at.y + 20, c.at.z, k);
+        if (c != null && c.fx >= 0 && level instanceof ServerLevel sl) Fx.stop(sl, c.fx, "");
         super.onServerCastComplete(level, spellLevel, entity, md, cancelled);
     }
 
@@ -154,13 +150,7 @@ public class ExplosionSpell extends PohSpell {
     }
 
     private static void boom(ServerLevel sl, LivingEntity caster, Vec3 c) {
-        HigherSpell.fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.PILLAR, HigherSpell.key(), -1, -1, 50, c.x, c.y, c.z, 6, COLOR));
-        HigherSpell.fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.BURST, HigherSpell.key(), -1, -1, 30, c.x, c.y + 0.2, c.z, R * 1.6, COLOR));
-        for (ServerPlayer p : sl.players()) {
-            double d = p.position().distanceTo(c);
-            if (d < 96) Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
-                    new Net.HFx(Net.HFx.FLASH, HigherSpell.key(), -1, -1, d < 40 ? 30 : 15, c.x, c.y, c.z, 0, 0xFFE2B0));
-        }
+        Fx.play(sl, Fx.fx("explosion_boom").at(c));   // white-out, fire column, bubble, ground wave, cracks, embers
         CameraShakeManager.addCameraShake(new CameraShakeData(sl, 60, c, 64));
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 12f, 0.5f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.DRAGON_FIREBALL_EXPLODE, SoundSource.PLAYERS, 10f, 0.6f);

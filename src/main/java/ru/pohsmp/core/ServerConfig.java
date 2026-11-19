@@ -19,6 +19,23 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.BooleanValue SW_MUTE_CHANT, SW_SILENT_STEPS, SW_NO_VIBRATIONS, SW_TEAM, SW_GATE_MAGIC_IMMUNE;
     public static final ForgeConfigSpec.IntValue SW_BARRIER_COOLDOWN, SW_BARRIER_INVUL, SW_STEALTH_RANGE, SW_EXPOSE_SECONDS;
     public static final ForgeConfigSpec.ConfigValue<String> SW_GATE_SPELL;
+    public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> JOINT_SPELLS;
+    public static final ForgeConfigSpec.DoubleValue JOINT_RADIUS, JOINT_WINDOW, JOINT_MULT;
+    public static final ForgeConfigSpec.DoubleValue COUNTDOWN_MAX;
+    public static final ForgeConfigSpec.DoubleValue STAR_FALL_DAMAGE, STAR_FALL_EDGE;
+    public static final ForgeConfigSpec.IntValue SCARLET_CUTS_MIN, SCARLET_CUTS_MAX, SCARLET_INTERVAL, SCARLET_CRACK_DELAY;
+    public static final ForgeConfigSpec.DoubleValue SCARLET_DAMAGE, SCARLET_WIDTH, SCARLET_NEAR, SCARLET_FAR,
+            SCARLET_SHARD_DAMAGE, SCARLET_SHARD_RADIUS, SCARLET_KNOCK_UP;
+
+    // [silent_staff] - the four Silent Witch staff spells (T20)
+    public static final ForgeConfigSpec.IntValue SPEARS_CAST, SPEARS_MANA, SPEARS_TARGETS, SPEARS_HOVER;
+    public static final ForgeConfigSpec.DoubleValue SPEARS_COOLDOWN, SPEARS_RANGE, SPEARS_CONE, SPEARS_SPEED, SPEARS_DAMAGE, SPEARS_KNOCKBACK;
+    public static final ForgeConfigSpec.IntValue VOLLEY_CAST, VOLLEY_MANA, VOLLEY_SEALS, VOLLEY_PER_TARGET;
+    public static final ForgeConfigSpec.DoubleValue VOLLEY_COOLDOWN, VOLLEY_RADIUS, VOLLEY_ARC, VOLLEY_SEAL_RADIUS, VOLLEY_DAMAGE;
+    public static final ForgeConfigSpec.IntValue BARRIER_CAST, BARRIER_MANA, BARRIER_SECONDS;
+    public static final ForgeConfigSpec.DoubleValue BARRIER_COOLDOWN, BARRIER_RADIUS;
+    public static final ForgeConfigSpec.IntValue FLAME_CAST, FLAME_MANA, FLAME_BREATH, FLAME_INTERVAL, FLAME_BURN;
+    public static final ForgeConfigSpec.DoubleValue FLAME_COOLDOWN, FLAME_CONE, FLAME_RANGE, FLAME_DAMAGE, FLAME_BURN_DPS;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -62,6 +79,81 @@ public final class ServerConfig {
         SW_GATE_SPELL = b.comment("10. The Gate spell id (cast only in the full outfit)").define("gateSpell", "pohsmp_core:silent_gate");
         SW_GATE_BONUS = b.comment("10. Full set: Gate beams deal this much more damage").defineInRange("gateDamageBonus", 0.20, 0.0, 10.0);
         SW_GATE_MAGIC_IMMUNE = b.comment("10. Full set: no magic damage while casting the Gate").define("gateMagicImmune", true);
+        b.pop();
+        b.comment("Silent Witch staff spells: Wind Spears, Silent Volley, Barrier, Black Flame of Worgan.",
+                "Damage is multiplied by the caster's Silent spell power (the staff itself gives +25%).").push("silent_staff");
+        b.push("wind_spears");
+        SPEARS_CAST = b.comment("Cast time (ticks)").defineInRange("castTicks", 20, 0, 1200);
+        SPEARS_COOLDOWN = b.comment("Cooldown (seconds)").defineInRange("cooldown", 6.0, 0.0, 3600.0);
+        SPEARS_MANA = b.comment("Mana cost").defineInRange("mana", 40, 0, 10000);
+        SPEARS_TARGETS = b.comment("Most targets (one spear each)").defineInRange("targets", 5, 1, 32);
+        SPEARS_CONE = b.comment("Cone in front of the caster, full angle (degrees)").defineInRange("coneDegrees", 60.0, 1.0, 360.0);
+        SPEARS_RANGE = b.comment("Range (blocks)").defineInRange("range", 32.0, 1.0, 128.0);
+        SPEARS_HOVER = b.comment("Spears hang over the shoulders before they fly (ticks)").defineInRange("hoverTicks", 10, 0, 200);
+        SPEARS_SPEED = b.comment("Spear speed (blocks per tick)").defineInRange("speed", 3.0, 0.1, 16.0);
+        SPEARS_DAMAGE = b.comment("Damage of one spear (to the head)").defineInRange("damage", 14.0, 0.0, 10000.0);
+        SPEARS_KNOCKBACK = b.comment("Knockback strength").defineInRange("knockback", 0.6, 0.0, 10.0);
+        b.pop();
+        b.push("silent_volley");
+        VOLLEY_CAST = b.comment("Cast time (ticks); the seals appear during it").defineInRange("castTicks", 60, 0, 1200);
+        VOLLEY_COOLDOWN = b.comment("Cooldown (seconds)").defineInRange("cooldown", 20.0, 0.0, 3600.0);
+        VOLLEY_MANA = b.comment("Mana cost").defineInRange("mana", 100, 0, 10000);
+        VOLLEY_SEALS = b.comment("Seals (= arrows)").defineInRange("seals", 24, 1, 128);
+        VOLLEY_ARC = b.comment("Arc of the seals behind and to the sides of the caster (degrees)").defineInRange("arcDegrees", 200.0, 10.0, 360.0);
+        VOLLEY_SEAL_RADIUS = b.comment("Distance of the seals from the caster (blocks)").defineInRange("sealRadius", 2.5, 0.5, 16.0);
+        VOLLEY_RADIUS = b.comment("Enemies within this radius are shot (blocks)").defineInRange("radius", 24.0, 1.0, 128.0);
+        VOLLEY_DAMAGE = b.comment("Damage of one arrow").defineInRange("damage", 6.0, 0.0, 10000.0);
+        VOLLEY_PER_TARGET = b.comment("Most arrows into one target").defineInRange("perTarget", 6, 1, 128);
+        b.pop();
+        b.push("sage_barrier");
+        BARRIER_CAST = b.comment("Cast time (ticks)").defineInRange("castTicks", 30, 0, 1200);
+        BARRIER_COOLDOWN = b.comment("Cooldown (seconds)").defineInRange("cooldown", 40.0, 0.0, 3600.0);
+        BARRIER_MANA = b.comment("Mana cost").defineInRange("mana", 120, 0, 10000);
+        BARRIER_RADIUS = b.comment("Dome radius (blocks); the dome follows the caster").defineInRange("radius", 5.0, 1.0, 64.0);
+        BARRIER_SECONDS = b.comment("Dome lifetime (seconds)").defineInRange("seconds", 8, 1, 3600);
+        b.pop();
+        b.push("worgan_flame");
+        FLAME_CAST = b.comment("Cast time (ticks); the dragon shadow rises during it").defineInRange("castTicks", 40, 0, 1200);
+        FLAME_COOLDOWN = b.comment("Cooldown (seconds)").defineInRange("cooldown", 30.0, 0.0, 3600.0);
+        FLAME_MANA = b.comment("Mana cost").defineInRange("mana", 150, 0, 10000);
+        FLAME_BREATH = b.comment("Breath duration (ticks)").defineInRange("breathTicks", 60, 1, 1200);
+        FLAME_CONE = b.comment("Breath cone, full angle (degrees)").defineInRange("coneDegrees", 40.0, 1.0, 180.0);
+        FLAME_RANGE = b.comment("Breath length (blocks)").defineInRange("range", 12.0, 1.0, 64.0);
+        FLAME_DAMAGE = b.comment("Damage of one breath hit").defineInRange("damage", 3.0, 0.0, 10000.0);
+        FLAME_INTERVAL = b.comment("One breath hit per target every this many ticks").defineInRange("hitInterval", 10, 1, 200);
+        FLAME_BURN = b.comment("Black flame burning time (seconds); water does not put it out").defineInRange("burnSeconds", 8, 0, 600);
+        FLAME_BURN_DPS = b.comment("Black flame damage per second").defineInRange("burnDamagePerSecond", 1.5, 0.0, 10000.0);
+        b.pop();
+        b.pop();
+        b.push("joint_cast");
+        JOINT_SPELLS = b.comment("Joint cast: spells (full ids) two mages can cast together from scrolls. Only long casts (with a cast bar) take part.",
+                        "The second mage starts the same spell from a scroll within the window and the radius: both casts end together after",
+                        "castTimeMult of the first mage's cast time, the spell takes effect once (from the first mage), the second scroll is spent too.")
+                .defineListAllowEmpty(java.util.List.of("spells"), () -> java.util.List.of("pohsmp_core:explosion", "pohsmp_core:heaven_fall",
+                        "pohsmp_core:ark", "pohsmp_core:frozen_hour", "pohsmp_core:disintegration"), o -> o instanceof String s && s.contains(":"));
+        JOINT_RADIUS = b.comment("Max distance between the two mages (blocks)").defineInRange("radius", 6.0, 1.0, 64.0);
+        JOINT_WINDOW = b.comment("The second mage must start within this many seconds of the first one's cast start").defineInRange("windowSeconds", 2.0, 0.05, 30.0);
+        JOINT_MULT = b.comment("Cast time of a joint cast as a share of the first mage's cast time").defineInRange("castTimeMult", 0.7, 0.05, 1.0);
+        b.pop();
+        b.push("countdown");
+        COUNTDOWN_MAX = b.comment("Countdown: the repeated hit is capped at this share of the target's max health").defineInRange("maxRepeat", 0.4, 0.0, 100.0);
+        b.pop();
+        b.push("star_fall");
+        STAR_FALL_DAMAGE = b.comment("Star Fall: damage in the centre of the impact (times [higher] damageMult)").defineInRange("damage", 60.0, 0.0, 100000.0);
+        STAR_FALL_EDGE = b.comment("Star Fall: share of that damage at the edge of the radius (8 blocks); it falls off linearly from the centre").defineInRange("edgeShare", 0.4, 0.0, 1.0);
+        b.pop();
+        b.push("scarlet_cut");
+        SCARLET_CUTS_MIN = b.comment("Scarlet Cut: fewest cuts in a series").defineInRange("cutsMin", 3, 1, 20);
+        SCARLET_CUTS_MAX = b.comment("Most cuts in a series (the count is picked at random between min and max)").defineInRange("cutsMax", 5, 1, 20);
+        SCARLET_INTERVAL = b.comment("Ticks between cuts").defineInRange("interval", 4, 1, 40);
+        SCARLET_DAMAGE = b.comment("Damage of one cut to everyone it hits (times [higher] damageMult)").defineInRange("damage", 6.0, 0.0, 10000.0);
+        SCARLET_WIDTH = b.comment("Width of a cut across the view, blocks").defineInRange("width", 4.0, 0.5, 32.0);
+        SCARLET_NEAR = b.comment("A cut hits from this distance in front of the caster...").defineInRange("near", 3.0, 0.0, 32.0);
+        SCARLET_FAR = b.comment("...up to this distance, blocks").defineInRange("far", 6.0, 0.5, 64.0);
+        SCARLET_CRACK_DELAY = b.comment("Ticks from a cut until its crack bursts (the effect's burst is timed for 20)").defineInRange("crackDelay", 20, 1, 200);
+        SCARLET_SHARD_DAMAGE = b.comment("Damage of the crack's burst (times [higher] damageMult)").defineInRange("shardDamage", 4.0, 0.0, 10000.0);
+        SCARLET_SHARD_RADIUS = b.comment("The burst hits within this distance of the crack line, blocks").defineInRange("shardRadius", 1.5, 0.1, 16.0);
+        SCARLET_KNOCK_UP = b.comment("Upward push of the burst").defineInRange("knockUp", 0.4, 0.0, 5.0);
         b.pop();
         SPEC = b.build();
     }

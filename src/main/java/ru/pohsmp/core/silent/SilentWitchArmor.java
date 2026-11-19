@@ -32,12 +32,11 @@ import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache
 import software.bernie.geckolib.core.animation.AnimatableManager;
 import software.bernie.geckolib.core.animation.AnimationController;
 import software.bernie.geckolib.core.animation.RawAnimation;
-import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
  * Hood, robe and robe skirt of the Silent Witch (T19). Leather-level protection (1/3/2), high durability, enchantable,
- * repaired with lapis. Drawn by GeckoLib (geo/armor/silent_witch_outfit.geo.json - one model, each slot shows its bones).
+ * repaired with lapis. Drawn by GeckoLib (geo/armor/silent_witch_armor.geo.json from tools/gen_silent_outfit.py - one model, each slot shows its bones).
  * Bonuses are attribute modifiers read from the [silent_witch] server config; the rest of the effects live in {@link SilentWitchEvents}.
  */
 public class SilentWitchArmor extends ArmorItem implements GeoItem {
@@ -45,7 +44,6 @@ public class SilentWitchArmor extends ArmorItem implements GeoItem {
     public static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
     public static final RawAnimation RUN = RawAnimation.begin().thenLoop("run");
     public static final RawAnimation CAST = RawAnimation.begin().thenLoop("cast");
-    public static final RawAnimation NERO = RawAnimation.begin().thenLoop("nero_idle");
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -124,16 +122,13 @@ public class SilentWitchArmor extends ArmorItem implements GeoItem {
     /** The vanilla armor layer asks for a texture even though GeckoLib draws the model; give it ours (no missing-texture spam). */
     @Override
     public String getArmorTexture(ItemStack stack, net.minecraft.world.entity.Entity entity, EquipmentSlot slot, String type) {
-        return PohCore.MODID + ":textures/armor/silent_witch_outfit.png";
+        return PohCore.MODID + ":textures/armor/silent_witch_armor.png";
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "cloak", 6, s -> s.setAndContinue(ru.pohsmp.core.client.OutfitAnim.pick(s))));
-        controllers.add(new AnimationController<>(this, "nero", 0, s -> {
-            s.getController().setAnimation(NERO);
-            return PlayState.CONTINUE;
-        }));
+        controllers.add(new AnimationController<>(this, "nero", 2, s -> s.setAndContinue(ru.pohsmp.core.client.OutfitAnim.cat(s))));
     }
 
     @Override

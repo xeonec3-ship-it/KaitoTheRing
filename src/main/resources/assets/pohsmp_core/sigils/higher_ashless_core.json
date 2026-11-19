@@ -1,0 +1,14 @@
+{
+  "comment": "Без пепла: печать в основании столба синего огня — выбивается ударом с перелётом, держится, пока горит столб, затем гаснет слоями.",
+  "size": 2.2, "color": "#4DA6FF", "orientation": "ground", "lifetime": -1, "hold": 26,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.0, "color": "#2A6ABF", "brightness": 1.2,
+      "appear": { "delay": 0, "duration": 4, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "sigil", "type": "disc", "texture": "ashless_sigil", "radius": 0.9, "heightOffset": 0.01, "color": "#9FD0FF",
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutBack", "modes": ["grow"] }, "rotation": { "speed": 60 } },
+    { "id": "flames", "type": "band", "texture": "ashless_flames", "radius": 1.12, "inner": 0.86, "repeat": 6, "heightOffset": 0.02,
+      "appear": { "delay": 1, "duration": 6, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": -90 } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.6, "duration": 8, "sparks": 40 },
+  "dissolve": { "modes": ["reverse", "fade"], "duration": 20, "stagger": 4 }
+}

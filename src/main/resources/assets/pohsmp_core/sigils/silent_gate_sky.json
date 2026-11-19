@@ -5,6 +5,8 @@
   "orientation": "sky",
   "lifetime": -1,
   "hold": 120,
+  "groundLight": { "radius": 0.6, "strength": 0.55, "reach": 48 },
+  "blockGlow": { "radius": 1.0, "strength": 0.3, "falloff": 1.5, "reach": 48 },
   "layers": [
     { "id": "arcs", "type": "arcs", "texture": "arc_strip", "radius": 1.0, "width": 0.05, "heightOffset": 0.0,
       "count": 4, "arcLength": 55,

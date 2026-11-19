@@ -17,7 +17,6 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -40,7 +39,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Mythic, level 1. "Frozen Hour": everything within 24 blocks except the caster stops for 8 s: creatures, projectiles, dropped
@@ -62,6 +61,7 @@ public class FrozenHourSpell extends PohSpell {
         float stored;
         DamageSource last;
         long until;
+        int prism = -1;
     }
 
     private static final Map<UUID, Frozen> FROZEN = new HashMap<>();
@@ -95,6 +95,25 @@ public class FrozenHourSpell extends PohSpell {
         }
     }
 
+    /** The cast clock under the caster's feet (2 s), by caster. */
+    private static final Map<UUID, Integer> CAST_FX = new HashMap<>();
+
+    @Override
+    public void onServerPreCast(Level level, int spellLevel, LivingEntity caster, MagicData md) {
+        super.onServerPreCast(level, spellLevel, caster, md);
+        if (level instanceof ServerLevel sl) {
+            Integer old = CAST_FX.put(caster.getUUID(), Fx.play(sl, Fx.fx("frozen_hour_cast").caster(caster)));
+            if (old != null) Fx.stop(sl, old, "");
+        }
+    }
+
+    @Override
+    public void onServerCastComplete(Level level, int spellLevel, LivingEntity caster, MagicData md, boolean cancelled) {
+        Integer id = CAST_FX.remove(caster.getUUID());
+        if (id != null && level instanceof ServerLevel sl) Fx.stop(sl, id, "");
+        super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
+    }
+
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
         if (level instanceof ServerLevel sl) stop(sl, caster);
@@ -104,12 +123,8 @@ public class FrozenHourSpell extends PohSpell {
     private static void stop(ServerLevel sl, LivingEntity caster) {
         Vec3 c = caster.position();
         long until = sl.getGameTime() + LIFE;
-        int k = HigherSpell.key();
-        HigherSpell.fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.RING, k, -1, -1, 12, c.x, c.y, c.z, (float) R, COLOR));
-        HigherSpell.fx(sl, c.x, c.y + 18, c.z, new Net.HFx(Net.HFx.SKY, HigherSpell.key(), -1, -1, LIFE, c.x, c.y + 18, c.z, 14, COLOR));
-        for (ServerPlayer p : sl.players())
-            if (p.distanceToSqr(c) < R * R * 4) Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p),
-                    new Net.HFx(Net.HFx.FLASH, HigherSpell.key(), -1, -1, 12, c.x, c.y, c.z, 0, 0xCFEFFF));
+        int prisms = 0;
+        Fx.play(sl, Fx.fx("frozen_hour").at(c).yaw(caster.getYRot()));   // grey world, clocks in the sky, golden column, flash
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 4f, 0.5f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 4f, 0.5f);
         for (Entity e : sl.getEntities(caster, new AABB(c, c).inflate(R), e -> e.position().distanceToSqr(c) < R * R)) {
@@ -134,8 +149,15 @@ public class FrozenHourSpell extends PohSpell {
             e.setNoGravity(true);
             e.setDeltaMovement(Vec3.ZERO);
             FROZEN.put(e.getUUID(), f);
+            if (e instanceof LivingEntity le && prisms++ < MAX_PRISMS) {   // a glass prism around each frozen creature
+                double h = le.getBbHeight() + 0.3;
+                f.prism = Fx.play(sl, Fx.fx("frozen_hour_prism").at(le.position()).yaw(le.getYRot()).scale(Math.max(0.5, h / 2.3))
+                        .point("top", le.position().add(0, h, 0)).duration(LIFE));
+            }
         }
     }
+
+    private static final int MAX_PRISMS = 16;
 
     private static void hold(Frozen f) {
         Entity e = f.e;
@@ -157,6 +179,7 @@ public class FrozenHourSpell extends PohSpell {
 
     private static void free(Frozen f) {
         Entity e = f.e;
+        if (f.prism >= 0 && e.level() instanceof ServerLevel sl && sl.getGameTime() < f.until - 4) Fx.stop(sl, f.prism, "");   // died or left early
         if (e instanceof Mob m) m.setNoAi(f.noAi);
         e.setNoGravity(f.noGravity);
         e.getPersistentData().remove(KEY_AI);

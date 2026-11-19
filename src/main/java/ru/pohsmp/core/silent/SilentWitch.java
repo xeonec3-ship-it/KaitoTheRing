@@ -114,4 +114,16 @@ public final class SilentWitch {
                 ? ctr + extra : 2.0 - Utils.softCapFormula(ctr + extra);
         return Math.round((float) (base * mult));
     }
+
+    /**
+     * Effect 9 + T20 "Black Flame of Worgan": in the full set the dragon shadow is Nero himself - the cat jumps off and dissolves
+     * (armor animation nero_dragon; the shadow should rise 0.55 s after this call) and comes back after {@code ticks} (nero_return).
+     * Returns false (nothing sent) outside the full set. ticks 0 brings the cat back at once (cancelled cast).
+     */
+    public static boolean neroDragon(LivingEntity wearer, int ticks) {
+        if (!fullSet(wearer) || wearer.level().isClientSide) return false;
+        ru.pohsmp.core.net.Net.CH.send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> wearer),
+                new ru.pohsmp.core.net.Net.NeroMsg(wearer.getId(), Math.max(0, ticks)));
+        return true;
+    }
 }

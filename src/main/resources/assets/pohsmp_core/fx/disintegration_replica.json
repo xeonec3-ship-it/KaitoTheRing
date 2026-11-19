@@ -233,6 +233,180 @@
         "easing": "easeInSine"
       },
       "comment": "послевкусие: тонкий столб до неба, у основания кольца-бусины"
+    },
+    {
+      "type": "wave",
+      "delay": 72,
+      "duration": 22,
+      "at": "target+0,0.05,0",
+      "shape": "ring",
+      "radius": 7.5,
+      "color": "@primary",
+      "brightness": 0.9,
+      "comment": "кольцо света по земле, когда формируется большая печать"
+    },
+    {
+      "type": "wave",
+      "delay": 88,
+      "duration": 22,
+      "at": "target+0,0.05,0",
+      "shape": "ring",
+      "radius": 7.5,
+      "color": "@primary",
+      "brightness": 0.9,
+      "comment": "кольцо света по земле, когда формируется большая печать"
+    },
+    {
+      "type": "wave",
+      "delay": 106,
+      "duration": 22,
+      "at": "target+0,0.05,0",
+      "shape": "ring",
+      "radius": 7.5,
+      "color": "@primary",
+      "brightness": 0.9,
+      "comment": "кольцо света по земле, когда формируется большая печать"
+    },
+    {
+      "type": "sprites",
+      "delay": 100,
+      "duration": 100,
+      "at": "target+0,8.0,0",
+      "texture": "@shards",
+      "count": 70,
+      "rate": 0.7,
+      "area": 4.2,
+      "speed": 0.01,
+      "gravity": 0.0016,
+      "sway": 0.6,
+      "tumble": 1.0,
+      "spin": 30,
+      "size": [
+        0.32,
+        0.22
+      ],
+      "life": 100,
+      "color": "#FFC1C8",
+      "brightness": 0.85,
+      "comment": "перья медленно падают из башни печатей"
+    },
+    {
+      "type": "sprites",
+      "delay": 110,
+      "duration": 90,
+      "at": "caster",
+      "texture": "spark_soft",
+      "count": 120,
+      "rate": 1.4,
+      "area": 1.1,
+      "speed": 0.012,
+      "gravity": -0.0025,
+      "size": [
+        0.12,
+        0.03
+      ],
+      "life": 50,
+      "color": "@primary",
+      "comment": "искры поднимаются вокруг молящегося заклинателя"
+    },
+    {
+      "type": "beam_rain",
+      "delay": 150,
+      "duration": 40,
+      "at": "target",
+      "area": 4.0,
+      "count": 26,
+      "interval": 1,
+      "width": 0.16,
+      "height": 4.8,
+      "color": "#FFC1C8",
+      "comment": "тонкие лучи бьют с верхней печати вниз, нарастание перед ливнем"
+    },
+    {
+      "type": "flash",
+      "delay": 176,
+      "duration": 24,
+      "at": "target+0,2.4,0",
+      "size": 2.6,
+      "anamorphic": 7,
+      "rays": 12,
+      "color": "#FFFFFF",
+      "comment": "ядро над целью разгорается перед ударом"
+    },
+    {
+      "type": "wave",
+      "delay": 200,
+      "duration": 26,
+      "at": "target+0,0.05,0",
+      "shape": "ring",
+      "radius": 14,
+      "color": "#FFFFFF",
+      "brightness": 1.2,
+      "comment": "ударная волна по земле"
+    },
+    {
+      "type": "wave",
+      "delay": 200,
+      "duration": 18,
+      "at": "target+0,1.2,0",
+      "shape": "sphere",
+      "radius": 5.2,
+      "rim": 1.0,
+      "color": "@primary",
+      "comment": "купол света в момент удара"
+    },
+    {
+      "type": "sprites",
+      "delay": 202,
+      "duration": 50,
+      "at": "target+0,0.9,0",
+      "texture": "spark_soft",
+      "count": 260,
+      "rate": 6,
+      "spread": 0.7,
+      "speed": 0.03,
+      "gravity": -0.003,
+      "size": [
+        0.16,
+        0.02
+      ],
+      "life": 70,
+      "color": "@primary",
+      "comment": "прах поднимается вверх по столбу"
+    },
+    {
+      "type": "sprites",
+      "delay": 204,
+      "duration": 70,
+      "at": "target+0,6,0",
+      "texture": "@shards",
+      "count": 40,
+      "rate": 0.8,
+      "area": 3.0,
+      "speed": 0.008,
+      "gravity": 0.0014,
+      "sway": 0.5,
+      "tumble": 1.0,
+      "size": [
+        0.3,
+        0.2
+      ],
+      "life": 110,
+      "color": "#FFC1C8",
+      "brightness": 0.8,
+      "comment": "послевкусие: перья оседают"
+    },
+    {
+      "type": "decal",
+      "delay": 200,
+      "duration": 100,
+      "at": "target",
+      "texture": "holy_seal",
+      "radius": 3.2,
+      "fadeOut": 60,
+      "color": "@primary",
+      "brightness": 0.55,
+      "comment": "выжженная святая печать на месте удара, гаснет"
     }
   ]
 }

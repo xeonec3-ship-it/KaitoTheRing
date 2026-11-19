@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «nature» для знаков при касте (fx/school_nature.json): природа: лоза с листьями, кружатся листья.",
+ "palette": {
+  "primary": "#7EE04A",
+  "secondary": "#D8FF9A",
+  "core": "#FFFFFF",
+  "shadow": "#2A5A10"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_nature_band",
+  "shards": "leaf",
+  "sigil": "sigil_nature"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

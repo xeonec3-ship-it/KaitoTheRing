@@ -18,15 +18,18 @@ import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoArmorRenderer;
 
 /**
- * GeckoLib armor renderer of the Silent Witch outfit: one model for the three pieces (geo/armor/silent_witch_outfit.geo.json),
- * cat bone "nero" shown only in the full set and not while running (effect 9), and the gold trim glowing at night (effect 8):
- * textures/armor/silent_witch_outfit_glowmask.png drawn full-bright at night, stronger the darker it is.
+ * GeckoLib armor renderer of the Silent Witch outfit: one model for the three pieces (geo/armor/silent_witch_armor.geo.json,
+ * tools/gen_silent_outfit.py), the skirt following the legs at a quarter (see {@link #applyBaseTransformations}), Nero driven by
+ * its own animation controller ({@link OutfitAnim#cat}), and the gold trim glowing at night (effect 8):
+ * textures/armor/silent_witch_armor_glowmask.png drawn full-bright at night, stronger the darker it is.
  */
 public class SilentWitchRenderer extends GeoArmorRenderer<SilentWitchArmor> {
-    public static final ResourceLocation GEO = new ResourceLocation(PohCore.MODID, "geo/armor/silent_witch_outfit.geo.json");
-    public static final ResourceLocation TEXTURE = new ResourceLocation(PohCore.MODID, "textures/armor/silent_witch_outfit.png");
-    public static final ResourceLocation GLOW = new ResourceLocation(PohCore.MODID, "textures/armor/silent_witch_outfit_glowmask.png");
-    public static final ResourceLocation ANIM = new ResourceLocation(PohCore.MODID, "animations/armor/silent_witch_outfit.animation.json");
+    public static final ResourceLocation GEO = new ResourceLocation(PohCore.MODID, "geo/armor/silent_witch_armor.geo.json");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(PohCore.MODID, "textures/armor/silent_witch_armor.png");
+    public static final ResourceLocation GLOW = new ResourceLocation(PohCore.MODID, "textures/armor/silent_witch_armor_glowmask.png");
+    public static final ResourceLocation ANIM = new ResourceLocation(PohCore.MODID, "animations/armor/silent_witch_armor.animation.json");
+
+    public static final float LEG_SHARE = 0.25f;
 
     public SilentWitchRenderer() {
         super(new GeoModel<>() {
@@ -47,11 +50,16 @@ public class SilentWitchRenderer extends GeoArmorRenderer<SilentWitchArmor> {
         });
     }
 
+    /** The skirt hangs on the leg bones: they turn only a quarter as far as the player's legs, or the dress splits in two on a step. */
     @Override
-    public void preRender(PoseStack poseStack, SilentWitchArmor animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer,
-                          boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-        super.preRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, red, green, blue, alpha);
-        model.getBone("nero").ifPresent(b -> b.setHidden(!(currentEntity instanceof LivingEntity le && SilentWitch.fullSet(le) && OutfitAnim.neroHere(le))));
+    protected void applyBaseTransformations(net.minecraft.client.model.HumanoidModel<?> baseModel) {
+        super.applyBaseTransformations(baseModel);
+        for (var leg : new software.bernie.geckolib.cache.object.GeoBone[] {rightLeg, leftLeg}) {
+            if (leg == null) continue;
+            leg.setRotX(leg.getRotX() * LEG_SHARE);
+            leg.setRotY(leg.getRotY() * LEG_SHARE);
+            leg.setRotZ(leg.getRotZ() * LEG_SHARE);
+        }
     }
 
     /** 0 by day, up to 0.85 at midnight; smooth through dusk and dawn. */

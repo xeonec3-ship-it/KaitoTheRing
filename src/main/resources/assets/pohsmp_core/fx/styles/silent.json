@@ -1,7 +1,8 @@
 {
-  "comment": "Безмолвная (ВРЕМЕННО, до стиля из чата идей): бирюзово-зелёный, золото каймы, мягкие искры, плавное движение.",
-  "palette": { "primary": "#7FFFD0", "secondary": "#C8FFF0", "core": "#FFFFFF", "shadow": "#1E5A4A" },
-  "textures": { "sparks": "spark_soft", "runes": "rune_band", "shards": "shard", "sigil": "core" },
+  "comment": "Безмолвная (магия ведьмы из аниме): бирюзово-зелёный свет, белое ядро, бледно-голубые лучи, золото кругов; мягкие искры, плавное вращение.",
+  "palette": { "primary": "#7FFFD0", "secondary": "#CFE8FF", "core": "#FFFFFF", "shadow": "#6E8AA0", "gold": "#E8C25A" },
+  "textures": { "sparks": "spark_soft", "runes": "rune_band", "shards": "shard", "sigil": "spiral_ring" },
   "blend": "additive",
-  "motion": { "rotationScale": 0.7, "jitter": 0.0, "easing": "easeOutSine" }
+  "motion": { "rotationScale": 0.7, "jitter": 0.0, "easing": "easeInOutSine" },
+  "sigilTheme": "тонкие спирали, руны, бирюзовые нимбы"
 }

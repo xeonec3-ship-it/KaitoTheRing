@@ -34,8 +34,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
-import ru.pohsmp.core.net.Net.HFx;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Divine Taboo, levels 1-6. 25 s cast that cannot be interrupted, with a cutscene for everyone around. A zone of 128 blocks around the cast point:
@@ -54,23 +53,23 @@ public class TabooSpell extends PohSpell {
         Vec3 c;
         UUID caster;
         long until;
-        int key;
+        int fx = -1;
     }
 
-    /** The seal over the field for everyone within 160 of the center; the same key refreshes it without restarting. */
-    private static void sendSeal(ServerLevel sl, Zone z) {
+    /** The seal over the field (fx taboo_zone); players who come closer later get it from Fx with its current age. */
+    private static void sendSeal(ServerLevel sl, Zone z, float yaw) {
         int left = (int) Math.max(1, z.until - sl.getGameTime());
-        Net.sendNear(sl, z.c.x, z.c.y, z.c.z, z.c.x, z.c.y + 56, z.c.z, new HFx(HFx.TABOO, z.key, -1, -1, left, z.c.x, z.c.y, z.c.z, R, Reg.DIVINE_COLOR));
+        z.fx = Fx.play(sl, Fx.fx("taboo_zone").at(z.c).yaw(yaw).duration(left));
     }
 
     private static final List<Zone> ZONES = new ArrayList<>();
 
     public static final int CAST = 500;
 
-    /** The 25 s cast: cutscene for everyone around and the rising seals (HFx TABOO_CAST). */
+    /** The 25 s cast: cutscene for everyone around and the rising seals (fx taboo_cast). */
     private static final class Casting {
         Vec3 at;
-        int key, cutKey;
+        int fx, cutKey;
         List<UUID> watchers = new ArrayList<>();
     }
 
@@ -89,12 +88,11 @@ public class TabooSpell extends PohSpell {
     private static Casting begin(ServerLevel sl, LivingEntity caster) {
         Casting c = new Casting();
         c.at = caster.position();
-        c.key = HigherSpell.key();
         c.cutKey = HigherSpell.key();
         Vec3 look = caster.getLookAngle();
         double ang = Math.atan2(look.z, look.x);
         c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.TABOO, CAST, c.at.add(0, 56, 0), ang);
-        HigherSpell.fx(sl, c.at.x, c.at.y + 28, c.at.z, new HFx(HFx.TABOO_CAST, c.key, caster.getId(), -1, CAST, c.at.x, c.at.y, c.at.z, R, Reg.DIVINE_COLOR));
+        c.fx = Fx.play(sl, Fx.fx("taboo_cast").at(c.at).caster(caster));
         CASTING.put(caster.getUUID(), c);
         return c;
     }
@@ -103,7 +101,7 @@ public class TabooSpell extends PohSpell {
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity caster, MagicData md, boolean cancelled) {
         Casting c = CASTING.remove(caster.getUUID());
         if (c != null && level instanceof ServerLevel sl) {
-            HigherSpell.stop(sl, c.at.x, c.at.y + 28, c.at.z, c.key);
+            Fx.stop(sl, c.fx, "");
             Cutscene.end(sl, caster, c.watchers, c.cutKey);
         }
         super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
@@ -156,10 +154,13 @@ public class TabooSpell extends PohSpell {
             z.c = caster.position();
             z.caster = caster.getUUID();
             z.until = sl.getGameTime() + minutes(spellLevel) * 1200L;
-            z.key = z.caster.hashCode() ^ 0x7AB00;
-            ZONES.removeIf(o -> o.caster.equals(z.caster));
+            for (Zone o : new ArrayList<>(ZONES))
+                if (o.caster.equals(z.caster)) {
+                    ZONES.remove(o);
+                    if (o.fx >= 0) Fx.stop(sl, o.fx, "");
+                }
             ZONES.add(z);
-            sendSeal(sl, z);
+            sendSeal(sl, z, caster.getYRot());
             sl.playSound(null, z.c.x, z.c.y, z.c.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 4f, 0.5f);
             sl.playSound(null, z.c.x, z.c.y, z.c.z, SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 4f, 0.6f);
             DivineEvents.particle(sl, ParticleTypes.END_ROD, z.c.x, z.c.y + 1, z.c.z, 150, 0.5, 0.6);
@@ -172,12 +173,11 @@ public class TabooSpell extends PohSpell {
                     if (!ZONES.contains(z)) return false;
                     if (sl.getGameTime() > z.until) {
                         ZONES.remove(z);
-                        Net.sendNear(sl, z.c.x, z.c.y, z.c.z, z.c.x, z.c.y + 56, z.c.z, new HFx(HFx.STOP, z.key, -1, -1, 0, 0, 0, 0, 0, 0));
+                        Fx.stop(sl, z.fx, "");
                         sl.playSound(null, z.c.x, z.c.y, z.c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 4f, 0.6f);
                         return false;
                     }
                     if (age % 100 == 1) cleanse(sl, z);
-                    if (age % 100 == 50) sendSeal(sl, z);
                     if (age % 10 == 0) {   // golden column at the center and a glimmer around players inside
                         DivineEvents.particle(sl, GOLD, z.c.x, z.c.y + 1 + (age % 60) / 10.0, z.c.z, 2, 0.2, 0);
                         for (ServerPlayer p : sl.players())

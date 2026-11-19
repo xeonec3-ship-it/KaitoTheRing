@@ -1,0 +1,82 @@
+{
+ "comment": "Кровавая луна: печать крови под кастером на всю зону (радиус 16), бьётся в такт.",
+ "size": 16.0,
+ "color": "#D0101E",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "blood",
+   "type": "disc",
+   "texture": "sigil_blood",
+   "radius": 0.4,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -6
+   },
+   "pulse": {
+    "amp": 0.3,
+    "period": 20
+   }
+  },
+  {
+   "id": "runes",
+   "type": "band",
+   "texture": "rune_band",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "brightness": 0.8,
+   "inner": 0.95,
+   "repeat": 16,
+   "appear": {
+    "delay": 6,
+    "duration": 24,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 3
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 0.93,
+   "heightOffset": 0.02,
+   "color": "#FF5A5A",
+   "brightness": 0.7,
+   "inner": 0.99,
+   "repeat": 1,
+   "appear": {
+    "delay": 10,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

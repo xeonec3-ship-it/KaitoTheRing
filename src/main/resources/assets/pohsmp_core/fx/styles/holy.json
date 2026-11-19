@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «holy» для знаков при касте (fx/school_holy.json): свет: солнца и кресты, падают перья.",
+ "palette": {
+  "primary": "#FFE38A",
+  "secondary": "#FFFBE6",
+  "core": "#FFFFFF",
+  "shadow": "#8A6420"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_holy_band",
+  "shards": "feather",
+  "sigil": "sigil_holy"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

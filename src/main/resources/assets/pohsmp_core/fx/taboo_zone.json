@@ -1,0 +1,105 @@
+{
+ "comment": "Табу: поле на минуты. Великая печать в 56 блоках над центром, столб света с гироскопом, печать у основания, световая завеса по границе (радиус 128).",
+ "style": "divine",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,2,0",
+   "duration": 16,
+   "size": 14,
+   "anamorphic": 40,
+   "rays": 16,
+   "screen": 0.7,
+   "color": "#FFF4D6"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "shape": "ring",
+   "radius": 128,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,56,0",
+   "id": "taboo_seal"
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "id": "taboo_center"
+  },
+  {
+   "type": "column",
+   "delay": 0,
+   "at": "caster",
+   "radius": 1.4,
+   "height": 56,
+   "rings": 4,
+   "ringSpeed": 3,
+   "fill": 1,
+   "color": "@primary",
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,26,0",
+   "id": "taboo_gyro"
+  },
+  {
+   "type": "sigil",
+   "delay": 20,
+   "at": "caster+0,3,0",
+   "id": "taboo_gyro",
+   "scale": 0.36
+  },
+  {
+   "type": "curtain",
+   "delay": 20,
+   "at": "caster+0,-4,0",
+   "radius": 128,
+   "count": 96,
+   "height": 64,
+   "grow": 60,
+   "width": 1.6,
+   "brightness": [
+    0.12,
+    0.32
+   ],
+   "flicker": 0.4,
+   "texture": "beam_fade",
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,30,0",
+   "duration": 200,
+   "texture": "feather",
+   "count": 240,
+   "rate": 1.2,
+   "area": 80,
+   "speed": 0.004,
+   "gravity": 0.0015,
+   "sway": 1.2,
+   "tumble": 0.6,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 200,
+   "color": "@secondary",
+   "comment": "перья опускаются на поле, пока печать встаёт"
+  }
+ ]
+}

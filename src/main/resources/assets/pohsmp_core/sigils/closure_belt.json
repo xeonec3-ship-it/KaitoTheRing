@@ -1,0 +1,57 @@
+{
+ "comment": "Закрытие пространства: пояс рун на экваторе купола.",
+ "size": 1.0,
+ "color": "#8A6CFF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "runes",
+   "type": "band",
+   "texture": "rune_band",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "inner": 0.985,
+   "repeat": 48,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 0.5
+   }
+  },
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.003,
+   "heightOffset": 0.0,
+   "color": "#E4DAFF",
+   "inner": 0.998,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

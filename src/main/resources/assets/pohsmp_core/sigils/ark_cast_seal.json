@@ -1,0 +1,125 @@
+{
+ "comment": "Ковчег, каст (5 с): печать под магом прорисовывается слоями и медленно растёт; на касте — солнце, нимб, кольцо рун. Сгенерировано tools/gen_ark_fx.py.",
+ "size": 3.2,
+ "color": "#FFD36B",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.9,
+   "color": "#8A6420",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 30
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "inner": 0.97,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  },
+  {
+   "id": "runes",
+   "type": "band",
+   "texture": "rune_band",
+   "radius": 0.96,
+   "heightOffset": 0.01,
+   "color": "#FFF4D6",
+   "inner": 0.8,
+   "repeat": 10,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": 1
+   },
+   "rotation": {
+    "speed": 6
+   }
+  },
+  {
+   "id": "holy",
+   "type": "disc",
+   "texture": "holy_seal",
+   "radius": 0.76,
+   "heightOffset": 0.02,
+   "appear": {
+    "delay": 30,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -4
+   }
+  },
+  {
+   "id": "sun",
+   "type": "disc",
+   "texture": "divine_sun",
+   "radius": 0.34,
+   "heightOffset": 0.03,
+   "color": "#FFFFFF",
+   "appear": {
+    "delay": 55,
+    "duration": 25,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "twist"
+    ]
+   },
+   "rotation": {
+    "speed": 10
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.2,
+  "duration": 12,
+  "sparks": 30
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 12,
+  "stagger": 2
+ }
+}

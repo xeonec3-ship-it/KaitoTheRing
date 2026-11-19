@@ -1,0 +1,79 @@
+{
+ "comment": "Ковчег: пояс рун по краю купола на земле (scale = радиус купола). Сгенерировано tools/gen_ark_fx.py.",
+ "size": 1.0,
+ "color": "#FFD36B",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "inner": 0.995,
+   "repeat": 1,
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  },
+  {
+   "id": "runes",
+   "type": "band",
+   "texture": "rune_band",
+   "radius": 0.99,
+   "heightOffset": 0.01,
+   "color": "#FFF4D6",
+   "inner": 0.955,
+   "repeat": 48,
+   "appear": {
+    "delay": 10,
+    "duration": 40,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": 1
+   },
+   "rotation": {
+    "speed": -0.5
+   }
+  },
+  {
+   "id": "rim2",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 0.95,
+   "heightOffset": 0.0,
+   "inner": 0.946,
+   "repeat": 1,
+   "brightness": 0.6,
+   "appear": {
+    "delay": 20,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

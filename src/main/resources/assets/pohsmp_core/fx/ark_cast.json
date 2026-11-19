@@ -1,0 +1,68 @@
+{
+ "comment": "Ковчег, каст 5 с (ArkSpell.CAST): печать под магом, золотые огни поднимаются вокруг, тонкий столб вверх. ArkSpell останавливает его на касте или отмене. Сгенерировано tools/gen_ark_fx.py.",
+ "style": "divine",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "ark_cast_seal",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 2000,
+   "rate": 1.5,
+   "area": 2.6,
+   "speed": 0.02,
+   "gravity": -0.006,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 40,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "feather",
+   "count": 2000,
+   "rate": 0.25,
+   "area": 2.2,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "sway": 1.0,
+   "tumble": 0.6,
+   "size": [
+    0.3,
+    0.2
+   ],
+   "life": 50,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 30,
+   "at": "caster",
+   "duration": 9999,
+   "radius": 0.35,
+   "height": 12,
+   "rings": 2,
+   "ringSpeed": 3,
+   "fill": 0.6,
+   "color": "@primary",
+   "in": {
+    "duration": 40,
+    "easing": "easeInSine"
+   }
+  }
+ ]
+}

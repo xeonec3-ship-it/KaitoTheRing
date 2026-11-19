@@ -1,0 +1,58 @@
+{
+ "comment": "Ковчег: широта купола (радиус задаёт scale элемента): золотое кольцо и бегущий пунктир. Сгенерировано tools/gen_ark_fx.py.",
+ "size": 1.0,
+ "color": "#FFD36B",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.85,
+   "inner": 0.993,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  },
+  {
+   "id": "dash",
+   "type": "band",
+   "texture": "orbit_dash",
+   "radius": 0.992,
+   "heightOffset": 0.0,
+   "color": "#FFF4D6",
+   "brightness": 0.55,
+   "inner": 0.975,
+   "repeat": 16,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.8
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

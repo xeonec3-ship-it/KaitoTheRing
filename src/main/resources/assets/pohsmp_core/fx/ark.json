@@ -1,43 +1,176 @@
 {
- "comment": "Ковчег: купол света на минуту — пузырь и кольцо, солнце-печать над куполом, столб к нему, завеса тонких лучей по границе, кольцо рун на земле, падают перья.",
+ "comment": "Ковчег: купол света r=32 на минуту в новом виде (как купол Закрытия): пузырь, каркас из шести меридианов, четыре широты, пояс рун по краю, шесть святых печатей на оболочке, солнце в зените, круг на земле, столб и тонкая завеса, падают перья. Сгенерировано tools/gen_ark_fx.py.",
  "style": "divine",
  "duration": 1200,
  "elements": [
   {
    "type": "wave",
    "delay": 0,
-   "at": "caster",
-   "duration": 30,
-   "shape": "ring",
-   "radius": 32,
+   "at": "caster+0,0.5,0",
+   "duration": 40,
+   "shape": "sphere",
+   "radius": 32.0,
+   "rim": 1.2,
    "color": "@primary"
   },
   {
    "type": "wave",
    "delay": 0,
-   "at": "caster+0,0.5,0",
-   "duration": 40,
-   "shape": "sphere",
-   "radius": 32,
-   "rim": 1.2,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 32.0,
    "color": "@primary"
   },
   {
    "type": "flash",
    "delay": 0,
    "at": "caster+0,1.5,0",
-   "duration": 14,
-   "size": 8,
+   "duration": 16,
+   "size": 10,
    "rays": 12,
-   "screen": 0.4,
+   "anamorphic": 24,
+   "screen": 0.45,
    "color": "#FFF4D6"
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ark_meridian",
+   "yaw": 0,
+   "until": 1190
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ark_meridian",
+   "yaw": 30,
+   "until": 1190
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ark_meridian",
+   "yaw": 60,
+   "until": 1190
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ark_meridian",
+   "yaw": 90,
+   "until": 1190
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ark_meridian",
+   "yaw": 120,
+   "until": 1190
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ark_meridian",
+   "yaw": 150,
+   "until": 1190
   },
   {
    "type": "sigil",
    "delay": 6,
-   "at": "caster+0,32,0",
-   "id": "ark_sky",
+   "at": "caster+0,0.3,0",
+   "id": "ark_belt",
+   "scale": 32.0,
    "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 14,
+   "at": "caster+0,10.94,0",
+   "id": "ark_lat",
+   "scale": 30.07,
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 20,
+   "at": "caster+0,20.57,0",
+   "id": "ark_lat",
+   "scale": 24.51,
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 26,
+   "at": "caster+0,27.71,0",
+   "id": "ark_lat",
+   "scale": 16.0,
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 32,
+   "at": "caster+0,30.91,0",
+   "id": "ark_lat",
+   "scale": 8.28,
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 24,
+   "at": "caster+30.43,9.89,0.0",
+   "id": "ark_emblem",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 28,
+   "at": "caster+15.22,9.89,26.36",
+   "id": "ark_emblem",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 32,
+   "at": "caster+-15.22,9.89,26.36",
+   "id": "ark_emblem",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 36,
+   "at": "caster+-30.43,9.89,0.0",
+   "id": "ark_emblem",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 40,
+   "at": "caster+-15.22,9.89,-26.36",
+   "id": "ark_emblem",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 44,
+   "at": "caster+15.22,9.89,-26.36",
+   "id": "ark_emblem",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,32.0,0",
+   "id": "ark_sky",
+   "scale": 0.55,
+   "until": 1190,
+   "comment": "солнце в зените, лицом вниз"
   },
   {
    "type": "sigil",
@@ -52,7 +185,7 @@
    "at": "caster",
    "duration": 1180,
    "radius": 0.6,
-   "height": 32,
+   "height": 32.0,
    "rings": 3,
    "ringSpeed": 4,
    "fill": 1,
@@ -71,17 +204,17 @@
    "delay": 10,
    "at": "caster",
    "duration": 1180,
-   "radius": 32,
-   "count": 72,
-   "height": 26,
+   "radius": 32.0,
+   "count": 48,
+   "height": 18,
    "grow": 30,
    "width": [
-    0.06,
-    0.16
+    0.05,
+    0.12
    ],
    "brightness": [
-    0.15,
-    0.4
+    0.12,
+    0.3
    ],
    "flicker": 0.3,
    "texture": "beam_fade",

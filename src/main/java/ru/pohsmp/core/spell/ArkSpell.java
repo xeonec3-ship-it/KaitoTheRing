@@ -73,28 +73,38 @@ public class ArkSpell extends PohSpell {
         return List.of(ui("zone", (int) R, LIFE / 20), ui("undying"), ui("heal"), ui("blind"));
     }
 
+    /** caster -> its cast effect (fx/ark_cast.json: seal under the caster, rising lights), stopped on cast or cancel. */
+    private static final java.util.Map<java.util.UUID, Integer> CASTING = new java.util.HashMap<>();
+
     @Override
-    public void onServerCastTick(Level level, int spellLevel, LivingEntity caster, MagicData md) {
-        super.onServerCastTick(level, spellLevel, caster, md);
-        if (level instanceof ServerLevel sl && caster.tickCount % 2 == 0) {
-            double h = (caster.tickCount % 60) / 20.0;
-            for (int i = 0; i < 8; i++) {
-                double a = caster.tickCount * 0.08 + i * Math.PI / 4;
-                DivineEvents.particle(sl, GOLD, caster.getX() + Math.cos(a) * 2, caster.getY() + h, caster.getZ() + Math.sin(a) * 2, 1, 0, 0);
-            }
+    public void onServerPreCast(Level level, int spellLevel, LivingEntity caster, MagicData md) {
+        super.onServerPreCast(level, spellLevel, caster, md);
+        if (level instanceof ServerLevel sl) {
+            Integer old = CASTING.put(caster.getUUID(), Fx.play(sl, Fx.fx("ark_cast").at(caster.position()).caster(caster).attach(caster)));
+            if (old != null) Fx.stop(sl, old, "");
         }
+    }
+
+    @Override
+    public void onServerCastComplete(Level level, int spellLevel, LivingEntity caster, MagicData md, boolean cancelled) {
+        Integer k = CASTING.remove(caster.getUUID());
+        if (k != null && level instanceof ServerLevel sl) Fx.stop(sl, k, "");
+        super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
     }
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
         if (level instanceof ServerLevel sl) {
+            Integer k = CASTING.remove(caster.getUUID());
+            if (k != null) Fx.stop(sl, k, "");
             Dome d = new Dome();
             d.dim = sl.dimension();
             d.c = caster.position();
             d.until = sl.getGameTime() + LIFE;
             DOMES.add(d);
             Vec3 c = d.c;
-            int fx = Fx.play(sl, Fx.fx("ark").at(c).yaw(caster.getYRot()).duration(LIFE));   // bubble, sun seal overhead, curtain of light, feathers
+            // the dome (owner, 19.11.2026: new circles and effects like the Closure dome): frame, latitudes, rune belt, seals on the shell, sun at the zenith
+            int fx = Fx.play(sl, Fx.fx("ark").at(c).yaw(0).duration(LIFE));
             sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 5f, 0.5f);
             sl.playSound(null, c.x, c.y, c.z, SoundEvents.BELL_BLOCK, SoundSource.PLAYERS, 5f, 0.5f);
             MobEffect silence = net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getValue(new net.minecraft.resources.ResourceLocation("mna", "silence"));
@@ -119,11 +129,6 @@ public class ArkSpell extends PohSpell {
                         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 5f, 0.5f);
                         return false;
                     }
-                    if (age % 4 == 0)   // dome shell
-                        for (int i = 0; i < 40; i++) {
-                            double th = sl.random.nextDouble() * Math.PI * 2, ph = Math.asin(sl.random.nextDouble());
-                            DivineEvents.particle(sl, GOLD, c.x + Math.cos(th) * Math.cos(ph) * R, c.y + Math.sin(ph) * R, c.z + Math.sin(th) * Math.cos(ph) * R, 1, 0, 0);
-                        }
                     if (age % 20 == 0) {
                         for (ServerPlayer p : sl.players()) {
                             if (p.position().distanceToSqr(c) >= R * R || p.isSpectator()) continue;

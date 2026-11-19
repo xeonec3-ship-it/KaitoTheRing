@@ -6,7 +6,8 @@
 Модели (fx/meshes, часть `boxes` — docs/fx.md):
   silent_spear   — прозрачное копьё ветра: вытянутый ромб вдоль +z, светлые грани, светящийся стержень, три кольца-завихрения
   silent_dome    — купол Барьера: шестиугольные ячейки на сфере радиуса 1 (масштаб эффекта = радиус), собирается снизу вверх
-  worgan_dragon  — тень чёрного дракона: голова с рогами и шея, тёмная полупрозрачная, фиолетовая кромка и глаза; смотрит в +z
+  worgan_dragon  — тень чёрного дракона: встаёт из правого плеча, шея S-изгибом вверх-вперёд, детальная голова с раскрытой пастью;
+                   тёмная полупрозрачная, фиолетовые глаза и контуры; смотрит в +z; начало модели — правое плечо
 Эффекты (fx):
   silent_wind_spears      — на одно копьё: модель копья и шлейф ветра; сервер двигает экземпляр (Fx.move) и гасит при попадании
   silent_wind_spears_hit  — попадание копья: кольцо ветра, вспышка, искры (играет код в точке попадания)
@@ -177,53 +178,260 @@ def dome():
                     {'delay': 0, 'duration': 18, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.2}, 18, collapse=10, blend='additive')
 
 
+# ---------------------------------------------------------------- тень дракона: матрицы и локальные системы координат
+def _rot(rx, ry, rz):
+    """Матрица поворота как three.js Euler 'YXZ': R = Ry·Rx·Rz (градусы)."""
+    a, b, c = (math.radians(v) for v in (rx, ry, rz))
+    ca, sa, cb, sb, cc, sc = math.cos(a), math.sin(a), math.cos(b), math.sin(b), math.cos(c), math.sin(c)
+    Rx = [[1, 0, 0], [0, ca, -sa], [0, sa, ca]]
+    Ry = [[cb, 0, sb], [0, 1, 0], [-sb, 0, cb]]
+    Rz = [[cc, -sc, 0], [sc, cc, 0], [0, 0, 1]]
+    return _mm(Ry, _mm(Rx, Rz))
+
+
+def _mm(A, Bm):
+    return [[sum(A[i][k] * Bm[k][j] for k in range(3)) for j in range(3)] for i in range(3)]
+
+
+def _mv(M, v):
+    return tuple(sum(M[i][k] * v[k] for k in range(3)) for i in range(3))
+
+
+def _euler(M):
+    """Обратно в Euler 'YXZ' (как Euler.setFromRotationMatrix в three.js)."""
+    m23 = max(-1.0, min(1.0, M[1][2]))
+    x = math.asin(-m23)
+    if abs(m23) < 0.9999999:
+        y, z = math.atan2(M[0][2], M[2][2]), math.atan2(M[1][0], M[1][1])
+    else:
+        y, z = math.atan2(-M[2][0], M[0][0]), 0.0
+    return [math.degrees(x), math.degrees(y), math.degrees(z)]
+
+
+def _nrm(v):
+    ln = math.sqrt(sum(c * c for c in v)) or 1.0
+    return tuple(c / ln for c in v)
+
+
+def _cross(a, b):
+    return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+
+def _axes(T, up):
+    """Матрица со столбцами X (вбок), Y (≈up, ортогонален T), Z = T."""
+    T = _nrm(T)
+    d = sum(u * t for u, t in zip(up, T))
+    N = _nrm(tuple(u - d * t for u, t in zip(up, T)))
+    X = _cross(N, T)
+    return [[X[0], N[0], T[0]], [X[1], N[1], T[1]], [X[2], N[2], T[2]]]
+
+
+class Frame:
+    """Локальная система (начало + поворот) поверх Boxes: голова, челюсть, рог строятся в своих осях, бруски пишутся в осях модели."""
+    I = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+
+    def __init__(self, B, o=(0, 0, 0), M=None):
+        self.B, self.o, self.M = B, tuple(o), M or Frame.I
+
+    def pt(self, p):
+        q = _mv(self.M, p)
+        return tuple(o + c for o, c in zip(self.o, q))
+
+    def child(self, o, M=None):
+        return Frame(self.B, self.pt(o), _mm(self.M, M or Frame.I))
+
+    def box(self, c, size, t, rot=None, M=None):
+        Mw = _mm(self.M, M if M is not None else (_rot(*rot) if rot else Frame.I))
+        e = _euler(Mw)
+        x, y, z = self.pt(c)
+        self.B.cbox(x, y, z, size[0], size[1], size[2], t, e)
+
+    def seg(self, p, q, w, t, h=None, roll=0.0, ext=0.5):
+        """Брусок от p до q (в осях кадра), сечение w×h, roll — поворот сечения вокруг оси бруска."""
+        dx, dy, dz = q[0] - p[0], q[1] - p[1], q[2] - p[2]
+        ln = math.sqrt(dx * dx + dy * dy + dz * dz)
+        yaw = math.degrees(math.atan2(dx, dz))
+        pitch = -math.degrees(math.atan2(dy, math.hypot(dx, dz)))
+        self.box(((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2), (w, h if h else w, ln + w * ext), t, [pitch, yaw, roll])
+
+    def taper(self, pts, w0, w1, t, glow=None, gw=0.016, band=None):
+        """Сужающийся изогнутый рог/шип по точкам; band — каждый второй отрезок другим тоном (кольчатые рога), glow — светящаяся линия по верху."""
+        n = len(pts) - 1
+        for i, (p, q) in enumerate(zip(pts, pts[1:])):
+            w = w0 + (w1 - w0) * (i + 0.5) / n
+            self.seg(p, q, w, band if band is not None and i % 2 else t)
+            if glow is not None and i < n - 1:
+                self.seg((p[0], p[1] + w * 0.45, p[2]), (q[0], q[1] + w * 0.45, q[2]), gw, glow, ext=0)
+
+
+def _catmull(P, n):
+    """Сплайн Катмулла–Рома через точки P (концы продлены), n отрезков на участок."""
+    P = [tuple(2 * a - b for a, b in zip(P[0], P[1]))] + list(P) + [tuple(2 * a - b for a, b in zip(P[-1], P[-2]))]
+    out = []
+    for i in range(1, len(P) - 2):
+        p0, p1, p2, p3 = P[i - 1], P[i], P[i + 1], P[i + 2]
+        for k in range(n):
+            u = k / n
+            out.append(tuple(0.5 * (2 * b + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u * u + (-a + 3 * b - 3 * c + d) * u ** 3)
+                             for a, b, c, d in zip(p0, p1, p2, p3)))
+    out.append(P[-2])
+    return out
+
+
+# Где стоит тень относительно заклинателя (оси взгляда: x вправо, y вверх от ног, z вперёд): основание шеи — на правом плече.
+DRAGON_AT = (0.45, 1.35, 0.0)
+DRAGON_SCALE = 1.0
+DRAGON_HEAD_PITCH = 10.0          # голова опущена на 10° — морда смотрит туда же, куда прицел (голова на ~1.4 блока выше глаз)
+DRAGON_JAW = 30.0                 # пасть раскрыта на 30°
+# Хребет шеи (в осях модели, от основания на плече): нижняя дуга выгибается вперёд, верхняя — назад (над головой ведьмы, выше глаз),
+# затем шея загибается вперёд к голове — S-изгиб змеиного горла. Последняя точка — затылок, касательная там = направление головы.
+DRAGON_SPINE = [(0.00, -0.12, 0.22), (0.08, 0.30, 0.50), (0.26, 0.78, 0.40), (0.42, 1.22, 0.00), (0.50, 1.60, 0.08),
+                (0.49, 1.80, 0.45), (0.47, 1.80, 0.72)]
+DRAGON_MOUTH = None               # точка между челюстями (в осях модели) — считает dragon(), из неё дышит эффект
+
+
 def dragon():
-    """Тень чёрного дракона Ворганы (по аниме: Неро — чёрный дракон): изгиб шеи с пластинами и гребнем, вытянутая морда, надбровья,
-    загнутые назад рога, приоткрытая пасть с клыками, скулы-шипы; тёмный полупрозрачный, фиолетовые глаза и тонкие светящиеся контуры."""
+    """Тень чёрного дракона Ворганы (по аниме: Неро — чёрный дракон). Встаёт из правого плеча заклинателя: шея S-изгибом вверх и вперёд
+    (нижняя дуга вперёд, верхняя — назад над головой, затем к голове), голова впереди-сверху смотрит по взгляду, пасть раскрыта —
+    из неё выдох (DRAGON_MOUTH). Шея — восьмигранная труба с брюшными пластинами, боковой чешуёй и гребнем шипов, светящаяся линия по хребту.
+    Голова: затылок и темя с гребнем, надбровья, глаза-щели, сужающаяся морда, ноздри, носовой рожок, кольчатые рога назад-вверх,
+    малые рога, гребни-«уши», шипы по скулам, нижняя челюсть на шарнире с зубами, клыки, язык и фиолетовый жар в горле, шипы-бородка.
+    Тёмная полупрозрачная, глаза и контуры светятся фиолетовым. Ничего не уходит за спину ниже глаз (проверка check_dragon())."""
+    global DRAGON_MOUTH
     B = Boxes()
-    neck = []
-    for k in range(9):                                               # шея: S-изгиб снизу-сзади к голове
-        u = k / 8
-        y = -2.2 + 2.1 * math.sin(u * math.pi / 2)
-        z = -1.6 + 1.3 * u + 0.25 * math.sin(u * math.pi)
-        neck.append((0, y, z, 0.78 - 0.22 * u))
-    for (x0, y0, z0, w0), (x1, y1, z1, w1) in zip(neck, neck[1:]):
-        B.seg3((x0, y0, z0), (x1, y1, z1), (w0 + w1) / 2, 1)
-        B.seg3((x0, y0 - w0 * 0.42, z0 + 0.02), (x1, y1 - w1 * 0.42, z1 + 0.02), (w0 + w1) * 0.32, 2)   # брюшные пластины
-        B.seg3((x0, y0 + w0 * 0.5, z0), (x0, y0 + w0 * 0.5 + 0.28, z0 - 0.12), 0.07, 0)               # гребень-шипы
-    # череп и морда
-    B.cbox(0, 0.05, 0.15, 0.8, 0.62, 0.95, 1)
-    B.cbox(0, 0.36, 0.2, 0.62, 0.14, 0.85, 0)                        # темя
-    for s in (-1, 1):
-        B.cbox(s * 0.26, 0.3, 0.62, 0.22, 0.12, 0.4, 0, [0, 0, s * 12])   # надбровья
-    B.cbox(0, 0.0, 0.95, 0.56, 0.36, 0.85, 1, [6, 0, 0])               # верхняя челюсть
-    B.cbox(0, 0.12, 1.42, 0.38, 0.22, 0.32, 1, [10, 0, 0])             # кончик морды
-    for s in (-1, 1):
-        B.cbox(s * 0.11, 0.16, 1.58, 0.07, 0.05, 0.05, 2)               # ноздри
-    B.cbox(0, -0.38, 0.88, 0.46, 0.14, 0.8, 1, [-20, 0, 0])            # нижняя челюсть — пасть приоткрыта
-    B.cbox(0, -0.2, 0.9, 0.42, 0.12, 0.7, 4, [-8, 0, 0])               # отсвет фиолетового пламени в пасти
-    for s in (-1, 1):
-        for k in range(3):                                            # клыки сверху и снизу
-            B.cbox(s * (0.12 + 0.05 * k), -0.2, 1.25 - 0.18 * k, 0.04, 0.14, 0.04, 3)
-            B.cbox(s * (0.12 + 0.05 * k), -0.3, 1.12 - 0.18 * k, 0.035, 0.1, 0.035, 3)
-        B.cbox(s * 0.24, 0.16, 0.66, 0.13, 0.07, 0.12, 4)              # глаза
-        B.cbox(s * 0.24, 0.16, 0.6, 0.2, 0.03, 0.03, 4)                # прищур-свечение
-        horn = [(s * 0.28, 0.38, 0.05), (s * 0.5, 0.7, -0.35), (s * 0.62, 0.85, -0.8), (s * 0.6, 0.8, -1.2), (s * 0.5, 0.62, -1.45)]
-        for i, (p, q) in enumerate(zip(horn, horn[1:])):
-            B.seg3(p, q, 0.16 - 0.03 * i, 1)
-        B.seg3(horn[0], (s * 0.52, 0.2, -0.3), 0.08, 0)               # малый рог назад
-        for k in range(4):                                            # шипы по скуле
-            B.seg3((s * 0.4, 0.0 - 0.04 * k, 0.4 - 0.22 * k), (s * 0.62, 0.08 - 0.04 * k, 0.25 - 0.22 * k), 0.06, 0)
-        # тонкие светящиеся контуры: линия челюсти, надбровья, вдоль рога
-        B.seg3((s * 0.28, -0.08, 0.5), (s * 0.2, -0.06, 1.45), 0.02, 4)
-        B.seg3((s * 0.38, 0.36, 0.45), (s * 0.1, 0.3, 0.85), 0.02, 4)
-        for p, q in zip(horn, horn[1:]):
-            B.seg3((p[0], p[1] + 0.06, p[2]), (q[0], q[1] + 0.06, q[2]), 0.018, 4)
-    for (x0, y0, z0, w0), (x1, y1, z1, w1) in zip(neck, neck[1:]):     # светящийся контур по гребню шеи
-        B.seg3((x0, y0 + w0 * 0.52, z0), (x1, y1 + w1 * 0.52, z1), 0.02, 4)
-    return mesh_doc('Тень чёрного дракона Ворганы (T20, «Чёрное пламя»): детальная голова и шея, фиолетовые глаза и контуры. Сгенерировано tools/gen_silent_staff_fx.py.',
+    W = Frame(B)
+    UP = (0, 1, 0)
+
+    # ---- шея
+    S = _catmull(DRAGON_SPINE, 4)
+    n = len(S) - 1
+    rad = lambda u: 0.2 - 0.07 * u                                # полутолщина: 0.4 у плеча → 0.26 у затылка
+    for i, (p, q) in enumerate(zip(S, S[1:])):
+        u = (i + 0.5) / n
+        T = _nrm(tuple(b - a for a, b in zip(p, q)))
+        dors = (0, T[2], -T[1])                                    # «спина» шеи: назад, пока шея вертикальна, вверх — когда горизонтальна
+        F = W.child(tuple((a + b) / 2 for a, b in zip(p, q)), _axes(T, dors))
+        ln = math.dist(p, q) + 0.03
+        r = rad(u)
+        F.box((0, 0, 0), (2 * r, 2 * r * 0.92, ln), 1)                               # восьмигранник: квадрат + повёрнутый на 45°
+        F.box((0, 0, 0), (2 * r * 0.9, 2 * r * 0.84, ln), 1, M=_rot(0, 0, 45))
+        F.box((0, -r * 0.82, 0), (2 * r * 0.78, r * 0.32, ln * 0.78), 2)             # брюшная пластина — полосами, видна сегментация
+        for sd in (-1, 1):                                                          # боковая чешуя, вразбежку
+            if i % 2 == (0 if sd > 0 else 1):
+                F.box((sd * r * 0.88, r * 0.15, 0), (r * 0.28, r * 0.7, ln * 0.7), 0, rot=[0, sd * 8, sd * 20])
+        F.seg((0, r * 0.95, -ln * 0.3), (0, r * 0.95, ln * 0.55), 0.022, 4, ext=0)     # светящийся хребет
+        if i % 2 == 0 and u < 0.97 and p[1] > 0.3:                                  # гребень: шип назад-вверх, выше к середине шеи (не у плеча — там он смотрел бы за спину)
+            hgt = 0.12 + 0.16 * math.sin(math.pi * min(1.0, u * 1.15))
+            F.taper([(0, r * 0.8, ln * 0.2), (0, r + hgt * 0.55, -ln * 0.05), (0, r + hgt, -ln * 0.45)], 0.075, 0.025, 0)
+            F.seg((0, r + hgt * 0.5, -ln * 0.02), (0, r + hgt * 0.95, -ln * 0.42), 0.014, 4, ext=0)
+    # основание: тень вытекает из плеча струйками дыма (вниз и вбок, перед спиной, не за ней)
+    for k, (dx, dz) in enumerate(((-0.18, 0.12), (0.2, 0.05), (0.05, 0.22), (-0.05, 0.02), (0.22, 0.2))):
+        pts = [(0.0 + dx * j * 0.35 + 0.03 * math.sin(j * 1.7 + k), -0.05 - j * 0.11, 0.06 + dz * j * 0.3) for j in range(5)]
+        W.taper(pts, 0.12, 0.03, 1 if k % 2 else 2)
+
+    # ---- голова: начало — затылок (конец хребта), ось z — вдоль морды, опущена на DRAGON_HEAD_PITCH
+    j = DRAGON_SPINE[-1]
+    H = W.child(j, _rot(DRAGON_HEAD_PITCH, 0, 0))
+    H.box((0, 0.03, 0.1), (0.42, 0.36, 0.4), 1)                                     # затылок
+    H.box((0, 0.02, 0.1), (0.36, 0.32, 0.42), 1, M=_rot(0, 0, 45))
+    H.box((0, 0.2, 0.3), (0.34, 0.08, 0.52), 0, rot=[4, 0, 0])                      # темя — тёмная пластина
+    H.box((0, 0.27, 0.22), (0.05, 0.07, 0.44), 0)                                   # срединный гребень на темени
+    H.seg((0, 0.31, 0.02), (0, 0.29, 0.45), 0.014, 4, ext=0)
+    for k in range(3):                                                               # шипы на затылке — продолжение гребня шеи
+        H.taper([(0, 0.2, 0.02 - 0.1 * k), (0, 0.33 - 0.03 * k, -0.06 - 0.1 * k), (0, 0.42 - 0.05 * k, -0.2 - 0.1 * k)], 0.06, 0.02, 0)
+    # морда: сужается вперёд, верхняя линия чуть опускается к носу
+    ns = 6
+    for k in range(ns):
+        z0, z1 = 0.42 + 0.13 * k, 0.42 + 0.13 * (k + 1)
+        f = (k + 0.5) / ns
+        w, h = 0.33 - 0.15 * f, 0.21 - 0.08 * f
+        H.box((0, -0.06 + h / 2, (z0 + z1) / 2), (w, h, z1 - z0 + 0.02), 1, rot=[3, 0, 0])
+        H.box((0, -0.06 + h + 0.012, (z0 + z1) / 2), (w * 0.62, 0.035, z1 - z0), 0, rot=[3, 0, 0])   # спинка носа
+        for sd in (-1, 1):                                                           # верхние зубы по краю пасти
+            big = k == ns - 2
+            ln = 0.15 if big else 0.07 + 0.01 * (k % 2)
+            H.seg((sd * (w / 2 - 0.025), -0.05, (z0 + z1) / 2), (sd * (w / 2 - 0.035), -0.05 - ln, (z0 + z1) / 2 + 0.01), 0.035 if big else 0.025, 3, ext=0)
+    H.box((0, 0.0, 1.22), (0.17, 0.13, 0.12), 1, rot=[18, 0, 0])                     # кончик носа
+    H.taper([(0, 0.06, 1.08), (0, 0.13, 1.02), (0, 0.19, 0.94)], 0.05, 0.015, 0)    # носовой рожок
+    for sd in (-1, 1):
+        H.box((sd * 0.055, 0.06, 1.24), (0.04, 0.025, 0.04), 4)                     # ноздри — фиолетовый жар
+        H.seg((sd * 0.06, 0.07, 1.22), (sd * 0.09, 0.1, 1.29), 0.03, 2, ext=0)      # раздутые края ноздрей
+        # надбровья: тяжёлая скошенная дуга над глазом
+        H.box((sd * 0.15, 0.19, 0.5), (0.13, 0.07, 0.3), 0, rot=[-6, sd * -14, sd * 16])
+        H.seg((sd * 0.2, 0.2, 0.34), (sd * 0.11, 0.16, 0.64), 0.016, 4, ext=0)
+        # глаз: щель с ярким зрачком
+        H.box((sd * 0.165, 0.11, 0.5), (0.05, 0.045, 0.13), 4, rot=[0, sd * -14, 0])
+        H.box((sd * 0.185, 0.11, 0.505), (0.012, 0.055, 0.025), 3, rot=[0, sd * -14, 0])
+        H.seg((sd * 0.18, 0.105, 0.44), (sd * 0.22, 0.12, 0.3), 0.012, 4, ext=0)    # след-прищур от глаза назад
+        # главные рога: назад-вверх и наружу, кольчатые, загиб на концах; светящаяся линия по верху
+        horn = [(sd * 0.12, 0.22, 0.14), (sd * 0.2, 0.36, -0.04), (sd * 0.28, 0.48, -0.26), (sd * 0.34, 0.54, -0.5),
+                (sd * 0.35, 0.53, -0.72), (sd * 0.31, 0.46, -0.9), (sd * 0.25, 0.38, -1.0)]
+        H.taper(horn, 0.12, 0.03, 1, glow=4, band=0)
+        # малые рога под главными
+        H.taper([(sd * 0.17, 0.1, 0.1), (sd * 0.27, 0.12, -0.08), (sd * 0.35, 0.12, -0.28), (sd * 0.38, 0.09, -0.42)], 0.07, 0.02, 0, glow=4, gw=0.012)
+        # гребни-«уши»: веер из трёх тонких пластин за глазом, кромка светится
+        for m in range(3):
+            a = sd * (25 + 18 * m)
+            q = (sd * (0.2 + 0.2 * math.cos(math.radians(abs(a)))), 0.04 + 0.2 * math.sin(math.radians(abs(a))) - 0.1 * m, -0.12 - 0.08 * m)
+            H.seg((sd * 0.19, 0.05, 0.2), q, 0.03, 0, h=0.09, roll=sd * (30 + 20 * m))
+            H.seg((q[0] - sd * 0.02, q[1], q[2] + 0.04), q, 0.016, 4, ext=0)
+        # шипы по скуле, назад-наружу
+        for m in range(3):
+            H.taper([(sd * 0.17, -0.04, 0.42 - 0.12 * m), (sd * 0.27, -0.03 - 0.02 * m, 0.33 - 0.12 * m), (sd * 0.34, -0.04 - 0.03 * m, 0.22 - 0.12 * m)],
+                    0.05, 0.015, 0)
+        H.seg((sd * 0.165, -0.05, 0.42), (sd * 0.11, -0.05, 1.2), 0.016, 4, ext=0)   # светящаяся линия губы
+
+    # ---- нижняя челюсть на шарнире у затылка, раскрыта на DRAGON_JAW
+    J = H.child((0, -0.07, 0.28), _rot(DRAGON_JAW, 0, 0))
+    nj = 6
+    for k in range(nj):
+        z0, z1 = 0.0 + 0.15 * k, 0.15 * (k + 1)
+        f = (k + 0.5) / nj
+        w = 0.3 - 0.14 * f
+        J.box((0, -0.055, (z0 + z1) / 2), (w, 0.1, z1 - z0 + 0.02), 1)
+        J.box((0, -0.11, (z0 + z1) / 2), (w * 0.7, 0.03, z1 - z0), 2)                   # горловая пластина снизу
+        for sd in (-1, 1):                                                           # нижние зубы — вверх
+            big = k == nj - 2
+            ln = 0.12 if big else 0.06
+            J.seg((sd * (w / 2 - 0.025), -0.01, (z0 + z1) / 2), (sd * (w / 2 - 0.03), -0.01 + ln, (z0 + z1) / 2 - 0.01), 0.03 if big else 0.022, 3, ext=0)
+            J.seg((sd * (w / 2), -0.03, z0), (sd * (w / 2 - 0.01), -0.03, z1), 0.014, 4, ext=0)   # светящаяся кромка челюсти
+    J.box((0, -0.06, 0.93), (0.13, 0.08, 0.08), 1)                                  # подбородок
+    for sd in (-1, 0, 1):                                                            # шипы-бородка под подбородком
+        J.taper([(sd * 0.05, -0.1, 0.85), (sd * 0.07, -0.2, 0.78), (sd * 0.08, -0.3, 0.66)], 0.04, 0.012, 0)
+    for sd in (-1, 1):                                                               # шипы на углу челюсти
+        J.taper([(sd * 0.14, -0.06, 0.08), (sd * 0.24, -0.12, -0.04), (sd * 0.3, -0.2, -0.12)], 0.05, 0.015, 0)
+    # язык (раздвоенный) и жар в горле
+    J.box((0, 0.0, 0.42), (0.1, 0.025, 0.6), 4)
+    for sd in (-1, 1):
+        J.seg((0, 0.0, 0.7), (sd * 0.04, 0.02, 0.86), 0.018, 4, ext=0)
+    H.box((0, -0.08, 0.3), (0.2, 0.14, 0.2), 4)                                      # жар в глотке, между челюстями
+    # точка выдоха — между кончиками челюстей
+    tip_up = H.pt((0, -0.08, 1.22))
+    tip_dn = J.pt((0, 0.0, 0.92))
+    DRAGON_MOUTH = tuple((a + b) / 2 for a, b in zip(tip_up, tip_dn))
+
+    return mesh_doc('Тень чёрного дракона Ворганы (T20, «Чёрное пламя»): встаёт из правого плеча, шея S-изгибом вверх и вперёд, голова впереди-сверху смотрит '
+                    'по взгляду, пасть раскрыта. Начало модели — правое плечо (эффект ставит её в caster+0.45,1.35,0). Сгенерировано tools/gen_silent_staff_fx.py.',
                     'forbidden', B, ['#050407', '#120D18', '#2A1D38', '#E8DDF4', '#8A46E0'], [3, 4], 0.78,
-                    {'delay': 0, 'duration': 30, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.6}, 30, collapse=20)
+                    {'delay': 0, 'duration': 30, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.5}, 30, collapse=20)
+
+
+def check_dragon(B_boxes):
+    """Ничего за спиной (z < 0) ниже глаз (1.62) ближе 1.5 блока к голове заклинателя; вершины брусков — в осях заклинателя."""
+    eye = (0.0, 1.62, 0.0)
+    bad = 0
+    for b in B_boxes:
+        c = ((b[0] + b[3]) / 2, (b[1] + b[4]) / 2, (b[2] + b[5]) / 2)
+        hs = ((b[3] - b[0]) / 2, (b[4] - b[1]) / 2, (b[5] - b[2]) / 2)
+        M = _rot(*b[7]) if len(b) > 7 else Frame.I
+        for sx in (-1, 1):
+            for sy in (-1, 1):
+                for sz in (-1, 1):
+                    v = _mv(M, (sx * hs[0], sy * hs[1], sz * hs[2]))
+                    p = tuple(DRAGON_AT[i] + DRAGON_SCALE * (c[i] + v[i]) for i in range(3))
+                    if p[2] < -0.05 and p[1] < eye[1] and math.dist(p, eye) < 1.5:
+                        bad += 1
+    return bad
 
 
 def fx(name, comment, style, duration, elements):
@@ -271,17 +479,26 @@ def build_fx():
                       {'type': 'sigil', 'id': 'silent_impact', 'delay': 0, 'at': 'caster', 'follow': True, 'sigilScale': 2.4},
                       {'type': 'sprites', 'delay': 4, 'at': 'caster+0,1,0', 'follow': True, 'texture': '@sparks', 'count': 600, 'rate': 1,
                        'spread': 1.0, 'speed': 0.004, 'gravity': -0.001, 'size': [0.12, 0.03], 'life': 40, 'color': '@primary'}]))
-    # пламя Ворганы: тень дракона над правым плечом (WorganFlameSpell.headPos: справа 0.95, над головой, чуть сзади)
-    out.append(fx('silent_worgan_flame', 'Чёрное пламя Ворганы (T20): за каст (40 тиков) над правым плечом встаёт тень дракона, затем выдох — '
-                  'конус чёрного пламени с фиолетовой кромкой на 12 блоков (3 с), пепел; тень рассыпается. Следует за заклинателем.', 'forbidden', 130, [
-                      {'type': 'mesh', 'model': 'worgan_dragon', 'delay': 0, 'until': 112, 'at': 'caster+0.95,2.6,-0.25', 'follow': True, 'scale': 1.3},
-                      {'type': 'sprites', 'delay': 0, 'duration': 40, 'at': 'caster+0.95,2.2,-0.25', 'follow': True, 'texture': 'soul_mote', 'count': 60,
-                       'rate': 2, 'spread': 0.8, 'speed': 0.01, 'gravity': -0.002, 'size': [0.4, 0.1], 'life': 30, 'color': '#2A1638'},
-                      {'type': 'flash', 'delay': 38, 'duration': 6, 'at': 'caster+0.95,2.6,1.2', 'follow': True, 'size': 1.4, 'rays': 5, 'color': '#9A5CF0'},
-                      {'type': 'sprites', 'delay': 40, 'duration': 60, 'at': 'caster+0.95,2.5,1.4', 'follow': True, 'texture': 'soul_mote', 'count': 900,
-                       'rate': 16, 'spread': 0.35, 'speed': 0.42, 'gravity': -0.002, 'size': [0.35, 1.1], 'life': 22, 'color': '#1A0C24', 'cone': 40},
-                      {'type': 'sprites', 'delay': 40, 'duration': 60, 'at': 'caster+0.95,2.5,1.4', 'follow': True, 'texture': '@sparks', 'count': 500,
-                       'rate': 9, 'spread': 0.3, 'speed': 0.44, 'size': [0.18, 0.05], 'life': 20, 'color': '#9A5CF0', 'cone': 40},
+    # пламя Ворганы: тень дракона встаёт из правого плеча (DRAGON_AT), пламя — из пасти (DRAGON_MOUTH, считает dragon()), конусом по взгляду
+    at = lambda p: 'caster+' + ','.join(f'{v:.2f}' for v in p)
+    loc = lambda m: tuple(DRAGON_AT[i] + DRAGON_SCALE * m[i] for i in range(3))
+    mouth = loc(DRAGON_MOUTH)
+    head = loc(DRAGON_SPINE[-1])
+    mid = loc(DRAGON_SPINE[3])
+    out.append(fx('silent_worgan_flame', 'Чёрное пламя Ворганы (T20): за каст (40 тиков) из правого плеча встаёт тень дракона — шея S-изгибом вверх и вперёд, '
+                  'голова впереди-сверху; на 38 тике вспышка в пасти, затем выдох — конус чёрного пламени с фиолетовой кромкой на 12 блоков (3 с) из пасти '
+                  'по взгляду, жар в пасти, пепел; тень рассыпается. Следует за заклинателем.', 'forbidden', 130, [
+                      {'type': 'mesh', 'model': 'worgan_dragon', 'delay': 0, 'until': 112, 'at': at(DRAGON_AT), 'follow': True, 'scale': DRAGON_SCALE},
+                      {'type': 'sprites', 'delay': 0, 'duration': 40, 'at': at(mid), 'follow': True, 'texture': 'soul_mote', 'count': 60,
+                       'rate': 2, 'spread': 0.6, 'speed': 0.01, 'gravity': -0.002, 'size': [0.4, 0.1], 'life': 30, 'color': '#2A1638'},
+                      {'type': 'sprites', 'delay': 20, 'duration': 20, 'at': at(head), 'follow': True, 'texture': '@sparks', 'count': 30,
+                       'rate': 2, 'spread': 0.35, 'speed': 0.005, 'gravity': -0.003, 'size': [0.12, 0.02], 'life': 16, 'color': '#9A5CF0'},
+                      {'type': 'flash', 'delay': 38, 'duration': 6, 'at': at(mouth), 'follow': True, 'size': 1.4, 'rays': 5, 'color': '#9A5CF0'},
+                      {'type': 'flash', 'delay': 40, 'duration': 60, 'at': at(mouth), 'follow': True, 'size': 0.7, 'rays': 0, 'color': '#6A2CC0'},
+                      {'type': 'sprites', 'delay': 40, 'duration': 60, 'at': at(mouth), 'follow': True, 'texture': 'soul_mote', 'count': 900,
+                       'rate': 16, 'spread': 0.25, 'speed': 0.42, 'gravity': -0.002, 'size': [0.35, 1.1], 'life': 22, 'color': '#1A0C24', 'cone': 40},
+                      {'type': 'sprites', 'delay': 40, 'duration': 60, 'at': at(mouth), 'follow': True, 'texture': '@sparks', 'count': 500,
+                       'rate': 9, 'spread': 0.2, 'speed': 0.44, 'size': [0.18, 0.05], 'life': 20, 'color': '#9A5CF0', 'cone': 40},
                       {'type': 'sprites', 'delay': 60, 'duration': 60, 'at': 'caster+0,1,6', 'follow': True, 'texture': '@shards', 'count': 120, 'rate': 2,
                        'spread': 4, 'speed': 0.01, 'gravity': 0.002, 'size': [0.18, 0.06], 'life': 50, 'color': '#3A3440'}]))
     return out
@@ -292,6 +509,10 @@ def main():
     for name, doc in (('silent_spear', spear()), ('silent_dome', dome()), ('worgan_dragon', dragon())):
         json.dump(doc, open(os.path.join(md, name + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
         print(f'mesh {name}: {len(doc["parts"][0]["boxes"])} boxes')
+        if name == 'worgan_dragon':
+            bad = check_dragon(doc['parts'][0]['boxes'])
+            print(f'  dragon: mouth {tuple(round(v, 2) for v in DRAGON_MOUTH)} (model axes), corners behind caster below eyes within 1.5: {bad}')
+            assert bad == 0, 'worgan_dragon: part of the model is behind the caster below eye level'
     for name, doc in build_fx():
         json.dump(doc, open(os.path.join(A, 'fx', name + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
         print(f'fx {name}: {len(doc["elements"])} elements')

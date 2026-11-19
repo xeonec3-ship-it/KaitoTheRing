@@ -1,5 +1,5 @@
 {
- "comment": "Чёрное пламя Ворганы (T20): за каст (40 тиков) над правым плечом встаёт тень дракона, затем выдох — конус чёрного пламени с фиолетовой кромкой на 12 блоков (3 с), пепел; тень рассыпается. Следует за заклинателем. Сгенерировано tools/gen_silent_staff_fx.py.",
+ "comment": "Чёрное пламя Ворганы (T20): за каст (40 тиков) из правого плеча встаёт тень дракона — шея S-изгибом вверх и вперёд, голова впереди-сверху; на 38 тике вспышка в пасти, затем выдох — конус чёрного пламени с фиолетовой кромкой на 12 блоков (3 с) из пасти по взгляду, жар в пасти, пепел; тень рассыпается. Следует за заклинателем. Сгенерировано tools/gen_silent_staff_fx.py.",
  "style": "forbidden",
  "duration": 130,
  "elements": [
@@ -8,20 +8,20 @@
    "model": "worgan_dragon",
    "delay": 0,
    "until": 112,
-   "at": "caster+0.95,2.6,-0.25",
+   "at": "caster+0.45,1.35,0.00",
    "follow": true,
-   "scale": 1.3
+   "scale": 1.0
   },
   {
    "type": "sprites",
    "delay": 0,
    "duration": 40,
-   "at": "caster+0.95,2.2,-0.25",
+   "at": "caster+0.87,2.57,0.00",
    "follow": true,
    "texture": "soul_mote",
    "count": 60,
    "rate": 2,
-   "spread": 0.8,
+   "spread": 0.6,
    "speed": 0.01,
    "gravity": -0.002,
    "size": [
@@ -32,25 +32,54 @@
    "color": "#2A1638"
   },
   {
+   "type": "sprites",
+   "delay": 20,
+   "duration": 20,
+   "at": "caster+0.92,3.15,0.72",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 30,
+   "rate": 2,
+   "spread": 0.35,
+   "speed": 0.005,
+   "gravity": -0.003,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 16,
+   "color": "#9A5CF0"
+  },
+  {
    "type": "flash",
    "delay": 38,
    "duration": 6,
-   "at": "caster+0.95,2.6,1.2",
+   "at": "caster+0.92,2.65,1.80",
    "follow": true,
    "size": 1.4,
    "rays": 5,
    "color": "#9A5CF0"
   },
   {
+   "type": "flash",
+   "delay": 40,
+   "duration": 60,
+   "at": "caster+0.92,2.65,1.80",
+   "follow": true,
+   "size": 0.7,
+   "rays": 0,
+   "color": "#6A2CC0"
+  },
+  {
    "type": "sprites",
    "delay": 40,
    "duration": 60,
-   "at": "caster+0.95,2.5,1.4",
+   "at": "caster+0.92,2.65,1.80",
    "follow": true,
    "texture": "soul_mote",
    "count": 900,
    "rate": 16,
-   "spread": 0.35,
+   "spread": 0.25,
    "speed": 0.42,
    "gravity": -0.002,
    "size": [
@@ -65,12 +94,12 @@
    "type": "sprites",
    "delay": 40,
    "duration": 60,
-   "at": "caster+0.95,2.5,1.4",
+   "at": "caster+0.92,2.65,1.80",
    "follow": true,
    "texture": "@sparks",
    "count": 500,
    "rate": 9,
-   "spread": 0.3,
+   "spread": 0.2,
    "speed": 0.44,
    "size": [
     0.18,

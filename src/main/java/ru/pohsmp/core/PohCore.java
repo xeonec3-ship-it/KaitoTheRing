@@ -44,6 +44,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.IllusionSpell.IllusionEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MirrorPrisonSpell.MirrorPrisonEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.FrozenHourSpell.FrozenHourEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.CountdownSpell.CountdownEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.ArkSpell.ArkEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DownfallSpell.DownfallEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.EightShieldsSpell.EightShieldsEvents.class);
@@ -55,6 +56,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.Fx.FxServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.FxCommands.class);
         MinecraftForge.EVENT_BUS.register(Hidden.class);
+        MinecraftForge.EVENT_BUS.register(NpcCast.NpcCastEvents.class);
         if (FMLEnvironment.dist == Dist.CLIENT) ClientInit.init(modBus);
     }
 
@@ -71,6 +73,8 @@ public class PohCore {
             if (!e.has(type, Reg.HIGHER_RESIST.get())) e.add(type, Reg.HIGHER_RESIST.get());
             if (!e.has(type, Reg.FORBIDDEN_POWER.get())) e.add(type, Reg.FORBIDDEN_POWER.get());
             if (!e.has(type, Reg.FORBIDDEN_RESIST.get())) e.add(type, Reg.FORBIDDEN_RESIST.get());
+            if (!e.has(type, Reg.SILENT_POWER.get())) e.add(type, Reg.SILENT_POWER.get());
+            if (!e.has(type, Reg.SILENT_RESIST.get())) e.add(type, Reg.SILENT_RESIST.get());
         }
     }
 }

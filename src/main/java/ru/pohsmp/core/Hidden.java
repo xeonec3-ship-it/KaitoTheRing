@@ -46,27 +46,31 @@ import ru.pohsmp.core.net.Net;
  * Clients that start tracking the entity later get the hide packet too, so relogging or walking up does not reveal it.
  *
  * <p>Options: noDamage cancels all damage and melee hits; noCollide stops pushing (a scoreboard team with collision "never",
- * only if the entity is in no team of its own), projectile hits and right-click interaction. Mobs and NPCs do not move while hidden:
- * they stay where they were hidden (hide again to set a new spot). Fire on a hidden entity is put out.
+ * only if the entity is in no team of its own), projectile hits and right-click interaction; freeze keeps it where it was hidden
+ * (by default mobs and NPCs, not players; hide again or {@link #moveTo} for a new spot). Fire on a hidden entity is put out.
+ * Damage that bypasses invulnerability (/kill, the void) still goes through.
  */
 public final class Hidden {
     private Hidden() {}
 
     /** Team without collisions for noCollide (added only to entities in no team). */
     public static final String TEAM = "pohsmp_hidden";
+    /** Long enough to mean "until shown" (about 24 days), for callers that want a number. */
+    public static final int FOREVER = Integer.MAX_VALUE / 100;
 
     private static final class State {
         Entity entity;
         long until;
-        final boolean noDamage, noCollide;
+        final boolean noDamage, noCollide, freeze;
         Vec3 anchor;
         boolean teamed;
 
-        State(Entity e, long until, boolean noDamage, boolean noCollide) {
+        State(Entity e, long until, boolean noDamage, boolean noCollide, boolean freeze) {
             this.entity = e;
             this.until = until;
             this.noDamage = noDamage;
             this.noCollide = noCollide;
+            this.freeze = freeze;
             this.anchor = e.position();
         }
     }
@@ -79,12 +83,17 @@ public final class Hidden {
         hide(e, ticks, true, true);
     }
 
-    /** Hides e for ticks (&lt;= 0: until {@link #show}); hiding again renews the time, options and the spot a mob is held at. */
+    /** Hides e for ticks (&lt;= 0: until {@link #show}); mobs and NPCs are held in place, players are not. */
     public static void hide(Entity e, int ticks, boolean noDamage, boolean noCollide) {
+        hide(e, ticks, noDamage, noCollide, !(e instanceof Player));
+    }
+
+    /** Hides e for ticks (&lt;= 0: until {@link #show}); hiding again renews the time, the options and the spot it is held at. */
+    public static void hide(Entity e, int ticks, boolean noDamage, boolean noCollide, boolean freeze) {
         if (e == null || e.level().isClientSide || !(e.level() instanceof ServerLevel)) return;
         State old = HIDDEN.get(e.getUUID());
         if (old != null && old.teamed && !noCollide) leaveTeam(old);
-        State s = new State(e, ticks > 0 ? now + ticks : Long.MAX_VALUE, noDamage, noCollide);
+        State s = new State(e, ticks > 0 ? now + ticks : Long.MAX_VALUE, noDamage, noCollide, freeze);
         if (old != null) s.teamed = old.teamed && noCollide;
         HIDDEN.put(e.getUUID(), s);
         if (noCollide && !s.teamed) joinTeam(s);
@@ -97,6 +106,12 @@ public final class Hidden {
         State s = HIDDEN.remove(e.getUUID());
         if (s != null) release(e);
         else if (!e.level().isClientSide) send(e, PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> e), 0);
+    }
+
+    /** Where a frozen hidden entity is held from now on (e.g. after the caller moved it). */
+    public static void moveTo(Entity e, Vec3 p) {
+        State s = e == null ? null : HIDDEN.get(e.getUUID());
+        if (s != null) s.anchor = p;
     }
 
     public static boolean isHidden(Entity e) {
@@ -124,13 +139,18 @@ public final class Hidden {
         leaveTeam(e);
     }
 
-    /** Every tick while hidden: invisibility (no particles, no icon: only the shared flag), no fire, mobs held in place. */
+    /** Every tick while hidden: invisibility (no particles, no icon: only the shared flag), no fire, held in place if frozen. */
     private static void apply(State s) {
         Entity e = s.entity;
         if (!e.isInvisible()) e.setInvisible(true);
         if (e.getRemainingFireTicks() > 0) e.clearFire();
         e.fallDistance = 0;
-        if (e instanceof Player) return;
+        if (!s.freeze) return;
+        Vec3 a = s.anchor;
+        if (e instanceof ServerPlayer sp) {
+            if (sp.position().distanceToSqr(a) > 0.0025) sp.connection.teleport(a.x, a.y, a.z, sp.getYRot(), sp.getXRot());
+            return;
+        }
         if (e instanceof Mob m) {
             m.getNavigation().stop();
             m.setTarget(null);
@@ -141,7 +161,6 @@ public final class Hidden {
             le.setJumping(false);
         }
         e.setDeltaMovement(Vec3.ZERO);
-        Vec3 a = s.anchor;
         if (e.position().distanceToSqr(a) > 0.0025) e.teleportTo(a.x, a.y, a.z);
     }
 
@@ -249,7 +268,7 @@ public final class Hidden {
     public static void onAttack(LivingAttackEvent e) {
         if (HIDDEN.isEmpty()) return;
         State s = HIDDEN.get(e.getEntity().getUUID());
-        if (s != null && s.noDamage) e.setCanceled(true);
+        if (s != null && s.noDamage && !e.getSource().is(net.minecraft.tags.DamageTypeTags.BYPASSES_INVULNERABILITY)) e.setCanceled(true);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

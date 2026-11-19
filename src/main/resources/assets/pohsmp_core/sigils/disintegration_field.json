@@ -5,6 +5,8 @@
   "orientation": "ground",
   "lifetime": -1,
   "hold": -1,
+  "groundLight": { "radius": 1.1, "strength": 0.6 },
+  "blockGlow": { "radius": 1.8, "strength": 0.35, "falloff": 1.5 },
   "layers": [
     {
       "id": "arcs",

@@ -61,47 +61,84 @@ public final class Api {
         return ru.pohsmp.core.fx.Fx.play(sl, s);
     }
 
+    /**
+     * Hides an entity from everyone (model, armour, held items, name, shadow; CNPC NPCs too) for ticks (&lt;= 0 = until {@link #show}),
+     * with no damage and no collisions; a mob or NPC stays where it was hidden. entity: a CNPC script entity (npc, player, e.npc...)
+     * or a Minecraft entity. Example: <code>Core.hide(npc, 100)</code>.
+     */
+    public static void hide(Object entity, int ticks) {
+        Hidden.hide(mc(entity), ticks);
+    }
+
+    /** Same, with options: no damage, no pushing/projectiles/clicks; mobs and NPCs (not players) are kept in place. */
+    public static void hide(Object entity, int ticks, boolean noDamage, boolean noCollide) {
+        Hidden.hide(mc(entity), ticks, noDamage, noCollide);
+    }
+
+    /** Same, freeze chosen explicitly (true keeps players in place too, false lets mobs move). */
+    public static void hide(Object entity, int ticks, boolean noDamage, boolean noCollide, boolean freeze) {
+        Hidden.hide(mc(entity), ticks, noDamage, noCollide, freeze);
+    }
+
+    public static void show(Object entity) {
+        Hidden.show(mc(entity));
+    }
+
+    public static boolean isHidden(Object entity) {
+        return Hidden.isHidden(mc(entity));
+    }
+
+    /**
+     * An NPC (or any non-player mob) casts a spell like a player: animation, effects, cutscene. id: "pohsmp_core:disintegration",
+     * "irons_spellbooks:fireball" (or just "fireball"). target: an entity (CNPC or Minecraft) or null (straight ahead).
+     * Spell level = its minimum. Returns false if it could not start (already casting, unknown spell, the spell refused).
+     */
+    public static boolean cast(Object npc, String id, Object target) {
+        return cast(npc, id, target, 0);
+    }
+
+    public static boolean cast(Object npc, String id, Object target, int level) {
+        net.minecraft.world.entity.Entity t = mc(target);
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le
+                && NpcCast.cast(le, id, level, t instanceof net.minecraft.world.entity.LivingEntity lt ? lt : null,
+                        t != null ? t.position() : null);
+    }
+
+    /** Same, aimed at a point. */
+    public static boolean castAt(Object npc, String id, double x, double y, double z, int level) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.cast(le, id, level, null, new net.minecraft.world.phys.Vec3(x, y, z));
+    }
+
+    /** Stops the NPC's cast; a spell that cannot be interrupted is not stopped. Returns true if stopped. */
+    public static boolean cancelCast(Object npc) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.cancel(le, false);
+    }
+
+    /** Stops it even if the spell cannot be interrupted (the boss dies, the phase changes). */
+    public static boolean forceCancelCast(Object npc) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.cancel(le, true);
+    }
+
+    public static boolean isCasting(Object npc) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.isCasting(le);
+    }
+
+    /** A CNPC script wrapper (IEntity) or a Minecraft entity to the Minecraft entity; null if neither. */
+    static net.minecraft.world.entity.Entity mc(Object o) {
+        if (o instanceof net.minecraft.world.entity.Entity e) return e;
+        if (o == null) return null;
+        try {
+            Object r = o.getClass().getMethod("getMCEntity").invoke(o);
+            return r instanceof net.minecraft.world.entity.Entity e ? e : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     /** Runs a command as the server at the level's spawn, with no feedback in chat or log. Returns the command result. */
     public static int cmd(Level level, String command) {
         if (!(level instanceof ServerLevel sl)) return 0;
         MinecraftServer s = sl.getServer();
         return s.getCommands().performPrefixedCommand(s.createCommandSourceStack().withLevel(sl).withSuppressedOutput(), command);
-    }
-    /**
-     * Hides an entity from every player (model, armour, held items, name tag, shadow) for ticks (&lt;= 0: until {@link #show}),
-     * with no damage and no collisions; a hidden NPC stays where it is. Takes a CNPC script entity (npc, player, e.target)
-     * or a Minecraft entity. Example: <code>Core.hide(npc, 100)</code>.
-     */
-    public static void hide(Object entity, int ticks) {
-        net.minecraft.world.entity.Entity e = unwrap(entity);
-        if (e != null) Hidden.hide(e, ticks);
-    }
-
-    /** Like {@link #hide(Object, int)} with the options: noDamage cancels damage, noCollide stops pushing, projectiles and clicks. */
-    public static void hide(Object entity, int ticks, boolean noDamage, boolean noCollide) {
-        net.minecraft.world.entity.Entity e = unwrap(entity);
-        if (e != null) Hidden.hide(e, ticks, noDamage, noCollide);
-    }
-
-    /** Shows an entity hidden by {@link #hide}. */
-    public static void show(Object entity) {
-        net.minecraft.world.entity.Entity e = unwrap(entity);
-        if (e != null) Hidden.show(e);
-    }
-
-    public static boolean isHidden(Object entity) {
-        return Hidden.isHidden(unwrap(entity));
-    }
-
-    /** A Minecraft entity, or a CNPC script wrapper (IEntity.getMCEntity()), or null. */
-    private static net.minecraft.world.entity.Entity unwrap(Object o) {
-        if (o instanceof net.minecraft.world.entity.Entity e) return e;
-        if (o == null) return null;
-        try {
-            Object mc = o.getClass().getMethod("getMCEntity").invoke(o);
-            return mc instanceof net.minecraft.world.entity.Entity e ? e : null;
-        } catch (ReflectiveOperationException ex) {
-            return null;
-        }
     }
 }

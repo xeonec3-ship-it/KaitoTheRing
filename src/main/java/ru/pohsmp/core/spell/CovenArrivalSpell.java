@@ -423,14 +423,13 @@ public class CovenArrivalSpell extends PohSpell {
         // (CNPC NPCs ignore invisibility when drawn, so Hidden cancels their rendering), unhurt and not pushed until their exit
         a.pre.clear();
         a.walks.clear();
-        Vec3 inside = a.inside;
+        Vec3 p = a.inside;
         List<LivingEntity> all = new ArrayList<>(a.retinue);
         all.add(caster);
         for (LivingEntity e : all) {
             HIDDEN.put(e.getUUID(), caster.getUUID());
             Hidden.hide(e, CAST, true, true);   // gone on the cast level at once; the time limit is a safety net, exit/finish show them
             if (!(e instanceof Player)) HigherSpell.burst(e.level() instanceof ServerLevel el ? el : cl, e.getX(), e.getY() + 1, e.getZ(), 1.4, COLOR);
-            Vec3 p = inside;
             LivingEntity moved = move(e, ar, p, a.yaw);
             Hidden.hide(moved, CAST, true, true);   // again: held at the new spot (and the new entity if it changed dimension)
             a.hold.put(moved.getUUID(), p);

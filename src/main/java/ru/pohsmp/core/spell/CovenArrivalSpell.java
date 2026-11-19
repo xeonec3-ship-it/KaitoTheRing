@@ -9,7 +9,9 @@ import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SpellData;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
+import com.mojang.logging.LogUtils;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -24,6 +26,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -47,6 +52,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.net.Net;
 import ru.pohsmp.core.net.Net.HFx;
+import org.slf4j.Logger;
 
 /**
  * Mythic "Coven Arrival" (a Coven seal), level 1. First use marks the arena where the caster stands (no cast, the scroll stays);
@@ -236,6 +242,21 @@ public class CovenArrivalSpell extends PohSpell {
         final Map<UUID, Vec3> pre = new HashMap<>();
         /** CNPC NPCs: the model animation they had before the arrival changed it. */
         final Map<UUID, Integer> poses = new HashMap<>();
+        /** Retinue members whose exit came while they could not be found (chunk not loaded yet): retried every tick. */
+        final Map<UUID, Vec3> pendingExit = new HashMap<>();
+    }
+
+    private static final Logger LOG = LogUtils.getLogger();
+    /** Keeps the arena and the cast spot loaded through the whole arrival (renewed every second, lives 3 s). */
+    private static final TicketType<ChunkPos> TICKET = TicketType.create("pohsmp_coven", Comparator.comparingLong(ChunkPos::toLong), 60);
+
+    private static void keep(ServerLevel l, Vec3 p) {
+        ChunkPos cp = new ChunkPos(BlockPos.containing(p));
+        l.getChunkSource().addRegionTicket(TICKET, cp, 2, cp);
+    }
+
+    private static String where(LivingEntity e) {
+        return e == null ? "null" : String.format("%s %s %.1f %.1f %.1f", e.getName().getString(), e.level().dimension().location(), e.getX(), e.getY(), e.getZ());
     }
 
     private record Walk(Vec3 from, Vec3 to, int start, int len) {}
@@ -291,6 +312,10 @@ public class CovenArrivalSpell extends PohSpell {
         a.seed = Fx.play(a.arena, Fx.mesh("coven_seed").at(a.at).yaw(a.yaw));
         a.arena.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 6f, 0.5f);
         CAST_BY.put(caster.getUUID(), a);
+        keep(a.arena, a.at);
+        keep(sl, a.cAt);
+        LOG.info("[pohsmp] coven arrival: caster {}, arena {} {}, retinue {}", where(caster), a.arena.dimension().location(), a.at,
+                a.retinue.stream().map(CovenArrivalSpell::where).toList());
         Tasks.add(() -> step(caster, a));
     }
 
@@ -299,6 +324,15 @@ public class CovenArrivalSpell extends PohSpell {
         if (CAST_BY.get(caster.getUUID()) != a) return false;
         int t = ++a.age;
         ServerLevel ar = a.arena;
+        if (t % 20 == 0) {   // the arena (often far from the caster) must tick its entities before anyone arrives
+            keep(ar, a.at);
+            if (t < T_PORTAL + 20) keep(a.castLevel, a.cAt);
+        }
+        if (t % 200 == 0) LOG.info("[pohsmp] coven arrival t={}: {}", t, a.retinue.stream().map(e -> where(find(ar.getServer(), e.getUUID()))).toList());
+        if (!a.pendingExit.isEmpty()) for (var e : new ArrayList<>(a.pendingExit.entrySet())) {
+            LivingEntity le = find(ar.getServer(), e.getKey());
+            if (le != null && exit(caster, a, le, e.getValue(), 0.6f)) a.pendingExit.remove(e.getKey());
+        }
         if (t % 100 == 0 && t < T_PORTAL) ar.playSound(null, a.at.x, a.at.y + 3, a.at.z, SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 5f, 0.45f);
         if (t == 200) ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 4f, 0.5f);
         if (t == T_BOW || t == T_BOW_END) for (LivingEntity e : a.retinue) {
@@ -310,8 +344,8 @@ public class CovenArrivalSpell extends PohSpell {
         }
         if (t == T_CPORTAL) openCasterPortal(a);
         if (t == T_PORTAL) openPortal(caster, a);
-        if (t == T_EXIT1 && a.retinue.size() > 0) exit(caster, a, a.retinue.get(0), a.at.add(a.fw.scale(2.2)).subtract(a.rt.scale(3)), 0.6f);
-        if (t == T_EXIT2 && a.retinue.size() > 1) exit(caster, a, a.retinue.get(1), a.at.add(a.fw.scale(2.2)).add(a.rt.scale(3)), 0.6f);
+        if (t == T_EXIT1 && a.retinue.size() > 0) exitOrWait(caster, a, a.retinue.get(0), a.at.add(a.fw.scale(2.2)).subtract(a.rt.scale(3)));
+        if (t == T_EXIT2 && a.retinue.size() > 1) exitOrWait(caster, a, a.retinue.get(1), a.at.add(a.fw.scale(2.2)).add(a.rt.scale(3)));
         if (t == T_CASTER) exit(caster, a, caster, a.at.add(a.fw.scale(3.2)), 0.45f);
         if (t == T_RITUAL) ritual(caster, a);
         if (t == T_DOME) {
@@ -408,6 +442,7 @@ public class CovenArrivalSpell extends PohSpell {
             Vec3 p = e instanceof Player ? inside : stash(ar, inside);
             LivingEntity moved = move(e, ar, p, a.yaw);
             a.hold.put(moved.getUUID(), p);
+            if (moved != caster) LOG.info("[pohsmp] coven arrival: {} into the portal -> {}", where(moved), p);
             if (moved != e) {
                 a.retinue.replaceAll(x -> x == e ? moved : x);
                 Integer pose = a.poses.remove(e.getUUID());
@@ -458,6 +493,7 @@ public class CovenArrivalSpell extends PohSpell {
             Cutscene.refreeze(sp, p);
             return sp;
         }
+        keep(to, p);
         if (e.level() == to) {
             e.teleportTo(p.x, p.y, p.z);
             e.setYRot(yaw);
@@ -478,10 +514,20 @@ public class CovenArrivalSpell extends PohSpell {
         return moved instanceof LivingEntity le ? le : e;
     }
 
-    private static void exit(LivingEntity caster, Arrival a, LivingEntity e, Vec3 to, float pitch) {
+    private static void exitOrWait(LivingEntity caster, Arrival a, LivingEntity e, Vec3 to) {
+        if (!exit(caster, a, e, to, 0.6f)) {
+            LOG.warn("[pohsmp] coven arrival: {} not found at its exit, waiting for it", e.getUUID());
+            a.pendingExit.put(e.getUUID(), to);
+        }
+    }
+
+    /** False if the entity cannot be found right now (its chunk is not loaded): the caller retries. */
+    private static boolean exit(LivingEntity caster, Arrival a, LivingEntity e, Vec3 to, float pitch) {
         ServerLevel ar = a.arena;
         LivingEntity le = find(ar.getServer(), e.getUUID());
-        if (le == null || !le.isAlive()) return;
+        if (le == null) return false;
+        if (!le.isAlive()) return true;
+        keep(ar, to);
         HIDDEN.remove(le.getUUID());
         unhide(le);
         LivingEntity m;
@@ -497,7 +543,11 @@ public class CovenArrivalSpell extends PohSpell {
         HigherSpell.burst(ar, to.x, to.y + 1, to.z, 1.6, COLOR);
         ar.playSound(null, to.x, to.y, to.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 2f, pitch);
         ar.playSound(null, to.x, to.y, to.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 2f, 0.8f);
-        if (m != caster) CnpcHooks.call(m, "coven_exit", caster.getName().getString());
+        if (m != caster) {
+            CnpcHooks.call(m, "coven_exit", caster.getName().getString());
+            LOG.info("[pohsmp] coven arrival: {} steps out to {}", where(m), to);
+        }
+        return true;
     }
 
     private static void ritual(LivingEntity caster, Arrival a) {

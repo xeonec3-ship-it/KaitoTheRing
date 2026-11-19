@@ -74,6 +74,11 @@ public final class CnpcHooks {
             set.setAccessible(true);
             int old = ((Number) get.invoke(ai)).intValue();
             set.invoke(ai, type);
+            // DataAI.setAnimation only changes the server value: ask CNPC to resend the NPC data to the clients
+            try {
+                field(npc.getClass(), "updateClient").setBoolean(npc, true);
+            } catch (NoSuchFieldException ignored) {
+            }
             return old;
         } catch (Throwable t) {
             LOG.warn("[pohsmp] CNPC animation {} failed: {}", type, t.toString());

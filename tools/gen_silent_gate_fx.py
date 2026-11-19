@@ -53,14 +53,25 @@ def build():
     # «туманность» — плотный поток мельчайших белых и бледно-бирюзовых искр с розово-лиловым отливом, мягкие светящиеся облачка,
     # в потоке мерцают крупные четырёхлучевые звёздочки (textures/fx/glint4.png); у кисти — мягкое белое ядро.
     # Никаких лучей-лент от руки к вратам (решение владельца 19.11).
-    # Указ рукой (14.6–26 с) — ТУМАННОСТЬ как в видео мода (владелец 19.11: «как на видео»): большое мягкое светящееся облако-рукав
-    # галактики перед ведьмой и над ней (печать silent_hand_nebula, billboard: облака в два слоя, светлые струи, звёзды с ореолами;
-    # медленно вращаются), вокруг редкие мерцающие звёздочки. Ни лучей к вратам, ни частиц из пальца.
-    el(type='sigil', id='silent_hand_nebula', delay=T(14.6), until=T(26), at='caster+0,2.6,1.6', orientation='billboard')
-    el(type='sprites', delay=T(14.8), duration=T(11), at='caster+0,2.6,1.6', texture='glint4', count=90, rate=0.4, spread=3.2, speed=0.006,
-       gravity=-0.001, spin=40, size=[0.0, 0.35], life=44, color='#FFFFFF', comment='мерцающие звёздочки в облаке')
-    el(type='sprites', delay=T(14.8), duration=T(11), at='caster+0,2.6,1.6', texture='spark_soft', count=160, rate=0.7, spread=3.6, speed=0.008,
-       gravity=-0.0015, size=[0.08, 0.02], life=50, color='#F2D8F2', comment='редкие пылинки света')
+    # ТУМАННОСТЬ ОТ ПОСОХА — как в видео мода, когда камера сбоку (владелец 19.11): посох парит слева-спереди от ведьмы
+    # (GateStaff: 0.8 влево, 1.1 вверх, 0.25 вперёд); от него ГОРИЗОНТАЛЬНО тянется широкая полоса туманности — розово-белые облака,
+    # звёзды, бирюзовые струи — сквозь ведьму и далеко вправо (~9 блоков), чуть поднимаясь; у посоха — яркое пятно света.
+    # Дважды: в самом начале каста (1–9 с) и во время указа рукой (14.6–26 с). Камера в эти моменты — сбоку (код).
+    STAFF = (-0.8, 1.3, 0.25)
+    for t0, t1 in ((1.0, 9.0), (14.6, 26.0)):
+        el(type='flash', delay=T(t0), duration=T(t1 - t0), at='caster+%.2f,%.2f,%.2f' % STAFF, size=1.6, rays=6, color='@core', brightness=0.8,
+           **{'in': {'duration': T(0.8)}, 'out': {'duration': T(1.5)}}, comment='яркое пятно у посоха')
+        for k in range(6):                                  # полоса: облака-billboard вдоль линии от посоха вправо
+            u = k / 5
+            x = STAFF[0] + 0.6 + 8.4 * u
+            y = STAFF[1] + 0.4 + 0.9 * u
+            z = STAFF[2] + 0.4 * math.sin(u * 3)
+            el(type='sigil', id='silent_hand_nebula', delay=T(t0) + int(k * 6), until=T(t1), at=f'caster+{x:.2f},{y:.2f},{z:.2f}',
+               orientation='billboard', scale=round(0.55 + 0.2 * math.sin(u * 3.1), 2))
+        el(type='sprites', delay=T(t0), duration=T(t1 - t0), at='caster+%.2f,%.2f,%.2f' % STAFF, texture='spark_soft', count=900, rate=3,
+           cone=26, speed=0.09, gravity=-0.0008, size=[0.08, 0.02], life=70, color='#F4E0F4', comment='искры текут от посоха вдоль полосы')
+        el(type='sprites', delay=T(t0), duration=T(t1 - t0), at='caster+3.5,2.2,0.3', texture='glint4', count=160, rate=0.6, spread=4.5,
+           speed=0.004, gravity=0.0, spin=40, size=[0.0, 0.4], life=46, color='#FFFFFF', comment='мерцающие звёздочки в полосе')
     # 49.9 с: рука прямо вперёд — вспышка у руки
     el(type='flash', delay=T(49.9), duration=T(0.6), at='caster.hand', size=1.6, anamorphic=4, rays=6, color='@core')
     # 20 с: над местом врат плашмя собирается магический круг; 21.8–27 с врата МЕДЛЕННО выходят из него вниз — опускаются сквозь круг

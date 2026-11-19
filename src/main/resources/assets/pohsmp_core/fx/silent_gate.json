@@ -35,51 +35,224 @@
    "color": "@primary"
   },
   {
+   "type": "flash",
+   "delay": 20,
+   "duration": 160,
+   "at": "caster+-0.80,1.30,0.25",
+   "size": 1.6,
+   "rays": 6,
+   "color": "@core",
+   "brightness": 0.8,
+   "in": {
+    "duration": 16
+   },
+   "out": {
+    "duration": 30
+   },
+   "comment": "яркое пятно у посоха"
+  },
+  {
    "type": "sigil",
    "id": "silent_hand_nebula",
-   "delay": 292,
-   "until": 520,
-   "at": "caster+0,2.6,1.6",
-   "orientation": "billboard"
+   "delay": 20,
+   "until": 180,
+   "at": "caster+-0.20,1.70,0.25",
+   "orientation": "billboard",
+   "scale": 0.55
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 26,
+   "until": 180,
+   "at": "caster+1.48,1.88,0.48",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 32,
+   "until": 180,
+   "at": "caster+3.16,2.06,0.62",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 38,
+   "until": 180,
+   "at": "caster+4.84,2.24,0.64",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 44,
+   "until": 180,
+   "at": "caster+6.52,2.42,0.52",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 50,
+   "until": 180,
+   "at": "caster+8.20,2.60,0.31",
+   "orientation": "billboard",
+   "scale": 0.56
   },
   {
    "type": "sprites",
-   "delay": 296,
-   "duration": 220,
-   "at": "caster+0,2.6,1.6",
-   "texture": "glint4",
-   "count": 90,
-   "rate": 0.4,
-   "spread": 3.2,
-   "speed": 0.006,
-   "gravity": -0.001,
-   "spin": 40,
-   "size": [
-    0.0,
-    0.35
-   ],
-   "life": 44,
-   "color": "#FFFFFF",
-   "comment": "мерцающие звёздочки в облаке"
-  },
-  {
-   "type": "sprites",
-   "delay": 296,
-   "duration": 220,
-   "at": "caster+0,2.6,1.6",
+   "delay": 20,
+   "duration": 160,
+   "at": "caster+-0.80,1.30,0.25",
    "texture": "spark_soft",
-   "count": 160,
-   "rate": 0.7,
-   "spread": 3.6,
-   "speed": 0.008,
-   "gravity": -0.0015,
+   "count": 900,
+   "rate": 3,
+   "cone": 26,
+   "speed": 0.09,
+   "gravity": -0.0008,
    "size": [
     0.08,
     0.02
    ],
-   "life": 50,
-   "color": "#F2D8F2",
-   "comment": "редкие пылинки света"
+   "life": 70,
+   "color": "#F4E0F4",
+   "comment": "искры текут от посоха вдоль полосы"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "duration": 160,
+   "at": "caster+3.5,2.2,0.3",
+   "texture": "glint4",
+   "count": 160,
+   "rate": 0.6,
+   "spread": 4.5,
+   "speed": 0.004,
+   "gravity": 0.0,
+   "spin": 40,
+   "size": [
+    0.0,
+    0.4
+   ],
+   "life": 46,
+   "color": "#FFFFFF",
+   "comment": "мерцающие звёздочки в полосе"
+  },
+  {
+   "type": "flash",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster+-0.80,1.30,0.25",
+   "size": 1.6,
+   "rays": 6,
+   "color": "@core",
+   "brightness": 0.8,
+   "in": {
+    "duration": 16
+   },
+   "out": {
+    "duration": 30
+   },
+   "comment": "яркое пятно у посоха"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 292,
+   "until": 520,
+   "at": "caster+-0.20,1.70,0.25",
+   "orientation": "billboard",
+   "scale": 0.55
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 298,
+   "until": 520,
+   "at": "caster+1.48,1.88,0.48",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 304,
+   "until": 520,
+   "at": "caster+3.16,2.06,0.62",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 310,
+   "until": 520,
+   "at": "caster+4.84,2.24,0.64",
+   "orientation": "billboard",
+   "scale": 0.74
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 316,
+   "until": 520,
+   "at": "caster+6.52,2.42,0.52",
+   "orientation": "billboard",
+   "scale": 0.67
+  },
+  {
+   "type": "sigil",
+   "id": "silent_hand_nebula",
+   "delay": 322,
+   "until": 520,
+   "at": "caster+8.20,2.60,0.31",
+   "orientation": "billboard",
+   "scale": 0.56
+  },
+  {
+   "type": "sprites",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster+-0.80,1.30,0.25",
+   "texture": "spark_soft",
+   "count": 900,
+   "rate": 3,
+   "cone": 26,
+   "speed": 0.09,
+   "gravity": -0.0008,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 70,
+   "color": "#F4E0F4",
+   "comment": "искры текут от посоха вдоль полосы"
+  },
+  {
+   "type": "sprites",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster+3.5,2.2,0.3",
+   "texture": "glint4",
+   "count": 160,
+   "rate": 0.6,
+   "spread": 4.5,
+   "speed": 0.004,
+   "gravity": 0.0,
+   "spin": 40,
+   "size": [
+    0.0,
+    0.4
+   ],
+   "life": 46,
+   "color": "#FFFFFF",
+   "comment": "мерцающие звёздочки в полосе"
   },
   {
    "type": "sigil",

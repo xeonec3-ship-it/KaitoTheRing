@@ -185,8 +185,9 @@ public final class Reg {
             SealSpell.PATH, AscensionSpell.PATH, AshlessSpell.PATH, ru.pohsmp.core.spell.BloodMoonSpell.PATH,
             ru.pohsmp.core.spell.OblivionBladesSpell.PATH, ru.pohsmp.core.spell.WorldRiftSpell.PATH, ru.pohsmp.core.spell.MirrorPrisonSpell.PATH,
             ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell.PATH,
-            ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH);
+            ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.CountdownSpell.PATH);
     static {
+        SPELLS.register(ru.pohsmp.core.spell.CountdownSpell.PATH, ru.pohsmp.core.spell.CountdownSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.DisintegrationReplicaSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.MilkyWaySpell::new);
         SPELLS.register(ru.pohsmp.core.spell.EternalBlizzardSpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell::new);

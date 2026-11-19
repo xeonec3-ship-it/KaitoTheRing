@@ -1,0 +1,18 @@
+{
+  "comment": "ВРЕМЕННО (чат идей заменит): печать тихого барьера — бирюзовый круг, обращённый к зрителю, вокруг носителя.",
+  "size": 1.4,
+  "color": "#7FFFD0",
+  "orientation": "billboard",
+  "lifetime": 50,
+  "hold": 40,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.25, "heightOffset": -0.01, "brightness": 0.4,
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutCubic", "modes": ["fade"] }, "pulse": { "amp": 0.25, "period": 20 } },
+    { "id": "rim", "type": "disc", "texture": "rim", "radius": 1.0, "heightOffset": 0.0,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutBack", "modes": ["grow", "unfold"] }, "rotation": { "speed": 30 } },
+    { "id": "core", "type": "disc", "texture": "core", "radius": 0.6, "heightOffset": 0.01,
+      "appear": { "delay": 3, "duration": 8, "easing": "easeOutCubic", "modes": ["grow"] }, "rotation": { "speed": -45 } }
+  ],
+  "formedFlash": { "color": "#C8FFF0", "size": 1.6, "duration": 6, "sparks": 8 },
+  "dissolve": { "modes": ["fade"], "duration": 12 }
+}

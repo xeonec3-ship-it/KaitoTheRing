@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "ru.pohsmp.core.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "XaeroRadarMixin",
+    "XaeroMinimapTrackerMixin",
+    "XaeroWorldMapTrackerMixin"
+  ],
+  "injectors": { "defaultRequire": 0 }
+}

@@ -120,6 +120,7 @@ public class ExplosionSpell extends PohSpell {
     }
 
     private static void say(ServerLevel sl, LivingEntity caster, String text) {
+        if (ru.pohsmp.core.silent.SilentWitch.muted(caster)) return;   // Silent Witch robe: silent chanting
         Component msg = Component.literal("").append(caster.getDisplayName()).append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
                 .append(Component.literal("«" + text + "»").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC));
         for (ServerPlayer p : sl.players()) if (p.distanceToSqr(caster) < 64 * 64) p.sendSystemMessage(msg);

@@ -17,13 +17,15 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "3";
+    private static final String V = "4";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
         CH.messageBuilder(Fx.class, 0, NetworkDirection.PLAY_TO_CLIENT).encoder(Fx::encode).decoder(Fx::new).consumerMainThread(Fx::handle).add();
         CH.messageBuilder(HFx.class, 1, NetworkDirection.PLAY_TO_CLIENT).encoder(HFx::encode).decoder(HFx::new).consumerMainThread(HFx::handle).add();
         CH.messageBuilder(FxMsg.class, 2, NetworkDirection.PLAY_TO_CLIENT).encoder(FxMsg::encode).decoder(FxMsg::new).consumerMainThread(FxMsg::handle).add();
+        CH.messageBuilder(SilentSync.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(SilentSync::encode).decoder(SilentSync::new)
+                .consumerMainThread(SilentSync::handle).add();
     }
 
     /**
@@ -127,6 +129,33 @@ public final class Net {
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.DisintegrationFx.handle(this));
+        }
+    }
+
+    /** Silent Witch outfit: the whole map player id -&gt; name-hiding flags (ru.pohsmp.core.silent.SilentWitch.NAME_TAG / NAMELESS). */
+    public static final class SilentSync {
+        public final java.util.Map<java.util.UUID, Integer> flags;
+
+        public SilentSync(java.util.Map<java.util.UUID, Integer> flags) {
+            this.flags = flags;
+        }
+
+        public SilentSync(FriendlyByteBuf buf) {
+            int n = buf.readVarInt();
+            flags = new java.util.HashMap<>();
+            for (int i = 0; i < n; i++) flags.put(buf.readUUID(), (int) buf.readByte());
+        }
+
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeVarInt(flags.size());
+            flags.forEach((id, f) -> {
+                buf.writeUUID(id);
+                buf.writeByte(f);
+            });
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            ru.pohsmp.core.silent.SilentWitch.setClientFlags(flags);
         }
     }
 }

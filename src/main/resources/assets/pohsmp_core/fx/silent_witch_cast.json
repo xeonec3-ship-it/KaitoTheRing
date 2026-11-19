@@ -1,0 +1,11 @@
+{
+  "comment": "ВРЕМЕННО (чат идей заменит): одежда безмолвной ведьмы, эффект 8 — бирюзовые искры кружат у ног, пока носитель мантии колдует. Код останавливает его, когда каст кончился.",
+  "style": "silent",
+  "duration": 12000,
+  "elements": [
+    { "type": "sprites", "delay": 0, "duration": 12000, "at": "caster+0,0.15,0", "follow": true, "texture": "@sparks", "count": 3, "rate": 1,
+      "spread": 0.9, "speed": 0.03, "gravity": -0.004, "spin": 90, "size": [0.18, 0.05], "life": 26, "color": "@primary" },
+    { "type": "decal", "delay": 0, "duration": 12000, "at": "caster+0,0.05,0", "follow": true, "texture": "core", "radius": 1.1, "fadeOut": 8,
+      "brightness": 0.35, "color": "@primary", "in": { "duration": 6, "easing": "easeOutCubic" } }
+  ]
+}

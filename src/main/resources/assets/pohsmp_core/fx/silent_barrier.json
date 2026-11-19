@@ -1,0 +1,13 @@
+{
+  "comment": "ВРЕМЕННО (чат идей заменит): одежда безмолвной ведьмы, эффект 4 — тихий барьер спас от смерти: бирюзовая печать вокруг, пузырь, вспышка.",
+  "style": "silent",
+  "duration": 70,
+  "elements": [
+    { "type": "sigil", "id": "silent_barrier", "delay": 0, "at": "caster+0,1,0" },
+    { "type": "wave", "shape": "sphere", "delay": 0, "duration": 40, "at": "caster+0,1,0", "follow": true, "radius": 1.6, "rim": 0.9, "color": "@primary",
+      "in": { "duration": 4, "easing": "easeOutCubic" }, "out": { "duration": 14, "easing": "easeInSine" } },
+    { "type": "flash", "delay": 0, "duration": 8, "at": "caster+0,1,0", "size": 2.5, "rays": 6, "color": "@secondary" },
+    { "type": "sprites", "delay": 2, "duration": 40, "at": "caster+0,1,0", "follow": true, "texture": "@sparks", "count": 24, "rate": 3,
+      "spread": 1.4, "speed": 0.05, "gravity": 0.0, "spin": 60, "size": [0.2, 0.05], "life": 30, "color": "@primary" }
+  ]
+}

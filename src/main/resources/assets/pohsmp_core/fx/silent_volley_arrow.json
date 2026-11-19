@@ -1,0 +1,35 @@
+{
+ "comment": "Одна стрела залпа (T20): яркое ядро и шлейф; сервер двигает экземпляр (Fx.move) по дуге к цели и гасит при попадании, там же играет silent_wind_spears_hit (меньшим масштабом). Сгенерировано tools/gen_silent_staff_fx.py.",
+ "style": "silent",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 200,
+   "at": "caster",
+   "follow": true,
+   "size": 0.45,
+   "rays": 0,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 200,
+   "at": "caster",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 300,
+   "rate": 3,
+   "spread": 0.08,
+   "speed": 0.005,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "@secondary"
+  }
+ ]
+}

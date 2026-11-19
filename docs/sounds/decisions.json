@@ -1,0 +1,1002 @@
+{
+ "spell.ember_blade.hit_boom": {
+  "use": "vanilla"
+ },
+ "spell.ember_blade.hit_fire": {
+  "use": "vanilla"
+ },
+ "spell.ember_blade.hit_hiss": {
+  "use": "vanilla"
+ },
+ "spell.ember_blade.hit_slam": {
+  "use": "vanilla"
+ },
+ "spell.ember_blade.loop": {
+  "use": "vanilla"
+ },
+ "spell.explosion.cast": {
+  "use": "vanilla"
+ },
+ "spell.explosion.charge_fire": {
+  "use": "vanilla"
+ },
+ "spell.explosion.charge_powerup": {
+  "use": [
+   1
+  ]
+ },
+ "spell.explosion.hit_boom": {
+  "use": [
+   3
+  ]
+ },
+ "spell.explosion.hit_thunder": {
+  "use": [
+   2
+  ]
+ },
+ "spell.falling_sun.hit": {
+  "use": [
+   2
+  ]
+ },
+ "spell.falling_sun.release": {
+  "use": [
+   1
+  ]
+ },
+ "spell.fire_whip.cast": {
+  "use": [
+   1
+  ]
+ },
+ "spell.fire_whip.loop": {
+  "use": [
+   1
+  ]
+ },
+ "spell.heaven_fall.cast": {
+  "use": [
+   2
+  ]
+ },
+ "spell.heaven_fall.charge_hum": {
+  "use": [
+   1
+  ]
+ },
+ "spell.heaven_fall.charge_thunder": {
+  "use": "vanilla"
+ },
+ "spell.heaven_fall.hit_boom": {
+  "use": [
+   1
+  ]
+ },
+ "spell.heaven_fall.hit_roar": {
+  "use": [
+   1
+  ]
+ },
+ "spell.heaven_fall.loop": {
+  "use": "vanilla"
+ },
+ "spell.frost_spike_wall.cast_form": {
+  "use": "vanilla"
+ },
+ "spell.frost_spike_wall.cast_shatter": {
+  "use": [
+   1
+  ]
+ },
+ "spell.frost_spike_wall.hit": {
+  "use": [
+   2
+  ]
+ },
+ "spell.glacial_tombs.cast_shatter": {
+  "use": [
+   1
+  ]
+ },
+ "spell.glacial_tombs.cast_snow": {
+  "use": "vanilla"
+ },
+ "spell.ground_shock.cast": {
+  "use": "vanilla"
+ },
+ "spell.ground_shock.loop": {
+  "use": "vanilla"
+ },
+ "spell.lightning_rod.cast": {
+  "use": "vanilla"
+ },
+ "spell.lightning_rod.hit": {
+  "use": "vanilla"
+ },
+ "spell.overload.cast": {
+  "use": [
+   1
+  ]
+ },
+ "spell.overload.hit": {
+  "use": [
+   1
+  ]
+ },
+ "spell.judgement.cast": {
+  "use": [
+   1
+  ]
+ },
+ "spell.judgement.hit": {
+  "use": "vanilla"
+ },
+ "spell.judgement.loop": {
+  "use": "vanilla"
+ },
+ "spell.last_dawn.cast": {
+  "use": "vanilla"
+ },
+ "spell.last_dawn.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.last_dawn.charge_resonate": {
+  "use": "vanilla"
+ },
+ "spell.last_dawn.end_bell": {
+  "use": [
+   1
+  ]
+ },
+ "spell.last_dawn.end_fanfare": {
+  "use": "vanilla"
+ },
+ "spell.living_shield.cast": {
+  "use": "vanilla"
+ },
+ "spell.sanctuary.cast": {
+  "use": "vanilla"
+ },
+ "spell.sanctuary.end": {
+  "use": "vanilla"
+ },
+ "spell.blood_gift.cast": {
+  "use": "vanilla"
+ },
+ "spell.blood_mark.cast": {
+  "use": "all"
+ },
+ "spell.hemorrhage.cast": {
+  "use": "vanilla"
+ },
+ "spell.magic_madness.cast": {
+  "use": [
+   1
+  ]
+ },
+ "spell.magic_madness.loop": {
+  "use": [
+   3
+  ]
+ },
+ "spell.banishment.cast": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.cast_chime": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.cast_hum": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.cast_powerup": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.charge_hum": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.charge_portal": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.charge_resonate": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.end_chime": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.end_portal": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.fail_click": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.fail_resonate": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.open": {
+  "use": "vanilla"
+ },
+ "spell.coven_arrival.release": {
+  "use": "vanilla"
+ },
+ "spell.frozen_hour.cast": {
+  "use": "vanilla"
+ },
+ "spell.frozen_hour.end_bell": {
+  "use": "vanilla"
+ },
+ "spell.frozen_hour.end_powerdown": {
+  "use": "vanilla"
+ },
+ "spell.frozen_hour.hit": {
+  "use": "vanilla"
+ },
+ "spell.frozen_hour.loop": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.cast": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.charge_hum": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.end_powerdown": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.end_shatter": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.hit_powerup": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.hit_resonate": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.open_portal": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.open_powerup": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.open_roar": {
+  "use": "vanilla"
+ },
+ "spell.space_closure.release": {
+  "use": "vanilla"
+ },
+ "spell.swap.cast": {
+  "use": "vanilla"
+ },
+ "spell.grasping_garden.cast": {
+  "use": [
+   1
+  ]
+ },
+ "spell.grasping_garden.hit": {
+  "use": "vanilla"
+ },
+ "spell.spore_cloud.cast": {
+  "use": [
+   2
+  ]
+ },
+ "spell.spore_cloud.loop": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.cast": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.charge_earth": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.charge_leaves": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.charge_wood": {
+  "use": [
+   1
+  ]
+ },
+ "spell.world_tree.hit_earth": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.hit_leaves": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.hit_wood": {
+  "use": "vanilla"
+ },
+ "spell.world_tree.loop": {
+  "use": "vanilla"
+ },
+ "spell.abyss_eye.cast": {
+  "use": [
+   2
+  ]
+ },
+ "spell.abyss_eye.charge_boom": {
+  "use": [
+   2
+  ]
+ },
+ "spell.abyss_eye.charge_heart": {
+  "use": [
+   1
+  ]
+ },
+ "spell.abyss_eye.charge_hum": {
+  "use": [
+   2
+  ]
+ },
+ "spell.abyss_eye.charge_thunder": {
+  "use": [
+   1
+  ]
+ },
+ "spell.abyss_eye.loop_heart": {
+  "use": "all"
+ },
+ "spell.abyss_eye.loop_hum": {
+  "use": "vanilla"
+ },
+ "spell.abyss_eye.loop_roar": {
+  "use": "all"
+ },
+ "spell.eight_shields.cast_powerup": {
+  "use": "vanilla"
+ },
+ "spell.eight_shields.cast_slam": {
+  "use": "vanilla"
+ },
+ "spell.eight_shields.hit_chime": {
+  "use": "vanilla"
+ },
+ "spell.eight_shields.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.illusion.cast": {
+  "use": "vanilla"
+ },
+ "spell.illusion_decoy.hit_boom": {
+  "use": "vanilla"
+ },
+ "spell.illusion_decoy.hit_magic": {
+  "use": "vanilla"
+ },
+ "spell.phantom_trap.cast": {
+  "use": "vanilla"
+ },
+ "spell.phantom_trap.hit": {
+  "use": "vanilla"
+ },
+ "spell.phantom_trap.loop": {
+  "use": "vanilla"
+ },
+ "spell.gale_ward.cast": {
+  "use": "vanilla"
+ },
+ "spell.gale_ward.loop": {
+  "use": [
+   3
+  ]
+ },
+ "spell.wind_mark.cast": {
+  "use": "vanilla"
+ },
+ "spell.wind_mark.loop": {
+  "use": "vanilla"
+ },
+ "spell.ashless_flame.cast": {
+  "use": "vanilla"
+ },
+ "spell.ashless_flame.loop": {
+  "use": [
+   2
+  ]
+ },
+ "spell.ashless_flame.release_boom": {
+  "use": "vanilla"
+ },
+ "spell.ashless_flame.release_fire": {
+  "use": "vanilla"
+ },
+ "spell.ashless_flame.release_soul": {
+  "use": "vanilla"
+ },
+ "spell.blood_moon.loop": {
+  "use": "all"
+ },
+ "spell.blood_moon.release": {
+  "use": "all"
+ },
+ "spell.countdown.cast_chime": {
+  "use": [
+   1
+  ]
+ },
+ "spell.countdown.cast_magic": {
+  "use": [
+   1
+  ]
+ },
+ "spell.countdown.cast_powerup": {
+  "use": [
+   1
+  ]
+ },
+ "spell.countdown.hit_bell": {
+  "use": [
+   1
+  ]
+ },
+ "spell.countdown.hit_chime": {
+  "use": "vanilla"
+ },
+ "spell.countdown.hit_click": {
+  "use": "vanilla"
+ },
+ "spell.countdown.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.countdown.loop": {
+  "use": "vanilla"
+ },
+ "spell.eternal_blizzard.loop_snow": {
+  "use": [
+   3
+  ]
+ },
+ "spell.eternal_blizzard.loop_whoosh": {
+  "use": "vanilla"
+ },
+ "spell.eternal_blizzard.open_shatter": {
+  "use": "vanilla"
+ },
+ "spell.eternal_blizzard.open_snow": {
+  "use": [
+   1
+  ]
+ },
+ "spell.eternal_blizzard.open_whoosh": {
+  "use": [
+   1
+  ]
+ },
+ "spell.eternal_blizzard.release": {
+  "use": [
+   1
+  ]
+ },
+ "spell.fate_star.cast": {
+  "use": [
+   2
+  ]
+ },
+ "spell.fate_star.hit": {
+  "use": "vanilla"
+ },
+ "spell.fate_star.loop": {
+  "use": "vanilla"
+ },
+ "spell.fate_star.release": {
+  "use": "vanilla"
+ },
+ "spell.forbidding_seal.cast": {
+  "use": "vanilla"
+ },
+ "spell.forbidding_seal.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.forbidding_seal.hit_slam": {
+  "use": [
+   1
+  ]
+ },
+ "spell.forbidding_seal.open_powerup": {
+  "use": [
+   1
+  ]
+ },
+ "spell.forbidding_seal.open_slam": {
+  "use": [
+   2
+  ]
+ },
+ "spell.joint_cast.cast": {
+  "use": "vanilla"
+ },
+ "spell.milky_way.cast": {
+  "use": "vanilla"
+ },
+ "spell.milky_way.charge_powerup": {
+  "use": [
+   1
+  ]
+ },
+ "spell.milky_way.charge_resonate": {
+  "use": "vanilla"
+ },
+ "spell.milky_way.charge_roar": {
+  "use": [
+   2
+  ]
+ },
+ "spell.milky_way.end": {
+  "use": "vanilla"
+ },
+ "spell.milky_way.hit": {
+  "use": "vanilla"
+ },
+ "spell.milky_way.loop": {
+  "use": "vanilla"
+ },
+ "spell.milky_way.release_boom": {
+  "use": "vanilla"
+ },
+ "spell.milky_way.release_portal": {
+  "use": "vanilla"
+ },
+ "spell.mirror_prison.cast_form": {
+  "use": [
+   2
+  ]
+ },
+ "spell.mirror_prison.cast_magic": {
+  "use": "vanilla"
+ },
+ "spell.mirror_prison.cast_resonate": {
+  "use": "vanilla"
+ },
+ "spell.mirror_prison.end": {
+  "use": "vanilla"
+ },
+ "spell.mirror_prison.release": {
+  "use": "vanilla"
+ },
+ "spell.nightmare_cradle.cast": {
+  "use": "vanilla"
+ },
+ "spell.nightmare_cradle.hit": {
+  "use": "vanilla"
+ },
+ "spell.nightmare_cradle.loop_roar": {
+  "use": "vanilla"
+ },
+ "spell.nightmare_cradle.loop_soul": {
+  "use": "vanilla"
+ },
+ "spell.oblivion_blades.hit": {
+  "use": "vanilla"
+ },
+ "spell.oblivion_blades.loop": {
+  "use": "vanilla"
+ },
+ "spell.oblivion_blades.release": {
+  "use": "vanilla"
+ },
+ "spell.scarlet_cut.hit_boom": {
+  "use": "vanilla"
+ },
+ "spell.scarlet_cut.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.scarlet_cut.hit_whoosh": {
+  "use": "vanilla"
+ },
+ "school.higher.cast": {
+  "use": "vanilla"
+ },
+ "spell.singularity.hit_boom": {
+  "use": "vanilla"
+ },
+ "spell.singularity.hit_portal": {
+  "use": "vanilla"
+ },
+ "spell.singularity.loop": {
+  "use": "all"
+ },
+ "spell.singularity.open": {
+  "use": "all"
+ },
+ "spell.singularity.release": {
+  "use": "all"
+ },
+ "spell.star_fall.cast": {
+  "use": "all"
+ },
+ "spell.star_fall.hit_boom": {
+  "use": [
+   1
+  ]
+ },
+ "spell.star_fall.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.star_fall.hit_thunder": {
+  "use": [
+   2
+  ]
+ },
+ "spell.star_fall.loop_chime": {
+  "use": "vanilla"
+ },
+ "spell.star_fall.loop_powerup": {
+  "use": "vanilla"
+ },
+ "spell.star_fall.loop_whoosh": {
+  "use": "vanilla"
+ },
+ "spell.wind_ascension.cast": {
+  "use": "vanilla"
+ },
+ "spell.wind_ascension.hit_chime": {
+  "use": "vanilla"
+ },
+ "spell.wind_ascension.hit_powerdown": {
+  "use": "vanilla"
+ },
+ "spell.wind_ascension.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.wind_ascension.release": {
+  "use": "vanilla"
+ },
+ "spell.world_rift.cast_boom": {
+  "use": "vanilla"
+ },
+ "spell.world_rift.cast_earth": {
+  "use": "vanilla"
+ },
+ "spell.world_rift.hit": {
+  "use": "vanilla"
+ },
+ "spell.world_rift.loop": {
+  "use": "vanilla"
+ },
+ "spell.ark.cast_bell": {
+  "use": "vanilla"
+ },
+ "spell.ark.cast_powerup": {
+  "use": [
+   1
+  ]
+ },
+ "spell.ark.end_bell": {
+  "use": [
+   1
+  ]
+ },
+ "spell.ark.end_powerdown": {
+  "use": "vanilla"
+ },
+ "spell.ark.release": {
+  "use": [
+   1
+  ]
+ },
+ "spell.blessing.cast": {
+  "use": "vanilla"
+ },
+ "spell.blessing.charge_chime": {
+  "use": "vanilla"
+ },
+ "spell.blessing.charge_magic": {
+  "use": [
+   2
+  ]
+ },
+ "spell.blessing.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.blessing.hit_bell": {
+  "use": "all"
+ },
+ "spell.blessing.hit_fanfare": {
+  "use": [
+   1
+  ]
+ },
+ "spell.disintegration.cast": {
+  "use": [
+   2
+  ]
+ },
+ "spell.disintegration.charge_chime": {
+  "use": [
+   1
+  ]
+ },
+ "spell.disintegration.charge_hum": {
+  "use": "vanilla"
+ },
+ "spell.disintegration.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.disintegration.charge_resonate": {
+  "use": "vanilla"
+ },
+ "spell.disintegration.charge_thunder": {
+  "use": "vanilla"
+ },
+ "spell.disintegration.hit_boom": {
+  "use": "vanilla"
+ },
+ "spell.disintegration.hit_powerdown": {
+  "use": "vanilla"
+ },
+ "spell.divine_backlash.cast": {
+  "use": "vanilla"
+ },
+ "spell.divine_backlash.loop_bell": {
+  "use": "vanilla"
+ },
+ "spell.divine_backlash.loop_chime": {
+  "use": "vanilla"
+ },
+ "spell.divine_taboo.cast_bell": {
+  "use": "vanilla"
+ },
+ "spell.divine_taboo.cast_powerup": {
+  "use": "vanilla"
+ },
+ "spell.divine_taboo.charge": {
+  "use": "vanilla"
+ },
+ "spell.divine_taboo.end": {
+  "use": "vanilla"
+ },
+ "spell.divine_taboo.release": {
+  "use": "vanilla"
+ },
+ "school.divine.cast": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.cast_heart": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.cast_roar": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.charge_heart": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.charge_roar": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.charge_soul": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.hit_boom": {
+  "use": "vanilla"
+ },
+ "spell.soul_devour.hit_soul": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.cast": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.charge_chain": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.charge_magic": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.charge_resonate": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.charge_roar": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.fail_chain": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.fail_resonate": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.hit_bell": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.hit_powerdown": {
+  "use": "vanilla"
+ },
+ "spell.soul_seal.hit_slam": {
+  "use": "all"
+ },
+ "spell.downfall.cast": {
+  "use": [
+   1
+  ]
+ },
+ "spell.downfall.charge_hum": {
+  "use": "vanilla",
+  "note": "без отметки у владельца — оставлен ванильный"
+ },
+ "spell.downfall.charge_portal": {
+  "use": [
+   1
+  ]
+ },
+ "spell.downfall.charge_powerup": {
+  "use": [
+   1
+  ]
+ },
+ "spell.downfall.charge_roar": {
+  "use": [
+   1
+  ]
+ },
+ "spell.downfall.hit": {
+  "use": "vanilla"
+ },
+ "spell.downfall.loop_hum": {
+  "use": [
+   2
+  ]
+ },
+ "spell.downfall.loop_powerup": {
+  "use": "vanilla"
+ },
+ "spell.downfall.open_boom": {
+  "use": "vanilla",
+  "note": "без отметки у владельца — оставлен ванильный"
+ },
+ "spell.downfall.open_portal": {
+  "use": [
+   1
+  ]
+ },
+ "spell.erased_name.cast_paper": {
+  "use": [
+   1
+  ]
+ },
+ "spell.erased_name.cast_whoosh": {
+  "use": "vanilla"
+ },
+ "spell.erased_name.charge_magic": {
+  "use": "vanilla"
+ },
+ "spell.erased_name.charge_paper": {
+  "use": "vanilla"
+ },
+ "spell.erased_name.charge_wet": {
+  "use": "vanilla"
+ },
+ "spell.erased_name.charge_whoosh": {
+  "use": "vanilla"
+ },
+ "spell.erased_name.loop": {
+  "use": "vanilla"
+ },
+ "school.forbidden.cast": {
+  "use": "vanilla"
+ },
+ "spell.barrier_guard.hit_resonate": {
+  "use": "vanilla"
+ },
+ "spell.barrier_guard.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.barrier_guard.hit_soul": {
+  "use": "vanilla"
+ },
+ "spell.barrier_guard.loop": {
+  "use": "vanilla"
+ },
+ "school.silent.cast": {
+  "use": "vanilla"
+ },
+ "spell.silent_staff.release": {
+  "use": "vanilla"
+ },
+ "spell.silent_witch.end": {
+  "use": "vanilla"
+ },
+ "spell.wind_spears.hit": {
+  "use": "vanilla"
+ },
+ "spell.wind_spears.loop": {
+  "use": "vanilla"
+ },
+ "spell.worgan_flame.cast": {
+  "use": "vanilla"
+ },
+ "spell.worgan_flame.loop": {
+  "use": "vanilla"
+ },
+ "spell.borrowed_face.cast_chime": {
+  "use": "all"
+ },
+ "spell.borrowed_face.cast_magic": {
+  "use": "vanilla"
+ },
+ "spell.borrowed_face.end": {
+  "use": "vanilla"
+ },
+ "spell.butterfly_dream.cast": {
+  "use": "vanilla"
+ },
+ "spell.butterfly_dream.charge_powerup": {
+  "use": "vanilla"
+ },
+ "spell.butterfly_dream.charge_resonate": {
+  "use": "vanilla"
+ },
+ "spell.butterfly_dream.charge_shatter": {
+  "use": "vanilla"
+ },
+ "spell.butterfly_dream.end": {
+  "use": "vanilla"
+ },
+ "spell.butterfly_dream.hit_chime": {
+  "use": "vanilla"
+ },
+ "spell.butterfly_dream.hit_shatter": {
+  "use": "vanilla"
+ },
+ "spell.false_step.cast": {
+  "use": "vanilla"
+ },
+ "spell.illusion_copies.hit_chime": {
+  "use": "vanilla"
+ },
+ "spell.illusion_copies.hit_wet": {
+  "use": "vanilla"
+ },
+ "spell.mirror_images.cast_chime": {
+  "use": "vanilla"
+ },
+ "spell.mirror_images.cast_magic": {
+  "use": "vanilla"
+ },
+ "spell.mirror_labyrinth.cast_resonate": {
+  "use": "vanilla"
+ },
+ "spell.mirror_labyrinth.cast_shatter": {
+  "use": "vanilla"
+ },
+ "spell.mirror_labyrinth.hit": {
+  "use": "vanilla"
+ },
+ "spell.phantom_pain.cast_chime": {
+  "use": "vanilla"
+ },
+ "spell.phantom_pain.cast_soul": {
+  "use": "vanilla"
+ },
+ "spell.phantom_pain.hit": {
+  "use": "vanilla"
+ },
+ "school.illusion.cast": {
+  "use": "vanilla"
+ },
+ "spell.veil.cast_resonate": {
+  "use": "vanilla"
+ },
+ "spell.veil.cast_soul": {
+  "use": "vanilla"
+ },
+ "spell.waking_nightmare.cast_heart": {
+  "use": "all"
+ },
+ "spell.waking_nightmare.cast_roar": {
+  "use": "vanilla"
+ }
+}

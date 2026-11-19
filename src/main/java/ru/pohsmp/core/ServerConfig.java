@@ -35,6 +35,11 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue VOLLEY_COOLDOWN, VOLLEY_RADIUS, VOLLEY_ARC, VOLLEY_SEAL_RADIUS, VOLLEY_DAMAGE;
     public static final ForgeConfigSpec.IntValue BARRIER_CAST, BARRIER_MANA, BARRIER_SECONDS;
     public static final ForgeConfigSpec.DoubleValue BARRIER_COOLDOWN, BARRIER_RADIUS;
+    // [barrier] - both barriers (Barrier spell and the Coven / Closing of Space dome), owner 19.11
+    public static final ForgeConfigSpec.BooleanValue BARRIER_KILL_MOBS;
+    public static final ForgeConfigSpec.DoubleValue BARRIER_BOSS_PCT;
+    // [ember] - T14 forms (manager 19.11)
+    public static final ForgeConfigSpec.IntValue EMBER_HITS_TO_BURN, EMBER_HITS_TO_SPECIAL;
     public static final ForgeConfigSpec.IntValue SILENT_PLAYER_AGGRO;
     public static final ForgeConfigSpec.IntValue FLAME_CAST, FLAME_MANA, FLAME_BREATH, FLAME_INTERVAL, FLAME_BURN;
     public static final ForgeConfigSpec.DoubleValue FLAME_COOLDOWN, FLAME_CONE, FLAME_RANGE, FLAME_DAMAGE, FLAME_BURN_DPS;
@@ -125,6 +130,16 @@ public final class ServerConfig {
         BARRIER_MANA = b.comment("Mana cost").defineInRange("mana", 120, 0, 10000);
         BARRIER_RADIUS = b.comment("Dome radius (blocks); the dome follows the caster").defineInRange("radius", 5.0, 1.0, 64.0);
         BARRIER_SECONDS = b.comment("Dome lifetime (seconds)").defineInRange("seconds", 8, 1, 3600);
+        b.pop();
+        b.push("barrier");
+        BARRIER_KILL_MOBS = b.comment("Mobs that cross the shell of a barrier die (not players, pets, villagers, golems, CNPC NPCs, allies of the caster,",
+                "nor those inside when it rose)").define("killMobs", true);
+        BARRIER_BOSS_PCT = b.comment("Bosses are not killed: pushed back off the shell, losing this part of their max health once a second of contact")
+                .defineInRange("bossPushDamagePct", 0.2, 0.0, 1.0);
+        b.pop();
+        b.push("ember");
+        EMBER_HITS_TO_BURN = b.comment("Hits of the cold sword that set it burning (form 1)").defineInRange("heatHitsToBurn", 15, 1, 1000);
+        EMBER_HITS_TO_SPECIAL = b.comment("Hits of the burning sword that fill the heat for its special attack").defineInRange("hitsToSpecial", 5, 1, 1000);
         b.pop();
         b.push("worgan_flame");
         FLAME_CAST = b.comment("Cast time (ticks); the dragon shadow rises during it").defineInRange("castTicks", 40, 0, 1200);

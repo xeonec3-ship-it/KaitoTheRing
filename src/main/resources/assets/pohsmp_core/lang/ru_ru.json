@@ -233,6 +233,7 @@
   "ui.pohsmp_core.coven_arrival.marked": "Арена отмечена",
   "ui.pohsmp_core.coven_arrival.moved": "Метка арены перенесена",
   "ui.pohsmp_core.coven_arrival.cleared": "Выбор арены очищен",
+  "ui.pohsmp_core.barrier.no_warp": "Барьер не пускает",
   "ui.pohsmp_core.coven_arrival.not_marked": "Арена не отмечена",
   "ui.pohsmp_core.coven_arrival.retinue": "Шифт+ПКМ со свитком по существу — свита (до %s)",
   "ui.pohsmp_core.coven_arrival.retinue_full": "В свите уже трое",

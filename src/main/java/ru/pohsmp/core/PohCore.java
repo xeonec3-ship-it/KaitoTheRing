@@ -57,6 +57,8 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.silent.SilentSpell.Aggro.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.SpaceClosureSpell.SpaceClosureEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.CovenArrivalSpell.CovenArrivalEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.BarrierGuard.WarpEvents.class);
+        ru.pohsmp.core.spell.BarrierGuard.hookWaystones();
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.Fx.FxServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.FxCommands.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.silent.SilentWitchEvents.class);

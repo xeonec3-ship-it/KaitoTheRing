@@ -44,6 +44,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.net.Net.HFx;
 
 /**
  * Mythic "Closing of Space" (a Coven seal), levels 1-4. 20 s cast that cannot be interrupted, with a cutscene for everyone within 64.
@@ -67,10 +69,12 @@ public class SpaceClosureSpell extends PohSpell {
         Vec3 c;
         UUID caster;
         long until;
-        int fx = -1;
+        int key;
         /** Which side of the shell each entity was on (true = inside). Kept for players who leave the level. */
         final Map<UUID, Boolean> side = new HashMap<>();
         final Map<UUID, Long> lastFx = new HashMap<>();
+        /** Who was inside when the dome rose: never killed by the shell (BarrierGuard), only held in as before. */
+        final java.util.Set<UUID> born = new java.util.HashSet<>();
     }
 
     private static final List<Zone> ZONES = new ArrayList<>();
@@ -165,10 +169,15 @@ public class SpaceClosureSpell extends PohSpell {
 
     // ---- the dome ----
 
-    /** The dome (fx space_closure_dome); players who come closer later get it from Fx with its current age. */
-    private static void sendDome(ServerLevel sl, Zone z, float yaw) {
+    /**
+     * Owner 19.11 («bring back the old look of the barrier — its wall»): the dome is again the client's HigherFx.closure — the lattice
+     * sphere of glowing cells with the running band, the rune belts, seven Coven seals in the shell, the zenith seal, the ground circle
+     * and the gyroscope (fx/space_closure_dome.json is no longer played). Sent again every 100 ticks for players who come closer later
+     * (the same key only refreshes it).
+     */
+    private static void sendDome(ServerLevel sl, Zone z) {
         int left = (int) Math.max(1, z.until - sl.getGameTime());
-        z.fx = Fx.play(sl, Fx.fx("space_closure_dome").at(z.c).yaw(yaw).duration(left));
+        Net.sendNear(sl, z.c.x, z.c.y, z.c.z, z.c.x, z.c.y + R, z.c.z, new HFx(HFx.CLOSURE, z.key, -1, -1, left, z.c.x, z.c.y, z.c.z, R, COLOR));
     }
 
     public static void open(ServerLevel sl, LivingEntity caster, Vec3 at, int min) {
@@ -180,8 +189,10 @@ public class SpaceClosureSpell extends PohSpell {
         for (Zone o : new ArrayList<>(ZONES)) if (o.caster.equals(z.caster)) close(sl, o);
         for (Entity e : sl.getEntities((Entity) null, box(z, 2), e -> true)) if (e.getVehicle() == null) z.side.put(e.getUUID(), e.position().distanceTo(z.c) < R);
         for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers()) z.side.putIfAbsent(p.getUUID(), p.level() == sl && p.position().distanceTo(z.c) < R);
+        for (var s : z.side.entrySet()) if (s.getValue()) z.born.add(s.getKey());
+        z.key = HigherSpell.key();
         ZONES.add(z);
-        sendDome(sl, z, caster.getYRot());
+        sendDome(sl, z);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 8f, 0.6f);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 6f, 0.4f);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 3f, 0.5f);
@@ -199,6 +210,7 @@ public class SpaceClosureSpell extends PohSpell {
                 }
                 if (age > 10) wall(sl, z);   // the shell closes after the dome has grown (client draws it in 40 ticks)
                 if (age % 100 == 1) silence(sl, z);
+                if (age % 100 == 50) sendDome(sl, z);
                 return true;
             }
         });
@@ -212,7 +224,7 @@ public class SpaceClosureSpell extends PohSpell {
             le.addEffect(new MobEffectInstance(ru.pohsmp.core.Reg.SPENT.get(), SPENT_TICKS, 0, false, true, true));
             if (le instanceof ServerPlayer sp) MagicData.getPlayerMagicData(sp).setMana(0);
         }
-        if (z.fx >= 0) Fx.stop(sl, z.fx, "");
+        Net.sendNear(sl, z.c.x, z.c.y, z.c.z, z.c.x, z.c.y + R, z.c.z, new HFx(HFx.STOP, z.key, -1, -1, 0, 0, 0, 0, 0, 0));
         Fx.play(sl, Fx.fx("space_closure_break").at(z.c));
         sl.playSound(null, z.c.x, z.c.y, z.c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 8f, 0.5f);
         sl.playSound(null, z.c.x, z.c.y, z.c.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 8f, 0.4f);
@@ -222,8 +234,10 @@ public class SpaceClosureSpell extends PohSpell {
         return new AABB(z.c.x - R - pad, z.c.y - R - pad, z.c.z - R - pad, z.c.x + R + pad, z.c.y + R + pad, z.c.z + R + pad);
     }
 
-    /** Keeps every entity on its own side of the shell. */
+    /** Keeps every entity on its own side of the shell; mobs that cross it (or press into it from outside) die (BarrierGuard). */
     private static void wall(ServerLevel sl, Zone z) {
+        LivingEntity caster = null;
+        boolean looked = false;
         for (Entity e : sl.getEntities((Entity) null, box(z, 16), e -> e.getVehicle() == null && !e.isSpectator())) {
             double d = e.position().distanceTo(z.c);
             boolean in = d < R;
@@ -232,13 +246,38 @@ public class SpaceClosureSpell extends PohSpell {
                 z.side.put(e.getUUID(), in);
                 continue;
             }
-            if (was == in) continue;
+            // a mob outside whose body already reaches into the shell and moves in counts as crossing
+            boolean pressing = !was && !in && e instanceof net.minecraft.world.entity.Mob && d - e.getBbWidth() / 2 < R
+                    && e.getDeltaMovement().dot(z.c.subtract(e.position())) > 0;
+            if (was == in && !pressing) continue;
             if (e instanceof Projectile) {   // arrows, spells, ender pearls: dissolve on the shell
                 hit(sl, z, e.position(), e.getUUID());
                 e.discard();
                 continue;
             }
-            putBack(sl, z, e, was);
+            if (e instanceof LivingEntity le && !z.born.contains(e.getUUID())) {
+                if (!looked) {
+                    looked = true;
+                    Entity ce = sl.getServer().getPlayerList().getPlayer(z.caster);
+                    if (ce == null) ce = sl.getEntity(z.caster);
+                    caster = ce instanceof LivingEntity cl ? cl : null;
+                }
+                BarrierGuard.Verdict v = BarrierGuard.judge(caster, le);
+                Vec3 dir = e.position().subtract(z.c);
+                dir = dir.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : dir.normalize();
+                Vec3 at = z.c.add(dir.scale(R)).add(0, le.getBbHeight() / 2, 0);
+                if (v == BarrierGuard.Verdict.KILL) {
+                    hit(sl, z, z.c.add(dir.scale(R)), e.getUUID());
+                    BarrierGuard.kill(sl, le, at, COLOR);
+                    continue;
+                }
+                if (v == BarrierGuard.Verdict.BOSS) {
+                    if (!pressing) putBack(sl, z, e, was);
+                    BarrierGuard.repel(sl, le, was ? dir.scale(-1) : dir, at, COLOR);
+                    continue;
+                }
+            }
+            if (!pressing) putBack(sl, z, e, was);
         }
     }
 
@@ -266,9 +305,9 @@ public class SpaceClosureSpell extends PohSpell {
         Long last = z.lastFx.get(who);
         if (last != null && now - last < 8) return;
         z.lastFx.put(who, now);
-        Vec3 n = p.subtract(z.c).normalize();
-        float yaw = (float) Math.toDegrees(Math.atan2(-n.x, n.z));   // the ripple stands on the shell, facing outward
-        Fx.play(sl, Fx.sigil("closure_ripple").at(p).yaw(yaw).orientation("facing"));
+        Vec3 n = p.subtract(z.c).normalize();   // the old lattice ripple on the shell (HigherFx.closureHit), as the old wall
+        int yaw = (int) Math.round(Math.atan2(n.z, n.x) * 1000), pitch = (int) Math.round(Math.asin(Math.max(-1, Math.min(1, n.y))) * 1000);
+        Net.sendNear(sl, p.x, p.y, p.z, p.x, p.y, p.z, new HFx(HFx.CLOSURE_HIT, HigherSpell.key(), yaw, pitch, 24, p.x, p.y, p.z, 3.5, COLOR));
         sl.playSound(null, p.x, p.y, p.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.6f);
         sl.playSound(null, p.x, p.y, p.z, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.PLAYERS, 1.2f, 1.4f);
     }
@@ -286,6 +325,13 @@ public class SpaceClosureSpell extends PohSpell {
         long now = p.level().getGameTime();
         for (Zone z : ZONES)
             if (z.dim == p.level().dimension() && now <= z.until && !p.getUUID().equals(z.caster) && p.position().distanceToSqr(z.c) < R * R) return true;
+        return false;
+    }
+
+    /** Is the point inside some dome of this level? For BarrierGuard's teleport rule. */
+    public static boolean anyInside(Level lvl, Vec3 p) {
+        long now = lvl.getGameTime();
+        for (Zone z : ZONES) if (z.dim == lvl.dimension() && now <= z.until && p.distanceToSqr(z.c) < R * R) return true;
         return false;
     }
 

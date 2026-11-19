@@ -1,5 +1,6 @@
 package ru.pohsmp.core.spell.silent;
 
+import ru.pohsmp.core.spell.BarrierGuard;
 import ru.pohsmp.core.spell.Tasks;
 
 import io.redspace.ironsspellbooks.api.events.SpellPreCastEvent;
@@ -52,6 +53,9 @@ public class SageBarrierSpell extends SilentSpell {
         final double radius;
         final int life;
         int age, fxInst = -1;   // fxInst: data effect instance, -1 = stand-in particles
+        /** BarrierGuard: which side of the shell each mob was on last tick, and the mobs inside when the dome rose (never killed). */
+        final java.util.Map<java.util.UUID, Boolean> side = new java.util.HashMap<>();
+        final java.util.Set<java.util.UUID> born = new java.util.HashSet<>();
 
         Dome(LivingEntity owner, ServerLevel level, double radius, int life) {
             this.owner = owner;
@@ -120,6 +124,12 @@ public class SageBarrierSpell extends SilentSpell {
         d.fxInst = fx(sl, "silent_barrier_dome", Fx.fx("silent_barrier_dome").caster(owner).attach(owner).scale(radius).duration(ticks));
         DOMES.add(d);
         return d;
+    }
+
+    /** Is the point inside some live dome of this level (whoever's)? For BarrierGuard's teleport rule. */
+    public static boolean anyInside(Level level, Vec3 p) {
+        for (Dome d : DOMES) if (d.alive() && d.level == level && d.inside(p)) return true;
+        return false;
     }
 
     /** The dome that shields this entity (it is inside and the owner's side), or null. */
@@ -230,9 +240,46 @@ public class SageBarrierSpell extends SilentSpell {
                 }
                 if (d.fxInst < 0) draw(d);
                 stopProjectiles(d);
+                guard(d);
                 return false;
             });
             clearSideEffects(sl);
+        }
+
+        /**
+         * Owner 19.11: mobs that cross the dome's shell either way die (BarrierGuard): those inside when it rose are left alone,
+         * bosses are pushed off it. The dome follows its caster, so walking onto a mob counts too.
+         */
+        private static void guard(Dome d) {
+            if (!ServerConfig.BARRIER_KILL_MOBS.get()) return;
+            Vec3 c = d.center();
+            java.util.Set<java.util.UUID> seen = new java.util.HashSet<>();
+            for (net.minecraft.world.entity.Mob m : d.level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,
+                    new AABB(c, c).inflate(d.radius + 4), m -> m.isAlive() && m.getVehicle() == null)) {
+                java.util.UUID u = m.getUUID();
+                seen.add(u);
+                boolean in = d.inside(m);
+                Boolean was = d.side.put(u, in);
+                if (was == null) {
+                    if (in && d.age <= 2) d.born.add(u);
+                    continue;
+                }
+                Vec3 mid = m.position().add(0, m.getBbHeight() * 0.5, 0), dir = mid.subtract(c);
+                dir = dir.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : dir.normalize();
+                double dist = mid.distanceTo(c);
+                boolean pressing = !in && dist - m.getBbWidth() / 2 < d.radius && m.getDeltaMovement().dot(dir) < 0;
+                if ((was == in && !pressing) || d.born.contains(u)) continue;
+                BarrierGuard.Verdict v = BarrierGuard.judge(d.owner, m);
+                if (v == BarrierGuard.Verdict.PASS) continue;
+                Vec3 at = c.add(dir.scale(d.radius));
+                ripple(d, at);
+                if (v == BarrierGuard.Verdict.KILL) BarrierGuard.kill(d.level, m, at, COLOR);
+                else {   // a boss: back out the way it came (bosses inside since the start are born and left alone)
+                    BarrierGuard.repel(d.level, m, dir, at, COLOR);
+                    d.side.put(u, false);
+                }
+            }
+            d.side.keySet().retainAll(seen);
         }
 
         /** Projectiles from outside that are inside or would enter this tick stop on the surface and go out. */

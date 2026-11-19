@@ -233,6 +233,7 @@
   "ui.pohsmp_core.coven_arrival.marked": "Arena marked",
   "ui.pohsmp_core.coven_arrival.moved": "Arena mark moved",
   "ui.pohsmp_core.coven_arrival.cleared": "Arena choice cleared",
+  "ui.pohsmp_core.barrier.no_warp": "The barrier does not let you through",
   "ui.pohsmp_core.coven_arrival.not_marked": "No arena marked",
   "ui.pohsmp_core.coven_arrival.retinue": "Shift+right click a creature with the scroll: retinue (up to %s)",
   "ui.pohsmp_core.coven_arrival.retinue_full": "The retinue is already full (3)",

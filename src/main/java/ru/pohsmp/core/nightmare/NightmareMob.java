@@ -48,13 +48,14 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
     /** id, the stage it needs, speed (blocks per tick, roughly), reach, hitbox, the animations its file has besides idle/walk/appear/vanish */
     public enum Kind {
         LURKER("nm_lurker", 1, 0.22, 2.2, 0.6f, 2.4f, "attack", "lunge", "dissolve"),
+        // stages as in the spec (T25 bestiary table): moths and the Lurker from 1; Crawler, Mimic, Hollow Child from 2; the rest at 3
+        MOTH("nm_moth", 1, 0.30, 1.6, 1.0f, 1.0f, "attack"),
         HOLLOW_CHILD("nm_hollow_child", 2, 0.34, 1.8, 0.5f, 1.1f, "attack", "laugh"),
-        WEEPER("nm_weeper", 2, 0.20, 0, 0.7f, 2.6f, "flee", "wail"),
-        HANDS("nm_hands", 2, 0, 1.9, 2.0f, 0.6f, "grab"),
-        MOTH("nm_moth", 2, 0.30, 1.6, 1.0f, 1.0f, "attack"),
+        CRAWLER("nm_crawler", 2, 0.32, 1.9, 1.2f, 0.9f, "attack", "pounce"),
+        MIMIC("nm_mimic", 2, 0.26, 2.0, 0.6f, 2.0f, "attack", "call", "reveal"),
+        WEEPER("nm_weeper", 3, 0.20, 0, 0.7f, 2.6f, "flee", "wail"),
+        HANDS("nm_hands", 3, 0, 1.9, 2.0f, 0.6f, "grab"),
         MAW("nm_maw", 3, 0.18, 3.0, 2.4f, 3.8f, "attack", "roar"),
-        CRAWLER("nm_crawler", 3, 0.32, 1.9, 1.2f, 0.9f, "attack", "pounce"),
-        MIMIC("nm_mimic", 3, 0.26, 2.0, 0.6f, 2.0f, "attack", "call", "reveal"),
         DREAD("nm_dread", 3, 0.25, 2.6, 0.8f, 3.2f, "attack", "scream");
 
         public final String id;
@@ -452,6 +453,8 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
     /** Goes as ink (the vanish animation, then gone); no death, no drops. */
     void vanish(ServerPlayer v) {
         if (goneIn >= 0) return;
+        if (life < 40) ru.pohsmp.core.PohCore.LOG.info("[pohsmp] {} vanished early (life {}): victim={} stage={}", kind.id, life,
+                v == null ? "gone" : v.getGameProfile().getName(), v == null ? -1 : Immersion.stage(v));
         if (aura >= 0 && level() instanceof ServerLevel sl) Fx.stop(sl, aura, "");
         entityData.set(GOING, true);
         goneIn = VANISH;

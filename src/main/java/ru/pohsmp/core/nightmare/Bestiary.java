@@ -158,6 +158,7 @@ public final class Bestiary {
                     return true;
                 });
             if (Immersion.now() % 40 != 7) return;
+            if (Immersion.now() % 200 == 7) PohCore.LOG.info("[pohsmp] bestiary tick: now={} players={}", Immersion.now(), server.getPlayerCount());
             EXTRA.values().removeIf(x -> Immersion.now() >= x[1]);
             Map<UUID, Integer> per = new HashMap<>();
             int total = 0;
@@ -179,7 +180,11 @@ public final class Bestiary {
                 if (ks.isEmpty()) continue;
                 NightmareMob.Kind k = ks.get(v.getRandom().nextInt(ks.size()));
                 if (k == NightmareMob.Kind.HANDS && v.getRandom().nextInt(3) != 0) k = ks.get(0);   // the hands are rare
-                if (spawnFor(v, k, 12 + v.getRandom().nextInt(8)) != null) total++;
+                NightmareMob made = spawnFor(v, k, 12 + v.getRandom().nextInt(8));
+                if (made != null) total++;
+                if (Immersion.now() % 200 == 7)   // owner 19.11: «монстры не появляются» - what the spawner does, every 10 s
+                    PohCore.LOG.info("[pohsmp] bestiary: {} stage={} have={} limit={} tried={} -> {}", v.getGameProfile().getName(), st,
+                            per.getOrDefault(v.getUUID(), 0), lim, k.id, made == null ? "no place" : "spawned at " + made.blockPosition());
             }
         }
 

@@ -81,7 +81,9 @@ public final class GateMana {
             Vec3 fwd = Vec3.directionFromRotation(0, (float) yawDeg);
             flow(c, feet, fwd, gain, time, (int) (FLOW * load));
             bands(c, feet, fwd, gain, time);
-            wandTrail(c, f, feet, yawDeg, gain, time, load);
+            // owner 19.11: the staff goes out after the command (its trail fades over 1 s); the wind of mana stays to the scene end
+            double staff = f.commandAge() < 0 ? gain : gain * (1 - sm(f.commandAge(), 0, 20));
+            if (staff > 0) wandTrail(c, f, feet, yawDeg, staff, time, load);
         } finally { c.nearMin = nMin; c.nearMax = nMax; }
         return c.quads - before;
     }

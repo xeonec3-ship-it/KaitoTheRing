@@ -1,0 +1,1440 @@
+{
+ "comment": "«Последний жар» (T14, форма меча): at = место, куда вонзён клинок; три волны огненных столбов r 3/5/7 на тиках 4/12/20 (урон кода — по этим тикам), горящие кольца, угли; потом клинок остывает (пар). Сгенерировано tools/gen_ember_fx.py.",
+ "style": "pyre",
+ "duration": 160,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 8,
+   "at": "caster+0,0.3,0",
+   "size": 3,
+   "rays": 10,
+   "anamorphic": 8,
+   "screen": 0.2,
+   "color": "@core",
+   "comment": "клинок входит в землю"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "duration": 120,
+   "at": "caster",
+   "texture": "higher_cracks",
+   "radius": 3.5,
+   "grow": 6,
+   "fadeOut": 50,
+   "color": "@primary",
+   "brightness": 1.2,
+   "comment": "раскалённые трещины от клинка"
+  },
+  {
+   "type": "decal",
+   "delay": 2,
+   "duration": 160,
+   "at": "caster",
+   "texture": "glow",
+   "radius": 8,
+   "grow": 26,
+   "fadeOut": 80,
+   "color": "@shadow",
+   "blend": "translucent",
+   "comment": "выжженный круг"
+  },
+  {
+   "type": "wave",
+   "delay": 2,
+   "duration": 12,
+   "at": "caster",
+   "radius": 3.6,
+   "thickness": 0.5,
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 6,
+   "duration": 16,
+   "at": "caster+2.99,0,-0.19",
+   "radius": 0.42906678535828635,
+   "height": 4.18,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "duration": 6,
+   "at": "caster+2.99,0.3,-0.19",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 5,
+   "duration": 16,
+   "at": "caster+2.21,0,2.03",
+   "radius": 0.4601089046217045,
+   "height": 4.23,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "duration": 6,
+   "at": "caster+2.21,0.3,2.03",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 6,
+   "duration": 16,
+   "at": "caster+-0.08,0,3.00",
+   "radius": 0.4809232962094325,
+   "height": 3.62,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "duration": 6,
+   "at": "caster+-0.08,0.3,3.00",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 5,
+   "duration": 16,
+   "at": "caster+-2.08,0,2.16",
+   "radius": 0.3834899174468374,
+   "height": 4.47,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "duration": 6,
+   "at": "caster+-2.08,0.3,2.16",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 5,
+   "duration": 16,
+   "at": "caster+-2.99,0,-0.19",
+   "radius": 0.4041005165922805,
+   "height": 3.7,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "duration": 6,
+   "at": "caster+-2.99,0.3,-0.19",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 4,
+   "duration": 16,
+   "at": "caster+-2.08,0,-2.17",
+   "radius": 0.432699900864175,
+   "height": 3.92,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "duration": 6,
+   "at": "caster+-2.08,0.3,-2.17",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 6,
+   "duration": 16,
+   "at": "caster+0.08,0,-3.00",
+   "radius": 0.3604905185733285,
+   "height": 3.43,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "duration": 6,
+   "at": "caster+0.08,0.3,-3.00",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 5,
+   "duration": 16,
+   "at": "caster+2.15,0,-2.09",
+   "radius": 0.38066325469398393,
+   "height": 3.24,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "duration": 6,
+   "at": "caster+2.15,0.3,-2.09",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "decal",
+   "delay": 4,
+   "duration": 90,
+   "at": "caster",
+   "texture": "thin_ring",
+   "radius": 3.3,
+   "fadeOut": 50,
+   "color": "@primary",
+   "comment": "горящее кольцо волны 1"
+  },
+  {
+   "type": "wave",
+   "delay": 10,
+   "duration": 12,
+   "at": "caster",
+   "radius": 5.6,
+   "thickness": 0.5,
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 13,
+   "duration": 16,
+   "at": "caster+4.72,0,1.66",
+   "radius": 0.48446171239860114,
+   "height": 3.37,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "duration": 6,
+   "at": "caster+4.72,0.3,1.66",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 12,
+   "duration": 16,
+   "at": "caster+3.76,0,3.30",
+   "radius": 0.43681706591220665,
+   "height": 3.7,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "duration": 6,
+   "at": "caster+3.76,0.3,3.30",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 12,
+   "duration": 16,
+   "at": "caster+1.19,0,4.86",
+   "radius": 0.46205056221201335,
+   "height": 3.31,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "duration": 6,
+   "at": "caster+1.19,0.3,4.86",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 13,
+   "duration": 16,
+   "at": "caster+-1.28,0,4.83",
+   "radius": 0.41789013626886584,
+   "height": 3.74,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "duration": 6,
+   "at": "caster+-1.28,0.3,4.83",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 14,
+   "duration": 16,
+   "at": "caster+-3.37,0,3.69",
+   "radius": 0.3881930561018303,
+   "height": 3.92,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "duration": 6,
+   "at": "caster+-3.37,0.3,3.69",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 13,
+   "duration": 16,
+   "at": "caster+-4.74,0,1.58",
+   "radius": 0.39210031381057153,
+   "height": 4.2,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "duration": 6,
+   "at": "caster+-4.74,0.3,1.58",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 12,
+   "duration": 16,
+   "at": "caster+-4.91,0,-0.93",
+   "radius": 0.45292965530503304,
+   "height": 3.84,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "duration": 6,
+   "at": "caster+-4.91,0.3,-0.93",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 14,
+   "duration": 16,
+   "at": "caster+-3.49,0,-3.58",
+   "radius": 0.3752559209631947,
+   "height": 3.4,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "duration": 6,
+   "at": "caster+-3.49,0.3,-3.58",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 13,
+   "duration": 16,
+   "at": "caster+-1.38,0,-4.81",
+   "radius": 0.41555638732503386,
+   "height": 3.23,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "duration": 6,
+   "at": "caster+-1.38,0.3,-4.81",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 13,
+   "duration": 16,
+   "at": "caster+1.37,0,-4.81",
+   "radius": 0.40911167029618845,
+   "height": 2.93,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "duration": 6,
+   "at": "caster+1.37,0.3,-4.81",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 13,
+   "duration": 16,
+   "at": "caster+3.51,0,-3.56",
+   "radius": 0.35996732067587817,
+   "height": 3.66,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "duration": 6,
+   "at": "caster+3.51,0.3,-3.56",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 14,
+   "duration": 16,
+   "at": "caster+4.75,0,-1.57",
+   "radius": 0.4162107598250053,
+   "height": 3.78,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "duration": 6,
+   "at": "caster+4.75,0.3,-1.57",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "decal",
+   "delay": 12,
+   "duration": 90,
+   "at": "caster",
+   "texture": "thin_ring",
+   "radius": 5.3,
+   "fadeOut": 50,
+   "color": "@primary",
+   "comment": "горящее кольцо волны 2"
+  },
+  {
+   "type": "wave",
+   "delay": 18,
+   "duration": 12,
+   "at": "caster",
+   "radius": 7.6,
+   "thickness": 0.5,
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 21,
+   "duration": 16,
+   "at": "caster+6.99,0,0.36",
+   "radius": 0.35311927312704605,
+   "height": 2.97,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "duration": 6,
+   "at": "caster+6.99,0.3,0.36",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 21,
+   "duration": 16,
+   "at": "caster+6.37,0,2.89",
+   "radius": 0.38953078913197103,
+   "height": 2.92,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "duration": 6,
+   "at": "caster+6.37,0.3,2.89",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 22,
+   "duration": 16,
+   "at": "caster+5.10,0,4.79",
+   "radius": 0.4339824268250811,
+   "height": 2.66,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "duration": 6,
+   "at": "caster+5.10,0.3,4.79",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 20,
+   "duration": 16,
+   "at": "caster+2.37,0,6.59",
+   "radius": 0.355216822988231,
+   "height": 2.53,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "duration": 6,
+   "at": "caster+2.37,0.3,6.59",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 22,
+   "duration": 16,
+   "at": "caster+0.21,0,7.00",
+   "radius": 0.42600020164540103,
+   "height": 3.78,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "duration": 6,
+   "at": "caster+0.21,0.3,7.00",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 21,
+   "duration": 16,
+   "at": "caster+-2.70,0,6.46",
+   "radius": 0.36706954468243536,
+   "height": 3.53,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "duration": 6,
+   "at": "caster+-2.70,0.3,6.46",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 20,
+   "duration": 16,
+   "at": "caster+-5.30,0,4.58",
+   "radius": 0.38450529826836893,
+   "height": 3.48,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "duration": 6,
+   "at": "caster+-5.30,0.3,4.58",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 20,
+   "duration": 16,
+   "at": "caster+-6.62,0,2.29",
+   "radius": 0.38117780939183366,
+   "height": 2.77,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "duration": 6,
+   "at": "caster+-6.62,0.3,2.29",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 22,
+   "duration": 16,
+   "at": "caster+-7.00,0,-0.20",
+   "radius": 0.4642382210815873,
+   "height": 2.86,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "duration": 6,
+   "at": "caster+-7.00,0.3,-0.20",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 22,
+   "duration": 16,
+   "at": "caster+-6.52,0,-2.54",
+   "radius": 0.46118910268952473,
+   "height": 3.19,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "duration": 6,
+   "at": "caster+-6.52,0.3,-2.54",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 22,
+   "duration": 16,
+   "at": "caster+-4.72,0,-5.17",
+   "radius": 0.4762095818638752,
+   "height": 2.62,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "duration": 6,
+   "at": "caster+-4.72,0.3,-5.17",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 21,
+   "duration": 16,
+   "at": "caster+-2.82,0,-6.41",
+   "radius": 0.4318913018930471,
+   "height": 2.94,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "duration": 6,
+   "at": "caster+-2.82,0.3,-6.41",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 22,
+   "duration": 16,
+   "at": "caster+0.31,0,-6.99",
+   "radius": 0.3547330173633728,
+   "height": 2.84,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "duration": 6,
+   "at": "caster+0.31,0.3,-6.99",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 21,
+   "duration": 16,
+   "at": "caster+2.83,0,-6.40",
+   "radius": 0.36344270325759714,
+   "height": 3.0,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "duration": 6,
+   "at": "caster+2.83,0.3,-6.40",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 20,
+   "duration": 16,
+   "at": "caster+5.19,0,-4.70",
+   "radius": 0.4538364089226276,
+   "height": 2.58,
+   "fill": 0.8,
+   "color": "@secondary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "duration": 6,
+   "at": "caster+5.19,0.3,-4.70",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "column",
+   "delay": 21,
+   "duration": 16,
+   "at": "caster+6.30,0,-3.05",
+   "radius": 0.36885164738970666,
+   "height": 2.76,
+   "fill": 0.8,
+   "color": "@primary",
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "duration": 6,
+   "at": "caster+6.30,0.3,-3.05",
+   "texture": "@sparks",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.14,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "decal",
+   "delay": 20,
+   "duration": 90,
+   "at": "caster",
+   "texture": "thin_ring",
+   "radius": 7.3,
+   "fadeOut": 50,
+   "color": "@primary",
+   "comment": "горящее кольцо волны 3"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "duration": 40,
+   "at": "caster+0,0.2,0",
+   "texture": "@sparks",
+   "count": 220,
+   "rate": 6,
+   "area": 7,
+   "speed": 0.03,
+   "gravity": -0.005,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 40,
+   "color": "@primary",
+   "comment": "угли поднимаются по всей площади"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "duration": 50,
+   "at": "caster+0,0.6,0",
+   "texture": "glow",
+   "count": 60,
+   "rate": 1.2,
+   "spread": 0.25,
+   "speed": 0.02,
+   "gravity": -0.003,
+   "size": [
+    0.5,
+    1.4
+   ],
+   "life": 50,
+   "color": "#8A8A92",
+   "blend": "translucent",
+   "comment": "клинок остывает: пар и дым от рукояти"
+  }
+ ]
+}

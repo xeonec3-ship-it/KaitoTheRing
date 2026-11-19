@@ -1,0 +1,130 @@
+package ru.pohsmp.core.client.illusion;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.Input;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.client.event.RenderNameTagEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.joml.Matrix4f;
+import ru.pohsmp.core.PohCore;
+import ru.pohsmp.core.illusion.Maze;
+
+/**
+ * T22, what the victim's own client draws inside a zone.
+ * «Зеркальный лабиринт»: the maze walls (the same Maze as on the server, by the seed) as mirror panes, cracking towards the end;
+ * left and right of the movement keys swapped.
+ * «Кошмар наяву»: every other living thing is not drawn (and has no name) - the server puts the faceless monster (fx) on each one, only for it.
+ */
+public final class ZoneDraw {
+    private ZoneDraw() {}
+
+    private static final ResourceLocation WALL = new ResourceLocation(PohCore.MODID, "textures/fx/illusion_mirror_wall.png");
+    private static final ResourceLocation CRACKS = new ResourceLocation(PohCore.MODID, "textures/fx/illusion_mirror_wall_cracks.png");
+
+    private static Maze maze;
+    private static String mazeKey = "";
+
+    private static Maze maze(Zones.Zone z) {
+        String k = z.text() + "@" + z.x() + "," + z.z();
+        if (maze == null || !k.equals(mazeKey)) {
+            long seed;
+            try {
+                seed = Long.parseLong(z.text());
+            } catch (NumberFormatException ex) {
+                seed = 0;
+            }
+            maze = new Maze(z.x(), z.y(), z.z(), z.r(), seed);
+            mazeKey = k;
+        }
+        return maze;
+    }
+
+    @SubscribeEvent
+    public static void onInput(MovementInputUpdateEvent e) {
+        if (Zones.active(Zones.LABYRINTH) == null) return;
+        Input in = e.getInput();
+        in.leftImpulse = -in.leftImpulse;
+        boolean l = in.left;
+        in.left = in.right;
+        in.right = l;
+    }
+
+    @SubscribeEvent
+    public static void onRender(RenderLevelStageEvent e) {
+        if (e.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
+        Zones.Zone z = Zones.active(Zones.LABYRINTH);
+        if (z == null) return;
+        Maze m = maze(z);
+        Vec3 cp = e.getCamera().getPosition();
+        PoseStack ps = e.getPoseStack();
+        ps.pushPose();
+        ps.translate(-cp.x, -cp.y, -cp.z);
+        Matrix4f mat = ps.last().pose();
+        MultiBufferSource.BufferSource buf = Minecraft.getInstance().renderBuffers().bufferSource();
+        long left = z.until() - IllusionClient.now();
+        float crack = left < 60 ? (float) (1 - left / 60.0) : 0f;
+        double y0 = m.cy - Maze.BELOW, y1 = m.cy + Maze.ABOVE;
+        VertexConsumer vc = buf.getBuffer(RenderType.entityTranslucent(WALL));
+        for (double[] w : m.walls) pane(vc, mat, w, y0, y1, 0.9f);
+        buf.endBatch(RenderType.entityTranslucent(WALL));
+        if (crack > 0) {
+            VertexConsumer cc = buf.getBuffer(RenderType.entityTranslucent(CRACKS));
+            for (double[] w : m.walls) pane(cc, mat, w, y0, y1, crack);
+            buf.endBatch(RenderType.entityTranslucent(CRACKS));
+        }
+        ps.popPose();
+    }
+
+    /** Both faces of a wall (offset by its half thickness), the texture once per 3x3 cell. */
+    private static void pane(VertexConsumer vc, Matrix4f mat, double[] w, double y0, double y1, float a) {
+        boolean alongX = Math.abs(w[0] - w[2]) > Math.abs(w[1] - w[3]);
+        double ox = alongX ? 0 : Maze.HALF_THICK, oz = alongX ? Maze.HALF_THICK : 0;
+        float u = (float) (Math.max(Math.abs(w[0] - w[2]), Math.abs(w[1] - w[3])) / Maze.CELL);
+        float v = (float) ((y1 - y0) / Maze.CELL);
+        for (int s = -1; s <= 1; s += 2) {
+            double x1 = w[0] + ox * s, z1 = w[1] + oz * s, x2 = w[2] + ox * s, z2 = w[3] + oz * s;
+            float nx = (float) (ox * s / Maze.HALF_THICK), nz = (float) (oz * s / Maze.HALF_THICK);
+            v(vc, mat, x1, y0, z1, 0, v, a, nx, nz);
+            v(vc, mat, x2, y0, z2, u, v, a, nx, nz);
+            v(vc, mat, x2, y1, z2, u, 0, a, nx, nz);
+            v(vc, mat, x1, y1, z1, 0, 0, a, nx, nz);
+        }
+    }
+
+    private static void v(VertexConsumer vc, Matrix4f m, double x, double y, double z, float u, float v, float a, float nx, float nz) {
+        vc.vertex(m, (float) x, (float) y, (float) z).color(1f, 1f, 1f, a).uv(u, v).overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(LightTexture.FULL_BRIGHT).normal(nx, 0, nz).endVertex();
+    }
+
+    /** «Кошмар наяву»: the real models of everyone else are gone for the victim (the monsters are fx from the server). */
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onLiving(RenderLivingEvent.Pre<?, ?> e) {
+        LivingEntity le = e.getEntity();
+        if (le == Minecraft.getInstance().player || Zones.active(Zones.NIGHTMARE) == null) return;
+        e.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onName(RenderNameTagEvent e) {
+        if (e.getEntity() instanceof LivingEntity && e.getEntity() != Minecraft.getInstance().player && Zones.active(Zones.NIGHTMARE) != null)
+            e.setResult(Event.Result.DENY);
+    }
+
+    static void clear() {
+        maze = null;
+        mazeKey = "";
+    }
+}

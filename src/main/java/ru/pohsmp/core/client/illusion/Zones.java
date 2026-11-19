@@ -12,9 +12,9 @@ import ru.pohsmp.core.net.IlluMsg;
 public final class Zones {
     private Zones() {}
 
-    public static final int VEIL = 1, LABYRINTH = 2, NIGHTMARE = 3, DREAM = 4;
+    public static final int VEIL = IlluMsg.Z_VEIL, LABYRINTH = IlluMsg.Z_LABYRINTH, NIGHTMARE = IlluMsg.Z_NIGHTMARE, DREAM = IlluMsg.Z_DREAM;
 
-    public record Zone(int kind, int caster, double x, double y, double z, double r, long until) {}
+    public record Zone(int kind, int caster, double x, double y, double z, double r, long until, String text) {}
 
     private static final Map<Long, Zone> ZONES = new HashMap<>();
 
@@ -23,7 +23,7 @@ public final class Zones {
     }
 
     static void handle(IlluMsg m) {
-        if (m.kind == IlluMsg.ZONE) ZONES.put(key(m.entity, m.i), new Zone(m.i, m.entity, m.x, m.y, m.z, m.yaw, IllusionClient.now() + m.ticks));
+        if (m.kind == IlluMsg.ZONE) ZONES.put(key(m.entity, m.i), new Zone(m.i, m.entity, m.x, m.y, m.z, m.yaw, IllusionClient.now() + m.ticks, m.text));
         else ZONES.remove(key(m.entity, m.i));
     }
 

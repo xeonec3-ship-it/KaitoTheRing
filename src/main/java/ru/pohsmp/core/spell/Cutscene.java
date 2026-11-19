@@ -33,7 +33,8 @@ public final class Cutscene {
     /** «Безмолвные врата»: camera, music and silence for everyone this close to the caster or the strike point (owner 19.11, was 64). */
     public static final double R_GATE = 128;
     public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, STAR_FALL = 6, SILENT_GATE = 7,
-            SOUL_SEAL = 8, BLESSING = 9;   // T21: i of the packet = the target's entity id
+            SOUL_SEAL = 8, BLESSING = 9,   // T21: i of the packet = the target's entity id
+            BUTTERFLY_DREAM = 10;          // T22: focus = 5 blocks ahead of the caster (the way it looked when it began)
 
     /**
      * Starts the scene for everyone within r of the caster (in the caster's level) or of `extra` in `extraLevel` (may be another dimension).

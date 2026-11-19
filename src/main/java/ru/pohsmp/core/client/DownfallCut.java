@@ -73,7 +73,7 @@ public final class DownfallCut {
 
     public static void stop(int k) {
         if (!active || k != key) return;
-        if (scene != RITE_SEAL && scene != RITE_BLESS) {
+        if (scene != RITE_SEAL && scene != RITE_BLESS && scene != BUTTERFLY) {
             active = false;
             return;
         }
@@ -215,7 +215,8 @@ public final class DownfallCut {
         float pt = (float) e.getPartialTick();
         double t = now(pt);
         boolean riteScene = scene == RITE_SEAL || scene == RITE_BLESS;
-        if (t > dur + (riteScene ? ru.pohsmp.core.spell.RiteSpell.HOLD + 40 : 20) || t < 0) {
+        boolean glide = riteScene || scene == BUTTERFLY;   // these glide back to the player on the server's stop
+        if (t > dur + (riteScene ? ru.pohsmp.core.spell.RiteSpell.HOLD + 40 : scene == BUTTERFLY ? 40 : 20) || t < 0) {
             active = false;
             return;
         }
@@ -225,7 +226,7 @@ public final class DownfallCut {
         double baseYaw = Math.atan2(dir.z, dir.x);
         Vec3 pos, look;
         double roll = 0, shake = 0;
-        if (riteScene && releaseAt >= 0) {   // T21: back to the player's own eyes in 1 s
+        if (glide && releaseAt >= 0) {   // T21: back to the player's own eyes in 1 s
             double u = sine((mc.level.getGameTime() + pt - releaseAt) / RELEASE);
             Entity me = mc.getCameraEntity() != null ? mc.getCameraEntity() : mc.player;
             if (u >= 1 || lastPos == null || me == null) {
@@ -246,6 +247,12 @@ public final class DownfallCut {
             pos = pl[0];
             look = pl[1];
             shake = pl[2].x;
+        } else if (scene == BUTTERFLY) {
+            Vec3[] pl = butterfly(t, c, dir, side, baseYaw);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+            roll = pl[2].y;
         } else if (scene == STAR) {
             Vec3[] pl = star(t, c, rift, dir, side, baseYaw);
             pos = pl[0];
@@ -322,6 +329,87 @@ public final class DownfallCut {
     }
 
     private static double portalYaw;
+
+    // ---- T22 «Сон бабочки» (docs/specs/tasks/T22_illusion_school.md, «Ролик»): 240 ticks of cast + 20 after ----
+
+    private static final int BUTTERFLY = ru.pohsmp.core.spell.Cutscene.BUTTERFLY_DREAM;
+    private static final int[] BF_AT = {0, 40, 80, 120, 160, 200, 236};
+    private static final boolean[] BF_CUT = {false, true, true, false, false, false, false};
+
+    private static double cubic(double u) {
+        u = Math.max(0, Math.min(1, u));
+        return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+    }
+
+    /** dir: the caster's look when it began (flat), side: its left. Returns pos, look, (shake, roll, 0). */
+    private static Vec3[] butterfly(double t, Vec3 c, Vec3 dir, Vec3 side, double baseYaw) {
+        int i = 0;
+        while (i < BF_AT.length - 1 && t >= BF_AT[i + 1]) i++;
+        Vec3[] now = bfShot(i, t, c, dir, side, baseYaw);
+        if (i == 0 || BF_CUT[i] || t - BF_AT[i] >= BLEND) return now;
+        Vec3[] prev = bfShot(i - 1, BF_AT[i], c, dir, side, baseYaw);
+        double u = sine((t - BF_AT[i]) / BLEND);
+        return new Vec3[] {prev[0].lerp(now[0], u), prev[1].lerp(now[1], u), now[2]};
+    }
+
+    private static Vec3[] bfShot(int i, double t, Vec3 c, Vec3 dir, Vec3 side, double baseYaw) {
+        double end = i + 1 < BF_AT.length ? BF_AT[i + 1] : BF_AT[i] + 24;
+        double k = sine((t - BF_AT[i]) / Math.max(1, end - BF_AT[i]));
+        Vec3 right = side.scale(-1);
+        Vec3 pos, look;
+        double shake = 0, roll = 0;
+        switch (i) {
+            case 0 -> {   // the palms close, from the front and below; a very slow push 1.6 -> 1.3, the camera breathes
+                pos = c.add(dir.scale(1.6 - 0.3 * k)).add(0, 1.1 + 0.025 * Math.sin(t * 0.18), 0);
+                look = c.add(dir.scale(0.4)).add(0, 1.15, 0);
+            }
+            case 1 -> {   // cut: from the side at 4; the camera rises with the butterflies to 6 and tilts up to the sky seal
+                pos = c.add(side.scale(4)).add(0, 1.2 + 4.8 * k, 0);
+                look = c.add(0, 2.5 + 9.5 * k, 0);
+            }
+            case 2 -> {   // cut: over the caster's shoulder along the arm to the touch; a push back 0.15 at 4.3 s and 5.2 s
+                double jolt = 0.15 * (Math.max(0, 1 - Math.abs(t - 88) / 6.0) + Math.max(0, 1 - Math.abs(t - 106) / 6.0));
+                pos = c.subtract(dir.scale(2.2 + jolt)).add(right.scale(0.5)).add(0, 1.8, 0);
+                look = c.add(dir.scale(0.65)).add(0, 1.4, 0);
+            }
+            case 3 -> {   // the world cracks: a 90° orbit at 6, rising 2.5 -> 5, a light tremble towards 8 s
+                double a = baseYaw + Math.toRadians(-45 + 90 * k);
+                pos = c.add(Math.cos(a) * 6, 2.5 + 2.5 * k, Math.sin(a) * 6);
+                look = c.add(0, 1.3, 0);
+                shake = 0.03 * k;
+            }
+            case 4 -> {   // the turn: wide, 9 away and 3 up; the camera rolls 180° in 8.0-9.4 s round its own axis
+                pos = c.add(dir.scale(9)).add(0, 3, 0);
+                look = c.add(0, 1.5, 0);
+                roll = 180 * cubic((t - 160) / 28.0);
+                shake = t < 182 ? 0.03 : 0;
+            }
+            case 5 -> {   // the reflection: the roll goes back 180° -> 0 in 10.0-11.2 s while the camera comes down to the face at 3.5
+                pos = c.add(dir.scale(9 - 5.5 * k)).add(0, 3 - 1.4 * k, 0);
+                look = c.add(0, 1.5, 0);
+                roll = 180 * (1 - cubic((t - 200) / 24.0));
+            }
+            default -> {   // the step into the reflection, then the same shot, still
+                pos = c.add(dir.scale(3.5)).add(0, 1.6, 0);
+                look = c.add(0, 1.5, 0);
+            }
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, roll, 0)};
+    }
+
+    private static final net.minecraft.resources.ResourceLocation WORLD_CRACKS =
+            new net.minecraft.resources.ResourceLocation(ru.pohsmp.core.PohCore.MODID, "textures/fx/illusion_world_cracks.png");
+
+    /** The cracks over the screen in the butterfly scene: from 6.5 s (0 -> 0.6), gone by 11 s. */
+    private static void butterflyOverlay(GuiGraphics g, int w, int h, double t) {
+        double a = t < 130 ? 0 : t < 190 ? 0.6 * (t - 130) / 60.0 : t < 200 ? 0.6 : Math.max(0, 0.6 * (1 - (t - 200) / 20.0));
+        if (a <= 0.01) return;
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        g.setColor(1f, 1f, 1f, (float) a);
+        g.blit(WORLD_CRACKS, 0, 0, w, h, 0, 0, 1024, 1024, 1024, 1024);
+        g.setColor(1f, 1f, 1f, 1f);
+        com.mojang.blaze3d.systems.RenderSystem.disableBlend();
+    }
 
     /**
      * Scene 5, Coven Arrival (90 s, by seconds s). rift = the arena mark, portalYaw = the portal's facing (degrees, MC yaw):
@@ -635,8 +723,8 @@ public final class DownfallCut {
 
     private static final String[] TITLES = {"fx.pohsmp_core.downfall.title", "fx.pohsmp_core.milky_way.title", "fx.pohsmp_core.soul_devour.title", "fx.pohsmp_core.divine_taboo.title",
             "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title", "fx.pohsmp_core.silent_gate.title",
-            "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title"};
-    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A};
+            "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title", "fx.pohsmp_core.butterfly_dream.title"};
+    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A, 0xC9A8FF};
 
     private static boolean apply(Camera cam, Vec3 pos) {
         try {
@@ -717,6 +805,7 @@ public final class DownfallCut {
         if (releaseAt >= 0 && Minecraft.getInstance().level != null)   // T21: the bars go with the camera
             in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + pt - releaseAt) / RELEASE));
         int bar = (int) (h * 0.11 * in);
+        if (scene == BUTTERFLY) butterflyOverlay(g, w, h, t);
         g.fill(0, 0, w, bar, 0xFF000000);
         g.fill(0, h - bar, w, h, 0xFF000000);
         if (scene == 5) {

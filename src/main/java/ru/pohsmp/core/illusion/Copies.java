@@ -58,6 +58,8 @@ public final class Copies {
         /** illusory damage of its strike, how long until it comes back, the debt tag */
         public float damage;
         public int damageReturn, tag;
+        /** strikes and arrows go through it as through air («Пелена») */
+        public boolean ghost;
         boolean gone;
 
         Copy(int id, LivingEntity owner, Mode mode, Vec3 pos, int maxHits, int delay, long until) {
@@ -95,6 +97,23 @@ public final class Copies {
 
     public static void onGone(Consumer<Copy> c) {
         ON_GONE.add(c);
+    }
+
+    static {
+        // the voice for a victim: from the running copy («Ложный шаг»), else from the copy nearest to it («Отражения»); not from «Пелена»
+        Voices.provider(out -> {
+            for (List<Copy> l : BY_OWNER.values())
+                for (Copy c : l) {
+                    if (c.gone || c.ghost || !(c.owner.level() instanceof ServerLevel sl)) continue;
+                    for (ServerPlayer v : players(sl, c)) {
+                        Map<UUID, Vec3> m = out.get(c.owner.getUUID());
+                        Vec3 had = m == null ? null : m.get(v.getUUID());
+                        Vec3 at = c.pos.add(0, 1.6, 0);
+                        if (had == null || c.mode == Mode.RUNNER || had.distanceToSqr(v.position()) > at.distanceToSqr(v.position()))
+                            out.computeIfAbsent(c.owner.getUUID(), k -> new HashMap<>()).put(v.getUUID(), at);
+                    }
+                }
+        });
     }
 
     /** A new copy of owner at pos for the victims; it lives ticks. delay - ticks behind the caster (MIRROR). */
@@ -179,7 +198,7 @@ public final class Copies {
         if (now - last < 8) return;
         for (List<Copy> l : BY_OWNER.values())
             for (Copy c : l) {
-                if (c.id != id || !c.victims.contains(p.getUUID()) || p.level() != c.owner.level()) continue;
+                if (c.id != id || c.ghost || !c.victims.contains(p.getUUID()) || p.level() != c.owner.level()) continue;
                 if (p.getEyePosition().distanceTo(box(c).getCenter()) > 6) return;
                 LAST_HIT.put(p.getUUID(), now);
                 hurt(c, p.getYRot());
@@ -260,7 +279,7 @@ public final class Copies {
         for (ServerPlayer p : players(sl, c))
             Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.COPY_MOVE, c.owner.getId(), fl, c.id, null, "", c.pos.x, c.pos.y, c.pos.z, c.yaw, c.pitch));
         if ((fl & SWING) != 0 && c.damage > 0) strike(sl, c);
-        arrows(sl, c);
+        if (!c.ghost) arrows(sl, c);
     }
 
     /** A copy's swing: illusory damage to a victim in reach in front of it. */

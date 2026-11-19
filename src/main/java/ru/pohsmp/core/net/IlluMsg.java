@@ -31,6 +31,10 @@ public final class IlluMsg {
     public static final int ZONE = 8;
     /** zone i of caster entity is over. */
     public static final int ZONE_END = 9;
+    /** player entity plays the Iron's / PlayerAnimator animation text (e.g. pohsmp_illusion_butterfly_wake). */
+    public static final int ANIM = 10;
+    /** zone kinds (i of ZONE / ZONE_END) */
+    public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4;
 
     public final byte kind;
     public final int entity, ticks, i;

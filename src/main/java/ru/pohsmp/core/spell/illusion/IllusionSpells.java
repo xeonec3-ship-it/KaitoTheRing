@@ -21,6 +21,10 @@ public final class IllusionSpells {
             case FalseStepSpell.PATH -> new FalseStepSpell();
             case PhantomPainSpell.PATH -> new PhantomPainSpell();
             case BorrowedFaceSpell.PATH -> new BorrowedFaceSpell();
+            case VeilSpell.PATH -> new VeilSpell();
+            case MirrorLabyrinthSpell.PATH -> new MirrorLabyrinthSpell();
+            case WakingNightmareSpell.PATH -> new WakingNightmareSpell();
+            case ButterflyDreamSpell.PATH -> new ButterflyDreamSpell();
             default -> new Pending(path);
         };
     }
@@ -28,9 +32,14 @@ public final class IllusionSpells {
     public static void registerEvents() {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.illusion.Illusions.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.illusion.Copies.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.illusion.Voices.class);
         MinecraftForge.EVENT_BUS.register(PhantomPainSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(BorrowedFaceSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(MirrorImagesSpell.Events.class);
+        MinecraftForge.EVENT_BUS.register(VeilSpell.Events.class);
+        MinecraftForge.EVENT_BUS.register(MirrorLabyrinthSpell.Events.class);
+        MinecraftForge.EVENT_BUS.register(WakingNightmareSpell.Events.class);
+        MinecraftForge.EVENT_BUS.register(ButterflyDreamSpell.Events.class);
     }
 
     /** A spell of the school not written yet: registered (scrolls, tiers), never cast. */

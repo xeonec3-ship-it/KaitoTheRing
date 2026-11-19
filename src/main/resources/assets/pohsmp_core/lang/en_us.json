@@ -709,5 +709,15 @@
   "subtitles.pohsmp_core.spell.abyss_eye.charge_thunder": "Eye of the Abyss: thunderclap",
   "subtitles.pohsmp_core.spell.abyss_eye.loop_heart": "Eye of the Abyss: heartbeat",
   "subtitles.pohsmp_core.spell.abyss_eye.loop_hum": "Eye of the Abyss: hum",
-  "subtitles.pohsmp_core.spell.abyss_eye.loop_roar": "Eye of the Abyss: roar"
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_roar": "Eye of the Abyss: roar",
+  "subtitles.pohsmp_core.spell.eight_shields.cast_powerup": "Eight Shields: power rises",
+  "subtitles.pohsmp_core.spell.eight_shields.cast_slam": "Eight Shields: heavy strike",
+  "subtitles.pohsmp_core.spell.eight_shields.hit_chime": "Eight Shields: chime",
+  "subtitles.pohsmp_core.spell.eight_shields.hit_shatter": "Eight Shields: shatters",
+  "subtitles.pohsmp_core.spell.illusion.cast": "Illusion: spell weaves",
+  "subtitles.pohsmp_core.spell.illusion_decoy.hit_boom": "Illusion: decoy: blast",
+  "subtitles.pohsmp_core.spell.illusion_decoy.hit_magic": "Illusion: decoy: spell weaves",
+  "subtitles.pohsmp_core.spell.phantom_trap.cast": "Phantom Trap: spell weaves",
+  "subtitles.pohsmp_core.spell.phantom_trap.hit": "Phantom Trap: heavy strike",
+  "subtitles.pohsmp_core.spell.phantom_trap.loop": "Phantom Trap: chains rattle"
 }

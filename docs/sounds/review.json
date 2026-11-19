@@ -2241,5 +2241,237 @@
   "replaces": [
    "WARDEN_ROAR"
   ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "eight_shields",
+  "spell_ru": "Восемь щитов",
+  "event": "pohsmp_core:spell.eight_shields.cast_powerup",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/evocation/eight_shields_cast_powerup_1.ogg",
+   "spell/evocation/eight_shields_cast_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eight_shields_cast_powerup_1.mp3",
+   "docs/sounds/mp3/eight_shields_cast_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "EightShieldsSpell.java onCast()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "eight_shields",
+  "spell_ru": "Восемь щитов",
+  "event": "pohsmp_core:spell.eight_shields.cast_slam",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/evocation/eight_shields_cast_slam_1.ogg",
+   "spell/evocation/eight_shields_cast_slam_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eight_shields_cast_slam_1.mp3",
+   "docs/sounds/mp3/eight_shields_cast_slam_2.mp3"
+  ],
+  "what": "тяжёлый металлический удар — начало каста (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "EightShieldsSpell.java onCast()",
+  "replaces": [
+   "ARMOR_EQUIP_NETHERITE"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "eight_shields",
+  "spell_ru": "Восемь щитов",
+  "event": "pohsmp_core:spell.eight_shields.hit_chime",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/evocation/eight_shields_hit_chime_1.ogg",
+   "spell/evocation/eight_shields_hit_chime_2.ogg",
+   "spell/evocation/eight_shields_hit_chime_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eight_shields_hit_chime_1.mp3",
+   "docs/sounds/mp3/eight_shields_hit_chime_2.mp3",
+   "docs/sounds/mp3/eight_shields_hit_chime_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — удар / взрыв / попадание (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "EightShieldsSpell.java block()",
+  "replaces": [
+   "AMETHYST_BLOCK_HIT"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "eight_shields",
+  "spell_ru": "Восемь щитов",
+  "event": "pohsmp_core:spell.eight_shields.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/evocation/eight_shields_hit_shatter_1.ogg",
+   "spell/evocation/eight_shields_hit_shatter_2.ogg",
+   "spell/evocation/eight_shields_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eight_shields_hit_shatter_1.mp3",
+   "docs/sounds/mp3/eight_shields_hit_shatter_2.mp3",
+   "docs/sounds/mp3/eight_shields_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "EightShieldsSpell.java tick()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "illusion",
+  "spell_ru": "Иллюзия",
+  "event": "pohsmp_core:spell.illusion.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/evocation/illusion_cast_1.ogg",
+   "spell/evocation/illusion_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/illusion_cast_1.mp3",
+   "docs/sounds/mp3/illusion_cast_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "IllusionSpell.java onCast()",
+  "replaces": [
+   "ILLUSIONER_MIRROR_MOVE"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "illusion_decoy",
+  "spell_ru": "Иллюзия: приманка",
+  "event": "pohsmp_core:spell.illusion_decoy.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/evocation/illusion_decoy_hit_boom_1.ogg",
+   "spell/evocation/illusion_decoy_hit_boom_2.ogg",
+   "spell/evocation/illusion_decoy_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/illusion_decoy_hit_boom_1.mp3",
+   "docs/sounds/mp3/illusion_decoy_hit_boom_2.mp3",
+   "docs/sounds/mp3/illusion_decoy_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "Marks.java boom()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "illusion_decoy",
+  "spell_ru": "Иллюзия: приманка",
+  "event": "pohsmp_core:spell.illusion_decoy.hit_magic",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/evocation/illusion_decoy_hit_magic_1.ogg",
+   "spell/evocation/illusion_decoy_hit_magic_2.ogg",
+   "spell/evocation/illusion_decoy_hit_magic_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/illusion_decoy_hit_magic_1.mp3",
+   "docs/sounds/mp3/illusion_decoy_hit_magic_2.mp3",
+   "docs/sounds/mp3/illusion_decoy_hit_magic_3.mp3"
+  ],
+  "what": "заклятие плетётся — удар / взрыв / попадание (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "Marks.java boom()",
+  "replaces": [
+   "ILLUSIONER_MIRROR_MOVE"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "phantom_trap",
+  "spell_ru": "Призрачный капкан",
+  "event": "pohsmp_core:spell.phantom_trap.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/evocation/phantom_trap_cast_1.ogg",
+   "spell/evocation/phantom_trap_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/phantom_trap_cast_1.mp3",
+   "docs/sounds/mp3/phantom_trap_cast_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "PhantomTrapSpell.java onCast()",
+  "replaces": [
+   "ILLUSIONER_PREPARE_MIRROR"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "phantom_trap",
+  "spell_ru": "Призрачный капкан",
+  "event": "pohsmp_core:spell.phantom_trap.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/evocation/phantom_trap_hit_1.ogg",
+   "spell/evocation/phantom_trap_hit_2.ogg",
+   "spell/evocation/phantom_trap_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/phantom_trap_hit_1.mp3",
+   "docs/sounds/mp3/phantom_trap_hit_2.mp3",
+   "docs/sounds/mp3/phantom_trap_hit_3.mp3"
+  ],
+  "what": "тяжёлый металлический удар — удар / взрыв / попадание (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "PhantomTrapSpell.java tick()",
+  "replaces": [
+   "EVOKER_FANGS_ATTACK"
+  ]
+ },
+ {
+  "school": "evocation",
+  "school_ru": "Вызывание",
+  "spell": "phantom_trap",
+  "spell_ru": "Призрачный капкан",
+  "event": "pohsmp_core:spell.phantom_trap.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/evocation/phantom_trap_loop_1.ogg",
+   "spell/evocation/phantom_trap_loop_2.ogg",
+   "spell/evocation/phantom_trap_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/phantom_trap_loop_1.mp3",
+   "docs/sounds/mp3/phantom_trap_loop_2.mp3",
+   "docs/sounds/mp3/phantom_trap_loop_3.mp3"
+  ],
+  "what": "цепи, оковы — пока действует (тики) (подпись школы: магический металл: гонг, щиты, вспышка заклятия)",
+  "where": "PhantomTrapSpell.java tick()",
+  "replaces": [
+   "CHAIN_PLACE"
+  ]
  }
 ]

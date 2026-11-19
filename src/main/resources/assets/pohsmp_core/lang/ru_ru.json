@@ -709,5 +709,15 @@
   "subtitles.pohsmp_core.spell.abyss_eye.charge_thunder": "Око бездны: раскат",
   "subtitles.pohsmp_core.spell.abyss_eye.loop_heart": "Око бездны: бьётся сердце",
   "subtitles.pohsmp_core.spell.abyss_eye.loop_hum": "Око бездны: гул",
-  "subtitles.pohsmp_core.spell.abyss_eye.loop_roar": "Око бездны: рёв"
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_roar": "Око бездны: рёв",
+  "subtitles.pohsmp_core.spell.eight_shields.cast_powerup": "Восемь щитов: сила нарастает",
+  "subtitles.pohsmp_core.spell.eight_shields.cast_slam": "Восемь щитов: тяжёлый удар",
+  "subtitles.pohsmp_core.spell.eight_shields.hit_chime": "Восемь щитов: звон",
+  "subtitles.pohsmp_core.spell.eight_shields.hit_shatter": "Восемь щитов: раскалывается",
+  "subtitles.pohsmp_core.spell.illusion.cast": "Иллюзия: плетётся заклятие",
+  "subtitles.pohsmp_core.spell.illusion_decoy.hit_boom": "Иллюзия: приманка: грохот",
+  "subtitles.pohsmp_core.spell.illusion_decoy.hit_magic": "Иллюзия: приманка: плетётся заклятие",
+  "subtitles.pohsmp_core.spell.phantom_trap.cast": "Призрачный капкан: плетётся заклятие",
+  "subtitles.pohsmp_core.spell.phantom_trap.hit": "Призрачный капкан: тяжёлый удар",
+  "subtitles.pohsmp_core.spell.phantom_trap.loop": "Призрачный капкан: звенят цепи"
 }

@@ -1768,5 +1768,159 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.eight_shields.cast_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.eight_shields.cast_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_cast_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_cast_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.eight_shields.cast_slam": {
+    "subtitle": "subtitles.pohsmp_core.spell.eight_shields.cast_slam",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_cast_slam_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_cast_slam_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.eight_shields.hit_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.eight_shields.hit_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_hit_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_hit_chime_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_hit_chime_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.eight_shields.hit_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.eight_shields.hit_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_hit_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_hit_shatter_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/eight_shields_hit_shatter_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.illusion.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.illusion.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.illusion_decoy.hit_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.illusion_decoy.hit_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_decoy_hit_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_decoy_hit_boom_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_decoy_hit_boom_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.illusion_decoy.hit_magic": {
+    "subtitle": "subtitles.pohsmp_core.spell.illusion_decoy.hit_magic",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_decoy_hit_magic_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_decoy_hit_magic_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/illusion_decoy_hit_magic_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.phantom_trap.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.phantom_trap.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.phantom_trap.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.phantom_trap.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.phantom_trap.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.phantom_trap.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/evocation/phantom_trap_loop_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

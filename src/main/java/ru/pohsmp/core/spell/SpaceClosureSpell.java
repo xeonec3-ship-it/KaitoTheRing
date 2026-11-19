@@ -335,6 +335,12 @@ public class SpaceClosureSpell extends PohSpell {
         return false;
     }
 
+    /** The live domes of this level as shells, for streams that stop at them (BarrierGuard.stream). */
+    public static void shells(Level lvl, List<BarrierGuard.Shell> out) {
+        long now = lvl.getGameTime();
+        for (Zone z : ZONES) if (z.dim == lvl.dimension() && now <= z.until) out.add(new BarrierGuard.Shell(z, z.c, R, COLOR));
+    }
+
     /** True when the segment from a to b crosses the shell of a dome in this level. */
     private static boolean crosses(Level lvl, Vec3 a, Vec3 b) {
         return crossing(lvl, a, b) != null;

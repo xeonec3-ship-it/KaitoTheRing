@@ -84,5 +84,23 @@
         "stream": true
       }
     ]
+  },
+  "spell.gate_hit": {
+    "category": "players",
+    "subtitle": "subtitles.pohsmp_core.spell.gate_hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/gate_hit1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "pohsmp_core:spell/gate_hit2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "pohsmp_core:spell/gate_hit3",
+        "attenuation_distance": 48
+      }
+    ]
   }
 }

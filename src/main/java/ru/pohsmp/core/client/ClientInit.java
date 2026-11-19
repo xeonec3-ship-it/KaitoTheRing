@@ -18,6 +18,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(HiddenEntities.class);
         MinecraftForge.EVENT_BUS.register(PohHud.class);
         MinecraftForge.EVENT_BUS.register(DownfallCut.class);
+        MinecraftForge.EVENT_BUS.register(SilentWitchClient.class);
         MinecraftForge.EVENT_BUS.register(SilentMusic.class);
         MinecraftForge.EVENT_BUS.register(GateStaff.class);
         MinecraftForge.EVENT_BUS.register(NpcCastClient.class);

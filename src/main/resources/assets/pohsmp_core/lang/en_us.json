@@ -369,5 +369,22 @@
   "ui.pohsmp_core.worgan_flame.damage": "%s damage every %s s",
   "ui.pohsmp_core.world_rift.length": "Length: %s blocks",
   "ui.pohsmp_core.world_rift.pillars": "Pillars of darkness: %s damage",
-  "ui.pohsmp_core.world_rift.toss": "Toss: %s damage"
+  "ui.pohsmp_core.world_rift.toss": "Toss: %s damage",
+  "attribute.pohsmp_core.silent_cast_time_reduction": "Silent Cast Time Reduction",
+  "effect.pohsmp_core.silent_barrier_cooldown": "Barrier Recharging",
+  "item.pohsmp_core.silent_witch.set": "Full set:",
+  "item.pohsmp_core.silent_witch.set_barrier": " Quiet barrier: once per 10 minutes lethal damage leaves you at 1 health",
+  "item.pohsmp_core.silent_witch.set_gate": " Full set: unlocks the Gate of the Silent Witch's staff",
+  "item.pohsmp_core.silent_witch.set_nameless": " Nameless: your name and marker are hidden from everyone, on maps too; Nero rides your shoulder",
+  "item.pohsmp_core.silent_witch_hood": "Silent Witch's Hood",
+  "item.pohsmp_core.silent_witch_hood.desc1": "Mobs farther than 12 blocks do not notice you until you attack or cast",
+  "item.pohsmp_core.silent_witch_hood.desc2": "Your name above your head is hidden",
+  "item.pohsmp_core.silent_witch_robe": "Silent Witch's Robe",
+  "item.pohsmp_core.silent_witch_robe.desc1": "Casting is 15% faster, Silent spells 25% faster",
+  "item.pohsmp_core.silent_witch_robe.desc2": "Spoken incantations are not written to chat",
+  "item.pohsmp_core.silent_witch_robe.desc3": "Turquoise sparks circle at your feet while you cast",
+  "item.pohsmp_core.silent_witch_skirt": "Silent Witch's Robe Skirt",
+  "item.pohsmp_core.silent_witch_skirt.desc1": "Your steps, jumps, landings and swimming make no sound",
+  "item.pohsmp_core.silent_witch_skirt.desc2": "You cause no vibrations: sculk and the Warden do not hear you",
+  "item.pohsmp_core.silent_witch_staff.gate": "Full set: unlocks the Gate of the Silent Witch's staff"
 }

@@ -60,3 +60,8 @@
 Если один из пары прервал каст, второй продолжает один с уже сокращённым временем.
 Застывший час для пары (каст 2 с, совместно 1.4 с):
 /give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:frozen_hour",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+
+Одежда безмолвной ведьмы (T19; числа — [silent_witch] в pohsmp_core-server.toml):
+/give @s pohsmp_core:silent_witch_hood
+/give @s pohsmp_core:silent_witch_robe
+/give @s pohsmp_core:silent_witch_skirt

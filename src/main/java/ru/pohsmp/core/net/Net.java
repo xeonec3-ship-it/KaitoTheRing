@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "5";
+    private static final String V = "7";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -27,6 +27,10 @@ public final class Net {
         CH.messageBuilder(HideMsg.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(HideMsg::encode).decoder(HideMsg::new).consumerMainThread(HideMsg::handle).add();
         CH.messageBuilder(NpcCastMsg.class, 4, NetworkDirection.PLAY_TO_CLIENT).encoder(NpcCastMsg::encode).decoder(NpcCastMsg::new).consumerMainThread(NpcCastMsg::handle).add();
         CH.messageBuilder(CastTime.class, 5, NetworkDirection.PLAY_TO_CLIENT).encoder(CastTime::encode).decoder(CastTime::new).consumerMainThread(CastTime::handle).add();
+        CH.messageBuilder(SilentSync.class, 6, NetworkDirection.PLAY_TO_CLIENT).encoder(SilentSync::encode).decoder(SilentSync::new)
+                .consumerMainThread(SilentSync::handle).add();
+        CH.messageBuilder(NeroMsg.class, 7, NetworkDirection.PLAY_TO_CLIENT).encoder(NeroMsg::encode).decoder(NeroMsg::new)
+                .consumerMainThread(NeroMsg::handle).add();
     }
 
     /**
@@ -191,6 +195,57 @@ public final class Net {
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.JointFx.castTime(this));
+        }
+    }
+
+    /** Silent Witch outfit: the whole map player id -&gt; name-hiding flags (ru.pohsmp.core.silent.SilentWitch.NAME_TAG / NAMELESS). */
+    public static final class SilentSync {
+        public final java.util.Map<java.util.UUID, Integer> flags;
+
+        public SilentSync(java.util.Map<java.util.UUID, Integer> flags) {
+            this.flags = flags;
+        }
+
+        public SilentSync(FriendlyByteBuf buf) {
+            int n = buf.readVarInt();
+            flags = new java.util.HashMap<>();
+            for (int i = 0; i < n; i++) flags.put(buf.readUUID(), (int) buf.readByte());
+        }
+
+        public void encode(FriendlyByteBuf buf) {
+            buf.writeVarInt(flags.size());
+            flags.forEach((id, f) -> {
+                buf.writeUUID(id);
+                buf.writeByte(f);
+            });
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            ru.pohsmp.core.silent.SilentWitch.setClientFlags(flags);
+        }
+    }
+
+    /** Silent Witch outfit: the wearer's Nero turns into the dragon shadow for this many ticks (0 = comes back now). */
+    public static final class NeroMsg {
+        public final int entity, ticks;
+
+        public NeroMsg(int entity, int ticks) {
+            this.entity = entity;
+            this.ticks = ticks;
+        }
+
+        public NeroMsg(FriendlyByteBuf b) {
+            entity = b.readVarInt();
+            ticks = b.readVarInt();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeVarInt(entity);
+            b.writeVarInt(ticks);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.OutfitAnim.dragon(entity, ticks));
         }
     }
 }

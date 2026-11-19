@@ -84,6 +84,8 @@ public class WorganFlameSpell extends SilentSpell {
 
     @Override
     public void onServerPreCast(Level level, int spellLevel, LivingEntity caster, MagicData md) {
+        // T19: in the full Silent Witch outfit Nero is the dragon - the cat dissolves now and comes back after the breath
+        ru.pohsmp.core.silent.SilentWitch.neroDragon(caster, getCastTime(spellLevel) + cfg(ru.pohsmp.core.ServerConfig.FLAME_BREATH::get, 60) + 10);
         super.onServerPreCast(level, spellLevel, caster, md);
         if (!(level instanceof ServerLevel sl)) return;
         Cast c = new Cast();
@@ -125,6 +127,7 @@ public class WorganFlameSpell extends SilentSpell {
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity caster, MagicData md, boolean cancelled) {
         Cast c = CASTS.remove(caster.getUUID());
         if (cancelled && c != null && level instanceof ServerLevel sl) crumble(sl, caster, c.fxInst);
+        if (cancelled) ru.pohsmp.core.silent.SilentWitch.neroDragon(caster, 0);
         super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
     }
 

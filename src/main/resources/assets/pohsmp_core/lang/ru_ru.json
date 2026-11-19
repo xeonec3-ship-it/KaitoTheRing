@@ -369,5 +369,22 @@
   "ui.pohsmp_core.worgan_flame.damage": "%s урона раз в %s с",
   "ui.pohsmp_core.world_rift.length": "Длина: %s блоков",
   "ui.pohsmp_core.world_rift.pillars": "Столбы тьмы: %s урона",
-  "ui.pohsmp_core.world_rift.toss": "Подброс: %s урона"
+  "ui.pohsmp_core.world_rift.toss": "Подброс: %s урона",
+  "attribute.pohsmp_core.silent_cast_time_reduction": "Ускорение безмолвных заклинаний",
+  "effect.pohsmp_core.silent_barrier_cooldown": "Барьер восстанавливается",
+  "item.pohsmp_core.silent_witch.set": "Полный комплект:",
+  "item.pohsmp_core.silent_witch.set_barrier": " Тихий барьер: раз в 10 минут смертельный урон оставляет 1 здоровья",
+  "item.pohsmp_core.silent_witch.set_gate": " Полный комплект: открывает «Врата» посоха безмолвной ведьмы",
+  "item.pohsmp_core.silent_witch.set_nameless": " Безымянная: ник и метка скрыты от всех, и на картах; на плече сидит Неро",
+  "item.pohsmp_core.silent_witch_hood": "Капюшон безмолвной ведьмы",
+  "item.pohsmp_core.silent_witch_hood.desc1": "Мобы дальше 12 блоков не замечают вас, пока вы не атакуете или не колдуете",
+  "item.pohsmp_core.silent_witch_hood.desc2": "Ник над головой скрыт",
+  "item.pohsmp_core.silent_witch_robe": "Мантия безмолвной ведьмы",
+  "item.pohsmp_core.silent_witch_robe.desc1": "Касты на 15 % короче, заклинания Безмолвной школы — на 25 %",
+  "item.pohsmp_core.silent_witch_robe.desc2": "Заклинания с репликами не пишут фразы в чат",
+  "item.pohsmp_core.silent_witch_robe.desc3": "При касте у ног кружат бирюзовые искры",
+  "item.pohsmp_core.silent_witch_skirt": "Полы мантии безмолвной ведьмы",
+  "item.pohsmp_core.silent_witch_skirt.desc1": "Шаги, прыжки, приземления и плавание не звучат",
+  "item.pohsmp_core.silent_witch_skirt.desc2": "Не вызывает вибраций: скалк и Хранитель вас не слышат",
+  "item.pohsmp_core.silent_witch_staff.gate": "Полный комплект: открывает «Врата» посоха безмолвной ведьмы"
 }

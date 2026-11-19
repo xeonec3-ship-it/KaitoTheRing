@@ -19,5 +19,6 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> {
     private void pohsmp$npcCastPose(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch,
                                     CallbackInfo ci) {
         NpcCastClient.apply((HumanoidModel<?>) (Object) this, entity);
+        ru.pohsmp.core.client.OutfitAnim.legs((HumanoidModel<?>) (Object) this, entity);   // Silent Witch skirt: half steps
     }
 }

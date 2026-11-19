@@ -95,10 +95,13 @@ for (const b of G.bones) {
 // фигура игрока под одеждой
 const SKIN = { bipedHead: [[-4, 24, -4, 8, 8, 8, 0xd8b090]], bipedBody: [[-4, 12, -2, 8, 12, 4, 0x3a3f5a]], bipedRightArm: [[-8, 12, -2, 4, 12, 4, 0xd8b090]],
   bipedLeftArm: [[4, 12, -2, 4, 12, 4, 0xd8b090]], bipedRightLeg: [[-3.9, 0, -2, 4, 12, 4, 0x2a2a33]], bipedLeftLeg: [[-0.1, 0, -2, 4, 12, 4, 0x2a2a33]] };
+const LEGS = {};
 for (const [bn, list] of Object.entries(SKIN)) for (const [x, y, z, sx, sy, sz, col] of list) {
   const o = BONES[bn]; if (!o) continue; const bp = o.userData.pivot;
   const m = new THREE.Mesh(new THREE.BoxGeometry(sx - 0.05, sy - 0.05, sz - 0.05), new THREE.MeshLambertMaterial({ color: col }));
-  m.position.set(-(x + sx / 2) - bp[0], y + sy / 2 - bp[1], z + sz / 2 - bp[2]); o.children[0].add(m);
+  m.position.set(-(x + sx / 2) - bp[0], y + sy / 2 - bp[1], z + sz / 2 - bp[2]);
+  if (bn.includes("Leg")) { const g = new THREE.Group(); g.add(m); o.children[0].add(g); LEGS[bn] = g; }   // нога доворачивается сверх 25 % кости
+  else o.children[0].add(m);
 }
 // шаг/бег: ноги и руки ходят, как у игрока
 const LIMB = { walk: [1, 35], run: [0.6, 60] };
@@ -133,7 +136,11 @@ function frame(now) {
     const rest = o.userData.rest, inner = o.children[0];
     let lx = 0;
     if (LIMB[cur]) { const [L, amp] = LIMB[cur], sw = Math.sin(2 * Math.PI * t / L) * amp * D2R;
-      if (n === "bipedRightLeg" || n === "bipedLeftArm") lx = sw; if (n === "bipedLeftLeg" || n === "bipedRightArm") lx = -sw; }
+      // руки качаются полностью; кости ног (с юбкой) — на 25 %, как в рендере брони ведьмы; сами ноги фигуры шагают полностью
+      if (n === "bipedLeftArm") lx = sw; if (n === "bipedRightArm") lx = -sw;
+      if (n === "bipedRightLeg") lx = sw * 0.25; if (n === "bipedLeftLeg") lx = -sw * 0.25;
+      if (LEGS[n]) LEGS[n].rotation.x = (n === "bipedRightLeg" ? sw : -sw) * 0.75; }
+    else if (LEGS[n]) LEGS[n].rotation.x = 0;
     inner.rotation.set(-rest[0] - r[0] * D2R + lx, -rest[1] - r[1] * D2R, rest[2] + r[2] * D2R, "ZYX");
     inner.scale.set(s[0], s[1], s[2]); inner.position.set(p[0], p[1], p[2]);
   }

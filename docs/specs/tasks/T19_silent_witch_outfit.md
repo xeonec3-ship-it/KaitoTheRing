@@ -5,7 +5,9 @@
 пелерина с золотым зигзагом, золотой узор по переду, ромбики по юбке, короткие пышные рукава, зелёная ленточка, кот Неро на плече.
 **Модель готова:** `tools/gen_silent_outfit.py` → `geo/armor/silent_witch_armor.geo.json`, `animations/armor/silent_witch_armor.animation.json`
 (idle / walk / run / cast), `textures/armor/silent_witch_armor.png` (128×128, своя прорисовка у каждой части) и `_glowmask.png`;
-превью — `tools/outfit_preview.html`. Кости для кода: `cape`, `cape_low`, `hood_tip`, `hem_r`, `hem_l`, `nero`, `nero_head`, `nero_eyes`, `nero_tail`.
+превью — `tools/outfit_preview.html`. **Рендер:** юбка сидит на костях ног — в рендере брони ведьмы поворачивать
+`bipedRightLeg` / `bipedLeftLeg` только на 25 % от поворота ноги игрока (переопределить `applyBaseTransformations`), иначе платье на шаге
+разъезжается пополам (замечание владельца 19.11). Кости для кода: `cape`, `cape_low`, `hood_tip`, `hem_r`, `hem_l`, `nero`, `nero_head`, `nero_eyes`, `nero_tail`.
 
 ## Предметы
 

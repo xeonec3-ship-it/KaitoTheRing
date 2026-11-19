@@ -8,7 +8,9 @@
 
 Текстура 128x128: у каждой части своя прорисовка (складки, светотень, затемнение книзу, полосы и узоры — прямо на ткани),
 а не один мелкий узор на все грани. GeckoLib-броня: одна геометрия на комплект с костями armorHead / armorBody / armorRightArm /
-armorLeftArm / armorRightLeg / armorLeftLeg; колышутся свои кости: cape (пелерина), cape_low (задний клин юбки), hood_tip, hem_r / hem_l
+armorLeftArm / armorRightLeg / armorLeftLeg. ВАЖНО для кода: юбка сидит на костях ног, поэтому рендер брони ведьмы должен
+поворачивать кости ног (bipedRightLeg / bipedLeftLeg) только на 25 % от поворота ноги игрока — иначе платье на шаге разъезжается
+пополам (переопределить applyBaseTransformations в GeoArmorRenderer). Колышутся свои кости: cape (пелерина), cape_low (задний клин юбки), hood_tip, hem_r / hem_l
 (низ юбки), кот — nero, nero_head, nero_eyes, nero_tail.
 
 Выход (assets/pohsmp_core): geo/armor/silent_witch_armor.geo.json, animations/armor/silent_witch_armor.animation.json,
@@ -287,7 +289,7 @@ def build():
     # ---- юбка на ногах: широкая, расклешённая, до середины голени; низ колышется
     for s, bn, hem in ((-1, 'armorRightLeg', 'hem_r'), (1, 'armorLeftLeg', 'hem_l')):
         px = s * 1.9
-        x_in, x_out = 0.0, px + s * 2.9                                  # половина юбки: от середины тела до бока
+        x_in, x_out = -s * 0.6, px + s * 2.9                             # половина юбки: заходит за середину — половины перекрываются, щели нет
         box(bn, min(x_in, x_out), 7.0, -3.0, max(x_in, x_out), 12.4, 3.0, 'skirt_top')
         bone(hem, bn, [px, 7.0, 0])
         xo2 = px + s * 3.8

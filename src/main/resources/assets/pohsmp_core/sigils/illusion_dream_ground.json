@@ -1,0 +1,229 @@
+{
+ "comment": "Сон бабочки, каст 12 с: мифическая печать под заклинателем — большая бабочка с ячейками-лунами, кольцо фаз луны, циферблат сна, надпись; прорисовывается 2 с, к 4 с полностью; трещины «как стекло». Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 4.6,
+ "color": "#C9A8FF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": -0.01,
+   "color": "#3A2A5A",
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 60
+   }
+  },
+  {
+   "id": "rays",
+   "type": "spokes",
+   "texture": "rays",
+   "radius": 1.4,
+   "heightOffset": -0.005,
+   "color": "#EFE6FF",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1
+   }
+  },
+  {
+   "id": "dream",
+   "type": "disc",
+   "texture": "illusion_dream",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 38,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 2
+   }
+  },
+  {
+   "id": "ghost_pink",
+   "type": "disc",
+   "texture": "illusion_dream",
+   "radius": 1.035,
+   "heightOffset": 0.006,
+   "color": "#FFB8E6",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 30,
+    "duration": 20,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -3
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 23
+   }
+  },
+  {
+   "id": "ghost_blue",
+   "type": "disc",
+   "texture": "illusion_dream",
+   "radius": 0.968,
+   "heightOffset": 0.008,
+   "color": "#9AE6FF",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 33,
+    "duration": 20,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 4
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 31
+   }
+  },
+  {
+   "id": "seal",
+   "type": "band",
+   "texture": "school_illusion_band",
+   "radius": 1.18,
+   "heightOffset": 0.012,
+   "color": "#EFE6FF",
+   "brightness": 0.9,
+   "inner": 0.9,
+   "repeat": 12,
+   "appear": {
+    "delay": 18,
+    "duration": 24,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": -4
+   }
+  },
+  {
+   "id": "words",
+   "type": "text",
+   "radius": 1.27,
+   "heightOffset": 0.02,
+   "color": "#FFB8E6",
+   "brightness": 0.85,
+   "appear": {
+    "delay": 30,
+    "duration": 30,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 1.5
+   },
+   "text": "SOMNIUM PAPILIONIS ✦ QUIS SOMNIAT ✦ ",
+   "font": "latin",
+   "size": 0.06,
+   "repeat": 2,
+   "side": "outer"
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.34,
+   "heightOffset": 0.025,
+   "color": "#9AE6FF",
+   "brightness": 0.9,
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 40,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  },
+  {
+   "id": "stars",
+   "type": "disc",
+   "texture": "orbit_stars",
+   "radius": 1.5,
+   "heightOffset": 0.03,
+   "color": "#EFE6FF",
+   "brightness": 0.5,
+   "appear": {
+    "delay": 50,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -2
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.25,
+  "duration": 14,
+  "sparks": 40
+ },
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 20,
+  "stagger": 2
+ },
+ "groundLight": {
+  "radius": 0.8,
+  "strength": 0.5
+ }
+}

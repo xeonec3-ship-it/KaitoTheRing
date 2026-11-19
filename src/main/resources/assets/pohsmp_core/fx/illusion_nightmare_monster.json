@@ -1,0 +1,15 @@
+{
+ "comment": "Кошмар наяву: безликое чудовище (для превью и как запасной вариант): mesh illusion_nightmare на месте существа, follow. Клиент жертвы рисует ТО ЖЕ чудовище вместо каждого игрока/моба (см. письмо), рост модели — 1.95 (масштаб под рост сущности: scale = рост / 1.95). Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "model": "illusion_nightmare",
+   "until": 56
+  }
+ ]
+}

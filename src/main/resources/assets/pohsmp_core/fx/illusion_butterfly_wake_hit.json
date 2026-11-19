@@ -1,0 +1,66 @@
+{
+ "comment": "Сон бабочки: накопленный иллюзорный урон становится настоящим (target = жертва): бабочки вокруг неё вспыхивают и бьются в неё осколками, трещина-вспышка у груди, розово-белая вспышка, звон. 20 тиков. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 22,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "target+0,1.1,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 36,
+   "rate": 12,
+   "spread": 1.4,
+   "speed": -0.12,
+   "gravity": 0,
+   "spin": 260,
+   "tumble": 1,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 12,
+   "color": "#EFE6FF",
+   "comment": "осколки летят В цель"
+  },
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "target+0,1.2,0",
+   "follow": true,
+   "id": "illusion_mirror_crack",
+   "scale": 1.1,
+   "until": 16,
+   "orientation": "billboard"
+  },
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "target+0,1.2,0",
+   "follow": true,
+   "duration": 8,
+   "size": 2.0,
+   "rays": 8,
+   "color": "#FFB8E6"
+  },
+  {
+   "type": "sprites",
+   "delay": 8,
+   "at": "target+0,1.2,0",
+   "duration": 2,
+   "texture": "spark_sharp",
+   "count": 24,
+   "rate": 12,
+   "spread": 0.3,
+   "speed": 0.16,
+   "gravity": 0.004,
+   "size": [
+    0.2,
+    0.02
+   ],
+   "life": 14,
+   "color": "#FFFFFF"
+  }
+ ]
+}

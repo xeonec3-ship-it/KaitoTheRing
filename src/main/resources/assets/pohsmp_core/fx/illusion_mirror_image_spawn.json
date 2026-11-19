@@ -1,0 +1,49 @@
+{
+ "comment": "Отражения: появление фигуры (caster = фигура: каждая копия И настоящий маг — одинаково). Короткая дрожь воздуха по росту, 3 блика; 10 тиков. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 10,
+   "thickness": 0.05,
+   "pulse": [
+    0.4,
+    4
+   ],
+   "motes": 0,
+   "color": "#EFE6FF",
+   "brightness": 0.5,
+   "in": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 4,
+   "rate": 2,
+   "spread": 0.4,
+   "speed": 0.03,
+   "gravity": 0.003,
+   "spin": 120,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 10,
+   "color": "@primary"
+  }
+ ]
+}

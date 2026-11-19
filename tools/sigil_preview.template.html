@@ -1364,6 +1364,25 @@ const SCENES = {
   "Благословение: каст": () => [new FxRun("blessing_cast", { caster: new THREE.Vector3(0, 0, -6), noLift: true, faceCaster: true })],
   "Благословение: нимб-печать": () => { caster.visible = false; return [new Sigil("blessing_halo", new THREE.Vector3(0, 2.7, 0))]; },
   "Благословение: круг на земле": () => [new Sigil("blessing_ground", new THREE.Vector3(0, 0.02, 0))],
+  // T22 — школа «Иллюзии» (tools/gen_illusion_fx.py)
+  "Иллюзии: печать школы и венец": () => [new Sigil("illusion_seal", new THREE.Vector3(0, 0.02, 0), { stopAfter: 140 }), new Sigil("illusion_crown", new THREE.Vector3(0, 2.55, 0), { t0: 10, stopAfter: 130 })],
+  "Иллюзии: знак обычного каста": () => [new Sigil("school_illusion", new THREE.Vector3(0, 0.02, 0))],
+  "Иллюзии: Божественная ступень": () => [new FxRun("school_illusion_cast_divine", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Отражения": () => [new FxRun("illusion_mirror_images_cast", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Пелена": () => [new FxRun("illusion_veil", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Фантомная боль (метка)": () => [new FxRun("illusion_phantom_pain_mark", { caster: new THREE.Vector3(0, 0, -6), noLift: true, faceCaster: true })],
+  "Иллюзии: возврат иллюзорного урона": () => [new FxRun("illusion_return", { caster: new THREE.Vector3(0, 0, -6), noLift: true, faceCaster: true })],
+  "Иллюзии: Чужое лицо": () => [new FxRun("illusion_borrowed_face", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Лабиринт — каст": () => [new FxRun("illusion_labyrinth_cast", { caster: new THREE.Vector3(0, 0, 0), noTarget: true }), new Sigil("illusion_maze_ground", new THREE.Vector3(0, 0.03, 0), { stopAfter: 80 })],
+  "Иллюзии: Лабиринт — купол": () => [new FxRun("illusion_labyrinth", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: зеркальная стена (модель)": () => [new Portal("illusion_mirror_wall", new THREE.Vector3(0, 0, 0), { noAuto: true }), new Portal("illusion_mirror_wall", new THREE.Vector3(1, 0, 0), { noAuto: true }), new Portal("illusion_mirror_wall", new THREE.Vector3(-1, 0, 0), { noAuto: true })],
+  "Иллюзии: Лабиринт — вход в стену": () => [new FxRun("illusion_labyrinth_wall_hit", { caster: new THREE.Vector3(0, 0, -2), noTarget: true, points: { hit: [0, 1.4, 0] } }), new Portal("illusion_mirror_wall", new THREE.Vector3(0, 0, 0.1), { noAuto: true })],
+  "Иллюзии: Кошмар — каст": () => [new FxRun("illusion_nightmare_cast", { caster: new THREE.Vector3(0, 0, -6), noLift: true, faceCaster: true }), new Sigil("illusion_nightmare_ground", new THREE.Vector3(0, 0.03, -6), { stopAfter: 70 })],
+  "Иллюзии: безликое чудовище (модель)": () => { caster.visible = false; return [new Portal("illusion_nightmare", new THREE.Vector3(0, 0, 0), { noAuto: true, yaw: 180 })]; },
+  "Иллюзии: Сон бабочки — каст": () => [new FxRun("illusion_butterfly_cast", { caster: new THREE.Vector3(0, 0, 0), noTarget: true, points: { touch: [0, 1.4, 0.65] } })],
+  "Иллюзии: стеклянная бабочка (модель)": () => { caster.visible = false; return [new Portal("illusion_butterfly", new THREE.Vector3(0, 1, 0), { noAuto: true, scale: 2.5 })]; },
+  "Иллюзии: Сон бабочки — проявление": () => [new FxRun("illusion_butterfly_reveal", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Сон бабочки — пробуждение": () => [new FxRun("illusion_butterfly_wake", { caster: new THREE.Vector3(0, 0, 0), noTarget: true }), new FxRun("illusion_butterfly_wake_hit", { caster: new THREE.Vector3(0, 0, 0), noLift: true })],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
 // небесная печать Silent Gate с разборкой «трещины» — только для превью (сам файл не меняется)
@@ -1393,6 +1412,26 @@ for (const [s, ru] of Object.entries(SCHOOL_RU)) {
 }
 SCENES["Школы: все печати"] = () => Object.keys(SCHOOL_RU).map((s, i) => new Sigil(s + "_seal", new THREE.Vector3(((i % 5) - 2) * 6, 0.02, (Math.floor(i / 5) - 0.5) * 6.5), { t0: i * 3, stopAfter: 150 }));
 MAIN_ID["Школы: все печати"] = "fire_seal"; VIEW_FOR["Школы: все печати"] = "gallery";
+
+// T22: главный файл и вид камеры для сцен «Иллюзии»
+MAIN_ID["Иллюзии: печать школы и венец"] = "illusion_seal"; VIEW_FOR["Иллюзии: печать школы и венец"] = "school";
+MAIN_ID["Иллюзии: знак обычного каста"] = "school_illusion"; VIEW_FOR["Иллюзии: знак обычного каста"] = "close";
+MAIN_ID["Иллюзии: Божественная ступень"] = "school_illusion_cast_divine"; VIEW_FOR["Иллюзии: Божественная ступень"] = "volley";
+MAIN_ID["Иллюзии: Отражения"] = "illusion_mirror_images_cast"; VIEW_FOR["Иллюзии: Отражения"] = "close";
+MAIN_ID["Иллюзии: Пелена"] = "illusion_veil"; VIEW_FOR["Иллюзии: Пелена"] = "side";
+MAIN_ID["Иллюзии: Фантомная боль (метка)"] = "illusion_phantom_pain_mark"; VIEW_FOR["Иллюзии: Фантомная боль (метка)"] = "t21";
+MAIN_ID["Иллюзии: возврат иллюзорного урона"] = "illusion_return"; VIEW_FOR["Иллюзии: возврат иллюзорного урона"] = "t21";
+MAIN_ID["Иллюзии: Чужое лицо"] = "illusion_borrowed_face"; VIEW_FOR["Иллюзии: Чужое лицо"] = "close";
+MAIN_ID["Иллюзии: Лабиринт — каст"] = "illusion_labyrinth_cast"; VIEW_FOR["Иллюзии: Лабиринт — каст"] = "volley";
+MAIN_ID["Иллюзии: Лабиринт — купол"] = "illusion_labyrinth"; VIEW_FOR["Иллюзии: Лабиринт — купол"] = "dome";
+MAIN_ID["Иллюзии: зеркальная стена (модель)"] = "illusion_mirror_wall"; VIEW_FOR["Иллюзии: зеркальная стена (модель)"] = "close";
+MAIN_ID["Иллюзии: Лабиринт — вход в стену"] = "illusion_labyrinth_wall_hit"; VIEW_FOR["Иллюзии: Лабиринт — вход в стену"] = "close";
+MAIN_ID["Иллюзии: Кошмар — каст"] = "illusion_nightmare_cast"; VIEW_FOR["Иллюзии: Кошмар — каст"] = "t21";
+MAIN_ID["Иллюзии: безликое чудовище (модель)"] = "illusion_nightmare"; VIEW_FOR["Иллюзии: безликое чудовище (модель)"] = "close";
+MAIN_ID["Иллюзии: Сон бабочки — каст"] = "illusion_butterfly_cast"; VIEW_FOR["Иллюзии: Сон бабочки — каст"] = "dream";
+MAIN_ID["Иллюзии: стеклянная бабочка (модель)"] = "illusion_butterfly"; VIEW_FOR["Иллюзии: стеклянная бабочка (модель)"] = "close";
+MAIN_ID["Иллюзии: Сон бабочки — проявление"] = "illusion_butterfly_reveal"; VIEW_FOR["Иллюзии: Сон бабочки — проявление"] = "close";
+MAIN_ID["Иллюзии: Сон бабочки — пробуждение"] = "illusion_butterfly_wake"; VIEW_FOR["Иллюзии: Сон бабочки — пробуждение"] = "dream";
 
 let hitQueue = [], nextAutoHit = 24;
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -1428,6 +1467,7 @@ let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
 const VIEWS = { whip: [1.35, 0.18, 8, 1.0], hit: [0.55, 0.78, 8.5, 0.2], hitBig: [0.55, 0.62, 13, 0.2], barrier: [0.45, 0.12, 6.2, 1.0], crackSky: [0.45, -0.12, 26, 7.5], ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], dial: [3.14, 0.05, 6.5, 2.2], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 VIEWS.t21 = [1.15, 0.2, 13, 1.8]; VIEWS.t21lock = [0.4, -0.35, 6.5, 2.6]; VIEWS.t21chest = [0.25, 0.1, 3.4, 1.3];   // T21
 VIEWS.school = [0.55, 0.55, 9.5, 1.1]; VIEWS.gallery = [0.0, 1.32, 27, 0];   // сцены «Школа: …» (T06)
+VIEWS.dome = [0.6, 0.35, 40, 3]; VIEWS.dream = [0.5, 0.3, 22, 3];   // T22, «Иллюзии»
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

@@ -1,0 +1,66 @@
+{
+ "comment": "Зеркальный лабиринт: враг вошёл в зеркальную стену (point:hit — точка входа на стене, caster = жертва; видит только жертва): звон, осколки летят из стены навстречу, трещина-вспышка на стекле, короткая белая засветка экрана. Иллюзорный урон и отталкивание — код. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "point:hit",
+   "id": "illusion_mirror_crack",
+   "scale": 0.7,
+   "until": 14
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "point:hit",
+   "duration": 6,
+   "size": 1.4,
+   "rays": 8,
+   "screen": 0.2,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "point:hit",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 30,
+   "rate": 15,
+   "spread": 0.3,
+   "speed": 0.2,
+   "gravity": 0.012,
+   "spin": 260,
+   "tumble": 1,
+   "size": [
+    0.28,
+    0.08
+   ],
+   "life": 20,
+   "color": "#EFE6FF",
+   "glow": 0.3,
+   "cone": 120
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "point:hit",
+   "duration": 2,
+   "texture": "spark_sharp",
+   "count": 14,
+   "rate": 7,
+   "spread": 0.2,
+   "speed": 0.18,
+   "gravity": 0.006,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 12,
+   "color": "#FFB8E6",
+   "cone": 140
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+ "comment": "Фантомная боль, каст 0.8 с (caster; связи с целью нет — метку цели даёт illusion_phantom_pain_mark): указ ладонью, у ладони вспыхивает малое сердце-метка и гаснет. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 18,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 4,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "illusion_phantom_hand",
+   "until": 16
+  },
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster.hand",
+   "follow": true,
+   "duration": 6,
+   "size": 0.7,
+   "rays": 4,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 8,
+   "at": "caster.hand",
+   "duration": 2,
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.1,
+   "speed": 0.05,
+   "gravity": 0.001,
+   "size": [
+    0.1,
+    0.0
+   ],
+   "life": 10,
+   "color": "@secondary"
+  }
+ ]
+}

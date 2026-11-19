@@ -1,0 +1,104 @@
+{
+ "comment": "Пелена: марево r6 на земле (10 с) — дрожащие кольца, редкие бабочки, слабая калейдоскопическая печать; почти прозрачное (это воздух дрожит, а не круг горит). Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 6.0,
+ "color": "#C9A8FF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.9,
+   "heightOffset": -0.01,
+   "color": "#3A2A5A",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "haze",
+   "type": "disc",
+   "texture": "illusion_veil_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.55,
+   "appear": {
+    "delay": 0,
+    "duration": 26,
+    "easing": "easeOutSine",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2.5
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 50
+   }
+  },
+  {
+   "id": "haze2",
+   "type": "disc",
+   "texture": "illusion_veil_ring",
+   "radius": 0.97,
+   "heightOffset": 0.005,
+   "color": "#FFB8E6",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 6,
+    "duration": 26,
+    "easing": "easeOutSine",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -3.5
+   },
+   "pulse": {
+    "amp": 0.4,
+    "period": 37
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "illusion_seal",
+   "radius": 0.42,
+   "heightOffset": 0.01,
+   "brightness": 0.35,
+   "appear": {
+    "delay": 4,
+    "duration": 20,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -4
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

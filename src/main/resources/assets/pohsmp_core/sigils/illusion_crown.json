@@ -1,0 +1,130 @@
+{
+ "comment": "T22, школа «Иллюзии»: венец над головой мага для ступеней Мифическая и Божественная — зеркальные иглы, бабочки, звезда-призма; раскрывается из ребра, двоится. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 0.75,
+ "color": "#EFE6FF",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.8,
+   "heightOffset": -0.01,
+   "color": "#3A2A5A",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "crown",
+   "type": "disc",
+   "texture": "illusion_crown",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 2,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -14,
+    "boost": 2
+   }
+  },
+  {
+   "id": "ghost_pink",
+   "type": "disc",
+   "texture": "illusion_crown",
+   "radius": 1.035,
+   "heightOffset": 0.012,
+   "color": "#FFB8E6",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 10,
+    "duration": 10,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 10
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 23
+   }
+  },
+  {
+   "id": "ghost_blue",
+   "type": "disc",
+   "texture": "illusion_crown",
+   "radius": 0.968,
+   "heightOffset": 0.014,
+   "color": "#9AE6FF",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 13,
+    "duration": 10,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -16
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 31
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "thin_ring",
+   "radius": 1.12,
+   "heightOffset": 0.02,
+   "color": "#FFB8E6",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 8,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.3,
+  "duration": 8,
+  "sparks": 14
+ },
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 12,
+  "stagger": 0
+ }
+}

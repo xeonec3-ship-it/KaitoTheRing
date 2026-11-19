@@ -1,0 +1,103 @@
+{
+ "comment": "T22, школа «Иллюзии», ступень Высшая (SchoolSeals): печать под магом + блики-осколки, бабочки. duration −1: код останавливает эффект в конце каста. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "illusion_seal",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.4,0",
+   "duration": 10,
+   "size": 2.2,
+   "color": "#EFE6FF",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 2,
+   "at": "caster+0,1,0",
+   "duration": 14,
+   "shape": "sphere",
+   "radius": 2.2,
+   "rim": 0.9,
+   "color": "@secondary",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "texture": "mote_glass",
+   "rate": 0.9,
+   "area": 2.0,
+   "speed": 0.008,
+   "gravity": -0.0016,
+   "spin": 90,
+   "tumble": 0.8,
+   "size": [
+    0.2,
+    0.06
+   ],
+   "life": 34,
+   "color": "@primary",
+   "glow": 0.4,
+   "follow": true,
+   "count": 4000
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,0.1,0",
+   "texture": "mote_butterfly",
+   "rate": 0.22,
+   "area": 1.8,
+   "speed": 0.012,
+   "gravity": -0.003,
+   "sway": 1.4,
+   "tumble": 0.25,
+   "size": [
+    0.26,
+    0.14
+   ],
+   "life": 50,
+   "color": "@secondary",
+   "glow": 0.5,
+   "follow": true,
+   "count": 4000
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,1.0,0",
+   "texture": "spark_soft",
+   "rate": 1.2,
+   "spread": 1.1,
+   "speed": 0.004,
+   "gravity": -0.001,
+   "size": [
+    0.08,
+    0.0
+   ],
+   "life": 24,
+   "color": "#9AE6FF",
+   "follow": true,
+   "count": 4000
+  }
+ ]
+}

@@ -1,0 +1,129 @@
+{
+ "comment": "Кошмар наяву, каст 3.5 с (70 тиков): левая ладонь закрывает глаза, правая — когтем к цели; над целью (target) собирается печать пустых очей, из-под её ног ползёт тьма; у мага — малое око в ладони, тёмные клочья у ног. Никакой линии к цели. На 66 тике печать над целью вспыхивает и сжимается в голову. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 74,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "illusion_hand_eye",
+   "until": 66
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 68,
+   "follow": true,
+   "texture": "glow",
+   "count": 200,
+   "rate": 2.2,
+   "area": 1.6,
+   "speed": 0.006,
+   "gravity": -0.002,
+   "size": [
+    0.5,
+    1.0
+   ],
+   "life": 26,
+   "color": "#1A1028",
+   "brightness": 0.7,
+   "blend": "translucent",
+   "comment": "тьма у ног мага"
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "target+0,2.6,0",
+   "follow": true,
+   "id": "illusion_nightmare_over",
+   "until": 68
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "target+0,0.1,0",
+   "duration": 58,
+   "follow": true,
+   "texture": "glow",
+   "count": 200,
+   "rate": 2.6,
+   "area": 1.2,
+   "speed": 0.008,
+   "gravity": -0.006,
+   "size": [
+    0.5,
+    1.1
+   ],
+   "life": 26,
+   "color": "#1A1028",
+   "brightness": 0.8,
+   "blend": "translucent",
+   "comment": "тьма поднимается по цели"
+  },
+  {
+   "type": "aura",
+   "delay": 20,
+   "at": "target",
+   "target": "target",
+   "duration": 50,
+   "thickness": 0.09,
+   "pulse": [
+    0.3,
+    10
+   ],
+   "motes": 10,
+   "texture": "mote_eye",
+   "color": "#6A4A9A",
+   "brightness": 0.6,
+   "in": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "tint",
+   "delay": 30,
+   "at": "target",
+   "duration": 44,
+   "radius": 3,
+   "color": "#140A20",
+   "strength": 0.3,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 66,
+   "at": "target+0,1.7,0",
+   "follow": true,
+   "duration": 8,
+   "size": 1.2,
+   "rays": 6,
+   "color": "#B08CFF"
+  },
+  {
+   "type": "wave",
+   "delay": 66,
+   "at": "target+0,1.6,0",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 1.0,
+   "rim": 1.4,
+   "color": "@primary",
+   "brightness": 0.6
+  }
+ ]
+}

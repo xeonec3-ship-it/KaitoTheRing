@@ -1,0 +1,47 @@
+{
+ "comment": "Облачко исчезновения (копия «умирает», копия «Ложного шага» пропадает): ТО ЖЕ, что у игрока при рывке — серо-белый пух, без искр и цвета школы (правило 3: никаких частиц «разоблачения»). caster = место копии. Если код рисует рывок ванильными частицами POOF, пусть и копии гасит ими же — главное, одинаково. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.9,0",
+   "duration": 2,
+   "texture": "glow",
+   "count": 16,
+   "rate": 8,
+   "spread": 0.45,
+   "speed": 0.035,
+   "gravity": -0.0015,
+   "size": [
+    0.55,
+    0.95
+   ],
+   "life": 16,
+   "color": "#ECE8F2",
+   "brightness": 0.55,
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.25,0",
+   "duration": 2,
+   "texture": "glow",
+   "count": 8,
+   "rate": 4,
+   "area": 0.5,
+   "speed": 0.02,
+   "gravity": -0.001,
+   "size": [
+    0.45,
+    0.8
+   ],
+   "life": 14,
+   "color": "#ECE8F2",
+   "brightness": 0.45,
+   "blend": "translucent"
+  }
+ ]
+}

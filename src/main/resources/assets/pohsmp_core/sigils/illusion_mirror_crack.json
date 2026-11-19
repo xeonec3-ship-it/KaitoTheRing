@@ -1,0 +1,84 @@
+{
+ "comment": "Трещина в воздухе (Сон бабочки, 4–8 с; Лабиринт — вход в стену): точка касания, от неё бегут трещины по невидимому зеркалу (facing, лицом к заклинателю/по взгляду). Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 1.0,
+ "color": "#EFE6FF",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.4,
+   "heightOffset": -0.01,
+   "color": "#FFFFFF",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 10
+   }
+  },
+  {
+   "id": "cracks",
+   "type": "disc",
+   "texture": "illusion_world_cracks",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 26,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "ghost",
+   "type": "disc",
+   "texture": "illusion_world_cracks",
+   "radius": 1.03,
+   "heightOffset": 0.004,
+   "color": "#FFB8E6",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 6,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.6
+   }
+  }
+ ],
+ "expand": {
+  "scale": 1.15,
+  "delay": 0,
+  "duration": 30,
+  "easing": "easeOutSine"
+ },
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 12,
+  "stagger": 2
+ }
+}

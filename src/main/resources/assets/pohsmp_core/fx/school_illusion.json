@@ -1,0 +1,85 @@
+{
+ "comment": "Каст обычной магии школы «Иллюзии» (PohSpell.onCast): знак под магом, рябь-сфера (воздух дрогнул), осколки-блики и пара бабочек. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 36,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "school_illusion",
+   "follow": true
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 1.6,
+   "rim": 0.8,
+   "color": "@primary",
+   "brightness": 0.6
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 3.0,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 8,
+   "size": 1.6,
+   "color": "#EFE6FF",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,0.2,0",
+   "duration": 26,
+   "follow": true,
+   "texture": "mote_glass",
+   "count": 14,
+   "rate": 1.0,
+   "area": 1.6,
+   "speed": 0.02,
+   "gravity": -0.003,
+   "spin": 100,
+   "tumble": 0.8,
+   "size": [
+    0.22,
+    0.08
+   ],
+   "life": 22,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.6,0",
+   "duration": 10,
+   "follow": true,
+   "texture": "mote_butterfly",
+   "count": 3,
+   "rate": 0.4,
+   "area": 1.0,
+   "speed": 0.02,
+   "gravity": -0.006,
+   "sway": 1.2,
+   "size": [
+    0.24,
+    0.16
+   ],
+   "life": 26,
+   "color": "@secondary",
+   "glow": 0.4
+  }
+ ]
+}

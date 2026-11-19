@@ -1,0 +1,148 @@
+{
+ "comment": "Зеркальный лабиринт, каст 4 с (80 тиков; caster): ладони чертят квадрат, по кругу из земли растут тонкие зеркальные «пластины» (лучи-завеса), осколки кружат; на 76 тике ладони вниз — удар, вспышка, волна до r14 (дальше зону держит illusion_labyrinth). Печать под ногами — отдельно illusion_labyrinth_seal. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 90,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "illusion_hand_eye",
+   "until": 74
+  },
+  {
+   "type": "trail",
+   "delay": 8,
+   "at": "caster.hand",
+   "duration": 40,
+   "follow": true,
+   "width": 0.05,
+   "length": 14,
+   "fade": 1.2,
+   "head": 1.4,
+   "color": "@secondary",
+   "comment": "ладонь чертит квадрат (анимация 0.4–2.4 с)"
+  },
+  {
+   "type": "curtain",
+   "delay": 14,
+   "at": "caster",
+   "duration": 66,
+   "radius": [
+    2.4,
+    3.4
+   ],
+   "count": 18,
+   "height": [
+    1.4,
+    2.8
+   ],
+   "grow": 30,
+   "width": [
+    0.08,
+    0.16
+   ],
+   "brightness": [
+    0.25,
+    0.5
+   ],
+   "flicker": 0.25,
+   "texture": "beam_fade",
+   "color": "#EFE6FF",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "comment": "пластины-зеркала растут"
+  },
+  {
+   "type": "vortex",
+   "delay": 10,
+   "at": "caster+0,0.15,0",
+   "duration": 66,
+   "radius": 3.2,
+   "height": 0,
+   "arms": 4,
+   "speed": 3,
+   "pull": 0.4,
+   "texture": "mote_glass",
+   "particles": 50,
+   "life": 30,
+   "size": 0.18,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,0.3,0",
+   "duration": 46,
+   "follow": true,
+   "texture": "mote_butterfly",
+   "count": 20,
+   "rate": 0.45,
+   "area": 2.6,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "sway": 1.4,
+   "size": [
+    0.26,
+    0.18
+   ],
+   "life": 40,
+   "color": "@secondary",
+   "glow": 0.4
+  },
+  {
+   "type": "flash",
+   "delay": 76,
+   "at": "caster+0,0.4,0",
+   "duration": 10,
+   "size": 3.2,
+   "rays": 8,
+   "anamorphic": 5,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "wave",
+   "delay": 76,
+   "at": "caster",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 14,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 76,
+   "at": "caster+0,0.5,0",
+   "duration": 24,
+   "shape": "sphere",
+   "radius": 14,
+   "rim": 1.2,
+   "color": "#EFE6FF",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 76,
+   "at": "caster+0,0.3,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 14,
+   "area": 1.5,
+   "speed": 0.2,
+   "gravity": 0.006,
+   "spin": 200,
+   "tumble": 1,
+   "size": [
+    0.26,
+    0.06
+   ],
+   "life": 22,
+   "color": "@primary",
+   "glow": 0.3
+  }
+ ]
+}

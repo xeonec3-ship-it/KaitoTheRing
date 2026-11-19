@@ -1,0 +1,195 @@
+{
+ "comment": "T22, школа «Иллюзии», ступени Высшая/Мифическая/Божественная: печать под магом на время каста (hold −1). Зеркальные окна, калейдоскоп, бабочки, трещины; осколки слетаются и встают со вспышкой, края двоятся (розовая и голубая тени вращаются врозь), ядро — око над чертой зеркала; распад — разбивается. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 2.4,
+ "color": "#C9A8FF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": -0.01,
+   "color": "#3A2A5A",
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "illusion_seal",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 2,
+    "duration": 28,
+    "easing": "easeOutBack",
+    "modes": [
+     "pieces"
+    ],
+    "pieces": {
+     "count": 12,
+     "order": "scatter",
+     "pieceTime": 0.4,
+     "fly": 0.55,
+     "lift": 0.45,
+     "orbit": 40,
+     "tilt": 75,
+     "spin": 140,
+     "lockFlash": 1.3
+    }
+   },
+   "rotation": {
+    "speed": -7
+   }
+  },
+  {
+   "id": "ghost_pink",
+   "type": "disc",
+   "texture": "illusion_seal",
+   "radius": 1.035,
+   "heightOffset": 0.014,
+   "color": "#FFB8E6",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 24,
+    "duration": 12,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -5
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 23
+   }
+  },
+  {
+   "id": "ghost_blue",
+   "type": "disc",
+   "texture": "illusion_seal",
+   "radius": 0.968,
+   "heightOffset": 0.016,
+   "color": "#9AE6FF",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 27,
+    "duration": 12,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 7
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 31
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_illusion_band",
+   "radius": 1.22,
+   "heightOffset": 0.02,
+   "color": "#EFE6FF",
+   "brightness": 0.85,
+   "inner": 0.88,
+   "repeat": 10,
+   "appear": {
+    "delay": 14,
+    "duration": 16,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": 10,
+    "boost": 2
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "illusion_core",
+   "radius": 0.4,
+   "heightOffset": 0.03,
+   "color": "#FFFFFF",
+   "appear": {
+    "delay": 24,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 12
+   }
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.3,
+   "heightOffset": 0.04,
+   "color": "#9AE6FF",
+   "brightness": 0.8,
+   "count": 3,
+   "arcLength": 70,
+   "width": 0.03,
+   "appear": {
+    "delay": 28,
+    "duration": 10,
+    "easing": "easeInOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -18,
+    "boost": 3
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.35,
+  "duration": 10,
+  "sparks": 30
+ },
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 16,
+  "stagger": 2
+ },
+ "groundLight": {
+  "radius": 0.7,
+  "strength": 0.45
+ }
+}

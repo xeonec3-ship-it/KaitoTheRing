@@ -1,0 +1,78 @@
+{
+ "comment": "Чужое лицо: рябь при смене облика / спадании (0.6 с) — зеркальное око вспыхивает перед лицом и расходится кругами, двоится. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 0.42,
+ "color": "#EFE6FF",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": 2,
+ "layers": [
+  {
+   "id": "eye",
+   "type": "disc",
+   "texture": "illusion_mirror_eye",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.8,
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "ghost",
+   "type": "disc",
+   "texture": "illusion_mirror_eye",
+   "radius": 1.1,
+   "heightOffset": 0.005,
+   "color": "#FFB8E6",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 1,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -30
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "wave_ring",
+   "radius": 1.5,
+   "heightOffset": 0.01,
+   "color": "#9AE6FF",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  }
+ ],
+ "expand": {
+  "scale": 1.6,
+  "delay": 0,
+  "duration": 10,
+  "easing": "easeOutCubic"
+ },
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 6,
+  "stagger": 2
+ }
+}

@@ -1,0 +1,25 @@
+{
+ "comment": "Стиль школы «Иллюзии» (T22): перламутрово-лиловый, розовые и голубые блики, тень #3A2A5A; осколки зеркала, стеклянные бабочки; движение плавное, с лёгким дрожанием (марево). Сгенерировано tools/gen_illusion_fx.py.",
+ "palette": {
+  "primary": "#C9A8FF",
+  "secondary": "#FFB8E6",
+  "core": "#FFFFFF",
+  "shadow": "#3A2A5A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_illusion_band",
+  "shards": "mote_glass",
+  "sigil": "illusion_seal"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.8,
+  "jitter": 0.12,
+  "easing": "easeOutSine",
+  "pulse": {
+   "amp": 0.1,
+   "period": 23
+  }
+ }
+}

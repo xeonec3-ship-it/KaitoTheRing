@@ -1,0 +1,30 @@
+{
+ "comment": "Пелена: настоящая модель «пропала» на миг / фальшивый силуэт мигнул (видит только враг в мареве — код). Едва заметная рябь по росту, 6 тиков; caster = фигура. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 8,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 6,
+   "thickness": 0.04,
+   "pulse": [
+    0.6,
+    3
+   ],
+   "motes": 0,
+   "color": "#EFE6FF",
+   "brightness": 0.35,
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 5,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

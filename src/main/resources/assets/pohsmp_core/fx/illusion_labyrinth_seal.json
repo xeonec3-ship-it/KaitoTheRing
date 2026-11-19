@@ -1,0 +1,23 @@
+{
+ "comment": "Зеркальный лабиринт: печать-лабиринт под заклинателем на время каста (код запускает, если SchoolSeals.shown(caster) == false — иначе под ногами уже печать ступени). duration −1, гасит код. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "illusion_maze_ground",
+   "follow": true
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 4.0,
+   "color": "@primary"
+  }
+ ]
+}

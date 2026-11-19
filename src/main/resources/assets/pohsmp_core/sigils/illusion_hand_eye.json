@@ -1,0 +1,85 @@
+{
+ "comment": "Малое зеркальное око у ладони (касты «Отражений», «Кошмара»), смотрит вперёд. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 0.24,
+ "color": "#EFE6FF",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.4,
+   "heightOffset": -0.01,
+   "color": "#C9A8FF",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 12
+   }
+  },
+  {
+   "id": "eye",
+   "type": "disc",
+   "texture": "illusion_mirror_eye",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0
+   }
+  },
+  {
+   "id": "ghost",
+   "type": "disc",
+   "texture": "illusion_mirror_eye",
+   "radius": 1.07,
+   "heightOffset": 0.004,
+   "color": "#FFB8E6",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 3,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -14
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.4,
+  "duration": 4,
+  "sparks": 4
+ },
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 6,
+  "stagger": 2
+ }
+}

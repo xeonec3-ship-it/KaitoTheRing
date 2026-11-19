@@ -1,0 +1,98 @@
+{
+ "comment": "Возврат иллюзорного урона (общий для школы: метка «Фантомной боли» пережита, «Лабиринт», «Сон бабочки» — где урон возвращается): 1 с (20 тиков), target = цель. Перламутровые искры сходятся к груди со всех сторон, мягко светится оболочка, в конце тихая вспышка. Здоровье код поднимает плавно за эти же 20 тиков. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "target+0,1.1,0",
+   "duration": 20,
+   "radius": 1.3,
+   "height": 0,
+   "arms": 3,
+   "speed": 6,
+   "pull": 1,
+   "texture": "spark_soft",
+   "particles": 40,
+   "life": 16,
+   "size": 0.12,
+   "color": "#EFE6FF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "target+0,1.1,0",
+   "duration": 16,
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 60,
+   "rate": 3.5,
+   "spread": 1.0,
+   "speed": -0.05,
+   "gravity": 0,
+   "size": [
+    0.14,
+    0.03
+   ],
+   "life": 14,
+   "color": "#FFB8E6",
+   "glow": 0.5,
+   "comment": "speed < 0: летят к центру"
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "target+0,1.1,0",
+   "duration": 14,
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 40,
+   "rate": 3,
+   "spread": 1.0,
+   "speed": -0.05,
+   "gravity": 0,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 14,
+   "color": "#9AE6FF",
+   "glow": 0.5
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "target",
+   "target": "target",
+   "duration": 22,
+   "thickness": 0.08,
+   "pulse": [
+    0.15,
+    8
+   ],
+   "motes": 10,
+   "texture": "spark_soft",
+   "color": "#EFE6FF",
+   "in": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 18,
+   "at": "target+0,1.1,0",
+   "follow": true,
+   "duration": 8,
+   "size": 1.0,
+   "rays": 4,
+   "color": "#FFFFFF",
+   "brightness": 0.7
+  }
+ ]
+}

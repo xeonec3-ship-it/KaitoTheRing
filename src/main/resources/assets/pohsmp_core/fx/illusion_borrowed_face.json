@@ -1,0 +1,50 @@
+{
+ "comment": "Чужое лицо: смена облика (caster; 12 тиков, видят все): жест ладонью по лицу (анимация), на 8 тике рябь по всему телу и малое зеркальное око перед лицом расходится кругом. Ровно в этот тик код меняет скин/ник. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "caster.eyes+0,0,0.35",
+   "follow": true,
+   "id": "illusion_face_ripple",
+   "until": 16
+  },
+  {
+   "type": "aura",
+   "delay": 8,
+   "at": "caster",
+   "target": "caster",
+   "duration": 10,
+   "thickness": 0.07,
+   "pulse": [
+    0.6,
+    3
+   ],
+   "motes": 4,
+   "texture": "mote_glass",
+   "color": "#EFE6FF",
+   "brightness": 0.7,
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 9,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "wave",
+   "delay": 8,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 1.3,
+   "rim": 1.0,
+   "color": "@primary",
+   "brightness": 0.5
+  }
+ ]
+}

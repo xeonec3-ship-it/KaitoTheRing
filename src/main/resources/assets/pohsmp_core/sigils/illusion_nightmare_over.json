@@ -1,0 +1,72 @@
+{
+ "comment": "Кошмар наяву: печать над головой цели (весь каст и 12 с действия), лицом вниз — пустые очи кружат, дрожит; её видят все рядом (знак, что цель в кошмаре). Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 0.62,
+ "color": "#C9A8FF",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "illusion_nightmare",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 18,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -12,
+    "boost": 3
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 12
+   }
+  },
+  {
+   "id": "ghost",
+   "type": "disc",
+   "texture": "illusion_nightmare",
+   "radius": 1.06,
+   "heightOffset": 0.006,
+   "color": "#FFB8E6",
+   "brightness": 0.3,
+   "appear": {
+    "delay": 8,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 9
+   },
+   "pulse": {
+    "amp": 0.6,
+    "period": 9
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B08CFF",
+  "size": 1.3,
+  "duration": 8,
+  "sparks": 12
+ },
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

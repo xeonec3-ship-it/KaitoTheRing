@@ -1,0 +1,178 @@
+{
+ "comment": "Пелена: марево r6 на 10 с (200 тиков) вокруг точки каста (caster; follow нет — марево стоит на месте; если нужно, чтобы шло за магом, — код ставит follow). Дрожащий воздух: бледная печать-марево на земле, стенка марева по краю r6 (вертикальные полупрозрачные ленты illusion_haze, мерцают), пузырь со слабым ободом, плывущие блики и пара бабочек, лёгкая лиловая дымка у игроков внутри (tint). Подмену силуэтов рисует код. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "illusion_veil_ground",
+   "until": 196
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 18,
+   "shape": "ring",
+   "radius": 6,
+   "color": "@primary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 24,
+   "shape": "sphere",
+   "radius": 6,
+   "rim": 0.5,
+   "color": "#EFE6FF",
+   "brightness": 0.25
+  },
+  {
+   "type": "curtain",
+   "delay": 4,
+   "at": "caster",
+   "duration": 192,
+   "radius": [
+    5.7,
+    6.1
+   ],
+   "count": 46,
+   "height": 3.6,
+   "grow": 24,
+   "width": [
+    0.35,
+    0.7
+   ],
+   "brightness": [
+    0.06,
+    0.16
+   ],
+   "flicker": 0.6,
+   "texture": "illusion_haze",
+   "color": "@primary",
+   "in": {
+    "duration": 20,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 10,
+   "at": "caster",
+   "duration": 186,
+   "radius": [
+    2.0,
+    5.6
+   ],
+   "count": 22,
+   "height": 2.6,
+   "grow": 30,
+   "width": [
+    0.3,
+    0.5
+   ],
+   "brightness": [
+    0.04,
+    0.1
+   ],
+   "flicker": 0.8,
+   "texture": "illusion_haze",
+   "color": "#FFB8E6",
+   "in": {
+    "duration": 24,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,0.6,0",
+   "duration": 186,
+   "texture": "glow",
+   "count": 400,
+   "rate": 1.6,
+   "area": 5.6,
+   "speed": 0.004,
+   "gravity": -0.0008,
+   "size": [
+    0.6,
+    1.2
+   ],
+   "life": 60,
+   "color": "#C9A8FF",
+   "brightness": 0.12,
+   "comment": "волны дрожащего воздуха"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,0.3,0",
+   "duration": 186,
+   "texture": "mote_glass",
+   "count": 400,
+   "rate": 0.7,
+   "area": 5.6,
+   "speed": 0.004,
+   "gravity": -0.001,
+   "spin": 60,
+   "tumble": 0.8,
+   "size": [
+    0.18,
+    0.04
+   ],
+   "life": 40,
+   "color": "#EFE6FF",
+   "glow": 0.4
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,1.2,0",
+   "duration": 160,
+   "texture": "mote_butterfly",
+   "count": 40,
+   "rate": 0.12,
+   "area": 5.0,
+   "speed": 0.008,
+   "gravity": -0.0012,
+   "sway": 1.6,
+   "tumble": 0.3,
+   "size": [
+    0.26,
+    0.18
+   ],
+   "life": 70,
+   "color": "@secondary",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 200,
+   "radius": 6,
+   "color": "#B8A0E8",
+   "strength": 0.12,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

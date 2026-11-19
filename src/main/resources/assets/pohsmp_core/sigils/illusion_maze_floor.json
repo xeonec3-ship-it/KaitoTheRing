@@ -1,0 +1,61 @@
+{
+ "comment": "Зеркальный лабиринт, зона (20 с): огромный бледный лабиринт по земле под куполом r14 (виден только врагам — код шлёт им). Почти прозрачный, медленно вращается. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 14.0,
+ "color": "#C9A8FF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "maze",
+   "type": "disc",
+   "texture": "illusion_maze",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.3,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -0.6
+   }
+  },
+  {
+   "id": "ghost",
+   "type": "disc",
+   "texture": "illusion_maze",
+   "radius": 1.01,
+   "heightOffset": 0.006,
+   "color": "#FFB8E6",
+   "brightness": 0.14,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.8
+   },
+   "pulse": {
+    "amp": 0.5,
+    "period": 60
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

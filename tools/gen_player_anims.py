@@ -1319,6 +1319,211 @@ def blessing_cast():
 
 
 
+# ---------------------------------------------------------------- T22: школа «Иллюзии»
+# Шкалы — docs/specs/tasks/T22_illusion_school.md и эффекты fx/illusion_*.json (tools/gen_illusion_fx.py). Без посоха (предмет прячет клиент).
+# Короткие касты (0.5–1.2 с) кончаются в стойке (hold=False); Высшие (4 / 3.5 с) и «Сон бабочки» (12 с = 240 тиков) замирают
+# в последней позе (hold), к ним — финалы *_finish.
+def _end_stand(a, t):
+    a.pose(t, rightArm=ARM_DOWN_R, leftArm=ARM_DOWN_L, torso=ZERO_T, head=ZERO_H, body={'y': 0}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+
+
+def illusion_mirror_images_cast():
+    """«Отражения», 1.0 с: правая ладонь проводит перед лицом слева направо, как по зеркалу (0.15–0.5),
+    затем руки чуть в стороны ладонями наружу — копии разбегаются (0.6 = 12 тик эффекта), и в стойку."""
+    a, r = Anim('pohsmp_illusion_mirror_images_cast', 1.0, hold=False), Rig()
+    _start(a)
+    a.pose(0.18, 'easeOutCubic', rightArm=r.R(1.0, 24.4, 10.4), leftArm=_fk(pitch=-8, roll=-10, bend=-12), torso=_TO(yaw=8), head=_HL(yaw=6))
+    a.pose(0.5, 'easeInOutSine', rightArm=r.R(-9.5, 24.0, 8.6, elbow_out=1.3), torso=_TO(yaw=-10, pitch=1), head=_HL(yaw=-10))
+    out_r = _fk(pitch=-28, yaw=-10, roll=42, bend=-14)
+    a.pose(0.66, 'easeOutBack', rightArm=out_r, leftArm=mirror(out_r), torso=_TO(pitch=-3), head=_HL(pitch=-4))
+    a.pose(0.8, rightArm=out_r, leftArm=mirror(out_r))
+    _end_stand(a, 1.0)
+    return a
+
+
+def illusion_false_step_cast():
+    """«Ложный шаг», 0.5 с: короткий рывок — корпус вперёд, руки отброшены назад, выпад; сразу в стойку."""
+    a = Anim('pohsmp_illusion_false_step_cast', 0.5, hold=False)
+    _start(a)
+    back = _fk(pitch=38, yaw=4, roll=14, bend=-8)
+    a.pose(0.12, 'easeOutCubic', rightArm=back, leftArm=mirror(back), torso=_TO(pitch=18, bend=6), head=_HL(pitch=-12),
+           rightLeg=_TO(pitch=-24, bend=16), leftLeg=_TO(pitch=20, bend=6), body={'y': -0.08})
+    a.pose(0.28, rightArm=back, leftArm=mirror(back), torso=_TO(pitch=14, bend=5), head=_HL(pitch=-10))
+    _end_stand(a, 0.5)
+    return a
+
+
+def illusion_veil_cast():
+    """«Пелена», 1.2 с: ладони скрещиваются перед грудью (0.3), разводятся в стороны ладонями вниз — «задёргивает занавес» (0.7),
+    лёгкое колыхание, в стойку."""
+    a, r = Anim('pohsmp_illusion_veil_cast', 1.2, hold=False), Rig()
+    _start(a)
+    a.pose(0.3, 'easeOutCubic', rightArm=r.R(1.4, 19.5, 8.8, elbow_out=1.4), leftArm=r.L(-1.4, 18.0, 8.2, elbow_out=1.4),
+           torso=_TO(pitch=4, bend=4), head=_HL(pitch=8))
+    wide_r, wide_l = r.R(-12.5, 19.5, 4.5), r.L(12.5, 19.5, 4.5)
+    a.pose(0.7, 'easeOutCubic', rightArm=wide_r, leftArm=wide_l, torso=_TO(pitch=-2), head=_HL(pitch=-2))
+    a.sway(0.7, 1.0, 0.15, 'rightArm', wide_r, 'pitch', 3)
+    a.sway(0.7, 1.0, 0.15, 'leftArm', wide_l, 'pitch', 3)
+    _end_stand(a, 1.2)
+    return a
+
+
+def illusion_phantom_pain_cast():
+    """«Фантомная боль», 0.8 с: кисть к груди (0.2), выброс ладони к цели (0.4), поворот кисти «закручивает» боль (0.55), в стойку."""
+    a, r = Anim('pohsmp_illusion_phantom_pain_cast', 0.8, hold=False), Rig()
+    _start(a)
+    a.pose(0.2, 'easeOutCubic', rightArm=r.R(-1.6, 19.0, 6.4, elbow_out=1.3), torso=_TO(yaw=-8), head=_HL(yaw=-4))
+    palm = _fk(pitch=-90, yaw=4, roll=-4, bend=-6)
+    a.pose(0.4, 'easeOutBack', rightArm=palm, leftArm=_fk(pitch=10, roll=-14, bend=-10), torso=_TO(yaw=-12, pitch=3), head=_HL(yaw=6))
+    a.pose(0.56, 'easeInOutQuad', rightArm=_fk(pitch=-86, yaw=-6, roll=-38, bend=-22), torso=_TO(yaw=-10, pitch=3))
+    a.pose(0.62, rightArm=_fk(pitch=-86, yaw=-6, roll=-38, bend=-22))
+    _end_stand(a, 0.8)
+    return a
+
+
+def illusion_borrowed_face():
+    """«Чужое лицо» (жест, 0.9 с): ладонь проводит по лицу сверху вниз — ото лба к подбородку (не касаясь, в ладони перед лицом),
+    голова чуть отворачивается и возвращается — на 0.4 с (8 тик) облик сменился; рука опускается."""
+    a, r = Anim('pohsmp_illusion_borrowed_face', 0.9, hold=False), Rig()
+    _start(a)
+    a.pose(0.07, 'easeInQuad', rightArm=r.R(-3.4, 21.0, 9.6, elbow_out=1.2))
+    a.pose(0.18, 'easeOutCubic', rightArm=r.R(-2.6, 31.0, 9.4, elbow_out=1.2), head=_HL(pitch=4, yaw=10), torso=_TO(pitch=2))
+    a.pose(0.42, 'easeInOutSine', rightArm=r.R(-2.4, 26.6, 10.2, elbow_out=1.2), head=_HL(pitch=6, yaw=6))
+    a.pose(0.58, 'easeInOutSine', rightArm=r.R(-3.0, 22.4, 10.0, elbow_out=1.2), head=_HL(pitch=-2, yaw=-8), torso=_TO(yaw=-4))
+    a.pose(0.7, head=_HL(pitch=-2, yaw=-8))
+    _end_stand(a, 0.9)
+    return a
+
+
+LAB_T = 4.0
+LAB_SLAM_R = _fk(pitch=-42, yaw=-14, roll=12, bend=-16)          # ладони вниз к земле перед собой
+LAB_LEGS = dict(rightLeg=_TO(pitch=-30, roll=6, bend=40), leftLeg=_TO(pitch=12, roll=-6, bend=28))
+
+
+def illusion_labyrinth_cast():
+    """«Зеркальный лабиринт» (Высшее), 4 с: 0–0.4 руки к груди; 0.4–2.4 правая ладонь чертит перед собой квадрат (стенки растут),
+    левая держит око у груди; 2.4–3.2 обе руки вверх; 3.2–3.75 ладони резко вниз — присед, удар ладонями к земле (76 тик — вспышка,
+    волна до r14); держит упор до 4.0."""
+    a, r = Anim('pohsmp_illusion_labyrinth_cast', LAB_T), Rig()
+    _start(a)
+    chest_l = r.L(1.6, 18.6, 6.4, elbow_out=1.4)
+    a.pose(0.4, 'easeOutCubic', rightArm=r.R(1.0, 24.0, 10.6), leftArm=chest_l, torso=_TO(pitch=2), head=_HL(pitch=2))
+    sq = [(-8.0, 24.0, 10.0), (-8.0, 16.0, 10.0), (1.0, 16.0, 10.6), (1.0, 24.0, 10.6)]   # квадрат перед собой, по часовой
+    for k, p in enumerate(sq):
+        a.pose(0.4 + 0.5 * (k + 1), 'linear', rightArm=r.R(*p, elbow_out=1.3), head=_HL(pitch=2 if p[1] > 20 else 10, yaw=-6 if p[0] < -3 else 2),
+               torso=_TO(yaw=-6 if p[0] < -3 else 2, pitch=2))
+    a.sway(0.4, 2.4, 0.5, 'leftArm', chest_l, 'roll', -2)
+    up_r = _fk(pitch=-24, yaw=0, roll=142, bend=-10)              # руки вверх буквой V (как V_R)
+    a.pose(3.1, 'easeInOutQuad', rightArm=up_r, leftArm=mirror(up_r), torso=_TO(pitch=-8, bend=-4), head=_HL(pitch=-24), body={'y': 0.02})
+    a.pose(3.2, rightArm=merge(up_r, {'roll': 150}), leftArm=mirror(merge(up_r, {'roll': 150})), torso=_TO(pitch=-9, bend=-5))
+    a.pose(3.75, 'easeInCubic', rightArm=LAB_SLAM_R, leftArm=mirror(LAB_SLAM_R), torso=_TO(pitch=34, bend=12), head=_HL(pitch=-20),
+           body={'y': -0.32}, **LAB_LEGS)
+    a.pose(LAB_T, rightArm=LAB_SLAM_R, leftArm=mirror(LAB_SLAM_R), torso=_TO(pitch=32, bend=12), head=_HL(pitch=-18), body={'y': -0.3}, **LAB_LEGS)
+    return a, (LAB_SLAM_R, mirror(LAB_SLAM_R), _TO(pitch=32, bend=12), (LAB_LEGS['rightLeg'], LAB_LEGS['leftLeg']), -0.3)
+
+
+NM_T = 3.5
+NM_CLAW_R = _fk(pitch=-84, yaw=6, roll=-8, bend=-34)             # рука-коготь к цели, пальцы согнуты
+NM_GRIP_R = _fk(pitch=-80, yaw=8, roll=-14, bend=-58)            # сжимает: кулак-коготь
+NM_RIP_R = _fk(pitch=-60, yaw=24, roll=22, bend=-70)              # рывок к себе
+NM_OFF_L = _fk(pitch=24, yaw=-8, roll=-34, bend=-20)              # левая отброшена от лица
+
+
+def illusion_nightmare_cast():
+    """«Кошмар наяву» (Высшее), 3.5 с: левая ладонь закрывает свои глаза, правая — коготь к цели (0.4); дрожь, пальцы медленно
+    сжимаются (до 3.0); 3.15–3.3 левая резко отнимается от лица, голова вскидывается, правая рвёт к себе (66 тик — печать над целью
+    вспыхивает)."""
+    a, r = Anim('pohsmp_illusion_nightmare_cast', NM_T), Rig()
+    _start(a)
+    a.pose(0.18, 'easeInQuad', leftArm=r.L(2.4, 23.0, 10.6, elbow_out=1.4))   # кисть идёт вперёд, потом вверх — мимо лица
+    eyes_l = r.L(0.4, 27.6, 9.4, elbow_out=1.4)                     # ладонь перед глазами (лицо — до z = 4)
+    a.pose(0.4, 'easeOutCubic', rightArm=NM_CLAW_R, leftArm=eyes_l, torso=_TO(pitch=6, yaw=-6, bend=4), head=_HL(pitch=14, yaw=4),
+           rightLeg=_TO(pitch=-8, roll=4, bend=8), leftLeg=_TO(pitch=10, roll=-4, bend=4))
+    a.sway(0.4, 3.0, 0.14, 'rightArm', NM_CLAW_R, 'yaw', 1.6)
+    a.pose(3.0, 'easeInOutSine', rightArm=NM_GRIP_R, torso=_TO(pitch=9, yaw=-8, bend=6), head=_HL(pitch=18, yaw=4))
+    a.sway(0.4, 3.0, 1.1, 'head', _HL(pitch=14, yaw=4), 'roll', 3)
+    rip_t = _TO(pitch=-6, yaw=-16, bend=-4)
+    a.pose(3.3, 'easeOutBack', rightArm=NM_RIP_R, leftArm=NM_OFF_L, torso=rip_t, head=_HL(pitch=-10, yaw=8))
+    a.pose(NM_T, rightArm=NM_RIP_R, leftArm=NM_OFF_L, torso=rip_t, head=_HL(pitch=-8, yaw=8))
+    return a, (NM_RIP_R, NM_OFF_L, rip_t, (_TO(pitch=-8, roll=4, bend=8), _TO(pitch=10, roll=-4, bend=4)), 0.0)
+
+
+BD_T = 12.0
+BD_OPEN_R = _fk(pitch=-30, yaw=-8, roll=78, bend=-10)            # руки раскрыты в стороны ладонями вверх (10–12 с)
+BD_SKY_R = _fk(pitch=-14, yaw=0, roll=148, bend=-10)           # руки над головой (переворот мира)
+
+
+def illusion_butterfly_cast():
+    """«Сон бабочки» (Мифическое), 12 с = 240 тиков ровно (планы ролика — ТЗ T22, «Ролик»):
+    0–2 ладони лодочкой у груди, взгляд вниз (в них рождается бабочка); 2–4 ладони поднимаются к лицу и над головой, раскрываются —
+    бабочка улетает, взгляд за ней; 4–6 правая ладонь касается невидимого зеркала перед собой (4.3 с — трещина), отдёргивается и
+    снова кладётся; 6–8 обе ладони на «зеркале», давит, корпус вперёд, дрожь; 8–10 руки взмывают над головой, корпус прогибается —
+    мир переворачивается (9 с вспышка); 10–12 руки медленно раскрываются в стороны ладонями вверх, тело чуть приподнято — спокойно."""
+    a, r = Anim('pohsmp_illusion_butterfly_cast', BD_T), Rig()
+    _start(a)
+    cup_r, cup_l = r.R(-1.3, 18.2, 6.8, elbow_out=1.3), r.L(1.3, 18.2, 6.8, elbow_out=1.3)
+    cup_t = _TO(pitch=5, bend=5)
+    a.pose(0.8, rightArm=cup_r, leftArm=cup_l, torso=cup_t, head=_HL(pitch=22))
+    a.sway(0.8, 2.0, 0.6, 'torso', cup_t, 'pitch', 1)
+    a.sway(0.8, 2.0, 0.5, 'rightArm', cup_r, 'roll', 2)
+    a.sway(0.8, 2.0, 0.55, 'leftArm', cup_l, 'roll', -2)
+    face_r, face_l = r.R(-2.0, 24.2, 10.2, elbow_out=1.3), r.L(2.0, 24.2, 10.2, elbow_out=1.3)
+    a.pose(2.6, 'easeInOutSine', rightArm=face_r, leftArm=face_l, torso=_TO(pitch=0), head=_HL(pitch=-4))
+    rel_r = _fk(pitch=-30, yaw=0, roll=138, bend=-10)
+    a.pose(3.3, 'easeOutCubic', rightArm=rel_r, leftArm=mirror(rel_r), torso=_TO(pitch=-8, bend=-4), head=_HL(pitch=-30), body={'y': 0.02})
+    a.pose(3.9, 'easeInOutSine', rightArm=_fk(pitch=-60, yaw=-4, roll=40, bend=-14), leftArm=mirror(_fk(pitch=-50, yaw=-4, roll=44, bend=-14)),
+           torso=_TO(pitch=-3), head=_HL(pitch=-18, yaw=-6), body={'y': 0})
+    touch_r = r.R(-3.2, 22.4, 10.2)                                    # ладонь на «зеркале» (≈0.65 бл. перед грудью)
+    a.pose(4.3, 'easeOutCubic', rightArm=touch_r, leftArm=_fk(pitch=6, roll=-12, bend=-10), torso=_TO(pitch=3, yaw=-4), head=_HL(pitch=2, yaw=-2))
+    a.pose(4.45, 'easeOutQuad', rightArm=r.R(-3.4, 22.0, 8.2), torso=_TO(pitch=0, yaw=-4), head=_HL(pitch=0, yaw=4))   # отдёрнул: звон
+    a.pose(5.2, 'easeInOutSine', rightArm=r.R(-3.2, 22.4, 10.0), torso=_TO(pitch=3, yaw=-4), head=_HL(pitch=4))
+    push_r, push_l = r.R(-3.4, 22.2, 10.2), r.L(3.4, 22.2, 10.2)
+    push_t = _TO(pitch=10, bend=6)
+    push_legs = dict(rightLeg=_TO(pitch=-14, roll=4, bend=12), leftLeg=_TO(pitch=16, roll=-4, bend=6))
+    a.pose(6.2, 'easeInOutSine', rightArm=push_r, leftArm=push_l, torso=push_t, head=_HL(pitch=6), body={'y': -0.04}, **push_legs)
+    a.sway(6.2, 7.9, 0.16, 'rightArm', push_r, 'pitch', 1.4)
+    a.sway(6.2, 7.9, 0.17, 'leftArm', push_l, 'pitch', 1.4)
+    a.pose(7.9, 'easeInOutSine', torso=merge(push_t, {'pitch': 13}), head=_HL(pitch=8))
+    a.pose(8.6, 'easeInOutCubic', rightArm=BD_SKY_R, leftArm=mirror(BD_SKY_R), torso=_TO(pitch=-8, bend=-5), head=_HL(pitch=-26),
+           body={'y': 0.04}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.sway(8.6, 9.0, 0.2, 'rightArm', BD_SKY_R, 'roll', 3)
+    a.pose(9.05, 'easeOutBack', rightArm=merge(BD_SKY_R, {'roll': 162}), leftArm=mirror(merge(BD_SKY_R, {'roll': 162})),
+           torso=_TO(pitch=-9, bend=-6), head=_HL(pitch=-26), body={'y': 0.06})
+    a.pose(10.0, 'easeInOutSine', rightArm=merge(BD_SKY_R, {'roll': 156}), leftArm=mirror(merge(BD_SKY_R, {'roll': 156})),
+           torso=_TO(pitch=-7, bend=-4), head=_HL(pitch=-24), body={'y': 0.08})
+    open_t = _TO(pitch=-4, bend=-2)
+    a.pose(11.2, 'easeInOutSine', rightArm=BD_OPEN_R, leftArm=mirror(BD_OPEN_R), torso=open_t, head=_HL(pitch=-8), body={'y': 0.1})
+    a.sway(11.2, 11.8, 0.6, 'body', {'y': 0.1}, 'y', 0.02)
+    a.pose(BD_T, rightArm=BD_OPEN_R, leftArm=mirror(BD_OPEN_R), torso=open_t, head=_HL(pitch=-6), body={'y': 0.1})
+    return a, (BD_OPEN_R, mirror(BD_OPEN_R), open_t, (ZERO_LEG, ZERO_LEG), 0.1)
+
+
+def illusion_butterfly_wake():
+    """«Сон бабочки», пробуждение (0.8 с; код играет у заклинателя в момент финала, если он жив): хлопок ладонями перед грудью
+    (0.25 — бабочки рассыпаются, вспышка), ладони расходятся, в стойку."""
+    a, r = Anim('pohsmp_illusion_butterfly_wake', 0.8, hold=False), Rig()
+    _start(a)
+    a.pose(0.14, 'easeOutCubic', rightArm=r.R(-4.6, 22.6, 8.8), leftArm=r.L(4.6, 22.6, 8.8), torso=_TO(pitch=-2), head=_HL(pitch=-4))
+    a.pose(0.25, 'easeInQuad', rightArm=r.R(-1.1, 21.6, 9.6), leftArm=r.L(1.1, 21.6, 9.6), torso=_TO(pitch=4, bend=3), head=_HL(pitch=2))
+    a.pose(0.42, 'easeOutCubic', rightArm=r.R(-6.0, 20.8, 7.4), leftArm=r.L(6.0, 20.8, 7.4), torso=_TO(pitch=0), head=_HL(pitch=-2))
+    _end_stand(a, 0.8)
+    return a
+
+
+def _t22_finish(fn, name, length, head):
+    def fin():
+        _, (fr, fl, torso, legs, by) = fn()
+        return _finish(name, fr, fl, torso=torso, head=head, legs=legs, body_y=by, length=length)
+    return fin
+
+
+_T22 = [illusion_mirror_images_cast, illusion_false_step_cast, illusion_veil_cast, illusion_phantom_pain_cast, illusion_borrowed_face,
+        lambda: illusion_labyrinth_cast()[0], _t22_finish(illusion_labyrinth_cast, 'pohsmp_illusion_labyrinth_finish', 1.2, _HL(pitch=-18)),
+        lambda: illusion_nightmare_cast()[0], _t22_finish(illusion_nightmare_cast, 'pohsmp_illusion_nightmare_finish', 1.0, _HL(pitch=-8, yaw=8)),
+        lambda: illusion_butterfly_cast()[0], _t22_finish(illusion_butterfly_cast, 'pohsmp_illusion_butterfly_finish', 1.5, _HL(pitch=-6)),
+        illusion_butterfly_wake]
+
+
 def pose_gallery():
     """Только для превью: по 1.4 с на каждую позу библиотеки."""
     out = []
@@ -1355,7 +1560,7 @@ _BL = (lambda: blessing_cast()[0],
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
          scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
          silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish,
-         *_SS, *_BL]
+         *_SS, *_BL, *_T22]
 
 
 def main():

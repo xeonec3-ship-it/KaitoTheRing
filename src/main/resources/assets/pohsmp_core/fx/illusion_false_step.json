@@ -1,0 +1,87 @@
+{
+ "comment": "Ложный шаг (видят ТОЛЬКО сам маг и союзники — код шлёт им; врагам нечего видеть: для них маг пропал, а копия бежит дальше). caster = маг, follow: призрачный след рывка 8 бл., бледное двоение, рябь в точке прибытия на 8 тике. Копию гасит illusion_poof. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 12,
+   "thickness": 0.06,
+   "pulse": [
+    0.5,
+    3
+   ],
+   "motes": 6,
+   "texture": "mote_glass",
+   "color": "@primary",
+   "brightness": 0.6,
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 10,
+   "follow": true,
+   "width": 0.5,
+   "length": 7,
+   "fade": 1.2,
+   "head": 0,
+   "color": "@primary",
+   "brightness": 0.35
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 10,
+   "follow": true,
+   "width": 0.3,
+   "length": 6,
+   "fade": 1.4,
+   "head": 0,
+   "color": "@secondary",
+   "brightness": 0.3
+  },
+  {
+   "type": "wave",
+   "delay": 8,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 1.2,
+   "rim": 1.0,
+   "color": "#EFE6FF",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 8,
+   "at": "caster+0,0.8,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.05,
+   "gravity": 0.004,
+   "spin": 160,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 12,
+   "color": "@primary"
+  }
+ ]
+}

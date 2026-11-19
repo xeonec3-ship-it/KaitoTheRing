@@ -1,0 +1,14 @@
+{
+ "comment": "Кошмар наяву: тёмная печать под заклинателем на время каста (если SchoolSeals.shown(caster) == false). duration −1. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "illusion_nightmare_ground",
+   "follow": true
+  }
+ ]
+}

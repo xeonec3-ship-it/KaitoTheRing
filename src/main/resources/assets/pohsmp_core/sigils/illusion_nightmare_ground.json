@@ -1,0 +1,136 @@
+{
+ "comment": "Кошмар наяву, каст (3.5 с): тёмная печать под заклинателем — венок пустых очей, когти, безликий овал; очи открываются по одному (draw), тьма пульсирует. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 3.0,
+ "color": "#C9A8FF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.9,
+   "heightOffset": -0.01,
+   "color": "#3A2A5A",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 18
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "illusion_nightmare",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 2,
+    "duration": 30,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": 4
+   }
+  },
+  {
+   "id": "ghost_pink",
+   "type": "disc",
+   "texture": "illusion_nightmare",
+   "radius": 1.035,
+   "heightOffset": 0.006,
+   "color": "#FFB8E6",
+   "brightness": 0.25,
+   "appear": {
+    "delay": 20,
+    "duration": 12,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -6
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 23
+   }
+  },
+  {
+   "id": "ghost_blue",
+   "type": "disc",
+   "texture": "illusion_nightmare",
+   "radius": 0.968,
+   "heightOffset": 0.008,
+   "color": "#9AE6FF",
+   "brightness": 0.25,
+   "appear": {
+    "delay": 23,
+    "duration": 12,
+    "easing": "easeOutSine",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 5
+   },
+   "pulse": {
+    "amp": 0.55,
+    "period": 31
+   }
+  },
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.1,
+   "heightOffset": 0.015,
+   "color": "#FFB8E6",
+   "brightness": 0.7,
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 18,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B08CFF",
+  "size": 1.2,
+  "duration": 10,
+  "sparks": 20
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 14,
+  "stagger": 2
+ }
+}

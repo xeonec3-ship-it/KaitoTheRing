@@ -1,0 +1,380 @@
+{
+ "comment": "Сон бабочки, каст 12 с (240 тиков) + хвост до 260; caster = маг. Планы ролика — ТЗ T22, «Ролик». 0–2 с: под магом прорисовывается мифическая печать, в сложенных ладонях у груди рождается стеклянная бабочка; 2–4: бабочка взлетает, за ней поток бабочек по спирали, высоко в небе — печать-«небо»; 4–6: ладонь касается воздуха — трещина по невидимому зеркалу (point:touch — у ладони: ≈0.65 бл. перед магом на высоте 1.4, код), звон; 6–8: трещины бегут по миру (по земле r14, экранная накладка у всех в ролике — код), тьма по краям; 8–10: мир переворачивается (код: камера/небо), вихрь бабочек вокруг, вспышка-кольцо на 9 с; 10–12: зеркальный мир успокоился, волна до r32 (зона), на 236 тике — вспышка и звон «шагнули в отражение». Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 260,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "illusion_dream_ground",
+   "until": 244
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 40,
+   "texture": "spark_soft",
+   "count": 100,
+   "rate": 2.5,
+   "area": 4.0,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "size": [
+    0.14,
+    0.03
+   ],
+   "life": 34,
+   "color": "#EFE6FF",
+   "glow": 0.4,
+   "comment": "свет поднимается от печати"
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "at": "caster+0,1.25,0.35",
+   "follow": true,
+   "duration": 30,
+   "size": 0.7,
+   "color": "#FFB8E6",
+   "brightness": 0.6,
+   "comment": "свет в ладонях 0.5–2 с"
+  },
+  {
+   "type": "mesh",
+   "delay": 24,
+   "at": "caster+0,1.25,0.38",
+   "model": "illusion_butterfly",
+   "scale": 0.6,
+   "until": 60,
+   "comment": "стеклянная бабочка в ладонях (крупно 0–2 с)"
+  },
+  {
+   "type": "flash",
+   "delay": 40,
+   "at": "caster+0,1.4,0.4",
+   "duration": 10,
+   "size": 1.2,
+   "rays": 6,
+   "color": "#FFFFFF",
+   "comment": "бабочка вспорхнула"
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "caster+0,1.2,0.35",
+   "duration": 34,
+   "follow": true,
+   "texture": "mote_butterfly",
+   "count": 12,
+   "rate": 0.4,
+   "spread": 0.2,
+   "speed": 0.03,
+   "gravity": -0.009,
+   "sway": 1.8,
+   "tumble": 0.3,
+   "size": [
+    0.3,
+    0.22
+   ],
+   "life": 70,
+   "color": "@secondary",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 46,
+   "at": "caster+0,1.2,0.35",
+   "duration": 34,
+   "follow": true,
+   "texture": "mote_butterfly",
+   "count": 12,
+   "rate": 0.4,
+   "spread": 0.2,
+   "speed": 0.03,
+   "gravity": -0.009,
+   "sway": 1.8,
+   "tumble": 0.3,
+   "size": [
+    0.3,
+    0.22
+   ],
+   "life": 70,
+   "color": "#9AE6FF",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 52,
+   "at": "caster+0,1.2,0.35",
+   "duration": 34,
+   "follow": true,
+   "texture": "mote_butterfly",
+   "count": 12,
+   "rate": 0.4,
+   "spread": 0.2,
+   "speed": 0.03,
+   "gravity": -0.009,
+   "sway": 1.8,
+   "tumble": 0.3,
+   "size": [
+    0.3,
+    0.22
+   ],
+   "life": 70,
+   "color": "#EFE6FF",
+   "glow": 0.5
+  },
+  {
+   "type": "trail",
+   "delay": 44,
+   "at": "caster+0,0.6,0",
+   "duration": 76,
+   "follow": true,
+   "width": 0.12,
+   "length": 16,
+   "fade": 1.3,
+   "head": 1.2,
+   "count": 3,
+   "color": "@secondary",
+   "orbit": {
+    "radius": 1.6,
+    "speed": 7,
+    "rise": 1.2,
+    "risePeriod": 50,
+    "climb": 1.2
+   },
+   "comment": "поток бабочек спиралью вверх"
+  },
+  {
+   "type": "sigil",
+   "delay": 46,
+   "at": "caster+0,12,0",
+   "id": "illusion_dream_sky",
+   "until": 236
+  },
+  {
+   "type": "sigil",
+   "delay": 86,
+   "at": "point:touch",
+   "id": "illusion_mirror_crack",
+   "until": 176
+  },
+  {
+   "type": "flash",
+   "delay": 86,
+   "at": "point:touch",
+   "duration": 8,
+   "size": 1.2,
+   "rays": 10,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 86,
+   "at": "point:touch",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.2,
+   "speed": 0.07,
+   "gravity": 0.004,
+   "spin": 200,
+   "tumble": 1,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 26,
+   "color": "#EFE6FF"
+  },
+  {
+   "type": "sigil",
+   "delay": 100,
+   "at": "point:touch",
+   "id": "illusion_mirror_crack",
+   "scale": 3.5,
+   "until": 176,
+   "comment": "трещина растёт"
+  },
+  {
+   "type": "decal",
+   "delay": 120,
+   "at": "caster+0,0.08,0",
+   "duration": 120,
+   "texture": "illusion_world_cracks",
+   "radius": 14,
+   "grow": 40,
+   "glow": 0.15,
+   "rotation": 20,
+   "color": "#C9A8FF",
+   "brightness": 0.45,
+   "fadeOut": 20
+  },
+  {
+   "type": "decal",
+   "delay": 132,
+   "at": "caster+0,0.09,0",
+   "duration": 108,
+   "texture": "illusion_world_cracks",
+   "radius": 9,
+   "grow": 30,
+   "glow": 0.1,
+   "rotation": -35,
+   "color": "#FFB8E6",
+   "brightness": 0.3,
+   "fadeOut": 20
+  },
+  {
+   "type": "tint",
+   "delay": 120,
+   "at": "caster",
+   "duration": 120,
+   "radius": 40,
+   "color": "#2A1E44",
+   "strength": 0.22,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "vortex",
+   "delay": 160,
+   "at": "caster+0,0.5,0",
+   "duration": 60,
+   "radius": 9,
+   "height": 7,
+   "arms": 5,
+   "speed": 6,
+   "pull": -0.2,
+   "funnel": 0.3,
+   "turns": 1.5,
+   "width": 0.1,
+   "texture": "mote_butterfly",
+   "particles": 120,
+   "life": 40,
+   "size": 0.34,
+   "color": "@secondary"
+  },
+  {
+   "type": "vortex",
+   "delay": 164,
+   "at": "caster+0,0.5,0",
+   "duration": 56,
+   "radius": 6,
+   "height": 5,
+   "arms": 3,
+   "speed": -5,
+   "pull": 0.2,
+   "funnel": 0.4,
+   "turns": 1.2,
+   "width": 0.06,
+   "texture": "mote_glass",
+   "particles": 80,
+   "life": 30,
+   "size": 0.24,
+   "color": "#9AE6FF"
+  },
+  {
+   "type": "flash",
+   "delay": 180,
+   "at": "caster+0,1.4,0",
+   "duration": 12,
+   "size": 4.0,
+   "rays": 12,
+   "anamorphic": 10,
+   "screen": 0.35,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "wave",
+   "delay": 180,
+   "at": "caster+0,1,0",
+   "duration": 20,
+   "shape": "sphere",
+   "radius": 6,
+   "rim": 1.4,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 200,
+   "at": "caster+0,2,0",
+   "duration": 60,
+   "texture": "mote_butterfly",
+   "count": 90,
+   "rate": 1.6,
+   "area": 8,
+   "speed": 0.01,
+   "gravity": -0.001,
+   "sway": 1.6,
+   "tumble": 0.3,
+   "size": [
+    0.32,
+    0.22
+   ],
+   "life": 80,
+   "color": "#EFE6FF",
+   "glow": 0.5
+  },
+  {
+   "type": "wave",
+   "delay": 222,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 32,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 224,
+   "at": "caster+0,0.5,0",
+   "duration": 34,
+   "shape": "sphere",
+   "radius": 32,
+   "rim": 1.0,
+   "color": "#EFE6FF",
+   "brightness": 0.4
+  },
+  {
+   "type": "flash",
+   "delay": 236,
+   "at": "caster+0,1.4,0",
+   "duration": 10,
+   "size": 5.0,
+   "rays": 12,
+   "anamorphic": 12,
+   "screen": 0.5,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 236,
+   "at": "caster+0,1.4,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 60,
+   "rate": 20,
+   "spread": 0.6,
+   "speed": 0.22,
+   "gravity": 0.006,
+   "spin": 240,
+   "tumble": 1,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 30,
+   "color": "#EFE6FF",
+   "glow": 0.4
+  }
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "comment": "Фантомная боль: метка на цели (target) на 6 с (120 тиков; код гасит раньше, если надо): сердце над головой бьётся, розовые искры падают, слабая дрожащая оболочка. Видят все рядом. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "target+0,2.35,0",
+   "follow": true,
+   "id": "illusion_phantom_mark",
+   "until": 116
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "target+0,2.35,0",
+   "follow": true,
+   "duration": 8,
+   "size": 0.8,
+   "rays": 4,
+   "color": "@secondary"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "target",
+   "target": "target",
+   "duration": 118,
+   "thickness": 0.05,
+   "pulse": [
+    0.25,
+    16
+   ],
+   "motes": 6,
+   "texture": "spark_soft",
+   "color": "#FFB8E6",
+   "brightness": 0.5,
+   "in": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "target+0,2.2,0",
+   "follow": true,
+   "duration": 112,
+   "texture": "spark_soft",
+   "count": 200,
+   "rate": 0.5,
+   "spread": 0.15,
+   "speed": 0.005,
+   "gravity": 0.003,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 18,
+   "color": "#FFB8E6"
+  }
+ ]
+}

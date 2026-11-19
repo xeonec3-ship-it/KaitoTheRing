@@ -1,0 +1,78 @@
+{
+ "comment": "Фантомная боль: малая метка у ладони заклинателя на взмахе (0.3–0.8 с), смотрит вперёд. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 0.22,
+ "color": "#FFB8E6",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": 6,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.4,
+   "heightOffset": -0.01,
+   "color": "#C9A8FF",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "heart",
+   "type": "disc",
+   "texture": "illusion_phantom",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "thin_ring",
+   "radius": 1.25,
+   "heightOffset": 0.01,
+   "color": "#FFFFFF",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 2,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.4,
+  "duration": 4,
+  "sparks": 4
+ },
+ "dissolve": {
+  "modes": [
+   "collapse"
+  ],
+  "duration": 6,
+  "stagger": 2
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "comment": "Фантомная боль: удар по меченой цели — иллюзорная половина урона: розовая трещинка-вспышка у груди и мерцание метки (6 тиков); target = цель. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 8,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "target+0,1.2,0",
+   "follow": true,
+   "duration": 5,
+   "size": 0.6,
+   "rays": 3,
+   "color": "#FFB8E6",
+   "brightness": 0.8
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "target+0,1.2,0",
+   "duration": 1,
+   "texture": "mote_glass",
+   "count": 4,
+   "rate": 4,
+   "spread": 0.2,
+   "speed": 0.05,
+   "gravity": 0.004,
+   "spin": 200,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 10,
+   "color": "#FFB8E6"
+  }
+ ]
+}

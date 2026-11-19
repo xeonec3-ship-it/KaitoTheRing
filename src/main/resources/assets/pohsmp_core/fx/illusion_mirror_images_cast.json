@@ -1,0 +1,86 @@
+{
+ "comment": "Отражения, каст 0.8 с (caster): ладонь проводит перед собой — у неё малое зеркальное око; на 12 тике вокруг мага «трескается воздух»: сфера-рябь, кольцо осколков разлетается в стороны, куда побегут копии. Сами копии появляются каждая со своим illusion_mirror_image_spawn (у настоящего мага — тот же эффект: чтобы враг не отличил). Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "illusion_hand_eye",
+   "until": 14
+  },
+  {
+   "type": "trail",
+   "delay": 2,
+   "at": "caster.hand",
+   "duration": 10,
+   "follow": true,
+   "width": 0.06,
+   "length": 8,
+   "fade": 1.5,
+   "head": 1.5,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 12,
+   "at": "caster+0,1,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 2.4,
+   "rim": 1.2,
+   "color": "@primary",
+   "brightness": 0.7
+  },
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "caster+0,1.1,0",
+   "duration": 8,
+   "size": 1.6,
+   "rays": 6,
+   "color": "#EFE6FF"
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+0,1.0,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 26,
+   "rate": 13,
+   "spread": 0.4,
+   "speed": 0.16,
+   "gravity": 0.004,
+   "spin": 200,
+   "tumble": 1,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 18,
+   "color": "@primary",
+   "glow": 0.4
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+0,1.0,0",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 30,
+   "rate": 15,
+   "spread": 0.5,
+   "speed": 0.1,
+   "gravity": 0,
+   "size": [
+    0.14,
+    0.0
+   ],
+   "life": 14,
+   "color": "#9AE6FF"
+  }
+ ]
+}

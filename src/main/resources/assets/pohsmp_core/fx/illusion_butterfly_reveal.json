@@ -1,0 +1,54 @@
+{
+ "comment": "Сон бабочки: невидимый маг/союзник ударил или скастовал — мерцающий контур на 1 с (20 тиков; caster = проявившийся; видят жертвы). Оболочка по росту мерцает рвано (pulse 3 тика), стеклянные блики, контур гаснет к концу — код в эти 20 тиков рисует модель полупрозрачной. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 22,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 20,
+   "thickness": 0.06,
+   "pulse": [
+    0.7,
+    3
+   ],
+   "motes": 8,
+   "texture": "mote_glass",
+   "color": "#EFE6FF",
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 14,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 16,
+   "thickness": 0.11,
+   "pulse": [
+    0.6,
+    5
+   ],
+   "motes": 0,
+   "ring": false,
+   "color": "#FFB8E6",
+   "brightness": 0.5,
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 12,
+    "easing": "easeInSine"
+   }
+  }
+ ]
+}

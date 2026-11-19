@@ -1,0 +1,101 @@
+{
+ "comment": "Сон бабочки: мир-отражение 25 с (500 тиков) — у КАЖДОЙ жертвы (код шлёт только ей; caster = жертва, follow). Стеклянные бабочки кружат вокруг, бледные трещины в «небе» над головой, лиловая дымка, редкие блики. Сам переворот неба/зеркальность мира — клиент (см. письмо). Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 500,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 496,
+   "follow": true,
+   "texture": "mote_butterfly",
+   "count": 5000,
+   "rate": 0.6,
+   "area": 9,
+   "speed": 0.01,
+   "gravity": -0.0008,
+   "sway": 1.8,
+   "tumble": 0.3,
+   "size": [
+    0.32,
+    0.22
+   ],
+   "life": 90,
+   "color": "#EFE6FF",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 496,
+   "follow": true,
+   "texture": "mote_butterfly",
+   "count": 5000,
+   "rate": 0.3,
+   "area": 7,
+   "speed": 0.012,
+   "gravity": -0.001,
+   "sway": 1.8,
+   "tumble": 0.3,
+   "size": [
+    0.28,
+    0.2
+   ],
+   "life": 80,
+   "color": "@secondary",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.4,0",
+   "duration": 496,
+   "follow": true,
+   "texture": "mote_glass",
+   "count": 5000,
+   "rate": 0.8,
+   "area": 8,
+   "speed": 0.004,
+   "gravity": -0.001,
+   "spin": 60,
+   "tumble": 0.8,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 40,
+   "color": "#9AE6FF",
+   "glow": 0.3
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,14,0",
+   "follow": true,
+   "id": "illusion_mirror_crack",
+   "scale": 16,
+   "until": 490,
+   "orientation": "sky",
+   "comment": "трещины «неба» над головой"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 500,
+   "radius": 4,
+   "color": "#BFA6F0",
+   "strength": 0.14,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

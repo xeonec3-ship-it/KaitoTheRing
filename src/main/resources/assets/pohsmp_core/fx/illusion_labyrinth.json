@@ -1,0 +1,81 @@
+{
+ "comment": "Зеркальный лабиринт, зона r14 на 20 с (400 тиков; caster = центр, без follow). Купол из перламутровых рёбер (mesh illusion_dome × 14), бледный лабиринт по земле, блики. Купол и пол видят ВСЕ (знак зоны), стены — только враги (их строит код: материал textures/fx/illusion_mirror_wall + _cracks, модуль fx/meshes/illusion_mirror_wall). Внутри у врагов — лиловая дымка (tint, код шлёт только им или всем). Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 400,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "illusion_dome",
+   "scale": 14,
+   "until": 392
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "id": "illusion_maze_floor",
+   "until": 390
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,0.4,0",
+   "duration": 380,
+   "texture": "mote_glass",
+   "count": 2000,
+   "rate": 2.2,
+   "area": 13,
+   "speed": 0.004,
+   "gravity": -0.0012,
+   "spin": 60,
+   "tumble": 0.8,
+   "size": [
+    0.24,
+    0.05
+   ],
+   "life": 50,
+   "color": "#EFE6FF",
+   "glow": 0.3
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,1.5,0",
+   "duration": 360,
+   "texture": "mote_butterfly",
+   "count": 200,
+   "rate": 0.35,
+   "area": 12,
+   "speed": 0.01,
+   "gravity": -0.001,
+   "sway": 1.6,
+   "tumble": 0.3,
+   "size": [
+    0.3,
+    0.2
+   ],
+   "life": 80,
+   "color": "@secondary",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 400,
+   "radius": 14,
+   "color": "#C8B4F0",
+   "strength": 0.1,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

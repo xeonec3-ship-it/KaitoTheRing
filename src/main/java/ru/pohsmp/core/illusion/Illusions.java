@@ -214,6 +214,38 @@ public final class Illusions {
 
     @SubscribeEvent
     public static void onTick(TickEvent.ServerTickEvent e) {
+        // owner 19.11: the labyrinth's, the bestiary's (and more) own ServerTickEvent listeners were never called on the test server,
+        // with nothing in the log - so the T22/T25 tickers are driven from here, each on its own, an error in one stopping no other
+        hub("illusions", () -> self(e));
+        hub("copies", () -> Copies.onTick(e));
+        hub("voices", () -> Voices.onTick(e));
+        hub("borrowed_face", () -> ru.pohsmp.core.spell.illusion.BorrowedFaceSpell.Events.onTick(e));
+        hub("mirror_images", () -> ru.pohsmp.core.spell.illusion.MirrorImagesSpell.Events.onTick(e));
+        hub("veil", () -> ru.pohsmp.core.spell.illusion.VeilSpell.Events.onTick(e));
+        hub("mirror_labyrinth", () -> ru.pohsmp.core.spell.illusion.MirrorLabyrinthSpell.Events.onTick(e));
+        hub("waking_nightmare", () -> ru.pohsmp.core.spell.illusion.WakingNightmareSpell.Events.onTick(e));
+        hub("butterfly_dream", () -> ru.pohsmp.core.spell.illusion.ButterflyDreamSpell.Events.onTick(e));
+        hub("immersion", () -> ru.pohsmp.core.nightmare.Immersion.onTick(e));
+        hub("endless_night", () -> ru.pohsmp.core.nightmare.EndlessNightSpell.Events.onTick(e));
+        hub("bestiary", () -> ru.pohsmp.core.nightmare.Bestiary.Events.onTick(e));
+    }
+
+    private static final Map<String, Long> HUB_ERR = new HashMap<>();
+
+    private static void hub(String name, Runnable r) {
+        try {
+            r.run();
+        } catch (Throwable ex) {
+            long t = System.currentTimeMillis();
+            Long last = HUB_ERR.get(name);
+            if (last == null || t - last > 60_000) {   // once a minute per ticker
+                HUB_ERR.put(name, t);
+                PohCore.LOG.error("[pohsmp] ticker " + name + " failed", ex);
+            }
+        }
+    }
+
+    private static void self(TickEvent.ServerTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         now++;
         if (TARGETS.isEmpty()) return;

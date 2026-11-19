@@ -148,7 +148,7 @@ public class VeilSpell extends IllusionBase {
     public static final class Events {
         private Events() {}
 
-        @SubscribeEvent
+        /* driven by Illusions.onTick (TickHub) */
         public static void onTick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END || VEILS.isEmpty()) return;
             long now = Illusions.now();

@@ -143,7 +143,7 @@ public class MirrorImagesSpell extends IllusionBase {
     public static final class Events {
         private Events() {}
 
-        @net.minecraftforge.eventbus.api.SubscribeEvent
+        /* driven by Illusions.onTick (TickHub) */
         public static void onTick(net.minecraftforge.event.TickEvent.ServerTickEvent e) {
             if (e.phase == net.minecraftforge.event.TickEvent.Phase.END) tickAll();
         }

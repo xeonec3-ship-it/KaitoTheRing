@@ -41,7 +41,7 @@ public final class Voices {
         out.computeIfAbsent(speaker, k -> new HashMap<>()).putIfAbsent(listener, at);
     }
 
-    @SubscribeEvent
+    /* driven by Illusions.onTick (TickHub) */
     public static void onTick(TickEvent.ServerTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         if (PROVIDERS.isEmpty()) return;

@@ -146,10 +146,20 @@ public final class Bestiary {
     public static final class Events {
         private Events() {}
 
-        @SubscribeEvent
+        private static long alive;
+
+        /* driven by Illusions.onTick (TickHub) */
         public static void onTick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END) return;
-            var server = e.getServer();
+            if (alive++ % 1200 == 0) PohCore.LOG.info("[pohsmp] bestiary ticker alive: immersion now={}", Immersion.now());
+            try {
+                tick(e.getServer());
+            } catch (Throwable ex) {
+                PohCore.LOG.error("[pohsmp] bestiary tick failed", ex);
+            }
+        }
+
+        private static void tick(net.minecraft.server.MinecraftServer server) {
             if (!FAKE.isEmpty() && Immersion.now() % 5 == 0)
                 FAKE.entrySet().removeIf(f -> {
                     ServerPlayer p = server.getPlayerList().getPlayer(f.getKey());

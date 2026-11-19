@@ -113,7 +113,7 @@ public final class Immersion {
         ru.pohsmp.core.illusion.Illusions.onDispel(t -> t instanceof Player && clear(t));   // Blessing takes it all
     }
 
-    @SubscribeEvent
+    /* driven by Illusions.onTick (TickHub) */
     public static void onTick(TickEvent.ServerTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         now++;

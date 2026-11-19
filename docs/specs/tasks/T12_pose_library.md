@@ -18,3 +18,8 @@
 финал `AnimationHolder.pass()` (жест доигрывает до конца, 1.9 с); `WindSpearsSpell` — `CastAnims.of("finger_snap")`, финал `pass()`
 (каст 1 с, щелчок 1.1 с). Других заклинаний посоха со щелчком в T20 нет (залп, барьер, пламя — анимации Iron's).
 Не проверено в игре.
+
+**Дополнено (19.11, чат идей):** позы `star_aim`, `sky_open`, `star_grab`, `star_pull`, `star_impact` (T05) и с посохом —
+`staff_up`, `staff_swing`, `staff_guard`, `staff_strike`, `dragon_point` (T20; у них есть `rightItem`). `Rig.S(x, y, z, staff)` — правая рука
+с посохом: подбирает хват рядом с точкой, чтобы предплечье было поперёк посоха, и докручивает посох в кисти (`rightItem roll`).
+В превью: посох виден у анимаций и поз с посохом, добавлены плавности easeInQuad/OutQuad/InCubic/OutQuart.

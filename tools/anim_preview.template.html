@@ -178,7 +178,29 @@ const META = {
   pohsmp_coven_arrival_finish: [[0, "Руки опускаются"]],
   pohsmp_coven_ritual: [[0, "Свита: руки в стороны"], [3.4, "Руки вверх"], [12.4, "Купол: толчок"], [16.6, "Руки опускаются"]],
   pohsmp_milky_way_finish: [[0, "Руки опускаются"]], pohsmp_soul_devour_finish: [[0, "Руки опускаются"]],
-  pohsmp_taboo_finish: [[0, "Рука опускается"]], pohsmp_space_closure_finish: [[0, "Руки опускаются"]]
+  pohsmp_taboo_finish: [[0, "Рука опускается"]], pohsmp_space_closure_finish: [[0, "Руки опускаются"]],
+  pohsmp_star_fall_cast: [
+    [0, "Рука-приказ вскидывается к точке на земле"], [0.7, "Печать-прицел: толчки ладонью, сила у груди"],
+    [2.9, "Вдох: руки к груди, голова вниз"], [3.2, "Звёздная печать в небе: руки и взгляд вверх"],
+    [4.8, "Вспышка звезды: руки распахиваются"], [5.0, "Хватает звезду над головой"],
+    [5.3, "Тянет звезду вниз, корпус наклоняется"], [7.45, "Последний рывок: на колено"], [8, "Удар: ладонь в землю"]
+  ],
+  pohsmp_star_fall_finish: [[0, "Держит упор: отдача волны"], [0.45, "Встаёт, смотрит на кратер"], [1.0, "Руки опускаются"]],
+  pohsmp_silent_volley_cast: [
+    [0, "Посох поднимается"], [0.45, "Левая ладонь раскрывается за спину"], [0.6, "Веер печатей встаёт за спиной"],
+    [2.4, "Замах посохом за плечо"], [2.72, "Взмах вперёд — стрелы летят (3.0)"]
+  ],
+  pohsmp_silent_volley_finish: [[0, "Посох вперёд, пока летят стрелы"], [0.3, "Посох опускается"]],
+  pohsmp_sage_barrier_cast: [
+    [0, "Посох вертикально перед собой"], [0.4, "Левая рука на древке"], [0.9, "Приподнимает посох"],
+    [1.12, "Удар концом о землю"], [1.25, "Отдача — купол встаёт (1.5)"]
+  ],
+  pohsmp_sage_barrier_finish: [[0, "Держит посох у земли"], [0.35, "Взгляд на купол"], [0.6, "Выпрямляется"]],
+  pohsmp_worgan_flame_cast: [
+    [0, "Левая рука поднимается"], [0.6, "Указ вперёд, посох низко у бока"], [1.2, "Тень дракона встаёт: взгляд на неё, корпус влево"],
+    [1.7, "Рука подтягивается перед выдохом"]
+  ],
+  pohsmp_worgan_flame_finish: [[0, "Выдох: ладонь вперёд"], [0.18, "Держит пламя 3 с, дрожь"], [3.0, "Рука опускается"]]
 };
 
 const $ = (id) => document.getElementById(id);
@@ -190,6 +212,8 @@ const EASE = {
   INOUTSINE: (t) => -(Math.cos(Math.PI * t) - 1) / 2, INSINE: (t) => 1 - Math.cos((t * Math.PI) / 2),
   OUTSINE: (t) => Math.sin((t * Math.PI) / 2), INOUTQUAD: (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2),
   OUTCUBIC: (t) => 1 - Math.pow(1 - t, 3), OUTBACK: back,
+  INQUAD: (t) => t * t, OUTQUAD: (t) => 1 - (1 - t) * (1 - t), INCUBIC: (t) => t * t * t,
+  OUTQUART: (t) => 1 - Math.pow(1 - t, 4), INOUTCUBIC: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2),
 };
 const easeOf = (name) => EASE[String(name || "linear").toUpperCase().replace(/^EASE/, "")] || EASE.LINEAR;
 
@@ -293,6 +317,9 @@ ghost.traverse((o) => { if (o.material) { o.material = o.material.clone(); o.mat
 ghost.rotation.x = -Math.PI / 2;                                     // навершие вверх, наконечник вниз
 const ghostRoot = new THREE.Group(); ghostRoot.add(ghost); scene.add(ghostRoot);
 const STAFF_IN_HAND = { pohsmp_downfall_cast: 2.62 };
+// анимации и позы с посохом в правой руке (Низвержение и жесты посоха T20)
+const STAFF_RE = /^(pohsmp_downfall|pohsmp_silent_volley|pohsmp_sage_barrier|pohsmp_worgan_flame|поза: staff_(up|swing|guard|strike)|поза: dragon_point)/;
+const GHOST_RE = /^pohsmp_downfall/;
 
 const disc = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.6, 64), new THREE.MeshBasicMaterial({ color: 0xf0c35a, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
 disc.rotation.x = -Math.PI / 2; disc.position.y = 0.002; scene.add(disc);
@@ -313,10 +340,10 @@ function pose(name, tick) {
   }
   staff.rotation.set(0, v("rightItem", "roll") * D2R, 0);   // поворот предмета вокруг оси «кисть -> локоть»
   const t = tick / TPS, from = STAFF_IN_HAND[name];
-  const withStaff = name.startsWith("pohsmp_downfall");          // остальные — без посоха, предмет в руках спрятан
+  const withStaff = STAFF_RE.test(name);                         // остальные — без посоха, предмет в руках спрятан
   const inHand = withStaff && (from === undefined || t >= from);
   staff.visible = inHand;
-  ghostRoot.visible = withStaff && !inHand;
+  ghostRoot.visible = GHOST_RE.test(name) && !inHand;
   ghostRoot.position.set(-1.0, 0.75 + 0.06 * Math.sin(t * 2.2), 0.15);
   ghostRoot.rotation.z = 0.06 * Math.sin(t * 1.3);
   disc.material.opacity = 0.35 + 0.25 * Math.sin(t * 3);

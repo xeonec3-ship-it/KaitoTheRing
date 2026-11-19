@@ -1,0 +1,268 @@
+{
+ "version": 3,
+ "name": "pohsmp_star_fall_finish",
+ "author": "pohsmp_core",
+ "emote": {
+  "beginTick": 0,
+  "endTick": 30,
+  "stopTick": 30,
+  "degrees": true,
+  "easeBeforeKeyframe": true,
+  "moves": [
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "rightArm": {
+     "pitch": -38.0,
+     "yaw": -6.0,
+     "roll": 8.0,
+     "bend": -6.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "leftArm": {
+     "pitch": 42.0,
+     "yaw": -10.0,
+     "roll": -42.0,
+     "bend": -12.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "torso": {
+     "pitch": 32.0,
+     "yaw": -6.0,
+     "roll": 0.0,
+     "bend": 10.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "head": {
+     "pitch": -22.0,
+     "yaw": 4.0,
+     "roll": 0.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "rightLeg": {
+     "pitch": -78.0,
+     "yaw": 0.0,
+     "roll": 6.0,
+     "bend": 82.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "leftLeg": {
+     "pitch": 6.0,
+     "yaw": 0.0,
+     "roll": -6.0,
+     "bend": 86.0
+    }
+   },
+   {
+    "tick": 0,
+    "easing": "easeInOutSine",
+    "body": {
+     "y": -0.36
+    }
+   },
+   {
+    "tick": 2,
+    "easing": "easeOutCubic",
+    "torso": {
+     "pitch": 36.0,
+     "yaw": -6.0,
+     "roll": 0.0,
+     "bend": 10.0
+    }
+   },
+   {
+    "tick": 2,
+    "easing": "easeOutCubic",
+    "body": {
+     "y": -0.38
+    }
+   },
+   {
+    "tick": 9,
+    "easing": "easeInOutSine",
+    "rightArm": {
+     "pitch": -38.0,
+     "yaw": -6.0,
+     "roll": 8.0,
+     "bend": -6.0
+    }
+   },
+   {
+    "tick": 9,
+    "easing": "easeInOutSine",
+    "leftArm": {
+     "pitch": 42.0,
+     "yaw": -10.0,
+     "roll": -42.0,
+     "bend": -12.0
+    }
+   },
+   {
+    "tick": 9,
+    "easing": "easeInOutSine",
+    "torso": {
+     "pitch": 32.0,
+     "yaw": -6.0,
+     "roll": 0.0,
+     "bend": 10.0
+    }
+   },
+   {
+    "tick": 9,
+    "easing": "easeInOutSine",
+    "head": {
+     "pitch": -14.0,
+     "yaw": 2.0,
+     "roll": 0.0
+    }
+   },
+   {
+    "tick": 20,
+    "easing": "easeInOutQuad",
+    "rightArm": {
+     "pitch": -14.0,
+     "yaw": 0.0,
+     "roll": 6.0,
+     "bend": -12.0
+    }
+   },
+   {
+    "tick": 20,
+    "easing": "easeInOutQuad",
+    "leftArm": {
+     "pitch": 4.0,
+     "yaw": 0.0,
+     "roll": -12.0,
+     "bend": -10.0
+    }
+   },
+   {
+    "tick": 20,
+    "easing": "easeInOutQuad",
+    "torso": {
+     "pitch": 10.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 4.0
+    }
+   },
+   {
+    "tick": 20,
+    "easing": "easeInOutQuad",
+    "head": {
+     "pitch": 14.0,
+     "yaw": 0.0,
+     "roll": 0.0
+    }
+   },
+   {
+    "tick": 20,
+    "easing": "easeInOutQuad",
+    "rightLeg": {
+     "pitch": -22.0,
+     "yaw": 0.0,
+     "roll": 6.0,
+     "bend": 34.0
+    }
+   },
+   {
+    "tick": 20,
+    "easing": "easeInOutQuad",
+    "leftLeg": {
+     "pitch": 10.0,
+     "yaw": 0.0,
+     "roll": -6.0,
+     "bend": 22.0
+    }
+   },
+   {
+    "tick": 20,
+    "easing": "easeInOutQuad",
+    "body": {
+     "y": -0.1
+    }
+   },
+   {
+    "tick": 30,
+    "easing": "easeInOutSine",
+    "rightArm": {
+     "pitch": 0.0,
+     "yaw": 0.0,
+     "roll": 3.0,
+     "bend": -5.0
+    }
+   },
+   {
+    "tick": 30,
+    "easing": "easeInOutSine",
+    "leftArm": {
+     "pitch": 0.0,
+     "yaw": 0.0,
+     "roll": -3.0,
+     "bend": -5.0
+    }
+   },
+   {
+    "tick": 30,
+    "easing": "easeInOutSine",
+    "torso": {
+     "pitch": 0.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 30,
+    "easing": "easeInOutSine",
+    "head": {
+     "pitch": 6.0,
+     "yaw": 0.0,
+     "roll": 0.0
+    }
+   },
+   {
+    "tick": 30,
+    "easing": "easeInOutSine",
+    "rightLeg": {
+     "pitch": 0.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 30,
+    "easing": "easeInOutSine",
+    "leftLeg": {
+     "pitch": 0.0,
+     "yaw": 0.0,
+     "roll": 0.0,
+     "bend": 0.0
+    }
+   },
+   {
+    "tick": 30,
+    "easing": "easeInOutSine",
+    "body": {
+     "y": 0.0
+    }
+   }
+  ]
+ }
+}

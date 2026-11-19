@@ -64,7 +64,7 @@ def _perp(v, ref):
 ITEM_FIX_MAX = 25.0   # на сколько градусов разрешено докручивать посох в кисти (rightItem roll) в статичных позах
 
 
-def arm(side, hand, staff=None, elbow_out=1.0, fore=None, prev_u=None):
+def arm(side, hand, staff=None, elbow_out=1.0, fore=None, prev_u=None, free_twist=False):
     """
     Кисть в точке hand (пиксели модели), посох в этой руке смотрит по staff, предплечье — примерно по fore.
     Перебираем, куда отвести локоть, и берём вариант, где посох ближе к нужному направлению,
@@ -100,7 +100,9 @@ def arm(side, hand, staff=None, elbow_out=1.0, fore=None, prev_u=None):
         st = low[:, 2]                                           # посох торчит по локальной +Z предплечья
         e_abs = SHOULDER[side] + elbow
         score = 0.0
-        if staff is not None:
+        if staff is not None and free_twist:                      # посох докрутят в кисти: нужно лишь предплечье поперёк посоха
+            score -= 8.0 * abs(float(np.dot(f, _n(staff))))
+        elif staff is not None:
             score += 4.0 * float(np.dot(st, _n(staff))) - 2.0 * abs(float(np.dot(f, _n(staff))))
         if fore is not None:
             score += 3.0 * float(np.dot(f, _n(fore)))
@@ -228,6 +230,31 @@ class Rig:
 
     def L(self, x, y, z, staff=None, **kw):
         return self.arm('left', (x, y, z), staff, **kw)
+
+    def S(self, x, y, z, staff, search=3.0, **kw):
+        """
+        Правая рука с посохом: (углы руки, {'roll': докрутка посоха в кисти}) — для rightItem.
+        Посох в кисти всегда поперёк предплечья, поэтому точное направление достижимо только при предплечье,
+        перпендикулярном посоху: ищем хват в кубе ±search px вокруг (x, y, z), где это так, а остаток
+        добираем поворотом посоха в кисти (полностью, без ограничения ITEM_FIX_MAX — жесты динамичные).
+        """
+        want = _n(staff)
+        best = None
+        steps = np.linspace(-search, search, 5) if search else [0.0]
+        kw.setdefault('free_twist', True)
+        for dx in steps:
+            for dy in steps:
+                for dz in steps:
+                    h = (x + dx, y + dy, z + dz)
+                    q, info = arm('right', h, staff, prev_u=self.u['right'], **kw)
+                    err = math.degrees(math.asin(min(1.0, abs(float(np.dot(info['fore'], want))))))
+                    score = err + 2.0 * math.sqrt(dx * dx + dy * dy + dz * dz)
+                    if best is None or score < best[0]:
+                        best = (score, q, info, h)
+        _, q, info, _h = best
+        self.u['right'] = info['u']
+        self.hand = np.array(_h)
+        return q, {'roll': info['twist']}
 
 
 def merge(*dicts):
@@ -960,6 +987,243 @@ def held_target():
     return a
 
 
+# ---------------------------------------------------------------- позы T05 и T20 (дополнение библиотеки)
+# «Падение звезды» — без посоха (руки пустые, как у других заклинаний с роликом); жесты T20 — с посохом в правой руке
+# (у этих поз есть rightItem — докрутка посоха в кисти, чтобы он смотрел куда нужно).
+_SR = Rig()
+AIM_R = _fk(pitch=-74, yaw=10, roll=-2, bend=-6)               # ладонь к точке на земле впереди, рука прямая
+GATHER_L = _PR.L(1.2, 17.6, 4.6, elbow_out=1.6)                # левая кисть у груди собирает силу (локоть в сторону)
+SKY_OPEN_R = _fk(pitch=-42, roll=146, bend=-10)                 # руки к небу широким V, ладони раскрыты
+SKY_FLARE_R = _fk(pitch=-34, roll=128, bend=-4)                # вспышка звезды: руки распахиваются шире, корпус назад
+GRAB_R = _fk(pitch=-158, yaw=-4, roll=14, bend=-18)            # хватает звезду: кисти почти сходятся над головой
+PULL_MID_R = _PR.R(-8.5, 28.5, 5.5, elbow_out=1.6)             # тянет вниз: кулаки над головой по бокам, локти в стороны
+PULL_LOW_R = _fk(pitch=-70, yaw=-8, roll=14, bend=-24)         # дотягивает: руки перед грудью вниз
+SLAM_R = _fk(pitch=-38, yaw=-6, roll=8, bend=-6)               # удар: правая ладонь к земле (корпус наклонён — рука почти отвесно)
+BRACE_L = _fk(pitch=42, yaw=-10, roll=-42, bend=-12)                    # левая — отведена назад-в сторону для равновесия
+KNEEL_LEGS = dict(rightLeg=_TO(pitch=-78, roll=6, bend=82), leftLeg=_TO(pitch=6, roll=-6, bend=86))
+CROUCH_LEGS = dict(rightLeg=_TO(pitch=-22, roll=6, bend=34), leftLeg=_TO(pitch=10, roll=-6, bend=22))
+
+STAFF_REST = _SR.S(-6.4, 13.0, 4.6, (0.0, 0.25, 1.0), search=0, free_twist=False)        # посох в опущенной руке, навершием вперёд
+STAFF_UP = _SR.S(-6.0, 27.0, 5.0, (0.08, 1.0, 0.12))          # посох поднят вертикально: кисть над плечом, предплечье поперёк
+STAFF_BACK = _SR.S(-7.0, 27.0, 2.0, (0.1, 0.55, -0.83))       # замах: навершие за правым плечом, назад-вверх
+STAFF_SWING = _SR.S(-4.0, 17.0, 6.0, (0.0, 0.08, 1.0))        # взмах: посох указывает вперёд, на врагов
+STAFF_GUARD = _SR.S(-2.2, 19.0, 6.4, (0.0, 1.0, 0.0))         # посох вертикально перед собой
+GUARD_L = _PR.L(*grip(_SR.hand, (0, 1, 0), 5.0), (0.0, 1.0, 0.0), elbow_out=1.4)   # левая берётся за древко над правой
+STAFF_LIFT = _SR.S(-2.2, 23.0, 7.5, (0.0, 1.0, 0.0))          # приподнят перед ударом
+LIFT_L = _PR.L(*grip(_SR.hand, (0, 1, 0), 5.0), (0.0, 1.0, 0.0), elbow_out=1.4)
+STAFF_STRIKE = _SR.S(-2.4, 17.6, 7.0, (0.0, 1.0, 0.0), search=1.5)       # удар концом о землю (корпус и ноги опускают его ниже)
+STRIKE_L = _PR.L(*grip(_SR.hand, (0, 1, 0), 5.0), (0.0, 1.0, 0.0), elbow_out=1.4)
+STAFF_BOUNCE = _SR.S(-2.4, 18.6, 7.0, (0.0, 1.0, 0.0), search=1.5)       # отдача после удара
+STAFF_LOW = _SR.S(-7.2, 12.4, 2.0, (-0.3, 0.28, -0.91))      # посох низко у правого бока, навершие назад-вверх (не мешает тени дракона)
+PALM_BACK_L = _fk(pitch=38, yaw=-10, roll=-34, bend=-4)        # левая ладонь раскрыта за спину, низко
+FAN_MID_L = _fk(pitch=30, yaw=-14, roll=-62, bend=-4)          # ведёт веер печатей вверх-в сторону
+FAN_HI_L = _fk(pitch=14, yaw=-18, roll=-92, bend=-6)           # веер раскрыт: рука в сторону-назад на уровне плеча
+DRAGON_POINT_L = mirror(_fk(pitch=-92, yaw=10, roll=-4, bend=-2))  # левая указывает вперёд (куда дохнёт тень)
+DRAGON_AIM_L = mirror(_fk(pitch=-86, yaw=8, roll=-2, bend=-30))     # подтягивает руку перед выдохом
+DRAGON_PUSH_L = mirror(_fk(pitch=-94, yaw=12, roll=-6, bend=0))     # выдох: ладонь вперёд
+LEAN_L = _TO(roll=7, yaw=9, pitch=-1)                           # корпус отклонён влево (от тени над правым плечом)
+
+POSES.update({
+    'star_aim': dict(rightArm=AIM_R, leftArm=GATHER_L, torso=_TO(pitch=3, yaw=-12, bend=2), head=_HL(pitch=10, yaw=-6), **CROUCH_LEGS),
+    'sky_open': dict(rightArm=SKY_OPEN_R, leftArm=mirror(SKY_OPEN_R), torso=_TO(pitch=-10, bend=-6), head=_HL(pitch=-40),
+                     rightLeg=_TO(pitch=-6, roll=7, bend=6), leftLeg=_TO(pitch=6, roll=-7, bend=4)),
+    'star_grab': dict(rightArm=GRAB_R, leftArm=mirror(GRAB_R), torso=_TO(pitch=-8, bend=-6), head=_HL(pitch=-36),
+                      rightLeg=_TO(pitch=-6, roll=7, bend=6), leftLeg=_TO(pitch=6, roll=-7, bend=4)),
+    'star_pull': dict(rightArm=PULL_LOW_R, leftArm=mirror(PULL_LOW_R), torso=_TO(pitch=16, bend=10), head=_HL(pitch=-10),
+                      body={'y': -0.08}, **CROUCH_LEGS),
+    'star_impact': dict(rightArm=SLAM_R, leftArm=BRACE_L, torso=_TO(pitch=32, yaw=-6, bend=10), head=_HL(pitch=-22, yaw=4),
+                        body={'y': -0.36}, **KNEEL_LEGS),
+    'staff_up': dict(rightArm=STAFF_UP[0], rightItem=STAFF_UP[1], leftArm=PALM_BACK_L, torso=_TO(pitch=-3, yaw=6), head=_HL(pitch=-8)),
+    'staff_swing': dict(rightArm=STAFF_SWING[0], rightItem=STAFF_SWING[1], leftArm=_fk(pitch=22, roll=-40, bend=-10),
+                        torso=_TO(pitch=8, yaw=-14, bend=4), head=_HL(yaw=10), **_STANCE_LEGS),
+    'staff_guard': dict(rightArm=STAFF_GUARD[0], rightItem=STAFF_GUARD[1], leftArm=GUARD_L, torso=_TO(pitch=2), head=_HL(pitch=6)),
+    'staff_strike': dict(rightArm=STAFF_STRIKE[0], rightItem=STAFF_STRIKE[1], leftArm=STRIKE_L, torso=_TO(pitch=2, bend=1),
+                         head=_HL(pitch=12), body={'y': -0.24}, rightLeg=_TO(pitch=-30, roll=6, bend=46), leftLeg=_TO(pitch=12, roll=-6, bend=30)),
+    'dragon_point': dict(rightArm=STAFF_LOW[0], rightItem=STAFF_LOW[1], leftArm=DRAGON_POINT_L, torso=LEAN_L, head=_HL(pitch=-2, yaw=6, roll=3),
+                         rightLeg=_TO(pitch=8, roll=4, bend=4), leftLeg=_TO(pitch=-10, roll=-4, bend=8)),
+})
+POSE_NAMES.update({'star_aim': 'прицел: ладонь к точке, сила у груди', 'sky_open': 'руки к небу (печать)', 'star_grab': 'хватает звезду',
+                   'star_pull': 'тянет звезду вниз', 'star_impact': 'удар: колено и ладонь к земле',
+                   'staff_up': 'посох вверх, ладонь за спину', 'staff_swing': 'взмах посохом вперёд', 'staff_guard': 'посох вертикально',
+                   'staff_strike': 'удар концом посоха о землю', 'dragon_point': 'указ левой, посох низко'})
+
+
+# ---------------------------------------------------------------- Падение звезды (T05), 8 с = 160 тиков ровно
+# Шкала эффекта fx/star_fall.json и ролика: 0–3.2 печать-прицел на земле; 3.2 звёздная печать в небе; 4.8 вспышка звезды;
+# 5–8 звезда падает (easeInCubic); 8 — удар. Стиль властный: прямая рука-приказ, рывок вниз всем телом, удар на колено.
+STAR_T = 8.0
+
+
+def star_fall_cast():
+    a = Anim('pohsmp_star_fall_cast', STAR_T)
+    _start(a)
+    P = {k: pose(k) for k in ('star_aim', 'sky_open', 'star_grab', 'star_pull', 'star_impact')}
+    aim = P['star_aim']
+    # 0–0.7 рука-приказ вскидывается к точке на земле, левая кисть идёт к груди, стойка шире
+    a.pose(0.35, 'easeInQuad', rightArm=_fk(pitch=-40, yaw=6, roll=2, bend=-30), head=_HL(pitch=4, yaw=-4))
+    a.pose(0.7, 'easeOutBack', rightArm=AIM_R, leftArm=GATHER_L, torso=aim['torso'], head=aim['head'],
+           rightLeg=aim['rightLeg'], leftLeg=aim['leftLeg'], body={'y': -0.03})
+    # 0.7–3.0 печать собирается по частям: три толчка ладонью (части печати встают), дрожь силы в левой
+    for t in (1.25, 1.95, 2.65):
+        a.pose(t - 0.12, rightArm=AIM_R, torso=aim['torso'])
+        a.pose(t, 'easeOutCubic', rightArm=merge(AIM_R, {'pitch': AIM_R['pitch'] - 4, 'bend': 0}),
+               torso=merge(aim['torso'], {'pitch': 5}))
+        a.pose(t + 0.3, rightArm=AIM_R, torso=aim['torso'])
+    a.sway(0.7, 2.9, 0.22, 'leftArm', GATHER_L, 'roll', 2.5)
+    a.sway(0.7, 2.9, 1.1, 'head', aim['head'], 'pitch', 2)
+    # 2.9–3.2 вдох: обе руки на миг опускаются к груди, голова вниз — набирает силу
+    a.pose(3.05, 'easeInOutQuad', rightArm=_PR.R(-1.4, 18.4, 4.4), leftArm=_PR.L(1.4, 18.4, 4.4),
+           torso=_TO(pitch=8, bend=6), head=_HL(pitch=22), body={'y': -0.06})
+    # 3.2 звёздная печать раскрывается в небе: руки и взгляд вверх рывком, корпус прогибается
+    sky = P['sky_open']
+    a.pose(3.5, 'easeOutBack', rightArm=SKY_OPEN_R, leftArm=mirror(SKY_OPEN_R), torso=sky['torso'], head=sky['head'],
+           rightLeg=sky['rightLeg'], leftLeg=sky['leftLeg'], body={'y': 0.02})
+    a.sway(3.5, 4.55, 0.18, 'rightArm', SKY_OPEN_R, 'roll', 2)
+    a.sway(3.5, 4.55, 0.2, 'leftArm', mirror(SKY_OPEN_R), 'roll', -2)
+    # 4.8 вспышка звезды: руки распахиваются, голова откидывается
+    a.pose(4.68, rightArm=merge(SKY_OPEN_R, {'roll': 156}), leftArm=mirror(merge(SKY_OPEN_R, {'roll': 156})),
+           head=_HL(pitch=-42), torso=sky['torso'])
+    a.pose(4.85, 'easeOutCubic', rightArm=SKY_FLARE_R, leftArm=mirror(SKY_FLARE_R), head=_HL(pitch=-48),
+           torso=_TO(pitch=-14, bend=-8))
+    # 5.0–5.3 хватает звезду: кисти сходятся над головой
+    grab = P['star_grab']
+    a.pose(5.3, 'easeOutBack', rightArm=GRAB_R, leftArm=mirror(GRAB_R), torso=grab['torso'], head=grab['head'])
+    # 5.3–8 тянет вниз — ускоряется вместе со звездой (easeInCubic); корпус наклоняется, ноги сгибаются
+    a.pose(6.5, 'easeInQuad', rightArm=PULL_MID_R, leftArm=mirror(PULL_MID_R), torso=_TO(pitch=4, bend=2),
+           head=_HL(pitch=-26), rightLeg=_TO(pitch=-12, roll=7, bend=16), leftLeg=_TO(pitch=8, roll=-7, bend=10),
+           body={'y': -0.03})
+    pull = P['star_pull']
+    a.pose(7.45, 'easeInCubic', rightArm=PULL_LOW_R, leftArm=mirror(PULL_LOW_R), torso=pull['torso'], head=pull['head'],
+           rightLeg=pull['rightLeg'], leftLeg=pull['leftLeg'], body=pull['body'])
+    # 7.45–8 последний рывок: на колено, правая ладонь в землю — удар ровно на 8 с
+    imp = P['star_impact']
+    a.pose(7.75, 'easeInQuad', rightArm=_fk(pitch=-58, yaw=-6, roll=10, bend=-20), leftArm=_fk(pitch=-30, roll=-40, bend=-30),
+           torso=_TO(pitch=24, yaw=-4, bend=10), head=_HL(pitch=-16))
+    a.pose(STAR_T, 'easeOutCubic', **{k: imp[k] for k in ('rightArm', 'leftArm', 'torso', 'head', 'rightLeg', 'leftLeg', 'body')})
+    return a
+
+
+def star_fall_finish():
+    """После удара (1.5 с): держит упор, пока бьёт волна, потом встаёт и опускает руки, глядя на кратер."""
+    a = Anim('pohsmp_star_fall_finish', 1.5, hold=False)
+    imp = pose('star_impact')
+    a.pose(0, **{k: imp[k] for k in ('rightArm', 'leftArm', 'torso', 'head', 'rightLeg', 'leftLeg', 'body')})
+    a.pose(0.12, 'easeOutCubic', torso=merge(imp['torso'], {'pitch': 36}), body={'y': -0.38})   # отдача волны
+    a.pose(0.45, rightArm=SLAM_R, leftArm=BRACE_L, torso=imp['torso'], head=_HL(pitch=-14, yaw=2))
+    a.pose(1.0, 'easeInOutQuad', rightArm=_fk(pitch=-14, roll=6, bend=-12), leftArm=_fk(pitch=4, roll=-12, bend=-10),
+           torso=_TO(pitch=10, bend=4), head=_HL(pitch=14), body={'y': -0.1}, **CROUCH_LEGS)
+    a.pose(1.5, rightArm=ARM_DOWN_R, leftArm=ARM_DOWN_L, torso=ZERO_T, head=_HL(pitch=6), body={'y': 0},
+           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    return a
+
+
+# ---------------------------------------------------------------- жесты посоха T20 (посох в правой руке)
+def _staff_start(a):
+    _start(a)
+    a.pose(0, rightArm=STAFF_REST[0], rightItem=STAFF_REST[1])
+
+
+def silent_volley_cast():
+    """«Безмолвный залп», каст 3 с (VOLLEY_CAST 60 тиков): посох вверх, левая ладонь за спину — веер печатей встаёт
+    за 80 % каста (2.4 с); замах и взмах посохом вперёд ровно к концу каста — стрелы вылетают."""
+    T = 3.0
+    a = Anim('pohsmp_silent_volley_cast', T)
+    _staff_start(a)
+    up = pose('staff_up')
+    a.pose(0.45, 'easeOutBack', rightArm=STAFF_UP[0], rightItem=STAFF_UP[1], torso=up['torso'], head=up['head'])
+    a.pose(0.6, 'easeOutCubic', leftArm=PALM_BACK_L, rightLeg=_TO(pitch=-6, roll=5, bend=6), leftLeg=_TO(pitch=8, roll=-5, bend=4))
+    # левая ведёт веер: от низа за спиной вверх и в сторону; корпус чуть раскрывается влево, взгляд вскользь назад
+    a.pose(1.4, leftArm=FAN_MID_L, torso=_TO(pitch=-4, yaw=10, roll=2), head=_HL(pitch=-6, yaw=14))
+    a.pose(2.3, leftArm=FAN_HI_L, torso=_TO(pitch=-5, yaw=8, roll=3), head=_HL(pitch=-4, yaw=6))
+    a.sway(0.45, 2.3, 0.9, 'rightArm', STAFF_UP[0], 'pitch', 2)
+    a.pose(2.4, rightItem=STAFF_UP[1])                         # посох держится, пока встают печати
+    # 2.4–2.72 замах за плечо (корпус закручивается вправо), 2.72–2.95 взмах вперёд — к 3.0 посох смотрит на врагов
+    a.pose(2.72, 'easeOutQuad', rightArm=STAFF_BACK[0], rightItem=STAFF_BACK[1], torso=_TO(pitch=-6, yaw=20, bend=-3),
+           head=_HL(yaw=-6), leftArm=FAN_HI_L)
+    sw = pose('staff_swing')
+    a.pose(2.95, 'easeInQuad', rightArm=STAFF_SWING[0], rightItem=STAFF_SWING[1], torso=sw['torso'], head=sw['head'],
+           leftArm=sw['leftArm'], rightLeg=sw['rightLeg'], leftLeg=sw['leftLeg'])
+    a.pose(T, rightArm=STAFF_SWING[0], rightItem=STAFF_SWING[1])
+    return a
+
+
+def silent_volley_finish():
+    """0.9 с: посох задерживается вперёд, пока летят стрелы, и опускается."""
+    a = Anim('pohsmp_silent_volley_finish', 0.9, hold=False)
+    sw = pose('staff_swing')
+    a.pose(0, **{k: sw[k] for k in ('rightArm', 'rightItem', 'leftArm', 'torso', 'head', 'rightLeg', 'leftLeg')}, body={'y': 0})
+    a.pose(0.3, rightArm=STAFF_SWING[0], torso=merge(sw['torso'], {'pitch': 6}))
+    a.pose(0.9, rightArm=STAFF_REST[0], rightItem=STAFF_REST[1], leftArm=ARM_DOWN_L, torso=ZERO_T, head=ZERO_H,
+           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    return a
+
+
+def sage_barrier_cast():
+    """«Барьер», каст 1.5 с (BARRIER_CAST 30 тиков): посох вертикально перед собой, вторая рука на древке, приподнять —
+    удар концом о землю на 1.2 с, к 1.5 купол встаёт."""
+    T = 1.5
+    a = Anim('pohsmp_sage_barrier_cast', T)
+    _staff_start(a)
+    g = pose('staff_guard')
+    a.pose(0.4, 'easeOutCubic', rightArm=STAFF_GUARD[0], rightItem=STAFF_GUARD[1], leftArm=GUARD_L, torso=g['torso'], head=g['head'])
+    a.pose(0.9, 'easeInOutSine', rightArm=STAFF_LIFT[0], rightItem=STAFF_LIFT[1], leftArm=LIFT_L, torso=_TO(pitch=-3, bend=-2),
+           head=_HL(pitch=-2), body={'y': 0.03})
+    s = pose('staff_strike')
+    a.pose(1.12, 'easeInQuad', rightArm=STAFF_STRIKE[0], rightItem=STAFF_STRIKE[1], leftArm=STRIKE_L, torso=s['torso'],
+           head=s['head'], body=s['body'], rightLeg=s['rightLeg'], leftLeg=s['leftLeg'])
+    # отдача: посох чуть подпрыгивает, и снова прижат
+    a.pose(1.25, 'easeOutQuad', rightArm=STAFF_BOUNCE[0], rightItem=STAFF_BOUNCE[1], torso=merge(s['torso'], {'pitch': 6}))
+    a.pose(T, rightArm=STAFF_STRIKE[0], rightItem=STAFF_STRIKE[1], leftArm=STRIKE_L, torso=s['torso'], body=s['body'])
+    return a
+
+
+def sage_barrier_finish():
+    """1.0 с: держит посох у земли, пока купол собирается, выпрямляется, левая рука отпускает древко."""
+    a = Anim('pohsmp_sage_barrier_finish', 1.0, hold=False)
+    s = pose('staff_strike')
+    a.pose(0, **{k: s[k] for k in ('rightArm', 'rightItem', 'leftArm', 'torso', 'head', 'body', 'rightLeg', 'leftLeg')})
+    a.pose(0.35, head=_HL(pitch=-14), torso=_TO(pitch=4, bend=2))
+    a.pose(0.6, rightArm=STAFF_GUARD[0], rightItem=STAFF_GUARD[1], leftArm=_fk(pitch=-6, roll=-10, bend=-12), body={'y': 0},
+           torso=ZERO_T, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.pose(1.0, rightArm=STAFF_REST[0], rightItem=STAFF_REST[1], leftArm=ARM_DOWN_L, head=ZERO_H)
+    return a
+
+
+def worgan_flame_cast():
+    """«Чёрное пламя Ворганы», каст 2 с (FLAME_CAST 40 тиков): левая указывает вперёд, посох уходит низко к правому боку,
+    над правым плечом встаёт тень дракона — корпус отклоняется влево; перед выдохом рука подтягивается."""
+    T = 2.0
+    a = Anim('pohsmp_worgan_flame_cast', T)
+    _staff_start(a)
+    d = pose('dragon_point')
+    a.pose(0.3, 'easeInQuad', leftArm=mirror(_fk(pitch=-50, roll=-4, bend=-40)), head=_HL(pitch=-2, yaw=4))
+    a.pose(0.6, 'easeOutBack', leftArm=DRAGON_POINT_L, rightArm=STAFF_LOW[0], rightItem=STAFF_LOW[1],
+           torso=_TO(roll=3, yaw=8), head=d['head'], rightLeg=d['rightLeg'], leftLeg=d['leftLeg'])
+    # тень дракона поднимается — заклинатель всё сильнее отклоняется от неё, взгляд мельком на неё (вправо-вверх) и снова вперёд
+    a.pose(1.2, torso=_TO(roll=5, yaw=9, pitch=-2), head=_HL(pitch=-14, yaw=-22, roll=2))
+    a.pose(1.6, torso=LEAN_L, head=d['head'])
+    a.sway(0.6, 1.7, 0.3, 'leftArm', DRAGON_POINT_L, 'pitch', 1.5)
+    a.pose(1.7, leftArm=DRAGON_POINT_L)
+    a.pose(T, 'easeInOutQuad', leftArm=DRAGON_AIM_L, torso=merge(LEAN_L, {'pitch': 2}), head=_HL(pitch=2, yaw=6, roll=3))
+    return a
+
+
+def worgan_flame_finish():
+    """3.5 с: выдох 3 с (FLAME_BREATH 60 тиков) — ладонь вперёд, корпус держит отдачу, лёгкая дрожь; потом рука опускается."""
+    a = Anim('pohsmp_worgan_flame_finish', 3.5, hold=False)
+    d = pose('dragon_point')
+    a.pose(0, rightArm=STAFF_LOW[0], rightItem=STAFF_LOW[1], leftArm=DRAGON_AIM_L, torso=merge(LEAN_L, {'pitch': 2}),
+           head=_HL(pitch=2, yaw=6, roll=3), rightLeg=d['rightLeg'], leftLeg=d['leftLeg'], body={'y': 0})
+    push_torso = _TO(roll=8, yaw=10, pitch=-5, bend=-2)
+    a.pose(0.18, 'easeOutBack', leftArm=DRAGON_PUSH_L, torso=push_torso, head=_HL(pitch=-2, yaw=6, roll=4))
+    a.sway(0.18, 2.9, 0.16, 'leftArm', DRAGON_PUSH_L, 'yaw', -1.5)
+    a.sway(0.18, 2.9, 1.0, 'torso', push_torso, 'pitch', 1.5)
+    a.pose(3.0, leftArm=DRAGON_PUSH_L, torso=LEAN_L)
+    a.pose(3.5, rightArm=STAFF_REST[0], rightItem=STAFF_REST[1], leftArm=ARM_DOWN_L, torso=ZERO_T, head=ZERO_H,
+           rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    return a
+
+
 def pose_gallery():
     """Только для превью: по 1.4 с на каждую позу библиотеки."""
     out = []
@@ -988,7 +1252,8 @@ _DI = _pair(disintegration_cast, 'pohsmp_disintegration_finish')
 
 
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_finish,
-         scarlet_cut_cast, finger_snap, held_target]
+         scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
+         silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish]
 
 
 def main():

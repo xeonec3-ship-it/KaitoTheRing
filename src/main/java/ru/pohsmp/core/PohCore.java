@@ -70,6 +70,8 @@ public class PohCore {
             if (!e.has(type, Reg.HIGHER_RESIST.get())) e.add(type, Reg.HIGHER_RESIST.get());
             if (!e.has(type, Reg.FORBIDDEN_POWER.get())) e.add(type, Reg.FORBIDDEN_POWER.get());
             if (!e.has(type, Reg.FORBIDDEN_RESIST.get())) e.add(type, Reg.FORBIDDEN_RESIST.get());
+            if (!e.has(type, Reg.SILENT_POWER.get())) e.add(type, Reg.SILENT_POWER.get());
+            if (!e.has(type, Reg.SILENT_RESIST.get())) e.add(type, Reg.SILENT_RESIST.get());
         }
     }
 }

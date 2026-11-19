@@ -91,7 +91,7 @@ public class MirrorLabyrinthSpell extends IllusionBase {
         final Set<UUID> inside = new HashSet<>();
         final Map<UUID, Long> lastHit = new HashMap<>();
         final float damage;
-        int fx = -1;
+        int fx = -1, debug = 61;
 
         Lab(LivingEntity caster, ServerLevel sl, Maze maze, long seed, long until, float damage) {
             this.caster = caster;
@@ -119,6 +119,7 @@ public class MirrorLabyrinthSpell extends IllusionBase {
             sl.playSound(null, c.x, c.y + 1, c.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.6f);
             LABS.add(lab);
             Illusions.logZone("mirror_labyrinth", sl, caster, c, r);
+            ru.pohsmp.core.PohCore.LOG.info("[pohsmp] mirror_labyrinth: lab added, until={} now={} labs={}", lab.until, Illusions.now(), LABS.size());
         }
         super.onCast(level, spellLevel, caster, source, md);
     }
@@ -170,6 +171,15 @@ public class MirrorLabyrinthSpell extends IllusionBase {
                 }
                 double r = lab.maze.r;
                 Vec3 c = new Vec3(lab.maze.cx, lab.maze.cy, lab.maze.cz);
+                if (lab.debug-- > 0 && lab.debug % 20 == 0) {   // owner 19.11: the zone never reaches the victim - why, every second for 3 s
+                    StringBuilder sb = new StringBuilder();
+                    for (ServerPlayer p : lab.sl.players())
+                        sb.append(p.getGameProfile().getName()).append(" d=").append(Math.round(Math.sqrt(p.position().distanceToSqr(c)) * 10) / 10.0)
+                                .append(" ally=").append(Illusions.ally(lab.caster, p)).append(" in=").append(lab.inside.contains(p.getUUID()))
+                                .append(" last=").append(lab.lastHit.get(p.getUUID())).append("; ");
+                    ru.pohsmp.core.PohCore.LOG.info("[pohsmp] mirror_labyrinth tick now={} until={} level={} : {}", now, lab.until,
+                            lab.sl.dimension().location(), sb);
+                }
                 for (ServerPlayer p : lab.sl.players()) {
                     if (p.isSpectator() || Illusions.ally(lab.caster, p) || p.position().distanceToSqr(c) > r * r) continue;
                     Long last = lab.lastHit.get(p.getUUID());

@@ -103,8 +103,10 @@ public final class HigherFx {
             SilentMusic.stop(m.key);
             Inst x = LIVE.get(m.key);
             if (x != null && x.fadeAt < 0) x.fadeAt = now;
+            if (x != null && x.kind == HFx.JOINT) JointFx.mark(x.a, now + 10);   // the final flash of the cast still gets both outlines
             return;
         }
+        if (m.kind == HFx.JOINT) JointFx.mark(m.a, now + Math.max(1, m.dur) + 10);
         Inst prev = LIVE.get(m.key);
         if ((m.kind == HFx.TABOO || m.kind == HFx.CLOSURE) && prev != null && prev.kind == m.kind && prev.fadeAt < 0) {   // refresh: keep the animation running
             prev.dur = (int) (now - prev.start) + Math.max(1, m.dur);
@@ -184,6 +186,7 @@ public final class HigherFx {
                 case HFx.CLOSURE_CAST -> closureCast(c, x);
                 case HFx.CLOSURE -> closure(c, x);
                 case HFx.CLOSURE_HIT -> closureHit(c, x);
+                case HFx.JOINT -> joint(c, x);
                 default -> {}
             }
         }
@@ -701,6 +704,8 @@ public final class HigherFx {
         float fd = c.fade * out;
         ResourceLocation tx = SIGILS[x.b];
         flat(c.vc(tx), c.pose, p.add(0, 0.04, 0), UP, size, (float) (c.time * 0.06), cr, cg, cb, fd);
+        if (JointFx.isJoint(x.a, c.lvl.getGameTime()))   // joint cast: second outline, raised, wider, turning the other way
+            flat(c.vc(tx), c.pose, p.add(0, 0.04 + JointFx.LIFT, 0), UP, size * JointFx.SCALE, (float) (-c.time * 0.09 + JointFx.TURN), cr, cg, cb, fd * JointFx.ALPHA);
         float rise = (float) Math.min(1, t / 20.0);
         flat(c.vc(tx), c.pose, p.add(0, 0.1 + 1.6 * rise, 0), UP, size * (0.65f - 0.25f * rise), (float) (-c.time * 0.1), cr, cg, cb, fd * (1 - rise) * 0.8f);
         if (t < 16) {
@@ -712,6 +717,29 @@ public final class HigherFx {
         runeSwarm(c, p, 6, x.f * 0.75f, 2.2f, x.dur - 10, seed, 0.2f, cr, cg, cb, c.fade);
         float gk = (float) smooth(Math.min(1, t / 8.0));
         gyro(c, p.add(0, 1.1, 0), 2, x.f * 0.5f * (0.6f + 0.4f * gk), seed, cr, cg, cb, fd * gk * 0.8f);
+    }
+
+    /**
+     * Joint cast (T15): the school sigil (i >> 24) under the caster (a) for the whole merged cast, with a double outline: the
+     * second layer is raised, wider and turns the other way, shifted by a sixteenth of a turn; a thin ring closes it.
+     */
+    private static void joint(Ctx c, Inst x) {
+        int sb = (x.i >>> 24) & 0xFF, col = x.i & 0xFFFFFF;
+        if (sb >= SIGILS.length) sb = 7;
+        Vec3 p = follow(c, x, x.a);
+        float cr = r(col), cg = g(col), cb = b(col), fd = c.fade;
+        float k = (float) smooth(Math.min(1, c.age / 10.0));
+        float R = x.f * k;
+        ResourceLocation tx = SIGILS[sb];
+        flat(c.vc(tx), c.pose, p.add(0, 0.05, 0), UP, R, (float) (c.time * 0.05), cr, cg, cb, fd);
+        flat(c.vc(tx), c.pose, p.add(0, 0.05 + JointFx.LIFT, 0), UP, R * JointFx.SCALE, (float) (-c.time * 0.08 + JointFx.TURN), cr, cg, cb, fd * JointFx.ALPHA);
+        flat(c.vc(RING), c.pose, p.add(0, 0.07, 0), UP, R * (JointFx.SCALE + 0.12f), 0, cr, cg, cb, fd * 0.5f);
+        if (x.b >= 0 && c.lvl.getEntity(x.b) != null) {   // a spark running toward the partner
+            Vec3 q = c.lvl.getEntity(x.b).getPosition(c.pt);
+            double u = (c.time * 0.05) % 1.0;
+            Vec3 s = p.add(q.subtract(p).scale(u)).add(0, 0.25, 0);
+            billboard(c.vc(FLARE), c.pose, s, c.cam, 0.35f, cr, cg, cb, fd * 0.8f);
+        }
     }
 
     /** Eight Shields: the ward circle under the caster (a) with eight runes turning with the wall. */

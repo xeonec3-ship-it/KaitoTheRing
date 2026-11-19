@@ -16,6 +16,12 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue GATE_RAY_DAMAGE, GATE_RAY_RADIUS, GATE_RAYS_PER_SECOND, GATE_MAIN_PERCENT, GATE_MAIN_FLAT,
             GATE_MAIN_RADIUS, GATE_AREA, GATE_SET_BONUS;
     public static final ForgeConfigSpec.IntValue GATE_HIT_COOLDOWN, GATE_AIM_INTERVAL, GATE_RANGE, GATE_SILENCE_SECONDS;
+    public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> JOINT_SPELLS;
+    public static final ForgeConfigSpec.DoubleValue JOINT_RADIUS, JOINT_WINDOW, JOINT_MULT;
+    public static final ForgeConfigSpec.DoubleValue COUNTDOWN_MAX;
+    public static final ForgeConfigSpec.IntValue SCARLET_CUTS_MIN, SCARLET_CUTS_MAX, SCARLET_INTERVAL, SCARLET_CRACK_DELAY;
+    public static final ForgeConfigSpec.DoubleValue SCARLET_DAMAGE, SCARLET_WIDTH, SCARLET_NEAR, SCARLET_FAR,
+            SCARLET_SHARD_DAMAGE, SCARLET_SHARD_RADIUS, SCARLET_KNOCK_UP;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -52,6 +58,32 @@ public final class ServerConfig {
         GATE_MAIN_RADIUS = b.comment("Main beam: radius of its hit").defineInRange("mainRadius", 3.0, 0.5, 32.0);
         GATE_SET_BONUS = b.comment("Silent Witch full set (always worn when Gate is cast): ray and main beam damage multiplier").defineInRange("setBonus", 1.2, 0.0, 100.0);
         GATE_SILENCE_SECONDS = b.comment("'Silence' after the cast: Gate cannot be cast again for this long (other magic is fine)").defineInRange("silenceSeconds", 180, 0, 86400);
+        b.pop();
+        b.push("joint_cast");
+        JOINT_SPELLS = b.comment("Joint cast: spells (full ids) two mages can cast together from scrolls. Only long casts (with a cast bar) take part.",
+                        "The second mage starts the same spell from a scroll within the window and the radius: both casts end together after",
+                        "castTimeMult of the first mage's cast time, the spell takes effect once (from the first mage), the second scroll is spent too.")
+                .defineListAllowEmpty(java.util.List.of("spells"), () -> java.util.List.of("pohsmp_core:explosion", "pohsmp_core:heaven_fall",
+                        "pohsmp_core:ark", "pohsmp_core:frozen_hour", "pohsmp_core:disintegration"), o -> o instanceof String s && s.contains(":"));
+        JOINT_RADIUS = b.comment("Max distance between the two mages (blocks)").defineInRange("radius", 6.0, 1.0, 64.0);
+        JOINT_WINDOW = b.comment("The second mage must start within this many seconds of the first one's cast start").defineInRange("windowSeconds", 2.0, 0.05, 30.0);
+        JOINT_MULT = b.comment("Cast time of a joint cast as a share of the first mage's cast time").defineInRange("castTimeMult", 0.7, 0.05, 1.0);
+        b.pop();
+        b.push("countdown");
+        COUNTDOWN_MAX = b.comment("Countdown: the repeated hit is capped at this share of the target's max health").defineInRange("maxRepeat", 0.4, 0.0, 100.0);
+        b.pop();
+        b.push("scarlet_cut");
+        SCARLET_CUTS_MIN = b.comment("Scarlet Cut: fewest cuts in a series").defineInRange("cutsMin", 3, 1, 20);
+        SCARLET_CUTS_MAX = b.comment("Most cuts in a series (the count is picked at random between min and max)").defineInRange("cutsMax", 5, 1, 20);
+        SCARLET_INTERVAL = b.comment("Ticks between cuts").defineInRange("interval", 4, 1, 40);
+        SCARLET_DAMAGE = b.comment("Damage of one cut to everyone it hits (times [higher] damageMult)").defineInRange("damage", 6.0, 0.0, 10000.0);
+        SCARLET_WIDTH = b.comment("Width of a cut across the view, blocks").defineInRange("width", 4.0, 0.5, 32.0);
+        SCARLET_NEAR = b.comment("A cut hits from this distance in front of the caster...").defineInRange("near", 3.0, 0.0, 32.0);
+        SCARLET_FAR = b.comment("...up to this distance, blocks").defineInRange("far", 6.0, 0.5, 64.0);
+        SCARLET_CRACK_DELAY = b.comment("Ticks from a cut until its crack bursts (the effect's burst is timed for 20)").defineInRange("crackDelay", 20, 1, 200);
+        SCARLET_SHARD_DAMAGE = b.comment("Damage of the crack's burst (times [higher] damageMult)").defineInRange("shardDamage", 4.0, 0.0, 10000.0);
+        SCARLET_SHARD_RADIUS = b.comment("The burst hits within this distance of the crack line, blocks").defineInRange("shardRadius", 1.5, 0.1, 16.0);
+        SCARLET_KNOCK_UP = b.comment("Upward push of the burst").defineInRange("knockUp", 0.4, 0.0, 5.0);
         b.pop();
         SPEC = b.build();
     }

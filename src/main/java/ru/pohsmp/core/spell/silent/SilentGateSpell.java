@@ -1,4 +1,4 @@
-package ru.pohsmp.core.spell;
+package ru.pohsmp.core.spell.silent;
 
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
@@ -36,6 +36,9 @@ import ru.pohsmp.core.ServerConfig;
 import ru.pohsmp.core.SilentWitch;
 import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.fx.FxLib;
+import ru.pohsmp.core.spell.CnpcHooks;
+import ru.pohsmp.core.spell.Cutscene;
+import ru.pohsmp.core.spell.HigherSpell;
 
 /**
  * "Gate" (T03): Silent school, Unknown tier, only from the Silent Witch's staff and only in her full outfit (T18/T19, see {@link SilentWitch}).
@@ -46,7 +49,7 @@ import ru.pohsmp.core.fx.FxLib;
  * Damage: Silent magic (through armor, Silent power, Silent resistance), numbers in [silent_gate]. Afterwards "Silence": the spell's own
  * cooldown, 3 min. The caster, the caster's team, its pets and allied CNPC NPCs are never hit.
  */
-public class SilentGateSpell extends PohSpell {
+public class SilentGateSpell extends SilentStaffSpell {
     public static final String PATH = "silent_gate";
     /** Ticks: cast (= 50 s in the track), first rays, main beam, last rays, crystal, end of the scene, crystal life. */
     public static final int CAST = 1000, RAYS_FROM = 1000, MAIN = 1040, RAYS_TO = 1260, CRYSTAL = 1280, END = 1300, CRYSTAL_LIFE = 600;
@@ -74,13 +77,12 @@ public class SilentGateSpell extends PohSpell {
     private static boolean hitting;
 
     public SilentGateSpell() {
-        super(PATH, Reg.SILENT_ID, SpellRarity.LEGENDARY, 1, 180, CAST, 0, 0);
+        super(PATH, 180, CAST, 0);
     }
 
+    @Override protected boolean ready() { return true; }
     @Override public CastType getCastType() { return CastType.LONG; }
     @Override public boolean canBeInterrupted(Player player) { return false; }
-    @Override public boolean allowCrafting() { return false; }
-    @Override public boolean allowLooting() { return false; }
     /** No spell sounds: only the music (T03). */
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
@@ -102,21 +104,17 @@ public class SilentGateSpell extends PohSpell {
                 ui("silence", ServerConfig.GATE_SILENCE_SECONDS.get() / 60));
     }
 
-    /** Why the caster cannot start (or keep) the Gate, or null. */
+    /** Staff: checked by {@link SilentStaffSpell}. Outfit: the full Silent Witch set (stub until T19 registers the pieces). */
+    @Override
+    protected String whyNot(Level level, LivingEntity entity) {
+        return SilentWitch.hasFullSet(entity) ? null : "need_set";
+    }
+
+    /** Why the Gate must stop mid-cast (staff dropped or a piece taken off), or null. */
     private static String why(LivingEntity e) {
         if (!SilentWitch.hasStaff(e)) return "need_staff";
         if (!SilentWitch.hasFullSet(e)) return "need_set";
         return null;
-    }
-
-    @Override
-    public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData md) {
-        String why = why(entity);
-        if (why != null) {
-            if (entity instanceof Player p) p.displayClientMessage(Component.translatable("ui.pohsmp_core.silent_gate." + why).withStyle(s -> s.withColor(Reg.SILENT_COLOR)), true);
-            return false;
-        }
-        return super.checkPreCastConditions(level, spellLevel, entity, md);
     }
 
     @Override
@@ -293,7 +291,7 @@ public class SilentGateSpell extends PohSpell {
     }
 
     /** Never hit: the caster, its team, its pets, armor stands, spectators, and NPCs of a CNPC faction friendly to the caster. */
-    static boolean friendly(LivingEntity caster, Entity e) {
+    public static boolean friendly(LivingEntity caster, Entity e) {
         if (HigherSpell.friendly(caster, e)) return true;
         if (e instanceof Player p && (p.isCreative() || p.isSpectator())) return true;
         return CnpcHooks.friendlyTo(e, caster) || CnpcHooks.friendlyTo(caster, e);

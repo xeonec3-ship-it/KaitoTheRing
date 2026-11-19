@@ -42,6 +42,16 @@ public abstract class PohSpell extends AbstractSpell {
     private static final String[] SIGIL_SCHOOLS = {"fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind"};
     private static final int[] SIGIL_COLORS = {0xFF7A2A, 0x9FE0FF, 0x6BE6FF, 0x7EE04A, 0xFFE38A, 0xE0242C, 0xC060FF, 0xDDE6F0, 0x3FD6B8, 0xBFF2E8};
 
+    /** Index of the drawn sigil of an Iron's school (by path), -1 if it has none. */
+    public static int sigilIndex(String school) {
+        for (int i = 0; i < SIGIL_SCHOOLS.length; i++) if (SIGIL_SCHOOLS[i].equals(school)) return i;
+        return -1;
+    }
+
+    public static int sigilColor(int index) {
+        return SIGIL_COLORS[index];
+    }
+
     /** Every cast of an ordinary-school spell flashes the drawn sigil of its school under the caster. */
     @Override
     public void onCast(net.minecraft.world.level.Level level, int spellLevel, LivingEntity caster, io.redspace.ironsspellbooks.api.spells.CastSource source,

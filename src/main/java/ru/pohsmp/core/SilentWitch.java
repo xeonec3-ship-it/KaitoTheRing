@@ -9,8 +9,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 /**
  * Silent Witch's staff (T18) and outfit (T19), checked by item id.
- * STUB until T18/T19 are done: an item that is not registered yet counts as present, so "Gate" can already be cast
- * (and tested) without them. As soon as items with these ids exist, the checks become real with no code change here.
+ * The staff exists (T18). The outfit check is a STUB until T19 registers the pieces: a piece that is not registered
+ * counts as worn, so "Gate" can already be cast and tested. Once items with these ids exist the check is real, no change here.
  */
 public final class SilentWitch {
     private SilentWitch() {}

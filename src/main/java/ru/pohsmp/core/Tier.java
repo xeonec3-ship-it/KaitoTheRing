@@ -12,7 +12,7 @@ import ru.pohsmp.core.spell.DisintegrationSpell;
 
 /**
  * Tiers above Iron's Legendary. Only a label on scrolls: Iron's itself still sees the spell as Legendary.
- * Tier comes from the "pohsmp_tier" NBT tag ("higher" / "mythic" / "divine" / "none"), then from the spell's built-in tier,
+ * Tier comes from the "pohsmp_tier" NBT tag ("higher" / "mythic" / "divine" / "creation" / "unknown" / "none"), then from the spell's built-in tier,
  * then from how far the level is above the spell's max level (+1..2 higher, +3..4 mythic, +5 and more divine).
  */
 public enum Tier {
@@ -20,6 +20,7 @@ public enum Tier {
     MYTHIC("mythic", 0xB45CFF, true),
     DIVINE("divine", 0xFFD34D, true),
     CREATION("creation", 0xD4A017, true),
+    /** Silent Witch staff spells (T18): no scrolls, only from the staff. */
     UNKNOWN("unknown", 0x7FFFD0, true);
 
     public static final String NBT = "pohsmp_tier";

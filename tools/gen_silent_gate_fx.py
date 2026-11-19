@@ -53,21 +53,15 @@ def build():
     # «туманность» — плотный поток мельчайших белых и бледно-бирюзовых искр с розово-лиловым отливом, мягкие светящиеся облачка,
     # в потоке мерцают крупные четырёхлучевые звёздочки (textures/fx/glint4.png); у кисти — мягкое белое ядро.
     # Никаких лучей-лент от руки к вратам (решение владельца 19.11).
-    hand = dict(delay=T(14.6), duration=T(11.4), at='caster.hand', follow=True)
-    # Плотность урезана (в игре экран заливало белым, 19.11): без вспышки у кисти, без свечения (glow), облачка — редкие и тусклые;
-    # искры быстрее уходят от руки, чтобы не копиться у камеры; поток загибается вверх (как в видео мода: вперёд-вверх от руки). Читается как поток искр и звёздочек, не как туман.
-    el(type='sprites', texture='spark_soft', count=900, rate=5, cone=40, speed=0.12, gravity=-0.0035, size=[0.06, 0.015], life=34,
-       color='#E8F4FF', **hand, comment='мелкие белые искры — основа потока')
-    el(type='sprites', texture='spark_soft', count=500, rate=3, cone=50, speed=0.1, gravity=-0.003, size=[0.07, 0.015], life=38,
-       color='#9FE6F2', **hand, comment='бледно-бирюзовые')
-    el(type='sprites', texture='spark_soft', count=260, rate=1.5, cone=60, speed=0.08, gravity=-0.0025, size=[0.06, 0.015], life=40,
-       color='#D8A8D8', **hand, comment='розово-лиловый отлив по краям')
-    el(type='sprites', texture='glow', count=40, rate=0.25, cone=36, speed=0.08, gravity=-0.002, size=[0.5, 1.2], life=40,
-       color='#2A2638', **hand, comment='редкие тусклые облачка туманности (далеко от руки)')
-    el(type='sprites', texture='glint4', count=120, rate=0.7, cone=46, speed=0.09, gravity=-0.003, spin=60, size=[0.3, 0.05], life=34,
-       color='#FFFFFF', **hand, comment='четырёхлучевые звёздочки в потоке')
-    el(type='sprites', delay=T(14.6), duration=T(11.4), at='caster+0,1.6,2.5', texture='glint4', count=60, rate=0.3, spread=6,
-       speed=0.004, gravity=0.0, spin=30, size=[0.0, 0.4], life=50, color='#FFFFFF', comment='редкие звёздочки, мерцающие в воздухе вокруг')
+    # Вместо частиц — МОДЕЛЬ потока (владелец 19.11): туманность из кисти вперёд-вверх, проявляется от руки наружу за 1.5 с;
+    # два набора мелких звёздочек сменяют друг друга каждые 0.4 с — мерцание. Никаких лучей к вратам.
+    el(type='mesh', model='silent_hand_stream', delay=T(14.6), until=T(26), at='caster.hand')
+    k = 0
+    t0 = T(15.0)
+    while t0 < T(25.6):
+        el(type='mesh', model='silent_hand_glints_' + ('a' if k % 2 == 0 else 'b'), delay=t0, until=t0 + 8, at='caster.hand')
+        t0 += 8
+        k += 1
     # 49.9 с: рука прямо вперёд — вспышка у руки
     el(type='flash', delay=T(49.9), duration=T(0.6), at='caster.hand', size=1.6, anamorphic=4, rays=6, color='@core')
     # 20 с: над местом врат плашмя собирается магический круг; 21.8–27 с врата МЕДЛЕННО выходят из него вниз — опускаются сквозь круг
@@ -106,6 +100,8 @@ def build():
     el(type='flash', delay=T(50), duration=T(0.8), at='caster+0,2,0', size=4, anamorphic=10, rays=6, screen=0.45, color='@core')
     # поле печатей-«блюдец» по всему небу под и вокруг врат (по видео мода — десятки, высоко и широко); лучей сами по себе
     # не дают: наведённые залпы в врагов пускает код (fx/silent_gate_beam.json), случайные удары по площади — beam_rain ниже
+    # Печати-«блюдца» по всему небу; из КАЖДОЙ — свой луч прямо вниз до земли, градом и вразнобой (как в аниме и в видео мода:
+    # лучи вспыхивают по одному в разные моменты под своими печатями, а не все вместе). Наведённые лучи во врагов — отдельно (код).
     for i in range(90):
         r = 6 + (AREA_R - 6) * math.sqrt(rnd.random())
         a = rnd.uniform(0, 2 * math.pi)
@@ -115,11 +111,77 @@ def build():
         green = i % 3 != 0
         el(type='sigil', id='silent_field_green' if green else 'silent_field_white', delay=d, until=T(62.8),
            at=f'caster+{x:.1f},{h:.1f},{FWD + z:.1f}', orientation='sky', scale=rnd.uniform(0.28, 0.6))   # мельче (решение владельца 19.11; было 0.7–1.5)
-    # лучи — от неба ДО ЗЕМЛИ в своей точке (`ground: true`: низ луча и кольцо удара — на поверхности под точкой, не на высоте заклинателя)
-    el(type='beam_rain', delay=T(50.5), duration=T(12), at=AREA, area=AREA_R, count=400, interval=0.6, width=0.22, height=40, ground=True,
-       color='@secondary', impact='silent_impact')
+        # «град»: эта печать бьёт 4–6 раз за 50.5–62.5 с, каждый раз в момент со своим сдвигом; луч — от печати до земли под ней
+        start = d + rnd.randint(8, 40)
+        shots = rnd.randint(4, 6)
+        gap = rnd.randint(36, 56)
+        el(type='beam_rain', delay=start, duration=min(T(62.5) - start, shots * gap + 10), at=f'caster+{x:.1f},0,{FWD + z:.1f}', area=0.6,
+           count=shots, interval=gap, width=0.16 + 0.06 * rnd.random(), height=round(h, 1), ground=True,
+           color='@secondary' if green else '@core', impact='silent_impact')
     # 62.8–65 с: всё гаснет (ледяной горы нет — решение владельца 19.11)
     el(type='flash', delay=T(62.8), duration=T(1.2), at=f'caster+0,{GATE_UP + 7},{FWD}', size=10, anamorphic=12, rays=8, screen=0.2, color='@core')
+
+def hand_stream_meshes():
+    """Модель вместо частиц (владелец 19.11): «туманность» от руки — конус вперёд-вверх (ось из кисти, +z вперёд, +y вверх), длина 6:
+    сотни светящихся крупинок (белые, бледно-бирюзовые, розово-лиловые; гуще к оси) и четырёхлучевые звёздочки (скрещённые бруски).
+    silent_hand_stream — крупинки и большие звёзды, проявляются от руки наружу; silent_hand_glints_a/_b — два набора мелких звёздочек,
+    сменяют друг друга (мерцание)."""
+    R3 = lambda v: round(v, 3)
+    rnd = random.Random(1460)
+    ax = (0.0, 0.5, 1.0); n_ = math.sqrt(sum(c * c for c in ax)); ax = tuple(c / n_ for c in ax)
+    up = (0.0, 1.0, 0.0)
+    side = (1.0, 0.0, 0.0)
+    nrm = (ax[1] * side[2] - ax[2] * side[1], ax[2] * side[0] - ax[0] * side[2], ax[0] * side[1] - ax[1] * side[0])
+
+    def point(t, rr, ang):
+        L = 6.0 * t
+        bend = 0.6 * t * t                     # поток загибается вверх
+        rad = (0.12 + 1.9 * t ** 0.9) * rr
+        return tuple(ax[k] * L + (side[k] * math.cos(ang) + nrm[k] * math.sin(ang)) * rad + up[k] * bend for k in range(3))
+
+    def cube(c, s_, tone, out, rot=None):
+        b = [R3(c[0] - s_), R3(c[1] - s_), R3(c[2] - s_), R3(c[0] + s_), R3(c[1] + s_), R3(c[2] + s_), tone]
+        if rot:
+            b.append(rot)
+        out.append(b)
+
+    def star(c, r, tone, out):
+        th = max(0.02, r * 0.09)
+        out.append([R3(c[0] - r), R3(c[1] - th), R3(c[2] - th), R3(c[0] + r), R3(c[1] + th), R3(c[2] + th), tone])
+        out.append([R3(c[0] - th), R3(c[1] - r), R3(c[2] - th), R3(c[0] + th), R3(c[1] + r), R3(c[2] + th), tone])
+        out.append([R3(c[0] - th), R3(c[1] - th), R3(c[2] - r * 0.7), R3(c[0] + th), R3(c[1] + th), R3(c[2] + r * 0.7), tone])
+        cube(c, th * 2.2, 0, out)
+
+    grains, stars = [], []
+    for i in range(620):
+        t = rnd.random() ** 0.8
+        rr = abs(rnd.gauss(0, 0.45))           # гуще к оси
+        c = point(t, min(1.0, rr), rnd.uniform(0, 2 * math.pi))
+        tone = rnd.choices((0, 1, 2), weights=(5, 3, 2))[0]
+        cube(c, rnd.uniform(0.018, 0.045) * (1.2 - 0.4 * t), tone, grains)
+    for i in range(14):
+        t = rnd.uniform(0.1, 0.95)
+        star(point(t, rnd.uniform(0, 0.8), rnd.uniform(0, 6.28)), rnd.uniform(0.18, 0.38), 0, stars)
+    tones = ['#FFFFFF', '#AEEFF8', '#E2B4E2']
+    def dump_mesh(name, boxes, comment, appear):
+        ys = [b[1] for b in boxes] + [b[4] for b in boxes]
+        doc = {'comment': comment + ' Сгенерировано tools/gen_silent_gate_fx.py.', 'style': 'silent', 'center': 0, 'formedAt': appear['duration'],
+               'collapse': {'duration': 20, 'easing': 'easeInSine'},
+               'parts': [{'type': 'boxes', 'tones': tones, 'glowTones': [0, 1, 2], 'blend': 'additive', 'opacity': 0.9, 'shade': False,
+                          'boxes': boxes, 'appear': appear, 'bounds': [min(ys), max(ys)]}]}
+        with open(os.path.join(os.path.dirname(OUT), 'meshes', name + '.json'), 'w', encoding='utf-8') as fh:
+            json.dump(doc, fh, ensure_ascii=False, separators=(',', ':'))
+        print(name, len(boxes), 'boxes')
+    dump_mesh('silent_hand_stream', grains + stars, '«Безмолвные врата», от руки (14.6–26 с): модель потока-туманности из кисти вперёд-вверх.',
+              {'delay': 0, 'duration': 30, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.5})
+    for k in 'ab':
+        gl = []
+        for i in range(22):
+            t = rnd.uniform(0.05, 1.0)
+            star(point(t, rnd.uniform(0, 1.0), rnd.uniform(0, 6.28)), rnd.uniform(0.08, 0.2), rnd.choice((0, 0, 1)), gl)
+        dump_mesh('silent_hand_glints_' + k, gl, '«Безмолвные врата», от руки: мелкие звёздочки (набор %s), мерцают по очереди с другим набором.' % k,
+                  {'delay': 0, 'duration': 2, 'easing': 'easeOutCubic'})
+
 
 def aimed_beam():
     """Один наведённый луч в ВРАЖДЕБНУЮ сущность (код пускает залпами: раз в 0.5 с в каждого врага 3–5 лучей из разных печатей неба).
@@ -152,6 +214,7 @@ def aimed_beam():
 
 
 def main():
+    hand_stream_meshes()
     aimed_beam()
     build()
     doc = {

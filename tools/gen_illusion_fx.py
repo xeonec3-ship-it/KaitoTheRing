@@ -14,9 +14,9 @@ T22 — визуальная часть школы «Иллюзии» (pohsmp_co
                    mote_glass, mote_butterfly, mote_butterfly_side                        — спрайты (осколок, бабочка анфас и в профиль)
   textures/fx/     illusion_world_cracks (1024, трещины мира), illusion_haze (марево), illusion_mirror_wall (256, материал
                    зеркальной стены, непрозрачный), illusion_mirror_wall_cracks (256, трещины поверх стены, светятся)
-                   «Сон бабочки» (мир сна): illusion_dream_mirror (плёнка r24), illusion_dream_glints, illusion_dream_sky,
-                   illusion_wound_butterfly (атлас 4 кадра), illusion_dream_death (экран «смерть сна»), illusion_dream_ripple,
-                   illusion_wake_grid (экран 1920×1080), illusion_wake_shards (.png атлас + .json куски); sigil/mote_glass_petal
+                   «Сон бабочки»: illusion_wound_butterfly (атлас 4 кадра), illusion_dream_death (экран «смерть сна»),
+                   illusion_dream_ripple; УСТАРЕЛО — illusion_wake_grid, illusion_wake_shards (.png + .json): стекло пробуждения,
+                   удалить вместе с кодом DreamScreen. Каст, мир сна и пробуждение «Небесная бабочка» — tools/gen_celestial_butterfly.py
   sigils/          illusion_seal, illusion_crown, school_illusion, illusion_* (печати заклинаний)
   fx/              school_illusion, school_illusion_cast, _cast_crown, _cast_divine, illusion_*.json (касты и срабатывания)
   fx/styles/       illusion.json
@@ -1155,55 +1155,8 @@ def spell_fx():
                                      'модели — 1.95 (масштаб под рост сущности: scale = рост / 1.95).', 'illusion', 60, [
         E('mesh', 0, 'caster', follow=True, model='illusion_nightmare', until=56),
     ])
-    # ---------------------------------------------------------------- 8. Сон бабочки (Мифическое) — шкала совпадает с роликом (ТЗ, «Ролик»)
-    butterflies_up = [E('sprites', 40 + 6 * k, 'caster+0,1.2,0.35', duration=34, follow=True, texture='mote_butterfly', count=12, rate=0.4,
-                        spread=0.2, speed=0.03, gravity=-0.009, sway=1.8, tumble=0.3, size=[0.3, 0.22], life=70, color=c, glow=0.5)
-                      for k, c in enumerate(('@secondary', BLUE, PEARL))]
-    fx('illusion_butterfly_cast', 'Сон бабочки, каст 12 с (240 тиков) + хвост до 260; caster = маг. Планы ролика — ТЗ T22, «Ролик». '
-                                  '0–2 с: под магом прорисовывается мифическая печать, в сложенных ладонях у груди рождается стеклянная бабочка; '
-                                  '2–4: бабочка взлетает, за ней поток бабочек по спирали, высоко в небе — печать-«небо»; 4–6: ладонь касается '
-                                  'воздуха — трещина по невидимому зеркалу (point:touch — у ладони: ≈0.65 бл. перед магом на высоте 1.4, код), звон; 6–8: трещины бегут '
-                                  'по миру (по земле r14, экранная накладка у всех в ролике — код), тьма по краям; 8–10: мир переворачивается '
-                                  '(код: камера/небо), вихрь бабочек вокруг, вспышка-кольцо на 9 с; 10–12: зеркальный мир успокоился, волна до '
-                                  'r64 (зона), на 236 тике — вспышка и звон «шагнули в отражение».', 'illusion', 260, [
-        E('sigil', 0, 'caster+0,0.05,0', id='illusion_dream_ground', until=244),
-        E('sprites', 0, 'caster+0,0.2,0', duration=40, texture='spark_soft', count=100, rate=2.5, area=4.0, speed=0.01, gravity=-0.004,
-          size=[0.14, 0.03], life=34, color=PEARL, glow=0.4, comment='свет поднимается от печати'),
-        E('flash', 10, 'caster+0,1.25,0.35', follow=True, duration=30, size=0.7, color=PINK, brightness=0.6, comment='свет в ладонях 0.5–2 с'),
-        E('mesh', 24, 'caster+0,1.25,0.38', model='illusion_butterfly', scale=0.6, until=60, comment='стеклянная бабочка в ладонях (крупно 0–2 с)'),
-        E('flash', 40, 'caster+0,1.4,0.4', duration=10, size=1.2, rays=6, color=WHITE, comment='бабочка вспорхнула'),
-        *butterflies_up,
-        E('trail', 44, 'caster+0,0.6,0', duration=76, follow=True, width=0.12, length=16, fade=1.3, head=1.2, count=3, color='@secondary',
-          orbit={'radius': 1.6, 'speed': 7, 'rise': 1.2, 'risePeriod': 50, 'climb': 1.2}, comment='поток бабочек спиралью вверх'),
-        E('sigil', 46, 'caster+0,12,0', id='illusion_dream_sky', until=236),
-        # 4–6 с: касание — трещина по невидимому зеркалу
-        E('sigil', 86, 'point:touch', id='illusion_mirror_crack', until=176),
-        E('flash', 86, 'point:touch', duration=8, size=1.2, rays=10, color=WHITE),
-        E('sprites', 86, 'point:touch', duration=3, texture='mote_glass', count=24, rate=8, spread=0.2, speed=0.07, gravity=0.004,
-          spin=200, tumble=1, size=[0.2, 0.05], life=26, color=PEARL),
-        E('sigil', 100, 'point:touch', id='illusion_mirror_crack', scale=3.5, until=176, comment='трещина растёт'),
-        # 6–8 с: трещины по миру
-        E('decal', 120, 'caster+0,0.08,0', duration=120, texture='illusion_world_cracks', radius=14, grow=40, glow=0.15, rotation=20,
-          color=LILAC, brightness=0.45, fadeOut=20),
-        E('decal', 132, 'caster+0,0.09,0', duration=108, texture='illusion_world_cracks', radius=9, grow=30, glow=0.1, rotation=-35,
-          color=PINK, brightness=0.3, fadeOut=20),
-        E('tint', 120, 'caster', duration=120, radius=40, color='#2A1E44', strength=0.22, **{'in': ease(40), 'out': ease(16)}),
-        # 8–10 с: переворот — вихрь бабочек, вспышка-кольцо
-        E('vortex', 160, 'caster+0,0.5,0', duration=60, radius=9, height=7, arms=5, speed=6, pull=-0.2, funnel=0.3, turns=1.5, width=0.1,
-          texture='mote_butterfly', particles=120, life=40, size=0.34, color='@secondary'),
-        E('vortex', 164, 'caster+0,0.5,0', duration=56, radius=6, height=5, arms=3, speed=-5, pull=0.2, funnel=0.4, turns=1.2, width=0.06,
-          texture='mote_glass', particles=80, life=30, size=0.24, color=BLUE),
-        E('flash', 180, 'caster+0,1.4,0', duration=12, size=4.0, rays=12, anamorphic=10, screen=0.35, color=WHITE),
-        E('wave', 180, 'caster+0,1,0', duration=20, shape='sphere', radius=6, rim=1.4, color='@primary'),
-        # 10–12 с: зеркальный мир, волна до r64, вспышка
-        E('sprites', 200, 'caster+0,2,0', duration=60, texture='mote_butterfly', count=90, rate=1.6, area=8, speed=0.01, gravity=-0.001,
-          sway=1.6, tumble=0.3, size=[0.32, 0.22], life=80, color=PEARL, glow=0.5),
-        E('wave', 222, 'caster', duration=34, shape='ring', radius=64, color='@primary'),
-        E('wave', 224, 'caster+0,0.5,0', duration=38, shape='sphere', radius=64, rim=1.0, color=PEARL, brightness=0.4),
-        E('flash', 236, 'caster+0,1.4,0', duration=10, size=5.0, rays=12, anamorphic=12, screen=0.5, color=WHITE),
-        E('sprites', 236, 'caster+0,1.4,0', duration=3, texture='mote_glass', count=60, rate=20, spread=0.6, speed=0.22, gravity=0.006,
-          spin=240, tumble=1, size=[0.3, 0.08], life=30, color=PEARL, glow=0.4),
-    ])
+    # ---------------------------------------------------------------- 8. Сон бабочки (Мифическое): каст, мир сна, пробуждение —
+    # tools/gen_celestial_butterfly.py («Небесная бабочка», 19.11). Здесь только проявление невидимого мага.
     fx('illusion_butterfly_reveal', 'Сон бабочки: невидимый маг/союзник ударил или скастовал — мерцающий контур на 1 с (20 тиков; caster = '
                                     'проявившийся; видят жертвы). Оболочка по росту мерцает рвано (pulse 3 тика), стеклянные блики, '
                                     'контур гаснет к концу — код в эти 20 тиков рисует модель полупрозрачной.', 'illusion', 22, [
@@ -1321,126 +1274,6 @@ def _jag_edges(cells, W, H, seed, amp=0.05, depth=3):
 
 
 # ------------------------------------------------------------------ текстуры мира сна
-def dream_mirror():
-    """Зеркальная плёнка на земле (декаль r24 вокруг жертвы, 1024): отражение перламутрового неба (в центре — зенит, к краю —
-    горизонт), отражённые облака и трещины неба, косые блики; края растворяются рваными островками и хлопьями стекла.
-    Рисуется blend translucent (белёсое стекло поверх блоков) — альфа ≈0.55 в центре."""
-    S = 1024
-    y, x = np.mgrid[0:S, 0:S].astype(np.float32)
-    dx, dy = (x - S / 2) / (S / 2), (y - S / 2) / (S / 2)
-    r = np.hypot(dx, dy)
-    th = np.arctan2(dy, dx)
-    n1, n2, n3 = _fbm(S, S, 3301, 6, 3), _fbm(S, S, 3302, 5, 4), _fbm(S, S, 3303, 6, 8, 0.6)
-    zen, hor = _hex('#B4C6FF'), _hex('#EBDDFA')
-    col = zen[None, None] * (1 - r[..., None]) + hor[None, None] * r[..., None]
-    film = _irid(r * 2.2 + 0.5 * n1 + 0.05 * np.sin(3 * th), SKY_IRID)        # тонкая плёнка: радужные разводы
-    col = col * 0.62 + film * 0.38
-    clouds = _smooth(0.52, 0.8, n2) * (0.55 + 0.45 * r)                        # отражённые облака
-    col = col * (1 - 0.35 * clouds[..., None]) + 255 * 0.35 * clouds[..., None]
-    sheen = np.zeros((S, S), np.float32)                                       # косые блики-полосы («отражает свет»)
-    for k, (off_, wdt, s_) in enumerate(((-0.35, 0.05, 0.9), (-0.22, 0.016, 0.7), (0.3, 0.09, 0.5), (0.42, 0.02, 0.6))):
-        d = (dx * 0.5 + dy * 0.866) - off_
-        sheen += np.exp(-(d / wdt) ** 2) * s_ * (0.6 + 0.4 * n2)
-    col += (sheen * 70)[..., None]
-    # отражённые трещины неба и звёздочки-блики
-    p = Pen(S, S)
-    rr = random.Random(3304)
-    for i in range(9):
-        a = i * TAU / 9 + rr.uniform(-0.2, 0.2)
-        r0, r1 = rr.uniform(40, 120), rr.uniform(260, 470)
-        crack(p, rr, (S / 2 + r0 * math.cos(a), S / 2 + r0 * math.sin(a)), (S / 2 + r1 * math.cos(a), S / 2 + r1 * math.sin(a)),
-              1.6, depth=4, amp=0.06, branches=1)
-    lines = np.asarray(gst.to_alpha(p, glow=0.5, glow_r=3), np.float32) / 255
-    q = Pen(S, S)
-    for _ in range(46):
-        a, rad = rr.uniform(0, TAU), 470 * math.sqrt(rr.random())
-        _star(q, S / 2 + rad * math.cos(a), S / 2 + rad * math.sin(a), rr.uniform(6, 20), rr.uniform(0.8, 1.6))
-    stars = np.asarray(gst.to_alpha(q, glow=0.7, glow_r=3), np.float32) / 255
-    col += (lines * 60 + stars * 120)[..., None]
-    # альфа: плотная середина, край рвётся островками (шум), хлопья стекла за краем
-    n4 = _fbm(S, S, 3305, 4, 24, 0.5)                                          # мелкий шум для рваного края
-    edge = r + 0.07 * (n1 - 0.5) + 0.05 * (n3 - 0.5)
-    alpha = 0.8 * (1 - _smooth(0.7, 0.98, edge))
-    islands = _smooth(0.0, 0.08, n4 - _smooth(0.66, 0.97, r))                 # край крошится островками
-    alpha = np.where(r > 0.62, alpha * islands, alpha)
-    alpha *= 0.88 + 0.12 * n2
-    f = Pen(S, S)
-    for _ in range(140):                                                       # хлопья-осколки плёнки
-        a, rad = rr.uniform(0, TAU), rr.uniform(0.72, 0.99) * S / 2
-        cx, cy, L = S / 2 + rad * math.cos(a), S / 2 + rad * math.sin(a), rr.uniform(3, 10)
-        b = rr.uniform(0, TAU)
-        f.poly([(cx + L * math.cos(b + k * 2.1 + rr.uniform(-0.4, 0.4)), cy + L * math.sin(b + k * 2.1)) for k in range(3)], rr.randint(90, 200))
-    flakes = np.asarray(gst.to_alpha(f, glow=0), np.float32) / 255
-    alpha = np.maximum(alpha, flakes * 0.55)
-    alpha = np.clip(alpha + lines * 0.25 * (1 - _smooth(0.8, 1, r)) + stars * 0.5, 0, 1)
-    alpha[r > 1.0] = 0
-    _save_rgba(np.dstack([np.clip(col, 0, 255), alpha * 255]), 'illusion_dream_mirror')
-
-
-def dream_glints():
-    """Блики на зеркальной плёнке (512, аддитивно, белое на прозрачном): редкие звёздочки и искорки — второй слой плёнки,
-    медленно вращается против первого, поэтому блики «бегут» при ходьбе."""
-    S = 512
-    p = Pen(S, S)
-    r = random.Random(3310)
-    for _ in range(60):
-        a, rad = r.uniform(0, TAU), 245 * math.sqrt(r.random())
-        x, y = S / 2 + rad * math.cos(a), S / 2 + rad * math.sin(a)
-        if r.random() < 0.35:
-            _star(p, x, y, r.uniform(3, 7), r.uniform(0.5, 0.9))
-        else:
-            p.dot(x, y, r.uniform(0.6, 1.6), r.randint(120, 255))
-    a = np.asarray(gst.to_alpha(p, glow=0.8, glow_r=2.5), np.float32)
-    _save_rgba(np.dstack([np.full_like(a, 255), np.full_like(a, 250), np.full_like(a, 255), a]), 'illusion_dream_glints')
-
-
-def dream_sky():
-    """Перламутровое небо сна (1024, вид снизу, центр — зенит): радужные разводы, небо разбито на грани-«зеркала» (ячейки чуть
-    разного оттенка, как осколки, по-разному отражающие свет), трещины светятся; край растворяется в настоящем небе."""
-    S = 1024
-    y, x = np.mgrid[0:S, 0:S].astype(np.float32)
-    dx, dy = (x - S / 2) / (S / 2), (y - S / 2) / (S / 2)
-    r, th = np.hypot(dx, dy), np.arctan2(dy, dx)
-    n1, n2 = _fbm(S, S, 3321, 6, 3), _fbm(S, S, 3322, 5, 5)
-    rr = random.Random(3323)
-    sites = [(S / 2, S / 2)]
-    for i in range(46):                                                         # гуще к зениту
-        a, rad = rr.uniform(0, TAU), (rr.random() ** 0.8) * S * 0.62
-        sites.append((S / 2 + rad * math.cos(a), S / 2 + rad * math.sin(a)))
-    cells = _jag_edges(_voronoi(sites, S, S), S, S, 3324, amp=0.04)
-    lab = Image.new('L', (S, S), 0)
-    dl = ImageDraw.Draw(lab)
-    for i, c in enumerate(cells):
-        dl.polygon(c, fill=i * 5 % 256)
-    lab = np.asarray(lab, np.float32)
-    shift = (lab / 255.0 * 7.3) % 1.0                                           # у каждой грани свой отлив
-    t = r * 1.5 + 0.45 * n1 + 0.06 * np.sin(4 * th) + 0.12 * shift
-    col = _irid(t, SKY_IRID) * 0.92 + _hex('#F4EEFF')[None, None] * 0.08                 # насыщенно: в игре кладётся аддитивно на голубое небо
-    col *= (0.8 + 0.3 * shift)[..., None]
-    col += (_smooth(0.55, 0.85, n2) * 30)[..., None]
-    p = Pen(S, S)
-    for c in cells:
-        p.line(c + [c[0]], 1.8, caps=False)
-    for i in range(13):                                                          # главные трещины от зенита
-        a = i * TAU / 13 + rr.uniform(-0.15, 0.15)
-        crack(p, rr, (S / 2, S / 2), (S / 2 + 520 * math.cos(a), S / 2 + 520 * math.sin(a)), 3.0, depth=4, amp=0.05, branches=2)
-    cr = np.asarray(gst.to_alpha(p, glow=0.9, glow_r=5), np.float32) / 255
-    col = col * (1 - 0.3 * cr[..., None]) + 255 * cr[..., None] * 0.95
-    alpha = (1 - _smooth(0.2, 1.0, r + 0.08 * (n2 - 0.5))) ** 1.4
-    alpha = np.clip(np.maximum(alpha, cr * (1 - _smooth(0.85, 1.0, r))), 0, 1)
-    _save_rgba(np.dstack([np.clip(col, 0, 255), alpha * 255]), 'illusion_dream_sky')
-
-
-def mote_glass_petal(p):
-    """Стеклянный лепесток (128): вытянутая капля с надрезом на конце (как у сакуры), яркая кромка, блик и тонкая жилка."""
-    outline = (bez((64, 118), (22, 96), (28, 30), (54, 12), 24) + bez((54, 12), (60, 22), (64, 22), (64, 16), 6)[1:]
-               + bez((64, 16), (64, 22), (68, 22), (74, 12), 6)[1:] + bez((74, 12), (100, 30), (106, 96), (64, 118), 24)[1:])
-    p.poly(outline, 80)
-    p.line(outline + [outline[0]], 3.2)
-    p.line(bez((64, 110), (60, 80), (62, 50), (64, 26), 20), 1.4, fill=170)
-    p.line(bez((44, 92), (36, 66), (42, 40), (56, 26), 16), 3, fill=235)
-
-
 def wound_butterfly_atlas():
     """Бабочка-метка ранения (атлас 512×128: 4 кадра взмаха — раскрыта, 2/3, 1/3, почти сложена; цвет — стекло: розовое у тела,
     лиловое к краю, голубой отлив, белая кромка). Код рисует billboard ≈0.24 бл. и листает кадры 0-1-2-3-2-1 (период 6 тиков)."""
@@ -1605,175 +1438,11 @@ def wake_glass():
 
 
 def dream_textures():
-    p = Pen(128, 128); mote_glass_petal(p); save_sigil(p, 'mote_glass_petal', glow=0.6, glow_r=3)
-    dream_mirror()
-    dream_glints()
-    dream_sky()
+    """Экранные материалы мира сна, которые ещё зовёт код (DreamScreen). Мир сна, каст и пробуждение — gen_celestial_butterfly."""
     wound_butterfly_atlas()
     dream_death_overlay()
     dream_ripple()
-    wake_glass()
-
-
-# ------------------------------------------------------------------ печати и эффекты мира сна
-def dream_sigils():
-    sigil('illusion_dream_heaven', 'Сон бабочки: перламутровое небо сна высоко над жертвой (sky, лицом вниз; масштаб 1 = r48): '
-                                   'радужные разводы, небо разбито на грани-зеркала, светятся трещины; медленно вращается, края '
-                                   'двоятся розовым и голубым; при пробуждении — шаттер.', 96.0, WHITE, 'sky', [
-        L('sky', 'disc', 'illusion_dream_sky', 1.0, 0.0, ap(0, 40, 'grow', 'fade', easing='easeOutSine'), rot=-0.25, br=0.3),
-        L('ghost_pink', 'disc', 'illusion_dream_sky', 1.02, 0.004, ap(20, 40, 'fade'), rot=0.3, color=PINK, br=0.12, pulse=(0.4, 90)),
-        L('ghost_blue', 'disc', 'illusion_dream_sky', 0.98, 0.008, ap(30, 40, 'fade'), rot=-0.4, color=BLUE, br=0.1, pulse=(0.4, 130)),
-        L('cracks', 'disc', 'illusion_world_cracks', 0.5, 0.012, ap(10, 60, 'grow', 'fade', easing='easeOutCubic'), rot=0.15, color=PEARL,
-          br=0.16, pulse=(0.5, 70)),
-    ], dissolve=('shatter', 'fade'), ddur=24, stagger=1)
-
-
-def dream_fx():
-    T = DREAM_TICKS
-    fx('illusion_butterfly_world', 'Сон бабочки: мир сна на ВСЕ 2 минуты (2400 тиков) — у КАЖДОЙ жертвы (код шлёт только ей; caster = '
-                                   'жертва, follow). Под ногами зеркальная плёнка r24 (отражает перламутровое небо, блики бегут, край '
-                                   'растворяется хлопьями), над головой перламутровое небо с гранями и трещинами (печать '
-                                   'illusion_dream_heaven, r48 на высоте 34), медленно падают стеклянные лепестки, кружат бабочки, '
-                                   'перламутровая дымка. Конец — ролик пробуждения (illusion_dream_wake, старт на тике 2366): код '
-                                   'останавливает этот эффект на 34 тике ролика (Fx.stop — плёнка и небо бьются dissolve shatter). '
-                                   'Зеркальность лево/право и вход/выход — клиент (illusion_dream_enter/_exit).', 'illusion', T + 20, [
-        E('decal', 0, 'caster+0,0.06,0', duration=T, follow=True, texture='illusion_dream_mirror', radius=24, grow=16, blend='translucent',
-          color=WHITE, brightness=1.0, fadeOut=10, rotation=0, lift=0.02, comment='зеркальная плёнка r24 (translucent — белёсое стекло поверх блоков)'),
-        E('decal', 4, 'caster+0,0.07,0', duration=T - 4, follow=True, texture='illusion_dream_glints', radius=22, grow=16, spin=0.12,
-          glow=0, color=WHITE, brightness=0.8, pulse=37, fadeOut=10, lift=0.03, comment='блики плёнки, медленно вращаются'),
-        E('decal', 8, 'caster+0,0.08,0', duration=T - 8, follow=True, texture='illusion_dream_glints', radius=14, grow=16, spin=-0.2,
-          rotation=40, glow=0, color=PINK, brightness=0.5, pulse=23, fadeOut=10, lift=0.035),
-        E('sigil', 0, 'caster+0,34,0', follow=True, id='illusion_dream_heaven', until=T, orientation='sky', comment='перламутровое небо'),
-        E('sprites', 0, 'caster+0,9,0', duration=T - 4, follow=True, texture='mote_glass_petal', count=20000, rate=0.8, area=16, speed=0.0,
-          gravity=0.0006, sway=2.2, tumble=0.9, spin=40, size=[0.22, 0.18], life=200, color=PEARL, glow=0.35,
-          comment='стеклянные лепестки медленно падают (≈4 с до земли, качаются)'),
-        E('sprites', 0, 'caster+0,8,0', duration=T - 4, follow=True, texture='mote_glass_petal', count=20000, rate=0.35, area=12, speed=0.0,
-          gravity=0.0007, sway=2.0, tumble=0.9, spin=-50, size=[0.2, 0.16], life=180, color=PINK, glow=0.4),
-        E('sprites', 0, 'caster+0,1.6,0', duration=T - 4, follow=True, texture='mote_butterfly', count=20000, rate=0.5, area=10, speed=0.01,
-          gravity=-0.0008, sway=1.8, tumble=0.3, size=[0.32, 0.22], life=90, color=PEARL, glow=0.5),
-        E('sprites', 0, 'caster+0,1.6,0', duration=T - 4, follow=True, texture='mote_butterfly', count=20000, rate=0.25, area=8, speed=0.012,
-          gravity=-0.001, sway=1.8, tumble=0.3, size=[0.28, 0.2], life=80, color='@secondary', glow=0.5),
-        E('sprites', 0, 'caster+0,0.3,0', duration=T - 4, follow=True, texture='mote_glass', count=20000, rate=0.6, area=10, speed=0.004,
-          gravity=-0.001, spin=60, tumble=0.8, size=[0.18, 0.04], life=40, color=BLUE, glow=0.3, comment='искры над плёнкой'),
-        E('tint', 0, 'caster', duration=T, radius=6, color='#C9B4F2', strength=0.16, **{'in': ease(30), 'out': ease(10)}),
-    ])
-    fx('illusion_dream_enter', 'Сон бабочки: вход в отражение (10 тиков; caster = жертва, follow; только ей). Сфера-рябь сходится к жертве, '
-                               'кольцо по земле расходится, лёгкая засветка. Вместе — экранная рябь textures/fx/illusion_dream_ripple '
-                               '(код: из центра 0.2 → 2.4 высоты экрана, альфа 0.7 → 0) и зеркалирование экрана: на 5 тике картинка '
-                               'переворачивается по горизонтали (сжатие по x 1 → 0 → −1 за тики 2–8, easeInOutSine).', 'illusion', 12, [
-        E('wave', 0, 'caster+0,1,0', follow=True, duration=10, shape='sphere', radius=3.5, rim=1.2, color=PEARL, brightness=0.6),
-        E('wave', 2, 'caster', follow=True, duration=10, shape='ring', radius=8, color='@primary'),
-        E('flash', 4, 'caster+0,1.4,0', follow=True, duration=6, size=1.6, screen=0.18, color=WHITE),
-        E('sprites', 2, 'caster+0,1,0', follow=True, duration=4, texture='mote_glass', count=16, rate=4, spread=1.4, speed=-0.04, spin=200,
-          tumble=1, size=[0.2, 0.05], life=10, color=PEARL, glow=0.3),
-    ])
-    fx('illusion_dream_exit', 'Сон бабочки: выход из отражения без ролика (сон кончился раньше — сопротивление, «Благословение»; '
-                              '10 тиков; caster = жертва): та же рябь наружу и обратное зеркалирование экрана.', 'illusion', 12, [
-        E('wave', 0, 'caster+0,1,0', follow=True, duration=10, shape='sphere', radius=4, rim=1.0, color=PEARL, brightness=0.5),
-        E('flash', 0, 'caster+0,1.4,0', follow=True, duration=6, size=1.4, screen=0.15, color=WHITE),
-        E('sprites', 0, 'caster+0,1,0', follow=True, duration=3, texture='mote_glass', count=20, rate=7, spread=0.4, speed=0.09, gravity=0.004,
-          spin=200, tumble=1, size=[0.22, 0.05], life=14, color=PEARL, glow=0.3),
-    ])
-    fx('illusion_dream_wound', 'Сон бабочки: удар по жертве во сне (caster = жертва; видят жертва и заклинатель). Рождение бабочки-метки: '
-                               'стеклянный всплеск и вспышка у груди; саму бабочку дальше рисует код (атлас textures/fx/'
-                               'illusion_wound_butterfly, кружит у тела, до 12 — см. письмо). 12 тиков.', 'illusion', 12, [
-        E('flash', 0, 'caster+0,1.2,0', follow=True, duration=6, size=0.8, rays=6, color=PINK, brightness=0.8),
-        E('sprites', 0, 'caster+0,1.2,0', follow=True, duration=2, texture='mote_glass', count=10, rate=5, spread=0.2, speed=0.07, gravity=0.004,
-          spin=220, tumble=1, size=[0.16, 0.04], life=10, color=PEARL, glow=0.3),
-        E('sprites', 1, 'caster+0,1.2,0', follow=True, duration=2, texture='spark_soft', count=8, rate=4, spread=0.2, speed=0.05,
-          size=[0.1, 0.0], life=8, color=WHITE),
-    ])
-    fx('illusion_dream_death', 'Сон бабочки: «смерть» во сне — видит ТОЛЬКО жертва (caster = жертва). Тело рассыпается в бабочки снизу '
-                               'вверх: 0–14 тиков стеклянная оболочка тела, из неё вылетают бабочки и лепестки (вверх и в стороны), '
-                               'осколки сыплются; на 4 тике — экранная накладка «смерть сна» (textures/fx/illusion_dream_death, код, '
-                               'тайминг в письме). Код в эти тики гасит модель жертвы (от третьего лица) и переносит её на 22 тике.',
-       'illusion', 30, [
-           E('aura', 0, 'caster', target='caster', duration=16, thickness=0.08, pulse=[0.5, 3], motes=14, texture='mote_glass', color=PEARL,
-             **{'in': ease(2), 'out': ease(10, 'easeInSine')}),
-           E('sprites', 0, 'caster+0,0.2,0', duration=6, texture='mote_butterfly', count=26, rate=4.4, area=0.4, speed=0.05, gravity=-0.006,
-             sway=1.8, tumble=0.4, size=[0.3, 0.2], life=30, color=LILAC, brightness=0.8, glow=0.25, comment='ноги'),
-           E('sprites', 4, 'caster+0,1.0,0', duration=6, texture='mote_butterfly', count=28, rate=4.6, spread=0.35, speed=0.06, gravity=-0.006,
-             sway=1.8, tumble=0.4, size=[0.32, 0.2], life=30, color='@secondary', brightness=0.8, glow=0.25, comment='корпус'),
-           E('sprites', 8, 'caster+0,1.7,0', duration=6, texture='mote_butterfly', count=22, rate=3.6, spread=0.25, speed=0.07, gravity=-0.007,
-             sway=1.8, tumble=0.4, size=[0.3, 0.2], life=30, color=BLUE, brightness=0.8, glow=0.25, comment='голова'),
-           E('sprites', 2, 'caster+0,1,0', duration=12, texture='mote_glass_petal', count=40, rate=3.4, spread=0.5, speed=0.03, gravity=0.002,
-             sway=2, tumble=1, spin=90, size=[0.2, 0.14], life=36, color=PINK, glow=0.4),
-           E('sprites', 2, 'caster+0,1,0', duration=10, texture='mote_glass', count=40, rate=4, spread=0.45, speed=0.04, gravity=0.01, spin=240,
-             tumble=1, size=[0.2, 0.05], life=22, color=PEARL, glow=0.3, comment='осколки сыплются'),
-           E('flash', 4, 'caster+0,1.1,0', duration=10, size=2.6, rays=8, anamorphic=4, color=WHITE),
-           E('wave', 6, 'caster', duration=14, shape='ring', radius=5, color='@primary'),
-       ])
-    fx('illusion_dream_respawn', 'Сон бабочки: жертва появляется в новой точке сна (caster = жертва в новой точке; видит она — и её '
-                                 'клиент сразу показывает мир сна вокруг). Бабочки слетаются в силуэт, оболочка проявляется сверху вниз, '
-                                 'кольцо по земле, звон. 24 тика (код делает модель видимой с 14 тика).', 'illusion', 24, [
-        E('sprites', 0, 'caster+0,1,0', duration=6, texture='mote_butterfly', count=40, rate=7, spread=2.4, speed=-0.12, gravity=0, sway=1,
-          size=[0.3, 0.18], life=12, color=PEARL, glow=0.5, comment='бабочки слетаются в тело'),
-        E('sprites', 0, 'caster+0,1,0', duration=6, texture='mote_glass_petal', count=24, rate=4, spread=2.0, speed=-0.1, spin=120,
-          size=[0.2, 0.12], life=12, color=PINK, glow=0.4),
-        E('aura', 8, 'caster', target='caster', duration=14, thickness=0.07, pulse=[0.4, 4], motes=10, texture='mote_glass', color=PEARL,
-          **{'in': ease(4), 'out': ease(8, 'easeInSine')}),
-        E('flash', 12, 'caster+0,1.1,0', duration=8, size=2.0, rays=6, color=WHITE),
-        E('wave', 12, 'caster', duration=12, shape='ring', radius=4, color='@primary'),
-    ])
-    fx('illusion_dream_ripple', 'Сон бабочки: что видят ОСТАЛЬНЫЕ, когда жертва «умерла во сне» и перенеслась (caster = старая точка, затем '
-                               'та же — в новой): короткая рябь воздуха в рост человека и кольцо, без бабочек и цвета смерти. 16 тиков.',
-       'illusion', 16, [
-           E('wave', 0, 'caster+0,1,0', duration=12, shape='sphere', radius=1.4, rim=1.3, color=PEARL, brightness=0.45),
-           E('wave', 0, 'caster', duration=14, shape='ring', radius=2.4, color='@primary'),
-           E('flash', 0, 'caster+0,1,0', duration=6, size=1.4, color=PEARL, brightness=0.5),
-           E('sprites', 0, 'caster+0,1,0', duration=3, texture='mote_glass', count=10, rate=4, spread=0.5, speed=0.03, gravity=0.004,
-             spin=200, tumble=1, size=[0.16, 0.04], life=12, color=PEARL),
-       ])
-    B = WAKE_BREAK
-    fx('illusion_dream_wake', 'Сон бабочки: ролик пробуждения, мир (2.5 с = 50 тиков; caster = жертва, follow; у каждой жертвы и у '
-                              'заклинателя — caster = он). Старт — тик сна 2366 (130.3 с от начала каста, удар в музыке). 0–34: '
-                              'зеркальная плёнка под ногами трескается от центра, трещины светлеют, бабочки замирают и стекленеют '
-                              '(экранная сетка — код); 34 (132.0 с, конец сна, второй акцент музыки): всё бьётся — осколки плёнки '
-                              'взлетают и падают, бабочки рассыпаются стеклом, белая вспышка, кольцо r24; код в этот тик делает Fx.stop '
-                              'мира сна и роняет куски экрана (illusion_wake_shards). 34–50: осколки оседают и тают в настоящем мире.',
-       'illusion', WAKE_LEN, [
-           E('decal', 0, 'caster+0,0.1,0', follow=True, duration=B + 2, texture='illusion_world_cracks', radius=24, grow=30, glow=0.2,
-             rotation=15, color=PEARL, brightness=0.9, comment='плёнка трескается'),
-           E('decal', 8, 'caster+0,0.11,0', follow=True, duration=B - 6, texture='illusion_world_cracks', radius=12, grow=20, glow=0.15,
-             rotation=-40, color=PINK, brightness=0.6, pulse=8),
-           E('sprites', 0, 'caster+0,1.4,0', follow=True, duration=B, texture='spark_soft', count=120, rate=3.5, area=10, speed=0.004,
-             gravity=-0.001, size=[0.1, 0.0], life=20, color=WHITE, comment='воздух звенит'),
-           E('flash', 0, 'caster+0,1.5,0', follow=True, duration=4, size=1.6, screen=0.12, color=WHITE),
-           E('flash', B, 'caster+0,1.5,0', follow=True, duration=8, size=6, rays=14, anamorphic=14, screen=0.55, color=WHITE),
-           E('wave', B, 'caster', duration=14, shape='ring', radius=24, color=PEARL),
-           E('wave', B, 'caster+0,1,0', duration=16, shape='sphere', radius=10, rim=1.5, color='@primary', brightness=0.6),
-           E('sprites', B, 'caster+0,0.2,0', duration=3, texture='mote_glass', count=260, rate=90, area=20, speed=0.16, gravity=0.012, spin=320,
-             tumble=1, size=[0.34, 0.12], life=26, color=PEARL, glow=0.35, comment='плёнка разлетается осколками'),
-           E('sprites', B, 'caster+0,2.5,0', duration=3, texture='mote_glass', count=160, rate=55, area=10, speed=0.03, gravity=0.014, spin=300,
-             tumble=1, size=[0.3, 0.1], life=24, color=BLUE, glow=0.3, comment='бабочки → стекло'),
-           E('sprites', B, 'caster+0,6,0', duration=4, texture='mote_glass_petal', count=120, rate=30, area=16, speed=0.01, gravity=0.016,
-             spin=200, tumble=1, size=[0.24, 0.1], life=22, color=PINK, glow=0.3, comment='лепестки бьются и сыплются'),
-       ])
-    # пробуждение у заклинателя — всем в r64 (общий знак, без урона); то же время, что ролик
-    fx('illusion_butterfly_wake', 'Сон бабочки, «пробуждение» у заклинателя (caster = маг, видят ВСЕ в r64; урона НЕТ — «это был просто '
-                                  'сон»). Старт одновременно с роликом пробуждения (тик сна 2366); на 34 тике (132.0 с, конец сна) — '
-                                  'бабочки по всей зоне рассыпаются стеклом, белая вспышка, кольцо-звон до r64, «небо» трескается. '
-                                  'Звук — GLASS_BREAK + AMETHYST_CLUSTER_BREAK громко на 34 тике.', 'illusion', B + 30, [
-        E('sprites', 0, 'caster+0,2,0', duration=B, texture='spark_soft', count=200, rate=6, area=24, speed=0.004, gravity=-0.001,
-          size=[0.14, 0.0], life=24, color=PEARL, comment='воздух звенит перед разломом'),
-        E('flash', B, 'caster+0,1.5,0', duration=12, size=6, rays=14, anamorphic=14, screen=0.4, color=WHITE),
-        E('wave', B, 'caster', duration=24, shape='ring', radius=64, color=PEARL),
-        E('wave', B + 2, 'caster+0,1,0', duration=26, shape='sphere', radius=48, rim=1.5, color='@primary', brightness=0.5),
-        E('sprites', B, 'caster+0,6,0', duration=4, texture='mote_glass', count=400, rate=100, area=40, speed=0.02, gravity=0.02, spin=300,
-          tumble=1, size=[0.34, 0.1], life=40, color=PEARL, glow=0.3, comment='бабочки по зоне рассыпаются осколками'),
-        E('sprites', B, 'caster+0,3,0', duration=4, texture='spark_soft', count=300, rate=75, area=40, speed=0.02, gravity=0.004,
-          size=[0.2, 0.0], life=24, color=PINK),
-        E('sigil', B, 'caster+0,12,0', id='illusion_mirror_crack', scale=20, until=B + 8, orientation='sky', comment='небо-зеркало трескается'),
-    ])
-    fx('illusion_butterfly_wake_hit', 'Сон бабочки (после пересмотра — БЕЗ урона): на 34 тике ролика пробуждения бабочки-метки ранений '
-                                      'жертвы (target = жертва, как зовёт ButterflyDreamSpell.wakeFx; видят жертва и заклинатель) вспыхивают и разлетаются стеклом — «раны были '
-                                      'сном». Код в этот тик убирает свои бабочки-метки. 22 тика.', 'illusion', 22, [
-        E('sprites', 0, 'target+0,1.1,0', duration=3, texture='mote_glass', count=36, rate=12, spread=0.9, speed=0.12, gravity=0.008,
-          spin=260, tumble=1, size=[0.24, 0.06], life=16, color=PEARL, glow=0.3, comment='осколки разлетаются ОТ жертвы'),
-        E('sprites', 0, 'target+0,1.1,0', duration=3, texture='mote_butterfly', count=12, rate=4, spread=0.9, speed=0.08, gravity=-0.004,
-          sway=1.6, size=[0.24, 0.0], life=20, color=PINK, glow=0.5, comment='бабочки-метки улетают и тают'),
-        E('flash', 0, 'target+0,1.2,0', follow=True, duration=8, size=1.6, rays=8, color=PINK),
-    ])
+    wake_glass()     # УСТАРЕЛО (19.11, «Небесная бабочка»): сетка трещин и куски стекла пробуждения — удалить вместе с кодом DreamScreen
 
 
 # ================================================================== модели (fx/meshes, части boxes — docs/fx.md)
@@ -2254,9 +1923,10 @@ if __name__ == '__main__':
     school_fx()
     spell_fx()
     dream_textures()
-    dream_sigils()
-    dream_fx()
     meshes()
+    import gen_celestial_butterfly      # «Сон бабочки» — Небесная бабочка: каст, мир сна, пробуждение, кокон, следы
+    gen_celestial_butterfly.write_all()
+    WRITTEN += gen_celestial_butterfly.WRITTEN
     icons()
     if '--sheet' in sys.argv:
         sheet(sys.argv[sys.argv.index('--sheet') + 1] if len(sys.argv) > sys.argv.index('--sheet') + 1 else 'illusion_sheet.png')

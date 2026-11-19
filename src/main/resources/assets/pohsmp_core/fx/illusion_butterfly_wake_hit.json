@@ -1,50 +1,49 @@
 {
- "comment": "Сон бабочки (после пересмотра — БЕЗ урона): на 34 тике ролика пробуждения бабочки-метки ранений жертвы (target = жертва, как зовёт ButterflyDreamSpell.wakeFx; видят жертва и заклинатель) вспыхивают и разлетаются стеклом — «раны были сном». Код в этот тик убирает свои бабочки-метки. 22 тика. Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки (без урона): на 34 тике ролика пробуждения бабочки-метки ранений жертвы (target = жертва; видят жертва и заклинатель) вспыхивают и улетают светлячками вверх — «раны были сном». Код в этот тик убирает свои метки. 30 тиков. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
- "duration": 22,
+ "duration": 30,
  "elements": [
   {
    "type": "sprites",
    "delay": 0,
    "at": "target+0,1.1,0",
    "duration": 3,
-   "texture": "mote_glass",
-   "count": 36,
-   "rate": 12,
+   "texture": "mote_sky_butterfly",
+   "count": 12,
+   "rate": 4,
    "spread": 0.9,
-   "speed": 0.12,
-   "gravity": 0.008,
-   "spin": 260,
-   "tumble": 1,
+   "speed": 0.06,
+   "gravity": -0.006,
+   "sway": 1.6,
+   "tumble": 0.4,
    "size": [
-    0.24,
-    0.06
+    0.3,
+    0.1
    ],
-   "life": 16,
-   "color": "#EFE6FF",
-   "glow": 0.3,
-   "comment": "осколки разлетаются ОТ жертвы"
+   "life": 28,
+   "color": "#FFC6E6",
+   "glow": 0.6,
+   "comment": "бабочки-метки улетают вверх"
   },
   {
    "type": "sprites",
    "delay": 0,
    "at": "target+0,1.1,0",
-   "duration": 3,
-   "texture": "mote_butterfly",
-   "count": 12,
-   "rate": 4,
-   "spread": 0.9,
-   "speed": 0.08,
+   "duration": 4,
+   "texture": "mote_firefly",
+   "count": 30,
+   "rate": 8,
+   "spread": 0.8,
+   "speed": 0.05,
    "gravity": -0.004,
-   "sway": 1.6,
+   "sway": 1.0,
    "size": [
     0.24,
-    0.0
+    0.08
    ],
-   "life": 20,
-   "color": "#FFB8E6",
-   "glow": 0.5,
-   "comment": "бабочки-метки улетают и тают"
+   "life": 26,
+   "color": "#FFF0C8",
+   "glow": 0.6
   },
   {
    "type": "flash",
@@ -54,7 +53,7 @@
    "duration": 8,
    "size": 1.6,
    "rays": 8,
-   "color": "#FFB8E6"
+   "color": "#FFE2B8"
   }
  ]
 }

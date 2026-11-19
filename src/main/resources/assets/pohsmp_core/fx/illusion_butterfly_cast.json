@@ -1,5 +1,5 @@
 {
- "comment": "Сон бабочки, каст 12 с (240 тиков) + хвост до 260; caster = маг. Планы ролика — ТЗ T22, «Ролик». 0–2 с: под магом прорисовывается мифическая печать, в сложенных ладонях у груди рождается стеклянная бабочка; 2–4: бабочка взлетает, за ней поток бабочек по спирали, высоко в небе — печать-«небо»; 4–6: ладонь касается воздуха — трещина по невидимому зеркалу (point:touch — у ладони: ≈0.65 бл. перед магом на высоте 1.4, код), звон; 6–8: трещины бегут по миру (по земле r14, экранная накладка у всех в ролике — код), тьма по краям; 8–10: мир переворачивается (код: камера/небо), вихрь бабочек вокруг, вспышка-кольцо на 9 с; 10–12: зеркальный мир успокоился, волна до r64 (зона), на 236 тике — вспышка и звон «шагнули в отражение». Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки, каст 12 с (240 тиков) + хвост до 260; caster = маг; видят все в ролике. Планы камеры — ТЗ T22, «Небесная бабочка — ролик». 0–2 с: под магом печать, в ладонях рождается светящаяся бабочка; 2–6 с: она взлетает и уходит в небо (поток света спиралью), на 4.3 с ладонь отпускает её (point:touch); 6–8 с: в небе звезда вырастает в Небесную бабочку на полнеба, мир светлеет в рассвет; 9.0 с: первый взмах — волна света, земля вокруг отрывается островками, лепестки взлетают и замирают (переворот 180° камеры — как было); 10–12 с: река бабочек течёт в небо, волна по зоне r64, 11.7 с второй взмах и мягкая вспышка — шаг в сон. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
  "duration": 260,
  "elements": [
@@ -15,19 +15,19 @@
    "delay": 0,
    "at": "caster+0,0.2,0",
    "duration": 40,
-   "texture": "spark_soft",
-   "count": 100,
-   "rate": 2.5,
+   "texture": "mote_pollen",
+   "count": 110,
+   "rate": 2.7,
    "area": 4.0,
    "speed": 0.01,
    "gravity": -0.004,
    "size": [
-    0.14,
-    0.03
+    0.16,
+    0.05
    ],
-   "life": 34,
-   "color": "#EFE6FF",
-   "glow": 0.4,
+   "life": 36,
+   "color": "#FFD27A",
+   "glow": 0.5,
    "comment": "свет поднимается от печати"
   },
   {
@@ -35,96 +35,113 @@
    "delay": 10,
    "at": "caster+0,1.25,0.35",
    "follow": true,
-   "duration": 30,
-   "size": 0.7,
-   "color": "#FFB8E6",
-   "brightness": 0.6,
+   "duration": 34,
+   "size": 0.8,
+   "color": "#FFE2B8",
+   "brightness": 0.7,
    "comment": "свет в ладонях 0.5–2 с"
   },
   {
    "type": "mesh",
    "delay": 24,
-   "at": "caster+0,1.25,0.38",
-   "model": "illusion_butterfly",
-   "scale": 0.6,
-   "until": 60,
-   "comment": "стеклянная бабочка в ладонях (крупно 0–2 с)"
+   "at": "caster+0,1.28,0.42",
+   "model": "illusion_celestial_flutter",
+   "scale": 0.012,
+   "until": 46,
+   "comment": "в ладонях — Небесная бабочка размером с ладонь (та же модель, scale 0.012), трепещет"
   },
   {
    "type": "flash",
-   "delay": 40,
-   "at": "caster+0,1.4,0.4",
+   "delay": 42,
+   "at": "caster+0,1.4,0.42",
    "duration": 10,
-   "size": 1.2,
+   "size": 1.3,
    "rays": 6,
    "color": "#FFFFFF",
-   "comment": "бабочка вспорхнула"
+   "comment": "вспорхнула"
   },
   {
-   "type": "sprites",
-   "delay": 40,
-   "at": "caster+0,1.2,0.35",
-   "duration": 34,
-   "follow": true,
-   "texture": "mote_butterfly",
-   "count": 12,
-   "rate": 0.4,
-   "spread": 0.2,
-   "speed": 0.03,
-   "gravity": -0.009,
-   "sway": 1.8,
-   "tumble": 0.3,
-   "size": [
-    0.3,
-    0.22
-   ],
-   "life": 70,
-   "color": "@secondary",
-   "glow": 0.5
-  },
-  {
-   "type": "sprites",
+   "type": "mesh",
    "delay": 46,
-   "at": "caster+0,1.2,0.35",
-   "duration": 34,
-   "follow": true,
-   "texture": "mote_butterfly",
-   "count": 12,
-   "rate": 0.4,
-   "spread": 0.2,
-   "speed": 0.03,
-   "gravity": -0.009,
-   "sway": 1.8,
-   "tumble": 0.3,
-   "size": [
-    0.3,
-    0.22
-   ],
-   "life": 70,
-   "color": "#9AE6FF",
-   "glow": 0.5
+   "at": "caster+0,42,14",
+   "model": "illusion_celestial_flutter",
+   "scale": 0.06,
+   "until": 122,
+   "move": {
+    "from": [
+     0.0,
+     -678.3,
+     -226.3
+    ],
+    "scaleFrom": 0.2,
+    "delay": 0,
+    "duration": 74,
+    "easing": "easeInCubic"
+   },
+   "comment": "2–6 с: летит из ладоней в небо (ускоряясь), к 6 с — на месте Небесной бабочки (42 бл. вверх, 14 вперёд)"
   },
   {
    "type": "sprites",
-   "delay": 52,
-   "at": "caster+0,1.2,0.35",
-   "duration": 34,
-   "follow": true,
-   "texture": "mote_butterfly",
-   "count": 12,
-   "rate": 0.4,
+   "delay": 44,
+   "at": "caster+0,1.4,0.4",
+   "duration": 30,
+   "texture": "mote_sky_butterfly",
+   "count": 22,
+   "rate": 0.7,
    "spread": 0.2,
    "speed": 0.03,
    "gravity": -0.009,
    "sway": 1.8,
-   "tumble": 0.3,
+   "tumble": 0.4,
    "size": [
     0.3,
     0.22
    ],
-   "life": 70,
-   "color": "#EFE6FF",
-   "glow": 0.5
+   "life": 80,
+   "color": "#FFC6E6",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 50,
+   "at": "caster+0,1.4,0.4",
+   "duration": 30,
+   "texture": "mote_sky_butterfly",
+   "count": 22,
+   "rate": 0.7,
+   "spread": 0.2,
+   "speed": 0.03,
+   "gravity": -0.009,
+   "sway": 1.8,
+   "tumble": 0.4,
+   "size": [
+    0.3,
+    0.22
+   ],
+   "life": 80,
+   "color": "#FFD27A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 56,
+   "at": "caster+0,1.4,0.4",
+   "duration": 30,
+   "texture": "mote_sky_butterfly",
+   "count": 22,
+   "rate": 0.7,
+   "spread": 0.2,
+   "speed": 0.03,
+   "gravity": -0.009,
+   "sway": 1.8,
+   "tumble": 0.4,
+   "size": [
+    0.3,
+    0.22
+   ],
+   "life": 80,
+   "color": "#CDB8FF",
+   "glow": 0.6
   },
   {
    "type": "trail",
@@ -137,7 +154,7 @@
    "fade": 1.3,
    "head": 1.2,
    "count": 3,
-   "color": "@secondary",
+   "color": "#FFD27A",
    "orbit": {
     "radius": 1.6,
     "speed": 7,
@@ -145,108 +162,247 @@
     "risePeriod": 50,
     "climb": 1.2
    },
-   "comment": "поток бабочек спиралью вверх"
-  },
-  {
-   "type": "sigil",
-   "delay": 46,
-   "at": "caster+0,12,0",
-   "id": "illusion_dream_sky",
-   "until": 236
-  },
-  {
-   "type": "sigil",
-   "delay": 86,
-   "at": "point:touch",
-   "id": "illusion_mirror_crack",
-   "until": 176
+   "comment": "поток света спиралью вверх за ней"
   },
   {
    "type": "flash",
    "delay": 86,
    "at": "point:touch",
-   "duration": 8,
-   "size": 1.2,
-   "rays": 10,
-   "color": "#FFFFFF"
+   "duration": 10,
+   "size": 1.0,
+   "rays": 8,
+   "color": "#FFE2B8",
+   "comment": "4.3 с: ладонь отпускает бабочку ввысь (без трещин)"
   },
   {
    "type": "sprites",
    "delay": 86,
    "at": "point:touch",
-   "duration": 3,
-   "texture": "mote_glass",
-   "count": 24,
-   "rate": 8,
-   "spread": 0.2,
-   "speed": 0.07,
-   "gravity": 0.004,
-   "spin": 200,
-   "tumble": 1,
+   "duration": 4,
+   "texture": "mote_dream_petal",
+   "count": 18,
+   "rate": 5,
+   "spread": 0.25,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "sway": 1.2,
+   "tumble": 0.8,
    "size": [
     0.2,
-    0.05
+    0.16
    ],
-   "life": 26,
-   "color": "#EFE6FF"
-  },
-  {
-   "type": "sigil",
-   "delay": 100,
-   "at": "point:touch",
-   "id": "illusion_mirror_crack",
-   "scale": 3.5,
-   "until": 176,
-   "comment": "трещина растёт"
-  },
-  {
-   "type": "decal",
-   "delay": 120,
-   "at": "caster+0,0.08,0",
-   "duration": 120,
-   "texture": "illusion_world_cracks",
-   "radius": 14,
-   "grow": 40,
-   "glow": 0.15,
-   "rotation": 20,
-   "color": "#C9A8FF",
-   "brightness": 0.45,
-   "fadeOut": 20
-  },
-  {
-   "type": "decal",
-   "delay": 132,
-   "at": "caster+0,0.09,0",
-   "duration": 108,
-   "texture": "illusion_world_cracks",
-   "radius": 9,
-   "grow": 30,
-   "glow": 0.1,
-   "rotation": -35,
+   "life": 40,
    "color": "#FFB8E6",
-   "brightness": 0.3,
-   "fadeOut": 20
+   "glow": 0.3
+  },
+  {
+   "type": "flash",
+   "delay": 116,
+   "at": "caster+0,42,14",
+   "duration": 14,
+   "size": 10,
+   "rays": 10,
+   "anamorphic": 12,
+   "color": "#FFE9C2",
+   "brightness": 0.9,
+   "comment": "в небе — звезда"
+  },
+  {
+   "type": "mesh",
+   "delay": 120,
+   "at": "caster+0,42,14",
+   "model": "illusion_celestial_cast",
+   "scale": 1.0,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     0,
+     0
+    ],
+    "scaleFrom": 0.06,
+    "delay": 0,
+    "duration": 44,
+    "easing": "easeOutCubic"
+   },
+   "comment": "6.0–8.2 с: вырастает из звезды в Небесную бабочку на полнеба и раскрывает крылья; удары вниз — 180 и 234 тик"
+  },
+  {
+   "type": "flash",
+   "delay": 120,
+   "at": "caster+0,42,14",
+   "duration": 40,
+   "size": 60,
+   "rays": 14,
+   "color": "#FFD9EA",
+   "brightness": 0.45
   },
   {
    "type": "tint",
    "delay": 120,
    "at": "caster",
-   "duration": 120,
-   "radius": 40,
-   "color": "#2A1E44",
-   "strength": 0.22,
+   "duration": 124,
+   "radius": 64,
+   "color": "#FFC9DC",
+   "strength": 0.16,
    "in": {
     "duration": 40,
-    "easing": "easeOutCubic"
+    "easing": "easeInOutSine"
    },
    "out": {
     "duration": 16,
     "easing": "easeOutCubic"
+   },
+   "comment": "мир светлеет в пастель рассвета (код в ролике плавно красит небо, см. письмо)"
+  },
+  {
+   "type": "sprites",
+   "delay": 124,
+   "at": "caster+0,41,14",
+   "duration": 110,
+   "texture": "mote_firefly",
+   "count": 200,
+   "rate": 1.8,
+   "area": 28,
+   "speed": 0.004,
+   "gravity": 0.0008,
+   "sway": 1.4,
+   "size": [
+    0.4,
+    0.2
+   ],
+   "life": 160,
+   "color": "#FFF0C8",
+   "glow": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 178,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 180,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 190,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFD98A",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 180,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFD98A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 180,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 180,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFD98A",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
    }
   },
   {
+   "type": "flash",
+   "delay": 180,
+   "at": "caster+0,1.4,0",
+   "duration": 12,
+   "size": 4.0,
+   "rays": 12,
+   "anamorphic": 10,
+   "screen": 0.3,
+   "color": "#FFF1D6"
+  },
+  {
+   "type": "sprites",
+   "delay": 180,
+   "at": "caster+0,0.2,0",
+   "duration": 30,
+   "texture": "mote_dream_petal",
+   "count": 240,
+   "rate": 8,
+   "area": 16,
+   "speed": 0.01,
+   "gravity": -0.0035,
+   "sway": 1.5,
+   "tumble": 0.9,
+   "spin": 60,
+   "size": [
+    0.24,
+    0.2
+   ],
+   "life": 90,
+   "color": "#FFB8E6",
+   "glow": 0.3,
+   "comment": "с травы взлетают и замирают лепестки"
+  },
+  {
    "type": "vortex",
-   "delay": 160,
+   "delay": 164,
    "at": "caster+0,0.5,0",
    "duration": 60,
    "radius": 9,
@@ -257,15 +413,16 @@
    "funnel": 0.3,
    "turns": 1.5,
    "width": 0.1,
-   "texture": "mote_butterfly",
+   "texture": "mote_sky_butterfly",
    "particles": 120,
    "life": 40,
-   "size": 0.34,
-   "color": "@secondary"
+   "size": 0.36,
+   "color": "#FFC6E6",
+   "comment": "вихрь бабочек на перевороте"
   },
   {
    "type": "vortex",
-   "delay": 164,
+   "delay": 168,
    "at": "caster+0,0.5,0",
    "duration": 56,
    "radius": 6,
@@ -276,22 +433,11 @@
    "funnel": 0.4,
    "turns": 1.2,
    "width": 0.06,
-   "texture": "mote_glass",
+   "texture": "mote_dream_petal",
    "particles": 80,
    "life": 30,
    "size": 0.24,
-   "color": "#9AE6FF"
-  },
-  {
-   "type": "flash",
-   "delay": 180,
-   "at": "caster+0,1.4,0",
-   "duration": 12,
-   "size": 4.0,
-   "rays": 12,
-   "anamorphic": 10,
-   "screen": 0.35,
-   "color": "#FFFFFF"
+   "color": "#FFF2F8"
   },
   {
    "type": "wave",
@@ -305,24 +451,388 @@
   },
   {
    "type": "sprites",
-   "delay": 200,
-   "at": "caster+0,2,0",
-   "duration": 60,
-   "texture": "mote_butterfly",
-   "count": 90,
-   "rate": 1.6,
-   "area": 8,
-   "speed": 0.01,
-   "gravity": -0.001,
-   "sway": 1.6,
-   "tumble": 0.3,
+   "delay": 196,
+   "at": "caster+-30,1.5,-14",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.77,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
    "size": [
-    0.32,
-    0.22
+    0.6,
+    0.45
    ],
-   "life": 80,
-   "color": "#EFE6FF",
-   "glow": 0.5
+   "life": 300,
+   "color": "#FFD27A",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6,
+   "comment": "река светящихся бабочек к Небесной бабочке (path — новое: частицы текут по кривой Catmull-Rom за life тиков, разброс width сужается к концу; без поддержки — всплывают у первой точки)"
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+-30,1.5,-14",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.63,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#FFC6E6",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+-30,1.5,-14",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.56,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#CDB8FF",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+-30,1.5,-14",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 28000,
+   "rate": 1.4,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.4,
+   "tumble": 0,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 300,
+   "color": "#FFF4D8",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+28,1.6,-20",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.77,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.6,
+    0.45
+   ],
+   "life": 300,
+   "color": "#FFD27A",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+28,1.6,-20",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.63,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#FFC6E6",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+28,1.6,-20",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.56,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#CDB8FF",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+28,1.6,-20",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 28000,
+   "rate": 1.4,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.4,
+   "tumble": 0,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 300,
+   "color": "#FFF4D8",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+-4,1.4,-34",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.77,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.6,
+    0.45
+   ],
+   "life": 300,
+   "color": "#FFD27A",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+-4,1.4,-34",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.63,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#FFC6E6",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+-4,1.4,-34",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 28000,
+   "rate": 0.56,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#CDB8FF",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 196,
+   "at": "caster+-4,1.4,-34",
+   "duration": 64,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 28000,
+   "rate": 1.4,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.4,
+   "tumble": 0,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 300,
+   "color": "#FFF4D8",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
   },
   {
    "type": "wave",
@@ -331,7 +841,7 @@
    "duration": 34,
    "shape": "ring",
    "radius": 64,
-   "color": "@primary"
+   "color": "#FFC9A8"
   },
   {
    "type": "wave",
@@ -341,40 +851,639 @@
    "shape": "sphere",
    "radius": 64,
    "rim": 1.0,
-   "color": "#EFE6FF",
+   "color": "#FFE2F0",
    "brightness": 0.4
+  },
+  {
+   "type": "flash",
+   "delay": 232,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 234,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 244,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 64,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFC6E6",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 234,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFC6E6",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 234,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
   },
   {
    "type": "flash",
    "delay": 236,
    "at": "caster+0,1.4,0",
-   "duration": 10,
+   "duration": 12,
    "size": 5.0,
    "rays": 12,
    "anamorphic": 12,
    "screen": 0.5,
-   "color": "#FFFFFF"
+   "color": "#FFEBC8",
+   "comment": "мягкая вспышка: шаг в сон"
   },
   {
    "type": "sprites",
    "delay": 236,
    "at": "caster+0,1.4,0",
    "duration": 3,
-   "texture": "mote_glass",
-   "count": 60,
-   "rate": 20,
+   "texture": "mote_dream_petal",
+   "count": 70,
+   "rate": 24,
    "spread": 0.6,
-   "speed": 0.22,
-   "gravity": 0.006,
-   "spin": 240,
+   "speed": 0.18,
+   "gravity": -0.001,
+   "sway": 1.2,
    "tumble": 1,
+   "spin": 200,
    "size": [
-    0.3,
-    0.08
+    0.28,
+    0.2
    ],
-   "life": 30,
-   "color": "#EFE6FF",
+   "life": 40,
+   "color": "#FFB8E6",
    "glow": 0.4
+  },
+  {
+   "type": "mesh",
+   "delay": 183,
+   "at": "caster+19.47,9.28,0.18",
+   "model": "illusion_isle_m",
+   "scale": 0.95,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -9.53,
+     0
+    ],
+    "delay": 0,
+    "duration": 83,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -9.53,
+       0
+      ],
+      "linear"
+     ],
+     [
+      83,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      67,
+      -2.7,
+      "linear"
+     ]
+    ]
+   },
+   "comment": "с первым взмахом (9.0 с) земля вокруг отрывается островками; после ролика — сжимаются (collapse)"
+  },
+  {
+   "type": "mesh",
+   "delay": 182,
+   "at": "caster+-3.48,5.74,11.48",
+   "model": "illusion_isle_l",
+   "scale": 0.97,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -5.99,
+     0
+    ],
+    "delay": 0,
+    "duration": 87,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -5.99,
+       0
+      ],
+      "linear"
+     ],
+     [
+      87,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      68,
+      3.0,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 177,
+   "at": "caster+-11.14,7.33,10.36",
+   "model": "illusion_isle_s",
+   "scale": 1.05,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -7.58,
+     0
+    ],
+    "delay": 0,
+    "duration": 119,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -7.58,
+       0
+      ],
+      "linear"
+     ],
+     [
+      119,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      73,
+      -2.1,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 182,
+   "at": "caster+-11.59,5.42,-3.1",
+   "model": "illusion_isle_s",
+   "scale": 0.98,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -5.67,
+     0
+    ],
+    "delay": 0,
+    "duration": 73,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -5.67,
+       0
+      ],
+      "linear"
+     ],
+     [
+      73,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      68,
+      -1.3,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 190,
+   "at": "caster+-20.31,9.72,6.83",
+   "model": "illusion_isle_l",
+   "scale": 1.09,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -9.97,
+     0
+    ],
+    "delay": 0,
+    "duration": 117,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -9.97,
+       0
+      ],
+      "linear"
+     ],
+     [
+      117,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      60,
+      1.6,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 189,
+   "at": "caster+-11.25,6.07,-4.85",
+   "model": "illusion_isle_l",
+   "scale": 1.06,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -6.32,
+     0
+    ],
+    "delay": 0,
+    "duration": 115,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -6.32,
+       0
+      ],
+      "linear"
+     ],
+     [
+      115,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      61,
+      1.8,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 176,
+   "at": "caster+-2.9,4.05,-8.89",
+   "model": "illusion_isle_s",
+   "scale": 1.0,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -4.3,
+     0
+    ],
+    "delay": 0,
+    "duration": 116,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -4.3,
+       0
+      ],
+      "linear"
+     ],
+     [
+      116,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      74,
+      2.8,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 186,
+   "at": "caster+0.9,3.75,-7.44",
+   "model": "illusion_isle_m",
+   "scale": 1.02,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -4.0,
+     0
+    ],
+    "delay": 0,
+    "duration": 97,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -4.0,
+       0
+      ],
+      "linear"
+     ],
+     [
+      97,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      64,
+      2.2,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 192,
+   "at": "caster+16.93,9.87,-11.17",
+   "model": "illusion_isle_s",
+   "scale": 0.94,
+   "until": 250,
+   "move": {
+    "from": [
+     0,
+     -10.12,
+     0
+    ],
+    "delay": 0,
+    "duration": 72,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -10.12,
+       0
+      ],
+      "linear"
+     ],
+     [
+      72,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      58,
+      2.0,
+      "linear"
+     ]
+    ]
+   }
   }
  ]
 }

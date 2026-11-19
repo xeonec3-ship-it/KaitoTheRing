@@ -1,0 +1,85 @@
+{
+ "comment": "Сон бабочки — цветущий след (только жертве): код играет на каждом шаге жертвы по земле (каждые ≈0.9 бл. пути, точка — под стопой: 0.16 бл. вбок от центра, ноги по очереди; не чаще раза в 6 тиков; живых следов ≤ 24). Цветы распускаются за 6 тиков и светятся, держатся ≈3 с, на 46–70 тике осыпаются лепестками. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 80,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.02,0",
+   "duration": 66,
+   "texture": "illusion_dream_bloom",
+   "radius": 0.55,
+   "grow": 6,
+   "glow": 0.3,
+   "color": "#FFFFFF",
+   "fadeOut": 20,
+   "lift": 0.02,
+   "comment": "цветы под стопой"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 2,
+   "texture": "mote_pollen",
+   "count": 4,
+   "rate": 2,
+   "spread": 0.15,
+   "speed": 0.012,
+   "gravity": -0.001,
+   "size": [
+    0.1,
+    0.03
+   ],
+   "life": 24,
+   "color": "#FFD27A",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 46,
+   "at": "caster+0,0.1,0",
+   "duration": 20,
+   "texture": "mote_dream_petal",
+   "count": 7,
+   "rate": 0.35,
+   "area": 0.35,
+   "speed": 0.006,
+   "gravity": -0.0012,
+   "sway": 0.7,
+   "tumble": 1,
+   "spin": 60,
+   "size": [
+    0.14,
+    0.1
+   ],
+   "life": 34,
+   "color": "#FFB8E6",
+   "glow": 0.3,
+   "comment": "осыпаются лепестками (уносит ветерком)"
+  },
+  {
+   "type": "sprites",
+   "delay": 50,
+   "at": "caster+0,0.1,0",
+   "duration": 16,
+   "texture": "mote_dream_petal",
+   "count": 4,
+   "rate": 0.25,
+   "area": 0.3,
+   "speed": 0.005,
+   "gravity": -0.001,
+   "sway": 0.6,
+   "tumble": 1,
+   "spin": -50,
+   "size": [
+    0.12,
+    0.08
+   ],
+   "life": 30,
+   "color": "#FFF2F8",
+   "glow": 0.3
+  }
+ ]
+}

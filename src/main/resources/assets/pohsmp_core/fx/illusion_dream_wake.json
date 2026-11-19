@@ -1,165 +1,179 @@
 {
- "comment": "Сон бабочки: ролик пробуждения, мир (2.5 с = 50 тиков; caster = жертва, follow; у каждой жертвы и у заклинателя — caster = он). Старт — тик сна 2366 (130.3 с от начала каста, удар в музыке). 0–34: зеркальная плёнка под ногами трескается от центра, трещины светлеют, бабочки замирают и стекленеют (экранная сетка — код); 34 (132.0 с, конец сна, второй акцент музыки): всё бьётся — осколки плёнки взлетают и падают, бабочки рассыпаются стеклом, белая вспышка, кольцо r24; код в этот тик делает Fx.stop мира сна и роняет куски экрана (illusion_wake_shards). 34–50: осколки оседают и тают в настоящем мире. Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки — ролик пробуждения «рассвет» (caster = жертва, follow; также на заклинателе — caster = он). Старт — тик сна 2366 (130.3 с от каста, удар в музыке). 0–22: Небесная бабочка складывает крылья (ключи модели мира), острова опускаются (move.keys мира), воздух звенит светом; 26–36: бабочка рассыпается светлячками и малыми бабочками, они медленно сыплются вниз; 34 (132.0 с, конец сна): замершие лепестки разом падают, мягкая вспышка рассвета (экран — код, textures/fx/illusion_dawn_flash), тёплый свет мира гаснет 2 с. Код на 34: Fx.stop мира сна. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
- "duration": 50,
+ "duration": 90,
  "elements": [
-  {
-   "type": "decal",
-   "delay": 0,
-   "at": "caster+0,0.1,0",
-   "follow": true,
-   "duration": 36,
-   "texture": "illusion_world_cracks",
-   "radius": 24,
-   "grow": 30,
-   "glow": 0.2,
-   "rotation": 15,
-   "color": "#EFE6FF",
-   "brightness": 0.9,
-   "comment": "плёнка трескается"
-  },
-  {
-   "type": "decal",
-   "delay": 8,
-   "at": "caster+0,0.11,0",
-   "follow": true,
-   "duration": 28,
-   "texture": "illusion_world_cracks",
-   "radius": 12,
-   "grow": 20,
-   "glow": 0.15,
-   "rotation": -40,
-   "color": "#FFB8E6",
-   "brightness": 0.6,
-   "pulse": 8
-  },
   {
    "type": "sprites",
    "delay": 0,
-   "at": "caster+0,1.4,0",
-   "follow": true,
-   "duration": 34,
-   "texture": "spark_soft",
-   "count": 120,
-   "rate": 3.5,
-   "area": 10,
-   "speed": 0.004,
-   "gravity": -0.001,
-   "size": [
-    0.1,
-    0.0
-   ],
-   "life": 20,
-   "color": "#FFFFFF",
-   "comment": "воздух звенит"
-  },
-  {
-   "type": "flash",
-   "delay": 0,
    "at": "caster+0,1.5,0",
    "follow": true,
-   "duration": 4,
-   "size": 1.6,
-   "screen": 0.12,
-   "color": "#FFFFFF"
+   "duration": 34,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 4,
+   "area": 10,
+   "speed": 0.003,
+   "gravity": -0.0015,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 26,
+   "color": "#FFD27A",
+   "glow": 0.5,
+   "comment": "0–1.7 с: воздух звенит светом"
+  },
+  {
+   "type": "sprites",
+   "delay": 26,
+   "at": "caster+0,42,14",
+   "follow": true,
+   "duration": 10,
+   "texture": "mote_firefly",
+   "count": 450,
+   "rate": 45,
+   "area": 34,
+   "speed": 0.03,
+   "gravity": 0.0016,
+   "sway": 1.6,
+   "size": [
+    0.45,
+    0.2
+   ],
+   "life": 90,
+   "color": "#FFE2A0",
+   "glow": 0.3,
+   "comment": "1.3–1.8 с: сложенная бабочка рассыпается светлячками (на 34 код делает Fx.stop мира — модель сжимается)"
+  },
+  {
+   "type": "sprites",
+   "delay": 28,
+   "at": "caster+0,42,14",
+   "follow": true,
+   "duration": 8,
+   "texture": "mote_sky_butterfly",
+   "count": 160,
+   "rate": 20,
+   "area": 26,
+   "speed": 0.05,
+   "gravity": 0.0012,
+   "sway": 1.8,
+   "tumble": 0.5,
+   "size": [
+    0.6,
+    0.3
+   ],
+   "life": 80,
+   "color": "#FFC6E6",
+   "glow": 0.3
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,42,14",
+   "follow": true,
+   "duration": 8,
+   "texture": "mote_firefly",
+   "count": 300,
+   "rate": 38,
+   "area": 30,
+   "speed": 0.02,
+   "gravity": 0.0014,
+   "sway": 1.5,
+   "size": [
+    0.4,
+    0.2
+   ],
+   "life": 90,
+   "color": "#CDB8FF",
+   "glow": 0.3
+  },
+  {
+   "type": "sprites",
+   "delay": 34,
+   "at": "caster+0,3.5,0",
+   "follow": true,
+   "duration": 3,
+   "texture": "mote_dream_petal",
+   "count": 320,
+   "rate": 110,
+   "area": 14,
+   "speed": 0.0,
+   "gravity": 0.012,
+   "sway": 1.6,
+   "tumble": 1,
+   "spin": 90,
+   "size": [
+    0.22,
+    0.18
+   ],
+   "life": 40,
+   "color": "#FFB8E6",
+   "glow": 0.3,
+   "comment": "замершие лепестки разом падают"
+  },
+  {
+   "type": "sprites",
+   "delay": 34,
+   "at": "caster+0,1.5,0",
+   "follow": true,
+   "duration": 3,
+   "texture": "mote_dream_petal",
+   "count": 200,
+   "rate": 70,
+   "area": 12,
+   "speed": 0.0,
+   "gravity": 0.014,
+   "sway": 1.4,
+   "tumble": 1,
+   "spin": -80,
+   "size": [
+    0.18,
+    0.15
+   ],
+   "life": 34,
+   "color": "#FFF2F8",
+   "glow": 0.3
   },
   {
    "type": "flash",
    "delay": 34,
    "at": "caster+0,1.5,0",
    "follow": true,
-   "duration": 8,
-   "size": 6,
-   "rays": 14,
-   "anamorphic": 14,
-   "screen": 0.55,
-   "color": "#FFFFFF"
+   "duration": 14,
+   "size": 3.5,
+   "rays": 12,
+   "anamorphic": 10,
+   "color": "#FFE6C4",
+   "comment": "мягкая вспышка рассвета (экран — illusion_dawn_flash, код)"
+  },
+  {
+   "type": "tint",
+   "delay": 34,
+   "at": "caster",
+   "duration": 50,
+   "radius": 64,
+   "color": "#FFD9A8",
+   "strength": 0.2,
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 44,
+    "easing": "easeInOutSine"
+   }
   },
   {
    "type": "wave",
    "delay": 34,
    "at": "caster",
-   "duration": 14,
+   "duration": 20,
    "shape": "ring",
    "radius": 24,
-   "color": "#EFE6FF"
-  },
-  {
-   "type": "wave",
-   "delay": 34,
-   "at": "caster+0,1,0",
-   "duration": 16,
-   "shape": "sphere",
-   "radius": 10,
-   "rim": 1.5,
-   "color": "@primary",
-   "brightness": 0.6
-  },
-  {
-   "type": "sprites",
-   "delay": 34,
-   "at": "caster+0,0.2,0",
-   "duration": 3,
-   "texture": "mote_glass",
-   "count": 260,
-   "rate": 90,
-   "area": 20,
-   "speed": 0.16,
-   "gravity": 0.012,
-   "spin": 320,
-   "tumble": 1,
-   "size": [
-    0.34,
-    0.12
-   ],
-   "life": 26,
-   "color": "#EFE6FF",
-   "glow": 0.35,
-   "comment": "плёнка разлетается осколками"
-  },
-  {
-   "type": "sprites",
-   "delay": 34,
-   "at": "caster+0,2.5,0",
-   "duration": 3,
-   "texture": "mote_glass",
-   "count": 160,
-   "rate": 55,
-   "area": 10,
-   "speed": 0.03,
-   "gravity": 0.014,
-   "spin": 300,
-   "tumble": 1,
-   "size": [
-    0.3,
-    0.1
-   ],
-   "life": 24,
-   "color": "#9AE6FF",
-   "glow": 0.3,
-   "comment": "бабочки → стекло"
-  },
-  {
-   "type": "sprites",
-   "delay": 34,
-   "at": "caster+0,6,0",
-   "duration": 4,
-   "texture": "mote_glass_petal",
-   "count": 120,
-   "rate": 30,
-   "area": 16,
-   "speed": 0.01,
-   "gravity": 0.016,
-   "spin": 200,
-   "tumble": 1,
-   "size": [
-    0.24,
-    0.1
-   ],
-   "life": 22,
-   "color": "#FFB8E6",
-   "glow": 0.3,
-   "comment": "лепестки бьются и сыплются"
+   "color": "#FFC9A8",
+   "brightness": 0.7
   }
  ]
 }

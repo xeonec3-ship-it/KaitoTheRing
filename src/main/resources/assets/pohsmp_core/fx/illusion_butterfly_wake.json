@@ -1,107 +1,99 @@
 {
- "comment": "Сон бабочки, «пробуждение» у заклинателя (caster = маг, видят ВСЕ в r64; урона НЕТ — «это был просто сон»). Старт одновременно с роликом пробуждения (тик сна 2366); на 34 тике (132.0 с, конец сна) — бабочки по всей зоне рассыпаются стеклом, белая вспышка, кольцо-звон до r64, «небо» трескается. Звук — GLASS_BREAK + AMETHYST_CLUSTER_BREAK громко на 34 тике. Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки, пробуждение у заклинателя — видят ВСЕ в r64 (урона нет: «это был просто сон»). Тот же старт, что ролик (тик сна 2366); 26–36: над зоной сыплются светлячки и малые бабочки (рассыпалась Небесная бабочка); 34: мягкая тёплая вспышка, кольцо света до r64. Звук на 34 (предложение): AMETHYST_BLOCK_RESONATE + тихий BELL_RESONATE, без стекла. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
- "duration": 64,
+ "duration": 90,
  "elements": [
   {
    "type": "sprites",
    "delay": 0,
    "at": "caster+0,2,0",
    "duration": 34,
-   "texture": "spark_soft",
+   "texture": "mote_pollen",
    "count": 200,
    "rate": 6,
    "area": 24,
    "speed": 0.004,
-   "gravity": -0.001,
+   "gravity": -0.0015,
    "size": [
-    0.14,
-    0.0
+    0.16,
+    0.05
    ],
-   "life": 24,
-   "color": "#EFE6FF",
-   "comment": "воздух звенит перед разломом"
+   "life": 26,
+   "color": "#FFD27A",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+0,18,0",
+   "duration": 12,
+   "texture": "mote_firefly",
+   "count": 700,
+   "rate": 58,
+   "area": 56,
+   "speed": 0.02,
+   "gravity": 0.0018,
+   "sway": 1.6,
+   "size": [
+    0.45,
+    0.2
+   ],
+   "life": 110,
+   "color": "#FFE2A0",
+   "glow": 0.3,
+   "comment": "светлячки над всей зоной"
+  },
+  {
+   "type": "sprites",
+   "delay": 26,
+   "at": "caster+0,16,0",
+   "duration": 10,
+   "texture": "mote_sky_butterfly",
+   "count": 220,
+   "rate": 22,
+   "area": 50,
+   "speed": 0.03,
+   "gravity": 0.0012,
+   "sway": 1.8,
+   "tumble": 0.5,
+   "size": [
+    0.6,
+    0.3
+   ],
+   "life": 100,
+   "color": "#FFC6E6",
+   "glow": 0.6
   },
   {
    "type": "flash",
    "delay": 34,
    "at": "caster+0,1.5,0",
-   "duration": 12,
-   "size": 6,
-   "rays": 14,
-   "anamorphic": 14,
-   "screen": 0.4,
-   "color": "#FFFFFF"
+   "duration": 14,
+   "size": 4,
+   "rays": 12,
+   "anamorphic": 12,
+   "screen": 0.2,
+   "color": "#FFE6C4"
   },
   {
    "type": "wave",
    "delay": 34,
    "at": "caster",
-   "duration": 24,
+   "duration": 26,
    "shape": "ring",
    "radius": 64,
-   "color": "#EFE6FF"
+   "color": "#FFC9A8"
   },
   {
    "type": "wave",
    "delay": 36,
    "at": "caster+0,1,0",
-   "duration": 26,
+   "duration": 28,
    "shape": "sphere",
    "radius": 48,
-   "rim": 1.5,
-   "color": "@primary",
-   "brightness": 0.5
-  },
-  {
-   "type": "sprites",
-   "delay": 34,
-   "at": "caster+0,6,0",
-   "duration": 4,
-   "texture": "mote_glass",
-   "count": 400,
-   "rate": 100,
-   "area": 40,
-   "speed": 0.02,
-   "gravity": 0.02,
-   "spin": 300,
-   "tumble": 1,
-   "size": [
-    0.34,
-    0.1
-   ],
-   "life": 40,
-   "color": "#EFE6FF",
-   "glow": 0.3,
-   "comment": "бабочки по зоне рассыпаются осколками"
-  },
-  {
-   "type": "sprites",
-   "delay": 34,
-   "at": "caster+0,3,0",
-   "duration": 4,
-   "texture": "spark_soft",
-   "count": 300,
-   "rate": 75,
-   "area": 40,
-   "speed": 0.02,
-   "gravity": 0.004,
-   "size": [
-    0.2,
-    0.0
-   ],
-   "life": 24,
-   "color": "#FFB8E6"
-  },
-  {
-   "type": "sigil",
-   "delay": 34,
-   "at": "caster+0,12,0",
-   "id": "illusion_mirror_crack",
-   "scale": 20,
-   "until": 42,
-   "orientation": "sky",
-   "comment": "небо-зеркало трескается"
+   "rim": 1.2,
+   "color": "#FFE2F0",
+   "brightness": 0.45
   }
  ]
 }

@@ -1,201 +1,11101 @@
 {
- "comment": "Сон бабочки: мир сна на ВСЕ 2 минуты (2400 тиков) — у КАЖДОЙ жертвы (код шлёт только ей; caster = жертва, follow). Под ногами зеркальная плёнка r24 (отражает перламутровое небо, блики бегут, край растворяется хлопьями), над головой перламутровое небо с гранями и трещинами (печать illusion_dream_heaven, r48 на высоте 34), медленно падают стеклянные лепестки, кружат бабочки, перламутровая дымка. Конец — ролик пробуждения (illusion_dream_wake, старт на тике 2366): код останавливает этот эффект на 34 тике ролика (Fx.stop — плёнка и небо бьются dissolve shatter). Зеркальность лево/право и вход/выход — клиент (illusion_dream_enter/_exit). Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки — мир сна «Небесная бабочка», все 2 минуты (2400 тиков), у КАЖДОЙ жертвы (только ей; caster = жертва). Над жертвой на полнеба — Небесная бабочка (витраж: перламутр, золото, лиловый), взмах раз в 8–10 с: волна света, мир на 3–5 с в цвете крыла (золото → лиловый → перламутр). Вокруг отрываются и парят 16 островков с травой и цветами; пыльца, лепестки и капли висят неподвижно и расступаются вокруг жертвы; река светящихся бабочек течёт к Небесной бабочке. Пастель, рассветное небо (код). На пробуждении (ролик с тика 2366) крылья складываются, острова опускаются; на 2400 код делает Fx.stop. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
  "duration": 2420,
  "elements": [
   {
-   "type": "decal",
+   "type": "mesh",
    "delay": 0,
-   "at": "caster+0,0.06,0",
+   "at": "caster+0,42,14",
+   "follow": true,
+   "model": "illusion_celestial_butterfly",
+   "scale": 1.0,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     0,
+     0
+    ],
+    "scaleFrom": 0.92,
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       0,
+       0
+      ],
+      "linear"
+     ],
+     [
+      70,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      86,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      150,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      250,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      266,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      330,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      419,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      435,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      499,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      604,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      620,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      684,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      767,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      783,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      847,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      931,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      947,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      1011,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1125,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1141,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      1205,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1291,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1307,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      1371,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1474,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1490,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      1554,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1671,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1687,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      1751,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1834,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1850,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      1914,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2026,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2042,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      2106,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2199,
+      [
+       0,
+       -0.6,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2215,
+      [
+       0,
+       1.8,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      2279,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ]
+    ]
+   },
+   "comment": "Небесная бабочка: 42 бл. над жертвой, 14 вперёд; ключи взмахов — в модели, подскок тела на ударе — move.keys"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,41,14",
    "duration": 2400,
    "follow": true,
-   "texture": "illusion_dream_mirror",
-   "radius": 24,
-   "grow": 16,
-   "blend": "translucent",
-   "color": "#FFFFFF",
-   "brightness": 1.0,
-   "fadeOut": 10,
-   "rotation": 0,
-   "lift": 0.02,
-   "comment": "зеркальная плёнка r24 (translucent — белёсое стекло поверх блоков)"
-  },
-  {
-   "type": "decal",
-   "delay": 4,
-   "at": "caster+0,0.07,0",
-   "duration": 2396,
-   "follow": true,
-   "texture": "illusion_dream_glints",
-   "radius": 22,
-   "grow": 16,
-   "spin": 0.12,
-   "glow": 0,
-   "color": "#FFFFFF",
-   "brightness": 0.8,
-   "pulse": 37,
-   "fadeOut": 10,
-   "lift": 0.03,
-   "comment": "блики плёнки, медленно вращаются"
-  },
-  {
-   "type": "decal",
-   "delay": 8,
-   "at": "caster+0,0.08,0",
-   "duration": 2392,
-   "follow": true,
-   "texture": "illusion_dream_glints",
-   "radius": 14,
-   "grow": 16,
-   "spin": -0.2,
-   "rotation": 40,
-   "glow": 0,
-   "color": "#FFB8E6",
-   "brightness": 0.5,
-   "pulse": 23,
-   "fadeOut": 10,
-   "lift": 0.035
-  },
-  {
-   "type": "sigil",
-   "delay": 0,
-   "at": "caster+0,34,0",
-   "follow": true,
-   "id": "illusion_dream_heaven",
-   "until": 2400,
-   "orientation": "sky",
-   "comment": "перламутровое небо"
-  },
-  {
-   "type": "sprites",
-   "delay": 0,
-   "at": "caster+0,9,0",
-   "duration": 2396,
-   "follow": true,
-   "texture": "mote_glass_petal",
+   "texture": "mote_firefly",
    "count": 20000,
-   "rate": 0.8,
-   "area": 16,
-   "speed": 0.0,
+   "rate": 0.7,
+   "area": 30,
+   "speed": 0.004,
    "gravity": 0.0006,
-   "sway": 2.2,
-   "tumble": 0.9,
-   "spin": 40,
+   "sway": 1.4,
    "size": [
-    0.22,
-    0.18
-   ],
-   "life": 200,
-   "color": "#EFE6FF",
-   "glow": 0.35,
-   "comment": "стеклянные лепестки медленно падают (≈4 с до земли, качаются)"
-  },
-  {
-   "type": "sprites",
-   "delay": 0,
-   "at": "caster+0,8,0",
-   "duration": 2396,
-   "follow": true,
-   "texture": "mote_glass_petal",
-   "count": 20000,
-   "rate": 0.35,
-   "area": 12,
-   "speed": 0.0,
-   "gravity": 0.0007,
-   "sway": 2.0,
-   "tumble": 0.9,
-   "spin": -50,
-   "size": [
-    0.2,
-    0.16
-   ],
-   "life": 180,
-   "color": "#FFB8E6",
-   "glow": 0.4
-  },
-  {
-   "type": "sprites",
-   "delay": 0,
-   "at": "caster+0,1.6,0",
-   "duration": 2396,
-   "follow": true,
-   "texture": "mote_butterfly",
-   "count": 20000,
-   "rate": 0.5,
-   "area": 10,
-   "speed": 0.01,
-   "gravity": -0.0008,
-   "sway": 1.8,
-   "tumble": 0.3,
-   "size": [
-    0.32,
-    0.22
-   ],
-   "life": 90,
-   "color": "#EFE6FF",
-   "glow": 0.5
-  },
-  {
-   "type": "sprites",
-   "delay": 0,
-   "at": "caster+0,1.6,0",
-   "duration": 2396,
-   "follow": true,
-   "texture": "mote_butterfly",
-   "count": 20000,
-   "rate": 0.25,
-   "area": 8,
-   "speed": 0.012,
-   "gravity": -0.001,
-   "sway": 1.8,
-   "tumble": 0.3,
-   "size": [
-    0.28,
+    0.4,
     0.2
    ],
-   "life": 80,
-   "color": "@secondary",
-   "glow": 0.5
-  },
-  {
-   "type": "sprites",
-   "delay": 0,
-   "at": "caster+0,0.3,0",
-   "duration": 2396,
-   "follow": true,
-   "texture": "mote_glass",
-   "count": 20000,
-   "rate": 0.6,
-   "area": 10,
-   "speed": 0.004,
-   "gravity": -0.001,
-   "spin": 60,
-   "tumble": 0.8,
-   "size": [
-    0.18,
-    0.04
-   ],
-   "life": 40,
-   "color": "#9AE6FF",
-   "glow": 0.3,
-   "comment": "искры над плёнкой"
+   "life": 200,
+   "color": "#FFF0C8",
+   "glow": 0.6,
+   "comment": "с крыльев всегда чуть сыплется свет"
   },
   {
    "type": "tint",
    "delay": 0,
    "at": "caster",
    "duration": 2400,
-   "radius": 6,
-   "color": "#C9B4F2",
-   "strength": 0.16,
+   "radius": 64,
+   "color": "#FFD3E4",
+   "strength": 0.1,
    "in": {
-    "duration": 30,
+    "duration": 40,
     "easing": "easeOutCubic"
    },
    "out": {
-    "duration": 10,
+    "duration": 20,
     "easing": "easeOutCubic"
+   },
+   "comment": "пастель сна; небо и туман — рассвет (код, см. письмо)"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_pollen",
+   "count": 20000,
+   "rate": 0.5,
+   "area": 12,
+   "speed": 0.002,
+   "gravity": -0.0008,
+   "sway": 0.8,
+   "size": [
+    0.12,
+    0.05
+   ],
+   "life": 160,
+   "color": "#FFD27A",
+   "glow": 0.5,
+   "comment": "от травы тихо поднимается пыльца"
+  },
+  {
+   "type": "flash",
+   "delay": 80,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 82,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 92,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFD98A",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 82,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFD98A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 82,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 82,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFD98A",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
    }
+  },
+  {
+   "type": "flash",
+   "delay": 260,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 262,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 272,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#C9A8FF",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 262,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#C9A8FF",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 262,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 262,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#C9A8FF",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 429,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 431,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 441,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFC6E6",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 431,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFC6E6",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 431,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 431,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFC6E6",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 614,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 616,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 626,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFD98A",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 616,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFD98A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 616,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 616,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFD98A",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 777,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 779,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 789,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#C9A8FF",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 779,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#C9A8FF",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 779,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 779,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#C9A8FF",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 941,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 943,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 953,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFC6E6",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 943,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFC6E6",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 943,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 943,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFC6E6",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 1135,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1137,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1147,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFD98A",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1137,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFD98A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1137,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 1137,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFD98A",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 1301,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1303,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1313,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#C9A8FF",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1303,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#C9A8FF",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1303,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 1303,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#C9A8FF",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 1484,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1486,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1496,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFC6E6",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1486,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFC6E6",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1486,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 1486,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFC6E6",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 1681,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1683,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1693,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFD98A",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1683,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFD98A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1683,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 1683,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFD98A",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 1844,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1846,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#C9A8FF",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 1856,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#C9A8FF",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1846,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#C9A8FF",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 1846,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 1846,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#C9A8FF",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 2036,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 2038,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFC6E6",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 2048,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFC6E6",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 2038,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFC6E6",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 2038,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 2038,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFC6E6",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 2209,
+   "at": "caster+0,42,14",
+   "duration": 16,
+   "size": 34,
+   "rays": 10,
+   "anamorphic": 0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 2211,
+   "at": "caster+0,42,14",
+   "duration": 44,
+   "shape": "sphere",
+   "radius": 78,
+   "rim": 1.0,
+   "color": "#FFD98A",
+   "brightness": 0.55
+  },
+  {
+   "type": "wave",
+   "delay": 2221,
+   "at": "caster",
+   "duration": 50,
+   "shape": "ring",
+   "radius": 40,
+   "followTerrain": true,
+   "thickness": 6,
+   "color": "#FFD98A",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 2211,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 140,
+   "rate": 24,
+   "area": 28,
+   "speed": 0.02,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "size": [
+    0.5,
+    0.3
+   ],
+   "life": 120,
+   "color": "#FFD98A",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 2211,
+   "at": "caster+0,41,14",
+   "duration": 6,
+   "texture": "mote_firefly",
+   "count": 60,
+   "rate": 10,
+   "area": 30,
+   "speed": 0.015,
+   "gravity": 0.0009,
+   "sway": 1.5,
+   "size": [
+    0.35,
+    0.2
+   ],
+   "life": 140,
+   "color": "#FFF6E0",
+   "glow": 0.4
+  },
+  {
+   "type": "tint",
+   "delay": 2211,
+   "at": "caster",
+   "duration": 110,
+   "radius": 64,
+   "color": "#FFD98A",
+   "strength": 0.34,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutSine"
+   },
+   "out": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 28,
+   "at": "caster+23.94,11.13,-1.48",
+   "model": "illusion_isle_s",
+   "scale": 1.03,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -11.38,
+     0
+    ],
+    "delay": 0,
+    "duration": 117,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -11.38,
+       0
+      ],
+      "linear"
+     ],
+     [
+      117,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      164,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      211,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      258,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      305,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      352,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      399,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      446,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      493,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      540,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      587,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      634,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      681,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      728,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      775,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      822,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      869,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      916,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      963,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1010,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1057,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1104,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1151,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1198,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1245,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1292,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1339,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1386,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1433,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1480,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1527,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1574,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1621,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1668,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1715,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1762,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1809,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1856,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1903,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1950,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1997,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2044,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2091,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2138,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2185,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2232,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2279,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2326,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2341,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2367,
+      [
+       0,
+       -10.8,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2372,
+      27.7,
+      "linear"
+     ]
+    ]
+   },
+   "comment": "16 островков вокруг места, где жертва уснула (follow нет — это мир): отрываются от земли за 1–5 с, парят, медленно поворачиваются, с тика 2366 опускаются на землю"
+  },
+  {
+   "type": "mesh",
+   "delay": 53,
+   "at": "caster+29.39,16.03,8.39",
+   "model": "illusion_isle_m",
+   "scale": 1.09,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -16.28,
+     0
+    ],
+    "delay": 0,
+    "duration": 97,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -16.28,
+       0
+      ],
+      "linear"
+     ],
+     [
+      97,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      148,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      199,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      250,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      301,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      352,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      403,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      454,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      505,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      556,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      607,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      658,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      709,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      760,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      811,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      862,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      913,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      964,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1015,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1066,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1117,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1168,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1219,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1270,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1321,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1372,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1423,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1474,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1525,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1576,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1627,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1678,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1729,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1780,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1831,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1882,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1933,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1984,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2035,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2086,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2137,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2188,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2239,
+      [
+       0,
+       -0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2290,
+      [
+       0,
+       0.44,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2315,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2341,
+      [
+       0,
+       -15.55,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2347,
+      -23.4,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 39,
+   "at": "caster+14.51,11.7,17.02",
+   "model": "illusion_isle_m",
+   "scale": 0.9,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -11.95,
+     0
+    ],
+    "delay": 0,
+    "duration": 82,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -11.95,
+       0
+      ],
+      "linear"
+     ],
+     [
+      82,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      127,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      172,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      217,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      262,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      307,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      352,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      397,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      442,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      487,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      532,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      577,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      622,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      667,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      712,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      757,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      802,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      847,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      892,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      937,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      982,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1027,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1072,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1117,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1162,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1207,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1252,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1297,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1342,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1387,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1432,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1477,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1522,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1567,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1612,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1657,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1702,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1747,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1792,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1837,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1882,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1927,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1972,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2017,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2062,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2107,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2152,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2197,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2242,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2287,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2327,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2353,
+      [
+       0,
+       -11.35,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2361,
+      19.5,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 55,
+   "at": "caster+10.75,14.27,26.35",
+   "model": "illusion_isle_m",
+   "scale": 1.02,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -14.52,
+     0
+    ],
+    "delay": 0,
+    "duration": 101,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -14.52,
+       0
+      ],
+      "linear"
+     ],
+     [
+      101,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      156,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      211,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      266,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      321,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      376,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      431,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      486,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      541,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      596,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      651,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      706,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      761,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      816,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      871,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      926,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      981,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1036,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1091,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1146,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1201,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1256,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1311,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1366,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1421,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1476,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1531,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1586,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1641,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1696,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1751,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1806,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1861,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1916,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1971,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2026,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2081,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2136,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2191,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2246,
+      [
+       0,
+       0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2301,
+      [
+       0,
+       -0.27,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2313,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2339,
+      [
+       0,
+       -13.84,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2345,
+      18.4,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 25,
+   "at": "caster+-10.43,7.53,5.94",
+   "model": "illusion_isle_m",
+   "scale": 0.96,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -7.78,
+     0
+    ],
+    "delay": 0,
+    "duration": 94,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -7.78,
+       0
+      ],
+      "linear"
+     ],
+     [
+      94,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      129,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      164,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      199,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      234,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      269,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      304,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      339,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      374,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      409,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      444,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      479,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      514,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      549,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      584,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      619,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      654,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      689,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      724,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      759,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      794,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      829,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      864,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      899,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      934,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      969,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1004,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1039,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1074,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1109,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1144,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1179,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1214,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1249,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1284,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1319,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1354,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1389,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1424,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1459,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1494,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1529,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1564,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1599,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1634,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1669,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1704,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1739,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1774,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1809,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1844,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1879,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1914,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1949,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1984,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2019,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2054,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2089,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2124,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2159,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2194,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2229,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2264,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2299,
+      [
+       0,
+       0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2334,
+      [
+       0,
+       -0.43,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2348,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2374,
+      [
+       0,
+       -7.3,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2375,
+      16.5,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 54,
+   "at": "caster+-13.87,15.01,29.22",
+   "model": "illusion_isle_s",
+   "scale": 0.92,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -15.26,
+     0
+    ],
+    "delay": 0,
+    "duration": 78,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -15.26,
+       0
+      ],
+      "linear"
+     ],
+     [
+      78,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      124,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      170,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      216,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      262,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      308,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      354,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      400,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      446,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      492,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      538,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      584,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      630,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      676,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      722,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      768,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      814,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      860,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      906,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      952,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      998,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1044,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1090,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1136,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1182,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1228,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1274,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1320,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1366,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1412,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1458,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1504,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1550,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1596,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1642,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1688,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1734,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1780,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1826,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1872,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1918,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1964,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2010,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2056,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2102,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2148,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2194,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2240,
+      [
+       0,
+       0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2286,
+      [
+       0,
+       -0.31,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2318,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2344,
+      [
+       0,
+       -14.56,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2346,
+      16.8,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 73,
+   "at": "caster+-11.07,7.28,-4.73",
+   "model": "illusion_isle_l",
+   "scale": 0.95,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -7.53,
+     0
+    ],
+    "delay": 0,
+    "duration": 118,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -7.53,
+       0
+      ],
+      "linear"
+     ],
+     [
+      118,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      157,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      196,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      235,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      274,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      313,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      352,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      391,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      430,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      469,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      508,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      547,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      586,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      625,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      664,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      703,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      742,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      781,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      820,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      859,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      898,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      937,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      976,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1015,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1054,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1093,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1132,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1171,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1210,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1249,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1288,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1327,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1366,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1405,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1444,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1483,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1522,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1561,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1600,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1639,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1678,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1717,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1756,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1795,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1834,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1873,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1912,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1951,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1990,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2029,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2068,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2107,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2146,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2185,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2224,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2263,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2295,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2321,
+      [
+       0,
+       -7.06,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2327,
+      16.0,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 16,
+   "at": "caster+-23.77,11.51,10.27",
+   "model": "illusion_isle_s",
+   "scale": 0.99,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -11.76,
+     0
+    ],
+    "delay": 0,
+    "duration": 91,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -11.76,
+       0
+      ],
+      "linear"
+     ],
+     [
+      91,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      129,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      167,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      205,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      243,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      281,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      319,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      357,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      395,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      433,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      471,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      509,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      547,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      585,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      623,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      661,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      699,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      737,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      775,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      813,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      851,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      889,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      927,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      965,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1003,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1041,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1079,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1117,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1155,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1193,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1231,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1269,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1307,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1345,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1383,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1421,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1459,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1497,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1535,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1573,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1611,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1649,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1687,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1725,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1763,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1801,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1839,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1877,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1915,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1953,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1991,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2029,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2067,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2105,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2143,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2181,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2219,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2257,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2295,
+      [
+       0,
+       -0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2333,
+      [
+       0,
+       0.46,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2354,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2380,
+      [
+       0,
+       -11.16,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2384,
+      -29.1,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 76,
+   "at": "caster+-24.91,13.69,-0.5",
+   "model": "illusion_isle_s",
+   "scale": 1.06,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -13.94,
+     0
+    ],
+    "delay": 0,
+    "duration": 78,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -13.94,
+       0
+      ],
+      "linear"
+     ],
+     [
+      78,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      119,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      160,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      201,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      242,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      283,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      324,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      365,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      406,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      447,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      488,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      529,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      570,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      611,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      652,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      693,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      734,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      775,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      816,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      857,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      898,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      939,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      980,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1021,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1062,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1103,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1144,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1185,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1226,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1267,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1308,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1349,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1390,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1431,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1472,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1513,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1554,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1595,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1636,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1677,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1718,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1759,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1800,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1841,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1882,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1923,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1964,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2005,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2046,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2087,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2128,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2169,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2210,
+      [
+       0,
+       -0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2251,
+      [
+       0,
+       0.35,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2297,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2323,
+      [
+       0,
+       -13.28,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2324,
+      -20.1,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 3,
+   "at": "caster+-23.5,14.53,-13.09",
+   "model": "illusion_isle_l",
+   "scale": 1.06,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -14.78,
+     0
+    ],
+    "delay": 0,
+    "duration": 117,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -14.78,
+       0
+      ],
+      "linear"
+     ],
+     [
+      117,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      170,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      223,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      276,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      329,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      382,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      435,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      488,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      541,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      594,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      647,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      700,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      753,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      806,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      859,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      912,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      965,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1018,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1071,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1124,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1177,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1230,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1283,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1336,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1389,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1442,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1495,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1548,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1601,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1654,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1707,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1760,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1813,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1866,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1919,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1972,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2025,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2078,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2131,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2184,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2237,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2290,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2343,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2364,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2390,
+      [
+       0,
+       -14.09,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2397,
+      -17.0,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 31,
+   "at": "caster+-15.64,12.79,-18.94",
+   "model": "illusion_isle_m",
+   "scale": 0.98,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -13.04,
+     0
+    ],
+    "delay": 0,
+    "duration": 76,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -13.04,
+       0
+      ],
+      "linear"
+     ],
+     [
+      76,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      119,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      162,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      205,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      248,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      291,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      334,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      377,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      420,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      463,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      506,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      549,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      592,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      635,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      678,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      721,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      764,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      807,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      850,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      893,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      936,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      979,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1022,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1065,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1108,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1151,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1194,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1237,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1280,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1323,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1366,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1409,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1452,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1495,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1538,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1581,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1624,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1667,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1710,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1753,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1796,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1839,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1882,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1925,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1968,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2011,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2054,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2097,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2140,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2183,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2226,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2269,
+      [
+       0,
+       0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2312,
+      [
+       0,
+       -0.34,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2338,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2364,
+      [
+       0,
+       -12.41,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2369,
+      23.4,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 36,
+   "at": "caster+-4.66,6.58,-9.81",
+   "model": "illusion_isle_s",
+   "scale": 1.01,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -6.83,
+     0
+    ],
+    "delay": 0,
+    "duration": 116,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -6.83,
+       0
+      ],
+      "linear"
+     ],
+     [
+      116,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      151,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      186,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      221,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      256,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      291,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      326,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      361,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      396,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      431,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      466,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      501,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      536,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      571,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      606,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      641,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      676,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      711,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      746,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      781,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      816,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      851,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      886,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      921,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      956,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      991,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1026,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1061,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1096,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1131,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1166,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1201,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1236,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1271,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1306,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1341,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1376,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1411,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1446,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1481,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1516,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1551,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1586,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1621,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1656,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1691,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1726,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1761,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1796,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1831,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1866,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1901,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1936,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1971,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2006,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2041,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2076,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2111,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2146,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2181,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2216,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2251,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2286,
+      [
+       0,
+       -0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2321,
+      [
+       0,
+       0.3,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2333,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2359,
+      [
+       0,
+       -6.38,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2364,
+      27.0,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 88,
+   "at": "caster+-0.29,7.18,-13.72",
+   "model": "illusion_isle_s",
+   "scale": 1.01,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -7.43,
+     0
+    ],
+    "delay": 0,
+    "duration": 105,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -7.43,
+       0
+      ],
+      "linear"
+     ],
+     [
+      105,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      154,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      203,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      252,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      301,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      350,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      399,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      448,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      497,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      546,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      595,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      644,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      693,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      742,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      791,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      840,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      889,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      938,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      987,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1036,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1085,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1134,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1183,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1232,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1281,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1330,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1379,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1428,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1477,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1526,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1575,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1624,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1673,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1722,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1771,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1820,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1869,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1918,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1967,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2016,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2065,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2114,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2163,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2212,
+      [
+       0,
+       0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2261,
+      [
+       0,
+       -0.26,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2284,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2310,
+      [
+       0,
+       -6.96,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2312,
+      23.9,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 80,
+   "at": "caster+4.15,6.97,-9.29",
+   "model": "illusion_isle_m",
+   "scale": 1.08,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -7.22,
+     0
+    ],
+    "delay": 0,
+    "duration": 113,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -7.22,
+       0
+      ],
+      "linear"
+     ],
+     [
+      113,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      157,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      201,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      245,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      289,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      333,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      377,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      421,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      465,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      509,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      553,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      597,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      641,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      685,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      729,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      773,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      817,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      861,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      905,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      949,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      993,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1037,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1081,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1125,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1169,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1213,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1257,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1301,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1345,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1389,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1433,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1477,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1521,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1565,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1609,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1653,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1697,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1741,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1785,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1829,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1873,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1917,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1961,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2005,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2049,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2093,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2137,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2181,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2225,
+      [
+       0,
+       -0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2269,
+      [
+       0,
+       0.51,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2286,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2312,
+      [
+       0,
+       -6.76,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2320,
+      -16.4,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 62,
+   "at": "caster+24.05,15.03,-23.99",
+   "model": "illusion_isle_m",
+   "scale": 0.93,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -15.28,
+     0
+    ],
+    "delay": 0,
+    "duration": 116,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -15.28,
+       0
+      ],
+      "linear"
+     ],
+     [
+      116,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      164,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      212,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      260,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      308,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      356,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      404,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      452,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      500,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      548,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      596,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      644,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      692,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      740,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      788,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      836,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      884,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      932,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      980,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1028,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1076,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1124,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1172,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1220,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1268,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1316,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1364,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1412,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1460,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1508,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1556,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1604,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1652,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1700,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1748,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1796,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1844,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1892,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1940,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1988,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2036,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2084,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2132,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2180,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2228,
+      [
+       0,
+       -0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2276,
+      [
+       0,
+       0.52,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2308,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2334,
+      [
+       0,
+       -14.58,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2338,
+      -12.2,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 26,
+   "at": "caster+18.5,9.57,-9.26",
+   "model": "illusion_isle_m",
+   "scale": 0.97,
+   "until": 2400,
+   "move": {
+    "from": [
+     0,
+     -9.82,
+     0
+    ],
+    "delay": 0,
+    "duration": 103,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -9.82,
+       0
+      ],
+      "linear"
+     ],
+     [
+      103,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      151,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      199,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      247,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      295,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      343,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      391,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      439,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      487,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      535,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      583,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      631,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      679,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      727,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      775,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      823,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      871,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      919,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      967,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1015,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1063,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1111,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1159,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1207,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1255,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1303,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1351,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1399,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1447,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1495,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1543,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1591,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1639,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1687,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1735,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1783,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1831,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1879,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1927,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      1975,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2023,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2071,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2119,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2167,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2215,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2263,
+      [
+       0,
+       0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2311,
+      [
+       0,
+       -0.41,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2340,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      2366,
+      [
+       0,
+       -9.28,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      0,
+      "linear"
+     ],
+     [
+      2374,
+      -28.4,
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 40,
+   "rate": 5.0,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.2,
+    0.2
+   ],
+   "life": 2440,
+   "color": "#FFB8E6",
+   "glow": 0.25,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   },
+   "comment": "замершие пыльца, лепестки и капли: висят, у жертвы расступаются (wrap, avoid — новое, см. письмо)"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 22,
+   "rate": 2.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.17,
+    0.17
+   ],
+   "life": 2440,
+   "color": "#FFF2F8",
+   "glow": 0.2,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_pollen",
+   "count": 46,
+   "rate": 5.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.14,
+    0.14
+   ],
+   "life": 2440,
+   "color": "#FFD27A",
+   "glow": 0.7,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 14,
+   "rate": 1.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.12,
+    0.12
+   ],
+   "life": 2440,
+   "color": "#D8EEFF",
+   "glow": 0.6,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 40,
+   "rate": 5.0,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.2,
+    0.2
+   ],
+   "life": 2440,
+   "color": "#FFB8E6",
+   "glow": 0.25,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 22,
+   "rate": 2.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.17,
+    0.17
+   ],
+   "life": 2440,
+   "color": "#FFF2F8",
+   "glow": 0.2,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_pollen",
+   "count": 46,
+   "rate": 5.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.14,
+    0.14
+   ],
+   "life": 2440,
+   "color": "#FFD27A",
+   "glow": 0.7,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 14,
+   "rate": 1.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.12,
+    0.12
+   ],
+   "life": 2440,
+   "color": "#D8EEFF",
+   "glow": 0.6,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 40,
+   "rate": 5.0,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.2,
+    0.2
+   ],
+   "life": 2440,
+   "color": "#FFB8E6",
+   "glow": 0.25,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 22,
+   "rate": 2.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.17,
+    0.17
+   ],
+   "life": 2440,
+   "color": "#FFF2F8",
+   "glow": 0.2,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_pollen",
+   "count": 46,
+   "rate": 5.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.14,
+    0.14
+   ],
+   "life": 2440,
+   "color": "#FFD27A",
+   "glow": 0.7,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.4,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 14,
+   "rate": 1.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.12,
+    0.12
+   ],
+   "life": 2440,
+   "color": "#D8EEFF",
+   "glow": 0.6,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 40,
+   "rate": 5.0,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.2,
+    0.2
+   ],
+   "life": 2440,
+   "color": "#FFB8E6",
+   "glow": 0.25,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 22,
+   "rate": 2.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.17,
+    0.17
+   ],
+   "life": 2440,
+   "color": "#FFF2F8",
+   "glow": 0.2,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_pollen",
+   "count": 46,
+   "rate": 5.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.14,
+    0.14
+   ],
+   "life": 2440,
+   "color": "#FFD27A",
+   "glow": 0.7,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 14,
+   "rate": 1.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.12,
+    0.12
+   ],
+   "life": 2440,
+   "color": "#D8EEFF",
+   "glow": 0.6,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 40,
+   "rate": 5.0,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.2,
+    0.2
+   ],
+   "life": 2440,
+   "color": "#FFB8E6",
+   "glow": 0.25,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 22,
+   "rate": 2.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.17,
+    0.17
+   ],
+   "life": 2440,
+   "color": "#FFF2F8",
+   "glow": 0.2,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_pollen",
+   "count": 46,
+   "rate": 5.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.14,
+    0.14
+   ],
+   "life": 2440,
+   "color": "#FFD27A",
+   "glow": 0.7,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,5,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 14,
+   "rate": 1.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.12,
+    0.12
+   ],
+   "life": 2440,
+   "color": "#D8EEFF",
+   "glow": 0.6,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,6.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 40,
+   "rate": 5.0,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.2,
+    0.2
+   ],
+   "life": 2440,
+   "color": "#FFB8E6",
+   "glow": 0.25,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,6.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_dream_petal",
+   "count": 22,
+   "rate": 2.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.25,
+   "size": [
+    0.17,
+    0.17
+   ],
+   "life": 2440,
+   "color": "#FFF2F8",
+   "glow": 0.2,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,6.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_pollen",
+   "count": 46,
+   "rate": 5.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.14,
+    0.14
+   ],
+   "life": 2440,
+   "color": "#FFD27A",
+   "glow": 0.7,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,6.6,0",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 14,
+   "rate": 1.75,
+   "area": 16,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.12,
+   "spin": 6,
+   "tumble": 0.0,
+   "size": [
+    0.12,
+    0.12
+   ],
+   "life": 2440,
+   "color": "#D8EEFF",
+   "glow": 0.6,
+   "wrap": 16,
+   "avoid": {
+    "radius": 1.8,
+    "push": 1.1
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-30,1.5,-14",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.55,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.6,
+    0.45
+   ],
+   "life": 300,
+   "color": "#FFD27A",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6,
+   "comment": "река светящихся бабочек к Небесной бабочке (path — новое: частицы текут по кривой Catmull-Rom за life тиков, разброс width сужается к концу; без поддержки — всплывают у первой точки)"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-30,1.5,-14",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.45,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#FFC6E6",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-30,1.5,-14",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.4,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#CDB8FF",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-30,1.5,-14",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 20000,
+   "rate": 1.0,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.4,
+   "tumble": 0,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 300,
+   "color": "#FFF4D8",
+   "glow": 0.3,
+   "path": [
+    "caster+-30,1.5,-14",
+    "caster+-21,2.2,-7",
+    "caster+-15,3.5,2",
+    "caster+-12,8,10",
+    "caster+-7,18,15",
+    "caster+-3,30,15",
+    "caster+0,41,13"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+28,1.6,-20",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.55,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.6,
+    0.45
+   ],
+   "life": 300,
+   "color": "#FFD27A",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+28,1.6,-20",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.45,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#FFC6E6",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+28,1.6,-20",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.4,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#CDB8FF",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+28,1.6,-20",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 20000,
+   "rate": 1.0,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.4,
+   "tumble": 0,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 300,
+   "color": "#FFF4D8",
+   "glow": 0.3,
+   "path": [
+    "caster+28,1.6,-20",
+    "caster+20,2.6,-12",
+    "caster+14,4.5,-2",
+    "caster+11,10,7",
+    "caster+6,20,12",
+    "caster+2,31,14",
+    "caster+0,41,12"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-4,1.4,-34",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.55,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.6,
+    0.45
+   ],
+   "life": 300,
+   "color": "#FFD27A",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-4,1.4,-34",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.45,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#FFC6E6",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-4,1.4,-34",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.4,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.9,
+   "tumble": 0.5,
+   "size": [
+    0.55,
+    0.4
+   ],
+   "life": 300,
+   "color": "#CDB8FF",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-4,1.4,-34",
+   "duration": 2400,
+   "follow": true,
+   "texture": "mote_firefly",
+   "count": 20000,
+   "rate": 1.0,
+   "spread": 1.2,
+   "speed": 0.0,
+   "gravity": -0.003,
+   "sway": 0.4,
+   "tumble": 0,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 300,
+   "color": "#FFF4D8",
+   "glow": 0.3,
+   "path": [
+    "caster+-4,1.4,-34",
+    "caster+3,2.4,-24",
+    "caster+-2,4,-14",
+    "caster+-6,9,-4",
+    "caster+-3,19,4",
+    "caster+-1,30,10",
+    "caster+0,41,14"
+   ],
+   "width": 1.6
   }
  ]
 }

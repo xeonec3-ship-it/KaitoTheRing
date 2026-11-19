@@ -1,7 +1,7 @@
 {
- "comment": "Сон бабочки: вход в отражение (10 тиков; caster = жертва, follow; только ей). Сфера-рябь сходится к жертве, кольцо по земле расходится, лёгкая засветка. Вместе — экранная рябь textures/fx/illusion_dream_ripple (код: из центра 0.2 → 2.4 высоты экрана, альфа 0.7 → 0) и зеркалирование экрана: на 5 тике картинка переворачивается по горизонтали (сжатие по x 1 → 0 → −1 за тики 2–8, easeInOutSine). Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки: вход в сон (12 тиков; caster = жертва, follow; только ей). Лепестки и пыльца закручиваются вокруг жертвы, мягкая рассветная засветка, кольцо по земле. Экранная рябь и зеркалирование — как было (код). Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
- "duration": 12,
+ "duration": 14,
  "elements": [
   {
    "type": "wave",
@@ -11,50 +11,70 @@
    "duration": 10,
    "shape": "sphere",
    "radius": 3.5,
-   "rim": 1.2,
-   "color": "#EFE6FF",
-   "brightness": 0.6
+   "rim": 1.0,
+   "color": "#FFE2F0",
+   "brightness": 0.5
   },
   {
    "type": "wave",
    "delay": 2,
    "at": "caster",
    "follow": true,
-   "duration": 10,
+   "duration": 12,
    "shape": "ring",
-   "radius": 8,
-   "color": "@primary"
+   "radius": 10,
+   "color": "#FFC9A8"
   },
   {
    "type": "flash",
    "delay": 4,
    "at": "caster+0,1.4,0",
    "follow": true,
-   "duration": 6,
-   "size": 1.6,
-   "screen": 0.18,
-   "color": "#FFFFFF"
+   "duration": 8,
+   "size": 1.8,
+   "screen": 0.22,
+   "color": "#FFEBD2"
   },
   {
    "type": "sprites",
-   "delay": 2,
+   "delay": 0,
    "at": "caster+0,1,0",
    "follow": true,
-   "duration": 4,
-   "texture": "mote_glass",
-   "count": 16,
-   "rate": 4,
-   "spread": 1.4,
-   "speed": -0.04,
-   "spin": 200,
+   "duration": 6,
+   "texture": "mote_dream_petal",
+   "count": 40,
+   "rate": 8,
+   "spread": 2.2,
+   "speed": -0.05,
+   "sway": 1.2,
    "tumble": 1,
+   "spin": 120,
    "size": [
-    0.2,
-    0.05
+    0.22,
+    0.18
    ],
-   "life": 10,
-   "color": "#EFE6FF",
+   "life": 14,
+   "color": "#FFB8E6",
    "glow": 0.3
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "follow": true,
+   "duration": 6,
+   "texture": "mote_pollen",
+   "count": 30,
+   "rate": 6,
+   "spread": 1.8,
+   "speed": -0.04,
+   "size": [
+    0.14,
+    0.06
+   ],
+   "life": 14,
+   "color": "#FFD27A",
+   "glow": 0.5
   }
  ]
 }

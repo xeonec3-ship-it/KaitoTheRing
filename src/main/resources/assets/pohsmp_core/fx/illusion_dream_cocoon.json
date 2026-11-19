@@ -1,0 +1,122 @@
+{
+ "comment": "Сон бабочки — кокон для ОСТАЛЬНЫХ (видят все, кроме самой жертвы — у неё мир сна; caster = жертва, follow): над спящей кружит тонкое кольцо бабочек и висит маленький светящийся силуэт Небесной бабочки — все видят, кто выведен из боя. На всё время сна; код останавливает Fx.stop при пробуждении/выходе. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 2410,
+ "elements": [
+  {
+   "type": "halo",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 2400,
+   "texture": "illusion_cocoon_ring",
+   "size": 0.95,
+   "tilt": 0,
+   "spin": 2.5,
+   "flap": [
+    0.06,
+    70
+   ],
+   "offset": [
+    0,
+    1.15,
+    0
+   ],
+   "color": "#FFFFFF",
+   "brightness": 0.8,
+   "in": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   },
+   "comment": "кольцо бабочек на уровне пояса"
+  },
+  {
+   "type": "halo",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 2400,
+   "texture": "illusion_cocoon_ring",
+   "size": 0.7,
+   "tilt": 10,
+   "spin": -3.5,
+   "flap": [
+    0.05,
+    55
+   ],
+   "offset": [
+    0,
+    1.95,
+    0
+   ],
+   "color": "#FFE2F0",
+   "brightness": 0.6,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.85,0",
+   "follow": true,
+   "duration": 2400,
+   "texture": "illusion_celestial_mini",
+   "count": 1,
+   "rate": 1,
+   "speed": 0.0,
+   "size": [
+    1.2,
+    1.2
+   ],
+   "life": 2410,
+   "color": "#FFFFFF",
+   "glow": 0.2,
+   "blend": "translucent",
+   "comment": "маленький силуэт Небесной бабочки над головой"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.5,0",
+   "follow": true,
+   "duration": 2400,
+   "texture": "mote_sky_butterfly",
+   "count": 20000,
+   "rate": 0.12,
+   "spread": 0.7,
+   "speed": 0.006,
+   "gravity": -0.0015,
+   "sway": 0.9,
+   "tumble": 0.4,
+   "size": [
+    0.18,
+    0.08
+   ],
+   "life": 60,
+   "color": "#FFC6E6",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "follow": true,
+   "duration": 2400,
+   "texture": "mote_pollen",
+   "count": 20000,
+   "rate": 0.25,
+   "area": 0.8,
+   "speed": 0.003,
+   "gravity": -0.0012,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 50,
+   "color": "#FFD27A",
+   "glow": 0.5
+  }
+ ]
+}

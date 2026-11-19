@@ -1,7 +1,7 @@
 {
- "comment": "Сон бабочки: «смерть» во сне — видит ТОЛЬКО жертва (caster = жертва). Тело рассыпается в бабочки снизу вверх: 0–14 тиков стеклянная оболочка тела, из неё вылетают бабочки и лепестки (вверх и в стороны), осколки сыплются; на 4 тике — экранная накладка «смерть сна» (textures/fx/illusion_dream_death, код, тайминг в письме). Код в эти тики гасит модель жертвы (от третьего лица) и переносит её на 22 тике. Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки: «смерть» во сне — видит ТОЛЬКО жертва (caster = жертва). Тело рассыпается в бабочки и лепестки снизу вверх (ноги 0–6, корпус 4–12, голова 8–14 тик), светлячки, мягкая вспышка; накладка «смерть сна» (код, с 4 тика), перенос на 22 тике. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
- "duration": 30,
+ "duration": 32,
  "elements": [
   {
    "type": "aura",
@@ -15,8 +15,8 @@
     3
    ],
    "motes": 14,
-   "texture": "mote_glass",
-   "color": "#EFE6FF",
+   "texture": "mote_firefly",
+   "color": "#FFE2F0",
    "in": {
     "duration": 2,
     "easing": "easeOutCubic"
@@ -31,7 +31,7 @@
    "delay": 0,
    "at": "caster+0,0.2,0",
    "duration": 6,
-   "texture": "mote_butterfly",
+   "texture": "mote_sky_butterfly",
    "count": 26,
    "rate": 4.4,
    "area": 0.4,
@@ -40,13 +40,12 @@
    "sway": 1.8,
    "tumble": 0.4,
    "size": [
-    0.3,
+    0.32,
     0.2
    ],
    "life": 30,
-   "color": "#C9A8FF",
-   "brightness": 0.8,
-   "glow": 0.25,
+   "color": "#CDB8FF",
+   "glow": 0.5,
    "comment": "ноги"
   },
   {
@@ -54,7 +53,7 @@
    "delay": 4,
    "at": "caster+0,1.0,0",
    "duration": 6,
-   "texture": "mote_butterfly",
+   "texture": "mote_sky_butterfly",
    "count": 28,
    "rate": 4.6,
    "spread": 0.35,
@@ -63,13 +62,12 @@
    "sway": 1.8,
    "tumble": 0.4,
    "size": [
-    0.32,
+    0.34,
     0.2
    ],
    "life": 30,
-   "color": "@secondary",
-   "brightness": 0.8,
-   "glow": 0.25,
+   "color": "#FFC6E6",
+   "glow": 0.5,
    "comment": "корпус"
   },
   {
@@ -77,7 +75,7 @@
    "delay": 8,
    "at": "caster+0,1.7,0",
    "duration": 6,
-   "texture": "mote_butterfly",
+   "texture": "mote_sky_butterfly",
    "count": 22,
    "rate": 3.6,
    "spread": 0.25,
@@ -86,13 +84,12 @@
    "sway": 1.8,
    "tumble": 0.4,
    "size": [
-    0.3,
+    0.32,
     0.2
    ],
    "life": 30,
-   "color": "#9AE6FF",
-   "brightness": 0.8,
-   "glow": 0.25,
+   "color": "#FFD27A",
+   "glow": 0.5,
    "comment": "голова"
   },
   {
@@ -100,9 +97,9 @@
    "delay": 2,
    "at": "caster+0,1,0",
    "duration": 12,
-   "texture": "mote_glass_petal",
-   "count": 40,
-   "rate": 3.4,
+   "texture": "mote_dream_petal",
+   "count": 44,
+   "rate": 3.6,
    "spread": 0.5,
    "speed": 0.03,
    "gravity": 0.002,
@@ -111,33 +108,30 @@
    "spin": 90,
    "size": [
     0.2,
-    0.14
+    0.16
    ],
    "life": 36,
    "color": "#FFB8E6",
-   "glow": 0.4
+   "glow": 0.3
   },
   {
    "type": "sprites",
    "delay": 2,
    "at": "caster+0,1,0",
-   "duration": 10,
-   "texture": "mote_glass",
-   "count": 40,
-   "rate": 4,
+   "duration": 12,
+   "texture": "mote_firefly",
+   "count": 30,
+   "rate": 2.6,
    "spread": 0.45,
-   "speed": 0.04,
-   "gravity": 0.01,
-   "spin": 240,
-   "tumble": 1,
+   "speed": 0.03,
+   "gravity": -0.003,
    "size": [
-    0.2,
-    0.05
+    0.22,
+    0.08
    ],
-   "life": 22,
-   "color": "#EFE6FF",
-   "glow": 0.3,
-   "comment": "осколки сыплются"
+   "life": 30,
+   "color": "#FFF0C8",
+   "glow": 0.6
   },
   {
    "type": "flash",
@@ -147,7 +141,7 @@
    "size": 2.6,
    "rays": 8,
    "anamorphic": 4,
-   "color": "#FFFFFF"
+   "color": "#FFEBD2"
   },
   {
    "type": "wave",
@@ -156,7 +150,7 @@
    "duration": 14,
    "shape": "ring",
    "radius": 5,
-   "color": "@primary"
+   "color": "#FFC9A8"
   }
  ]
 }

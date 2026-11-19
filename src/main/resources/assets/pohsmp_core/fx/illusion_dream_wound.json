@@ -1,7 +1,7 @@
 {
- "comment": "Сон бабочки: удар по жертве во сне (caster = жертва; видят жертва и заклинатель). Рождение бабочки-метки: стеклянный всплеск и вспышка у груди; саму бабочку дальше рисует код (атлас textures/fx/illusion_wound_butterfly, кружит у тела, до 12 — см. письмо). 12 тиков. Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки: удар по жертве во сне (caster = жертва; видят жертва и заклинатель): вспышка и всплеск лепестков у груди, рождается бабочка-метка (рисует код, атлас illusion_wound_butterfly). 14 тиков. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
- "duration": 12,
+ "duration": 14,
  "elements": [
   {
    "type": "flash",
@@ -20,20 +20,21 @@
    "at": "caster+0,1.2,0",
    "follow": true,
    "duration": 2,
-   "texture": "mote_glass",
-   "count": 10,
-   "rate": 5,
+   "texture": "mote_dream_petal",
+   "count": 12,
+   "rate": 6,
    "spread": 0.2,
    "speed": 0.07,
-   "gravity": 0.004,
-   "spin": 220,
+   "gravity": 0.003,
+   "sway": 0.8,
    "tumble": 1,
+   "spin": 200,
    "size": [
-    0.16,
-    0.04
+    0.18,
+    0.14
    ],
-   "life": 10,
-   "color": "#EFE6FF",
+   "life": 14,
+   "color": "#FFB8E6",
    "glow": 0.3
   },
   {
@@ -42,17 +43,18 @@
    "at": "caster+0,1.2,0",
    "follow": true,
    "duration": 2,
-   "texture": "spark_soft",
+   "texture": "mote_pollen",
    "count": 8,
    "rate": 4,
    "spread": 0.2,
    "speed": 0.05,
    "size": [
-    0.1,
+    0.12,
     0.0
    ],
-   "life": 8,
-   "color": "#FFFFFF"
+   "life": 10,
+   "color": "#FFD27A",
+   "glow": 0.5
   }
  ]
 }

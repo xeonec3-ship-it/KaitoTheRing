@@ -1,0 +1,56 @@
+{
+ "comment": "Сон бабочки: что видят ОСТАЛЬНЫЕ, когда жертва «умерла во сне» и перенеслась (caster = старая точка, затем та же — в новой): короткая рябь воздуха в рост человека и кольцо, без бабочек и цвета смерти. 16 тиков. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 1.4,
+   "rim": 1.3,
+   "color": "#EFE6FF",
+   "brightness": 0.45
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 2.4,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "size": 1.4,
+   "color": "#EFE6FF",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.03,
+   "gravity": 0.004,
+   "spin": 200,
+   "tumble": 1,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 12,
+   "color": "#EFE6FF"
+  }
+ ]
+}

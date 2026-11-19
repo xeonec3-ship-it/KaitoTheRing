@@ -1,0 +1,111 @@
+{
+ "comment": "Сон бабочки: перламутровое небо сна высоко над жертвой (sky, лицом вниз; масштаб 1 = r48): радужные разводы, небо разбито на грани-зеркала, светятся трещины; медленно вращается, края двоятся розовым и голубым; при пробуждении — шаттер. Сгенерировано tools/gen_illusion_fx.py.",
+ "size": 96.0,
+ "color": "#FFFFFF",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "sky",
+   "type": "disc",
+   "texture": "illusion_dream_sky",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.3,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutSine",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -0.25
+   }
+  },
+  {
+   "id": "ghost_pink",
+   "type": "disc",
+   "texture": "illusion_dream_sky",
+   "radius": 1.02,
+   "heightOffset": 0.004,
+   "color": "#FFB8E6",
+   "brightness": 0.12,
+   "appear": {
+    "delay": 20,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.3
+   },
+   "pulse": {
+    "amp": 0.4,
+    "period": 90
+   }
+  },
+  {
+   "id": "ghost_blue",
+   "type": "disc",
+   "texture": "illusion_dream_sky",
+   "radius": 0.98,
+   "heightOffset": 0.008,
+   "color": "#9AE6FF",
+   "brightness": 0.1,
+   "appear": {
+    "delay": 30,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -0.4
+   },
+   "pulse": {
+    "amp": 0.4,
+    "period": 130
+   }
+  },
+  {
+   "id": "cracks",
+   "type": "disc",
+   "texture": "illusion_world_cracks",
+   "radius": 0.5,
+   "heightOffset": 0.012,
+   "color": "#EFE6FF",
+   "brightness": 0.16,
+   "appear": {
+    "delay": 10,
+    "duration": 60,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.15
+   },
+   "pulse": {
+    "amp": 0.5,
+    "period": 70
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 24,
+  "stagger": 1
+ }
+}

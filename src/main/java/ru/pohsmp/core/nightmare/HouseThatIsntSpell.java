@@ -78,6 +78,7 @@ public class HouseThatIsntSpell extends NightmareSpells.Base {
         int b = -1;
         if (!SchoolSeals.shown(caster)) b = fx(sl, Fx.fx("nightmare_house_that_isnt_seal").at(caster.position()).caster(caster), "nightmare_house_that_isnt_seal");
         CASTING.put(caster.getUUID(), new int[] {a, b});
+        sl.playSound(null, caster.getX(), caster.getY() + 1, caster.getZ(), NmSounds.CAST_HOUSE, SoundSource.PLAYERS, 1f, 1f);   // approved T25 sound
     }
 
     @Override

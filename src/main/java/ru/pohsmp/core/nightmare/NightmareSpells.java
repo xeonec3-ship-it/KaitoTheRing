@@ -23,13 +23,15 @@ public final class NightmareSpells {
         return switch (path) {
             case NIGHT -> new EndlessNightSpell();
             case HOUSE -> new HouseThatIsntSpell();
-            default -> new Pending(path, path.equals(NO_AWAKENING) ? IllusionBase.Rank.MYTHIC : IllusionBase.Rank.HIGHER);
+            case NO_AWAKENING -> new NoAwakeningSpell();
+            default -> new Pending(path, IllusionBase.Rank.HIGHER);
         };
     }
 
     public static void registerEvents() {
         MinecraftForge.EVENT_BUS.register(EndlessNightSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(HouseThatIsntSpell.Events.class);
+        MinecraftForge.EVENT_BUS.register(NoAwakeningSpell.Events.class);
     }
 
     /** Base of the school's spells: Higher / Mythic on the rules of T22 (level 1, no mana, no cooldown, not crafted). */

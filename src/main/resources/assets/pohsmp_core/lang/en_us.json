@@ -1,4 +1,12 @@
 {
+  "entity.pohsmp_core.nm_crawler": "Crawler",
+  "entity.pohsmp_core.nm_dread": "Dread",
+  "entity.pohsmp_core.nm_hands": "Hands from the Ground",
+  "entity.pohsmp_core.nm_hollow_child": "Hollow Child",
+  "entity.pohsmp_core.nm_lurker": "Lurker",
+  "entity.pohsmp_core.nm_maw": "Maw",
+  "entity.pohsmp_core.nm_mimic": "Mimic",
+  "entity.pohsmp_core.nm_weeper": "Weeper",
   "attribute.pohsmp_core.divine_magic_resist": "Divine Magic Resistance",
   "attribute.pohsmp_core.divine_spell_power": "Divine Spell Power",
   "attribute.pohsmp_core.forbidden_magic_resist": "Forbidden Magic Resistance",

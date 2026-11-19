@@ -24,7 +24,8 @@ public abstract class TrackedEntityMixin {
 
     @Inject(method = "m_140497_(Lnet/minecraft/server/level/ServerPlayer;)V", at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void pohsmp$erased(ServerPlayer viewer, CallbackInfo ci) {
-        if (viewer != f_140472_ && Erased.hiddenFrom(f_140472_, viewer)) {
+        // T25: a nightmare only for those immersed deep enough
+        if (viewer != f_140472_ && (Erased.hiddenFrom(f_140472_, viewer) || ru.pohsmp.core.nightmare.Bestiary.hiddenFrom(f_140472_, viewer))) {
             m_140485_(viewer);
             ci.cancel();
         }

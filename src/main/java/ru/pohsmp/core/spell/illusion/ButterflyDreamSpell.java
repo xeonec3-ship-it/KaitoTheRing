@@ -80,7 +80,7 @@ public class ButterflyDreamSpell extends IllusionBase {
     @Override
     public List<MutableComponent> getUniqueInfo(int level, LivingEntity caster) {
         return List.of(ui("cast", CAST / 20), ui("zone", n(d(ServerConfig.BD_RADIUS)), n(d(ServerConfig.BD_SECONDS))),
-                ui("fake"), ui("death"));
+                ui("fake"), ui("death"), ui("nightmare"));
     }
 
     // ---------------------------------------------------------------- the cast and its scene
@@ -237,6 +237,11 @@ public class ButterflyDreamSpell extends IllusionBase {
         long now = Illusions.now();
         for (ServerPlayer v : Illusions.victims(sl, caster, r)) {
             if (v.isCreative()) continue;
+            if (ru.pohsmp.core.nightmare.Immersion.stage(v) >= 1) {   // owner 19.11: one in a nightmare does not dream - it does not wake up
+                music(sl, v.getUUID(), 1, 40);
+                ru.pohsmp.core.nightmare.NoAwakeningSpell.into(sl, caster, v);
+                continue;
+            }
             int t = Illusions.duration(v, ticks);
             UUID id = v.getUUID();
             d.victims.put(id, now + t);

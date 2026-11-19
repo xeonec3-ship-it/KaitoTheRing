@@ -196,6 +196,26 @@ public class NoAwakeningSpell extends NightmareSpells.Base {
         Illusions.logZone("no_awakening", sl, caster, caster.position(), d(ServerConfig.NA_RADIUS));
     }
 
+    /**
+     * Owner 19.11: «Сон бабочки» on a player already in a nightmare (any stage of the immersion) sends it here instead of the dream:
+     * into the caster's «Пробуждение не наступит» (made now, no scene, if the caster has none), for its full time.
+     */
+    public static void into(ServerLevel sl, LivingEntity caster, ServerPlayer v) {
+        Night n = NIGHTS.get(caster.getUUID());
+        if (n == null || n.sl != sl || Immersion.now() >= n.until) {
+            if (n != null) finish(n, false);
+            n = new Night(caster, sl, Immersion.now() + ticks(ServerConfig.NA_SECONDS));
+            n.nextStep = Immersion.now() + Math.round(d(ServerConfig.NA_THICKEN) * 20);
+            NIGHTS.put(caster.getUUID(), n);
+        }
+        if (n.worldFx.containsKey(v.getUUID())) return;
+        take(n, v);
+        fx(sl, Fx.fx("nightmare_no_awakening_thicken").at(v.position()).caster(v).attach(v).only(v), "nightmare_no_awakening_thicken");
+        v.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(net.minecraft.core.Holder.direct(NmSounds.THICKEN),
+                SoundSource.HOSTILE, v.getX(), v.getY(), v.getZ(), 1f, 0.8f, v.getRandom().nextLong()));
+        v.displayClientMessage(Component.translatable("ui.pohsmp_core.no_awakening.from_dream").withStyle(s -> s.withColor(0xE0285A)), true);
+    }
+
     private static void take(Night n, ServerPlayer p) {
         int left = (int) Math.max(1, n.until - Immersion.now());
         Immersion.hold(p, 3, left);

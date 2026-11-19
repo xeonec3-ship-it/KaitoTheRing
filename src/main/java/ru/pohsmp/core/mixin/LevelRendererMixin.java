@@ -25,6 +25,14 @@ public abstract class LevelRendererMixin {
         if (HouseClient.on()) ci.cancel();
     }
 
+    /** T25: the red moon (stage 3 and «Ночь без рассвета») - the moon's texture in renderSky swapped, the call left as it is. */
+    @org.spongepowered.asm.mixin.injection.ModifyArg(method = "m_202423_(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FLnet/minecraft/client/Camera;ZLjava/lang/Runnable;)V",
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;setShaderTexture(ILnet/minecraft/resources/ResourceLocation;)V"),
+            index = 1, remap = false, require = 0)
+    private net.minecraft.resources.ResourceLocation pohsmp$moon(net.minecraft.resources.ResourceLocation tex) {
+        return ru.pohsmp.core.client.nightmare.NightmareWorld.moon(tex);
+    }
+
     @Inject(method = "m_253054_(Lcom/mojang/blaze3d/vertex/PoseStack;Lorg/joml/Matrix4f;FDDD)V",
             at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void pohsmp$clouds(CallbackInfo ci) {

@@ -3,7 +3,6 @@ package ru.pohsmp.core.client.nightmare;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderNameTagEvent;
@@ -38,7 +37,7 @@ public final class NoAwakeningClient {
         Zones.Zone z = Zones.active(Zones.NO_AWAKENING);
         if (z == null) return;
         if (le.getId() == z.caster()) NmStandIn.draw(e, le, NightmareMob.Kind.DREAD);
-        else if (le instanceof Enemy) NmStandIn.draw(e, le, MASKS[Math.floorMod(le.getId() * 31 + 7, MASKS.length)]);
+        // owner 19.11: no other monsters - the real mobs keep their own look (MASKS kept for if it comes back)
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -47,6 +46,6 @@ public final class NoAwakeningClient {
         if (en == Minecraft.getInstance().player) return;
         Zones.Zone z = Zones.active(Zones.NO_AWAKENING);
         if (z == null) return;
-        if (en.getId() == z.caster() || en instanceof Enemy || (en instanceof Player && step(z) >= 3)) e.setResult(Event.Result.DENY);
+        if (en.getId() == z.caster() || (en instanceof Player && step(z) >= 3)) e.setResult(Event.Result.DENY);
     }
 }

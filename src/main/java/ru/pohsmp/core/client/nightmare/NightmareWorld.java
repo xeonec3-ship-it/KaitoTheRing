@@ -31,6 +31,7 @@ public final class NightmareWorld {
         if (e.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) {
+            if (NightmareBlocks.applied()) NightmareBlocks.set(false);   // left the world in the nightmare: the atlas back
             on = drawn = false;
             sky = 0;
             return;
@@ -39,12 +40,21 @@ public final class NightmareWorld {
         sky = on ? Math.min(1, sky + 0.03f) : Math.max(0, sky - 0.03f);
         if (on != drawn) {   // the tints are baked into the chunk meshes
             drawn = on;
+            NightmareBlocks.set(on);
             mc.levelRenderer.allChanged();
-        }
+        } else if (on && mc.level.getGameTime() % 100 == 0) NightmareBlocks.set(true);   // a resource reload puts the vanilla atlas back
     }
 
     public static Vec3 sky(Vec3 c) {
         return sky <= 0 ? c : c.lerp(new Vec3(0x1A / 255.0, 0x04 / 255.0, 0x08 / 255.0), sky);
+    }
+
+    private static final net.minecraft.resources.ResourceLocation MOON = new net.minecraft.resources.ResourceLocation("minecraft", "textures/environment/moon_phases.png"),
+            RED_MOON = new net.minecraft.resources.ResourceLocation(ru.pohsmp.core.PohCore.MODID, "textures/environment/nightmare_moon_phases.png");
+
+    /** LevelRendererMixin: the red moon (same layout as the vanilla phases) at stage 3 and in «Ночь без рассвета». */
+    public static net.minecraft.resources.ResourceLocation moon(net.minecraft.resources.ResourceLocation tex) {
+        return (on || NightmareClient.night() > 0) && MOON.equals(tex) ? RED_MOON : tex;
     }
 
     public static Vec3 clouds(Vec3 c) {
@@ -57,15 +67,16 @@ public final class NightmareWorld {
      */
     public static Integer tint(net.minecraft.world.level.ColorResolver r) {
         if (!drawn) return null;
-        if (r == BiomeColors.GRASS_COLOR_RESOLVER) return 0x4A3E36;
-        if (r == BiomeColors.FOLIAGE_COLOR_RESOLVER) return 0x3A2E2C;
+        boolean painted = NightmareBlocks.applied();   // the rotten sprites carry their own colour: no tint over them
+        if (r == BiomeColors.GRASS_COLOR_RESOLVER) return painted ? 0x8A7E70 : 0x4A3E36;
+        if (r == BiomeColors.FOLIAGE_COLOR_RESOLVER) return painted ? 0xFFFFFF : 0x3A2E2C;
         if (r == BiomeColors.WATER_COLOR_RESOLVER) return 0x0A0610;
         return null;
     }
 
     /** Mod bus: spruce and birch leaves have fixed colours (no biome): wither them too. */
     public static void colors(RegisterColorHandlersEvent.Block e) {
-        e.register((s, l, p, i) -> drawn ? 0x3A2E2C : FoliageColor.getEvergreenColor(), Blocks.SPRUCE_LEAVES);
-        e.register((s, l, p, i) -> drawn ? 0x3A2E2C : FoliageColor.getBirchColor(), Blocks.BIRCH_LEAVES);
+        e.register((s, l, p, i) -> drawn ? (NightmareBlocks.applied() ? 0xFFFFFF : 0x3A2E2C) : FoliageColor.getEvergreenColor(), Blocks.SPRUCE_LEAVES);
+        e.register((s, l, p, i) -> drawn ? (NightmareBlocks.applied() ? 0xFFFFFF : 0x3A2E2C) : FoliageColor.getBirchColor(), Blocks.BIRCH_LEAVES);
     }
 }

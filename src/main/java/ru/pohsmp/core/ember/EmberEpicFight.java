@@ -54,6 +54,7 @@ public final class EmberEpicFight {
         modBus.addListener(Impl::registerAnimations);
         modBus.addListener(Impl::registerSkill);
         modBus.addListener(Impl::registerWeaponType);
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.addListener(Impl::watchSwing);
     }
 
     /** Plays the special attack animation for the holder (server). Returns the fx delay in ticks (0 without Epic Fight). */
@@ -75,6 +76,51 @@ public final class EmberEpicFight {
         static AnimationAccessor<BasicAttackAnimation> SWORD1, SWORD2, SWORD3, SWORD4, SWORD_DASH, SWORD_AIR;
         static AnimationAccessor<StaticAnimation> WHIP_IDLE;
 
+        /**
+         * Owner 19.11: "the whip hits like a plain hit though the model goes through the foe" — the whip lashes had the sword collider
+         * at the hand (~1.5 blocks). Now a long box along the tool, about the visible whip: ~5.5 blocks, ~1.2 thick, 6 steps per tick so a
+         * swing does not skip a target (EF sword: MultiOBBCollider(3, 0.4, 0.4, 0.7, 0, 0, -1), the tip along -Z).
+         */
+        static final yesman.epicfight.api.collider.Collider WHIP_COLLIDER = new yesman.epicfight.api.collider.MultiOBBCollider(6, 0.6, 0.6, 2.6, 0, 0, -2.8);
+        /** Contact start of whip1-3 (seconds, the antic of the animation): the lash goes then. */
+        static final float WHIP_CONTACT = 0.15F, WHIP3_CONTACT = 0.20F;
+
+        /** player -> the whip animation seen last tick (to tell a new swing) */
+        static final java.util.Map<java.util.UUID, Object> SWING_ANIM = new java.util.HashMap<>();
+
+        /**
+         * Server, every player tick: during whip1-3 the lash goes at the contact start of each swing (hit or miss); a new swing (another
+         * whip animation, or the same one started again) resets the swing in EmberBlade.
+         */
+        static void watchSwing(net.minecraftforge.event.TickEvent.PlayerTickEvent e) {
+            if (e.phase != net.minecraftforge.event.TickEvent.Phase.END || !(e.player instanceof ServerPlayer p)) return;
+            Object anim = null;
+            AnimationPlayer pl = null;
+            if (p.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.hot(p)) {
+                try {
+                    ServerPlayerPatch patch = EpicFightCapabilities.getEntityPatch(p, ServerPlayerPatch.class);
+                    pl = patch == null ? null : patch.getAnimator().getPlayerFor(null);
+                    Object real = pl == null ? null : pl.getRealAnimation();
+                    if (WHIP1 != null && (WHIP1.equals(real) || WHIP2.equals(real) || WHIP3.equals(real))) anim = real;
+                } catch (RuntimeException ex) {   // an API change in Epic Fight must not break the tick
+                    anim = null;
+                }
+            }
+            Object last = SWING_ANIM.get(p.getUUID());
+            if (anim == null) {
+                if (last != null) {
+                    SWING_ANIM.remove(p.getUUID());
+                    EmberBlade.swingEnd(p);
+                }
+                return;
+            }
+            float t = pl.getElapsedTime(), t0 = pl.getPrevElapsedTime();
+            if (!anim.equals(last) || t < t0) EmberBlade.swingStart(p);   // a new lash
+            SWING_ANIM.put(p.getUUID(), anim);
+            float c = WHIP3.equals(anim) ? WHIP3_CONTACT : WHIP_CONTACT;
+            if (t >= c && (t0 < c || !anim.equals(last) || t < t0)) EmberBlade.swingContact(p);
+        }
+
         /** A sword-form hit: the sword collider on the right hand, the same attack speed as the whip lashes. */
         static BasicAttackAnimation sword(AnimationAccessor<BasicAttackAnimation> a, float antic, float contact, float recovery) {
             return new BasicAttackAnimation(0.1F, antic, contact, recovery, null, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
@@ -95,11 +141,11 @@ public final class EmberEpicFight {
                     .addProperty(ActionAnimationProperty.STOP_MOVEMENT, true)
                     .addProperty(ActionAnimationProperty.MOVE_VERTICAL, false));
             // whip combo: the sword collider on the hand starts the hit, EmberBlade.lash adds the 6-block flaming arc
-            WHIP1 = b.nextAccessor("biped/ember/whip1", a -> new BasicAttackAnimation(0.1F, 0.15F, 0.30F, 0.45F, null, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
+            WHIP1 = b.nextAccessor("biped/ember/whip1", a -> new BasicAttackAnimation(0.1F, 0.15F, 0.30F, 0.45F, WHIP_COLLIDER, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
                     .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
-            WHIP2 = b.nextAccessor("biped/ember/whip2", a -> new BasicAttackAnimation(0.1F, 0.15F, 0.30F, 0.45F, null, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
+            WHIP2 = b.nextAccessor("biped/ember/whip2", a -> new BasicAttackAnimation(0.1F, 0.15F, 0.30F, 0.45F, WHIP_COLLIDER, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
                     .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
-            WHIP3 = b.nextAccessor("biped/ember/whip3", a -> new BasicAttackAnimation(0.1F, 0.20F, 0.35F, 0.55F, null, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
+            WHIP3 = b.nextAccessor("biped/ember/whip3", a -> new BasicAttackAnimation(0.1F, 0.20F, 0.35F, 0.55F, WHIP_COLLIDER, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
                     .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
             // sword form combo (owner 19.11: "ordinary hits, with variations"): 4 different hits, a dash hit and an air hit; fire trail in data/
             SWORD1 = b.nextAccessor("biped/ember/sword1", a -> sword(a, 0.15F, 0.30F, 0.45F));   // horizontal cut right to left

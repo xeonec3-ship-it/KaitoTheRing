@@ -3,6 +3,8 @@ package ru.pohsmp.core.ember;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -162,7 +164,19 @@ public class EmberBlade extends SwordItem {
             ItemStack s = p.getMainHandItem();
             if (!(s.getItem() instanceof EmberBlade)) return;
             if (e.getSource().getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile) return;
-            onHit(sl, p, s, e.getEntity());
+            Swing w = SWINGS.get(p.getUUID());
+            if (w == null) {   // a sword hit, or no Epic Fight: every hit counts
+                onHit(sl, p, s, e.getEntity());
+                return;
+            }
+            // an Epic Fight whip swing: one heat per swing; a foe the lash already burnt this swing takes no second hit from the collider
+            UUID id = e.getEntity().getUUID();
+            if (!w.counted) {
+                w.counted = true;
+                onHit(sl, p, s, e.getEntity());
+            }
+            if (w.lashed.contains(id)) e.setCanceled(true);
+            else w.hit.add(id);
         }
 
         /** A player who starts seeing the holder gets his form (the whip model and animations). */
@@ -175,6 +189,7 @@ public class EmberBlade extends SwordItem {
         @SubscribeEvent
         public static void onLogout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e) {
             SERVER.remove(e.getEntity().getUUID());
+            SWINGS.remove(e.getEntity().getUUID());
         }
 
         @SubscribeEvent
@@ -198,7 +213,42 @@ public class EmberBlade extends SwordItem {
         }
         if (heat >= MAX_HEAT && before < MAX_HEAT)
             sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BLAZE_AMBIENT, SoundSource.PLAYERS, 0.8f, 1.6f);
-        if (wasHot) lash(sl, p, target);
+        if (wasHot && !EmberEpicFight.ON) lash(sl, p, java.util.Set.of(target.getUUID()));   // with Epic Fight the lash goes on every swing
+    }
+
+    // ---------------------------------------------------------------- Epic Fight whip swings (owner 19.11: the whip hit like a plain sword)
+
+    /** One whip swing of the holder: foes struck by the collider, foes burnt by the lash, heat already counted. */
+    private static final class Swing {
+        final Set<UUID> hit = new HashSet<>(), lashed = new HashSet<>();
+        boolean counted;
+    }
+
+    private static final java.util.Map<UUID, Swing> SWINGS = new java.util.HashMap<>();
+
+    /** EmberEpicFight: a whip swing (whip1-3) began. */
+    static void swingStart(Player p) {
+        SWINGS.put(p.getUUID(), new Swing());
+    }
+
+    /** EmberEpicFight: the swing left the whip combo. */
+    static void swingEnd(Player p) {
+        SWINGS.remove(p.getUUID());
+    }
+
+    /**
+     * EmberEpicFight: the contact moment of a whip swing — the lash burns the 6-block arc whether the collider hit or not (foes the collider
+     * already struck this swing are left out); a lash that burns anyone counts as the swing's hit for the heat.
+     */
+    static void swingContact(ServerPlayer p) {
+        Swing w = SWINGS.get(p.getUUID());
+        if (w == null || !hot(p) || !(p.level() instanceof ServerLevel sl)) return;
+        List<LivingEntity> burnt = lash(sl, p, w.hit);
+        for (LivingEntity e : burnt) w.lashed.add(e.getUUID());
+        if (!burnt.isEmpty() && !w.counted) {
+            w.counted = true;
+            onHit(sl, p, p.getMainHandItem(), burnt.get(0));
+        }
     }
 
     private static float damage(Player p) {
@@ -220,22 +270,25 @@ public class EmberBlade extends SwordItem {
         return f.lengthSqr() < 1e-4 ? new Vec3(0, 0, 1) : f.normalize();
     }
 
-    /** Whip form: the lash sweeps right to left (the 2nd combo lash: left to right) over 4 ticks and burns everyone in the arc but the one already struck. */
-    private static void lash(ServerLevel sl, Player p, LivingEntity struck) {
+    /** Whip form: the lash sweeps right to left (the 2nd combo lash: left to right) over 4 ticks and burns everyone in the arc but those already struck. Returns the burnt. */
+    private static List<LivingEntity> lash(ServerLevel sl, Player p, Set<UUID> struck) {
         Vec3 o = p.position().add(0, p.getBbHeight() * 0.6, 0), f = flat(p.getLookAngle());
         double yaw = Math.atan2(f.z, f.x);
         float dmg = damage(p) * 0.6f;
-        for (LivingEntity e : HigherSpell.around(sl, p.position(), WHIP_LEN + 1, e -> e != p && e != struck && !HigherSpell.friendly(p, e))) {
+        List<LivingEntity> burnt = new java.util.ArrayList<>();
+        for (LivingEntity e : HigherSpell.around(sl, p.position(), WHIP_LEN + 1, e -> e != p && !struck.contains(e.getUUID()) && !HigherSpell.friendly(p, e))) {
             Vec3 d = e.position().subtract(p.position()).multiply(1, 0, 1);
             double dist = d.length();
             if (dist > WHIP_LEN + e.getBbWidth() / 2 || Math.abs(e.getY() - p.getY()) > 3) continue;
             if (dist > 0.5 && Math.acos(Math.max(-1, Math.min(1, d.normalize().dot(f)))) > WHIP_HALF) continue;
             hurt(sl, p, e, dmg, 4);
+            burnt.add(e);
         }
         sl.playSound(null, o.x, o.y, o.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 0.7f, 1.3f);
         int dir = EmberEpicFight.lashDir(p);   // the 2nd lash of the Epic Fight combo goes left to right
         // the whip on every client: the physics rope sweeps from -WHIP_HALF*dir to +WHIP_HALF*dir (client/EmberWhipClient)
         whip(sl, p, LASH, yaw, dir, LASH_TICKS);
+        return burnt;
     }
 
     /** {@link Net.HFx#WHIP} modes (b) and the ticks of a lash / of the vortex turn for the client whip. */

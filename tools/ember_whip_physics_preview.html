@@ -1,0 +1,738 @@
+<title>Хлыст «Раскалённых углей»</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: the forge floor — a wide stage on the left, the smith's tally board on the right; one deliberate dark world (soot and embers). */
+:root {
+  --soot: #15110f;      /* page */
+  --iron: #201a17;      /* panels */
+  --seam: #3a2e27;      /* rules, borders */
+  --ash: #eee3d9;       /* text */
+  --cinder: #a8978b;    /* muted text */
+  --ember: #ff8a3a;     /* accent */
+  --flare: #ffc27a;     /* hot highlight */
+  --deep: #c2470e;      /* whip root colour */
+  --display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --body: "Golos Text", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--soot); color: var(--ash); }
+body { font: 15px/1.55 var(--body); padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 18px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ember); }
+h1 { font: 700 clamp(22px, 3.4vw, 34px)/1.1 var(--display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 em { font-style: normal; color: var(--flare); }
+.lede { color: var(--cinder); max-width: 72ch; margin: 0; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.stage { position: relative; border: 1px solid var(--seam); border-radius: 6px; overflow: hidden; background: #0d0a09; aspect-ratio: 16 / 10; max-width: 100%; touch-action: none; }
+.stage canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+.stage canvas:active { cursor: grabbing; }
+.hud { position: absolute; left: 12px; top: 10px; font: 500 12px/1.4 var(--mono); color: var(--cinder); pointer-events: none; text-shadow: 0 1px 2px #000; }
+.hud b { color: var(--ash); font-weight: 600; }
+.hint { position: absolute; right: 12px; bottom: 10px; font: 400 11px/1.3 var(--mono); color: #7d6f66; pointer-events: none; }
+.board { display: grid; gap: 14px; background: var(--iron); border: 1px solid var(--seam); border-radius: 6px; padding: 16px; min-width: 0; }
+.board h2 { font: 700 12px/1 var(--display); letter-spacing: .08em; text-transform: uppercase; margin: 0; color: var(--cinder); }
+.group { display: grid; gap: 8px; }
+.moves { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+button.move { font: 600 13px/1.2 var(--body); color: var(--ash); background: #2a211d; border: 1px solid var(--seam); border-radius: 5px; padding: 10px 10px; text-align: left; cursor: pointer; display: grid; gap: 2px; }
+button.move small { font: 400 11px/1.3 var(--mono); color: var(--cinder); }
+button.move:hover { border-color: var(--ember); }
+button.move:focus-visible, .toggle input:focus-visible + span { outline: 2px solid var(--flare); outline-offset: 2px; }
+button.move[aria-pressed="true"] { border-color: var(--ember); background: #3a2216; }
+button.move.wide { grid-column: 1 / -1; }
+.toggles { display: grid; gap: 6px; }
+.toggle { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; }
+.toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.toggle span.sw { width: 30px; height: 16px; border-radius: 9px; background: #3a2e27; position: relative; flex: none; transition: background .15s; }
+.toggle span.sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--cinder); transition: transform .15s, background .15s; }
+.toggle input:checked + span.sw { background: #6a2a0c; }
+.toggle input:checked + span.sw::after { transform: translateX(14px); background: var(--flare); }
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cell { display: grid; gap: 2px; min-width: 0; }
+.cell .k { font: 500 10px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--cinder); }
+.cell .v { font: 600 18px/1.1 var(--mono); font-variant-numeric: tabular-nums; color: var(--ash); }
+.cell .v.hot { color: var(--flare); }
+#spark { width: 100%; height: 70px; display: block; border-top: 1px solid var(--seam); padding-top: 6px; }
+.legend { font: 400 11px/1.4 var(--mono); color: var(--cinder); }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; border-top: 1px solid var(--seam); padding-top: 16px; }
+.notes section { min-width: 0; }
+.notes h3 { font: 700 13px/1.2 var(--display); margin: 0 0 8px; color: var(--ash); letter-spacing: .02em; }
+.notes p, .notes li { color: var(--cinder); font-size: 14px; margin: 0; }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.notes code { font: 500 12.5px var(--mono); color: var(--flare); }
+.spec { width: 100%; border-collapse: collapse; font: 400 13px/1.35 var(--mono); }
+.spec td { padding: 4px 0; border-bottom: 1px solid #2b221e; vertical-align: top; }
+.spec td:first-child { color: var(--cinder); padding-right: 10px; }
+.spec td:last-child { text-align: right; color: var(--ash); font-variant-numeric: tabular-nums; }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin-left: 4px; }
+@media (prefers-reduced-motion: reduce) { .toggle span.sw, .toggle span.sw::after { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">T14 · меч-хлыст · превью физики</div>
+    <h1>Хлыст <em>«Раскалённых углей»</em></h1>
+    <p class="lede">Канат из 36 звеньев с инерцией: корень в рукояти, остальное тянется за рукой. На ударе изгиб бежит волной к концу, кончик щёлкает на пике скорости. Здесь работает тот же алгоритм, что в моде (<code>WhipSim.java</code>, перенос на JS), с теми же константами.</p>
+  </header>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="view" aria-label="3D-сцена: владелец с огненным хлыстом"></canvas>
+      <div class="hud" id="hud">форма: <b>хлыст</b></div>
+      <div class="hint">тяни — вращать · колесо — ближе/дальше</div>
+    </div>
+
+    <aside class="board">
+      <div class="group">
+        <h2>Приёмы</h2>
+        <div class="moves">
+          <button class="move" id="m-lash" type="button">Удар<small>дуга ±50°, щелчок</small></button>
+          <button class="move" id="m-combo" type="button">Серия<small>3 хлёста подряд</small></button>
+          <button class="move wide" id="m-vortex" type="button">Огненный вихрь<small>оборот, хлыст вытянут по кругу r ≈ 5</small></button>
+          <button class="move" id="m-walk" type="button" aria-pressed="false">Шагать<small>рука качается</small></button>
+          <button class="move" id="m-form" type="button" aria-pressed="false">Форма меча<small>хлыст убран</small></button>
+        </div>
+      </div>
+      <div class="group toggles">
+        <label class="toggle"><input type="checkbox" id="t-slow"><span class="sw"></span>Замедление ×¼</label>
+        <label class="toggle"><input type="checkbox" id="t-wall" checked><span class="sw"></span>Каменная стена слева (столкновения)</label>
+        <label class="toggle"><input type="checkbox" id="t-pts"><span class="sw"></span>Показать звенья симуляции</label>
+        <label class="toggle"><input type="checkbox" id="t-sound"><span class="sw"></span>Звук щелчка</label>
+      </div>
+      <div class="group">
+        <h2>Кончик</h2>
+        <div class="readout">
+          <div class="cell"><span class="k">скорость</span><span class="v" id="r-speed">0.00</span></div>
+          <div class="cell"><span class="k">пик удара</span><span class="v hot" id="r-peak">—</span></div>
+          <div class="cell"><span class="k">щелчков</span><span class="v" id="r-cracks">0</span></div>
+        </div>
+        <canvas id="spark" aria-label="Скорость кончика за последние 3 секунды"></canvas>
+        <div class="legend">блоков за тик, последние 3 с; пунктир — порог щелчка 1.15</div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="notes">
+    <section>
+      <h3>Как устроено</h3>
+      <ul>
+        <li>Шаг Верле с затуханием, 6 подшагов на игровой тик, 6 проходов ограничений длины.</li>
+        <li>Масса тает к концу (обратная масса 1 → 3.5): лёгкий кончик разгоняется сильнее — отсюда щелчок.</li>
+        <li>Жёсткость на изгиб у рукояти, к концу — ноль. Растяжение не больше 4 %.</li>
+        <li>Удар ведёт мягкая PD-пружина по дуге; конец отстаёт от корня, и изгиб бежит волной.</li>
+        <li>Щелчок — пик скорости кончика выше порога во второй половине удара; энергия внешней половины гасится, хлыст не болтается.</li>
+        <li>Тело владельца — цилиндр, блоки — по коробкам столкновений; путь звена проверяется отрезком, сквозь стену не проскакивает.</li>
+      </ul>
+    </section>
+    <section>
+      <h3>Параметры из мода</h3>
+      <table class="spec">
+        <tr><td>звеньев</td><td>36</td></tr>
+        <tr><td>длина: висит / в ударе</td><td>2.1 / 5.6 бл</td></tr>
+        <tr><td>толщина: у рукояти → кончик</td><td>0.15 → 0.03 бл</td></tr>
+        <tr><td>цвет</td><td>#C2470E<span class="swatch" style="background:#C2470E"></span> → #FFC27A<span class="swatch" style="background:#FFC27A"></span></td></tr>
+        <tr><td>порог щелчка</td><td>1.15 бл/тик</td></tr>
+        <tr><td>удар / вихрь</td><td>6 / 10 тиков</td></tr>
+        <tr><td>гравитация</td><td>0.032 бл/тик²</td></tr>
+      </table>
+    </section>
+    <section>
+      <h3>В игре</h3>
+      <p>Корень берётся из настоящей матрицы предмета в руке в каждом кадре — с ванильной анимацией, с ударами Epic Fight и от первого лица. В руке в форме хлыста видна только раскалённая рукоять: клинок стал хлыстом. Урон по-прежнему считает сервер (дуга 6 бл ±50°, кольцо r 5).</p>
+    </section>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+// ======================================================================= WhipSim — JS port of src/main/java/ru/pohsmp/core/ember/WhipSim.java
+// (spring-chain ideas from GateMana of God Wand by HyIsNoob, MIT — see docs/third_party/god-wand-MIT.txt). Keep in step with the Java.
+const W = {
+  N: 36, LEN_IDLE: 2.1, LEN_FULL: 5.6, THICK_ROOT: 0.15, THICK_TIP: 0.03, CRACK_SPEED: 1.15,
+  SUB: 6, ITER: 6, CRACK_COOLDOWN: 7, GUIDE_K: 0.6, GRAVITY: 0.032, DRAG: 0.955, MAX_STRETCH: 1.04, CURL: 0.0016, SWAY: 0.0012,
+  BODY_PAD: 0.06, HOLD: 10, BEND_TIP: 0.008,
+};
+const lerp = (a, b, t) => a + (b - a) * t, clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+const smooth = (e0, e1, v) => { const t = clamp01((v - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
+function invMass(i) { const u = i / (W.N - 1); return 1 + 2.5 * u * u; }
+function curl(px, py, pz, t) {
+  const ax = 1.1 * py + .7 * pz + .031 * t, ay = 1.3 * pz + .9 * px + .026 * t + 1.7, az = .9 * px + 1.2 * py + .029 * t + 3.1;
+  return [1.2 * Math.cos(az) - 1.3 * Math.cos(ay), .7 * Math.cos(ax) - .9 * Math.cos(az), .9 * Math.cos(ay) - 1.1 * Math.cos(ax)];
+}
+function easeInOutSharp(t, u) { const p = 2 + 2.5 * u; return t < .5 ? Math.pow(2 * t, p) / 2 : 1 - Math.pow(2 - 2 * t, p) / 2; }
+function spin(t) { const a = .2, v = 1 / (1 - a); if (t < a) return v * t * t / (2 * a); if (t > 1 - a) return 1 - v * (1 - t) * (1 - t) / (2 * a); return v * (t - a / 2); }
+
+class WhipSim {
+  constructor() {
+    const N = W.N, f = () => new Float64Array(N);
+    this.x = f(); this.y = f(); this.z = f(); this.ox = f(); this.oy = f(); this.oz = f(); this.sx = f(); this.sy = f(); this.sz = f();
+    this.hist = Array.from({ length: W.SUB + 1 }, () => new Float64Array(3 * N));
+    this.lastRoot = null; this.ready = false; this.time = 0; this.len = W.LEN_IDLE; this.cooldown = 0;
+    this.tipSpeed = 0; this.peakSpeed = 0; this.peakAt = [0, 0, 0, 0, 0, 0];
+    this.mode = 0; this.driveT = 0; this.driveLen = 6; this.a0 = 0; this.a1 = 0; this.tilt = 0; this.sinceStrike = 1e9; this.cracked = false;
+  }
+  striking() { return this.mode !== 0 || this.sinceStrike < W.HOLD; }
+  lash(facing, from, to, ticks, rising) {
+    this.mode = 1; this.driveT = 0; this.driveLen = Math.max(2, ticks);
+    this.a0 = facing + from + .35 * Math.sign(from - to); this.a1 = facing + to; this.tilt = rising ? .55 : 0; this.sinceStrike = 0; this.cracked = false;
+  }
+  vortex(start, turn, ticks) {
+    this.mode = 2; this.driveT = 0; this.driveLen = Math.max(2, ticks); this.a0 = start; this.a1 = start + 3 * Math.PI * (turn >= 0 ? 1 : -1);
+    this.tilt = 0; this.sinceStrike = 0; this.cracked = false;
+  }
+  norm(r) { const l = Math.hypot(r.dx, r.dy, r.dz); return l < 1e-9 ? { ...r, dx: 0, dy: -1, dz: 0 } : { ...r, dx: r.dx / l, dy: r.dy / l, dz: r.dz / l }; }
+  reset(r, body, solid) {
+    const seg = this.len / (W.N - 1);
+    for (let i = 0; i < W.N; i++) {
+      let px = r.x, py = r.y, pz = r.z;
+      if (i >= 1) { px += r.dx * seg; py += r.dy * seg; pz += r.dz * seg; }
+      if (i >= 2) py -= (i - 1) * seg;
+      this.x[i] = this.ox[i] = px; this.y[i] = this.oy[i] = py; this.z[i] = this.oz[i] = pz;
+    }
+    this.lastRoot = r; this.ready = true;
+    for (let k = 0; k < 30; k++) this.tick(r, r, body, solid, null);
+    for (let s = 0; s <= W.SUB; s++) this.record(s);
+    this.tipSpeed = 0;
+  }
+  step(root, body, solid) {
+    const r = this.norm(root), out = [];
+    const lr = this.lastRoot;
+    if (!this.ready || !lr || (lr.x - r.x) ** 2 + (lr.y - r.y) ** 2 + (lr.z - r.z) ** 2 > 36) { this.reset(r, body, solid); return out; }
+    this.record(0); this.tick(lr, r, body, solid, out); this.lastRoot = r; return out;
+  }
+  tick(from, to, body, solid, out) {
+    const want = this.striking() ? W.LEN_FULL : W.LEN_IDLE, rate = want > this.len ? .9 : .12, was = this.len;
+    this.len += Math.max(-rate, Math.min(rate, want - this.len));
+    const seg = this.len / (W.N - 1), h = 1 / W.SUB;
+    if (this.len < was) this.reelIn(seg);
+    for (let s = 1; s <= W.SUB; s++) {
+      const k = s / W.SUB;
+      const rx = lerp(from.x, to.x, k), ry = lerp(from.y, to.y, k), rz = lerp(from.z, to.z, k);
+      let dx = lerp(from.dx, to.dx, k), dy = lerp(from.dy, to.dy, k), dz = lerp(from.dz, to.dz, k);
+      const dl = Math.hypot(dx, dy, dz);
+      if (dl < 1e-9) { dx = 0; dy = -1; dz = 0; } else { dx /= dl; dy /= dl; dz /= dl; }
+      this.substep(rx, ry, rz, dx, dy, dz, seg, h, body, solid, out);
+      if (out) this.record(s);
+      this.time += h;
+      if (this.mode !== 0) { this.driveT += h; if (this.driveT > this.driveLen * 1.6 + 3) this.mode = 0; }
+    }
+    this.sinceStrike += 1; if (this.cooldown > 0) this.cooldown--;
+  }
+  substep(rx, ry, rz, dx, dy, dz, seg, h, body, solid, out) {
+    const N = W.N, x = this.x, y = this.y, z = this.z, ox = this.ox, oy = this.oy, oz = this.oz;
+    const tipX = x[N - 1], tipY = y[N - 1], tipZ = z[N - 1];
+    const settle = this.mode === 0 ? this.sinceStrike < W.HOLD + 6 : this.driveT > this.driveLen * (this.mode === 2 ? 1.5 : 1.35);
+    const drag = Math.pow(W.DRAG * (settle ? .8 : 1), h);
+    this.pin(0, rx, ry, rz); this.pin(1, rx + dx * seg, ry + dy * seg, rz + dz * seg);
+    const env = this.mode === 0 ? 0 : this.envelope();
+    for (let i = 2; i < N; i++) {
+      const u = i / (N - 1);
+      const vx = (x[i] - ox[i]) * drag, vy = (y[i] - oy[i]) * drag, vz = (z[i] - oz[i]) * drag;
+      this.sx[i] = x[i]; this.sy[i] = y[i]; this.sz[i] = z[i];
+      ox[i] = x[i]; oy[i] = y[i]; oz[i] = z[i];
+      let ax = 0, ay = -W.GRAVITY, az = 0;
+      const free = .3 + .7 * u, c = curl(x[i] * .7, y[i] * .7, z[i] * .7, this.time);
+      ax += c[0] * W.CURL * free; ay += c[1] * W.CURL * free * .5; az += c[2] * W.CURL * free;
+      ax += Math.sin(this.time * .07 + u * 2.1) * W.SWAY * u; az += Math.cos(this.time * .053 + u * 1.7) * W.SWAY * u;
+      if (env > 0) {
+        const t = this.guide(i, this.driveT, rx, ry, rz, seg, body), tp = this.guide(i, this.driveT - h, rx, ry, rz, seg, body);
+        const kk = env * W.GUIDE_K * smooth(.04, .25, u) * (1 - .4 * u), cc = 2 * Math.sqrt(kk) * .9;
+        ax += (t[0] - x[i]) * kk + ((t[0] - tp[0]) / h - vx / h) * cc;
+        ay += (t[1] - y[i]) * kk + ((t[1] - tp[1]) / h - vy / h) * cc;
+        az += (t[2] - z[i]) * kk + ((t[2] - tp[2]) / h - vz / h) * cc;
+      }
+      x[i] += vx + ax * h * h; y[i] += vy + ay * h * h; z[i] += vz + az * h * h;
+    }
+    for (let it = 0; it < W.ITER; it++) {
+      for (let i = 1; i < N - 1; i++) {
+        const wi = i < 2 ? 0 : invMass(i), wj = invMass(i + 1);
+        const ex = x[i + 1] - x[i], ey = y[i + 1] - y[i], ez = z[i + 1] - z[i], d = Math.hypot(ex, ey, ez);
+        if (d < 1e-9) continue;
+        const corr = (d - seg) / d / (wi + wj);
+        x[i] += ex * corr * wi; y[i] += ey * corr * wi; z[i] += ez * corr * wi;
+        x[i + 1] -= ex * corr * wj; y[i + 1] -= ey * corr * wj; z[i + 1] -= ez * corr * wj;
+      }
+      for (let i = 1; i < N - 1; i++) {
+        const u = i / (N - 1), b = W.BEND_TIP + .3 * Math.pow(1 - u, 3);
+        const tx = x[i] - x[i - 1], ty = y[i] - y[i - 1], tz = z[i] - z[i - 1], tl = Math.hypot(tx, ty, tz);
+        if (tl < 1e-9) continue;
+        x[i + 1] += (x[i] + tx / tl * seg - x[i + 1]) * b; y[i + 1] += (y[i] + ty / tl * seg - y[i + 1]) * b; z[i + 1] += (z[i] + tz / tl * seg - z[i + 1]) * b;
+      }
+    }
+    const bodyR = body ? Math.min(body.halfWidth + W.BODY_PAD, Math.hypot(rx - body.x, rz - body.z) - .04) : 0;
+    for (let pass = 0; pass < 3; pass++) {
+      if (bodyR > .12) for (let i = 4; i < N; i++) this.keepOut(i, body, bodyR);
+      this.capStretch(seg);
+      for (let i = 2; i < N; i++) this.collide(i, solid);
+    }
+    const mx = x[N - 1] - tipX, my = y[N - 1] - tipY, mz = z[N - 1] - tipZ;
+    this.tipSpeed = Math.hypot(mx, my, mz) / h;
+    if (out) {
+      if (this.tipSpeed > this.peakSpeed) { this.peakSpeed = this.tipSpeed; this.peakAt = [x[N - 1], y[N - 1], z[N - 1], mx / h, my / h, mz / h]; }
+      if (this.tipSpeed < this.peakSpeed * .8) {
+        const may = this.mode === 0 ? this.peakSpeed > W.CRACK_SPEED * 2.6 && this.sinceStrike > W.HOLD + 10
+          : !this.cracked && this.driveT >= (this.mode === 2 ? .8 : .6) * this.driveLen && this.peakSpeed > W.CRACK_SPEED;
+        if (may && this.cooldown === 0 && out.length === 0) {
+          const p = this.peakAt; out.push({ x: p[0], y: p[1], z: p[2], vx: p[3], vy: p[4], vz: p[5], speed: this.peakSpeed });
+          this.cooldown = W.CRACK_COOLDOWN; this.cracked = true; this.spend();
+        }
+        this.peakSpeed = this.tipSpeed;
+      }
+    }
+  }
+  reelIn(seg) {   // shortening: drawn into the hilt along the rope's own line (no squeezing into kinks)
+    const N = W.N, x = this.x, y = this.y, z = this.z, arc = new Float64Array(N);
+    for (let i = 2; i < N; i++) arc[i] = arc[i - 1] + Math.hypot(x[i] - x[i - 1], y[i] - y[i - 1], z[i] - z[i - 1]);
+    const take = arc[N - 1] - (N - 2) * seg; if (take <= 1e-9) return;
+    const nx = [], ny = [], nz = [], px = [], py = [], pz = []; let j = 1;
+    for (let i = 2; i < N; i++) {
+      const want = take + (i - 1) * seg; while (j < N - 2 && arc[j + 1] < want) j++;
+      const span = arc[j + 1] - arc[j], t = span < 1e-12 ? 0 : clamp01((want - arc[j]) / span);
+      nx[i] = lerp(x[j], x[j + 1], t); ny[i] = lerp(y[j], y[j + 1], t); nz[i] = lerp(z[j], z[j + 1], t);
+      px[i] = lerp(this.ox[j], this.ox[j + 1], t); py[i] = lerp(this.oy[j], this.oy[j + 1], t); pz[i] = lerp(this.oz[j], this.oz[j + 1], t);
+    }
+    for (let i = 2; i < N; i++) { x[i] = nx[i]; y[i] = ny[i]; z[i] = nz[i]; this.ox[i] = px[i]; this.oy[i] = py[i]; this.oz[i] = pz[i]; }
+  }
+  spend() { for (let i = 2; i < W.N; i++) { const k = 1 - .7 * smooth(.35, 1, i / (W.N - 1)); this.ox[i] = this.x[i] - (this.x[i] - this.ox[i]) * k; this.oy[i] = this.y[i] - (this.y[i] - this.oy[i]) * k; this.oz[i] = this.z[i] - (this.z[i] - this.oz[i]) * k; } }
+  record(s) { const h = this.hist[s]; for (let i = 0; i < W.N; i++) { h[3 * i] = this.x[i]; h[3 * i + 1] = this.y[i]; h[3 * i + 2] = this.z[i]; } }
+  pin(i, px, py, pz) { this.ox[i] = this.x[i]; this.oy[i] = this.y[i]; this.oz[i] = this.z[i]; this.x[i] = px; this.y[i] = py; this.z[i] = pz; }
+  capStretch(seg) {
+    const cap = seg * W.MAX_STRETCH, x = this.x, y = this.y, z = this.z;
+    for (let i = 1; i < W.N - 1; i++) {
+      const ex = x[i + 1] - x[i], ey = y[i + 1] - y[i], ez = z[i + 1] - z[i], d = Math.hypot(ex, ey, ez);
+      if (d <= cap || d < 1e-9) continue;
+      const k = cap / d, nx = x[i] + ex * k, ny = y[i] + ey * k, nz = z[i] + ez * k;
+      this.ox[i + 1] += (nx - x[i + 1]) * .6; this.oy[i + 1] += (ny - y[i + 1]) * .6; this.oz[i + 1] += (nz - z[i + 1]) * .6;
+      x[i + 1] = nx; y[i + 1] = ny; z[i + 1] = nz;
+    }
+  }
+  keepOut(i, b, r) {
+    const dy = this.y[i] - b.y; if (dy < -.1 || dy > b.height + .1) return;
+    let ex = this.x[i] - b.x, ez = this.z[i] - b.z, d = Math.hypot(ex, ez);
+    if (d >= r) return;
+    if (d < 1e-6) { ex = this.ox[i] - b.x; ez = this.oz[i] - b.z; d = Math.hypot(ex, ez); if (d < 1e-6) { ex = 1; ez = 0; d = 1; } }
+    const k = (r + 1e-4) / d; this.x[i] = b.x + ex * k; this.z[i] = b.z + ez * k;
+  }
+  collide(i, solid) {
+    const free = (px, py, pz) => { const by = Math.floor(py), top = solid(Math.floor(px), by, Math.floor(pz)); return Number.isNaN(top) || py >= by + Math.max(.05, Math.min(1, top)); };
+    const x = this.x, y = this.y, z = this.z;
+    if (free(x[i], y[i], z[i])) return;
+    const sx = this.sx[i], sy = this.sy[i], sz = this.sz[i];
+    if (!free(sx, sy, sz)) { for (let up = .1; up <= 2.01; up += .1) if (free(x[i], y[i] + up, z[i])) { y[i] += up; this.oy[i] = y[i]; return; } return; }
+    let lo = 0, hi = 1;
+    for (let k = 0; k < 12; k++) { const m = (lo + hi) / 2; if (free(lerp(sx, x[i], m), lerp(sy, y[i], m), lerp(sz, z[i], m))) lo = m; else hi = m; }
+    let px = lerp(sx, x[i], lo), py = lerp(sy, y[i], lo), pz = lerp(sz, z[i], lo);
+    const floor = !free(px, py - .02, pz);
+    if (free(x[i], py, pz)) px = x[i];
+    if (free(px, py, z[i])) pz = z[i];
+    if (free(px, y[i], pz)) py = y[i];
+    x[i] = px; y[i] = py; z[i] = pz;
+    const fr = floor ? .25 : .3;
+    this.ox[i] += (x[i] - this.ox[i]) * fr; this.oy[i] += (y[i] - this.oy[i]) * (floor ? 1 : fr); this.oz[i] += (z[i] - this.oz[i]) * fr;
+  }
+  envelope() { const t = this.driveT, end = this.driveLen + (this.mode === 2 ? .5 : .35) * this.driveLen; if (t < .6) return t / .6; if (t < end) return 1; return Math.max(0, 1 - (t - end) / 2.5); }
+  guide(i, time, rx, ry, rz, seg, body) {
+    const u = i / (W.N - 1), lag = (this.mode === 2 ? .25 : .5) * this.driveLen * Math.pow(u, 1.3), tau = clamp01((time - lag) / this.driveLen);
+    const e = this.mode === 2 ? spin(tau) : easeInOutSharp(tau, u), a = this.a0 + (this.a1 - this.a0) * e, s = i * seg;
+    const elev = this.mode === 2 ? -.08 : -.1 + this.tilt * (e - .5), horiz = Math.cos(elev);
+    const sag = (this.mode === 2 ? .25 : .4) * Math.sin(Math.PI * u) * (1 - Math.abs(2 * tau - 1) * .5);
+    let cx = rx, cz = rz, r0 = 0; if (body) { cx = body.x; cz = body.z; r0 = Math.hypot(rx - cx, rz - cz); }
+    const r = r0 + horiz * s;
+    return [cx + Math.cos(a) * r, ry + Math.sin(elev) * s - sag, cz + Math.sin(a) * r];
+  }
+  sample(partial, out) { const f = clamp01(partial) * W.SUB, k = Math.min(W.SUB - 1, Math.floor(f)), t = f - k, a = this.hist[k], b = this.hist[k + 1]; for (let j = 0; j < 3 * W.N; j++) out[j] = lerp(a[j], b[j], t); }
+  static spline(pts, per) {
+    const n = pts.length / 3, m = (n - 1) * per + 1, out = new Float64Array(3 * m);
+    const cm = (a, b, c, d, t) => { const t2 = t * t, t3 = t2 * t; return .5 * (2 * b + (c - a) * t + (2 * a - 5 * b + 4 * c - d) * t2 + (-a + 3 * b - 3 * c + d) * t3); };
+    for (let j = 0; j < m; j++) {
+      let i = Math.min(n - 2, Math.floor(j / per)), t = (j - i * per) / per; if (j === m - 1) { i = n - 2; t = 1; }
+      const a = Math.max(0, i - 1), b = i, c = i + 1, d = Math.min(n - 1, i + 2);
+      for (let k = 0; k < 3; k++) out[3 * j + k] = cm(pts[3 * a + k], pts[3 * b + k], pts[3 * c + k], pts[3 * d + k], t);
+    }
+    return out;
+  }
+}
+const thickness = u => W.THICK_TIP + (W.THICK_ROOT - W.THICK_TIP) * Math.pow(1 - clamp01(u), .8);
+function mixRGB(a, b, t) { t = clamp01(t); return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]; }
+const hex = h => [(h >> 16 & 255) / 255, (h >> 8 & 255) / 255, (h & 255) / 255];
+const C_ROOT = hex(0xC2470E), C_TIP = hex(0xFFC27A), C_HI = hex(0xFFE7A0), C_TA = hex(0xFF9A3A), C_TB = hex(0xFFC27A);
+const whipColor = u => mixRGB(C_ROOT, C_TIP, Math.pow(clamp01(u), .85));
+
+// ======================================================================= scene
+const canvas = document.getElementById('view'), stageEl = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+renderer.outputEncoding = THREE.sRGBEncoding;
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0d0a09);
+scene.fog = new THREE.Fog(0x0d0a09, 12, 26);
+const camera = new THREE.PerspectiveCamera(50, 16 / 10, 0.05, 80);
+scene.add(new THREE.HemisphereLight(0xffe2c8, 0x24140c, 0.75));
+const sun = new THREE.DirectionalLight(0xfff0dd, 0.85); sun.position.set(-4, 9, 6); scene.add(sun);
+const fireLight = new THREE.PointLight(0xff7a22, 0.0, 6, 2); scene.add(fireLight);
+
+// blocks: a stone floor 18×18 and (toggle) a wall 3 blocks to the left of the holder (+x is the holder's left, facing +z)
+function blockTexture(base, seed) {
+  const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d');
+  let s = seed; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  for (let y = 0; y < 32; y += 2) for (let x = 0; x < 32; x += 2) { const k = .82 + rnd() * .3; g.fillStyle = `rgb(${base[0] * k | 0},${base[1] * k | 0},${base[2] * k | 0})`; g.fillRect(x, y, 2, 2); }
+  g.strokeStyle = 'rgba(0,0,0,.35)'; g.strokeRect(.5, .5, 31, 31);
+  const t = new THREE.CanvasTexture(c); t.magFilter = THREE.NearestFilter; t.encoding = THREE.sRGBEncoding; return t;
+}
+const floorTex = blockTexture([88, 78, 72], 7); floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping; floorTex.repeat.set(18, 18);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), new THREE.MeshLambertMaterial({ map: floorTex }));
+floor.rotation.x = -Math.PI / 2; floor.position.set(0, 64, 0); scene.add(floor);
+const WALL = { x0: 3, x1: 4, y0: 64, y1: 67, z0: -2, z1: 4 };
+const wallMesh = new THREE.Mesh(new THREE.BoxGeometry(WALL.x1 - WALL.x0, WALL.y1 - WALL.y0, WALL.z1 - WALL.z0), (() => {
+  const t = blockTexture([118, 112, 110], 3); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 3); return new THREE.MeshLambertMaterial({ map: t });
+})());
+wallMesh.position.set((WALL.x0 + WALL.x1) / 2, (WALL.y0 + WALL.y1) / 2, (WALL.z0 + WALL.z1) / 2); scene.add(wallMesh);
+let wallOn = true;
+const solid = (bx, by, bz) => {
+  if (by < 64) return 1;
+  if (wallOn && bx >= WALL.x0 && bx < WALL.x1 && by >= WALL.y0 && by < WALL.y1 && bz >= WALL.z0 && bz < WALL.z1) return 1;
+  return NaN;
+};
+
+// the holder: blocky, Minecraft proportions; feet at (0, 64, 0), facing +z, right arm on −x
+const holder = new THREE.Group(); holder.position.set(0, 64, 0); scene.add(holder);
+const skin = new THREE.MeshLambertMaterial({ color: 0xc9a07e }), cloth = new THREE.MeshLambertMaterial({ color: 0x3b2f2a }), dark = new THREE.MeshLambertMaterial({ color: 0x251d1a });
+const box = (w, h, d, m) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+const legL = box(.25, .75, .25, dark); legL.position.set(.125, .375, 0); holder.add(legL);
+const legR = box(.25, .75, .25, dark); legR.position.set(-.125, .375, 0); holder.add(legR);
+const torso = box(.5, .75, .25, cloth); torso.position.set(0, 1.125, 0); holder.add(torso);
+const head = box(.5, .5, .5, skin); head.position.set(0, 1.75, 0); holder.add(head);
+const visor = box(.42, .08, .02, dark); visor.position.set(0, 1.78, .26); holder.add(visor);
+const armL = new THREE.Group(); armL.position.set(.375, 1.375, 0); holder.add(armL);
+const armLm = box(.25, .75, .25, cloth); armLm.position.set(0, -.3, 0); armL.add(armLm);
+// the right arm is placed in world space each frame from the hand pose (the shoulder follows the body)
+const armR = box(.25, .66, .25, cloth); scene.add(armR);
+// the hilt in the fist: grip in black leather wraps, guard with the hook, ring pommel; a glowing mouth where the whip leaves it
+const hilt = new THREE.Group(); scene.add(hilt);
+const iron = new THREE.MeshStandardMaterial({ color: 0x3a3a44, metalness: .7, roughness: .45 });
+const leather = new THREE.MeshStandardMaterial({ color: 0x1b1716, roughness: .9 });
+const glowMat = new THREE.MeshBasicMaterial({ color: 0xffb040 });
+for (let i = 0; i < 6; i++) { const w = box(.07, .07, .045, i % 2 ? leather : iron); w.position.set(0, 0, -.06 - i * .05); hilt.add(w); }
+const guard = box(.16, .1, .06, iron); guard.position.set(0, 0, .01); hilt.add(guard);
+const hook = box(.05, .09, .05, iron); hook.position.set(0, .085, .03); hook.rotation.x = .45; hilt.add(hook);
+const mouth = box(.06, .06, .012, glowMat); mouth.position.set(0, 0, .045); hilt.add(mouth);
+const pommel = new THREE.Mesh(new THREE.TorusGeometry(.07, .018, 6, 14), iron); pommel.position.set(0, 0, -.42); pommel.rotation.y = Math.PI / 2; hilt.add(pommel);
+const bladeMat = new THREE.MeshStandardMaterial({ color: 0x4a4a54, metalness: .8, roughness: .35, emissive: 0x2a0800 });
+const blade = new THREE.Mesh(new THREE.BoxGeometry(.03, .12, .95), bladeMat); blade.position.set(0, -.01, .52); blade.visible = false; hilt.add(blade);
+
+// the whip tube: rebuilt each frame from the spline (per-face colours: gradient, ring bands, two stitch helices, highlight on top)
+const SIDES = 10, PER = 3, M = (W.N - 1) * PER + 1;
+const tubeGeo = new THREE.BufferGeometry();
+const tubePos = new Float32Array((M - 1) * SIDES * 6 * 3), tubeNor = new Float32Array(tubePos.length), tubeCol = new Float32Array(tubePos.length);
+tubeGeo.setAttribute('position', new THREE.BufferAttribute(tubePos, 3));
+tubeGeo.setAttribute('normal', new THREE.BufferAttribute(tubeNor, 3));
+tubeGeo.setAttribute('color', new THREE.BufferAttribute(tubeCol, 3));
+const tubeMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: .55, metalness: .05, emissive: 0x4a1404, side: THREE.DoubleSide });
+const tube = new THREE.Mesh(tubeGeo, tubeMat); tube.frustumCulled = false; scene.add(tube);
+const TASSEL_Q = 7 * 4 * 2;
+const tasGeo = new THREE.BufferGeometry(), tasPos = new Float32Array(TASSEL_Q * 6 * 3), tasCol = new Float32Array(tasPos.length);
+tasGeo.setAttribute('position', new THREE.BufferAttribute(tasPos, 3)); tasGeo.setAttribute('color', new THREE.BufferAttribute(tasCol, 3));
+const tassel = new THREE.Mesh(tasGeo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide })); tassel.frustumCulled = false; scene.add(tassel);
+const ptsGeo = new THREE.BufferGeometry(), ptsArr = new Float32Array(W.N * 3); ptsGeo.setAttribute('position', new THREE.BufferAttribute(ptsArr, 3));
+const ptsView = new THREE.Points(ptsGeo, new THREE.PointsMaterial({ color: 0x9fe8ff, size: 0.07, depthTest: false })); ptsView.visible = false; ptsView.frustumCulled = false; ptsView.renderOrder = 5; scene.add(ptsView);
+
+// crack effects: flash core, star, shock ring (sprites), sparks (points)
+function radialTex(stops) {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d');
+  const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); stops.forEach(([o, col]) => gr.addColorStop(o, col)); g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+  return new THREE.CanvasTexture(c);
+}
+const texGlow = radialTex([[0, 'rgba(255,255,240,1)'], [.25, 'rgba(255,214,140,.9)'], [.6, 'rgba(255,120,30,.25)'], [1, 'rgba(255,90,10,0)']]);
+const texRing = radialTex([[0, 'rgba(255,170,60,0)'], [.72, 'rgba(255,170,60,0)'], [.84, 'rgba(255,200,120,.9)'], [.93, 'rgba(255,150,50,.25)'], [1, 'rgba(255,120,30,0)']]);
+const texStar = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d'); g.translate(32, 32);
+  for (let k = 0; k < 4; k++) { g.rotate(Math.PI / 4 * (k ? 1 : 0) + (k ? Math.PI / 4 : 0)); const gr = g.createLinearGradient(-32, 0, 32, 0); gr.addColorStop(0, 'rgba(255,220,150,0)'); gr.addColorStop(.5, 'rgba(255,248,220,1)'); gr.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = gr; g.fillRect(-32, -1.5 + (k % 2), 64, 3 - (k % 2)); }
+  return new THREE.CanvasTexture(c);
+})();
+const sprite = (tex) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true })); s.visible = false; scene.add(s); return s; };
+const flashes = [];
+const SPARKS = 160, sparkGeo = new THREE.BufferGeometry(), sparkPos = new Float32Array(SPARKS * 3), sparkCol = new Float32Array(SPARKS * 3);
+sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3)); sparkGeo.setAttribute('color', new THREE.BufferAttribute(sparkCol, 3));
+const sparkPts = new THREE.Points(sparkGeo, new THREE.PointsMaterial({ size: .06, vertexColors: true, map: texGlow, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+sparkPts.frustumCulled = false; scene.add(sparkPts);
+const sparks = Array.from({ length: SPARKS }, () => ({ life: 0 })); let sparkNext = 0;
+function emitSpark(x, y, z, vx, vy, vz, life, col) { const s = sparks[sparkNext]; sparkNext = (sparkNext + 1) % SPARKS; Object.assign(s, { x, y, z, vx, vy, vz, life, max: life, col }); }
+
+// ======================================================================= the holder's motion (stands in for the animation)
+const sim = new WhipSim();
+let swordForm = false, walking = false, slow = false, showPts = false, sound = false;
+let gameTick = 0, acc = 0, last = performance.now();
+const queue = [];        // scheduled strikes {at, kind, dir}
+let action = null;        // current arm action {kind, start, dir, rising}
+const FACING = Math.PI / 2; // +z
+const SHOULDER = { x: -.375, y: 1.375, z: 0 }, ARM = .62;
+let bodyYaw = 0;          // extra spin of the whole body (vortex)
+
+function easeIO(t) { t = clamp01(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+/** Hand pose at tick time t (float): arm yaw φ (relative to facing, + = toward the holder's right as the angle grows in MC) and pitch. */
+function handPose(t) {
+  let phi = .25, el = -1.35, spinA = 0, bladeUp = 0;
+  if (walking) phi += .18 * Math.sin(t * .45);
+  if (action) {
+    const a = action, k = t - a.start;
+    if (a.kind === 'lash') {
+      const wind = clamp01(k / 1.5), sweep = easeIO((k - 1) / 5), back = clamp01((k - 9) / 6);
+      const phiWind = -1.25 * a.dir, phiEnd = 1.0 * a.dir;
+      phi = lerp(lerp(.25, phiWind, wind), phiEnd, sweep);
+      el = lerp(lerp(-1.35, a.rising ? -.75 : -.12, wind), a.rising ? .35 : -.15, sweep);
+      phi = lerp(phi, .25, back); el = lerp(el, -1.35, back); bladeUp = .25 * (1 - back);
+      if (k > 16) action = null;
+    } else if (a.kind === 'vortex') {
+      const s = clamp01(k / 10), arm = clamp01(k / 1.5), back = clamp01((k - 12) / 6);
+      spinA = spin(s) * 3 * Math.PI; phi = lerp(lerp(.25, Math.PI / 2, arm), .25, back); el = lerp(lerp(-1.35, -.1, arm), -1.35, back);
+      if (k > 19) { action = null; spinA = 3 * Math.PI; }
+    }
+  }
+  bodyYaw = spinA;
+  const yaw = FACING + bodyYaw;
+  // shoulder in world (the body turns about its axis)
+  const cs = Math.cos(bodyYaw), sn = Math.sin(bodyYaw);
+  const shx = SHOULDER.x * cs - SHOULDER.z * sn, shz = SHOULDER.x * sn + SHOULDER.z * cs;
+  const ang = yaw + phi, ce = Math.cos(el);
+  const dir = [Math.cos(ang) * ce, Math.sin(el), Math.sin(ang) * ce];
+  const hand = [shx + dir[0] * ARM, 64 + SHOULDER.y + dir[1] * ARM, shz + dir[2] * ARM];
+  // the blade axis: out along the forearm, tipped forward and a little up in a strike
+  const fwd = [Math.cos(yaw), 0, Math.sin(yaw)];
+  let bd = [dir[0] + fwd[0] * .55, dir[1] + .15 + bladeUp, dir[2] + fwd[2] * .55];
+  const bl = Math.hypot(...bd); bd = bd.map(v => v / bl);
+  return { x: hand[0], y: hand[1], z: hand[2], dx: bd[0], dy: bd[1], dz: bd[2], sh: [shx, 64 + SHOULDER.y, shz] };
+}
+const BODY = { x: 0, y: 64, z: 0, halfWidth: .3, height: 1.8 };
+let handTurn = 0, handAngle = NaN;
+function startLash(dir, rising) {
+  action = { kind: 'lash', start: gameTick + acc, dir, rising };
+  // the guide's sweep starts at the hit; in the mod the sweep sign follows the real hand motion
+  queue.push({ at: gameTick + 2, kind: 'lash', dir, rising });
+}
+function startVortex() { action = { kind: 'vortex', start: gameTick + acc }; queue.push({ at: gameTick + 1, kind: 'vortex' }); }
+
+// ======================================================================= tick (20 per second) and frame
+const speedHist = new Float32Array(60); let speedIdx = 0, crackCount = 0, lastPeak = 0;
+function gameStep() {
+  gameTick++;
+  for (let i = queue.length - 1; i >= 0; i--) {
+    const q = queue[i]; if (q.at > gameTick) continue; queue.splice(i, 1);
+    if (swordForm) continue;
+    if (q.kind === 'lash') { const half = 50 * Math.PI / 180, s = Math.abs(handTurn) > .04 ? Math.sign(handTurn) : q.dir; sim.lash(FACING, -half * s, half * s, 6, q.rising); }
+    else { const t = Math.abs(handTurn) > .04 ? Math.sign(handTurn) : 1; sim.vortex(Number.isNaN(handAngle) ? FACING + Math.PI : handAngle - .9 * t, t, 10); }
+  }
+  const hp = handPose(gameTick);
+  const ang = Math.atan2(hp.z - BODY.z, hp.x - BODY.x);
+  if (!Number.isNaN(handAngle)) { let d = ang - handAngle; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; handTurn = d; }
+  handAngle = ang;
+  if (swordForm) return;
+  const cracks = sim.step(hp, BODY, solid);
+  speedHist[speedIdx++ % speedHist.length] = sim.tipSpeed;
+  for (const c of cracks) crack(c);
+  if (sim.striking()) for (let k = 0; k < 3; k++) {   // a strike burns: small flames off the outer half
+    const i = Math.floor(W.N / 3 + Math.random() * (W.N - W.N / 3)), p = [sim.x[i], sim.y[i], sim.z[i]];
+    emitSpark(p[0], p[1], p[2], (Math.random() - .5) * .01, .02 + Math.random() * .02, (Math.random() - .5) * .01, 10 + Math.random() * 8, [1, .45, .1]);
+  }
+}
+function crack(c) {
+  crackCount++; lastPeak = c.speed;
+  const n = Math.hypot(c.vx, c.vy, c.vz) || 1, ux = c.vx / n, uy = c.vy / n, uz = c.vz / n;
+  flashes.push({ x: c.x, y: c.y, z: c.z, start: gameTick + acc, core: sprite(texGlow), star: sprite(texStar), ring: sprite(texRing), rot: Math.random() * Math.PI });
+  for (let i = 0; i < 34; i++) {
+    const k = .08 + .16 * Math.random();
+    emitSpark(c.x, c.y, c.z, ux * k + (Math.random() - .5) * .14, uy * k + (Math.random() - .3) * .14, uz * k + (Math.random() - .5) * .14, 8 + Math.random() * 12,
+      i % 3 ? [1, .78, .4] : [1, 1, .85]);
+  }
+  fireLight.position.set(c.x, c.y, c.z); fireLight.intensity = 3.2;
+  if (sound) crackSound(Math.min(1, c.speed / 6));
+}
+let audio = null;
+function crackSound(k) {
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const t = audio.currentTime, len = Math.floor(audio.sampleRate * .06), buf = audio.createBuffer(1, len, audio.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 6);
+    const src = audio.createBufferSource(); src.buffer = buf;
+    const hp = audio.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1800;
+    const g = audio.createGain(); g.gain.value = .35 + .4 * k;
+    src.connect(hp).connect(g).connect(audio.destination); src.start(t);
+  } catch (e) { /* no audio: the flash still shows */ }
+}
+
+const pts = new Float64Array(3 * W.N), before = new Float64Array(3 * W.N);
+function buildWhip(partial, hp) {
+  sim.sample(partial, pts);
+  // bend the first points onto this frame's hand (as EmberWhipClient.pinToHand)
+  const seg = sim.len / (W.N - 1), ox = hp.x - pts[0], oy = hp.y - pts[1], oz = hp.z - pts[2];
+  for (let i = 2; i < 8; i++) { const w = (1 - i / 8) ** 2; pts[3 * i] += ox * w; pts[3 * i + 1] += oy * w; pts[3 * i + 2] += oz * w; }
+  pts[0] = hp.x; pts[1] = hp.y; pts[2] = hp.z; pts[3] = hp.x + hp.dx * seg; pts[4] = hp.y + hp.dy * seg; pts[5] = hp.z + hp.dz * seg;
+  const sp = WhipSim.spline(pts, PER);
+  // frames carried along the curve
+  const T = [], Nn = [], B = [], arc = new Float64Array(M);
+  for (let j = 0; j < M; j++) {
+    const a = Math.max(0, j - 1), b = Math.min(M - 1, j + 1);
+    let t = [sp[3 * b] - sp[3 * a], sp[3 * b + 1] - sp[3 * a + 1], sp[3 * b + 2] - sp[3 * a + 2]]; const l = Math.hypot(...t) || 1; T.push(t.map(v => v / l));
+    if (j) arc[j] = arc[j - 1] + Math.hypot(sp[3 * j] - sp[3 * j - 3], sp[3 * j + 1] - sp[3 * j - 2], sp[3 * j + 2] - sp[3 * j - 1]);
+  }
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2], cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const nrm = (v, f) => { const l = Math.hypot(...v); return l < 1e-9 ? f : v.map(x => x / l); };
+  let n0 = [0 - T[0][0] * T[0][1], 1 - T[0][1] * T[0][1], 0 - T[0][2] * T[0][1]]; Nn.push(nrm(n0, [1, 0, 0])); B.push(cross(T[0], Nn[0]));
+  for (let j = 1; j < M; j++) { const p = Nn[j - 1], d = dot(p, T[j]); Nn.push(nrm([p[0] - T[j][0] * d, p[1] - T[j][1] * d, p[2] - T[j][2] * d], p)); B.push(cross(T[j], Nn[j])); }
+  const total = arc[M - 1] || 1;
+  const ring = (j, k) => { const th = 2 * Math.PI * k / SIDES, c = Math.cos(th), s = Math.sin(th); return [Nn[j][0] * c + B[j][0] * s, Nn[j][1] * c + B[j][1] * s, Nn[j][2] * c + B[j][2] * s]; };
+  let o = 0;
+  for (let j = 1; j < M; j++) {
+    const um = (arc[j - 1] + arc[j]) / 2 / total, band = Math.floor(arc[j] / .12);
+    const r0 = thickness(arc[j - 1] / total) / 2 * (1 + .035 * Math.cos(arc[j - 1] / .12 * 2 * Math.PI)), r1 = thickness(arc[j] / total) / 2 * (1 + .035 * Math.cos(arc[j] / .12 * 2 * Math.PI));
+    const base = whipColor(um);
+    for (let k = 0; k < SIDES; k++) {
+      const k2 = (k + 1) % SIDES, na = ring(j - 1, k), nb = ring(j, k), nc = ring(j, k2), nd = ring(j - 1, k2);
+      let col = base.slice();
+      if (band % 2 === 1) col = col.map(v => v * .86);
+      const st = ((k - Math.floor(arc[j] / .05)) % SIDES + SIDES) % SIDES;
+      if (thickness(um) > .045 && (st === 0 || st === SIDES / 2)) col = col.map(v => v * .68);
+      const up = (na[1] + nb[1] + nc[1] + nd[1]) / 4; if (up > .55) col = mixRGB(col, C_HI, .5 * (up - .55) / .45);
+      const P = (jj, n, r) => [sp[3 * jj] + n[0] * r, sp[3 * jj + 1] + n[1] * r, sp[3 * jj + 2] + n[2] * r];
+      const A = P(j - 1, na, r0), Bv = P(j, nb, r1), C = P(j, nc, r1), D = P(j - 1, nd, r0);
+      for (const [p, n] of [[A, na], [Bv, nb], [C, nc], [A, na], [C, nc], [D, nd]]) {
+        tubePos[o] = p[0]; tubePos[o + 1] = p[1]; tubePos[o + 2] = p[2]; tubeNor[o] = n[0]; tubeNor[o + 1] = n[1]; tubeNor[o + 2] = n[2];
+        tubeCol[o] = col[0]; tubeCol[o + 1] = col[1]; tubeCol[o + 2] = col[2]; o += 3;
+      }
+    }
+  }
+  tubeGeo.attributes.position.needsUpdate = tubeGeo.attributes.normal.needsUpdate = tubeGeo.attributes.color.needsUpdate = true;
+  // tassel: 7 thin strands fanned from the tip, trailing behind its motion
+  sim.sample(Math.max(0, partial - .25), before);
+  const n = W.N - 1, tip = [sp[3 * M - 3], sp[3 * M - 2], sp[3 * M - 1]], Tt = T[M - 1];
+  let side = nrm(cross(Tt, [0, 1, 0]), [1, 0, 0]); const side2 = cross(side, Tt);
+  const v = [(pts[3 * n] - before[3 * n]) * 4, (pts[3 * n + 1] - before[3 * n + 1]) * 4, (pts[3 * n + 2] - before[3 * n + 2]) * 4];
+  let q = 0;
+  for (let k = 0; k < 7; k++) {
+    const ang = (k - 3) * .22, L = .28 + .06 * (k % 3);
+    const d = nrm([0, 1, 2].map(i => Tt[i] + side[i] * Math.sin(ang) * .8 + side2[i] * Math.cos(k * 1.7) * .25), Tt);
+    let p = tip.slice(); const col = k % 2 ? C_TB : C_TA;
+    for (let s = 0; s < 4; s++) {
+      const t0 = s / 4, t1 = (s + 1) / 4;
+      const qn = [0, 1, 2].map(i => tip[i] + d[i] * L * t1 - v[i] * .05 * t1 * t1 - (i === 1 ? .05 * t1 * t1 : 0));
+      const w0 = .011 * (1 - .6 * t0), w1 = .011 * (1 - .6 * t1), c = s === 3 ? mixRGB(col, C_HI, .6) : col;
+      for (const sd of [side, side2]) {
+        const A = [0, 1, 2].map(i => p[i] - sd[i] * w0), Bq = [0, 1, 2].map(i => qn[i] - sd[i] * w1), C = [0, 1, 2].map(i => qn[i] + sd[i] * w1), D = [0, 1, 2].map(i => p[i] + sd[i] * w0);
+        for (const P of [A, Bq, C, A, C, D]) { tasPos[q] = P[0]; tasPos[q + 1] = P[1]; tasPos[q + 2] = P[2]; tasCol[q] = c[0]; tasCol[q + 1] = c[1]; tasCol[q + 2] = c[2]; q += 3; }
+      }
+      p = qn;
+    }
+  }
+  tasGeo.attributes.position.needsUpdate = tasGeo.attributes.color.needsUpdate = true;
+  for (let i = 0; i < W.N; i++) { ptsArr[3 * i] = pts[3 * i]; ptsArr[3 * i + 1] = pts[3 * i + 1]; ptsArr[3 * i + 2] = pts[3 * i + 2]; }
+  ptsGeo.attributes.position.needsUpdate = true;
+}
+
+function placeHolder(hp) {
+  holder.rotation.y = -bodyYaw;   // three.js turns +y counter-clockwise seen from above; the sim angle grows from +x to +z
+  // right arm: a box from the shoulder to the hand
+  const s = hp.sh, mid = [(s[0] + hp.x) / 2, (s[1] + hp.y) / 2, (s[2] + hp.z) / 2];
+  armR.position.set(...mid);
+  armR.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(hp.x - s[0], hp.y - s[1], hp.z - s[2]).normalize());
+  // the hilt: +z of the group along the blade axis, the guard mouth at the hand
+  const z = new THREE.Vector3(hp.dx, hp.dy, hp.dz), up = Math.abs(hp.dy) > .95 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
+  const x = new THREE.Vector3().crossVectors(up, z).normalize(), y = new THREE.Vector3().crossVectors(z, x);
+  hilt.matrix.makeBasis(x, y, z); hilt.matrix.setPosition(hp.x - hp.dx * .05, hp.y - hp.dy * .05, hp.z - hp.dz * .05); hilt.matrixAutoUpdate = false;
+  armL.rotation.x = walking ? .5 * Math.sin((gameTick + acc) * .45 + Math.PI) : 0;
+  legL.rotation.x = walking ? .5 * Math.sin((gameTick + acc) * .45) : 0; legR.rotation.x = -legL.rotation.x;
+}
+
+// camera: orbit by drag, zoom by wheel
+let camYaw = 2.3, camPitch = .3, camDist = 8.5;
+const target = new THREE.Vector3(.6, 65.0, 1.6);
+function placeCamera() { camera.position.set(target.x + Math.cos(camYaw) * Math.cos(camPitch) * camDist, target.y + Math.sin(camPitch) * camDist, target.z + Math.sin(camYaw) * Math.cos(camPitch) * camDist); camera.lookAt(target); }
+let drag = null;
+canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, yaw: camYaw, pitch: camPitch }; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', e => { if (!drag) return; camYaw = drag.yaw + (e.clientX - drag.x) * .008; camPitch = Math.max(-.15, Math.min(1.3, drag.pitch + (e.clientY - drag.y) * .006)); });
+canvas.addEventListener('pointerup', () => drag = null); canvas.addEventListener('pointercancel', () => drag = null);
+canvas.addEventListener('wheel', e => { e.preventDefault(); camDist = Math.max(3, Math.min(16, camDist * (e.deltaY > 0 ? 1.08 : .93))); }, { passive: false });
+
+function resize() { const w = stageEl.clientWidth, h = stageEl.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stageEl); resize();
+
+const spark = document.getElementById('spark'), sctx = spark.getContext('2d');
+function drawSpark() {
+  const dpr = Math.min(2, window.devicePixelRatio || 1), w = spark.clientWidth, h = spark.clientHeight;
+  if (spark.width !== Math.round(w * dpr)) { spark.width = Math.round(w * dpr); spark.height = Math.round(h * dpr); }
+  sctx.setTransform(dpr, 0, 0, dpr, 0, 0); sctx.clearRect(0, 0, w, h);
+  const top = 8, maxV = 6, Y = v => h - 4 - (h - top - 4) * Math.min(1, v / maxV);
+  sctx.strokeStyle = '#3a2e27'; sctx.lineWidth = 1; for (const v of [2, 4, 6]) { sctx.beginPath(); sctx.moveTo(0, Y(v) + .5); sctx.lineTo(w, Y(v) + .5); sctx.stroke(); }
+  sctx.setLineDash([3, 3]); sctx.strokeStyle = '#ffc27a'; sctx.beginPath(); sctx.moveTo(0, Y(W.CRACK_SPEED) + .5); sctx.lineTo(w, Y(W.CRACK_SPEED) + .5); sctx.stroke(); sctx.setLineDash([]);
+  sctx.fillStyle = '#a8978b'; sctx.font = '10px "JetBrains Mono", monospace'; sctx.fillText('6', w - 10, Y(6) + 10);
+  const n = speedHist.length; sctx.beginPath();
+  for (let i = 0; i < n; i++) { const v = speedHist[(speedIdx + i) % n], x = i / (n - 1) * w; if (i) sctx.lineTo(x, Y(v)); else sctx.moveTo(x, Y(v)); }
+  sctx.strokeStyle = '#ff8a3a'; sctx.lineWidth = 1.6; sctx.stroke();
+  sctx.lineTo(w, h); sctx.lineTo(0, h); sctx.closePath(); sctx.fillStyle = 'rgba(255,138,58,.12)'; sctx.fill();
+}
+
+const rSpeed = document.getElementById('r-speed'), rPeak = document.getElementById('r-peak'), rCracks = document.getElementById('r-cracks'), hud = document.getElementById('hud');
+function frame(now) {
+  const dt = Math.min(.1, (now - last) / 1000); last = now;
+  acc += dt * 20 * (slow ? .25 : 1);
+  while (acc >= 1) { acc -= 1; gameStep(); }
+  const hp = handPose(gameTick + acc);
+  placeHolder(hp);
+  tube.visible = tassel.visible = !swordForm && sim.ready; blade.visible = swordForm; mouth.visible = !swordForm;
+  ptsView.visible = showPts && !swordForm;
+  if (!swordForm && sim.ready) buildWhip(acc, hp);
+  // crack flashes: white-hot core, sharp star, shock ring; gone in a quarter second
+  for (let i = flashes.length - 1; i >= 0; i--) {
+    const f = flashes[i], t = (gameTick + acc - f.start) / 5;
+    if (t > 1) { [f.core, f.star, f.ring].forEach(s => { scene.remove(s); s.material.dispose(); }); flashes.splice(i, 1); continue; }
+    const fade = 1 - t;
+    for (const s of [f.core, f.star, f.ring]) { s.visible = true; s.position.set(f.x, f.y, f.z); }
+    f.core.scale.setScalar(.5 + 1.0 * Math.sqrt(t)); f.core.material.opacity = Math.min(1, 1.4 * fade * fade);
+    f.star.scale.setScalar(1.1 + t); f.star.material.rotation = f.rot + .7 * t; f.star.material.opacity = fade;
+    f.ring.scale.setScalar(.3 + 2.5 * t); f.ring.material.opacity = .9 * fade;
+  }
+  fireLight.intensity *= .86;
+  // sparks
+  const step = dt * 20 * (slow ? .25 : 1);
+  for (let i = 0; i < SPARKS; i++) {
+    const s = sparks[i];
+    if (s.life > 0) { s.life -= step; s.vy -= .012 * step; s.vx *= Math.pow(.94, step); s.vz *= Math.pow(.94, step); s.x += s.vx * step; s.y += s.vy * step; s.z += s.vz * step; if (s.y < 64.02) { s.y = 64.02; s.vy *= -.3; } }
+    const k = s.life > 0 ? s.life / s.max : 0;
+    sparkPos[3 * i] = s.life > 0 ? s.x : 0; sparkPos[3 * i + 1] = s.life > 0 ? s.y : -100; sparkPos[3 * i + 2] = s.life > 0 ? s.z : 0;
+    const c = s.col || [0, 0, 0]; sparkCol[3 * i] = c[0] * k; sparkCol[3 * i + 1] = c[1] * k; sparkCol[3 * i + 2] = c[2] * k;
+  }
+  sparkGeo.attributes.position.needsUpdate = sparkGeo.attributes.color.needsUpdate = true;
+  placeCamera(); renderer.render(scene, camera);
+  rSpeed.textContent = (swordForm ? 0 : sim.tipSpeed).toFixed(2);
+  rSpeed.classList.toggle('hot', sim.tipSpeed > W.CRACK_SPEED && !swordForm);
+  rPeak.textContent = lastPeak ? lastPeak.toFixed(2) : '—'; rCracks.textContent = crackCount;
+  hud.innerHTML = `форма: <b>${swordForm ? 'меч' : 'хлыст'}</b> · длина <b>${swordForm ? '—' : sim.len.toFixed(1) + ' бл'}</b>${slow ? ' · <b>×¼</b>' : ''}`;
+  drawSpark();
+  requestAnimationFrame(frame);
+}
+
+// controls
+const $ = id => document.getElementById(id);
+$('m-lash').onclick = () => { if (!swordForm) startLash(1, false); };
+$('m-combo').onclick = () => {
+  if (swordForm) return;
+  startLash(1, false);
+  setTimeout(() => startLash(-1, true), 600 * (slow ? 4 : 1));
+  setTimeout(() => startLash(1, false), 1200 * (slow ? 4 : 1));
+};
+$('m-vortex').onclick = () => { if (!swordForm) startVortex(); };
+$('m-walk').onclick = e => { walking = !walking; e.currentTarget.setAttribute('aria-pressed', walking); };
+$('m-form').onclick = e => { swordForm = !swordForm; e.currentTarget.setAttribute('aria-pressed', swordForm); if (!swordForm) sim.ready = false; };
+$('t-slow').onchange = e => slow = e.target.checked;
+$('t-wall').onchange = e => { wallOn = e.target.checked; wallMesh.visible = wallOn; };
+$('t-pts').onchange = e => showPts = e.target.checked;
+$('t-sound').onchange = e => { sound = e.target.checked; if (sound) crackSound(.3); };
+
+// warm start: settle, then one lash so the first frame already shows the whip at work
+for (let i = 0; i < 40; i++) gameStep();
+startLash(1, false); for (let i = 0; i < 4; i++) gameStep();
+requestAnimationFrame(frame);
+</script>

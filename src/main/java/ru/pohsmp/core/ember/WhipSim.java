@@ -50,6 +50,8 @@ public final class WhipSim {
     /** Tip speed (blocks per tick) above which its peak is a crack. */
     public static final double CRACK_SPEED = 1.15;
     static final int SUB = 6, ITER = 6, CRACK_COOLDOWN = 7;
+    /** Bending stiffness left at the tip: a plaited whip does not zigzag when it lies on the ground or shortens. */
+    static final double BEND_TIP = 0.008;
     /** Stiffness of the strike guide (per tick squared). */
     static final double GUIDE_K = 0.6;
     static final double GRAVITY = 0.032, DRAG = 0.955, MAX_STRETCH = 1.04, CURL = 0.0016, SWAY = 0.0012;
@@ -213,9 +215,10 @@ public final class WhipSim {
     private void tick(Pose from, Pose to, Body body, Solid solid, List<Crack> out) {
         // length: out to full at once in a strike, back slowly after it
         double want = striking() ? LEN_FULL : LEN_IDLE;
-        double rate = want > len ? 0.9 : 0.12;
+        double rate = want > len ? 0.9 : 0.12, was = len;
         len += Math.max(-rate, Math.min(rate, want - len));
         double seg = len / (N - 1);
+        if (len < was) reelIn(seg);
         double h = 1.0 / SUB;
         for (int s = 1; s <= SUB; s++) {
             double k = (double) s / SUB;
@@ -302,8 +305,7 @@ public final class WhipSim {
                 z[i + 1] -= ez * corr * wj;
             }
             for (int i = 1; i < N - 1; i++) {
-                double u = (double) i / (N - 1), b = 0.3 * Math.pow(1 - u, 3);
-                if (b < 0.004) break;
+                double u = (double) i / (N - 1), b = BEND_TIP + 0.3 * Math.pow(1 - u, 3);
                 double tx = x[i] - x[i - 1], ty = y[i] - y[i - 1], tz = z[i] - z[i - 1];
                 double tl = Math.sqrt(tx * tx + ty * ty + tz * tz);
                 if (tl < 1e-9) continue;
@@ -349,6 +351,43 @@ public final class WhipSim {
                 peakSpeed = tipSpeed;
             }
         }
+    }
+
+    /**
+     * Shortening: the rope is drawn into the hilt — every free point slides along the rope's own line toward the hand by the length
+     * taken in, so the whip keeps its shape and is never squeezed into kinks (it would coil up lying on the ground). The old
+     * positions slide the same way: the motion goes on.
+     */
+    private void reelIn(double seg) {
+        double[] arc = new double[N];
+        for (int i = 2; i < N; i++) arc[i] = arc[i - 1] + Math.sqrt(sq(x[i] - x[i - 1]) + sq(y[i] - y[i - 1]) + sq(z[i] - z[i - 1]));
+        double take = arc[N - 1] - (N - 2) * seg;
+        if (take <= 1e-9) return;
+        double[] nx = new double[N], ny = new double[N], nz = new double[N], px = new double[N], py = new double[N], pz = new double[N];
+        int j = 1;
+        for (int i = 2; i < N; i++) {
+            double want = take + (i - 1) * seg;
+            while (j < N - 2 && arc[j + 1] < want) j++;
+            double span = arc[j + 1] - arc[j], t = span < 1e-12 ? 0 : clamp01((want - arc[j]) / span);
+            nx[i] = lerp(x[j], x[j + 1], t);
+            ny[i] = lerp(y[j], y[j + 1], t);
+            nz[i] = lerp(z[j], z[j + 1], t);
+            px[i] = lerp(ox[j], ox[j + 1], t);
+            py[i] = lerp(oy[j], oy[j + 1], t);
+            pz[i] = lerp(oz[j], oz[j + 1], t);
+        }
+        for (int i = 2; i < N; i++) {
+            x[i] = nx[i];
+            y[i] = ny[i];
+            z[i] = nz[i];
+            ox[i] = px[i];
+            oy[i] = py[i];
+            oz[i] = pz[i];
+        }
+    }
+
+    private static double sq(double v) {
+        return v * v;
     }
 
     /** The crack takes the energy of the outer half: its speed drops (most at the tip), no wild flailing after it. */
@@ -464,7 +503,7 @@ public final class WhipSim {
         y[i] = py;
         z[i] = pz;
         // the touch takes speed: a lot across the surface, some along it
-        double fr = floor ? 0.45 : 0.3;
+        double fr = floor ? 0.25 : 0.3;
         ox[i] += (x[i] - ox[i]) * fr;
         oy[i] += (y[i] - oy[i]) * (floor ? 1 : fr);
         oz[i] += (z[i] - oz[i]) * fr;

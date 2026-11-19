@@ -89,6 +89,16 @@ public final class EmberWhipClient {
         long lastLash = -100;
         boolean swung;
         int swingTime = -1;
+        /** The hand's angle round the body axis (atan2(z, x)) and its turn per tick: which way the swing really goes. */
+        double handAngle = Double.NaN, handTurn;
+
+        /**
+         * Sweep sign for a lash: the way the hand turns round the body now (any animation), else the server's direction. The angle
+         * grows to the holder's right in Minecraft (+x east, +z south), so the sign is taken from the motion, not from a convention.
+         */
+        int sweep(int fallback) {
+            return Math.abs(handTurn) > 0.04 ? (handTurn > 0 ? 1 : -1) : fallback;
+        }
     }
 
     private static final Map<Integer, State> STATES = new HashMap<>();
@@ -200,11 +210,16 @@ public final class EmberWhipClient {
         if (mc.level == null || !(mc.level.getEntity(m.a) instanceof LivingEntity e) || !holdsWhip(e)) return;
         State st = STATES.computeIfAbsent(e.getId(), k -> new State());
         long now = mc.level.getGameTime();
-        if (m.b == EmberBlade.VORTEX) st.sim.vortex(m.x + Math.PI, 1, m.dur);   // from behind the back, the way ember_vortex turns
+        if (m.b == EmberBlade.VORTEX) {
+            // the turn goes the way the hand goes round (ember_vortex turns +1), the whip starting a little behind the hand;
+            // before the first hand pose: from behind the back
+            int turn = st.sweep(1);
+            st.sim.vortex(Double.isNaN(st.handAngle) ? m.x + Math.PI : st.handAngle - 0.9 * turn, turn, m.dur);
+        }
         else {
             if (now - st.lastLash < 5) return;   // this swing already lashes (started by the client swing)
-            int dir = m.y < 0 ? -1 : 1;
-            st.sim.lash(m.x, -m.f * dir, m.f * dir, m.dur, dir < 0);
+            int dir = m.y < 0 ? -1 : 1, s = st.sweep(dir);
+            st.sim.lash(m.x, -m.f * s, m.f * s, m.dur, dir < 0);   // the 2nd lash of the combo (dir −1) rises
         }
         st.lastLash = now;
     }
@@ -227,12 +242,17 @@ public final class EmberWhipClient {
             if (p.swinging && (!st.swung || p.swingTime < st.swingTime) && level.getGameTime() - st.lastLash > 6) {
                 Vec3 f = p.getLookAngle();
                 double half = Math.toRadians(50);
-                st.sim.lash(Math.atan2(f.z, f.x), -half, half, EmberBlade.LASH_TICKS, false);
+                int s = st.sweep(1);
+                st.sim.lash(Math.atan2(f.z, f.x), -half * s, half * s, EmberBlade.LASH_TICKS, false);
                 st.lastLash = level.getGameTime();
             }
             st.swung = p.swinging;
             st.swingTime = p.swingTime;
-            List<WhipSim.Crack> cracks = st.sim.step(root(st, p, 1), body(p), solid);
+            WhipSim.Pose hand = root(st, p, 1);
+            double ang = Math.atan2(hand.z() - p.getZ(), hand.x() - p.getX());
+            st.handTurn = Double.isNaN(st.handAngle) ? 0 : Mth.wrapDegrees(Math.toDegrees(ang - st.handAngle)) * Math.PI / 180;
+            st.handAngle = ang;
+            List<WhipSim.Crack> cracks = st.sim.step(hand, body(p), solid);
             for (WhipSim.Crack c : cracks) crack(level, c);
             if (st.sim.striking()) flames(level, st.sim);
         }
@@ -370,7 +390,7 @@ public final class EmberWhipClient {
         for (int j = 0; j < m; j++) {
             double u = arc[j] / total;
             int band = (int) Math.floor(arc[j] / BAND);
-            double r = WhipSim.thickness(u) / 2 * (1 + 0.07 * Math.cos(arc[j] / BAND * 2 * Math.PI));   // plaited rings swell a little
+            double r = WhipSim.thickness(u) / 2 * (1 + 0.035 * Math.cos(arc[j] / BAND * 2 * Math.PI));   // plaited rings swell a little
             for (int k = 0; k < sides; k++) {
                 double th = 2 * Math.PI * k / sides, c = Math.cos(th), s = Math.sin(th);
                 double nx = Nn[j][0] * c + B[j][0] * s, ny = Nn[j][1] * c + B[j][1] * s, nz = Nn[j][2] * c + B[j][2] * s;

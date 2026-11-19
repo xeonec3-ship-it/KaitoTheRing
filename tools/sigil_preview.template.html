@@ -529,6 +529,7 @@ class FxRun {
   constructor(id, opts = {}) {
     this.id = id; this.def = DATA.fx[id]; this.t0 = 0; this.stopAt = null; this.isFx = true;
     FIG.caster.copy(opts.caster || new THREE.Vector3(0, 0, -11));
+    for (const [k, v] of Object.entries(opts.points || {})) FIG["point:" + k] = new THREE.Vector3(...v);   // point:<имя> — как Fx.point(...)
     this.T = { layersEnd: 200, expandStart: 200, formedAt: 200 };
     this.root = new THREE.Group(); scene.add(this.root);
     this.sigils = []; this.items = [];
@@ -570,10 +571,22 @@ class FxRun {
       }
       it.base = p;
     } else if (e.type === "beam") {
-      const a = anchor(e.at), b = anchor(e.to), len = a.distanceTo(b);
-      const geo = new THREE.CylinderGeometry(e.width, e.width, len, 8, 1, true);
-      const m = new THREE.Mesh(geo, addMat(this.col(e.color))); m.position.copy(a.clone().add(b).multiplyScalar(0.5));
-      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize()); g.add(m); it.m = m;
+      const a = e.fromSky ? anchor(e.at).add(new THREE.Vector3(0, e.fromSky, 0)) : anchor(e.at), b = e.fromSky ? anchor(e.at) : anchor(e.to);
+      const geo = new THREE.CylinderGeometry(e.width * (1 - (e.taper || 0) * 0.5), e.width, 1, 12, 1, true);   // единичная длина: растёт по grow/tail
+      const m = new THREE.Mesh(geo, addMat(this.col(e.color)));
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize()); g.add(m); it.m = m; it.a = a; it.b = b;
+      if (e.head) { it.head = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("glow", this.col(e.color))); g.add(it.head); }
+    } else if (e.type === "decal") {   // пятно/трещина на земле
+      const crack = e.shape === "crack", r = crack ? (e.length || 3) / 2 : (e.radius || 1);
+      const mm = mat(crack ? "higher_cracks" : (e.texture || "glow"), this.col(e.color));
+      if (e.blend === "translucent") { mm.blending = THREE.NormalBlending; }
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(2 * r, crack ? 2 * r * 0.55 : 2 * r), mm);
+      m.rotation.x = -Math.PI / 2; m.position.copy(anchor(e.at)).add(new THREE.Vector3(0, 0.03 + 0.002 * this.items.indexOf(it), 0)); g.add(m); it.m = m;
+    } else if (e.type === "trail") {   // серп разреза в плоскости поперёк взгляда
+      const R = e.radius || 2.5, th = e.thickness || 0.3, arc = (e.arc || 100) * Math.PI / 180;
+      const m = new THREE.Mesh(new THREE.RingGeometry(R - th / 2, R + th / 2, 64, 1, Math.PI / 2 - arc / 2, arc), addMat(this.col(e.color)));
+      const pv = new THREE.Group(); pv.position.copy(anchor(e.at)).add(new THREE.Vector3(0, -R * (e.bend || 0.3), 0)); pv.rotation.z = (e.roll || 0) * Math.PI / 180;
+      pv.add(m); g.add(pv); it.m = m;
     } else if (e.type === "flash") {
       const m = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("glow", this.col(e.color))); m.position.copy(anchor(e.at)); g.add(m); it.m = m;
     } else if (e.type === "beam_rain") {
@@ -640,7 +653,18 @@ class FxRun {
           r.position.set(it.base.x, it.base.y + y, it.base.z); r.material.opacity = op * (0.8 + 0.2 * Math.sin(lt * 0.6 + i));
         });
       } else if (e.type === "beam") {
-        it.m.material.opacity = life * clamp01(k / 4) * (1 - (e.flicker || 0) * hash(3, lt)) * (e.brightness ?? 1);
+        const h = e.grow ? ease(e.easing || "easeOutCubic", clamp01(k / e.grow)) : 1, s0 = e.tail ? Math.max(0, h - e.tail) : 0;
+        const p0 = it.a.clone().lerp(it.b, s0), p1 = it.a.clone().lerp(it.b, h);
+        it.m.position.copy(p0).add(p1).multiplyScalar(0.5); it.m.scale.set(1, Math.max(0.001, p0.distanceTo(p1)), 1);
+        it.m.material.opacity = life * clamp01(k / 4) * (1 - (e.flicker || 0) * hash(3, lt)) * Math.min(1, e.brightness ?? 1);
+        if (it.head) { it.head.position.copy(p1); it.head.quaternion.copy(cam.quaternion); it.head.scale.setScalar(e.head * (0.6 + 0.4 * h)); it.head.material.opacity = end ? 0 : life; }
+      } else if (e.type === "decal") {
+        const gk = e.grow ? ease("easeOutCubic", clamp01(k / e.grow)) : 1, fo = e.fadeOut ? clamp01((dur - k) / e.fadeOut) : 1;
+        const pulse = e.pulse ? 0.75 + 0.25 * Math.sin(k * (0.3 + k * 0.03)) : 1;
+        it.m.scale.set(gk, gk, 1); it.m.material.opacity = end ? 0 : fo * pulse * Math.min(1, e.brightness ?? 1);
+      } else if (e.type === "trail") {
+        const sw = clamp01(k / (e.sweep || 3)), f = clamp01(k / dur);
+        it.m.scale.setScalar(0.85 + 0.15 * ease("easeOutCubic", sw)); it.m.material.opacity = end ? 0 : ease("easeOutCubic", sw) * (1 - f * f) * Math.min(1, e.brightness ?? 1);
       } else if (e.type === "beam_rain") {
         it.rays.forEach((r) => { const a = k - r.at; r.m.material.opacity = end || a < 0 || a > 8 ? 0 : 1 - a / 8; });
       } else if (e.type === "wave") {
@@ -694,15 +718,18 @@ const SCENES = {
   "Купол Барьера (модель)": () => [new Portal("silent_dome", new THREE.Vector3(0, 0.1, 0), { scale: 5, noAuto: true })],
   "Тень дракона (модель)": () => [new Portal("worgan_dragon", new THREE.Vector3(0, 3, 0), { scale: 1.6, yaw: 60, noAuto: true })],
   "Безмолвный залп": () => [new FxRun("silent_volley", { caster: new THREE.Vector3(0, 0, 0) })],
+  "Алый разрез": () => { const r = new FxRun("scarlet_cut", { caster: new THREE.Vector3(0, 1.3, 0), points: { ground: [0, 0, 0] } }); caster.position.set(0, 0, -2.6); return [r]; },
+  "Падение звезды": () => [new FxRun("star_fall", { caster: new THREE.Vector3(0, 0, -16), points: { impact: [0, 0, 0], sky: [-30, 60, 25] } })],
+  "Алое стекло (модель)": () => [new Portal("star_glass", new THREE.Vector3(0, 0, 0), { noAuto: true })],
   "Ведьма: каст в одежде": () => [new FxRun("silent_witch_cast", { caster: new THREE.Vector3(0, 0, 0) })],
   "Ведьма: Тихий барьер": () => [new FxRun("silent_barrier", { caster: new THREE.Vector3(0, 0, 0) })],
   "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
-const MAIN_ID = { "Ведьма: каст в одежде": "silent_witch_cast", "Ведьма: Тихий барьер": "silent_barrier", "Копьё ветра (модель)": "silent_spear", "Купол Барьера (модель)": "silent_dome", "Тень дракона (модель)": "worgan_dragon", "Безмолвный залп": "silent_volley", "Врата (весь эффект)": "silent_gate", "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
+const MAIN_ID = { "Алый разрез": "scarlet_cut", "Падение звезды": "star_fall", "Алое стекло (модель)": "star_glass", "Ведьма: каст в одежде": "silent_witch_cast", "Ведьма: Тихий барьер": "silent_barrier", "Копьё ветра (модель)": "silent_spear", "Купол Барьера (модель)": "silent_dome", "Тень дракона (модель)": "worgan_dragon", "Безмолвный залп": "silent_volley", "Врата (весь эффект)": "silent_gate", "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
-const VIEW_FOR = { "Ведьма: каст в одежде": "volley", "Ведьма: Тихий барьер": "volley", "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
+const VIEW_FOR = { "Алый разрез": "cut", "Падение звезды": "star", "Алое стекло (модель)": "close", "Ведьма: каст в одежде": "volley", "Ведьма: Тихий барьер": "volley", "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -733,7 +760,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [1.2, 0.15, 9, 2.6], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+const VIEWS = { cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [1.2, 0.15, 9, 2.6], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

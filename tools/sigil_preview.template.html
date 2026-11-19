@@ -1059,9 +1059,14 @@ class FxRun {
     } else if (e.type === "sprites") {
       const n = Math.min(e.count, 600), pos = new Float32Array(n * 3), base = anchor(e.at);
       it.p = []; for (let i = 0; i < n; i++) {
-        const a = Math.random() * Math.PI * 2, d = Math.sqrt(Math.random()) * (e.area || e.spread || 0.3);
+        const a = Math.random() * Math.PI * 2, d = e.cone ? 0.05 : Math.sqrt(Math.random()) * (e.area || e.spread || 0.3);
         const born = e.rate >= e.count ? 0 : i / (e.rate || 1);
-        const dir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.3, Math.random() - 0.5).normalize();
+        let dir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.3, Math.random() - 0.5).normalize();
+        if (e.cone) {   // конус по взгляду заклинателя (в превью — вперёд +Z и чуть вверх)
+          const ax = new THREE.Vector3(0, 0.45, 1).normalize(), h = (e.cone / 2) * Math.PI / 180, th = Math.acos(1 - Math.random() * (1 - Math.cos(h))), ph = Math.random() * 6.283;
+          const u = new THREE.Vector3(1, 0, 0), v = new THREE.Vector3().crossVectors(ax, u).normalize();
+          dir = ax.clone().multiplyScalar(Math.cos(th)).add(u.multiplyScalar(Math.sin(th) * Math.cos(ph))).add(v.multiplyScalar(Math.sin(th) * Math.sin(ph)));
+        }
         it.p.push({ born, x: base.x + Math.cos(a) * d, y: base.y + (e.area ? 0 : 0), z: base.z + Math.sin(a) * d, dir });
       }
       const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));

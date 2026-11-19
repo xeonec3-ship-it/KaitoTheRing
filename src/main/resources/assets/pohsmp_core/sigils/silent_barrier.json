@@ -1,0 +1,109 @@
+{
+ "comment": "Печать «Тихого барьера» (T19, пункт 4): вертикальная, вокруг носителя; собирается по частям за долю секунды. Сгенерировано tools/gen_silent_outfit_fx.py.",
+ "size": 1.6,
+ "color": "#7FFFD0",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": 40,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.2,
+   "heightOffset": -0.02,
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 16
+   }
+  },
+  {
+   "id": "nimbus",
+   "type": "disc",
+   "texture": "silent_nimbus",
+   "radius": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutBack",
+    "modes": [
+     "pieces"
+    ],
+    "pieces": {
+     "count": 10,
+     "order": "scatter",
+     "pieceTime": 0.5,
+     "fly": 0.6,
+     "lift": 0.5,
+     "orbit": 50,
+     "tilt": 80,
+     "spin": 90
+    }
+   },
+   "rotation": {
+    "speed": 20,
+    "boost": 4.0
+   }
+  },
+  {
+   "id": "hex",
+   "type": "disc",
+   "texture": "hex_ring",
+   "radius": 1.12,
+   "heightOffset": 0.01,
+   "color": "#CFE8FF",
+   "appear": {
+    "delay": 4,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -12
+   }
+  },
+  {
+   "id": "rim",
+   "type": "disc",
+   "texture": "rim",
+   "radius": 1.2,
+   "heightOffset": 0.02,
+   "appear": {
+    "delay": 6,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.4,
+  "duration": 10,
+  "sparks": 40
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 14,
+  "stagger": 2
+ }
+}

@@ -194,55 +194,51 @@ def whip():
     # ХЛЫСТ по референсу владельца (Naomi, 19.11): цепь из золотисто-бронзовых звеньев-шипов — каждое звено ромб с двумя шипами
     # назад-в-стороны (как наконечник стрелы), звенья смотрят по ходу хлыста и поворачиваются по очереди на 90°; на конце — большой
     # раздвоенный наконечник-крюк (два загнутых зубца и жало). Металл, без огня. Тоны 5–9 — бронза → золото.
-    STEPS = 40
+    # Вид, который понравился сценаристу (превью анимаций T14, 19.11): гладкий оранжевый хлыст — детализированный:
+    # круглое сечение (две скрещённые призмы = восьмигранник), сужается от рукояти к концу, цвет от тёмно-оранжевого к светлому,
+    # плетение — чередование тонов кольцами и косые стежки, блик сверху, на конце кисточка-хлопушка из тонких прядей.
+    STEPS = 140
     pts = [curve(i / STEPS) for i in range(STEPS + 1)]
     def norm(v):
         l = math.sqrt(sum(c * c for c in v)) or 1
         return tuple(c / l for c in v)
     def cross(u, v):
         return (u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
-    def seg(p, q, w, tone):
-        rx_, ry_, ln_ = rot_of(p, q)
-        box(tuple((p[k] + q[k]) / 2 for k in range(3)), (w, w, ln_), tone, (rx_, ry_, 0), B)
     for i in range(STEPS):
         t = (i + 0.5) / STEPS
         p0, p1 = pts[i], pts[i + 1]
-        T_ = norm(tuple(p1[k] - p0[k] for k in range(3)))
-        S1 = norm(cross(T_, (0, 1, 0)))                 # вбок
-        S2 = norm(cross(S1, T_))                        # вверх (перпендикуляр)
-        S = S1 if i % 2 == 0 else S2                    # звенья через одно повёрнуты на 90°
-        sc = 1.0 - 0.3 * t
+        rx, ry, ln = rot_of(p0, p1)
         c = tuple((p0[k] + p1[k]) / 2 for k in range(3))
-        L = math.dist(p0, p1)
-        tone_body, tone_spike = (7, 9) if i % 2 == 0 else (6, 8)
-        # стержень
-        seg(tuple(c[k] - T_[k] * L * 0.55 for k in range(3)), tuple(c[k] + T_[k] * L * 0.55 for k in range(3)), 0.08 * sc, 5)
-        # ромб: нос вперёд, боковые углы
-        nose = tuple(c[k] + T_[k] * 0.11 * sc for k in range(3))
-        for sd in (-1, 1):
-            corner = tuple(c[k] + S[k] * sd * 0.09 * sc - T_[k] * 0.02 for k in range(3))
-            seg(nose, corner, 0.075 * sc, tone_body)
-            # шип: из бокового угла назад-наружу (как зубец наконечника стрелы)
-            barb = tuple(corner[k] + S[k] * sd * 0.13 * sc - T_[k] * 0.16 * sc for k in range(3))
-            seg(corner, barb, 0.065 * sc, tone_spike)
-    # наконечник-крюк (как на референсе): широкое «сердце» из двух загнутых назад зубцов и жало вперёд
+        w = 0.15 * (1 - t) ** 0.8 + 0.028
+        braid = (i // 2) % 2
+        base = 5 if t < 0.25 else (6 if t < 0.6 else 7)
+        tone = base + braid if base + braid <= 8 else 8
+        L_ = ln * 1.18
+        box(c, (w, w * 0.62, L_), tone, (rx, ry, 0), B)
+        box(c, (w * 0.62, w, L_), tone, (rx, ry, 0), B)
+        box(c, (w * 0.78, w * 0.78, L_), tone, (rx, ry, 45), B)
+        T_ = norm(tuple(p1[k] - p0[k] for k in range(3)))
+        S1 = norm(cross(T_, (0, 1, 0))); S2 = norm(cross(S1, T_))
+        hl = tuple(c[k] + S2[k] * w * 0.42 for k in range(3))                     # блик сверху
+        box(hl, (w * 0.22, w * 0.18, L_ * 0.9), 9 if t > 0.3 else 8, (rx, ry, 0), B)
+        if i % 3 == 0 and w > 0.05:                                               # косой стежок плетения
+            st = tuple(c[k] + S1[k] * w * 0.4 for k in range(3))
+            box(st, (w * 0.18, w * 0.9, w * 0.5), base, (rx, ry, 35), B)
+    # кисточка-хлопушка на конце: 7 тонких прядей веером
     tip, pre = curve(1.0), curve(0.985)
     T_ = norm(tuple(tip[k] - pre[k] for k in range(3)))
-    S = norm(cross(T_, (0, 1, 0)))
-    sting = tuple(tip[k] + T_[k] * 0.32 for k in range(3))
-    seg(tip, sting, 0.08, 9)
-    for sd in (-1, 1):
-        prev = tip
-        for k in range(1, 6):
-            a_ = k / 5
-            q = tuple(tip[j] + S[j] * sd * 0.28 * math.sin(a_ * math.pi * 0.8) + T_[j] * (0.12 - 0.42 * a_) for j in range(3))
-            seg(prev, q, 0.075 - 0.008 * k, 8 if k < 4 else 9)
-            prev = q
+    S1 = norm(cross(T_, (0, 1, 0))); S2 = norm(cross(S1, T_))
+    for k in range(7):
+        ang = (k - 3) * 0.22
+        d = norm(tuple(T_[j] + S1[j] * math.sin(ang) * 0.8 + S2[j] * math.cos(k * 1.7) * 0.25 for j in range(3)))
+        q = tuple(tip[j] + d[j] * (0.28 + 0.06 * (k % 3)) for j in range(3))
+        rx_, ry_, ln_ = rot_of(tip, q)
+        box(tuple((tip[j] + q[j]) / 2 for j in range(3)), (0.02, 0.02, ln_), 9 if k % 2 else 8, (rx_, ry_, 0), B)
     ys = [b[1] for b in B + F] + [b[4] for b in B + F]
-    tones = ['#1C1716', '#5A1A08', '#E04A0C', '#FFE7A0', '#FFB040', '#6A3A12', '#8A5418', '#B87A28', '#D8A040', '#F6D27A']
+    tones = ['#1C1716', '#5A1A08', '#E04A0C', '#FFE7A0', '#FFB040', '#C2470E', '#E05A14', '#FF7A22', '#FF9A3A', '#FFC27A']
     doc = {'comment': 'Хлыст «Раскалённых углей» (T14), как на референсе Ruination: рукоять в обмотке и кольцо-навершие сзади, из пяты — широкая '
-                      'цепь золотисто-бронзовых звеньев-шипов (референс владельца Naomi) вперёд с провисом и петлёй-спиралью, на конце раздвоенный '
-                      'наконечник-крюк. Как fire_whip: начало в руке, код поворачивает '
+                      'гладкий оранжевый плетёный хлыст (вид, одобренный сценаристом): сужается к концу, плетение, блик, кисточка-хлопушка; '
+                      'провис и петля-спираль. Как fire_whip: начало в руке, код поворачивает '
                       'по дуге взмаха. Сгенерировано tools/gen_ember_fx.py.',
            'style': 'pyre', 'center': 0, 'formedAt': 3, 'collapse': {'duration': 6, 'easing': 'easeInSine'},
            'parts': [{'type': 'boxes', 'tones': tones, 'glowTones': [], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': B,

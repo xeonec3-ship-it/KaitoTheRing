@@ -1,21 +1,25 @@
 {
- "comment": "Школа Iron's «fire» для знаков при касте (fx/school_fire.json): огонь: языки пламени по ободу, искры-огоньки вверх.",
+ "comment": "Стиль школы Iron's «Огонь» (T06): языки пламени по ободу, алхимический треугольник огня, вихрь из трёх языков в центре. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#FF7A2A",
   "secondary": "#FFD27A",
-  "core": "#FFFFFF",
+  "core": "#FFF4E0",
   "shadow": "#7A1E00"
  },
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_fire_band",
-  "shards": "soul_mote",
-  "sigil": "sigil_fire"
+  "shards": "mote_flame",
+  "sigil": "fire_seal"
  },
  "blend": "additive",
  "motion": {
-  "rotationScale": 1.0,
-  "jitter": 0.0,
-  "easing": "easeOutCubic"
+  "rotationScale": 1.2,
+  "jitter": 0.15,
+  "easing": "easeOutCubic",
+  "pulse": {
+   "amp": 0.12,
+   "period": 9
+  }
  }
 }

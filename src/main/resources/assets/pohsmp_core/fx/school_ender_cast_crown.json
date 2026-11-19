@@ -1,0 +1,84 @@
+{
+ "comment": "T06, школа «Край», ступень Мифическая/Божественная: печать + венец над головой + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). Сгенерировано tools/gen_school_themes.py.",
+ "style": "ender",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "ender_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "sigil",
+   "id": "ender_crown",
+   "delay": 10,
+   "at": "caster+0,2.55,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "vortex",
+   "delay": 6,
+   "duration": 9999,
+   "at": "caster+0,0.15,0",
+   "radius": 2.4,
+   "height": 0,
+   "arms": 4,
+   "speed": 4,
+   "pull": 0.6,
+   "texture": "mote_ender",
+   "particles": 40,
+   "life": 30,
+   "size": 0.16,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "mote_ender",
+   "count": 2000,
+   "color": "@secondary",
+   "rate": 0.9,
+   "area": 2.0,
+   "speed": 0.01,
+   "gravity": -0.001,
+   "spin": 90,
+   "size": [
+    0.16,
+    0.05
+   ],
+   "life": 40
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "duration": 10,
+   "at": "caster+0,2.55,0",
+   "size": 1.4,
+   "color": "@core",
+   "brightness": 0.6,
+   "rays": 6
+  }
+ ]
+}

@@ -1,0 +1,147 @@
+{
+ "comment": "T06, школа «Святая», ступени Высшая/Мифическая/Божественная: печать под магом на время каста (hold -1 — гасит код в конце каста). Рисунок: лучи-клинья, два крыла из трёх рядов перьев, восьмиконечная звезда. Сгенерировано tools/gen_school_themes.py.",
+ "size": 2.4,
+ "color": "#FFE38A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "expand": {
+  "scale": 1.18,
+  "delay": 0,
+  "duration": 14,
+  "easing": "easeOutSine"
+ },
+ "dissolve": {
+  "modes": [
+   "fade",
+   "reverse"
+  ],
+  "duration": 20,
+  "stagger": 3
+ },
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": 0.0,
+   "color": "#8A6420",
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "holy_seal",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 2,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 4,
+    "boost": 0
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_holy_band",
+   "radius": 1.22,
+   "inner": 0.87,
+   "repeat": 10,
+   "heightOffset": 0.02,
+   "color": "#FFEFB0",
+   "brightness": 0.85,
+   "appear": {
+    "delay": 10,
+    "duration": 16,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": 1
+   },
+   "rotation": {
+    "speed": -6,
+    "boost": 1
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "holy_core",
+   "radius": 0.4,
+   "heightOffset": 0.03,
+   "color": "#FFFBE6",
+   "appear": {
+    "delay": 18,
+    "duration": 12,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -10,
+    "boost": 0
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 30
+   }
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.3,
+   "width": 0.03,
+   "heightOffset": 0.04,
+   "count": 3,
+   "arcLength": 70,
+   "color": "#FFEFB0",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 22,
+    "duration": 10,
+    "easing": "easeInOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 12,
+    "boost": 2
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFBE6",
+  "size": 1.6,
+  "duration": 14,
+  "sparks": 30
+ },
+ "groundLight": {
+  "radius": 0.7,
+  "strength": 0.45
+ }
+}

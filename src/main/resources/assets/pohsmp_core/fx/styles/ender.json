@@ -1,5 +1,5 @@
 {
- "comment": "Школа Iron's «ender» для знаков при касте (fx/school_ender.json): Эндер: глаза и звёзды, искры затягивает к центру.",
+ "comment": "Стиль школы Iron's «Край» (T06): тоннель портала из смещённых колец, глаза Края, крапинки эндерняка, частицы-квадратики. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#C060FF",
   "secondary": "#F0C8FF",
@@ -9,13 +9,13 @@
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_ender_band",
-  "shards": "spark_soft",
-  "sigil": "sigil_ender"
+  "shards": "mote_ender",
+  "sigil": "ender_seal"
  },
  "blend": "additive",
  "motion": {
-  "rotationScale": 1.0,
-  "jitter": 0.0,
+  "rotationScale": 0.9,
+  "jitter": 0.2,
   "easing": "easeOutCubic"
  }
 }

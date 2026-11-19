@@ -1,5 +1,5 @@
 {
- "comment": "Школа Iron's «eldritch» для знаков при касте (fx/school_eldritch.json): потустороннее: щупальца с завитками, бирюзовые огоньки.",
+ "comment": "Стиль школы Iron's «Мистическая» (T06): щупальца с присосками, глаза между ними, кривые «живые» кольца, око с ресницами-шипами. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#3FD6B8",
   "secondary": "#B8FFF0",
@@ -9,13 +9,17 @@
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_eldritch_band",
-  "shards": "soul_mote",
-  "sigil": "sigil_eldritch"
+  "shards": "mote_eye",
+  "sigil": "eldritch_seal"
  },
  "blend": "additive",
  "motion": {
-  "rotationScale": 1.0,
-  "jitter": 0.0,
-  "easing": "easeOutCubic"
+  "rotationScale": 0.7,
+  "jitter": 0.3,
+  "easing": "easeInOutSine",
+  "pulse": {
+   "amp": 0.18,
+   "period": 26
+  }
  }
 }

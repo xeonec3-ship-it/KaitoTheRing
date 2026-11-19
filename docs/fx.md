@@ -64,6 +64,10 @@
   `easing` — плавность по умолчанию, `pulse` — пульсация по умолчанию.
 
 Готовые стили: `divine` (Божественная), `higher` (Высшая), `sculk` (Скалк), `coven` (Ковен), `forbidden` (Запретная).
+Стили школ Iron's (T06, генератор `tools/gen_school_themes.py`): `fire`, `ice`, `lightning`, `nature`, `holy`, `school_blood`, `ender`,
+`eldritch`, `evocation`, `wind` — у каждой свои частицы `@shards` (`mote_flame`, `mote_ice`, `mote_bolt`, `mote_leaf`, `mote_feather`,
+`mote_drop`, `mote_ender`, `mote_eye`, `mote_rune`, `mote_wisp` в `textures/sigil/`), `@sigil` = `<школа>_seal`, `@runes` = `school_<школа>_band`
+и характер движения (молния — быстро и рвано, природа и свет — плавно и медленно, кровь — пульс сердца). Подробно — `docs/sigils.md`, «Темы школ».
 
 ## Типы элементов
 

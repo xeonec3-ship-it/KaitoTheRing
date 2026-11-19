@@ -1,0 +1,85 @@
+{
+ "comment": "T06, школа «Мистическая», ступень Мифическая/Божественная: печать + венец над головой + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). Сгенерировано tools/gen_school_themes.py.",
+ "style": "eldritch",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "eldritch_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "sigil",
+   "id": "eldritch_crown",
+   "delay": 10,
+   "at": "caster+0,2.55,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "ribbon",
+   "delay": 8,
+   "duration": 9999,
+   "at": "caster+0,0.2,0",
+   "width": 0.18,
+   "length": 18,
+   "fade": 1.5,
+   "count": 5,
+   "orbit": {
+    "radius": 1.8,
+    "speed": 5,
+    "rise": 0.6,
+    "risePeriod": 40,
+    "climb": 0
+   },
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "mote_eye",
+   "count": 2000,
+   "color": "@secondary",
+   "rate": 0.35,
+   "area": 2.2,
+   "speed": 0.006,
+   "gravity": -0.0012,
+   "size": [
+    0.12,
+    0.3
+   ],
+   "life": 50
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "duration": 10,
+   "at": "caster+0,2.55,0",
+   "size": 1.4,
+   "color": "@core",
+   "brightness": 0.6,
+   "rays": 6
+  }
+ ]
+}

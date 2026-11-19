@@ -1,0 +1,70 @@
+{
+ "comment": "T06, школа «Огонь», ступень Высшая: печать под магом + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). Сгенерировано tools/gen_school_themes.py.",
+ "style": "fire",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "fire_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "mote_flame",
+   "count": 2000,
+   "color": "@primary",
+   "rate": 1.6,
+   "area": 2.2,
+   "speed": 0.025,
+   "gravity": -0.004,
+   "spin": 30,
+   "size": [
+    0.34,
+    0.08
+   ],
+   "life": 26,
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 2000,
+   "color": "@secondary",
+   "rate": 2.5,
+   "area": 1.4,
+   "speed": 0.05,
+   "gravity": -0.006,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 30
+  }
+ ]
+}

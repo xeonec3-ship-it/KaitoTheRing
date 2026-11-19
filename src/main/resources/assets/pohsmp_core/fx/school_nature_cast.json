@@ -1,0 +1,71 @@
+{
+ "comment": "T06, школа «Природа», ступень Высшая: печать под магом + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). Сгенерировано tools/gen_school_themes.py.",
+ "style": "nature",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "nature_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "mote_leaf",
+   "count": 2000,
+   "color": "@primary",
+   "rate": 0.8,
+   "area": 2.4,
+   "speed": 0.012,
+   "gravity": -0.0015,
+   "spin": 40,
+   "tumble": 0.8,
+   "sway": 1.0,
+   "size": [
+    0.26,
+    0.2
+   ],
+   "life": 60
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 2000,
+   "color": "@secondary",
+   "rate": 1.0,
+   "area": 2.0,
+   "speed": 0.01,
+   "gravity": -0.002,
+   "size": [
+    0.08,
+    0.03
+   ],
+   "life": 50
+  }
+ ]
+}

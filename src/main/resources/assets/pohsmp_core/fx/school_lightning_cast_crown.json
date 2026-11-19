@@ -1,0 +1,93 @@
+{
+ "comment": "T06, школа «Молния», ступень Мифическая/Божественная: печать + венец над головой + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). Сгенерировано tools/gen_school_themes.py.",
+ "style": "lightning",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "lightning_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "sigil",
+   "id": "lightning_crown",
+   "delay": 10,
+   "at": "caster+0,2.55,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "mote_bolt",
+   "count": 2000,
+   "color": "@secondary",
+   "rate": 2.0,
+   "area": 2.2,
+   "speed": 0.04,
+   "gravity": 0.0,
+   "spin": 200,
+   "size": [
+    0.3,
+    0.05
+   ],
+   "life": 8,
+   "glow": 0.8
+  },
+  {
+   "type": "lightning",
+   "delay": 6,
+   "duration": 9999,
+   "at": "caster+1.6,0.1,0",
+   "to": "caster+-1.6,0.1,0.4",
+   "branches": 2,
+   "jaggedness": 0.35,
+   "regen": 3,
+   "width": 0.05,
+   "color": "@primary"
+  },
+  {
+   "type": "lightning",
+   "delay": 10,
+   "duration": 9999,
+   "at": "caster+0,0.1,1.7",
+   "to": "caster+0.3,0.1,-1.6",
+   "branches": 1,
+   "jaggedness": 0.35,
+   "regen": 4,
+   "width": 0.04,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "duration": 10,
+   "at": "caster+0,2.55,0",
+   "size": 1.4,
+   "color": "@core",
+   "brightness": 0.6,
+   "rays": 6
+  }
+ ]
+}

@@ -1,0 +1,65 @@
+{
+ "comment": "T06, школа «Кровь», ступень Высшая: печать под магом + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). Сгенерировано tools/gen_school_themes.py.",
+ "style": "school_blood",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "blood_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,1.4,0",
+   "follow": true,
+   "texture": "mote_drop",
+   "count": 2000,
+   "color": "@primary",
+   "rate": 0.9,
+   "area": 1.6,
+   "speed": 0.0,
+   "gravity": 0.004,
+   "size": [
+    0.2,
+    0.14
+   ],
+   "life": 24,
+   "blend": "translucent"
+  },
+  {
+   "type": "aura",
+   "delay": 8,
+   "duration": 9999,
+   "at": "caster",
+   "target": "caster",
+   "thickness": 0.12,
+   "pulse": {
+    "amp": 0.4,
+    "period": 16
+   },
+   "motes": 8,
+   "color": "@primary"
+  }
+ ]
+}

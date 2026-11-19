@@ -1,5 +1,5 @@
 {
- "comment": "Каст обычной магии школы «evocation» (PohSpell.onCast): знак под магом, волна, частицы школы.",
+ "comment": "Каст обычной магии школы «Призывание» (PohSpell.onCast): знак под магом, волна, частицы школы. Сгенерировано tools/gen_school_themes.py.",
  "style": "evocation",
  "duration": 36,
  "elements": [
@@ -40,7 +40,7 @@
    "area": 1.6,
    "speed": 0.02,
    "gravity": -0.003,
-   "spin": 48,
+   "spin": 80,
    "size": [
     0.22,
     0.1

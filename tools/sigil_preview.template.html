@@ -246,7 +246,7 @@ class Sigil {
   constructor(id, origin, opts = {}) {
     this.id = id; this.def = DATA.sigils[id]; this.origin = origin.clone(); this.t0 = opts.t0 ?? 0; this.scale = opts.scale ?? 1;
     this.orientation = opts.orientation || this.def.orientation; this.stopAt = null; this.flashed = false; this.childrenDone = false;
-    this.children = []; this.parentHold = opts.isChild;
+    this.children = []; this.parentHold = opts.isChild; this.stopAfter = opts.stopAfter ?? null;   // stopAfter — для печатей с hold -1: «код гасит» в превью
     this.T = timings(this.def);
     this.root = new THREE.Group(); scene.add(this.root);
     this.plane = new THREE.Group(); this.root.add(this.plane);          // плоскость печати: локальная XY, нормаль +Z
@@ -360,6 +360,7 @@ class Sigil {
     this.children.forEach((c) => c.update(t, dt));
     // удержание
     if (autoStop && this.stopAt === null && !this.parentHold && def.hold >= 0 && lt >= T.formedAt + def.hold) this.stop(t);
+    if (autoStop && this.stopAt === null && this.stopAfter !== null && lt >= this.stopAfter) this.stop(t);
   }
 
   spawnFlash(t, S) {
@@ -756,6 +757,20 @@ const MAIN_ID = { "Меч-хлыст: Последний жар": "ember_last_he
 const VIEW_FOR = { "Меч-хлыст: Последний жар": "ember", "Меч-хлыст: Огненный вихрь": "ember", "Алый разрез": "cut", "Падение звезды": "star", "Алое стекло (модель)": "close", "Ведьма: каст в одежде": "volley", "Ведьма: Тихий барьер": "volley", "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Чёрное пламя Ворганы": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
+// T06: темы школ Iron's — печать под магом (ступень Высшая) и венец над головой (Мифическая/Божественная).
+// Печати держатся, пока идёт каст (hold -1), в превью «каст» длится 7 с, затем распад.
+const SCHOOL_RU = { fire: "Огонь", ice: "Лёд", lightning: "Молния", nature: "Природа", holy: "Святая", blood: "Кровь", ender: "Край", eldritch: "Мистическая", evocation: "Призывание", wind: "Ветер" };
+for (const [s, ru] of Object.entries(SCHOOL_RU)) {
+  const k = "Школа: " + ru;
+  SCENES[k] = () => [new Sigil(s + "_seal", new THREE.Vector3(0, 0.02, 0), { stopAfter: 140 }), new Sigil(s + "_crown", new THREE.Vector3(0, 2.55, 0), { t0: 10, stopAfter: 130 })];
+  MAIN_ID[k] = s + "_seal"; VIEW_FOR[k] = "school";
+  const k2 = "Школа: " + ru + " (обычный каст)";
+  SCENES[k2] = () => [new Sigil("school_" + s, new THREE.Vector3(0, 0.02, 0))];
+  MAIN_ID[k2] = "school_" + s; VIEW_FOR[k2] = "close";
+}
+SCENES["Школы: все печати"] = () => Object.keys(SCHOOL_RU).map((s, i) => new Sigil(s + "_seal", new THREE.Vector3(((i % 5) - 2) * 6, 0.02, (Math.floor(i / 5) - 0.5) * 6.5), { t0: i * 3, stopAfter: 150 }));
+MAIN_ID["Школы: все печати"] = "fire_seal"; VIEW_FOR["Школы: все печати"] = "gallery";
+
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
 const sel = $("scene");
 for (const k of Object.keys(SCENES)) { const o = document.createElement("option"); o.value = k; o.textContent = k; sel.appendChild(o); }
@@ -784,7 +799,8 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+const VIEWS = { ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0],
+  school: [0.55, 0.55, 9.5, 1.1], gallery: [0.0, 1.32, 27, 0] };   // school, gallery — сцены «Школа: …» (T06)
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

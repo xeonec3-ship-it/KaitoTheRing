@@ -93,6 +93,8 @@ public final class HigherFx {
             if (m.b == ru.pohsmp.core.spell.Cutscene.SILENT_GATE) {
                 SilentMusic.start(m.key, m.dur);
                 GateStaff.start(m.key, m.a, now);
+            } else if (m.b == ru.pohsmp.core.spell.Cutscene.COVEN_ARRIVAL) {
+                SilentMusic.start(m.key, m.dur, ru.pohsmp.core.Reg.MUSIC_COVEN_ARRIVAL.get(), false);
             } else if (m.b == ru.pohsmp.core.spell.Cutscene.DOWNFALL) {
                 GateStaff.startDownfall(m.key, m.a, now);
             }

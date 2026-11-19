@@ -141,6 +141,9 @@ public final class Reg {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, PohCore.MODID);
     public static final RegistryObject<SoundEvent> MUSIC_SILENT_GATE = SOUNDS.register("music.silent_gate",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate")));
+    /** Coven Arrival scene music (owner 19.11), the first 92 s of the track with a fade-out. */
+    public static final RegistryObject<SoundEvent> MUSIC_COVEN_ARRIVAL = SOUNDS.register("music.coven_arrival",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.coven_arrival")));
     /** T08: a sigil struck (Fx.hit, the Sage Barrier dome). */
     public static final RegistryObject<SoundEvent> SIGIL_HIT = SOUNDS.register("sigil.hit",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "sigil.hit")));

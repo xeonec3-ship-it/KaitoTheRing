@@ -9,6 +9,17 @@
       }
     ]
   },
+  "music.coven_arrival": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.coven_arrival",
+    "sounds": [
+      {
+        "name": "pohsmp_core:music/coven_arrival",
+        "stream": true,
+        "volume": 0.45
+      }
+    ]
+  },
   "sigil.hit": {
     "subtitle": "subtitles.pohsmp_core.sigil.hit",
     "sounds": [

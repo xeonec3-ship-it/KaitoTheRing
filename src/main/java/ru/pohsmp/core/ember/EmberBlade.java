@@ -177,7 +177,7 @@ public class EmberBlade extends SwordItem {
 
     /** Turns the fire_whip model from a0 to a1 (radians from the facing, + = left) over n ticks, flames along the arc. */
     private static void sweep(ServerLevel sl, Vec3 o, double yaw, double a0, double a1, int n, boolean ring) {
-        int whip = Fx.play(sl, Fx.mesh("fire_whip").at(o).yaw(SilentSpell.yawOf(dir(yaw, a0))).duration(n + 15));
+        int whip = Fx.play(sl, Fx.mesh("ember_whip").at(o).yaw(SilentSpell.yawOf(dir(yaw, a0))).duration(n + 15));
         Tasks.add(new Tasks.Task() {
             int age;
 

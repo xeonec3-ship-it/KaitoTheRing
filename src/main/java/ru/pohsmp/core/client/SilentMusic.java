@@ -33,8 +33,8 @@ public final class SilentMusic {
     private static final class Track extends AbstractTickableSoundInstance {
         private int fade = -1;
 
-        Track() {
-            super(Reg.MUSIC_SILENT_GATE.get(), SoundSource.RECORDS, RandomSource.create());
+        Track(net.minecraft.sounds.SoundEvent music) {
+            super(music, SoundSource.RECORDS, RandomSource.create());
             this.relative = true;
             this.attenuation = SoundInstance.Attenuation.NONE;
             this.looping = false;
@@ -63,17 +63,33 @@ public final class SilentMusic {
 
     /** Scene start (Cutscene SILENT_GATE packet): silence the game, play the track. dur: scene length in ticks. */
     public static void start(int k, int dur) {
+        start(k, dur, Reg.MUSIC_SILENT_GATE.get(), true);
+    }
+
+    /**
+     * Scene music. muteAll: every other sound is muted (the Gate); otherwise only the game's music and records stop and stay off,
+     * the scene's own sounds play (Coven Arrival, owner 19.11).
+     */
+    public static void start(int k, int dur, net.minecraft.sounds.SoundEvent music, boolean muteAll) {
         Minecraft mc = Minecraft.getInstance();
         SoundManager sm = mc.getSoundManager();
         if (track != null) sm.stop(track);
         key = k;
         left = dur + 60;
         silent = true;
+        all = muteAll;
         mc.getMusicManager().stopPlaying();
-        sm.stop();
-        track = new Track();
+        if (muteAll) sm.stop();
+        else {
+            sm.stop(null, SoundSource.MUSIC);
+            sm.stop(null, SoundSource.RECORDS);
+        }
+        track = new Track(music);
         sm.play(track);
     }
+
+    /** False: only music and records are held off while the track plays. */
+    private static boolean all = true;
 
     /** Scene end or cancel (STOP with the scene key): the track fades in 1 s (at the natural end it is already over), sound returns. */
     public static void stop(int k) {
@@ -97,7 +113,7 @@ public final class SilentMusic {
     public static void onSound(PlaySoundEvent e) {
         if (!silent) return;
         SoundInstance s = e.getSound();
-        if (s != null && s != track) e.setSound(null);
+        if (s != null && s != track && (all || s.getSource() == SoundSource.MUSIC || s.getSource() == SoundSource.RECORDS)) e.setSound(null);
     }
 
     @SubscribeEvent

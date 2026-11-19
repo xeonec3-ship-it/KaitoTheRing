@@ -69,7 +69,9 @@ parts.append({'type': 'disc', 'texture': 'constellation', 'radius': R * 0.58, 'c
 portal = {
     'comment': 'Портал Ковена. Сгенерировано tools/gen_coven_portal.py — правки вносить в генератор.',
     'style': 'coven',
-    'center': R + 0.3,
+    # низ «космоса» (диска R*0.62) у самой земли, чтобы из портала выходили по земле, а не из воздуха; нижняя дуга
+    # внешних колец уходит в землю (владелец, 19.11: «портал в воздухе»). = CovenArrivalSpell.PORTAL_Y
+    'center': round(R * 0.62 + 0.25, 2),
     'formedAt': 80,
     'collapse': {'duration': 24, 'easing': 'easeInCubic'},
     'parts': parts,

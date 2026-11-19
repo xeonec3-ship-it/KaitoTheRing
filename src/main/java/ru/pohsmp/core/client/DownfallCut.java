@@ -177,7 +177,7 @@ public final class DownfallCut {
      * Returns camera position, look point and (shake, 0, 0).
      */
     private static Vec3[] coven(double s, Entity ce, float pt) {
-        Vec3 a = rift, pc = a.add(0, 2.9, 0);
+        Vec3 a = rift, pc = a.add(0, ru.pohsmp.core.spell.CovenArrivalSpell.PORTAL_Y, 0);
         Vec3 fw = new Vec3(-Math.sin(Math.toRadians(portalYaw)), 0, Math.cos(Math.toRadians(portalYaw)));
         Vec3 rt = new Vec3(-fw.z, 0, fw.x);
         Vec3 g = a.add(fw.scale(2.2));
@@ -232,10 +232,19 @@ public final class DownfallCut {
             pos = g.add(fw.scale(9 + 6 * k)).add(0, 2.5 + 14 * k, 0);
             look = g.add(0, 2 + 16 * k, 0);
             shake = 0.02 * k;
-        } else if (s < 86) {                                // very far outside: the dome unfolds
+        } else if (s < 86) {                                // the dome unfolds (at 83 s): the camera sees it whole
+            // The camera must stay inside the client's render distance: it was ~160 blocks out, where everything is in fog and
+            // the arena chunks are not drawn, so the shot looked into empty fog (owner, 19.11: "смотрит не туда").
             double k = smooth((s - 80) / 6);
-            pos = a.add(fw.scale(150 - 10 * k)).add(rt.scale(60)).add(0, 40, 0);
-            look = a.add(0, 20, 0);
+            double rd = Minecraft.getInstance().options.getEffectiveRenderDistance() * 16.0;
+            double out = Math.min(ru.pohsmp.core.spell.SpaceClosureSpell.R + 22, rd * 0.7);
+            if (out > ru.pohsmp.core.spell.SpaceClosureSpell.R + 8) {             // outside the shell: the whole dome against the sky
+                pos = a.add(fw.scale(out - 6 * k)).add(rt.scale(out * 0.25)).add(0, 26 + 6 * k, 0);
+                look = a.add(0, ru.pohsmp.core.spell.SpaceClosureSpell.R * 0.3, 0);
+            } else {                                        // short render distance: from inside, up at the closing zenith
+                pos = a.add(fw.scale(14 - 2 * k)).add(0, 3, 0);
+                look = a.add(fw.scale(-10)).add(0, ru.pohsmp.core.spell.SpaceClosureSpell.R * 0.8, 0);
+            }
             shake = s > 83 && s < 84.5 ? 0.15 : 0;
         } else {                                            // the portal collapses
             double k = smooth((s - 86) / 4);

@@ -1,7 +1,7 @@
 {
  "comment": "Портал Ковена. Сгенерировано tools/gen_coven_portal.py — правки вносить в генератор.",
  "style": "coven",
- "center": 2.9,
+ "center": 1.86,
  "formedAt": 80,
  "collapse": {
   "duration": 24,

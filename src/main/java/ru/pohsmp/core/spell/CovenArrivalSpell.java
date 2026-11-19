@@ -71,6 +71,8 @@ public class CovenArrivalSpell extends PohSpell {
     private static final int T_BOW = 188, T_BOW_END = 222, T_CPORTAL = 220, T_STEP = 324, STEP = 48, WALK = 32;
     /** How far in front of the caster his portal stands (the animation steps him 1.4 forward). */
     private static final double C_FRONT = 1.9;
+    /** Height of the portal's centre over the ground (fx/meshes/coven_portal.json "center"): the cosmos disc stands on the ground. */
+    public static final double PORTAL_Y = 1.86;
     /** Where the retinue stands at the start: to the sides of the caster, a little behind. */
     private static final double R_SIDE = 1.8, R_BACK = 0.5;
     /** CNPC model animations: bow, arms forward. */
@@ -281,11 +283,13 @@ public class CovenArrivalSpell extends PohSpell {
             a.at = k.pos();
             a.yaw = k.yaw();
         }
+        // the portals stand on the ground even if the mark or the cast was made in a jump, on a ladder or in flight
+        a.at = ground(a.arena, caster, a.at);
         double r = Math.toRadians(a.yaw);
         a.fw = new Vec3(-Math.sin(r), 0, Math.cos(r));
         a.rt = new Vec3(-a.fw.z, 0, a.fw.x);
         a.inside = a.at.subtract(a.fw.scale(0.3));
-        a.cAt = caster.position();
+        a.cAt = ground(sl, caster, caster.position());
         a.cYaw = caster.getYRot();
         double cr = Math.toRadians(a.cYaw);
         a.cFw = new Vec3(-Math.sin(cr), 0, Math.cos(cr));
@@ -353,7 +357,7 @@ public class CovenArrivalSpell extends PohSpell {
         if (t == T_CLOSE) {
             if (a.portal >= 0) Fx.stop(ar, a.portal, "");
             if (a.seal >= 0) Fx.stop(ar, a.seal, "");
-            HigherSpell.burst(ar, a.at.x, a.at.y + 2.9, a.at.z, 4, COLOR);
+            HigherSpell.burst(ar, a.at.x, a.at.y + PORTAL_Y, a.at.z, 4, COLOR);
             ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.ENDER_EYE_DEATH, SoundSource.PLAYERS, 4f, 0.5f);
         }
         // before the portal: the retinue stands beside the caster, then walks with him into his portal
@@ -417,7 +421,7 @@ public class CovenArrivalSpell extends PohSpell {
         Vec3 cp = a.cAt.add(a.cFw.scale(C_FRONT));
         if (a.cPortal >= 0) Fx.stop(cl, a.cPortal, "");
         if (a.cSeal >= 0) Fx.stop(cl, a.cSeal, "");
-        HigherSpell.burst(cl, cp.x, cp.y + 2.9, cp.z, 2.5, COLOR);
+        HigherSpell.burst(cl, cp.x, cp.y + PORTAL_Y, cp.z, 2.5, COLOR);
         cl.playSound(null, cp.x, cp.y, cp.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 3f, 0.5f);
         // everyone steps into the portal: moved to the arena (other dimension too) right behind the portal, hidden from every viewer
         // (CNPC NPCs ignore invisibility when drawn, so Hidden cancels their rendering), unhurt and not pushed until their exit

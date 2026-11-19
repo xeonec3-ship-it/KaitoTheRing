@@ -1011,7 +1011,15 @@ class Portal {
       this.root.position.copy(this.base).add(new THREE.Vector3(-f[0], f[1], f[2]).multiplyScalar(1 - e));
       ms = (mv.scaleFrom ?? 1) + (1 - (mv.scaleFrom ?? 1)) * e;
     }
-    if (this.hinge) { const h = this.hinge; this.hg.rotation.y = (h.angle || 0) * D2R * ease(h.easing || "easeInOutCubic", clamp01((lt - (h.delay || 0)) / (h.duration || 1))); }
+    if (this.hinge) {
+      const h = this.hinge; let ang;
+      if (h.keys) {   // ключи [тик, угол, плавность к этому ключу]
+        const K = h.keys; ang = K[K.length - 1][1];
+        for (let i = 1; i < K.length; i++) if (lt <= K[i][0]) { const a = K[i - 1], b = K[i]; ang = a[1] + (b[1] - a[1]) * ease(b[2] || "easeInOutSine", clamp01((lt - a[0]) / Math.max(1, b[0] - a[0]))); break; }
+        if (lt < K[0][0]) ang = K[0][1];
+      } else ang = (h.angle || 0) * ease(h.easing || "easeInOutCubic", clamp01((lt - (h.delay || 0)) / (h.duration || 1)));
+      this.hg.rotation.y = ang * D2R;
+    }
     this.lt = lt;
     if (this.hp) this.hits = this.hits.filter((e) => lt - e.at <= HIT.life(this.hp));
     const flin = this.hp && this.hits.length ? HIT.scale(this.hp, this.hits, lt) : 1;   // T08: купол вздрагивает от удара

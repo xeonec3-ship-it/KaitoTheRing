@@ -175,16 +175,17 @@
    "id": "silent_nimbus",
    "delay": 400,
    "until": 1260,
-   "at": "caster+0,58,28",
-   "orientation": "facing",
-   "color": "@primary"
+   "at": "caster+0,65,26",
+   "orientation": "sky",
+   "color": "@primary",
+   "scale": 1.6
   },
   {
    "type": "flash",
    "delay": 432,
    "duration": 40,
-   "at": "caster+0,58,28",
-   "size": 7,
+   "at": "caster+0,65,26",
+   "size": 9,
    "anamorphic": 14,
    "rays": 10,
    "screen": 0.15,
@@ -201,10 +202,10 @@
    "move": {
     "from": [
      0,
-     8,
-     4
+     17,
+     0
     ],
-    "scaleFrom": 0.2,
+    "scaleFrom": 1.0,
     "delay": 0,
     "duration": 104,
     "easing": "easeOutCubic"
@@ -221,10 +222,10 @@
    "move": {
     "from": [
      0,
-     8,
-     4
+     17,
+     0
     ],
-    "scaleFrom": 0.2,
+    "scaleFrom": 1.0,
     "delay": 0,
     "duration": 104,
     "easing": "easeOutCubic"
@@ -253,10 +254,10 @@
    "move": {
     "from": [
      0,
-     8,
-     4
+     17,
+     0
     ],
-    "scaleFrom": 0.2,
+    "scaleFrom": 1.0,
     "delay": 0,
     "duration": 104,
     "easing": "easeOutCubic"
@@ -299,7 +300,7 @@
    "type": "flash",
    "delay": 520,
    "duration": 200,
-   "at": "caster+0,58,28",
+   "at": "caster+0,65,26",
    "size": 10,
    "anamorphic": 0,
    "rays": 14,

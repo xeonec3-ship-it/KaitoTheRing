@@ -289,7 +289,7 @@ def _mesh(name, boxes, comment, appear, tones=None, blend='translucent', opacity
 def main():
     build()
     W, H, D = 3.0, 6.0, 0.6
-    reveal = {'delay': 0, 'duration': 100, 'easing': 'easeInOutSine', 'reveal': 'down', 'front': 0.8}
+    reveal = {'delay': 0, 'duration': 104, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.6}   # врата выходят вниз из круга над ними: низ показывается первым
     frame = [b for g, b in B if g == 'frame']
     left, right = _split_doors(W)
     _mesh('silent_gate', frame, 'Врата «Безмолвных врат» (T03): рама, колонны, шпиль, подвеска — без створок (створки — silent_gate_door_l/_r, '

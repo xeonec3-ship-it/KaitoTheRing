@@ -1,0 +1,470 @@
+[
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "ember_blade",
+  "spell_ru": "Раскалённые угли (клинок/плеть)",
+  "event": "pohsmp_core:spell.ember_blade.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/ember_blade_hit_boom_1.ogg",
+   "spell/fire/ember_blade_hit_boom_2.ogg",
+   "spell/fire/ember_blade_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ember_blade_hit_boom_1.mp3",
+   "docs/sounds/mp3/ember_blade_hit_boom_2.mp3",
+   "docs/sounds/mp3/ember_blade_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "EmberWhipClient.java crack()",
+  "replaces": [
+   "FIREWORK_ROCKET_BLAST"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "ember_blade",
+  "spell_ru": "Раскалённые угли (клинок/плеть)",
+  "event": "pohsmp_core:spell.ember_blade.hit_fire",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/ember_blade_hit_fire_1.ogg",
+   "spell/fire/ember_blade_hit_fire_2.ogg",
+   "spell/fire/ember_blade_hit_fire_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ember_blade_hit_fire_1.mp3",
+   "docs/sounds/mp3/ember_blade_hit_fire_2.mp3",
+   "docs/sounds/mp3/ember_blade_hit_fire_3.mp3"
+  ],
+  "what": "вспышка пламени — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "EmberBlade.java fireVortex(); EmberBlade.java lash(); EmberBlade.java lastEmber(); EmberBlade.java later(); EmberBlade.java onHit(); EmberWhipClient.java crack()",
+  "replaces": [
+   "BLAZE_AMBIENT",
+   "BLAZE_SHOOT",
+   "FIRECHARGE_USE",
+   "LAVA_POP"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "ember_blade",
+  "spell_ru": "Раскалённые угли (клинок/плеть)",
+  "event": "pohsmp_core:spell.ember_blade.hit_hiss",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/ember_blade_hit_hiss_1.ogg",
+   "spell/fire/ember_blade_hit_hiss_2.ogg",
+   "spell/fire/ember_blade_hit_hiss_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ember_blade_hit_hiss_1.mp3",
+   "docs/sounds/mp3/ember_blade_hit_hiss_2.mp3",
+   "docs/sounds/mp3/ember_blade_hit_hiss_3.mp3"
+  ],
+  "what": "пламя гаснет — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "EmberBlade.java lastEmber()",
+  "replaces": [
+   "FIRE_EXTINGUISH"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "ember_blade",
+  "spell_ru": "Раскалённые угли (клинок/плеть)",
+  "event": "pohsmp_core:spell.ember_blade.hit_slam",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/ember_blade_hit_slam_1.ogg",
+   "spell/fire/ember_blade_hit_slam_2.ogg",
+   "spell/fire/ember_blade_hit_slam_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ember_blade_hit_slam_1.mp3",
+   "docs/sounds/mp3/ember_blade_hit_slam_2.mp3",
+   "docs/sounds/mp3/ember_blade_hit_slam_3.mp3"
+  ],
+  "what": "тяжёлый металлический удар — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "EmberBlade.java lastEmber()",
+  "replaces": [
+   "ANVIL_LAND"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "ember_blade",
+  "spell_ru": "Раскалённые угли (клинок/плеть)",
+  "event": "pohsmp_core:spell.ember_blade.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/fire/ember_blade_loop_1.ogg",
+   "spell/fire/ember_blade_loop_2.ogg",
+   "spell/fire/ember_blade_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ember_blade_loop_1.mp3",
+   "docs/sounds/mp3/ember_blade_loop_2.mp3",
+   "docs/sounds/mp3/ember_blade_loop_3.mp3"
+  ],
+  "what": "пламя гаснет — пока действует (тики) (подпись школы: треск и рёв пламени, жар)",
+  "where": "EmberBlade.java inventoryTick()",
+  "replaces": [
+   "FIRE_EXTINGUISH"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "explosion",
+  "spell_ru": "Взрыв!",
+  "event": "pohsmp_core:spell.explosion.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/fire/explosion_cast_1.ogg",
+   "spell/fire/explosion_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/explosion_cast_1.mp3",
+   "docs/sounds/mp3/explosion_cast_2.mp3"
+  ],
+  "what": "вспышка пламени — начало каста (подпись школы: треск и рёв пламени, жар)",
+  "where": "ExplosionSpell.java getCastStartSound()",
+  "replaces": [
+   "BLAZE_AMBIENT"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "explosion",
+  "spell_ru": "Взрыв!",
+  "event": "pohsmp_core:spell.explosion.charge_fire",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/fire/explosion_charge_fire_1.ogg",
+   "spell/fire/explosion_charge_fire_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/explosion_charge_fire_1.mp3",
+   "docs/sounds/mp3/explosion_charge_fire_2.mp3"
+  ],
+  "what": "вспышка пламени — нарастание во время каста (подпись школы: треск и рёв пламени, жар)",
+  "where": "ExplosionSpell.java onServerCastTick()",
+  "replaces": [
+   "FIRECHARGE_USE",
+   "FIRE_AMBIENT"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "explosion",
+  "spell_ru": "Взрыв!",
+  "event": "pohsmp_core:spell.explosion.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/fire/explosion_charge_powerup_1.ogg",
+   "spell/fire/explosion_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/explosion_charge_powerup_1.mp3",
+   "docs/sounds/mp3/explosion_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: треск и рёв пламени, жар)",
+  "where": "ExplosionSpell.java onServerCastTick()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "explosion",
+  "spell_ru": "Взрыв!",
+  "event": "pohsmp_core:spell.explosion.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/explosion_hit_boom_1.ogg",
+   "spell/fire/explosion_hit_boom_2.ogg",
+   "spell/fire/explosion_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/explosion_hit_boom_1.mp3",
+   "docs/sounds/mp3/explosion_hit_boom_2.mp3",
+   "docs/sounds/mp3/explosion_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "ExplosionSpell.java boom()",
+  "replaces": [
+   "DRAGON_FIREBALL_EXPLODE",
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "explosion",
+  "spell_ru": "Взрыв!",
+  "event": "pohsmp_core:spell.explosion.hit_thunder",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/explosion_hit_thunder_1.ogg",
+   "spell/fire/explosion_hit_thunder_2.ogg",
+   "spell/fire/explosion_hit_thunder_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/explosion_hit_thunder_1.mp3",
+   "docs/sounds/mp3/explosion_hit_thunder_2.mp3",
+   "docs/sounds/mp3/explosion_hit_thunder_3.mp3"
+  ],
+  "what": "раскат грома — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "ExplosionSpell.java boom()",
+  "replaces": [
+   "LIGHTNING_BOLT_THUNDER"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "falling_sun",
+  "spell_ru": "Падающее солнце",
+  "event": "pohsmp_core:spell.falling_sun.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/falling_sun_hit_1.ogg",
+   "spell/fire/falling_sun_hit_2.ogg",
+   "spell/fire/falling_sun_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/falling_sun_hit_1.mp3",
+   "docs/sounds/mp3/falling_sun_hit_2.mp3",
+   "docs/sounds/mp3/falling_sun_hit_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "FallingSunSpell.java tick()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "falling_sun",
+  "spell_ru": "Падающее солнце",
+  "event": "pohsmp_core:spell.falling_sun.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/fire/falling_sun_release_1.ogg",
+   "spell/fire/falling_sun_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/falling_sun_release_1.mp3",
+   "docs/sounds/mp3/falling_sun_release_2.mp3"
+  ],
+  "what": "вспышка пламени — выпуск заклинания (подпись школы: треск и рёв пламени, жар)",
+  "where": "FallingSunSpell.java fall()",
+  "replaces": [
+   "BLAZE_SHOOT"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "fire_whip",
+  "spell_ru": "Огненная плеть",
+  "event": "pohsmp_core:spell.fire_whip.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/fire/fire_whip_cast_1.ogg",
+   "spell/fire/fire_whip_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/fire_whip_cast_1.mp3",
+   "docs/sounds/mp3/fire_whip_cast_2.mp3"
+  ],
+  "what": "вспышка пламени — начало каста (подпись школы: треск и рёв пламени, жар)",
+  "where": "FireWhipSpell.java onCast()",
+  "replaces": [
+   "BLAZE_SHOOT",
+   "FIRECHARGE_USE"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "fire_whip",
+  "spell_ru": "Огненная плеть",
+  "event": "pohsmp_core:spell.fire_whip.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/fire/fire_whip_loop_1.ogg",
+   "spell/fire/fire_whip_loop_2.ogg",
+   "spell/fire/fire_whip_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/fire_whip_loop_1.mp3",
+   "docs/sounds/mp3/fire_whip_loop_2.mp3",
+   "docs/sounds/mp3/fire_whip_loop_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — пока действует (тики) (подпись школы: треск и рёв пламени, жар)",
+  "where": "FireWhipSpell.java tick()",
+  "replaces": [
+   "FISHING_BOBBER_RETRIEVE"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "heaven_fall",
+  "spell_ru": "Падение небес",
+  "event": "pohsmp_core:spell.heaven_fall.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/fire/heaven_fall_cast_1.ogg",
+   "spell/fire/heaven_fall_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/heaven_fall_cast_1.mp3",
+   "docs/sounds/mp3/heaven_fall_cast_2.mp3"
+  ],
+  "what": "рёв / грозный гул — начало каста (подпись школы: треск и рёв пламени, жар)",
+  "where": "HeavenFallSpell.java getCastStartSound()",
+  "replaces": [
+   "WITHER_AMBIENT"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "heaven_fall",
+  "spell_ru": "Падение небес",
+  "event": "pohsmp_core:spell.heaven_fall.charge_hum",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/fire/heaven_fall_charge_hum_1.ogg",
+   "spell/fire/heaven_fall_charge_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/heaven_fall_charge_hum_1.mp3",
+   "docs/sounds/mp3/heaven_fall_charge_hum_2.mp3"
+  ],
+  "what": "гул / фон — нарастание во время каста (подпись школы: треск и рёв пламени, жар)",
+  "where": "HeavenFallSpell.java onServerCastTick()",
+  "replaces": [
+   "AMBIENT_CAVE"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "heaven_fall",
+  "spell_ru": "Падение небес",
+  "event": "pohsmp_core:spell.heaven_fall.charge_thunder",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/fire/heaven_fall_charge_thunder_1.ogg",
+   "spell/fire/heaven_fall_charge_thunder_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/heaven_fall_charge_thunder_1.mp3",
+   "docs/sounds/mp3/heaven_fall_charge_thunder_2.mp3"
+  ],
+  "what": "раскат грома — нарастание во время каста (подпись школы: треск и рёв пламени, жар)",
+  "where": "HeavenFallSpell.java onServerCastTick()",
+  "replaces": [
+   "LIGHTNING_BOLT_THUNDER"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "heaven_fall",
+  "spell_ru": "Падение небес",
+  "event": "pohsmp_core:spell.heaven_fall.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/heaven_fall_hit_boom_1.ogg",
+   "spell/fire/heaven_fall_hit_boom_2.ogg",
+   "spell/fire/heaven_fall_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/heaven_fall_hit_boom_1.mp3",
+   "docs/sounds/mp3/heaven_fall_hit_boom_2.mp3",
+   "docs/sounds/mp3/heaven_fall_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "HeavenFallSpell.java tick()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "heaven_fall",
+  "spell_ru": "Падение небес",
+  "event": "pohsmp_core:spell.heaven_fall.hit_roar",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/fire/heaven_fall_hit_roar_1.ogg",
+   "spell/fire/heaven_fall_hit_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/heaven_fall_hit_roar_1.mp3",
+   "docs/sounds/mp3/heaven_fall_hit_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — удар / взрыв / попадание (подпись школы: треск и рёв пламени, жар)",
+  "where": "HeavenFallSpell.java rain()",
+  "replaces": [
+   "WITHER_SPAWN"
+  ]
+ },
+ {
+  "school": "fire",
+  "school_ru": "Огонь",
+  "spell": "heaven_fall",
+  "spell_ru": "Падение небес",
+  "event": "pohsmp_core:spell.heaven_fall.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/fire/heaven_fall_loop_1.ogg",
+   "spell/fire/heaven_fall_loop_2.ogg",
+   "spell/fire/heaven_fall_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/heaven_fall_loop_1.mp3",
+   "docs/sounds/mp3/heaven_fall_loop_2.mp3",
+   "docs/sounds/mp3/heaven_fall_loop_3.mp3"
+  ],
+  "what": "вспышка пламени — пока действует (тики) (подпись школы: треск и рёв пламени, жар)",
+  "where": "HeavenFallSpell.java tick()",
+  "replaces": [
+   "BLAZE_SHOOT"
+  ]
+ }
+]

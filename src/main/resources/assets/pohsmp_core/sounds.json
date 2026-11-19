@@ -381,5 +381,309 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.ember_blade.hit_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.ember_blade.hit_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_boom_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_boom_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ember_blade.hit_fire": {
+    "subtitle": "subtitles.pohsmp_core.spell.ember_blade.hit_fire",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_fire_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_fire_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_fire_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ember_blade.hit_hiss": {
+    "subtitle": "subtitles.pohsmp_core.spell.ember_blade.hit_hiss",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_hiss_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_hiss_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_hiss_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ember_blade.hit_slam": {
+    "subtitle": "subtitles.pohsmp_core.spell.ember_blade.hit_slam",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_slam_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_slam_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_hit_slam_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ember_blade.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.ember_blade.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/ember_blade_loop_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.explosion.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.explosion.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/explosion_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/explosion_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.explosion.charge_fire": {
+    "subtitle": "subtitles.pohsmp_core.spell.explosion.charge_fire",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/explosion_charge_fire_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/explosion_charge_fire_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.explosion.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.explosion.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/explosion_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/explosion_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.explosion.hit_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.explosion.hit_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/explosion_hit_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/explosion_hit_boom_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/explosion_hit_boom_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.explosion.hit_thunder": {
+    "subtitle": "subtitles.pohsmp_core.spell.explosion.hit_thunder",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/explosion_hit_thunder_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/explosion_hit_thunder_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/explosion_hit_thunder_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.falling_sun.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.falling_sun.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/falling_sun_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/falling_sun_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/falling_sun_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.falling_sun.release": {
+    "subtitle": "subtitles.pohsmp_core.spell.falling_sun.release",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/falling_sun_release_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/falling_sun_release_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.fire_whip.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.fire_whip.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/fire_whip_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/fire_whip_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.fire_whip.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.fire_whip.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/fire_whip_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/fire_whip_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/fire_whip_loop_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.heaven_fall.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.heaven_fall.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.heaven_fall.charge_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.heaven_fall.charge_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_charge_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_charge_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.heaven_fall.charge_thunder": {
+    "subtitle": "subtitles.pohsmp_core.spell.heaven_fall.charge_thunder",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_charge_thunder_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_charge_thunder_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.heaven_fall.hit_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.heaven_fall.hit_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_hit_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_hit_boom_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_hit_boom_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.heaven_fall.hit_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.heaven_fall.hit_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_hit_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_hit_roar_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.heaven_fall.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.heaven_fall.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/fire/heaven_fall_loop_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

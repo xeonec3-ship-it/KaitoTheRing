@@ -716,5 +716,251 @@
   "replaces": [
    "LIGHTNING_BOLT_IMPACT"
   ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "judgement",
+  "spell_ru": "Приговор",
+  "event": "pohsmp_core:spell.judgement.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/holy/judgement_cast_1.ogg",
+   "spell/holy/judgement_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/judgement_cast_1.mp3",
+   "docs/sounds/mp3/judgement_cast_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: колокольчики и светлый хор)",
+  "where": "JudgementSpell.java onCast()",
+  "replaces": [
+   "BELL_RESONATE"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "judgement",
+  "spell_ru": "Приговор",
+  "event": "pohsmp_core:spell.judgement.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/holy/judgement_hit_1.ogg",
+   "spell/holy/judgement_hit_2.ogg",
+   "spell/holy/judgement_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/judgement_hit_1.mp3",
+   "docs/sounds/mp3/judgement_hit_2.mp3",
+   "docs/sounds/mp3/judgement_hit_3.mp3"
+  ],
+  "what": "раскат грома — удар / взрыв / попадание (подпись школы: колокольчики и светлый хор)",
+  "where": "JudgementSpell.java tick()",
+  "replaces": [
+   "TRIDENT_THUNDER"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "judgement",
+  "spell_ru": "Приговор",
+  "event": "pohsmp_core:spell.judgement.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/holy/judgement_loop_1.ogg",
+   "spell/holy/judgement_loop_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/judgement_loop_1.mp3",
+   "docs/sounds/mp3/judgement_loop_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — пока действует (тики) (подпись школы: колокольчики и светлый хор)",
+  "where": "JudgementSpell.java tick()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "last_dawn",
+  "spell_ru": "Последний рассвет",
+  "event": "pohsmp_core:spell.last_dawn.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/holy/last_dawn_cast_1.ogg",
+   "spell/holy/last_dawn_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/last_dawn_cast_1.mp3",
+   "docs/sounds/mp3/last_dawn_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: колокольчики и светлый хор)",
+  "where": "LastDawnSpell.java getCastStartSound()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "last_dawn",
+  "spell_ru": "Последний рассвет",
+  "event": "pohsmp_core:spell.last_dawn.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/holy/last_dawn_charge_powerup_1.ogg",
+   "spell/holy/last_dawn_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/last_dawn_charge_powerup_1.mp3",
+   "docs/sounds/mp3/last_dawn_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: колокольчики и светлый хор)",
+  "where": "LastDawnSpell.java castTick()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "last_dawn",
+  "spell_ru": "Последний рассвет",
+  "event": "pohsmp_core:spell.last_dawn.charge_resonate",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/holy/last_dawn_charge_resonate_1.ogg",
+   "spell/holy/last_dawn_charge_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/last_dawn_charge_resonate_1.mp3",
+   "docs/sounds/mp3/last_dawn_charge_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — нарастание во время каста (подпись школы: колокольчики и светлый хор)",
+  "where": "LastDawnSpell.java castTick()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE",
+   "BELL_RESONATE"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "last_dawn",
+  "spell_ru": "Последний рассвет",
+  "event": "pohsmp_core:spell.last_dawn.end_bell",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/holy/last_dawn_end_bell_1.ogg",
+   "spell/holy/last_dawn_end_bell_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/last_dawn_end_bell_1.mp3",
+   "docs/sounds/mp3/last_dawn_end_bell_2.mp3"
+  ],
+  "what": "колокол — конец / снятие / смерть (подпись школы: колокольчики и светлый хор)",
+  "where": "LastDawnSpell.java release()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "last_dawn",
+  "spell_ru": "Последний рассвет",
+  "event": "pohsmp_core:spell.last_dawn.end_fanfare",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/holy/last_dawn_end_fanfare_1.ogg",
+   "spell/holy/last_dawn_end_fanfare_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/last_dawn_end_fanfare_1.mp3",
+   "docs/sounds/mp3/last_dawn_end_fanfare_2.mp3"
+  ],
+  "what": "торжество, исцеление — конец / снятие / смерть (подпись школы: колокольчики и светлый хор)",
+  "where": "LastDawnSpell.java end(); LastDawnSpell.java guard()",
+  "replaces": [
+   "PLAYER_LEVELUP",
+   "TOTEM_USE"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "living_shield",
+  "spell_ru": "Живой щит",
+  "event": "pohsmp_core:spell.living_shield.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/holy/living_shield_cast_1.ogg",
+   "spell/holy/living_shield_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/living_shield_cast_1.mp3",
+   "docs/sounds/mp3/living_shield_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: колокольчики и светлый хор)",
+  "where": "LivingShieldSpell.java onCast()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "sanctuary",
+  "spell_ru": "Святилище",
+  "event": "pohsmp_core:spell.sanctuary.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/holy/sanctuary_cast_1.ogg",
+   "spell/holy/sanctuary_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/sanctuary_cast_1.mp3",
+   "docs/sounds/mp3/sanctuary_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: колокольчики и светлый хор)",
+  "where": "SanctuarySpell.java onCast()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "holy",
+  "school_ru": "Святая",
+  "spell": "sanctuary",
+  "spell_ru": "Святилище",
+  "event": "pohsmp_core:spell.sanctuary.end",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/holy/sanctuary_end_1.ogg",
+   "spell/holy/sanctuary_end_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/sanctuary_end_1.mp3",
+   "docs/sounds/mp3/sanctuary_end_2.mp3"
+  ],
+  "what": "спад, «выключение» — конец / снятие / смерть (подпись школы: колокольчики и светлый хор)",
+  "where": "SanctuarySpell.java tick()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
  }
 ]

@@ -641,5 +641,16 @@
   "subtitles.pohsmp_core.spell.lightning_rod.cast": "Lightning Rod: thunderclap",
   "subtitles.pohsmp_core.spell.lightning_rod.hit": "Lightning Rod: discharge",
   "subtitles.pohsmp_core.spell.overload.cast": "Overload: power rises",
-  "subtitles.pohsmp_core.spell.overload.hit": "Overload: discharge"
+  "subtitles.pohsmp_core.spell.overload.hit": "Overload: discharge",
+  "subtitles.pohsmp_core.spell.judgement.cast": "Judgement: resonance",
+  "subtitles.pohsmp_core.spell.judgement.hit": "Judgement: thunderclap",
+  "subtitles.pohsmp_core.spell.judgement.loop": "Judgement: power rises",
+  "subtitles.pohsmp_core.spell.last_dawn.cast": "Last Dawn: power rises",
+  "subtitles.pohsmp_core.spell.last_dawn.charge_powerup": "Last Dawn: power rises",
+  "subtitles.pohsmp_core.spell.last_dawn.charge_resonate": "Last Dawn: resonance",
+  "subtitles.pohsmp_core.spell.last_dawn.end_bell": "Last Dawn: bell",
+  "subtitles.pohsmp_core.spell.last_dawn.end_fanfare": "Last Dawn: triumph",
+  "subtitles.pohsmp_core.spell.living_shield.cast": "Living Shield: power rises",
+  "subtitles.pohsmp_core.spell.sanctuary.cast": "Sanctuary: power rises",
+  "subtitles.pohsmp_core.spell.sanctuary.end": "Sanctuary: power fades"
 }

@@ -844,5 +844,152 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.judgement.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.judgement.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/judgement_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/judgement_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.judgement.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.judgement.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/judgement_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/judgement_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/judgement_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.judgement.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.judgement.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/judgement_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/judgement_loop_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.last_dawn.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.last_dawn.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.last_dawn.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.last_dawn.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.last_dawn.charge_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.last_dawn.charge_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_charge_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_charge_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.last_dawn.end_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.last_dawn.end_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_end_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_end_bell_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.last_dawn.end_fanfare": {
+    "subtitle": "subtitles.pohsmp_core.spell.last_dawn.end_fanfare",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_end_fanfare_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/last_dawn_end_fanfare_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.living_shield.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.living_shield.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/living_shield_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/living_shield_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.sanctuary.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.sanctuary.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/sanctuary_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/sanctuary_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.sanctuary.end": {
+    "subtitle": "subtitles.pohsmp_core.spell.sanctuary.end",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/holy/sanctuary_end_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/holy/sanctuary_end_2",
+        "volume": 0.5
+      }
+    ]
   }
 }

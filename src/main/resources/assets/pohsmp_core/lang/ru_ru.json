@@ -641,5 +641,16 @@
   "subtitles.pohsmp_core.spell.lightning_rod.cast": "Громоотвод: раскат",
   "subtitles.pohsmp_core.spell.lightning_rod.hit": "Громоотвод: разряд",
   "subtitles.pohsmp_core.spell.overload.cast": "Перегрузка: сила нарастает",
-  "subtitles.pohsmp_core.spell.overload.hit": "Перегрузка: разряд"
+  "subtitles.pohsmp_core.spell.overload.hit": "Перегрузка: разряд",
+  "subtitles.pohsmp_core.spell.judgement.cast": "Приговор: резонанс",
+  "subtitles.pohsmp_core.spell.judgement.hit": "Приговор: раскат",
+  "subtitles.pohsmp_core.spell.judgement.loop": "Приговор: сила нарастает",
+  "subtitles.pohsmp_core.spell.last_dawn.cast": "Последний рассвет: сила нарастает",
+  "subtitles.pohsmp_core.spell.last_dawn.charge_powerup": "Последний рассвет: сила нарастает",
+  "subtitles.pohsmp_core.spell.last_dawn.charge_resonate": "Последний рассвет: резонанс",
+  "subtitles.pohsmp_core.spell.last_dawn.end_bell": "Последний рассвет: колокол",
+  "subtitles.pohsmp_core.spell.last_dawn.end_fanfare": "Последний рассвет: торжество",
+  "subtitles.pohsmp_core.spell.living_shield.cast": "Живой щит: сила нарастает",
+  "subtitles.pohsmp_core.spell.sanctuary.cast": "Святилище: сила нарастает",
+  "subtitles.pohsmp_core.spell.sanctuary.end": "Святилище: сила угасает"
 }

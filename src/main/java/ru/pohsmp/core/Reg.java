@@ -176,7 +176,7 @@ public final class Reg {
             ru.pohsmp.core.spell.ArkSpell.PATH);
     public static final List<String> MYTHIC_SPELLS = List.of(ru.pohsmp.core.spell.ExplosionSpell.PATH,
             ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.FrozenHourSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell.PATH,
-            ru.pohsmp.core.spell.CovenArrivalSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH);
+            ru.pohsmp.core.spell.CovenArrivalSpell.PATH);
     public static final RegistryObject<AbstractSpell> COVEN_ARRIVAL = SPELLS.register(ru.pohsmp.core.spell.CovenArrivalSpell.PATH,
             ru.pohsmp.core.spell.CovenArrivalSpell::new);
     static {
@@ -187,7 +187,6 @@ public final class Reg {
         SPELLS.register(ru.pohsmp.core.spell.SoulDevourSpell.PATH, ru.pohsmp.core.spell.SoulDevourSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ArkSpell.PATH, ru.pohsmp.core.spell.ArkSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ExplosionSpell.PATH, ru.pohsmp.core.spell.ExplosionSpell::new);
-        SPELLS.register(ru.pohsmp.core.spell.StarFallSpell.PATH, ru.pohsmp.core.spell.StarFallSpell::new);
     }
 
     /** "Creation" tier: only through its staff. */
@@ -217,8 +216,9 @@ public final class Reg {
             ru.pohsmp.core.spell.OblivionBladesSpell.PATH, ru.pohsmp.core.spell.WorldRiftSpell.PATH, ru.pohsmp.core.spell.MirrorPrisonSpell.PATH,
             ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell.PATH,
             ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.CountdownSpell.PATH,
-            ru.pohsmp.core.spell.ScarletCutSpell.PATH);
+            ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH);
     static {
+        SPELLS.register(ru.pohsmp.core.spell.StarFallSpell.PATH, ru.pohsmp.core.spell.StarFallSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.ScarletCutSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.CountdownSpell.PATH, ru.pohsmp.core.spell.CountdownSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.DisintegrationReplicaSpell::new);

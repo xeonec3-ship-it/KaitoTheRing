@@ -141,6 +141,13 @@ public final class Reg {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, PohCore.MODID);
     public static final RegistryObject<SoundEvent> MUSIC_SILENT_GATE = SOUNDS.register("music.silent_gate",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate")));
+    /** «Приказ» (owner 19.11): the Gate music in three parts — the cast (0-49.9 s of the track), the wait (a 7.9 s loop), the strike. */
+    public static final RegistryObject<SoundEvent> MUSIC_GATE_INTRO = SOUNDS.register("music.silent_gate_intro",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate_intro")));
+    public static final RegistryObject<SoundEvent> MUSIC_GATE_WAIT = SOUNDS.register("music.silent_gate_wait",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate_wait")));
+    public static final RegistryObject<SoundEvent> MUSIC_GATE_STRIKE = SOUNDS.register("music.silent_gate_strike",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate_strike")));
     /** Coven Arrival scene music (owner 19.11), the first 92 s of the track with a fade-out. */
     public static final RegistryObject<SoundEvent> MUSIC_COVEN_ARRIVAL = SOUNDS.register("music.coven_arrival",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.coven_arrival")));

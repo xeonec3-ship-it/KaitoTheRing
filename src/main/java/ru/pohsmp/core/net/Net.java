@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "9";   // 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07)
+    private static final String V = "10";   // 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S)
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -31,6 +31,22 @@ public final class Net {
                 .consumerMainThread(SilentSync::handle).add();
         CH.messageBuilder(NeroMsg.class, 7, NetworkDirection.PLAY_TO_CLIENT).encoder(NeroMsg::encode).decoder(NeroMsg::new)
                 .consumerMainThread(NeroMsg::handle).add();
+        CH.messageBuilder(GateCommand.class, 8, NetworkDirection.PLAY_TO_SERVER).encoder(GateCommand::encode).decoder(GateCommand::new)
+                .consumerMainThread(GateCommand::handle).add();
+    }
+
+    /** «Безмолвные врата», «Приказ»: the waiting caster clicked the left button (client -> server, no data). */
+    public static final class GateCommand {
+        public GateCommand() {}
+
+        public GateCommand(FriendlyByteBuf buf) {}
+
+        public void encode(FriendlyByteBuf buf) {}
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) ru.pohsmp.core.spell.silent.SilentGateSpell.commandFrom(p);
+        }
     }
 
     /**

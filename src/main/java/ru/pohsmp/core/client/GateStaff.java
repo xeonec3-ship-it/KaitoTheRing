@@ -28,7 +28,7 @@ public final class GateStaff {
     private GateStaff() {}
 
     /** Ticks from the scene start when the left hand takes the staff, and the scene length. */
-    private static final int TAKE = 760, END = 1300;
+    private static final int TAKE = 760, END = ru.pohsmp.core.spell.silent.SilentGateSpell.SCENE_MAX;   // «Приказ»: the STOP packet ends it earlier
 
     /**
      * "Downfall": the staff went through the head at the start of the cast (manager 19.11). Until this tick it is out of the hand and

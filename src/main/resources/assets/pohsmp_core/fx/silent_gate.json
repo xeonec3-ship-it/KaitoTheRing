@@ -39,61 +39,39 @@
    "color": "@primary"
   },
   {
-   "type": "flash",
-   "size": 0.9,
-   "rays": 0,
-   "color": "#FFFFFF",
-   "brightness": 0.9,
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true,
-   "in": {
-    "duration": 20,
-    "easing": "easeOutCubic"
-   },
-   "out": {
-    "duration": 32,
-    "easing": "easeInSine"
-   },
-   "comment": "мягкое белое ядро у кисти"
-  },
-  {
    "type": "sprites",
    "texture": "spark_soft",
-   "count": 4000,
-   "rate": 24,
-   "cone": 50,
-   "speed": 0.085,
+   "count": 900,
+   "rate": 5,
+   "cone": 46,
+   "speed": 0.14,
    "gravity": -0.0006,
    "size": [
-    0.07,
-    0.02
+    0.06,
+    0.015
    ],
-   "life": 48,
-   "glow": 0.25,
-   "color": "#FFFFFF",
+   "life": 34,
+   "color": "#E8F4FF",
    "delay": 292,
    "duration": 228,
    "at": "caster.hand",
    "follow": true,
-   "comment": "мельчайшие белые искры — основа потока"
+   "comment": "мелкие белые искры — основа потока"
   },
   {
    "type": "sprites",
    "texture": "spark_soft",
-   "count": 2200,
-   "rate": 13,
-   "cone": 62,
-   "speed": 0.065,
+   "count": 500,
+   "rate": 3,
+   "cone": 58,
+   "speed": 0.11,
    "gravity": -0.0004,
    "size": [
-    0.09,
-    0.02
+    0.07,
+    0.015
    ],
-   "life": 56,
-   "glow": 0.3,
-   "color": "#BFF4FF",
+   "life": 38,
+   "color": "#9FE6F2",
    "delay": 292,
    "duration": 228,
    "at": "caster.hand",
@@ -103,18 +81,17 @@
   {
    "type": "sprites",
    "texture": "spark_soft",
-   "count": 1200,
-   "rate": 7,
-   "cone": 74,
-   "speed": 0.05,
+   "count": 260,
+   "rate": 1.5,
+   "cone": 70,
+   "speed": 0.09,
    "gravity": -0.0003,
    "size": [
-    0.08,
-    0.02
+    0.06,
+    0.015
    ],
-   "life": 60,
-   "glow": 0.3,
-   "color": "#F2C6EE",
+   "life": 40,
+   "color": "#D8A8D8",
    "delay": 292,
    "duration": 228,
    "at": "caster.hand",
@@ -124,79 +101,59 @@
   {
    "type": "sprites",
    "texture": "glow",
-   "count": 260,
-   "rate": 1.6,
-   "cone": 44,
-   "speed": 0.045,
+   "count": 40,
+   "rate": 0.25,
+   "cone": 40,
+   "speed": 0.1,
    "gravity": -0.0002,
    "size": [
-    0.7,
-    2.4
+    0.5,
+    1.2
    ],
-   "life": 64,
-   "color": "#6E5C8E",
+   "life": 40,
+   "color": "#2A2638",
    "delay": 292,
    "duration": 228,
    "at": "caster.hand",
    "follow": true,
-   "comment": "мягкие светящиеся облачка туманности (тусклые, аддитивно)"
-  },
-  {
-   "type": "sprites",
-   "texture": "glow",
-   "count": 160,
-   "rate": 1.0,
-   "cone": 36,
-   "speed": 0.055,
-   "gravity": -0.0002,
-   "size": [
-    0.5,
-    1.8
-   ],
-   "life": 56,
-   "color": "#4E7E8E",
-   "delay": 292,
-   "duration": 228,
-   "at": "caster.hand",
-   "follow": true
+   "comment": "редкие тусклые облачка туманности (далеко от руки)"
   },
   {
    "type": "sprites",
    "texture": "glint4",
-   "count": 420,
-   "rate": 2.6,
-   "cone": 58,
-   "speed": 0.06,
+   "count": 120,
+   "rate": 0.7,
+   "cone": 54,
+   "speed": 0.1,
    "gravity": -0.0004,
    "spin": 60,
    "size": [
-    0.42,
-    0.06
+    0.3,
+    0.05
    ],
-   "life": 42,
-   "glow": 0.5,
+   "life": 34,
    "color": "#FFFFFF",
    "delay": 292,
    "duration": 228,
    "at": "caster.hand",
    "follow": true,
-   "comment": "крупные четырёхлучевые звёздочки в потоке"
+   "comment": "четырёхлучевые звёздочки в потоке"
   },
   {
    "type": "sprites",
    "delay": 292,
    "duration": 228,
-   "at": "caster+0,1.6,1.5",
+   "at": "caster+0,1.6,2.5",
    "texture": "glint4",
-   "count": 160,
-   "rate": 0.8,
+   "count": 60,
+   "rate": 0.3,
    "spread": 6,
    "speed": 0.004,
    "gravity": 0.0,
    "spin": 30,
    "size": [
     0.0,
-    0.5
+    0.4
    ],
    "life": 50,
    "color": "#FFFFFF",

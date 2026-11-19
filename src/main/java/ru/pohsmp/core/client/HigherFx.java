@@ -91,7 +91,7 @@ public final class HigherFx {
         if (m.kind == HFx.CUT) {
             DownfallCut.start(m, now);
             if (m.b == ru.pohsmp.core.spell.Cutscene.SILENT_GATE) {
-                SilentMusic.start(m.key, m.dur);
+                SilentMusic.start(m.key, m.dur, ru.pohsmp.core.Reg.MUSIC_GATE_INTRO.get(), true);   // «Приказ»: the cast part of the track
                 GateStaff.start(m.key, m.a, now);
             } else if (m.b == ru.pohsmp.core.spell.Cutscene.COVEN_ARRIVAL) {
                 SilentMusic.start(m.key, m.dur, ru.pohsmp.core.Reg.MUSIC_COVEN_ARRIVAL.get(), false);
@@ -103,6 +103,11 @@ public final class HigherFx {
         if (m.kind == HFx.ANIM) {   // a = entity id, b = animation (0: pohsmp_coven_ritual; 1/2: held target pose on/off, T13)
             if (m.b == ru.pohsmp.core.spell.TargetPose.HELD_START || m.b == ru.pohsmp.core.spell.TargetPose.HELD_STOP) {
                 TargetPoseClient.handle(m.a, m.b);
+                return;
+            }
+            if (m.b == ru.pohsmp.core.spell.silent.SilentGateSpell.ANIM_WAIT || m.b == ru.pohsmp.core.spell.silent.SilentGateSpell.ANIM_COMMAND
+                    || m.b == ru.pohsmp.core.spell.silent.SilentGateSpell.ANIM_STRIKE) {   // «Безмолвные врата», «Приказ»: scene phases
+                GateOrder.handle(m.key, m.a, m.b, now);
                 return;
             }
             if (m.b == ru.pohsmp.core.spell.CovenArrivalSpell.ANIM_RETINUE) {   // Coven Arrival: how many of the retinue step out (dur)
@@ -117,6 +122,7 @@ public final class HigherFx {
             DownfallCut.stop(m.key);
             SilentMusic.stop(m.key);
             GateStaff.stop(m.key);
+            GateOrder.stop(m.key);
             Inst x = LIVE.get(m.key);
             if (x != null && x.fadeAt < 0) x.fadeAt = now;
             if (x != null && x.kind == HFx.JOINT) JointFx.mark(x.a, now + 10);   // the final flash of the cast still gets both outlines

@@ -21,6 +21,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(SilentWitchClient.class);
         MinecraftForge.EVENT_BUS.register(SilentMusic.class);
         MinecraftForge.EVENT_BUS.register(GateStaff.class);
+        MinecraftForge.EVENT_BUS.register(GateOrder.class);
         MinecraftForge.EVENT_BUS.register(IceWallClient.class);
         MinecraftForge.EVENT_BUS.register(NpcCastClient.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.fx.FxClient.class);

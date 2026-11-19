@@ -118,7 +118,9 @@ public final class DownfallCut {
             look = pl[1];
             shake = pl[2].x;
         } else if (scene == ru.pohsmp.core.spell.Cutscene.SILENT_GATE) {
-            Vec3[] pl = gate(t / 20.0, c, side, baseYaw);
+            // «Приказ»: the cast as it was, then the wait camera until the hand comes down, then the strike timed from the command
+            double gs = GateOrder.sceneSeconds(key, t, mc.level.getGameTime() + pt);
+            Vec3[] pl = Double.isNaN(gs) ? gateWait(GateOrder.waitSeconds(mc.level.getGameTime() + pt), c, side) : gate(gs, c, side, baseYaw);
             pos = pl[0];
             look = pl[1];
             shake = pl[2].x;
@@ -277,6 +279,17 @@ public final class DownfallCut {
      * the row of circles from above, the finger up from below, the sky full of seals, the rays close, the wide shot, the crystal (no main beam).
      * Returns camera position, look point and (shake, roll, 0).
      */
+    /**
+     * «Приказ», the wait: the camera before the witch, a little to the right of her and low, the face and the raised finger in frame;
+     * a slow push-in over the 30 s of the wait. w: seconds of the wait.
+     */
+    private static Vec3[] gateWait(double w, Vec3 c, Vec3 side) {
+        double k = smooth(w / 30);
+        Vec3 pos = c.add(dir.scale(3.6 - 1.3 * k)).add(side.scale(0.7 - 0.2 * k)).add(0, 1.2 + 0.15 * k, 0);
+        Vec3 look = c.add(side.scale(0.15)).add(0, 1.85, 0);
+        return new Vec3[] {pos, look, new Vec3(0, 0, 0)};
+    }
+
     private static Vec3[] gate(double s, Vec3 c, Vec3 side, double yaw) {
         Vec3 f = rift, g = f.add(0, ru.pohsmp.core.spell.silent.SilentGateSpell.GATE_H, 0), face = c.add(0, 1.6, 0);
         Vec3 pos, look;

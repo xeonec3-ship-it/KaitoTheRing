@@ -1,0 +1,80 @@
+{
+ "comment": "Закрытие пространства: печать в зените купола, лицом вниз.",
+ "size": 30.0,
+ "color": "#8A6CFF",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "coven",
+   "type": "disc",
+   "texture": "circle_coven",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 2
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 60
+   }
+  },
+  {
+   "id": "stars",
+   "type": "disc",
+   "texture": "pat_stars",
+   "radius": 0.6,
+   "heightOffset": 0.3,
+   "color": "#E4DAFF",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 10,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -4
+   }
+  },
+  {
+   "id": "rays",
+   "type": "spokes",
+   "texture": "rays",
+   "radius": 0.5,
+   "heightOffset": 2,
+   "brightness": 0.5,
+   "appear": {
+    "delay": 20,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 1
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

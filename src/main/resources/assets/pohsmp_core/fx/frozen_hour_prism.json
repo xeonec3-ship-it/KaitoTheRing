@@ -1,0 +1,83 @@
+{
+ "comment": "Стеклянная призма вокруг застывшего существа (масштаб = рост/2.3; точка top — над головой). Бьётся, когда время идёт.",
+ "style": "chrono",
+ "duration": 166,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "frozen_hour_cap",
+   "until": 150
+  },
+  {
+   "type": "sigil",
+   "delay": 2,
+   "at": "point:top",
+   "id": "frozen_hour_cap",
+   "until": 150
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "duration": 150,
+   "radius": 0.9,
+   "count": 6,
+   "height": 2.3,
+   "grow": 6,
+   "width": 0.035,
+   "brightness": 1.0,
+   "texture": "beam",
+   "color": "@secondary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 150,
+   "texture": "spark_sharp",
+   "count": 12,
+   "rate": 0.1,
+   "spread": 0.9,
+   "speed": 0,
+   "size": [
+    0.25,
+    0.05
+   ],
+   "life": 20,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 150,
+   "at": "caster+0,1.1,0",
+   "duration": 3,
+   "texture": "shard",
+   "count": 26,
+   "rate": 26,
+   "spread": 0.7,
+   "speed": 0.22,
+   "gravity": 0.02,
+   "tumble": 1,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 150,
+   "at": "caster+0,1.1,0",
+   "duration": 8,
+   "size": 2.2,
+   "color": "#FFFFFF"
+  }
+ ]
+}

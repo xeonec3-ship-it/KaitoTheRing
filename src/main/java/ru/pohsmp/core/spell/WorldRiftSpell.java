@@ -24,7 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /** Higher: the ground splits along the caster's gaze for 20 blocks; whoever stands on the crack is thrown up, a second later pillars of darkness rise from it. */
 public class WorldRiftSpell extends HigherSpell {
@@ -59,6 +59,9 @@ public class WorldRiftSpell extends HigherSpell {
             Set<UUID> tossed = new HashSet<>();
             final Vec3 dir = f;
             sl.playSound(null, o.x, o.y, o.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2f, 0.4f);
+            Fx.Spec rift = Fx.fx("world_rift").at(o).caster(caster);   // cracks run along p0..p6, pillars burst from them
+            for (int k = 0; k < 7; k++) rift.point("p" + k, pts.get(Math.min(LEN - 1, k * 3)));
+            Fx.play(sl, rift);
             Tasks.add(new Tasks.Task() {
                 int age;
 
@@ -89,7 +92,6 @@ public class WorldRiftSpell extends HigherSpell {
                         sl.playSound(null, o.x, o.y, o.z, SoundEvents.WITHER_SHOOT, SoundSource.PLAYERS, 3f, 0.4f);
                         for (int i = 0; i < LEN; i += 3) {
                             Vec3 p = pts.get(i);
-                            fx(sl, p.x, p.y, p.z, new Net.HFx(Net.HFx.PILLAR, key(), -1, -1, 30, p.x, p.y, p.z, 1.1f, COLOR));
                             DivineEvents.particle(sl, ParticleTypes.SQUID_INK, p.x, p.y + 1, p.z, 20, 0.4, 0.2);
                         }
                         Set<UUID> hit = new HashSet<>();

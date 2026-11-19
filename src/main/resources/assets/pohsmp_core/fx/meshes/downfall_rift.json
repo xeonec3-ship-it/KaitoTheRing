@@ -1,0 +1,48 @@
+{
+ "comment": "Разлом Низвержения: тёмная рваная прорезь (translucent), огненная глубина и золотая кромка; лицом к кастеру.",
+ "style": "forbidden",
+ "center": 2.6,
+ "formedAt": 30,
+ "collapse": {
+  "duration": 20,
+  "easing": "easeInCubic"
+ },
+ "parts": [
+  {
+   "type": "disc",
+   "texture": "rift_tear",
+   "radius": 3.4,
+   "blend": "translucent",
+   "color": "#FFFFFF",
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "disc",
+   "texture": "rift_core",
+   "radius": 3.0,
+   "color": "#FFFFFF",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 10,
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "disc",
+   "texture": "rift_edge",
+   "radius": 3.1,
+   "color": "@primary",
+   "brightness": 1.2,
+   "appear": {
+    "delay": 4,
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

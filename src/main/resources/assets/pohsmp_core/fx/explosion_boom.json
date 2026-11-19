@@ -1,0 +1,101 @@
+{
+ "comment": "Взрыв: удар — засветка, огненный столб, пузырь и кольцо по земле, трещины и угли.",
+ "style": "pyre",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,3,0",
+   "duration": 20,
+   "size": 26,
+   "anamorphic": 60,
+   "rays": 16,
+   "screen": 1.0,
+   "color": "#FFE2B0"
+  },
+  {
+   "type": "column",
+   "delay": 0,
+   "at": "caster",
+   "duration": 50,
+   "radius": 6,
+   "height": 40,
+   "rings": 4,
+   "ringSpeed": 12,
+   "fill": 3,
+   "color": "@secondary",
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.5,0",
+   "duration": 24,
+   "shape": "sphere",
+   "radius": 19,
+   "rim": 1.6,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 2,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 200,
+   "texture": "higher_cracks",
+   "radius": 14,
+   "fadeOut": 120,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 4,
+   "texture": "spark_sharp",
+   "count": 300,
+   "rate": 75,
+   "spread": 3,
+   "speed": 0.5,
+   "gravity": 0.02,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 40,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,2,0",
+   "duration": 60,
+   "texture": "glow",
+   "count": 60,
+   "rate": 1,
+   "spread": 4,
+   "speed": 0.08,
+   "gravity": -0.006,
+   "size": [
+    3,
+    7
+   ],
+   "life": 50,
+   "color": "#FF6A1E",
+   "brightness": 0.5,
+   "comment": "огненный гриб"
+  }
+ ]
+}

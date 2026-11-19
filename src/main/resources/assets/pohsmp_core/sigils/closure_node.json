@@ -1,0 +1,54 @@
+{
+ "comment": "Закрытие пространства: малый круг у основания столба гептаграммы.",
+ "size": 1.4,
+ "color": "#E4DAFF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "circle",
+   "type": "disc",
+   "texture": "circle_a",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "twist"
+    ]
+   },
+   "rotation": {
+    "speed": 50
+   }
+  },
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.9,
+   "heightOffset": -0.01,
+   "color": "#8A6CFF",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

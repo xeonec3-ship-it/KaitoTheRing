@@ -1,0 +1,100 @@
+{
+ "comment": "Закрытие пространства, каст: великая печать Ковена в 40 блоках над кастером.",
+ "size": 30.0,
+ "color": "#8A6CFF",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "rays",
+   "type": "spokes",
+   "texture": "rays",
+   "radius": 0.7,
+   "heightOffset": -0.05,
+   "brightness": 0.5,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2
+   }
+  },
+  {
+   "id": "coven",
+   "type": "disc",
+   "texture": "circle_coven",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 90,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 2
+   }
+  },
+  {
+   "id": "zodiac",
+   "type": "disc",
+   "texture": "pat_zodiac",
+   "radius": 0.4,
+   "heightOffset": 0.02,
+   "color": "#E4DAFF",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 40,
+    "duration": 50,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "twist"
+    ]
+   },
+   "rotation": {
+    "speed": -5
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.05,
+   "heightOffset": 0.04,
+   "inner": 0.99,
+   "repeat": 1,
+   "appear": {
+    "delay": 70,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.1,
+  "duration": 14,
+  "sparks": 40
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

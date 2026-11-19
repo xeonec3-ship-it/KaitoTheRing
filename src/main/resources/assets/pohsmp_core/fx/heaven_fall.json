@@ -1,0 +1,97 @@
+{
+ "comment": "Падение небес: каст 10 с — небо закрывается четырьмя кольцами огня, мир краснеет, сыплются угли; потом 20 с метеоритного дождя (сами метеориты — meteor).",
+ "style": "pyre",
+ "duration": 640,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,33,0",
+   "id": "heaven_fall_sky",
+   "scale": 26,
+   "until": 620
+  },
+  {
+   "type": "sigil",
+   "delay": 50,
+   "at": "caster+0,36,0",
+   "id": "heaven_fall_sky",
+   "scale": 23,
+   "until": 620
+  },
+  {
+   "type": "sigil",
+   "delay": 100,
+   "at": "caster+0,39,0",
+   "id": "heaven_fall_sky",
+   "scale": 20,
+   "until": 620
+  },
+  {
+   "type": "sigil",
+   "delay": 150,
+   "at": "caster+0,42,0",
+   "id": "heaven_fall_sky",
+   "scale": 17,
+   "until": 620
+  },
+  {
+   "type": "tint",
+   "delay": 20,
+   "at": "caster",
+   "duration": 600,
+   "radius": 44,
+   "color": "#5A1A0A",
+   "strength": 0.35,
+   "in": {
+    "duration": 80,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,18,0",
+   "duration": 600,
+   "texture": "spark_sharp",
+   "count": 1800,
+   "rate": 3,
+   "area": 21,
+   "speed": 0.005,
+   "gravity": 0.002,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 90,
+   "color": "@secondary",
+   "comment": "угли сыплются с неба"
+  },
+  {
+   "type": "curtain",
+   "delay": 150,
+   "at": "caster",
+   "duration": 470,
+   "radius": 21,
+   "count": 48,
+   "height": 34,
+   "grow": 40,
+   "fromTop": true,
+   "width": [
+    0.08,
+    0.2
+   ],
+   "brightness": [
+    0.1,
+    0.3
+   ],
+   "flicker": 0.4,
+   "texture": "beam_fade",
+   "color": "@primary"
+  }
+ ]
+}

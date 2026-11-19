@@ -1,0 +1,73 @@
+{
+ "comment": "Млечный путь, каст: звёздный круг за спиной кастера.",
+ "size": 1.4,
+ "color": "#A07CFF",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.01,
+   "brightness": 0.45,
+   "appear": {
+    "delay": 0,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "const",
+   "type": "disc",
+   "texture": "constellation",
+   "radius": 0.9,
+   "heightOffset": 0.0,
+   "color": "#D8DCFF",
+   "appear": {
+    "delay": 0,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 10
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "orbit_stars",
+   "radius": 1.1,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 6,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -20
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

@@ -1,0 +1,21 @@
+{
+ "comment": "Пламя: оранжевый и жёлтый, белое ядро; языки огня, трещины, угли.",
+ "palette": {
+  "primary": "#FF6A1E",
+  "secondary": "#FFC23A",
+  "core": "#FFF2C0",
+  "shadow": "#3A0A00"
+ },
+ "textures": {
+  "sparks": "spark_sharp",
+  "runes": "rune_band",
+  "shards": "spark_sharp",
+  "sigil": "sigil_fire"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.2,
+  "jitter": 0.2,
+  "easing": "easeOutSine"
+ }
+}

@@ -1,0 +1,103 @@
+{
+ "comment": "Пожирание душ: печать над жертвой, лицом вниз — воронка, в которую уходит свет.",
+ "size": 9.0,
+ "color": "#46E0D8",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.7,
+   "heightOffset": -0.02,
+   "color": "#0B4F57",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "spiral",
+   "type": "disc",
+   "texture": "spiral_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "twist": -200,
+   "appear": {
+    "delay": 0,
+    "duration": 50,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "twist"
+    ]
+   },
+   "rotation": {
+    "speed": -20
+   }
+  },
+  {
+   "id": "eldritch",
+   "type": "disc",
+   "texture": "sigil_eldritch",
+   "radius": 0.6,
+   "heightOffset": 0.01,
+   "color": "#DFFFFB",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 30,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 10
+   }
+  },
+  {
+   "id": "saw",
+   "type": "disc",
+   "texture": "orbit_saw",
+   "radius": 1.2,
+   "heightOffset": 0.02,
+   "color": "#0B4F57",
+   "brightness": 1.5,
+   "appear": {
+    "delay": 50,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -6
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#DFFFFB",
+  "size": 1.1,
+  "duration": 12,
+  "sparks": 24
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

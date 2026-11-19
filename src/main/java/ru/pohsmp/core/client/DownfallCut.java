@@ -61,6 +61,7 @@ public final class DownfallCut {
         if (rite && d.lengthSqr() < 1e-4) dir = new Vec3(Math.cos(m.f), 0, Math.sin(m.f));   // Blessing on oneself: the way the caster looks
         portalYaw = m.f;
         retinue = 2;   // until the server says (older servers: two exits)
+        CamGuard.reset();
         active = true;
     }
 
@@ -307,7 +308,7 @@ public final class DownfallCut {
             shake = 0.08 + 0.2 * k;
         }
         if (shake > 0) pos = pos.add(Math.sin(t * 1.7) * shake, Math.sin(t * 2.3 + 1) * shake, Math.cos(t * 1.9) * shake);
-        pos = free(mc.level, pos);
+        pos = CamGuard.guard(mc.level, pos, look);
         Vec3 d = look.subtract(pos);
         double h = Math.sqrt(d.x * d.x + d.z * d.z);
         float yaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
@@ -637,16 +638,6 @@ public final class DownfallCut {
             "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title", "fx.pohsmp_core.silent_gate.title",
             "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title"};
     private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A};
-
-    /** Lift the camera out of solid blocks (up to 6). */
-    private static Vec3 free(ClientLevel lvl, Vec3 p) {
-        for (int i = 0; i < 6; i++) {
-            BlockPos bp = BlockPos.containing(p);
-            if (lvl.getBlockState(bp).getCollisionShape(lvl, bp).isEmpty()) return p;
-            p = p.add(0, 1, 0);
-        }
-        return p;
-    }
 
     private static boolean apply(Camera cam, Vec3 pos) {
         try {

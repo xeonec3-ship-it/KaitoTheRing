@@ -231,7 +231,7 @@
   "ui.pohsmp_core.coven_arrival.moved": "Arena mark moved",
   "ui.pohsmp_core.coven_arrival.not_marked": "No arena marked",
   "ui.pohsmp_core.coven_arrival.retinue": "Shift+right click a creature with the scroll: retinue (up to %s)",
-  "ui.pohsmp_core.coven_arrival.retinue_full": "The retinue is already two",
+  "ui.pohsmp_core.coven_arrival.retinue_full": "The retinue is already full (3)",
   "ui.pohsmp_core.coven_arrival.retinue_in": "%s joins the retinue (%s/%s)",
   "ui.pohsmp_core.coven_arrival.retinue_out": "%s leaves the retinue",
   "ui.pohsmp_core.disintegration.armor": "Ignores armor, target is held",

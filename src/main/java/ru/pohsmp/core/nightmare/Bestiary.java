@@ -182,7 +182,7 @@ public final class Bestiary {
             for (ServerPlayer v : server.getPlayerList().getPlayers()) {
                 if (total >= cap) return;
                 int st = Immersion.stage(v);
-                if (st <= 0 || v.isSpectator() || v.isCreative()) continue;
+                if (st <= 0 || v.isSpectator() || v.isCreative() || HouseThatIsntSpell.inside(v)) continue;   // the corridor brings its own shadows
                 long[] x = EXTRA.get(v.getUUID());
                 int lim = Math.max(limit(st), x == null ? 0 : (int) x[0]);
                 if (per.getOrDefault(v.getUUID(), 0) >= lim) continue;

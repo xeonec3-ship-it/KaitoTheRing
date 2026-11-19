@@ -20,9 +20,9 @@ public final class GateStaffPose {
     /**
      * Owner 19.11 (anime frame): after the spin the staff is held across the body, not upright — the head (ring and eye) low,
      * forward and to her right, the foot up behind her left shoulder; the left fist at the belt, almost in the middle.
-     * Axis toward the head ≈ (right .72, down .5, forward .48): roll 124.8° and tilt 28.7° in GateStaff's ZP·XP order.
+     * Axis toward the head ≈ (right .8, down .35, forward .48): roll 114.5° and tilt 28.7° in GateStaff's ZP·XP order.
      */
-    static final double HOLD_ROLL = 124.8, HOLD_TILT = 28.7;
+    static final double HOLD_ROLL = 114.5, HOLD_TILT = 28.7;   // owner 19.11 (2nd frame): raised to the chest and flatter, so the close-up shows it
     /** Head (ring and eye) and foot of the staff from the item origin along its axis, in blocks (geo silent_witch_staff: y -16..31 px). */
     static final double HEAD = 1.55, FOOT = .98;
 
@@ -30,7 +30,7 @@ public final class GateStaffPose {
     public static double[] local(double t) {
         double k = smoother((t - TAKE_FROM) / (TAKE_TO - TAKE_FROM));
         double fx = .75, fy = 1.15 + .08 * Math.sin(t * .06), fz = .65, rz = 4 * Math.sin(t * .045), rx = 3 * Math.sin(t * .037 + 1);
-        double hx = .14, hy = .99, hz = .35;   // = STAFF_L of tools/gen_player_anims.py (2.2, 15.8, 5.6 px)
+        double hx = .125, hy = 1.19, hz = .375;   // = STAFF_L of tools/gen_player_anims.py (2.0, 19.0, 6.0 px)
         double arc = ARC * Math.sin(Math.PI * k);
         return new double[]{fx + (hx - fx) * k, fy + (hy - fy) * k + arc, fz + (hz - fz) * k, rz * (1 - k) + (SPIN + HOLD_ROLL) * k, rx * (1 - k) + HOLD_TILT * k};
     }

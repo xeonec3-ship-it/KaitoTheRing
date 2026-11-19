@@ -57,6 +57,21 @@ public final class Illusions {
         return a.isAlliedTo(b) || b.isAlliedTo(a);
     }
 
+    /** Server log: who is near a zone illusion when it rises and why each one is or is not its victim (owner 19.11: tests). */
+    public static void logZone(String spell, ServerLevel sl, LivingEntity caster, net.minecraft.world.phys.Vec3 c, double r) {
+        StringBuilder sb = new StringBuilder();
+        for (ServerPlayer p : sl.players()) {
+            if (p == caster) continue;
+            double d = Math.sqrt(p.position().distanceToSqr(c));
+            if (d > r + 16) continue;
+            sb.append(p.getGameProfile().getName()).append(" d=").append(Math.round(d * 10) / 10.0)
+                    .append(d <= r ? " inside" : " outside").append(" ally=").append(ally(caster, p))
+                    .append(" chose=").append(IllusionAllies.chose(caster.getUUID(), p.getUUID()))
+                    .append(" spectator=").append(p.isSpectator()).append("; ");
+        }
+        PohCore.LOG.info("[pohsmp] {} by {} at {} r={}: {}", spell, caster.getName().getString(), c, r, sb.length() == 0 ? "nobody near" : sb);
+    }
+
     /** Players (not spectators, not creative) the caster's illusion works on within r of the caster. */
     public static List<ServerPlayer> victims(ServerLevel sl, LivingEntity caster, double r) {
         List<ServerPlayer> out = new ArrayList<>();

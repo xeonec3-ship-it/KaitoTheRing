@@ -118,6 +118,7 @@ public class MirrorLabyrinthSpell extends IllusionBase {
             sl.playSound(null, c.x, c.y + 1, c.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 2f, 0.7f);
             sl.playSound(null, c.x, c.y + 1, c.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.6f);
             LABS.add(lab);
+            Illusions.logZone("mirror_labyrinth", sl, caster, c, r);
         }
         super.onCast(level, spellLevel, caster, source, md);
     }

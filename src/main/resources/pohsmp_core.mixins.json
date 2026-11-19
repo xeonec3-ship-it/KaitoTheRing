@@ -12,6 +12,7 @@
     "EntityRenderDispatcherMixin",
     "ItemRendererMixin",
     "GameRendererMixin",
+    "MouseHandlerMixin",
     "AbstractClientPlayerMixin",
     "XaeroRadarMixin",
     "XaeroMinimapTrackerMixin",

@@ -101,6 +101,7 @@ public class VeilSpell extends IllusionBase {
             }
             for (ServerPlayer p : victims) enter(v, p);
             VEILS.add(v);
+            Illusions.logZone("veil", sl, caster, v.c, r);
         }
         super.onCast(level, spellLevel, caster, source, md);
     }

@@ -351,12 +351,21 @@ def soul_sigils():
               L('ring', 'band', 'chain_band', 1.32, 0.005, ap(4, 12, 'draw', startAngle=90), inner=0.82, repeat=6, rot=-5, color=S_VIOLET, br=1.1),
           ], dissolve=('collapse', 'fade'), ddur=12)
 
+    sigil('soul_seal_chest', 'Печать души, крупный план 7.5–9.5 с: печать на груди цели, лицом к заклинателю (и к камере «спереди T»): '
+                             'замок прорисовывается, знак с доворотом, цепь по кругу; сжимается к удару.', 0.42, S_GOLD, 'facing', [
+        L('glow', 'disc', 'glow', 1.5, -0.01, ap(0, 16, 'fade'), color=S_VIOLET, br=0.6, pulse=(0.3, 10)),
+        L('lock', 'disc', 'soul_lock', 1.0, 0.0, ap(0, 20, 'draw', easing='easeInOutSine', startAngle=90), rot=20, boost=4),
+        L('mark', 'disc', 'soul_mark', 0.5, 0.01, ap(10, 12, 'grow', 'twist', easing='easeOutBack', twist=-180), rot=-40, color=S_WHITE),
+        L('chain', 'band', 'chain_band', 1.3, 0.02, ap(16, 14, 'draw', startAngle=90, direction=-1), inner=0.84, repeat=10, rot=-30,
+          color=S_VIOLET, br=1.3),
+    ], expand={'scale': 0.8, 'delay': 0, 'duration': 10, 'easing': 'easeInCubic'}, dissolve=('collapse',), ddur=6)
+
     sigil('soul_seal_mark_in', 'Печать души, вдавливание: замок вспыхивает на груди большим и сжимается до малого знака.', 0.9, S_GOLD, 'facing', [
         L('glow', 'disc', 'glow', 1.3, -0.01, ap(0, 3, 'fade'), color=S_WHITE, br=0.9),
         L('lock', 'disc', 'soul_lock', 1.0, 0.0, ap(0, 3, 'fade'), rot=90),
         L('mark', 'disc', 'soul_mark', 0.6, 0.01, ap(0, 4, 'fade'), rot=-30, color=S_WHITE),
         L('chain', 'band', 'chain_band', 1.25, 0.02, ap(0, 4, 'fade'), inner=0.86, repeat=10, rot=-60, color=S_VIOLET, br=1.4),
-    ], expand={'scale': 0.19, 'delay': 0, 'duration': 14, 'easing': 'easeInCubic'}, hold=4, dissolve=('fade',), ddur=8)
+    ], expand={'scale': 0.19, 'delay': 0, 'duration': 14, 'easing': 'easeInCubic'}, hold=12, dissolve=('fade',), ddur=8)
 
     sigil('soul_seal_deny', 'Печать души: вспышка знака на груди при попытке колдовать — знак вырастает, цепь дёргается, гаснет.',
           0.3, S_GOLD, 'facing', [
@@ -380,6 +389,13 @@ def bless_sigils():
               L('rim', 'band', 'thin_ring', 1.13, 0.025, ap(22, 14, 'draw', startAngle=90), inner=0.985, repeat=1, color=B_BLUE),
               L('star', 'disc', 'star_ring', 0.2, 0.03, ap(26, 10, 'grow', 'fade'), rot=12, color=B_WHITE),
           ], flash={'color': B_PALE, 'size': 1.2, 'duration': 12, 'sparks': 24}, ddur=24)
+
+    sigil('blessing_hands', 'Благословение, 1.7–6 с: малый тёплый круг у сложенных ладоней (деталь крупного плана), смотрит вперёд.',
+          0.22, B_GOLD, 'facing', [
+              L('glow', 'disc', 'glow', 1.6, -0.01, ap(0, 14, 'fade'), color=B_WARM, br=0.55, pulse=(0.2, 30)),
+              L('holy', 'disc', 'holy_seal', 1.0, 0.0, ap(0, 16, 'unfold', 'fade'), rot=12),
+              L('ring', 'band', 'thin_ring', 1.25, 0.01, ap(6, 12, 'draw'), inner=0.9, repeat=1, color=B_BLUE),
+          ], dissolve=('collapse', 'fade'), ddur=12)
 
     sigil('blessing_halo', 'Благословение, 2–6 с: нимб-печать над целью лицом вниз — венец из перьев раскрывается из ребра, '
                            'солнце в центре, лучи, кольцо рун «ДА БУДЕТ СВЕТ»; мягко дышит. Гаснет к финальной вспышке.',
@@ -450,11 +466,13 @@ def soul_fx():
                         grow=24, rattle=0.02, color=S_VIOLET))
         chains.append(E('chains', 166, src, to=chest, follow=True, duration=22, link=0.16, sag=0.0, tension=1.0, rattle=0.06,
                         color=S_VIOLET, brightness=1.4, comment='цепи натянуты: провис уходит, дрожь'))
+    front = off('target', 0, CHEST, -0.3)                  # грудь цели со стороны заклинателя (оси взгляда заклинателя)
     binds = [E('sigil', 128 + 7 * k, off('target', 0, h, 0), follow=True, id='soul_seal_bind', until=188) for k, h in enumerate((0.55, 1.05, 1.55))]
     fx('soul_seal_cast', 'Печать души, каст 10 с (200 тиков). Точки: caster — заклинатель, target — цель. '
                          '0–2 с печать под заклинателем, свет стягивается к рукам; 2–6 с из лучей над целью собирается печать-замок, '
                          'малый замок у ладони (нитей от заклинателя к цели нет — как у других эффектов); 6–9 с цепи тянутся от замка к груди и сжимаются, кольца цепи стягивают тело; '
-                         '9.3–9.8 с замок сжимается в точку и луч вбивает его в грудь. Финал — fx/soul_seal_lock_in (код, на 200 тике).',
+                         '7.5 с печать на груди (крупный план); 9.1–9.5 с замок сжимается и падает в грудь; 9.5 с удар — вспышка 3 тика, волна, '
+                         'знак сжимается. После — fx/soul_seal_lock_in (код, на 200 тике: знак тускнеет, 10–11.5 с ролика).',
        'soul_seal', 200, [
            E('sigil', 0, 'caster+0,0.05,0', id='soul_seal_ground', until=196),
            E('sprites', 0, 'caster+0,0.15,0', duration=44, texture='spark_soft', count=110, rate=2.5, area=3.0, speed=0.012, gravity=-0.005,
@@ -468,32 +486,42 @@ def soul_fx():
            *rays,
            E('vortex', 40, lock, duration=60, radius=2.4, height=0, arms=4, speed=3, pull=1, texture='spark_sharp', particles=80, life=24,
              size=0.14, color=S_WHITE, comment='искры затягивает в печать'),
-           E('sigil', 44, lock, follow=True, id='soul_seal_lock', until=186),
-           E('sigil', 56, lock, follow=True, id='soul_seal_gyro', until=186),
+           E('sigil', 44, lock, follow=True, id='soul_seal_lock', until=182, comment='сформирован к 4.2 с: план «снизу на T» 4–6 с'),
+           E('sigil', 56, lock, follow=True, id='soul_seal_gyro', until=182),
            E('sprites', 80, lock, follow=True, duration=100, texture='rune', count=50, rate=0.5, spread=1.2, speed=0.006, gravity=0.0,
              spin=60, size=[0.18, 0.1], life=30, color=S_WHITE, comment='символы вокруг печати'),
            *chains,
            *binds,
            E('tint', 120, 'target', duration=80, radius=12, color='#20103A', strength=0.25, **{'in': ease(30), 'out': ease(6)}),
-           E('beam', 182, lock, to=chest, follow=True, duration=14, width=0.3, core=0.35, grow=6, easing='easeInCubic', head=3,
-             color=S_WHITE, **{'out': ease(6)}, comment='замок вбивается в грудь'),
-           E('flash', 188, 'caster.hand', duration=8, size=1.4, rays=6, color=S_VIOLET, comment='рывок «запереть»'),
+           E('sigil', 150, front, follow=True, id='soul_seal_chest', until=188, comment='деталь для крупного плана груди T (8–9.5 с)'),
+           E('beam', 184, lock, to=chest, follow=True, duration=12, width=0.3, core=0.35, grow=6, easing='easeInCubic', head=3,
+             color=S_WHITE, **{'out': ease(6)}, comment='замок падает в грудь (сверху, от печати — не от заклинателя)'),
+           E('flash', 188, 'caster.hand', duration=8, size=1.0, rays=6, color=S_VIOLET, comment='рывок «запереть» — в кулаке'),
+           # 9.5 с — удар: вспышка 3 тика (камера: рывок назад и тряска), звон-волна, замок сжимается в малый знак
+           E('flash', 190, front, follow=True, duration=6, size=2.8, anamorphic=7, rays=10, screen=0.55, color=S_WHITE),
+           E('flash', 191, front, follow=True, duration=14, size=1.4, ring=True, color=S_VIOLET),
+           E('wave', 190, off('target', 0, 1.3, 0), duration=14, shape='sphere', radius=2.0, rim=1.5, color=S_VIOLET),
+           E('wave', 190, 'target', duration=18, shape='ring', radius=4.5, color='@primary'),
+           E('sigil', 190, front, follow=True, id='soul_seal_mark_in', until=200),
+           E('sprites', 190, front, duration=3, texture='spark_sharp', count=46, rate=46, spread=0.25, speed=0.2, gravity=0.006,
+             size=[0.22, 0.03], life=20, color=S_WHITE, glow=0.5),
+           E('sprites', 190, front, duration=3, texture='chain_link', count=12, rate=12, spread=0.3, speed=0.12, gravity=0.012, tumble=1,
+             size=[0.22, 0.12], life=22, color=S_VIOLET, comment='обрывки цепи'),
        ])
 
     me = 'caster+0,%s,0.2' % fmt(CHEST)
-    fx('soul_seal_lock_in', 'Печать души, финал (на 200 тике каста; caster = запечатанный игрок): вспышка на груди, звон-волна, '
-                            'замок сжимается в малый знак, искры и обрывки цепи разлетаются. Дальше знак держит fx/soul_seal_mark.',
+    fx('soul_seal_lock_in', 'Печать души, после удара (на 200 тике каста, план «после» 10–11.5 с; caster = запечатанный игрок): '
+                            'малый знак на груди светится ярко и за 1.5 с тускнеет до постоянного, оседают обрывки цепи. '
+                            'Сам удар (вспышка, волна) — в конце soul_seal_cast на 190 тике. Дальше знак держит fx/soul_seal_mark.',
        'soul_seal', 40, [
-           E('flash', 0, me, follow=True, duration=12, size=2.6, anamorphic=7, rays=10, screen=0.3, color=S_WHITE),
-           E('flash', 2, me, follow=True, duration=16, size=1.4, ring=True, color=S_VIOLET),
-           E('wave', 0, 'caster+0,1.3,0', duration=16, shape='sphere', radius=2.0, rim=1.5, color=S_VIOLET),
-           E('wave', 0, 'caster', duration=20, shape='ring', radius=4.5, color='@primary'),
-           E('sigil', 0, me, follow=True, id='soul_seal_mark_in', until=22),
-           E('sprites', 0, me, duration=3, texture='spark_sharp', count=46, rate=46, spread=0.25, speed=0.2, gravity=0.006,
-             size=[0.22, 0.03], life=20, color=S_WHITE, glow=0.5),
-           E('sprites', 0, me, duration=3, texture='chain_link', count=12, rate=12, spread=0.3, speed=0.12, gravity=0.012, tumble=1,
-             size=[0.22, 0.12], life=22, color=S_VIOLET, comment='обрывки цепи'),
-           E('sigil', 16, me, follow=True, id='soul_seal_mark', until=40, comment='знак проявляется; дальше его держит soul_seal_mark'),
+           E('sigil', 0, me, follow=True, id='soul_seal_mark', until=40, comment='знак; дальше его держит soul_seal_mark'),
+           E('sigil', 0, me, follow=True, id='soul_seal_deny', until=6, comment='последний всплеск знака'),
+           E('flash', 0, me, follow=True, duration=30, size=0.9, color=S_VIOLET, **{'out': ease(24, 'easeInSine')},
+             comment='свечение гаснет до тусклого'),
+           E('sprites', 0, me, follow=True, duration=24, texture='spark_soft', count=24, rate=1, spread=0.2, speed=0.01, gravity=0.002,
+             size=[0.1, 0.02], life=20, color=S_VIOLET),
+           E('sprites', 0, 'caster+0,1.0,0.2', duration=4, texture='chain_link', count=6, rate=2, spread=0.3, speed=0.02, gravity=0.01,
+             tumble=1, size=[0.18, 0.1], life=26, color=S_VIOLET, comment='обрывки цепи оседают'),
        ])
     fx('soul_seal_deny', 'Печать души: попытка колдовать (caster = запечатанный игрок) — знак на груди вспыхивает, цепь дёргается, '
                          'фиолетовые искры. Короткий (16 тиков), можно запускать хоть каждую попытку.',
@@ -525,9 +553,10 @@ def bless_fx():
     halos = [E('sigil', 18 + 4 * k, off('caster', x, 1.75 + 0.25 * abs(x), -0.55), id='golden_halo') for k, x in enumerate((-1.2, 1.2, -0.7, 0.7))]
     fx('blessing_cast', 'Благословение, каст 10 с (200 тиков) и финал до 220. Точки: caster — заклинатель, target — цель '
                         '(без цели код передаёт target = caster). 0–2 с золотые круги под обоими, падают перья, за спиной встают золотые круги; '
-                        '2–6 с над целью раскрывается нимб-печать, сверху столб мягкого света; 6–9 с свет опускается на цель, тёмные '
-                        'осколки дебаффов вылетают и сгорают; 9.5–10 с вспышка, кольцо по земле, перья разлетаются.',
-       'blessing', 220, [
+                        '1.7–6 с свет в сложенных ладонях; 2–6 с над целью раскрывается нимб-печать, сверху столб мягкого света; 6–9 с свет '
+                        'опускается на цель, тёмные осколки дебаффов вылетают и сгорают; 9.5 с вспышка, кольцо по земле, перья разлетаются; '
+                        '10–11.5 с перья опускаются (эффект живёт до 230).',
+       'blessing', 230, [
            E('sigil', 0, 'caster+0,0.05,0', id='blessing_ground', until=198),
            E('sigil', 6, 'target+0,0.07,0', id='blessing_ground', scale=0.62, until=198),
            E('sprites', 0, 'caster+0,0.2,0', duration=40, texture='spark_soft', count=90, rate=2.2, area=2.4, speed=0.01, gravity=-0.004,
@@ -537,7 +566,10 @@ def bless_fx():
            E('sprites', 10, 'target+0,4.6,0', duration=180, texture='feather', count=110, rate=0.6, area=2.0, speed=0.003, gravity=0.0012,
              sway=1.2, tumble=0.6, size=[0.32, 0.22], life=150, color=B_BLUE, brightness=0.8, comment='перья падают у цели'),
            *halos,
-           E('sigil', 40, halo, follow=True, id='blessing_halo', until=188),
+           E('sigil', 34, 'caster+0,1.42,0.42', follow=True, id='blessing_hands', until=120, comment='свет в сложенных ладонях (крупный план 2–4 с)'),
+           E('sprites', 36, 'caster+0,1.42,0.42', follow=True, duration=84, texture='spark_soft', count=60, rate=0.7, spread=0.12, speed=0.006,
+             gravity=-0.003, size=[0.08, 0.01], life=24, color=B_WARM, glow=0.5),
+           E('sigil', 40, halo, follow=True, id='blessing_halo', until=188, comment='сформирована к 4 с: план снизу на нимб 4–6 с'),
            E('column', 50, 'target', duration=150, radius=0.85, height=18, rings=3, ringSpeed=2, fill=0, brightness=0.5, color='@secondary',
              **{'in': ease(30, 'easeInOutSine'), 'out': ease(10)}, comment='столб мягкого света сверху'),
            E('curtain', 60, 'target', duration=130, radius=[1.1, 2.3], count=14, height=16, grow=40, width=[0.04, 0.1],
@@ -547,10 +579,10 @@ def bless_fx():
              color='@secondary', brightness=0.8, **{'out': ease(10)}, comment='свет опускается на цель'),
            E('aura', 124, 'target', target='target', duration=76, thickness=0.12, pulse=[0.2, 20], motes=18, texture='spark_soft',
              color=B_PALE, **{'in': ease(16), 'out': ease(8)}),
-           E('sprites', 124, 'target+0,1.0,0', follow=True, duration=56, texture='shard', count=70, rate=1.25, spread=0.45, speed=0.05,
+           E('sprites', 120, 'target+0,1.0,0', follow=True, duration=60, texture='shard', count=70, rate=1.25, spread=0.45, speed=0.05,
              gravity=-0.0035, tumble=1, size=[0.3, 0.06], life=26, color=DARK_SHARD, blend='translucent',
              comment='тёмные осколки дебаффов вылетают из тела вверх'),
-           E('sprites', 128, 'target+0,2.1,0', follow=True, duration=56, texture='spark_soft', count=120, rate=2.1, spread=0.85, speed=0.02,
+           E('sprites', 124, 'target+0,2.1,0', follow=True, duration=60, texture='spark_soft', count=120, rate=2.1, spread=0.85, speed=0.02,
              gravity=-0.004, size=[0.22, 0.02], life=18, color='#FFB347', glow=0.6, comment='и сгорают золотыми искрами'),
            *burns,
            E('flash', 190, 'target+0,1.3,0', duration=14, size=5, anamorphic=12, rays=12, screen=0.45, color='#FFF8E6'),
@@ -561,6 +593,8 @@ def bless_fx():
              sway=1.0, tumble=1, size=[0.45, 0.3], life=50, color='@secondary', comment='перья разлетаются'),
            E('sprites', 191, 'target+0,1.2,0', duration=3, texture='spark_soft', count=60, rate=60, spread=0.5, speed=0.16, gravity=-0.002,
              size=[0.25, 0.03], life=26, color=B_WARM, glow=0.5),
+           E('sprites', 196, 'target+0,3.6,0', duration=30, texture='feather', count=24, rate=0.8, area=2.6, speed=0.002, gravity=0.0012,
+             sway=1.2, tumble=0.6, size=[0.4, 0.3], life=60, color='@secondary', comment='после (10–11.5 с): перья опускаются'),
        ])
 
 

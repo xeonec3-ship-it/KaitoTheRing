@@ -3111,5 +3111,243 @@
         "volume": 0.5
       }
     ]
+  },
+  "school.forbidden.cast": {
+    "subtitle": "subtitles.pohsmp_core.school.forbidden.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/forbidden_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/forbidden_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.charge_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.charge_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.charge_portal": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.charge_portal",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_portal_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_portal_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.charge_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.charge_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_charge_roar_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.loop_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.loop_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_loop_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_loop_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.loop_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.loop_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_loop_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_loop_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.open_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.open_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_open_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_open_boom_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.downfall.open_portal": {
+    "subtitle": "subtitles.pohsmp_core.spell.downfall.open_portal",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_open_portal_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/downfall_open_portal_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.erased_name.cast_paper": {
+    "subtitle": "subtitles.pohsmp_core.spell.erased_name.cast_paper",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_cast_paper_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_cast_paper_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.erased_name.cast_whoosh": {
+    "subtitle": "subtitles.pohsmp_core.spell.erased_name.cast_whoosh",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_cast_whoosh_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_cast_whoosh_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.erased_name.charge_magic": {
+    "subtitle": "subtitles.pohsmp_core.spell.erased_name.charge_magic",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_magic_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_magic_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.erased_name.charge_paper": {
+    "subtitle": "subtitles.pohsmp_core.spell.erased_name.charge_paper",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_paper_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_paper_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.erased_name.charge_wet": {
+    "subtitle": "subtitles.pohsmp_core.spell.erased_name.charge_wet",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_wet_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_wet_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.erased_name.charge_whoosh": {
+    "subtitle": "subtitles.pohsmp_core.spell.erased_name.charge_whoosh",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_whoosh_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_charge_whoosh_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.erased_name.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.erased_name.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/forbidden/erased_name_loop_2",
+        "volume": 0.5
+      }
+    ]
   }
 }

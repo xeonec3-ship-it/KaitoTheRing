@@ -4331,5 +4331,407 @@
   "replaces": [
    "WITHER_SHOOT"
   ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/forbidden/downfall_cast_1.ogg",
+   "spell/forbidden/downfall_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_cast_1.mp3",
+   "docs/sounds/mp3/downfall_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java getCastStartSound(); DownfallSpell.java start()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.charge_hum",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/downfall_charge_hum_1.ogg",
+   "spell/forbidden/downfall_charge_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_charge_hum_1.mp3",
+   "docs/sounds/mp3/downfall_charge_hum_2.mp3"
+  ],
+  "what": "гул / фон — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java tickFx()",
+  "replaces": [
+   "AMBIENT_CAVE"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.charge_portal",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/downfall_charge_portal_1.ogg",
+   "spell/forbidden/downfall_charge_portal_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_charge_portal_1.mp3",
+   "docs/sounds/mp3/downfall_charge_portal_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java tickFx()",
+  "replaces": [
+   "END_GATEWAY_SPAWN",
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/downfall_charge_powerup_1.ogg",
+   "spell/forbidden/downfall_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_charge_powerup_1.mp3",
+   "docs/sounds/mp3/downfall_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java tickFx()",
+  "replaces": [
+   "WARDEN_SONIC_CHARGE"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.charge_roar",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/downfall_charge_roar_1.ogg",
+   "spell/forbidden/downfall_charge_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_charge_roar_1.mp3",
+   "docs/sounds/mp3/downfall_charge_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java tickFx()",
+  "replaces": [
+   "ELDER_GUARDIAN_CURSE",
+   "WITHER_SPAWN"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/forbidden/downfall_hit_1.ogg",
+   "spell/forbidden/downfall_hit_2.ogg",
+   "spell/forbidden/downfall_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_hit_1.mp3",
+   "docs/sounds/mp3/downfall_hit_2.mp3",
+   "docs/sounds/mp3/downfall_hit_3.mp3"
+  ],
+  "what": "разрыв пространства, переход — удар / взрыв / попадание (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java send(); DownfallSpell.java swallow()",
+  "replaces": [
+   "PORTAL_TRAVEL"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.loop_hum",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/forbidden/downfall_loop_hum_1.ogg",
+   "spell/forbidden/downfall_loop_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_loop_hum_1.mp3",
+   "docs/sounds/mp3/downfall_loop_hum_2.mp3"
+  ],
+  "what": "гул / фон — пока действует (тики) (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java tick()",
+  "replaces": [
+   "PORTAL_AMBIENT"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.loop_powerup",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/forbidden/downfall_loop_powerup_1.ogg",
+   "spell/forbidden/downfall_loop_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_loop_powerup_1.mp3",
+   "docs/sounds/mp3/downfall_loop_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — пока действует (тики) (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java tick()",
+  "replaces": [
+   "END_PORTAL_FRAME_FILL"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.open_boom",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/forbidden/downfall_open_boom_1.ogg",
+   "spell/forbidden/downfall_open_boom_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_open_boom_1.mp3",
+   "docs/sounds/mp3/downfall_open_boom_2.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — раскрытие (печать, купол, разрыв) (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java openRift()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "downfall",
+  "spell_ru": "Низвержение",
+  "event": "pohsmp_core:spell.downfall.open_portal",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/forbidden/downfall_open_portal_1.ogg",
+   "spell/forbidden/downfall_open_portal_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/downfall_open_portal_1.mp3",
+   "docs/sounds/mp3/downfall_open_portal_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — раскрытие (печать, купол, разрыв) (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "DownfallSpell.java openRift()",
+  "replaces": [
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "erased_name",
+  "spell_ru": "Стёртое имя",
+  "event": "pohsmp_core:spell.erased_name.cast_paper",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/forbidden/erased_name_cast_paper_1.ogg",
+   "spell/forbidden/erased_name_cast_paper_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/erased_name_cast_paper_1.mp3",
+   "docs/sounds/mp3/erased_name_cast_paper_2.mp3"
+  ],
+  "what": "страницы — начало каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "ErasedNameSpell.java getCastStartSound()",
+  "replaces": [
+   "BOOK_PAGE_TURN"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "erased_name",
+  "spell_ru": "Стёртое имя",
+  "event": "pohsmp_core:spell.erased_name.cast_whoosh",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/forbidden/erased_name_cast_whoosh_1.ogg",
+   "spell/forbidden/erased_name_cast_whoosh_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/erased_name_cast_whoosh_1.mp3",
+   "docs/sounds/mp3/erased_name_cast_whoosh_2.mp3"
+  ],
+  "what": "свист, взмах, порыв — начало каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "ErasedNameSpell.java onCast()",
+  "replaces": [
+   "ELYTRA_FLYING"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "erased_name",
+  "spell_ru": "Стёртое имя",
+  "event": "pohsmp_core:spell.erased_name.charge_magic",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/erased_name_charge_magic_1.ogg",
+   "spell/forbidden/erased_name_charge_magic_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/erased_name_charge_magic_1.mp3",
+   "docs/sounds/mp3/erased_name_charge_magic_2.mp3"
+  ],
+  "what": "заклятие плетётся — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "ErasedNameSpell.java onServerCastTick()",
+  "replaces": [
+   "ENCHANTMENT_TABLE_USE"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "erased_name",
+  "spell_ru": "Стёртое имя",
+  "event": "pohsmp_core:spell.erased_name.charge_paper",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/erased_name_charge_paper_1.ogg",
+   "spell/forbidden/erased_name_charge_paper_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/erased_name_charge_paper_1.mp3",
+   "docs/sounds/mp3/erased_name_charge_paper_2.mp3"
+  ],
+  "what": "страницы — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "ErasedNameSpell.java onServerCastTick()",
+  "replaces": [
+   "BOOK_PAGE_TURN",
+   "BOOK_PUT",
+   "SAND_BREAK"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "erased_name",
+  "spell_ru": "Стёртое имя",
+  "event": "pohsmp_core:spell.erased_name.charge_wet",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/erased_name_charge_wet_1.ogg",
+   "spell/forbidden/erased_name_charge_wet_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/erased_name_charge_wet_1.mp3",
+   "docs/sounds/mp3/erased_name_charge_wet_2.mp3"
+  ],
+  "what": "влажный удар, кровь — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "ErasedNameSpell.java onServerCastTick()",
+  "replaces": [
+   "SCULK_CATALYST_BLOOM"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "erased_name",
+  "spell_ru": "Стёртое имя",
+  "event": "pohsmp_core:spell.erased_name.charge_whoosh",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/forbidden/erased_name_charge_whoosh_1.ogg",
+   "spell/forbidden/erased_name_charge_whoosh_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/erased_name_charge_whoosh_1.mp3",
+   "docs/sounds/mp3/erased_name_charge_whoosh_2.mp3"
+  ],
+  "what": "свист, взмах, порыв — нарастание во время каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "ErasedNameSpell.java onServerCastTick()",
+  "replaces": [
+   "PLAYER_ATTACK_SWEEP"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "erased_name",
+  "spell_ru": "Стёртое имя",
+  "event": "pohsmp_core:spell.erased_name.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/forbidden/erased_name_loop_1.ogg",
+   "spell/forbidden/erased_name_loop_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/erased_name_loop_1.mp3",
+   "docs/sounds/mp3/erased_name_loop_2.mp3"
+  ],
+  "what": "гул / фон — пока действует (тики) (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "ErasedClient.java onTick()",
+  "replaces": [
+   "AMBIENT_BASALT_DELTAS_LOOP"
+  ]
+ },
+ {
+  "school": "forbidden",
+  "school_ru": "Запретная (Мироздание)",
+  "spell": "school_forbidden",
+  "spell_ru": "Школа: Запретная (Мироздание)",
+  "event": "pohsmp_core:school.forbidden.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/forbidden/forbidden_cast_1.ogg",
+   "spell/forbidden/forbidden_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/forbidden_cast_1.mp3",
+   "docs/sounds/mp3/forbidden_cast_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — начало каста (подпись школы: искажение реальности: реверс, «цифровой» распад, тишина и разрыв)",
+  "where": "Reg.java Reg()",
+  "replaces": [
+   "END_PORTAL_SPAWN"
+  ]
  }
 ]

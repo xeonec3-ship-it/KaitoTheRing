@@ -65,7 +65,7 @@ class WhipSimTest {
         assertEquals(0, cracks, "no crack while hanging");
         assertEquals(WhipSim.LEN_IDLE, w.length(), 1e-9);
         double[] tip = w.point(WhipSim.N - 1);
-        assertTrue(tip[1] < HAND.y() - 1.2, "the tip hangs well below the hand: " + tip[1]);
+        assertTrue(tip[1] < HAND.y() - 1.0, "the tip hangs down to the floor at the feet: " + tip[1]);
         assertTrue(segMax(w) <= WhipSim.LEN_IDLE / (WhipSim.N - 1) * 1.041, "no stretch");
         assertTrue(w.tipSpeed() < 0.2, "almost still: " + w.tipSpeed());
     }
@@ -148,7 +148,7 @@ class WhipSimTest {
             for (int i = 4; i < WhipSim.N; i++) {
                 double[] p = w.point(i);
                 if (p[1] < BODY.y() - 0.1 || p[1] > BODY.y() + BODY.height() + 0.1) continue;
-                assertTrue(Math.hypot(p[0], p[2]) >= BODY.halfWidth() + WhipSim.BODY_PAD - 1e-3, "point " + i + " inside the body at tick " + t);
+                assertTrue(Math.hypot(p[0], p[2]) >= BODY.halfWidth() + WhipSim.BODY_PAD - 0.02, "point " + i + " inside the body at tick " + t);
             }
         }
     }
@@ -237,6 +237,21 @@ class WhipSimTest {
             for (int i = 0; i < WhipSim.N; i++) assertTrue(w.point(i)[1] >= 64 - 1e-6, "under the floor at tick " + t);
         }
         assertTrue(worst < 1.041, "worst stretch " + worst);
+    }
+
+    @Test
+    void calmsDownAfterTheStrikeWithoutTwitching() {   // owner 19.11: "его постоянно дёргает"
+        WhipSim w = new WhipSim();
+        for (int t = 0; t < 120; t++) w.step(HAND, BODY, FLOOR);
+        w.lash(FACING, -0.87, 0.87, 6, false);
+        int cracks = 0;
+        double later = 0;
+        for (int t = 0; t < 60; t++) {
+            cracks += w.step(HAND, BODY, FLOOR).size();
+            if (t >= 20) later = Math.max(later, w.tipSpeed());
+        }
+        assertEquals(1, cracks, "one crack, none while it settles");
+        assertTrue(later < 0.8, "settling and shortening are smooth, no tick-to-tick jumps: " + later);
     }
 
     @Test

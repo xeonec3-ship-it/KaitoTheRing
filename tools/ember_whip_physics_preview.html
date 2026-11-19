@@ -155,7 +155,7 @@ button.move.wide { grid-column: 1 / -1; }
 const W = {
   N: 36, LEN_IDLE: 2.1, LEN_FULL: 5.6, THICK_ROOT: 0.15, THICK_TIP: 0.03, CRACK_SPEED: 1.15,
   SUB: 6, ITER: 6, CRACK_COOLDOWN: 7, GUIDE_K: 0.6, GRAVITY: 0.032, DRAG: 0.955, MAX_STRETCH: 1.04, CURL: 0.0016, SWAY: 0.0012,
-  BODY_PAD: 0.06, HOLD: 10, BEND_TIP: 0.008,
+  BODY_PAD: 0.06, HOLD: 10, BEND_TIP: 0.008, CALM_DRAG: 0.86,
 };
 const lerp = (a, b, t) => a + (b - a) * t, clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
 const smooth = (e0, e1, v) => { const t = clamp01((v - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
@@ -227,7 +227,8 @@ class WhipSim {
     const N = W.N, x = this.x, y = this.y, z = this.z, ox = this.ox, oy = this.oy, oz = this.oz;
     const tipX = x[N - 1], tipY = y[N - 1], tipZ = z[N - 1];
     const settle = this.mode === 0 ? this.sinceStrike < W.HOLD + 6 : this.driveT > this.driveLen * (this.mode === 2 ? 1.5 : 1.35);
-    const drag = Math.pow(W.DRAG * (settle ? .8 : 1), h);
+    const calm = !this.striking();   // at rest: calm, no blocks, a smooth floor at the feet (no ground jitter)
+    const drag = Math.pow(W.DRAG * (settle ? .8 : 1) * (calm ? W.CALM_DRAG : 1), h);
     this.pin(0, rx, ry, rz); this.pin(1, rx + dx * seg, ry + dy * seg, rz + dz * seg);
     const env = this.mode === 0 ? 0 : this.envelope();
     for (let i = 2; i < N; i++) {
@@ -236,7 +237,7 @@ class WhipSim {
       this.sx[i] = x[i]; this.sy[i] = y[i]; this.sz[i] = z[i];
       ox[i] = x[i]; oy[i] = y[i]; oz[i] = z[i];
       let ax = 0, ay = -W.GRAVITY, az = 0;
-      const free = .3 + .7 * u, c = curl(x[i] * .7, y[i] * .7, z[i] * .7, this.time);
+      const free = (.3 + .7 * u) * (calm ? .4 : 1), c = curl(x[i] * .7, y[i] * .7, z[i] * .7, this.time);
       ax += c[0] * W.CURL * free; ay += c[1] * W.CURL * free * .5; az += c[2] * W.CURL * free;
       ax += Math.sin(this.time * .07 + u * 2.1) * W.SWAY * u; az += Math.cos(this.time * .053 + u * 1.7) * W.SWAY * u;
       if (env > 0) {
@@ -268,7 +269,7 @@ class WhipSim {
     for (let pass = 0; pass < 3; pass++) {
       if (bodyR > .12) for (let i = 4; i < N; i++) this.keepOut(i, body, bodyR);
       this.capStretch(seg);
-      for (let i = 2; i < N; i++) this.collide(i, solid);
+      for (let i = 2; i < N; i++) { if (calm) { this.restOnFloor(i, body); this.collide(i, solid); } else this.collide(i, solid); }
     }
     const mx = x[N - 1] - tipX, my = y[N - 1] - tipY, mz = z[N - 1] - tipZ;
     this.tipSpeed = Math.hypot(mx, my, mz) / h;
@@ -291,13 +292,14 @@ class WhipSim {
     const take = arc[N - 1] - (N - 2) * seg; if (take <= 1e-9) return;
     const nx = [], ny = [], nz = [], px = [], py = [], pz = []; let j = 1;
     for (let i = 2; i < N; i++) {
-      const want = take + (i - 1) * seg; while (j < N - 2 && arc[j + 1] < want) j++;
+      const want = (i - 1) * seg; while (j < N - 2 && arc[j + 1] < want) j++;
       const span = arc[j + 1] - arc[j], t = span < 1e-12 ? 0 : clamp01((want - arc[j]) / span);
       nx[i] = lerp(x[j], x[j + 1], t); ny[i] = lerp(y[j], y[j + 1], t); nz[i] = lerp(z[j], z[j + 1], t);
       px[i] = lerp(this.ox[j], this.ox[j + 1], t); py[i] = lerp(this.oy[j], this.oy[j + 1], t); pz[i] = lerp(this.oz[j], this.oz[j + 1], t);
     }
     for (let i = 2; i < N; i++) { x[i] = nx[i]; y[i] = ny[i]; z[i] = nz[i]; this.ox[i] = px[i]; this.oy[i] = py[i]; this.oz[i] = pz[i]; }
   }
+  restOnFloor(i, b) { if (!b) return; const fl = b.y + .02; if (this.y[i] >= fl) return; this.y[i] = fl; this.oy[i] = fl; this.ox[i] += (this.x[i] - this.ox[i]) * .15; this.oz[i] += (this.z[i] - this.oz[i]) * .15; }
   spend() { for (let i = 2; i < W.N; i++) { const k = 1 - .7 * smooth(.35, 1, i / (W.N - 1)); this.ox[i] = this.x[i] - (this.x[i] - this.ox[i]) * k; this.oy[i] = this.y[i] - (this.y[i] - this.oy[i]) * k; this.oz[i] = this.z[i] - (this.z[i] - this.oz[i]) * k; } }
   record(s) { const h = this.hist[s]; for (let i = 0; i < W.N; i++) { h[3 * i] = this.x[i]; h[3 * i + 1] = this.y[i]; h[3 * i + 2] = this.z[i]; } }
   pin(i, px, py, pz) { this.ox[i] = this.x[i]; this.oy[i] = this.y[i]; this.oz[i] = this.z[i]; this.x[i] = px; this.y[i] = py; this.z[i] = pz; }

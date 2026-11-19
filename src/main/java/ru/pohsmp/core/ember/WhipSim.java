@@ -52,6 +52,8 @@ public final class WhipSim {
     static final int SUB = 6, ITER = 6, CRACK_COOLDOWN = 7;
     /** Bending stiffness left at the tip: a plaited whip does not zigzag when it lies on the ground or shortens. */
     static final double BEND_TIP = 0.008;
+    /** Extra drag per tick at rest (no strike): the hanging whip only sways slowly. */
+    static final double CALM_DRAG = 0.86;
     /** Stiffness of the strike guide (per tick squared). */
     static final double GUIDE_K = 0.6;
     static final double GRAVITY = 0.032, DRAG = 0.955, MAX_STRETCH = 1.04, CURL = 0.0016, SWAY = 0.0012;
@@ -251,7 +253,10 @@ public final class WhipSim {
         double tipX = x[N - 1], tipY = y[N - 1], tipZ = z[N - 1];
         // after a strike the whip calms down quicker (a real whip spends its energy in the crack)
         boolean settle = mode == NONE ? sinceStrike < HOLD + 6 : driveT > driveLen * (mode == VORTEX ? 1.5 : 1.35);
-        double drag = Math.pow(DRAG * (settle ? 0.8 : 1), h);
+        // at rest (no strike) the whip is calm: much stronger drag, no blocks, only a smooth floor under the feet (owner 19.11: it
+        // twitched all the time from the ground contacts)
+        boolean calm = !striking();
+        double drag = Math.pow(DRAG * (settle ? 0.8 : 1) * (calm ? CALM_DRAG : 1), h);
         // the handle: pinned to the hand
         pin(0, rx, ry, rz);
         pin(1, rx + dx * seg, ry + dy * seg, rz + dz * seg);
@@ -268,7 +273,7 @@ public final class WhipSim {
             oz[i] = z[i];
             double ax = 0, ay = -GRAVITY, az = 0;
             // a slow drift (curl noise) and a gentle sway, more toward the tip: the hanging whip is never quite still
-            double free = 0.3 + 0.7 * u;
+            double free = (0.3 + 0.7 * u) * (calm ? 0.4 : 1);
             double[] c = curl(x[i] * 0.7, y[i] * 0.7, z[i] * 0.7, time);
             ax += c[0] * CURL * free;
             ay += c[1] * CURL * free * 0.5;
@@ -322,7 +327,12 @@ public final class WhipSim {
         for (int pass = 0; pass < 3; pass++) {
             if (bodyR > 0.12) for (int i = 4; i < N; i++) keepOut(i, body, bodyR);
             capStretch(seg);
-            for (int i = 2; i < N; i++) collide(i, solid);
+            for (int i = 2; i < N; i++) {
+                if (calm) {   // walls still stop it; the floor under the feet is the smooth plane
+                    restOnFloor(i, body);
+                    collide(i, solid);   // on the plane the floor block is never entered: only walls push
+                } else collide(i, solid);
+            }
         }
         // the tip speed, substep by substep: its peak above CRACK_SPEED is the crack
         double mx = x[N - 1] - tipX, my = y[N - 1] - tipY, mz = z[N - 1] - tipZ;
@@ -354,9 +364,9 @@ public final class WhipSim {
     }
 
     /**
-     * Shortening: the rope is drawn into the hilt — every free point slides along the rope's own line toward the hand by the length
-     * taken in, so the whip keeps its shape and is never squeezed into kinks (it would coil up lying on the ground). The old
-     * positions slide the same way: the motion goes on.
+     * Shortening: the rope is drawn into the hilt — its line in space stays where it is and ends sooner (the points are re-spread
+     * over the shorter length), so the whip is never squeezed into kinks (it would coil up lying on the ground) and nothing jumps.
+     * The old positions are re-spread the same way: the motion goes on.
      */
     private void reelIn(double seg) {
         double[] arc = new double[N];
@@ -366,7 +376,7 @@ public final class WhipSim {
         double[] nx = new double[N], ny = new double[N], nz = new double[N], px = new double[N], py = new double[N], pz = new double[N];
         int j = 1;
         for (int i = 2; i < N; i++) {
-            double want = take + (i - 1) * seg;
+            double want = (i - 1) * seg;   // the curve stays where it is, it ends sooner
             while (j < N - 2 && arc[j + 1] < want) j++;
             double span = arc[j + 1] - arc[j], t = span < 1e-12 ? 0 : clamp01((want - arc[j]) / span);
             nx[i] = lerp(x[j], x[j + 1], t);
@@ -461,6 +471,17 @@ public final class WhipSim {
         double k = (r + 1e-4) / d;
         x[i] = b.x() + ex * k;
         z[i] = b.z() + ez * k;
+    }
+
+    /** At rest: the ground is a flat plane at the holder's feet; a point on it just lies there (no friction pushes, no jitter). */
+    private void restOnFloor(int i, Body body) {
+        if (body == null) return;
+        double fl = body.y() + 0.02;
+        if (y[i] >= fl) return;
+        y[i] = fl;
+        oy[i] = fl;
+        ox[i] += (x[i] - ox[i]) * 0.15;
+        oz[i] += (z[i] - oz[i]) * 0.15;
     }
 
     /** Is the point outside every collision box? */

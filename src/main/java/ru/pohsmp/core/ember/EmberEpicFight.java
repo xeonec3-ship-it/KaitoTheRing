@@ -103,7 +103,7 @@ public final class EmberEpicFight {
         static void registerWeaponType(WeaponCapabilityPresetRegistryEvent e) {
             e.getTypeEntry().put(new ResourceLocation(PohCore.MODID, EmberBlade.NAME), item -> WeaponCapability.builder()
                     .category(CapabilityItem.WeaponCategories.SWORD)
-                    .styleProvider(patch -> hot(patch.getOriginal().getMainHandItem()) ? CapabilityItem.Styles.TWO_HAND : CapabilityItem.Styles.ONE_HAND)
+                    .styleProvider(patch -> hot(patch.getOriginal()) ? CapabilityItem.Styles.TWO_HAND : CapabilityItem.Styles.ONE_HAND)
                     .collider(ColliderPreset.SWORD)
                     .hitSound(EpicFightSounds.BLADE_HIT.get())
                     .newStyleCombo(CapabilityItem.Styles.ONE_HAND, Animations.SWORD_AUTO1, Animations.SWORD_AUTO2, Animations.SWORD_AUTO3,
@@ -138,22 +138,22 @@ public final class EmberEpicFight {
 
             @Override
             public boolean checkExecuteCondition(yesman.epicfight.skill.SkillContainer c) {
-                ItemStack s = ((Player) c.getExecutor().getOriginal()).getMainHandItem();
-                return s.getItem() instanceof EmberBlade && EmberBlade.heat(s) >= EmberBlade.MAX_HEAT;
+                Player p = (Player) c.getExecutor().getOriginal();
+                return p.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.heat(p) >= EmberBlade.MAX_HEAT;
             }
 
             @Override
             public void executeOnServer(yesman.epicfight.skill.SkillContainer c, net.minecraft.network.FriendlyByteBuf buf) {
                 ServerPlayer p = c.getServerExecutor().getOriginal();
                 ItemStack s = p.getMainHandItem();
-                if (!(s.getItem() instanceof EmberBlade) || EmberBlade.heat(s) < EmberBlade.MAX_HEAT) return;
+                if (!(s.getItem() instanceof EmberBlade) || EmberBlade.heat(p) < EmberBlade.MAX_HEAT) return;
                 super.executeOnServer(c, buf);
                 EmberBlade.special(p, s);
             }
         }
 
-        private static boolean hot(ItemStack s) {
-            return s.getItem() instanceof EmberBlade && EmberBlade.hot(s);
+        private static boolean hot(net.minecraft.world.entity.LivingEntity e) {
+            return e.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.hot(e);
         }
 
         static int playSpecial(ServerPlayer p, boolean vortex) {

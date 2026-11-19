@@ -35,6 +35,7 @@ GATE = f'caster+0,{GATE_UP},{FWD}'    # врата
 NIMBUS = f'caster+0,{GATE_UP + 17},{FWD}'    # магический круг НАД вратами, плашмя (решение владельца 19.11: не за вратами) — врата выходят из него вниз
 AREA = f'caster+0,0,{FWD}'           # центр площади ударов
 AREA_R = 44                          # радиус площади (было 22)
+AFTER = 30                           # выстрелы продолжаются ещё 30 с после конца заклинания (владелец 19.11)
 
 
 def el(**kw):
@@ -60,12 +61,42 @@ def build():
     el(type='sigil', id='silent_nimbus', delay=T(20), until=T(63), at=NIMBUS, orientation='sky', color='@primary', scale=1.6)
     el(type='flash', delay=T(21.6), duration=T(2.0), at=NIMBUS, size=9, anamorphic=14, rays=10, screen=0.15, color='@core')
     emerge = {'from': [0, 17, 0], 'scaleFrom': 1.0, 'delay': 0, 'duration': T(5.2), 'easing': 'easeOutCubic'}
-    for model, hinge in (('silent_gate', None), ('silent_gate_door_l', {'pivot': [-3, 0, 0], 'axis': 'y', 'angle': 100}),
-                         ('silent_gate_door_r', {'pivot': [3, 0, 0], 'axis': 'y', 'angle': -100})):
-        e = dict(type='mesh', model=model, delay=T(21.8), until=T(63), at=GATE, yaw=180, scale=1.5, move=emerge)
-        if hinge:   # 47.6–49.6 с: «Открытие врат» — створки медленно расходятся внутрь, из проёма бьёт свет
-            e['hinge'] = dict(hinge, delay=T(47.6) - T(21.8), duration=T(2.0), easing='easeInOutCubic')
+    # «ОТКРЫТИЕ ВРАТ» (владелец 19.11: полноценная анимация), 44–49.6 с:
+    #   44.0–47.0  шов между створками разгорается и пульсирует всё чаще; 45.0–46.8 по створкам снизу вверх пробегает свет
+    #   46.8–47.4  «замок» срывается: створки вздрагивают (рывки ±3–4°), по вратам — сферическая волна, вспышка розы
+    #   47.4–49.6  створки тяжело расходятся внутрь до 100° (медленный старт, разгон, мягкий доход), из проёма бьёт свет,
+    #              с крыльев врат срываются перья, ветер-волна по площади
+    S15 = 1.5                                                                 # масштаб врат
+    T0 = T(21.8)
+    def k(sec):
+        return T(sec) - T0
+    door_keys = lambda sgn: [[0, 0], [k(46.8), 0], [k(46.9), 3 * sgn, 'easeOutQuad'], [k(47.0), 0, 'easeInQuad'], [k(47.1), 4 * sgn, 'easeOutQuad'],
+                             [k(47.25), 1 * sgn, 'easeInQuad'], [k(47.4), 2 * sgn], [k(48.3), 38 * sgn, 'easeInCubic'], [k(49.6), 100 * sgn, 'easeOutCubic']]
+    for model, hinge in (('silent_gate', None), ('silent_gate_door_l', {'pivot': [-3, 0, 0], 'axis': 'y', 'sgn': 1}),
+                         ('silent_gate_door_r', {'pivot': [3, 0, 0], 'axis': 'y', 'sgn': -1})):
+        e = dict(type='mesh', model=model, delay=T0, until=T(63), at=GATE, yaw=180, scale=S15, move=emerge)
+        if hinge:
+            e['hinge'] = {'pivot': hinge['pivot'], 'axis': 'y', 'keys': door_keys(hinge['sgn'])}
         el(**e)
+    SEAM_Z = FWD - 0.95                                                       # лицо врат к заклинателю
+    # шов светится: тонкий луч по шву, пульс учащается
+    for i, (a, b, br) in enumerate(((44.0, 45.2, 0.45), (45.2, 46.2, 0.7), (46.2, 47.4, 1.0))):
+        el(type='beam', delay=T(a), duration=T(b - a) + 4, at=f'caster+0,{GATE_UP + 0.1:.1f},{SEAM_Z:.2f}', to=f'caster+0,{GATE_UP + 13.3:.1f},{SEAM_Z:.2f}',
+           width=0.12 + 0.05 * i, core=0.8, grow=6 if i == 0 else 1, flicker=0.25 + 0.15 * i, color='@core', brightness=br)
+    # свет пробегает по створкам снизу вверх: вспышки вдоль шва и по филёнкам
+    for j in range(10):
+        y = GATE_UP + 0.6 + 1.25 * j
+        for x in (-2.2, 0.0, 2.2) if j % 3 == 0 else (0.0,):
+            el(type='flash', delay=T(45.0) + j * 3, duration=10, at=f'caster+{x:.1f},{y:.1f},{SEAM_Z:.2f}', size=1.6 if x == 0 else 1.1, rays=4,
+               color='@primary', brightness=0.8)
+    # срыв замка: вспышка розы, волна-сфера
+    el(type='flash', delay=T(46.85), duration=T(0.6), at=f'caster+0,{GATE_UP + 9.9:.1f},{SEAM_Z:.2f}', size=7, anamorphic=12, rays=10, screen=0.12, color='@core')
+    el(type='wave', shape='sphere', delay=T(46.85), duration=T(1.2), at=f'caster+0,{GATE_UP + 6:.1f},{FWD}', radius=14, rim=1.0, color='@primary')
+    el(type='wave', delay=T(47.4), duration=T(2.0), at=AREA, radius=AREA_R, thickness=2.0, color='@primary', brightness=0.6, comment='ветер по площади')
+    # перья с крыльев врат, срываются при открытии
+    for x in (-6.5, 6.5):
+        el(type='sprites', delay=T(47.4), duration=T(2.5), at=f'caster+{x},{GATE_UP + 8:.1f},{FWD}', texture='feather', count=60, rate=1.2, spread=2.5,
+           speed=0.08, gravity=0.004, sway=0.6, spin=90, tumble=0.8, size=[0.5, 0.35], life=90, color='#EAF6FF')
     el(type='mesh', model='silent_gate_light', delay=T(47.5), until=T(63), at=GATE, yaw=180, scale=1.5)
     el(type='flash', delay=T(48.2), duration=T(2.2), at=f'caster+0,{GATE_UP + 7},{FWD}', size=16, anamorphic=26, rays=16, screen=0.3, color='@core',
        comment='свет из открывающихся врат')
@@ -99,17 +130,17 @@ def build():
         h = rnd.uniform(17, 32)
         d = T(50) + rnd.randint(0, 16)
         green = i % 3 != 0
-        el(type='sigil', id='silent_field_green' if green else 'silent_field_white', delay=d, until=T(62.8),
+        el(type='sigil', id='silent_field_green' if green else 'silent_field_white', delay=d, until=T(62.8 + AFTER),
            at=f'caster+{x:.1f},{h:.1f},{FWD + z:.1f}', orientation='sky', scale=rnd.uniform(0.28, 0.6))   # мельче (решение владельца 19.11; было 0.7–1.5)
         # «град»: эта печать бьёт 4–6 раз за 50.5–62.5 с, каждый раз в момент со своим сдвигом; луч — от печати до земли под ней
         start = d + rnd.randint(8, 40)
-        shots = rnd.randint(4, 6)
         gap = rnd.randint(36, 56)
-        el(type='beam_rain', delay=start, duration=min(T(62.5) - start, shots * gap + 10), at=f'caster+{x:.1f},0,{FWD + z:.1f}', area=0.6,
+        shots = max(4, (T(62.5 + AFTER) - start) // gap)
+        el(type='beam_rain', delay=start, duration=min(T(62.5 + AFTER) - start, shots * gap + 10), at=f'caster+{x:.1f},0,{FWD + z:.1f}', area=0.6,
            count=shots, interval=gap, width=0.16 + 0.06 * rnd.random(), height=round(h, 1), ground=True,
            color='@secondary' if green else '@core', impact='silent_impact')
-    # 62.8–65 с: всё гаснет (ледяной горы нет — решение владельца 19.11)
-    el(type='flash', delay=T(62.8), duration=T(1.2), at=f'caster+0,{GATE_UP + 7},{FWD}', size=10, anamorphic=12, rays=8, screen=0.2, color='@core')
+    # 62.8 + 30 с: всё гаснет (ледяной горы нет — решение владельца 19.11)
+    el(type='flash', delay=T(62.8 + AFTER), duration=T(1.2), at=f'caster+0,{GATE_UP + 7},{FWD}', size=10, anamorphic=12, rays=8, screen=0.2, color='@core')
 
 def hand_stream_meshes():
     """Модель вместо частиц (владелец 19.11): «туманность» от руки — конус вперёд-вверх (ось из кисти, +z вперёд, +y вверх), длина 6:
@@ -236,8 +267,8 @@ def main():
     json.dump(doc, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     doc2 = {
         'comment': 'Эффект «Безмолвные врата» (T03), часть 2: удар по приказу (ЛКМ) — отсчёт от приказа: вспышка у руки, поле печатей неба, '
-                   'лучи градом; наведённые выстрелы во врагов — код (fx/silent_gate_beam.json). 15 с. Сгенерировано tools/gen_silent_gate_fx.py.',
-        'style': 'silent', 'duration': T(15.2), 'elements': strike}
+                   'лучи градом; наведённые выстрелы во врагов — код (fx/silent_gate_beam.json). 15 с ролика + 30 с выстрелов после него. Сгенерировано tools/gen_silent_gate_fx.py.',
+        'style': 'silent', 'duration': T(15.2 + AFTER), 'elements': strike}
     json.dump(doc2, open(os.path.join(os.path.dirname(OUT), 'silent_gate_strike.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     print(f'silent_gate fx: {len(main_)} elements; silent_gate_strike: {len(strike)}')
 

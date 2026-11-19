@@ -114,7 +114,7 @@ public final class EmberWhipClient {
 
     /** Called by mixin/ItemRendererMixin before the held item is drawn (the pose stack is still that of the hand). */
     public static void capture(LivingEntity e, ItemStack s, ItemDisplayContext ctx, boolean left, PoseStack ps) {
-        if (!(s.getItem() instanceof EmberBlade) || !EmberBlade.hot(s)) return;
+        if (!(s.getItem() instanceof EmberBlade) || e == null || !EmberBlade.hot(e)) return;
         boolean first = ctx == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND || ctx == ItemDisplayContext.FIRST_PERSON_LEFT_HAND;
         boolean third = ctx == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND || ctx == ItemDisplayContext.THIRD_PERSON_LEFT_HAND;
         // the main hand only: the same stack, or (a renderer that copies it) an equal one drawn on the main arm's side
@@ -199,7 +199,7 @@ public final class EmberWhipClient {
 
     static boolean holdsWhip(LivingEntity e) {
         ItemStack s = e.getMainHandItem();
-        return s.getItem() instanceof EmberBlade && EmberBlade.hot(s) && e.isAlive() && !e.isSpectator();
+        return s.getItem() instanceof EmberBlade && EmberBlade.hot(e) && e.isAlive() && !e.isSpectator();
     }
 
     // ---------------------------------------------------------------- strikes

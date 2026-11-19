@@ -13,7 +13,9 @@ public final class GateStaffPose {
     private GateStaffPose() {}
 
     /** Ticks of the glide from the float into the left fist. */
-    public static final int TAKE_FROM = 748, TAKE_TO = 768;
+    public static final int TAKE_FROM = 744, TAKE_TO = 772;
+    /** Owner 19.11 (as in the anime): on its way into the left hand the staff spins a full turn (360° in its own plane) and rises in a short arc. */
+    static final double SPIN = 360, ARC = .35;
     /** Head (ring and eye) and foot of the staff from the item origin along its axis, in blocks (geo silent_witch_staff: y -16..31 px). */
     static final double HEAD = 1.55, FOOT = .98;
 
@@ -22,7 +24,8 @@ public final class GateStaffPose {
         double k = smoother((t - TAKE_FROM) / (TAKE_TO - TAKE_FROM));
         double fx = .75, fy = 1.15 + .08 * Math.sin(t * .06), fz = .65, rz = 4 * Math.sin(t * .045), rx = 3 * Math.sin(t * .037 + 1);
         double hx = .36, hy = .98, hz = .3;
-        return new double[]{fx + (hx - fx) * k, fy + (hy - fy) * k, fz + (hz - fz) * k, rz * (1 - k), rx * (1 - k)};
+        double arc = ARC * Math.sin(Math.PI * k);
+        return new double[]{fx + (hx - fx) * k, fy + (hy - fy) * k + arc, fz + (hz - fz) * k, rz * (1 - k) + SPIN * k, rx * (1 - k)};
     }
 
     static double smoother(double x) { x = Math.max(0, Math.min(1, x)); return x * x * x * (x * (6 * x - 15) + 10); }

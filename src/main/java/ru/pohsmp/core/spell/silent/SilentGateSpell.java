@@ -47,17 +47,19 @@ import ru.pohsmp.core.spell.HigherSpell;
 
 /**
  * "Gate" (T03): Silent school, Unknown tier, only from the Silent Witch's staff and only in her full outfit (T18/T19, see {@link SilentWitch}).
- * A 50 s cast that nothing interrupts, all of it to the music track: every player within 64 blocks of the caster or of the strike point
+ * A 50 s cast that nothing interrupts, all of it to the music track: every player within 128 blocks of the caster or of the strike point
  * hears it (not positional, client: SilentMusic) with every other game sound muted, and watches the camera scene (Cutscene 7).
- * No cast point: the gate stands in the sky 26 blocks ahead, 48 up; the area (radius 20) is under it. From 50 s (the spell is cast)
- * to 63 s aimed beam volleys hit every foe in the area (no main beam - owner's decision); at 64 s an ice crystal mountain rises (only a look). The scene ends at 65 s. Cancel = the track fades in 1 s.
+ * No cast point: the gate stands in the sky 26 blocks ahead, 48 up; the area (radius 40) is under it. From 50 s (the spell is cast)
+ * to 63 s aimed beam volleys hit every foe in the area (no main beam - owner's decision). The scene ends at 65 s. Cancel = the track fades in 1 s.
  * Damage: Silent magic (through armor, Silent power, Silent resistance), numbers in [silent_gate]. Afterwards "Silence": the spell's own
  * cooldown, 3 min. Only hostile entities are hit (see {@link #target}); players never.
  */
 public class SilentGateSpell extends SilentStaffSpell {
     public static final String PATH = "silent_gate";
     /** Ticks: cast (= 50 s in the track), first rays, last rays, crystal, end of the scene, crystal life. */
-    public static final int CAST = 1000, RAYS_FROM = 1000, RAYS_TO = 1260, CRYSTAL = 1280, END = 1300, CRYSTAL_LIFE = 600;
+    public static final int CAST = 1000, RAYS_FROM = 1000, RAYS_TO = 1260, END = 1300;   // no ice mountain any more (owner 19.11)
+    /** Ticks from an aimed beam's launch to its strike (fx/silent_gate_beam.json hits on the 6th tick). */
+    private static final int HIT_DELAY = 6;
     /**
      * No cast point (owner): the gate stands in the sky FWD blocks ahead of the caster (by the view at the cast start), GATE_H over the area;
      * the area of the rays is under it. Same numbers as tools/gen_silent_gate_fx.py (FWD, GATE_UP); the camera uses them too.
@@ -65,7 +67,7 @@ public class SilentGateSpell extends SilentStaffSpell {
      */
     public static final double FWD = 26, GATE_H = 48;
     /** Sky seals of the field the aimed beams start from (as in fx/silent_gate.json): height over the area and radius. */
-    private static final double SKY_LO = 17, SKY_HI = 32, SKY_R = 24;
+    private static final double SKY_LO = 17, SKY_HI = 32, SKY_R = 44;   // ×2 with the area (owner 19.11): the field covers the whole area
     /** Effects of the ideas chat (T03): the whole scene and one aimed beam; placeholders while they are missing. */
     private static final String FX_SCENE = "silent_gate", FX_BEAM = "silent_gate_beam";
 
@@ -151,8 +153,8 @@ public class SilentGateSpell extends SilentStaffSpell {
         c.cutKey = HigherSpell.key();
         Vec3 d = c.hit.subtract(c.at);
         float ang = (float) Math.atan2(-d.z, -d.x);
-        // camera + music + silence for everyone within 64 of the caster or of the strike point
-        c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.SILENT_GATE, END, c.hit, ang, Cutscene.R, sl, c.hit);
+        // camera + music + silence for everyone within 128 of the caster or of the strike point
+        c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.SILENT_GATE, END, c.hit, ang, Cutscene.R_GATE, sl, c.hit);
         c.placeholder = FxLib.fx(FX_SCENE) == null;
         // anchored at the caster's feet with the start yaw, not to the caster entity: its head turns would swing the whole sky.
         // The ideas chat's effect runs its own length (the crystal stays 30 s after the scene); the placeholder ends with the scene.
@@ -215,7 +217,6 @@ public class SilentGateSpell extends SilentStaffSpell {
             return;
         }
         if (t <= RAYS_TO) rays(c, t);
-        if (t == CRYSTAL) crystal(c);
         if (t >= END) {
             c.done = true;
             RUNNING.remove(c);
@@ -235,7 +236,17 @@ public class SilentGateSpell extends SilentStaffSpell {
         for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e))) {
             int n = lo + c.sl.random.nextInt(hi - lo + 1);
             for (int i = 0; i < n; i++) beam(c, e);
-            strike(c, e.position(), t);
+            // the beam (fx/silent_gate_beam.json) locks on for 4 ticks and strikes on the 6th: the damage comes then, where the foe is then
+            ru.pohsmp.core.spell.Tasks.add(new ru.pohsmp.core.spell.Tasks.Task() {
+                int left = HIT_DELAY;
+
+                @Override
+                public boolean tick() {
+                    if (--left > 0) return true;
+                    if (!c.done && e.isAlive()) strike(c, e.position(), c.age);
+                    return false;
+                }
+            });
         }
     }
 
@@ -262,11 +273,6 @@ public class SilentGateSpell extends SilentStaffSpell {
             c.lastHit.put(e.getUUID(), t);
             hurt(c, e, dmg);
         }
-    }
-
-    /** The placeholder scene has no crystal of its own. */
-    private static void crystal(Cast c) {
-        if (c.placeholder) Fx.play(c.sl, Fx.fx("silent_gate_crystal_placeholder").at(c.hit).yaw(c.yaw).point("p", c.hit).duration(CRYSTAL_LIFE));
     }
 
     /** The registered spell (Iron's damage source and power multiplier). */

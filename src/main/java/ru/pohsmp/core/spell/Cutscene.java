@@ -30,6 +30,8 @@ public final class Cutscene {
     public static final double R = 64;
     /** Coven Arrival: watchers within this of the arena and of the caster (the other scenes use R). */
     public static final double R_COVEN = 98;
+    /** «Безмолвные врата»: camera, music and silence for everyone this close to the caster or the strike point (owner 19.11, was 64). */
+    public static final double R_GATE = 128;
     public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, STAR_FALL = 6, SILENT_GATE = 7;
 
     /**

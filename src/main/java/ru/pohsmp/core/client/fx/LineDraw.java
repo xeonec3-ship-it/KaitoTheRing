@@ -190,10 +190,29 @@ final class LineDraw {
 
     // ---------------------------------------------------------------- vortex
 
-    static void vortex(Frame f, FxRun run, Element el, double te, Vec3 at, double s, int col, double a, long seed) {
+    /**
+     * Vortex: a funnel of `arms` spirals, narrow at `at`. Without `to` its axis goes up `height`; with `to` the axis runs from
+     * `at` (the apex) to `to` (the wide end) and the height is that distance («Безмолвные врата»: jets converging on the finger tip).
+     * `flow: -1` - the sparks run along the arms down to the apex instead of rising and being pulled in.
+     */
+    static void vortex(Frame f, FxRun run, Element el, double te, Vec3 at, Vec3 to, double s, int col, double a, long seed) {
         double R = el.num("radius", 2) * s, h = el.num("height", 3) * s, funnel = el.num("funnel", 0.35), turns = el.num("turns", 1.25);
         int arms = Math.max(1, (int) el.num("arms", 3));
         double speed = el.num("speed", 6) * run.style.rotationScale(), pull = el.num("pull", 0.6), width = el.num("width", 0.22) * s;
+        boolean inward = el.num("flow", 1) < 0;
+        // the funnel's frame: ax along the axis, u and w across it (the old upright vortex when there is no `to`)
+        Vec3 ax = new Vec3(0, 1, 0), u = new Vec3(1, 0, 0), wv = new Vec3(0, 0, 1);
+        if (to != null && to.distanceToSqr(at) > 1e-4) {
+            Vec3 d = to.subtract(at);
+            h = d.length();
+            ax = d.scale(1 / h);
+            Vec3 ref = Math.abs(ax.y) < 0.9 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
+            u = ax.cross(ref).normalize();
+            wv = ax.cross(u).normalize();
+        }
+        final Vec3 fa = ax, fu = u, fw = wv;
+        java.util.function.Function<ru.pohsmp.core.fx.FxMath.Vec, Vec3> map = p -> at.add(fu.scale(p.x())).add(fa.scale(p.y())).add(fw.scale(p.z()));
+        ru.pohsmp.core.fx.FxMath.Vec o = new ru.pohsmp.core.fx.FxMath.Vec(0, 0, 0);
         double spin = speed * te;
         int segs = f.low() ? 14 : 28;
         for (int k = 0; k < arms; k++) {
@@ -201,7 +220,7 @@ final class LineDraw {
             double[] w = new double[segs + 1], al = new double[segs + 1];
             for (int i = 0; i <= segs; i++) {
                 double hh = (double) i / segs;
-                pts.add(FxRun.w(FxShapes.spiral(FxRun.v(at), R, h, funnel, turns, k, arms, hh, spin)));
+                pts.add(map.apply(FxShapes.spiral(o, R, h, funnel, turns, k, arms, hh, spin)));
                 double env = Math.sin(Math.PI * hh);
                 w[i] = width * (0.4 + 0.6 * hh);
                 al[i] = a * env * (0.7 + 0.3 * Math.sin(te * 0.25 + k * 2.1 + hh * 6));
@@ -216,11 +235,12 @@ final class LineDraw {
             SplittableRandom r = new SplittableRandom(seed * 17 + i);
             double ph = r.nextDouble(), h0 = r.nextDouble(), a0 = r.nextDouble() * 360;
             double age = (te + ph * life) % life, k = age / life;
-            double hh = pull >= 0 ? (h0 * 0.6 + k * 0.4) : h0;
-            Vec3 c = FxRun.w(FxShapes.spiral(FxRun.v(at), R * FxShapes.pull(pull, k), h, funnel, turns, 0, 1, Math.min(1, hh), spin * 1.4 + a0 + k * 120));
+            double hh = inward ? (1 - k) * (0.7 + 0.3 * h0) : pull >= 0 ? (h0 * 0.6 + k * 0.4) : h0;
+            double rr = inward ? R : R * FxShapes.pull(pull, k);
+            Vec3 c = map.apply(FxShapes.spiral(o, rr, h, funnel, turns, 0, 1, Math.min(1, hh), spin * 1.4 + a0 + k * 120));
             FxDraw.billboard(vc, f, c, size * (0.6 + 0.6 * r.nextDouble()), a0 + te * 9, col, a * Math.sin(Math.PI * k));
         }
-        FxDraw.billboard(f.add(FxDraw.tex("glow")), f, at.add(0, h * 0.15, 0), R * funnel * 1.6, 0, col, a * 0.45);
+        FxDraw.billboard(f.add(FxDraw.tex("glow")), f, at.add(ax.scale(h * (inward ? 0.02 : 0.15))), R * funnel * 1.6, 0, col, a * 0.45);
     }
 
     // ---------------------------------------------------------------- chains

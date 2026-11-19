@@ -6,11 +6,11 @@
   14–26 с   указ рукой — вокруг руки закручиваются потоки искр, из руки к вратам тянется луч-лента света
   20–26 с   в небе впереди собирается нимб, из света сверху вниз проявляются врата, светлые полосы вниз
   26–36 с   врата висят: нимб, лучи-блики, медленное мерцание
-  38–47 с   палец к губам, посох в левой руке — за спиной дугой складываются золотые круги и зелёные сферы, струйки снизу вверх
-  46–49 с   от каждого круга и сферы вверх столб света
-  50 с      по небу над площадью — десятки малых печатей; залпы наведённых лучей во врагов (код, fx/silent_gate_beam.json)
-            и случайный ливень по площади, на земле — кольца ударов
-  62.5–65 с всё гаснет, в центре площади вырастает ледяная гора
+  38–47 с   палец к губам, посох в левой руке — за спиной дугой складываются золотые круги и зелёные сферы
+  47.6–49.6 «открытие врат»: створки расходятся, из проёма свет
+  50 с      по небу над площадью — десятки малых печатей; залпы НАВЕДЁННЫХ лучей во враждебных (код, fx/silent_gate_beam.json —
+            пишет этот же генератор) и случайный ливень по площади, на земле — кольца ударов
+  62.8–65 с всё гаснет
 Привязки: caster+x,y,z — в осях взгляда заклинателя в начале каста (x вправо, y вверх, z вперёд). Точки каста нет: врата в небе впереди.
 Запуск: python3 tools/gen_silent_gate_fx.py
 """
@@ -115,7 +115,38 @@ def build():
     # 62.8–65 с: всё гаснет (ледяной горы нет — решение владельца 19.11)
     el(type='flash', delay=T(62.8), duration=T(1.2), at=f'caster+0,{GATE_UP + 7},{FWD}', size=10, anamorphic=12, rays=8, screen=0.2, color='@core')
 
+def aimed_beam():
+    """Один наведённый луч в ВРАЖДЕБНУЮ сущность (код пускает залпами: раз в 0.5 с в каждого врага 3–5 лучей из разных печатей неба).
+    Должен читаться иначе, чем случайный ливень: на враге сначала вспыхивает метка захвата, затем падает толстый белый луч с бирюзовым
+    ореолом, удар — яркая вспышка, кольцо, искры и осколки. at = point:from (печать в небе), target — враг (следует за ним)."""
+    doc = {
+        'comment': 'Наведённый луч «Безмолвных врат» во враждебную сущность (по видео мода): метка захвата на цели (0–4 тик), из печати неба '
+                   '(point:from) в цель (target) падает толстый белый луч с бирюзовым ореолом (тики 3–12), удар — вспышка, кольцо, искры, осколки. '
+                   'Код: залпы раз в 0.5 с, 3–5 лучей в каждого врага. Случайный ливень по площади — beam_rain в silent_gate.json. '
+                   'Сгенерировано tools/gen_silent_gate_fx.py.',
+        'style': 'silent', 'duration': 34,
+        'elements': [
+            {'type': 'sigil', 'id': 'silent_impact', 'delay': 0, 'at': 'target', 'follow': True, 'until': 6, 'sigilScale': 0.6,
+             'comment': 'метка захвата на враге'},
+            {'type': 'flash', 'delay': 0, 'duration': 4, 'at': 'target+0,1,0', 'follow': True, 'size': 0.9, 'rays': 4, 'color': '@primary'},
+            {'type': 'beam', 'delay': 3, 'duration': 10, 'at': 'point:from', 'to': 'target+0,0.6,0', 'width': 0.95, 'core': 0.0, 'grow': 3,
+             'easing': 'easeInCubic', 'color': '@primary', 'brightness': 0.55, 'out': {'duration': 6, 'easing': 'easeInSine'}, 'comment': 'ореол'},
+            {'type': 'beam', 'delay': 3, 'duration': 9, 'at': 'point:from', 'to': 'target+0,0.6,0', 'width': 0.42, 'core': 0.75, 'grow': 3,
+             'easing': 'easeInCubic', 'color': '@core', 'brightness': 1.4, 'out': {'duration': 5, 'easing': 'easeInSine'}, 'comment': 'белое ядро'},
+            {'type': 'flash', 'delay': 6, 'duration': 8, 'at': 'target+0,0.8,0', 'size': 3.2, 'rays': 8, 'anamorphic': 6, 'color': '@core'},
+            {'type': 'sigil', 'id': 'silent_impact', 'delay': 6, 'at': 'target', 'until': 28},
+            {'type': 'wave', 'delay': 6, 'duration': 12, 'at': 'target', 'radius': 2.6, 'thickness': 0.35, 'color': '@primary'},
+            {'type': 'sprites', 'delay': 6, 'duration': 3, 'at': 'target+0,0.6,0', 'texture': '@sparks', 'count': 26, 'rate': 10, 'spread': 0.6,
+             'speed': 0.22, 'gravity': 0.012, 'size': [0.16, 0.03], 'life': 16, 'color': '@primary'},
+            {'type': 'sprites', 'delay': 6, 'duration': 2, 'at': 'target+0,0.4,0', 'texture': '@shards', 'count': 10, 'rate': 6, 'spread': 0.5,
+             'speed': 0.16, 'gravity': 0.03, 'spin': 400, 'size': [0.18, 0.05], 'life': 18, 'color': '@secondary'}]}
+    out = os.path.join(os.path.dirname(OUT), 'silent_gate_beam.json')
+    json.dump(doc, open(out, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('silent_gate_beam fx: aimed beam written')
+
+
 def main():
+    aimed_beam()
     build()
     doc = {
         'comment': 'Эффект «Безмолвные врата» (T03) на всю шкалу под музыку (0–65 с). Сгенерировано tools/gen_silent_gate_fx.py — правьте генератор.',

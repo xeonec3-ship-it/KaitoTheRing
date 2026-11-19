@@ -30,6 +30,8 @@ public final class MeshDraw {
         public Entity follow;
         public float yaw, pitch;
         public double start, scale = 1, alpha = 1, stopAt = Double.NaN;
+        /** Optional (docs/fx.md, mesh): move - comes out of a point to its place; hinge - turns on a hinge (gate doors). */
+        public JsonObject move, hinge;
 
         Vec3 pos(float pt) {
             return follow != null && follow.isAlive() ? follow.getPosition(pt).add(offset) : base;
@@ -85,7 +87,32 @@ public final class MeshDraw {
         // pitch (Minecraft sense, positive looks down) tilts forward and up around the right axis: a spear points along its flight
         double pr = Math.toRadians(r.pitch), cp = Math.cos(pr), sp = Math.sin(pr);
         Vec3 fwd = new Vec3(fw.x() * cp, -sp, fw.z() * cp), up = new Vec3(fw.x() * sp, cp, fw.z() * sp);
-        Axes ax = new Axes(o, new Vec3(rt.x(), rt.y(), rt.z()), up, fwd, s);
+        Vec3 right = new Vec3(rt.x(), rt.y(), rt.z());
+        if (r.move != null) {   // out of the point at + from (blocks, model axes: x right, y up, z forward) and scale scaleFrom
+            JsonObject mv = r.move;
+            double k = Easing.byName(str(mv, "easing", "easeOutCubic")).apply(FxDraw.clamp01((t - num(mv, "delay", 0)) / Math.max(1, num(mv, "duration", 1))));
+            JsonArray from = mv.has("from") ? mv.getAsJsonArray("from") : null;
+            if (from != null && from.size() >= 3) {
+                double q = (1 - k) * r.scale;
+                o = o.add(right.scale(from.get(0).getAsDouble() * q)).add(up.scale(from.get(1).getAsDouble() * q)).add(fwd.scale(from.get(2).getAsDouble() * q));
+            }
+            double sf = num(mv, "scaleFrom", 1);
+            s *= sf + (1 - sf) * k;
+        }
+        double hc = 1, hs = 0, hx = 0, hz = 0;
+        if (r.hinge != null) {   // turn about the vertical through pivot (model coordinates), as the preview: x' = x c + z s, z' = -x s + z c
+            JsonObject h = r.hinge;
+            double k = Easing.byName(str(h, "easing", "easeInOutCubic")).apply(FxDraw.clamp01((t - num(h, "delay", 0)) / Math.max(1, num(h, "duration", 1))));
+            double ang = Math.toRadians(num(h, "angle", 0) * k);
+            hc = Math.cos(ang);
+            hs = Math.sin(ang);
+            JsonArray pv = h.has("pivot") ? h.getAsJsonArray("pivot") : null;
+            if (pv != null && pv.size() >= 3) {
+                hx = pv.get(0).getAsDouble();
+                hz = pv.get(2).getAsDouble();
+            }
+        }
+        Axes ax = new Axes(o, right, up, fwd, s, hc, hs, hx, hz);
         SigilDef.Hit hit = hitOf(r.def);
         if (hit != null) {                       // T08: place new hits (directions on the dome), flinch while they last
             for (Object[] p : r.pending) {
@@ -102,7 +129,7 @@ public final class MeshDraw {
             if (!r.hits.isEmpty()) {
                 double k = 1;
                 for (DomeHit h : r.hits) k *= SigilHit.flinch(hit, h.e(), t);
-                ax = new Axes(o, ax.x(), ax.y(), ax.z(), s * k);
+                ax = new Axes(o, right, up, fwd, s * k, hc, hs, hx, hz);
             }
         } else r.pending.clear();
         if (!r.def.has("parts")) return true;
@@ -153,8 +180,17 @@ public final class MeshDraw {
     }
 
     /** Local (x, y, z) -> world: x right, y up, z forward, scaled. */
-    private record Axes(Vec3 o, Vec3 x, Vec3 y, Vec3 z, double s) {
+    private record Axes(Vec3 o, Vec3 x, Vec3 y, Vec3 z, double s, double hc, double hs, double hx, double hz) {
+        Axes(Vec3 o, Vec3 x, Vec3 y, Vec3 z, double s) {
+            this(o, x, y, z, s, 1, 0, 0, 0);
+        }
+
         Vec3 at(double lx, double ly, double lz) {
+            if (hs != 0 || hc != 1) {   // hinge: turn around the vertical through (hx, hz)
+                double dx = lx - hx, dz = lz - hz;
+                lx = hx + dx * hc + dz * hs;
+                lz = hz - dx * hs + dz * hc;
+            }
             return o.add(x.scale(lx * s)).add(y.scale(ly * s)).add(z.scale(lz * s));
         }
 

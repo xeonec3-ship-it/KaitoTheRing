@@ -1467,5 +1467,198 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.grasping_garden.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.grasping_garden.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/grasping_garden_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/grasping_garden_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.grasping_garden.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.grasping_garden.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/grasping_garden_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/grasping_garden_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/grasping_garden_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.spore_cloud.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.spore_cloud.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/spore_cloud_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/spore_cloud_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.spore_cloud.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.spore_cloud.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/spore_cloud_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/spore_cloud_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/spore_cloud_loop_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.charge_earth": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.charge_earth",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_earth_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_earth_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.charge_leaves": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.charge_leaves",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_leaves_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_leaves_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.charge_wood": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.charge_wood",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_wood_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_charge_wood_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.hit_earth": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.hit_earth",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_earth_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_earth_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_earth_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.hit_leaves": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.hit_leaves",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_leaves_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_leaves_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_leaves_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.hit_wood": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.hit_wood",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_wood_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_wood_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_hit_wood_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.world_tree.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.world_tree.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/nature/world_tree_loop_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

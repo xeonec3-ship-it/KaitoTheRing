@@ -2,7 +2,7 @@
 
 Все места, где заклинания играют ванильные `SoundEvents.*`: заклинание → школа/ступень → место (файл:строка, метод) → роль → текущий ванильный звук → наше событие. Собирается `tools/gen_spell_sounds.py --docs-only`.
 
-Мест: **348**, заклинаний: **77**, наших событий: **292**. Пропущено (уже свои / не магия): 10.
+Мест: **348**, заклинаний: **77**, наших событий: **292**. Пропущено (уже свои / не магия): 13.
 
 Роли: `cast` — начало каста; `charge` — нарастание во время каста; `release` — выпуск заклинания; `open` — раскрытие (печать, купол, разрыв); `loop` — пока действует (тики); `hit` — удар / взрыв / попадание; `end` — конец / снятие / смерть; `fail` — отказ / ошибка.
 
@@ -723,7 +723,7 @@
 |---|---|---|---|---|
 | `client/illusion/Copies.java:86` | `handle` | удар / взрыв / попадание | `PLAYER_HURT` | `pohsmp_core:spell.illusion_copies.hit_wet` |
 | `illusion/IllusionAllies.java:111` | `onInteract` | удар / взрыв / попадание | `AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
-| `illusion/Illusions.java:279` | `self` | удар / взрыв / попадание | `AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
+| `illusion/Illusions.java:280` | `self` | удар / взрыв / попадание | `AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
 
 ### Отражения (`mirror_images`) — ступень: RARE
 
@@ -775,6 +775,9 @@
 |---|---|---|
 | `Reg.java:164` | `WARDEN_HEARTBEAT` | школа Кошмаров — уже свои звуки (nightmare.heartbeat) |
 | `silent/SilentWitchArmor.java:179` | `ARMOR_EQUIP_LEATHER` | не магия: звук надевания мантии |
+| `nightmare/HouseThatIsntSpell.java:147` | `SOUL_ESCAPE` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/HouseThatIsntSpell.java:153` | `AMBIENT_CAVE` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/HouseThatIsntSpell.java:199` | `WOODEN_DOOR_OPEN` | Кошмары — уже свои звуки (nightmare.*) |
 | `nightmare/NightmareMob.java:303` | `SOUL_ESCAPE` | Кошмары — уже свои звуки (nightmare.*) |
 | `nightmare/NightmareMob.java:315` | `ENDERMAN_SCREAM` | Кошмары — уже свои звуки (nightmare.*) |
 | `nightmare/NightmareMob.java:371` | `SKELETON_STEP` | Кошмары — уже свои звуки (nightmare.*) |

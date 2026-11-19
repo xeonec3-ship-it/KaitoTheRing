@@ -36,7 +36,7 @@
 | `erased/ErasedNameSpell.java` | `onServerCastTick` | 161 | `SoundEvents.SAND_BREAK` | `pohsmp_core:spell.erased_name.charge_paper` |
 | `erased/ErasedNameSpell.java` | `onCast` | 171 | `SoundEvents.ELYTRA_FLYING` | `pohsmp_core:spell.erased_name.cast_whoosh` |
 | `illusion/IllusionAllies.java` | `onInteract` | 111 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
-| `illusion/Illusions.java` | `self` | 279 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
+| `illusion/Illusions.java` | `self` | 280 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
 | `mythic/AbyssEyeSpell.java` | `getCastStartSound` | 43 | `SoundEvents.AMBIENT_CAVE` | `pohsmp_core:spell.abyss_eye.cast` |
 | `mythic/AbyssEyeSpell.java` | `castTick` | 70 | `SoundEvents.AMBIENT_SOUL_SAND_VALLEY_MOOD` | `pohsmp_core:spell.abyss_eye.charge_hum` |
 | `mythic/AbyssEyeSpell.java` | `castTick` | 71 | `SoundEvents.LIGHTNING_BOLT_THUNDER` | `pohsmp_core:spell.abyss_eye.charge_thunder` |

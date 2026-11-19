@@ -688,6 +688,8 @@ def scan():
                     elif 'getCastFinishSound' in l:
                         site['method'] = 'getCastFinishSound'
                     why = SKIP_FILES.get(rel) or SKIP_LINES.get((rel, s))
+                    if not why and (rel.startswith('nightmare/') or rel.startswith('client/nightmare/')):
+                        why = 'Кошмары — уже свои звуки (nightmare.*)'
                     if why:
                         skipped.append(dict(site, why=why))
                         continue

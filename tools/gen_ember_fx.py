@@ -191,44 +191,63 @@ def whip():
         rx, ry, _ = rot_of(a, b)
         return rx, ry
 
-    # Лента без «огня вокруг» (владелец 19.11): сам хлыст — цвета огня с референса, детальный: плоская основа с волнистым краем,
-    # поверх — три сплетённые пряди (как струи на Ruination), по центру светлая жила; цвет идёт от тёмно-оранжевого у пяты
-    # к жёлто-белому к концу петли.
-    STEPS = 220
+    # ХЛЫСТ по референсу владельца (Naomi, 19.11): цепь из золотисто-бронзовых звеньев-шипов — каждое звено ромб с двумя шипами
+    # назад-в-стороны (как наконечник стрелы), звенья смотрят по ходу хлыста и поворачиваются по очереди на 90°; на конце — большой
+    # раздвоенный наконечник-крюк (два загнутых зубца и жало). Металл, без огня. Тоны 5–9 — бронза → золото.
+    STEPS = 40
     pts = [curve(i / STEPS) for i in range(STEPS + 1)]
-    def heat(t):                                   # 0 у пяты → 1 у кончика: индекс тона
-        return t
+    def norm(v):
+        l = math.sqrt(sum(c * c for c in v)) or 1
+        return tuple(c / l for c in v)
+    def cross(u, v):
+        return (u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0])
+    def seg(p, q, w, tone):
+        rx_, ry_, ln_ = rot_of(p, q)
+        box(tuple((p[k] + q[k]) / 2 for k in range(3)), (w, w, ln_), tone, (rx_, ry_, 0), B)
     for i in range(STEPS):
         t = (i + 0.5) / STEPS
         p0, p1 = pts[i], pts[i + 1]
-        rx, ry, ln = rot_of(p0, p1)
+        T_ = norm(tuple(p1[k] - p0[k] for k in range(3)))
+        S1 = norm(cross(T_, (0, 1, 0)))                 # вбок
+        S2 = norm(cross(S1, T_))                        # вверх (перпендикуляр)
+        S = S1 if i % 2 == 0 else S2                    # звенья через одно повёрнуты на 90°
+        sc = 1.0 - 0.3 * t
         c = tuple((p0[k] + p1[k]) / 2 for k in range(3))
-        w = (0.34 * (1 - 0.7 * t ** 1.2) + 0.05) * (1 + 0.12 * math.sin(i * 0.9))   # волнистый край
-        twist = 65 * math.sin(t * 3.0 * math.pi) + 15
-        L_ = ln * 1.3
-        edge = 5 if t < 0.35 else 6
-        box(c, (w, 0.035, L_), edge, (rx, ry, twist), F)                              # основа-край
-        box(c, (w * 0.7, 0.05, L_), 6 if t < 0.45 else 7, (rx, ry, twist), F)          # тело
-        box(c, (w * 0.16, 0.065, L_), 9, (rx, ry, twist), F)                          # светлая жила
-        # три пряди, сплетённые вдоль ленты: смещение поперёк по синусу со сдвигом фаз
-        for k, ph in enumerate((0.0, 2.1, 4.2)):
-            off = math.sin(t * 26 + ph) * w * 0.38
-            tw = math.radians(twist)
-            ox, oy = off * math.cos(tw), off * math.sin(tw)
-            # смещение вдоль «ширины» ленты в её плоскости (упрощённо: в осях после поворота по yaw)
-            yr = math.radians(ry)
-            box((c[0] + ox * math.cos(yr), c[1] + oy, c[2] - ox * math.sin(yr)), (0.045, 0.08, L_ * 0.9),
-                7 if (i + k * 3) % 4 else 8, (rx, ry, twist), F)
+        L = math.dist(p0, p1)
+        tone_body, tone_spike = (7, 9) if i % 2 == 0 else (6, 8)
+        # стержень
+        seg(tuple(c[k] - T_[k] * L * 0.55 for k in range(3)), tuple(c[k] + T_[k] * L * 0.55 for k in range(3)), 0.08 * sc, 5)
+        # ромб: нос вперёд, боковые углы
+        nose = tuple(c[k] + T_[k] * 0.11 * sc for k in range(3))
+        for sd in (-1, 1):
+            corner = tuple(c[k] + S[k] * sd * 0.09 * sc - T_[k] * 0.02 for k in range(3))
+            seg(nose, corner, 0.075 * sc, tone_body)
+            # шип: из бокового угла назад-наружу (как зубец наконечника стрелы)
+            barb = tuple(corner[k] + S[k] * sd * 0.13 * sc - T_[k] * 0.16 * sc for k in range(3))
+            seg(corner, barb, 0.065 * sc, tone_spike)
+    # наконечник-крюк (как на референсе): широкое «сердце» из двух загнутых назад зубцов и жало вперёд
+    tip, pre = curve(1.0), curve(0.985)
+    T_ = norm(tuple(tip[k] - pre[k] for k in range(3)))
+    S = norm(cross(T_, (0, 1, 0)))
+    sting = tuple(tip[k] + T_[k] * 0.32 for k in range(3))
+    seg(tip, sting, 0.08, 9)
+    for sd in (-1, 1):
+        prev = tip
+        for k in range(1, 6):
+            a_ = k / 5
+            q = tuple(tip[j] + S[j] * sd * 0.28 * math.sin(a_ * math.pi * 0.8) + T_[j] * (0.12 - 0.42 * a_) for j in range(3))
+            seg(prev, q, 0.075 - 0.008 * k, 8 if k < 4 else 9)
+            prev = q
     ys = [b[1] for b in B + F] + [b[4] for b in B + F]
-    tones = ['#1C1716', '#5A1A08', '#E04A0C', '#FFE7A0', '#FFB040', '#9E2A08', '#D24E14', '#F07A1E', '#FFA630', '#FFE08A']
+    tones = ['#1C1716', '#5A1A08', '#E04A0C', '#FFE7A0', '#FFB040', '#6A3A12', '#8A5418', '#B87A28', '#D8A040', '#F6D27A']
     doc = {'comment': 'Хлыст «Раскалённых углей» (T14), как на референсе Ruination: рукоять в обмотке и кольцо-навершие сзади, из пяты — широкая '
-                      'плоская лента цвета огня (без отдельного пламени): волнистый край, три сплетённые пряди, светлая жила; вперёд с провисом, S-изгибом и '
-                      'перекрутом, конец — большая петля-спираль. Как fire_whip: начало в руке, код поворачивает '
+                      'цепь золотисто-бронзовых звеньев-шипов (референс владельца Naomi) вперёд с провисом и петлёй-спиралью, на конце раздвоенный '
+                      'наконечник-крюк. Как fire_whip: начало в руке, код поворачивает '
                       'по дуге взмаха. Сгенерировано tools/gen_ember_fx.py.',
            'style': 'pyre', 'center': 0, 'formedAt': 3, 'collapse': {'duration': 6, 'easing': 'easeInSine'},
-           'parts': [{'type': 'boxes', 'tones': tones, 'glowTones': [2, 3, 4], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': B,
+           'parts': [{'type': 'boxes', 'tones': tones, 'glowTones': [], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': B,
                       'appear': {'delay': 0, 'duration': 2, 'easing': 'easeOutCubic'}, 'bounds': [min(ys), max(ys)]},
-                     {'type': 'boxes', 'tones': tones, 'glowTones': [8, 9], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': F,
+                     {'type': 'boxes', 'tones': tones, 'glowTones': [], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': F,
                       'appear': {'delay': 0, 'duration': 3, 'easing': 'easeOutCubic'}, 'bounds': [min(ys), max(ys)]}]}
     with open(os.path.join(A, 'fx', 'meshes', 'ember_whip.json'), 'w', encoding='utf-8') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))

@@ -1,0 +1,44 @@
+{
+ "comment": "Раскалённый клинок (T14): пока жар > 0; at = caster.hand, follow; яркость/частоту код задаёт через scale эффекта по доле жара. Гасится stop. Сгенерировано tools/gen_ember_fx.py.",
+ "style": "pyre",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 4000,
+   "rate": 1.5,
+   "spread": 0.35,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 20,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 2000,
+   "rate": 0.6,
+   "spread": 0.2,
+   "speed": 0.03,
+   "gravity": 0.01,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "comment": "капли-угли падают"
+  }
+ ]
+}

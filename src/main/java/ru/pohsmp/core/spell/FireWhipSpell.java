@@ -15,6 +15,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.DivineEvents;
+import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.spell.silent.SilentSpell;
 
 /** Fire: a whip of flame lashes an arc in front of the caster; everyone in the arc burns, the nearest one is pulled in. */
 public class FireWhipSpell extends PohSpell {
@@ -48,19 +50,23 @@ public class FireWhipSpell extends PohSpell {
             sl.playSound(null, o.x, o.y, o.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.2f, 0.7f);
             sl.playSound(null, o.x, o.y, o.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 1.4f);
             final Vec3 fo = o;
+            // own model (owner, 19.11.2026): handle + burning lash, fx/meshes/fire_whip.json, turned along the swing
+            int whip = Fx.play(sl, Fx.mesh("fire_whip").at(fo).yaw(SilentSpell.yawOf(dir(yaw, -HALF))).duration(20));
             Tasks.add(new Tasks.Task() {   // the lash sweeps from right to left over 5 ticks
                 int age;
 
                 @Override
                 public boolean tick() {
                     double a0 = -HALF + 2 * HALF * age / 5.0, a1 = -HALF + 2 * HALF * (age + 1) / 5.0;
-                    for (double a = a0; a <= a1; a += 0.05)
-                        for (double r = 1; r <= LEN; r += 0.5) {
+                    Fx.move(sl, whip, fo, SilentSpell.yawOf(dir(yaw, a1)));
+                    for (double a = a0; a <= a1; a += 0.15)   // a few flames along the swept arc
+                        for (double r = 1.5; r <= LEN; r += 1.5) {
                             double sag = Math.sin(r / LEN * Math.PI) * 0.6;
                             DivineEvents.particle(sl, r > LEN - 1 ? ParticleTypes.LAVA : ParticleTypes.FLAME,
                                     fo.x + Math.cos(yaw + a) * r, fo.y - sag, fo.z + Math.sin(yaw + a) * r, 1, 0.02, 0.01);
                         }
                     age++;
+                    if (age >= 5) Fx.stop(sl, whip, "");
                     return age < 5;
                 }
             });
@@ -82,5 +88,9 @@ public class FireWhipSpell extends PohSpell {
             }
         }
         super.onCast(level, spellLevel, caster, source, md);
+    }
+
+    private static Vec3 dir(double yaw, double a) {
+        return new Vec3(Math.cos(yaw + a), 0, Math.sin(yaw + a));
     }
 }

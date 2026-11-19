@@ -25,12 +25,16 @@ public final class HiddenHands {
     private static final Map<Integer, ItemStack[]> STASH = new HashMap<>();
 
     /** Called on the client when a staff-less cast starts; ticks covers the cast and its finish animation. */
-    public static void hide(LivingEntity e, int ticks, int finish) {
+    public static void hide(LivingEntity e, int ticks, int finish, boolean staffsToo) {
         if (e.level() == null) return;
         clear(e.getId());
         UNTIL.put(e.getId(), e.level().getGameTime() + ticks);
         FINISH.put(e.getId(), finish);
+        if (staffsToo) STAFFS_TOO.add(e.getId());
     }
+
+    /** Entities whose staff is taken out of the hand too (only the Gate scene: GateStaff draws it floating). */
+    private static final java.util.Set<Integer> STAFFS_TOO = new java.util.HashSet<>();
 
     public static void show(LivingEntity e) {
         clear(e.getId());
@@ -70,6 +74,7 @@ public final class HiddenHands {
         SPELL.remove(id);
         LAST_CAST.remove(id);
         FINISH.remove(id);
+        STAFFS_TOO.remove(id);
         return false;
     }
 
@@ -80,9 +85,18 @@ public final class HiddenHands {
         Inventory inv = p.getInventory();
         int sel = inv.selected;
         if (sel < 0 || sel >= inv.items.size()) return;
-        STASH.put(p.getId(), new ItemStack[]{inv.items.get(sel), inv.offhand.get(0)});
-        inv.items.set(sel, ItemStack.EMPTY);
-        inv.offhand.set(0, ItemStack.EMPTY);
+        boolean staffs = STAFFS_TOO.contains(p.getId());
+        ItemStack main = inv.items.get(sel), off = inv.offhand.get(0);
+        // a staff stays in the hand whatever is cast (owner, 19.11.2026); only scrolls and other items go. The Gate scene alone takes the staff.
+        boolean hideMain = !main.isEmpty() && (staffs || !isStaff(main)), hideOff = !off.isEmpty() && (staffs || !isStaff(off));
+        if (!hideMain && !hideOff) return;
+        STASH.put(p.getId(), new ItemStack[]{hideMain ? main : ItemStack.EMPTY, hideOff ? off : ItemStack.EMPTY});
+        if (hideMain) inv.items.set(sel, ItemStack.EMPTY);
+        if (hideOff) inv.offhand.set(0, ItemStack.EMPTY);
+    }
+
+    private static boolean isStaff(ItemStack s) {
+        return s.getItem() instanceof io.redspace.ironsspellbooks.item.weapons.StaffItem;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -95,8 +109,8 @@ public final class HiddenHands {
         if (s == null) return;
         Inventory inv = p.getInventory();
         int sel = inv.selected;
-        if (sel >= 0 && sel < inv.items.size() && inv.items.get(sel).isEmpty()) inv.items.set(sel, s[0]);
-        if (inv.offhand.get(0).isEmpty()) inv.offhand.set(0, s[1]);
+        if (!s[0].isEmpty() && sel >= 0 && sel < inv.items.size() && inv.items.get(sel).isEmpty()) inv.items.set(sel, s[0]);
+        if (!s[1].isEmpty() && inv.offhand.get(0).isEmpty()) inv.offhand.set(0, s[1]);
     }
 
     @SubscribeEvent
@@ -111,5 +125,6 @@ public final class HiddenHands {
         SPELL.clear();
         LAST_CAST.clear();
         FINISH.clear();
+        STAFFS_TOO.clear();
     }
 }

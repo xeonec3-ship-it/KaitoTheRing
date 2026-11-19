@@ -41,6 +41,8 @@ public class EightShieldsSpell extends PohSpell {
     private static final double RAD = 3.0;
     private static final float HP = 10000f;
     private static final int COLOR = 0x9FE6FF;
+    /** sigils/eight_shields_seal.json: one per shield, upright, facing like the shield. */
+    private static final String SEAL = "eight_shields_seal";
 
     /** shield entity id -> owner uuid (for letting the owner's projectiles through) */
     private static final Map<Integer, UUID> OWNERS = new ConcurrentHashMap<>();
@@ -79,6 +81,7 @@ public class EightShieldsSpell extends PohSpell {
             PohEvents.Pool pool = PohEvents.addPool(caster, max, dur);
             caster.addEffect(new MobEffectInstance(Reg.EIGHT_SHIELDS.get(), dur, 0, false, false, true));
             List<ShieldEntity> shields = new ArrayList<>();
+            int[] seals = new int[8];
             for (int i = 0; i < 8; i++) {
                 ShieldEntity s = new ShieldEntity(sl, HP);
                 double a = i * Math.PI / 4;
@@ -86,8 +89,11 @@ public class EightShieldsSpell extends PohSpell {
                 s.setRotation((float) Math.toDegrees(Math.PI / 2 - a), 0);
                 Disp.track(s);
                 sl.addFreshEntity(s);
+                // the glass shield of Iron's is not drawn: a seal stands in its place (owner); it still blocks and takes hits
+                ru.pohsmp.core.Hidden.hide(s, dur + 40, false, false, false);
                 OWNERS.put(s.getId(), caster.getUUID());
                 shields.add(s);
+                seals[i] = Fx.play(sl, Fx.sigil(SEAL).at(s.getBoundingBox().getCenter()).yaw(s.getYRot()).duration(dur + 20));
             }
             int ward = Fx.play(sl, Fx.sigil("eight_shields").at(caster.position().add(0, 0.05, 0)).caster(caster).attach(caster).duration(dur));   // octagram under the wall
             sl.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.ARMOR_EQUIP_NETHERITE, SoundSource.PLAYERS, 1.5f, 0.8f);
@@ -117,12 +123,14 @@ public class EightShieldsSpell extends PohSpell {
                             DivineEvents.particle(sl, ParticleTypes.ELECTRIC_SPARK, s.getX(), s.getY(), s.getZ(), 30, 0.8, 0.15);
                             sl.playSound(null, s.getX(), s.getY(), s.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1f, 1.3f);
                             OWNERS.remove(s.getId());
+                            Fx.stop(sl, seals[i], "");
                             s.discard();
                             continue;
                         }
                         double a = age * 0.015 + i * Math.PI / 4;
                         s.setPos(caster.getX() + Math.cos(a) * RAD, caster.getY() + 1.1, caster.getZ() + Math.sin(a) * RAD);
                         s.setRotation((float) Math.toDegrees(Math.PI / 2 - a), 0);
+                        Fx.move(sl, seals[i], s.getBoundingBox().getCenter(), s.getYRot());
                         resetAge(s);
                     }
                     if (over) {

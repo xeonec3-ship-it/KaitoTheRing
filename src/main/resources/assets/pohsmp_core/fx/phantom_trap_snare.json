@@ -1,0 +1,19 @@
+{
+  "comment": "Призрачный капкан сработал: at — место капкана, target — пойманный. Круг на земле и четыре призрачные цепи из гнёзд круга к пойманному, как у Печати запрета. PhantomTrapSpell останавливает эффект, когда хватка кончается.",
+  "style": "evocation",
+  "duration": -1,
+  "elements": [
+    { "type": "sigil", "id": "phantom_trap_ring", "delay": 0, "at": "caster+0,0.04,0" },
+    { "type": "flash", "delay": 0, "duration": 8, "at": "caster+0,0.4,0", "size": 1.6, "rays": 6, "color": "#C9B0FF" },
+    { "type": "chains", "delay": 2, "at": "caster+1.4,0.05,0", "to": "target+0,0.8,0", "follow": true, "link": 0.18, "sag": 0.2, "tension": 0.8, "grow": 5, "color": "#B79CFF",
+      "in": { "duration": 4, "easing": "easeOutCubic" } },
+    { "type": "chains", "delay": 3, "at": "caster+-1.4,0.05,0", "to": "target+0,0.8,0", "follow": true, "link": 0.18, "sag": 0.2, "tension": 0.8, "grow": 5, "color": "#B79CFF",
+      "in": { "duration": 4, "easing": "easeOutCubic" } },
+    { "type": "chains", "delay": 4, "at": "caster+0,0.05,1.4", "to": "target+0,1.0,0", "follow": true, "link": 0.18, "sag": 0.2, "tension": 0.8, "grow": 5, "color": "#B79CFF",
+      "in": { "duration": 4, "easing": "easeOutCubic" } },
+    { "type": "chains", "delay": 5, "at": "caster+0,0.05,-1.4", "to": "target+0,1.0,0", "follow": true, "link": 0.18, "sag": 0.2, "tension": 0.8, "grow": 5, "color": "#B79CFF",
+      "in": { "duration": 4, "easing": "easeOutCubic" } },
+    { "type": "sprites", "delay": 0, "at": "caster", "texture": "spark_soft", "count": 600, "rate": 0.4, "area": 1.2, "speed": 0.01, "gravity": -0.004,
+      "size": [0.12, 0.02], "life": 22, "color": "#C9B0FF" }
+  ]
+}

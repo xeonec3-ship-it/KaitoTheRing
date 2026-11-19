@@ -1,0 +1,16 @@
+{
+  "comment": "Призрачный капкан: круг на земле под пойманным. Шестиугольник, по ободу ползёт призрачная цепь, в четырёх гнёздах — якоря цепей.",
+  "size": 1.6, "color": "#9A73FF", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.0, "color": "#2A1450", "brightness": 1.2,
+      "appear": { "delay": 0, "duration": 5, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.25, "period": 26 } },
+    { "id": "hex", "type": "disc", "texture": "hex_ring", "radius": 0.9, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutBack", "modes": ["grow"] }, "rotation": { "speed": -6 } },
+    { "id": "chain", "type": "band", "texture": "chain_band", "radius": 1.04, "inner": 0.96, "repeat": 10, "heightOffset": 0.02, "color": "#C9B0FF",
+      "appear": { "delay": 2, "duration": 10, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90, "direction": -1 }, "rotation": { "speed": 12 } },
+    { "id": "core", "type": "disc", "texture": "circle_ward", "radius": 0.36, "heightOffset": 0.03, "color": "#FFFFFF", "brightness": 0.7,
+      "appear": { "delay": 4, "duration": 8, "easing": "easeOutBack", "modes": ["grow", "twist"] }, "rotation": { "speed": 20 } }
+  ],
+  "formedFlash": { "color": "#C9B0FF", "size": 1.2, "duration": 8, "sparks": 20 },
+  "dissolve": { "modes": ["reverse", "collapse"], "duration": 10, "stagger": 2 }
+}

@@ -57,7 +57,7 @@ public class PhantomTrapSpell extends PohSpell {
             sl.playSound(null, c.x, c.y, c.z, SoundEvents.ILLUSIONER_PREPARE_MIRROR, SoundSource.PLAYERS, 0.8f, 1.4f);
             DivineEvents.particle(sl, VIOLET, c.x, c.y + 0.1, c.z, 20, 0.5, 0);
             Tasks.add(new Tasks.Task() {
-                int age, held = -1;
+                int age, held = -1, snare = -1;
                 LivingEntity prey;
 
                 private boolean end() {
@@ -86,19 +86,16 @@ public class PhantomTrapSpell extends PohSpell {
                         return true;
                     }
                     held++;
-                    if (!prey.isAlive() || held > hold) return end();
+                    if (held == 1) snare = ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx("phantom_trap_snare").at(c).target(prey).yaw(caster.getYRot()));
+                    if (!prey.isAlive() || held > hold) {
+                        if (snare >= 0) ru.pohsmp.core.fx.Fx.stop(sl, snare, "");
+                        return end();
+                    }
                     HigherSpell.place(prey, c.x, c.y, c.z);
                     prey.setDeltaMovement(Vec3.ZERO);
                     if (prey instanceof Mob m) m.getNavigation().stop();
                     if (held % 10 == 1) prey.addEffect(new MobEffectInstance(Reg.PARALYSIS.get(), 15, 0, false, false, false));
-                    for (int i = 0; i < 4; i++) {   // four chains from the ground to the prey
-                        double a = i * Math.PI / 2 + 0.6;
-                        for (double k = 0; k <= 1; k += 0.2) {
-                            double r = 1.4 * (1 - k);
-                            DivineEvents.particle(sl, VIOLET, c.x + Math.cos(a) * r, c.y + k * prey.getBbHeight() * 0.7, c.z + Math.sin(a) * r, 1, 0, 0);
-                        }
-                    }
-                    return true;
+                    return true;   // the chains are drawn by fx/phantom_trap_snare.json
                 }
             });
         }

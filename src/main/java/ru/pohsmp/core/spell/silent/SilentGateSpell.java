@@ -106,7 +106,7 @@ public class SilentGateSpell extends SilentStaffSpell {
     @Override
     public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, net.minecraft.world.InteractionHand hand, @javax.annotation.Nullable MagicData md) {
         super.onClientPreCast(level, spellLevel, entity, hand, md);
-        CastAnims.hideHands(level, entity, CAST, FINISH_TICKS);
+        CastAnims.hideHands(level, entity, CAST, FINISH_TICKS, true);
     }
 
     /** The cast is bound to the music: nothing shortens it (cast time reduction, the robe's Silent Reading). */

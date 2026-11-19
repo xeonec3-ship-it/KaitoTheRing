@@ -28,8 +28,13 @@ public final class CastAnims {
 
     /** Same, with a longer tail after the cast (finish ticks), e.g. the Gate scene. Another spell cast meanwhile shows the hands at once. */
     public static void hideHands(Level level, LivingEntity caster, int castTicks, int finishTicks) {
+        hideHands(level, caster, castTicks, finishTicks, false);
+    }
+
+    /** A staff stays in the hand unless staffsToo (only the Gate scene, where the staff floats on its own). */
+    public static void hideHands(Level level, LivingEntity caster, int castTicks, int finishTicks, boolean staffsToo) {
         if (!level.isClientSide) return;
         int ticks = castTicks + finishTicks;
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.HiddenHands.hide(caster, ticks, finishTicks));
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.HiddenHands.hide(caster, ticks, finishTicks, staffsToo));
     }
 }

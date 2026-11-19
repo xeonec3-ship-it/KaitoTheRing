@@ -112,6 +112,12 @@ public final class Bestiary {
         };
     }
 
+    /**
+     * Owner 19.11: «убери всех монстров, оставь только того, на которого меняется кастующий» - the bestiary brings no one (the types stay
+     * registered, the ones already out go by themselves); only the caster's own look (the Dread, the shadow) is drawn, client-side.
+     */
+    public static final boolean SPAWNING = false;
+
     /** Extra room for a victim (the Mythic raises it to limitMythic); expires by itself. */
     private static final Map<UUID, long[]> EXTRA = new HashMap<>();
 
@@ -121,6 +127,7 @@ public final class Bestiary {
 
     /** One nightmare of kind for v somewhere out of its sight (dist blocks away); null if no place was found. */
     public static NightmareMob spawnFor(ServerPlayer v, NightmareMob.Kind k, double dist) {
+        if (!SPAWNING) return null;
         ServerLevel sl = v.serverLevel();
         Vec3 at = null;
         if (k == NightmareMob.Kind.HANDS) at = v.position();
@@ -167,7 +174,7 @@ public final class Bestiary {
                     if (p != null) sendFake(p, 0);   // the hearts come back
                     return true;
                 });
-            if (Immersion.now() % 40 != 7) return;
+            if (Immersion.now() % 40 != 7 || !SPAWNING) return;
             if (Immersion.now() % 200 == 7) PohCore.LOG.info("[pohsmp] bestiary tick: now={} players={}", Immersion.now(), server.getPlayerCount());
             EXTRA.values().removeIf(x -> Immersion.now() >= x[1]);
             Map<UUID, Integer> per = new HashMap<>();

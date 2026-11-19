@@ -199,6 +199,7 @@ public class HouseThatIsntSpell extends NightmareSpells.Base {
         fx(h.sl, Fx.fx("nightmare_house_that_isnt_shadow").at(door).yaw(inward).only(p), "nightmare_house_that_isnt_shadow");
         p.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(net.minecraft.core.Holder.direct(SoundEvents.WOODEN_DOOR_OPEN),
                 SoundSource.HOSTILE, door.x, door.y + 1, door.z, 1f, 0.5f, p.getRandom().nextLong()));
+        if (!Bestiary.SPAWNING) return;   // owner 19.11: no monsters - the door opens and the darkness flows out, no one comes
         Vec3 g = Bestiary.ground(h.sl, door.x - h.right.x * s * 0.6, door.y, door.z - h.right.z * s * 0.6);
         if (g == null) g = new Vec3(door.x - h.right.x * s * 0.6, h.y, door.z - h.right.z * s * 0.6);
         NightmareMob m = Bestiary.TYPES.get(NightmareMob.Kind.LURKER).get().create(h.sl);

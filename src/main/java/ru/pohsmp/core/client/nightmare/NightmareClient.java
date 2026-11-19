@@ -41,6 +41,11 @@ public final class NightmareClient {
         stage = Math.max(0, Math.min(3, st));
     }
 
+    /** 0..1: «Ночь без рассвета» on this client now */
+    public static float night() {
+        return night;
+    }
+
     public static void night(int ticks) {
         nightLeft = Math.max(0, ticks);
     }

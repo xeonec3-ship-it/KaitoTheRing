@@ -205,29 +205,3 @@ def skill_icon():
 if __name__ == '__main__':
     skill_icon()
 
-
-def whip_hilt():
-    """Форма хлыста В РУКЕ (физический хлыст T14, client/EmberWhipClient): клинок стал хлыстом, видна только раскалённая рукоять —
-    навершие, обмотка, пята с крюком; в «устье» пяты, откуда выходит хлыст, тлеет жар. В инвентаре/на земле остаётся
-    ember_blade_hot.png (models/item/ember_blade_hot.json, forge:separate_transforms). Корень хлыста в коде — u 0.35 оси иконки."""
-    full = draw(True)
-    M = sample()
-    im = Image.new('RGBA', (N, N), (0, 0, 0, 0))
-    for (px, py), (kind, u, v, k) in M.items():
-        if kind in ('pommel', 'grip', 'guard'):
-            im.putpixel((px, py), full.getpixel((px, py)))
-    # устье: раскалённая кромка пяты со стороны клинка и уголь посередине
-    for (px, py), (kind, u, v, k) in M.items():
-        if kind == 'guard' and u > U_GUARD - 0.018:
-            im.putpixel((px, py), hexc(HOT[5] if abs(v) < 1.2 else HOT[3]))
-    gx, gy = P0[0] + AX[0] * L * U_GUARD, P0[1] + AX[1] * L * U_GUARD
-    for dx, dy, c in ((0, 0, HOT[7]), (1, 0, HOT[6]), (0, 1, HOT[6]), (1, -1, HOT[5]), (-1, 1, HOT[5])):
-        x, y = int(gx) + dx, int(gy) + dy
-        if 0 <= x < N and 0 <= y < N and im.getpixel((x, y))[3]:
-            im.putpixel((x, y), hexc(c))
-    return im
-
-
-if __name__ == '__main__':
-    whip_hilt().save(os.path.join(OUT, 'ember_blade_whip.png'))
-    print('wrote ember_blade_whip.png')

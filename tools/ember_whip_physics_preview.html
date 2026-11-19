@@ -76,7 +76,7 @@ button.move.wide { grid-column: 1 / -1; }
   <header>
     <div class="eyebrow">T14 · меч-хлыст · превью физики</div>
     <h1>Хлыст <em>«Раскалённых углей»</em></h1>
-    <p class="lede">Канат из 36 звеньев с инерцией: корень в рукояти, остальное тянется за рукой. На ударе изгиб бежит волной к концу, кончик щёлкает на пике скорости. Здесь работает тот же алгоритм, что в моде (<code>WhipSim.java</code>, перенос на JS), с теми же константами.</p>
+    <p class="lede">Канат из 36 звеньев с инерцией: корень на острие клинка, остальное тянется за рукой. На ударе изгиб бежит волной к концу, кончик щёлкает на пике скорости. Здесь работает тот же алгоритм, что в моде (<code>WhipSim.java</code>, перенос на JS), с теми же константами.</p>
   </header>
 
   <div class="main">
@@ -93,8 +93,9 @@ button.move.wide { grid-column: 1 / -1; }
           <button class="move" id="m-lash" type="button">Удар<small>дуга ±50°, щелчок</small></button>
           <button class="move" id="m-combo" type="button">Серия<small>3 хлёста подряд</small></button>
           <button class="move wide" id="m-vortex" type="button">Огненный вихрь<small>оборот, хлыст вытянут по кругу r ≈ 5</small></button>
-          <button class="move" id="m-walk" type="button" aria-pressed="false">Шагать<small>рука качается</small></button>
-          <button class="move" id="m-form" type="button" aria-pressed="false">Форма меча<small>хлыст убран</small></button>
+          <button class="move" id="m-walk" type="button" aria-pressed="false">Шагать<small>хвост волочится сзади</small></button>
+          <button class="move" id="m-run" type="button" aria-pressed="false">Бежать<small>хвост летит за спиной</small></button>
+          <button class="move wide" id="m-form" type="button" aria-pressed="false">Форма меча<small>хлыст убран</small></button>
         </div>
       </div>
       <div class="group toggles">
@@ -142,7 +143,7 @@ button.move.wide { grid-column: 1 / -1; }
     </section>
     <section>
       <h3>В игре</h3>
-      <p>Корень берётся из настоящей матрицы предмета в руке в каждом кадре — с ванильной анимацией, с ударами Epic Fight и от первого лица. В руке в форме хлыста видна только раскалённая рукоять: клинок стал хлыстом. Урон по-прежнему считает сервер (дуга 6 бл ±50°, кольцо r 5).</p>
+      <p>Корень берётся из настоящей матрицы предмета в руке в каждом кадре — с ванильной анимацией, с ударами Epic Fight и от первого лица. Хлыст растёт из острия раскалённого клинка; при ходьбе и беге хвост тянется за владельцем (форма «следа» как в превью анимаций + цепочка для инерции и щелчка). Урон по-прежнему считает сервер (дуга 6 бл ±50°, кольцо r 5).</p>
     </section>
   </div>
 </div>
@@ -155,7 +156,7 @@ button.move.wide { grid-column: 1 / -1; }
 const W = {
   N: 36, LEN_IDLE: 2.1, LEN_FULL: 5.6, THICK_ROOT: 0.15, THICK_TIP: 0.03, CRACK_SPEED: 1.15,
   SUB: 6, ITER: 6, CRACK_COOLDOWN: 7, GUIDE_K: 0.6, GRAVITY: 0.032, DRAG: 0.955, MAX_STRETCH: 1.04, CURL: 0.0016, SWAY: 0.0012,
-  BODY_PAD: 0.06, HOLD: 10, BEND_TIP: 0.008, CALM_DRAG: 0.86,
+  BODY_PAD: 0.06, HOLD: 10, BEND_TIP: 0.008, CALM_DRAG: 0.86, TRAIL_K: 0.32, TRAIL_BACK: 4.3, TRAIL_SAG: 0.54,
 };
 const lerp = (a, b, t) => a + (b - a) * t, clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
 const smooth = (e0, e1, v) => { const t = clamp01((v - e0) / (e1 - e0)); return t * t * (3 - 2 * t); };
@@ -174,6 +175,7 @@ class WhipSim {
     this.hist = Array.from({ length: W.SUB + 1 }, () => new Float64Array(3 * N));
     this.lastRoot = null; this.ready = false; this.time = 0; this.len = W.LEN_IDLE; this.cooldown = 0;
     this.tipSpeed = 0; this.peakSpeed = 0; this.peakAt = [0, 0, 0, 0, 0, 0];
+    this.HIST = Math.ceil((W.TRAIL_BACK + 2) * W.SUB) + 2; this.hp = Array.from({ length: this.HIST }, () => new Float64Array(6)); this.hh = -1; this.hn = 0;
     this.mode = 0; this.driveT = 0; this.driveLen = 6; this.a0 = 0; this.a1 = 0; this.tilt = 0; this.sinceStrike = 1e9; this.cracked = false;
   }
   striking() { return this.mode !== 0 || this.sinceStrike < W.HOLD; }
@@ -230,16 +232,24 @@ class WhipSim {
     const calm = !this.striking();   // at rest: calm, no blocks, a smooth floor at the feet (no ground jitter)
     const drag = Math.pow(W.DRAG * (settle ? .8 : 1) * (calm ? W.CALM_DRAG : 1), h);
     this.pin(0, rx, ry, rz); this.pin(1, rx + dx * seg, ry + dy * seg, rz + dz * seg);
-    const env = this.mode === 0 ? 0 : this.envelope();
+    this.remember(rx, ry, rz, dx, dy, dz);
+    const env = this.mode === 0 ? 0 : this.envelope(), air = this.airflow();
     for (let i = 2; i < N; i++) {
       const u = i / (N - 1);
       const vx = (x[i] - ox[i]) * drag, vy = (y[i] - oy[i]) * drag, vz = (z[i] - oz[i]) * drag;
       this.sx[i] = x[i]; this.sy[i] = y[i]; this.sz[i] = z[i];
       ox[i] = x[i]; oy[i] = y[i]; oz[i] = z[i];
-      let ax = 0, ay = -W.GRAVITY, az = 0;
+      let ax = 0, ay = -W.GRAVITY * (1 - .85 * air * u), az = 0;
       const free = (.3 + .7 * u) * (calm ? .4 : 1), c = curl(x[i] * .7, y[i] * .7, z[i] * .7, this.time);
       ax += c[0] * W.CURL * free; ay += c[1] * W.CURL * free * .5; az += c[2] * W.CURL * free;
       ax += Math.sin(this.time * .07 + u * 2.1) * W.SWAY * u; az += Math.cos(this.time * .053 + u * 1.7) * W.SWAY * u;
+      const kt = (1 - env) * W.TRAIL_K * smooth(.04, .2, u) * (1 - .5 * u);
+      if (kt > 0 && this.hn > 1) {   // the trail: where the blade tip was u*TRAIL_BACK ticks ago, out along its direction then
+        const t = this.trail(i, 0, seg, body), tp = this.trail(i, 1, seg, body), cc = 2 * Math.sqrt(kt) * .8;
+        ax += (t[0] - x[i]) * kt + ((t[0] - tp[0]) / h - vx / h) * cc;
+        ay += (t[1] - y[i]) * kt + ((t[1] - tp[1]) / h - vy / h) * cc;
+        az += (t[2] - z[i]) * kt + ((t[2] - tp[2]) / h - vz / h) * cc;
+      }
       if (env > 0) {
         const t = this.guide(i, this.driveT, rx, ry, rz, seg, body), tp = this.guide(i, this.driveT - h, rx, ry, rz, seg, body);
         const kk = env * W.GUIDE_K * smooth(.04, .25, u) * (1 - .4 * u), cc = 2 * Math.sqrt(kk) * .9;
@@ -285,6 +295,21 @@ class WhipSim {
         this.peakSpeed = this.tipSpeed;
       }
     }
+  }
+  airflow() { if (this.hn <= W.SUB) return 0; const a = this.hp[this.hh], b = this.hp[((this.hh - W.SUB) % this.HIST + this.HIST) % this.HIST]; return clamp01(Math.hypot(a[0] - b[0], a[2] - b[2]) / .35); }
+  remember(rx, ry, rz, dx, dy, dz) { this.hh = (this.hh + 1) % this.HIST; this.hp[this.hh].set([rx, ry, rz, dx, dy, dz]); if (this.hn < this.HIST) this.hn++; }
+  trail(i, older, seg, body) {
+    const u = i / (W.N - 1), back = Math.min(this.hn - 1.001, u * W.TRAIL_BACK * W.SUB + older), k = Math.floor(back), f = back - k, H = this.HIST;
+    const a = this.hp[((this.hh - k) % H + H) % H], b = this.hp[((this.hh - k - 1) % H + H) % H], s = i * seg;
+    let dx = lerp(a[3], b[3], f), dy = lerp(a[4], b[4], f), dz = lerp(a[5], b[5], f); const dl = Math.hypot(dx, dy, dz); if (dl > 1e-9) { dx /= dl; dy /= dl; dz /= dl; }
+    let ty = lerp(a[1], b[1], f) + dy * s - W.TRAIL_SAG * u * u * (1 - .85 * this.airflow()); if (body) ty = Math.max(body.y + .02, ty);
+    return [lerp(a[0], b[0], f) + dx * s, ty, lerp(a[2], b[2], f) + dz * s];
+  }
+  shift(dz) {   // the preview's walk loops: move everything along z at once
+    for (let i = 0; i < W.N; i++) { this.z[i] += dz; this.oz[i] += dz; this.sz[i] += dz; }
+    for (const h of this.hist) for (let i = 0; i < W.N; i++) h[3 * i + 2] += dz;
+    for (const e of this.hp) e[2] += dz;
+    if (this.lastRoot) this.lastRoot = { ...this.lastRoot, z: this.lastRoot.z + dz };
   }
   reelIn(seg) {   // shortening: drawn into the hilt along the rope's own line (no squeezing into kinks)
     const N = W.N, x = this.x, y = this.y, z = this.z, arc = new Float64Array(N);
@@ -467,6 +492,10 @@ function emitSpark(x, y, z, vx, vy, vz, life, col) { const s = sparks[sparkNext]
 
 // ======================================================================= the holder's motion (stands in for the animation)
 const sim = new WhipSim();
+let gait = 0;             // 0 stand, 1 walk (4.3 bl/s), 2 run (7.5 bl/s)
+const GAIT_V = [0, .215, .375];
+let walkZ0 = 0, walkT0 = 0;   // the holder's z(t) = walkZ0 + v (t - walkT0)
+const walkZ = t => walkZ0 + GAIT_V[gait] * (t - walkT0);
 let swordForm = false, walking = false, slow = false, showPts = false, sound = false;
 let gameTick = 0, acc = 0, last = performance.now();
 const queue = [];        // scheduled strikes {at, kind, dir}
@@ -478,8 +507,10 @@ let bodyYaw = 0;          // extra spin of the whole body (vortex)
 function easeIO(t) { t = clamp01(t); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 /** Hand pose at tick time t (float): arm yaw φ (relative to facing, + = toward the holder's right as the angle grows in MC) and pitch. */
 function handPose(t) {
-  let phi = .25, el = -1.35, spinA = 0, bladeUp = 0;
-  if (walking) phi += .18 * Math.sin(t * .45);
+  let phi = .25, el = -1.35, spinA = 0, bladeUp = 0, bladeBack = 0;
+  if (gait === 1) { phi = 2.3 + .15 * Math.sin(t * .45); el = -1.05; bladeBack = .8; }   // whip_walk: arm a little back, hilt back-down
+  if (gait === 2) { phi = 2.5 + .1 * Math.sin(t * .7); el = -.7; bladeBack = 1.4; }      // whip_run: arm back-out, hilt pointing back
+  if (action) bladeBack = 0;
   if (action) {
     const a = action, k = t - a.start;
     if (a.kind === 'lash') {
@@ -502,13 +533,17 @@ function handPose(t) {
   const shx = SHOULDER.x * cs - SHOULDER.z * sn, shz = SHOULDER.x * sn + SHOULDER.z * cs;
   const ang = yaw + phi, ce = Math.cos(el);
   const dir = [Math.cos(ang) * ce, Math.sin(el), Math.sin(ang) * ce];
-  const hand = [shx + dir[0] * ARM, 64 + SHOULDER.y + dir[1] * ARM, shz + dir[2] * ARM];
-  // the blade axis: out along the forearm, tipped forward and a little up in a strike
-  const fwd = [Math.cos(yaw), 0, Math.sin(yaw)];
-  let bd = [dir[0] + fwd[0] * .55, dir[1] + .15 + bladeUp, dir[2] + fwd[2] * .55];
+  const wz = walkZ(t);
+  const hand = [shx + dir[0] * ARM, 64 + SHOULDER.y + dir[1] * ARM, shz + dir[2] * ARM + wz];
+  // the blade axis: out along the forearm, tipped forward and a little up in a strike; back and down when walking or running
+  const fwd = [Math.cos(yaw), 0, Math.sin(yaw)], fk = bladeBack ? -bladeBack : .55;
+  let bd = [dir[0] + fwd[0] * fk, dir[1] + .15 + bladeUp - (bladeBack ? .2 : 0), dir[2] + fwd[2] * fk];
   const bl = Math.hypot(...bd); bd = bd.map(v => v / bl);
-  return { x: hand[0], y: hand[1], z: hand[2], dx: bd[0], dy: bd[1], dz: bd[2], sh: [shx, 64 + SHOULDER.y, shz] };
+  // the whip grows from the point of the blade (BLADE long), as ROOT_U = 0.97 in the mod
+  return { x: hand[0] + bd[0] * BLADE, y: hand[1] + bd[1] * BLADE, z: hand[2] + bd[2] * BLADE, dx: bd[0], dy: bd[1], dz: bd[2],
+    hx: hand[0], hy: hand[1], hz: hand[2], sh: [shx, 64 + SHOULDER.y, shz + wz] };
 }
+const BLADE = .95;
 const BODY = { x: 0, y: 64, z: 0, halfWidth: .3, height: 1.8 };
 let handTurn = 0, handAngle = NaN;
 function startLash(dir, rising) {
@@ -528,6 +563,8 @@ function gameStep() {
     if (q.kind === 'lash') { const half = 50 * Math.PI / 180, s = Math.abs(handTurn) > .04 ? Math.sign(handTurn) : q.dir; sim.lash(FACING, -half * s, half * s, 6, q.rising); }
     else { const t = Math.abs(handTurn) > .04 ? Math.sign(handTurn) : 1; sim.vortex(Number.isNaN(handAngle) ? FACING + Math.PI : handAngle - .9 * t, t, 10); }
   }
+  if (walkZ(gameTick) > 7) { walkZ0 -= 14; sim.shift(-14); }   // the walk loops over the floor
+  BODY.z = walkZ(gameTick);
   const hp = handPose(gameTick);
   const ang = Math.atan2(hp.z - BODY.z, hp.x - BODY.x);
   if (!Number.isNaN(handAngle)) { let d = ang - handAngle; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; handTurn = d; }
@@ -635,15 +672,15 @@ function buildWhip(partial, hp) {
 }
 
 function placeHolder(hp) {
-  holder.rotation.y = -bodyYaw;   // three.js turns +y counter-clockwise seen from above; the sim angle grows from +x to +z
+  holder.rotation.y = -bodyYaw; holder.position.z = hp.sh[2] - (SHOULDER.x * Math.sin(bodyYaw) + SHOULDER.z * Math.cos(bodyYaw));   // three.js turns +y counter-clockwise seen from above; the sim angle grows from +x to +z
   // right arm: a box from the shoulder to the hand
-  const s = hp.sh, mid = [(s[0] + hp.x) / 2, (s[1] + hp.y) / 2, (s[2] + hp.z) / 2];
+  const s = hp.sh, mid = [(s[0] + hp.hx) / 2, (s[1] + hp.hy) / 2, (s[2] + hp.hz) / 2];
   armR.position.set(...mid);
-  armR.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(hp.x - s[0], hp.y - s[1], hp.z - s[2]).normalize());
+  armR.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(hp.hx - s[0], hp.hy - s[1], hp.hz - s[2]).normalize());
   // the hilt: +z of the group along the blade axis, the guard mouth at the hand
   const z = new THREE.Vector3(hp.dx, hp.dy, hp.dz), up = Math.abs(hp.dy) > .95 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0);
   const x = new THREE.Vector3().crossVectors(up, z).normalize(), y = new THREE.Vector3().crossVectors(z, x);
-  hilt.matrix.makeBasis(x, y, z); hilt.matrix.setPosition(hp.x - hp.dx * .05, hp.y - hp.dy * .05, hp.z - hp.dz * .05); hilt.matrixAutoUpdate = false;
+  hilt.matrix.makeBasis(x, y, z); hilt.matrix.setPosition(hp.hx, hp.hy, hp.hz); hilt.matrixAutoUpdate = false;
   armL.rotation.x = walking ? .5 * Math.sin((gameTick + acc) * .45 + Math.PI) : 0;
   legL.rotation.x = walking ? .5 * Math.sin((gameTick + acc) * .45) : 0; legR.rotation.x = -legL.rotation.x;
 }
@@ -651,7 +688,7 @@ function placeHolder(hp) {
 // camera: orbit by drag, zoom by wheel
 let camYaw = 2.3, camPitch = .3, camDist = 8.5;
 const target = new THREE.Vector3(.6, 65.0, 1.6);
-function placeCamera() { camera.position.set(target.x + Math.cos(camYaw) * Math.cos(camPitch) * camDist, target.y + Math.sin(camPitch) * camDist, target.z + Math.sin(camYaw) * Math.cos(camPitch) * camDist); camera.lookAt(target); }
+function placeCamera() { target.z += (BODY.z + 1.6 - target.z) * .15; camera.position.set(target.x + Math.cos(camYaw) * Math.cos(camPitch) * camDist, target.y + Math.sin(camPitch) * camDist, target.z + Math.sin(camYaw) * Math.cos(camPitch) * camDist); camera.lookAt(target); }
 let drag = null;
 canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, yaw: camYaw, pitch: camPitch }; canvas.setPointerCapture(e.pointerId); });
 canvas.addEventListener('pointermove', e => { if (!drag) return; camYaw = drag.yaw + (e.clientX - drag.x) * .008; camPitch = Math.max(-.15, Math.min(1.3, drag.pitch + (e.clientY - drag.y) * .006)); });
@@ -683,7 +720,7 @@ function frame(now) {
   while (acc >= 1) { acc -= 1; gameStep(); }
   const hp = handPose(gameTick + acc);
   placeHolder(hp);
-  tube.visible = tassel.visible = !swordForm && sim.ready; blade.visible = swordForm; mouth.visible = !swordForm;
+  tube.visible = tassel.visible = !swordForm && sim.ready; blade.visible = true; mouth.visible = false; bladeMat.emissive.setHex(swordForm ? 0x2a0800 : 0x7a2006);
   ptsView.visible = showPts && !swordForm;
   if (!swordForm && sim.ready) buildWhip(acc, hp);
   // crack flashes: white-hot core, sharp star, shock ring; gone in a quarter second
@@ -726,7 +763,12 @@ $('m-combo').onclick = () => {
   setTimeout(() => startLash(1, false), 1200 * (slow ? 4 : 1));
 };
 $('m-vortex').onclick = () => { if (!swordForm) startVortex(); };
-$('m-walk').onclick = e => { walking = !walking; e.currentTarget.setAttribute('aria-pressed', walking); };
+function setGait(g) {
+  const t = gameTick + acc; walkZ0 = walkZ(t); walkT0 = t; gait = gait === g ? 0 : g; walking = gait > 0;
+  $('m-walk').setAttribute('aria-pressed', gait === 1); $('m-run').setAttribute('aria-pressed', gait === 2);
+}
+$('m-walk').onclick = () => setGait(1);
+$('m-run').onclick = () => setGait(2);
 $('m-form').onclick = e => { swordForm = !swordForm; e.currentTarget.setAttribute('aria-pressed', swordForm); if (!swordForm) sim.ready = false; };
 $('t-slow').onchange = e => slow = e.target.checked;
 $('t-wall').onchange = e => { wallOn = e.target.checked; wallMesh.visible = wallOn; };

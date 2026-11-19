@@ -254,6 +254,29 @@ class WhipSimTest {
         assertTrue(later < 0.8, "settling and shortening are smooth, no tick-to-tick jumps: " + later);
     }
 
+    /** The holder walks or runs +z (blocks per tick), the hilt pointing back and down as in whip_walk / whip_run; returns the tip. */
+    static double[] move(double speed, double dirY) {
+        WhipSim w = new WhipSim();
+        double[] tip = null;
+        for (int t = 0; t < 120; t++) {
+            double z = t * speed;
+            w.step(new WhipSim.Pose(-0.4, 64.9, z + 0.1, 0, dirY, -1), new WhipSim.Body(0, 64, z, 0.3, 1.8), FLOOR);
+            tip = w.point(WhipSim.N - 1);
+            tip[2] -= z;   // relative to the holder
+            for (int i = 0; i < WhipSim.N; i++) assertTrue(w.point(i)[1] >= 64 - 1e-6, "under the floor while moving");
+        }
+        return tip;
+    }
+
+    @Test
+    void streamsBehindAWalkingOrRunningHolder() {   // owner 19.11: behind the player, not in front; drags when walking, flies when running
+        double[] walk = move(0.215, -0.8), run = move(0.375, -0.35);
+        assertTrue(walk[2] < -1.0, "walking: the whip trails behind: " + walk[2]);
+        assertTrue(walk[1] < 64.35, "walking: its end drags on the ground: " + walk[1]);
+        assertTrue(run[2] < -1.5, "running: far behind: " + run[2]);
+        assertTrue(run[1] > 64.3 && run[1] > walk[1], "running: higher, flying behind: " + run[1]);
+    }
+
     @Test
     void splinePassesThroughThePoints() {
         double[] pts = {0, 0, 0, 1, 0, 0, 2, 1, 0, 3, 1, 1};

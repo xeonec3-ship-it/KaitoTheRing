@@ -52,6 +52,8 @@ public final class WhipSim {
     static final int SUB = 6, ITER = 6, CRACK_COOLDOWN = 7;
     /** Bending stiffness left at the tip: a plaited whip does not zigzag when it lies on the ground or shortens. */
     static final double BEND_TIP = 0.008;
+    /** Trail: stiffness (per tick squared), how far back in ticks the end of the whip follows the blade, sag at the end. */
+    static final double TRAIL_K = 0.32, TRAIL_BACK = 4.3, TRAIL_SAG = 0.54;
     /** Extra drag per tick at rest (no strike): the hanging whip only sways slowly. */
     static final double CALM_DRAG = 0.86;
     /** Stiffness of the strike guide (per tick squared). */
@@ -99,6 +101,11 @@ public final class WhipSim {
     private int cooldown;
     private double tipSpeed, prevTipSpeed, peakSpeed;
     private final double[] peakAt = new double[6];
+
+    // the hand's path, one entry per substep (newest at hh): position and blade direction
+    private static final int HIST = (int) Math.ceil((TRAIL_BACK + 2) * SUB) + 2;
+    private final double[][] hp = new double[HIST][6];
+    private int hh = -1, hn;
 
     // the strike guide
     private int mode = NONE;
@@ -163,6 +170,49 @@ public final class WhipSim {
     }
 
     // ---------------------------------------------------------------- simulation
+
+    /** 0..1: how fast the hand moves along the ground (over the last tick), 1 from a run (0.35 blocks per tick) up. */
+    private double airflow() {
+        if (hn <= SUB) return 0;
+        double[] a = hp[hh], b = hp[Math.floorMod(hh - SUB, HIST)];
+        return clamp01(Math.hypot(a[0] - b[0], a[2] - b[2]) / 0.35);
+    }
+
+    private void remember(double rx, double ry, double rz, double dx, double dy, double dz) {
+        hh = (hh + 1) % HIST;
+        double[] e = hp[hh];
+        e[0] = rx;
+        e[1] = ry;
+        e[2] = rz;
+        e[3] = dx;
+        e[4] = dy;
+        e[5] = dz;
+        if (hn < HIST) hn++;
+    }
+
+    /**
+     * Trail target of point i, {@code older} substeps further in the past (0 — now, 1 — one substep before, for the target's speed):
+     * the hand pose u * TRAIL_BACK ticks back plus its blade direction times the rope length to i, sagging, not under the floor.
+     */
+    private double[] trail(int i, int older, double seg, Body body) {
+        double u = (double) i / (N - 1);
+        double back = Math.min(hn - 1.001, u * TRAIL_BACK * SUB + older);
+        int k = (int) back;
+        double f = back - k;
+        double[] a = hp[Math.floorMod(hh - k, HIST)], b = hp[Math.floorMod(hh - k - 1, HIST)];
+        double s = i * seg;
+        double px = lerp(a[0], b[0], f), py = lerp(a[1], b[1], f), pz = lerp(a[2], b[2], f);
+        double dx = lerp(a[3], b[3], f), dy = lerp(a[4], b[4], f), dz = lerp(a[5], b[5], f);
+        double dl = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (dl > 1e-9) {
+            dx /= dl;
+            dy /= dl;
+            dz /= dl;
+        }
+        double ty = py + dy * s - TRAIL_SAG * u * u * (1 - 0.85 * airflow());
+        if (body != null) ty = Math.max(body.y() + 0.02, ty);
+        return new double[] {px + dx * s, ty, pz + dz * s};
+    }
 
     /** Puts the rope hanging straight down from the hand and lets it settle (first step, or after a teleport). */
     void reset(Pose r, Body body, Solid solid) {
@@ -257,11 +307,13 @@ public final class WhipSim {
         // twitched all the time from the ground contacts)
         boolean calm = !striking();
         double drag = Math.pow(DRAG * (settle ? 0.8 : 1) * (calm ? CALM_DRAG : 1), h);
-        // the handle: pinned to the hand
+        // the handle: pinned to the hand; the hand's path is remembered for the trail
         pin(0, rx, ry, rz);
         pin(1, rx + dx * seg, ry + dy * seg, rz + dz * seg);
+        remember(rx, ry, rz, dx, dy, dz);
         // integrate the free points
         double env = mode == NONE ? 0 : envelope();
+        double air = airflow();
         for (int i = 2; i < N; i++) {
             double u = (double) i / (N - 1);
             double vx = (x[i] - ox[i]) * drag, vy = (y[i] - oy[i]) * drag, vz = (z[i] - oz[i]) * drag;
@@ -271,7 +323,8 @@ public final class WhipSim {
             ox[i] = x[i];
             oy[i] = y[i];
             oz[i] = z[i];
-            double ax = 0, ay = -GRAVITY, az = 0;
+            // running: the air the holder runs through holds the outer whip up, it streams almost level behind
+            double ax = 0, ay = -GRAVITY * (1 - 0.85 * air * u), az = 0;
             // a slow drift (curl noise) and a gentle sway, more toward the tip: the hanging whip is never quite still
             double free = (0.3 + 0.7 * u) * (calm ? 0.4 : 1);
             double[] c = curl(x[i] * 0.7, y[i] * 0.7, z[i] * 0.7, time);
@@ -280,6 +333,17 @@ public final class WhipSim {
             az += c[2] * CURL * free;
             ax += Math.sin(time * 0.07 + u * 2.1) * SWAY * u;
             az += Math.cos(time * 0.053 + u * 1.7) * SWAY * u;
+            double kt = (1 - env) * TRAIL_K * smooth(0.04, 0.2, u) * (1 - 0.5 * u);
+            if (kt > 0 && hn > 1) {
+                // the trail (the look the owner liked in the animation preview): point i goes where the blade tip was u * TRAIL_BACK
+                // ticks ago, out along the blade direction of that moment, sagging toward the end. The whip lags behind the hand,
+                // curls along the path of a swing and streams behind a walking or running holder; the chain adds inertia and the crack.
+                double[] t = trail(i, 0, seg, body), tp = trail(i, 1, seg, body);
+                double cc = 2 * Math.sqrt(kt) * 0.8;
+                ax += (t[0] - x[i]) * kt + ((t[0] - tp[0]) / h - vx / h) * cc;
+                ay += (t[1] - y[i]) * kt + ((t[1] - tp[1]) / h - vy / h) * cc;
+                az += (t[2] - z[i]) * kt + ((t[2] - tp[2]) / h - vz / h) * cc;
+            }
             if (env > 0) {
                 // the strike guide: a damped spring (PD) toward the point's place on the arc, and toward the arc's own speed there,
                 // so the rope follows the sweep without overshooting; weaker at the handle (the hand leads it) and at the tip (free)

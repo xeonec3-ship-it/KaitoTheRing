@@ -2565,5 +2565,1771 @@
   "replaces": [
    "PHANTOM_FLAP"
   ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "ashless_flame",
+  "spell_ru": "Без пепла",
+  "event": "pohsmp_core:spell.ashless_flame.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/ashless_flame_cast_1.ogg",
+   "spell/higher/ashless_flame_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ashless_flame_cast_1.mp3",
+   "docs/sounds/mp3/ashless_flame_cast_2.mp3"
+  ],
+  "what": "вспышка пламени — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AshlessSpell.java getCastStartSound()",
+  "replaces": [
+   "FIRECHARGE_USE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "ashless_flame",
+  "spell_ru": "Без пепла",
+  "event": "pohsmp_core:spell.ashless_flame.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/ashless_flame_loop_1.ogg",
+   "spell/higher/ashless_flame_loop_2.ogg",
+   "spell/higher/ashless_flame_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ashless_flame_loop_1.mp3",
+   "docs/sounds/mp3/ashless_flame_loop_2.mp3",
+   "docs/sounds/mp3/ashless_flame_loop_3.mp3"
+  ],
+  "what": "вспышка пламени — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AshlessSpell.java tick()",
+  "replaces": [
+   "FIRECHARGE_USE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "ashless_flame",
+  "spell_ru": "Без пепла",
+  "event": "pohsmp_core:spell.ashless_flame.release_boom",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/ashless_flame_release_boom_1.ogg",
+   "spell/higher/ashless_flame_release_boom_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ashless_flame_release_boom_1.mp3",
+   "docs/sounds/mp3/ashless_flame_release_boom_2.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AshlessSpell.java erupt()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "ashless_flame",
+  "spell_ru": "Без пепла",
+  "event": "pohsmp_core:spell.ashless_flame.release_fire",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/ashless_flame_release_fire_1.ogg",
+   "spell/higher/ashless_flame_release_fire_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ashless_flame_release_fire_1.mp3",
+   "docs/sounds/mp3/ashless_flame_release_fire_2.mp3"
+  ],
+  "what": "вспышка пламени — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AshlessSpell.java erupt()",
+  "replaces": [
+   "BLAZE_SHOOT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "ashless_flame",
+  "spell_ru": "Без пепла",
+  "event": "pohsmp_core:spell.ashless_flame.release_soul",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/ashless_flame_release_soul_1.ogg",
+   "spell/higher/ashless_flame_release_soul_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ashless_flame_release_soul_1.mp3",
+   "docs/sounds/mp3/ashless_flame_release_soul_2.mp3"
+  ],
+  "what": "душа / вздох духа — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AshlessSpell.java erupt()",
+  "replaces": [
+   "SOUL_ESCAPE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "blood_moon",
+  "spell_ru": "Кровавая луна",
+  "event": "pohsmp_core:spell.blood_moon.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/blood_moon_loop_1.ogg",
+   "spell/higher/blood_moon_loop_2.ogg",
+   "spell/higher/blood_moon_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blood_moon_loop_1.mp3",
+   "docs/sounds/mp3/blood_moon_loop_2.mp3",
+   "docs/sounds/mp3/blood_moon_loop_3.mp3"
+  ],
+  "what": "удар сердца — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "BloodMoonSpell.java tick()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "blood_moon",
+  "spell_ru": "Кровавая луна",
+  "event": "pohsmp_core:spell.blood_moon.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/blood_moon_release_1.ogg",
+   "spell/higher/blood_moon_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blood_moon_release_1.mp3",
+   "docs/sounds/mp3/blood_moon_release_2.mp3"
+  ],
+  "what": "рёв / грозный гул — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "BloodMoonSpell.java getCastFinishSound()",
+  "replaces": [
+   "WITHER_SPAWN"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.cast_chime",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/countdown_cast_chime_1.ogg",
+   "spell/higher/countdown_cast_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_cast_chime_1.mp3",
+   "docs/sounds/mp3/countdown_cast_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java start()",
+  "replaces": [
+   "NOTE_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.cast_magic",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/countdown_cast_magic_1.ogg",
+   "spell/higher/countdown_cast_magic_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_cast_magic_1.mp3",
+   "docs/sounds/mp3/countdown_cast_magic_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java getCastStartSound()",
+  "replaces": [
+   "ENCHANTMENT_TABLE_USE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.cast_powerup",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/countdown_cast_powerup_1.ogg",
+   "spell/higher/countdown_cast_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_cast_powerup_1.mp3",
+   "docs/sounds/mp3/countdown_cast_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java start()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.hit_bell",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/countdown_hit_bell_1.ogg",
+   "spell/higher/countdown_hit_bell_2.ogg",
+   "spell/higher/countdown_hit_bell_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_hit_bell_1.mp3",
+   "docs/sounds/mp3/countdown_hit_bell_2.mp3",
+   "docs/sounds/mp3/countdown_hit_bell_3.mp3"
+  ],
+  "what": "колокол — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java repeat()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.hit_chime",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/countdown_hit_chime_1.ogg",
+   "spell/higher/countdown_hit_chime_2.ogg",
+   "spell/higher/countdown_hit_chime_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_hit_chime_1.mp3",
+   "docs/sounds/mp3/countdown_hit_chime_2.mp3",
+   "docs/sounds/mp3/countdown_hit_chime_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java onDamage()",
+  "replaces": [
+   "AMETHYST_BLOCK_HIT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.hit_click",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/countdown_hit_click_1.ogg",
+   "spell/higher/countdown_hit_click_2.ogg",
+   "spell/higher/countdown_hit_click_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_hit_click_1.mp3",
+   "docs/sounds/mp3/countdown_hit_click_2.mp3",
+   "docs/sounds/mp3/countdown_hit_click_3.mp3"
+  ],
+  "what": "щелчок — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java onDamage()",
+  "replaces": [
+   "NOTE_BLOCK_HAT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/countdown_hit_shatter_1.ogg",
+   "spell/higher/countdown_hit_shatter_2.ogg",
+   "spell/higher/countdown_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_hit_shatter_1.mp3",
+   "docs/sounds/mp3/countdown_hit_shatter_2.mp3",
+   "docs/sounds/mp3/countdown_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java repeat()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "countdown",
+  "spell_ru": "Обратный отсчёт",
+  "event": "pohsmp_core:spell.countdown.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/countdown_loop_1.ogg",
+   "spell/higher/countdown_loop_2.ogg",
+   "spell/higher/countdown_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/countdown_loop_1.mp3",
+   "docs/sounds/mp3/countdown_loop_2.mp3",
+   "docs/sounds/mp3/countdown_loop_3.mp3"
+  ],
+  "what": "щелчок — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CountdownSpell.java tick()",
+  "replaces": [
+   "NOTE_BLOCK_HAT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "eternal_blizzard",
+  "spell_ru": "Вечная метель",
+  "event": "pohsmp_core:spell.eternal_blizzard.loop_snow",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/eternal_blizzard_loop_snow_1.ogg",
+   "spell/higher/eternal_blizzard_loop_snow_2.ogg",
+   "spell/higher/eternal_blizzard_loop_snow_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eternal_blizzard_loop_snow_1.mp3",
+   "docs/sounds/mp3/eternal_blizzard_loop_snow_2.mp3",
+   "docs/sounds/mp3/eternal_blizzard_loop_snow_3.mp3"
+  ],
+  "what": "снег и мороз — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "EternalBlizzardSpell.java tick()",
+  "replaces": [
+   "POWDER_SNOW_BREAK",
+   "POWDER_SNOW_STEP"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "eternal_blizzard",
+  "spell_ru": "Вечная метель",
+  "event": "pohsmp_core:spell.eternal_blizzard.loop_whoosh",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/eternal_blizzard_loop_whoosh_1.ogg",
+   "spell/higher/eternal_blizzard_loop_whoosh_2.ogg",
+   "spell/higher/eternal_blizzard_loop_whoosh_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eternal_blizzard_loop_whoosh_1.mp3",
+   "docs/sounds/mp3/eternal_blizzard_loop_whoosh_2.mp3",
+   "docs/sounds/mp3/eternal_blizzard_loop_whoosh_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "EternalBlizzardSpell.java tick()",
+  "replaces": [
+   "ELYTRA_FLYING"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "eternal_blizzard",
+  "spell_ru": "Вечная метель",
+  "event": "pohsmp_core:spell.eternal_blizzard.open_shatter",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/higher/eternal_blizzard_open_shatter_1.ogg",
+   "spell/higher/eternal_blizzard_open_shatter_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eternal_blizzard_open_shatter_1.mp3",
+   "docs/sounds/mp3/eternal_blizzard_open_shatter_2.mp3"
+  ],
+  "what": "раскол, осколки — раскрытие (печать, купол, разрыв) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "EternalBlizzardSpell.java open()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "eternal_blizzard",
+  "spell_ru": "Вечная метель",
+  "event": "pohsmp_core:spell.eternal_blizzard.open_snow",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/higher/eternal_blizzard_open_snow_1.ogg",
+   "spell/higher/eternal_blizzard_open_snow_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eternal_blizzard_open_snow_1.mp3",
+   "docs/sounds/mp3/eternal_blizzard_open_snow_2.mp3"
+  ],
+  "what": "снег и мороз — раскрытие (печать, купол, разрыв) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "EternalBlizzardSpell.java open()",
+  "replaces": [
+   "POWDER_SNOW_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "eternal_blizzard",
+  "spell_ru": "Вечная метель",
+  "event": "pohsmp_core:spell.eternal_blizzard.open_whoosh",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/higher/eternal_blizzard_open_whoosh_1.ogg",
+   "spell/higher/eternal_blizzard_open_whoosh_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eternal_blizzard_open_whoosh_1.mp3",
+   "docs/sounds/mp3/eternal_blizzard_open_whoosh_2.mp3"
+  ],
+  "what": "свист, взмах, порыв — раскрытие (печать, купол, разрыв) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "EternalBlizzardSpell.java open()",
+  "replaces": [
+   "ELYTRA_FLYING"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "eternal_blizzard",
+  "spell_ru": "Вечная метель",
+  "event": "pohsmp_core:spell.eternal_blizzard.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/eternal_blizzard_release_1.ogg",
+   "spell/higher/eternal_blizzard_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/eternal_blizzard_release_1.mp3",
+   "docs/sounds/mp3/eternal_blizzard_release_2.mp3"
+  ],
+  "what": "снег и мороз — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "EternalBlizzardSpell.java getCastFinishSound()",
+  "replaces": [
+   "POWDER_SNOW_PLACE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "fate_star",
+  "spell_ru": "Звезда судьбы",
+  "event": "pohsmp_core:spell.fate_star.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/fate_star_cast_1.ogg",
+   "spell/higher/fate_star_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/fate_star_cast_1.mp3",
+   "docs/sounds/mp3/fate_star_cast_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "FateStarSpell.java cast()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "fate_star",
+  "spell_ru": "Звезда судьбы",
+  "event": "pohsmp_core:spell.fate_star.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/fate_star_hit_1.ogg",
+   "spell/higher/fate_star_hit_2.ogg",
+   "spell/higher/fate_star_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/fate_star_hit_1.mp3",
+   "docs/sounds/mp3/fate_star_hit_2.mp3",
+   "docs/sounds/mp3/fate_star_hit_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "FateStarSpell.java impact()",
+  "replaces": [
+   "FIREWORK_ROCKET_LARGE_BLAST",
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "fate_star",
+  "spell_ru": "Звезда судьбы",
+  "event": "pohsmp_core:spell.fate_star.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/fate_star_loop_1.ogg",
+   "spell/higher/fate_star_loop_2.ogg",
+   "spell/higher/fate_star_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/fate_star_loop_1.mp3",
+   "docs/sounds/mp3/fate_star_loop_2.mp3",
+   "docs/sounds/mp3/fate_star_loop_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "FateStarSpell.java tick()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "fate_star",
+  "spell_ru": "Звезда судьбы",
+  "event": "pohsmp_core:spell.fate_star.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/fate_star_release_1.ogg",
+   "spell/higher/fate_star_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/fate_star_release_1.mp3",
+   "docs/sounds/mp3/fate_star_release_2.mp3"
+  ],
+  "what": "долгий резонанс — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "FateStarSpell.java getCastFinishSound()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "forbidding_seal",
+  "spell_ru": "Печать запрета",
+  "event": "pohsmp_core:spell.forbidding_seal.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/forbidding_seal_cast_1.ogg",
+   "spell/higher/forbidding_seal_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/forbidding_seal_cast_1.mp3",
+   "docs/sounds/mp3/forbidding_seal_cast_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SealSpell.java getCastStartSound()",
+  "replaces": [
+   "ENCHANTMENT_TABLE_USE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "forbidding_seal",
+  "spell_ru": "Печать запрета",
+  "event": "pohsmp_core:spell.forbidding_seal.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/forbidding_seal_hit_shatter_1.ogg",
+   "spell/higher/forbidding_seal_hit_shatter_2.ogg",
+   "spell/higher/forbidding_seal_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/forbidding_seal_hit_shatter_1.mp3",
+   "docs/sounds/mp3/forbidding_seal_hit_shatter_2.mp3",
+   "docs/sounds/mp3/forbidding_seal_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SealSpell.java tick()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "forbidding_seal",
+  "spell_ru": "Печать запрета",
+  "event": "pohsmp_core:spell.forbidding_seal.hit_slam",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/forbidding_seal_hit_slam_1.ogg",
+   "spell/higher/forbidding_seal_hit_slam_2.ogg",
+   "spell/higher/forbidding_seal_hit_slam_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/forbidding_seal_hit_slam_1.mp3",
+   "docs/sounds/mp3/forbidding_seal_hit_slam_2.mp3",
+   "docs/sounds/mp3/forbidding_seal_hit_slam_3.mp3"
+  ],
+  "what": "тяжёлый металлический удар — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SealSpell.java tick()",
+  "replaces": [
+   "ZOMBIE_ATTACK_IRON_DOOR"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "forbidding_seal",
+  "spell_ru": "Печать запрета",
+  "event": "pohsmp_core:spell.forbidding_seal.open_powerup",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/higher/forbidding_seal_open_powerup_1.ogg",
+   "spell/higher/forbidding_seal_open_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/forbidding_seal_open_powerup_1.mp3",
+   "docs/sounds/mp3/forbidding_seal_open_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — раскрытие (печать, купол, разрыв) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SealSpell.java seal()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "forbidding_seal",
+  "spell_ru": "Печать запрета",
+  "event": "pohsmp_core:spell.forbidding_seal.open_slam",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/higher/forbidding_seal_open_slam_1.ogg",
+   "spell/higher/forbidding_seal_open_slam_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/forbidding_seal_open_slam_1.mp3",
+   "docs/sounds/mp3/forbidding_seal_open_slam_2.mp3"
+  ],
+  "what": "тяжёлый металлический удар — раскрытие (печать, купол, разрыв) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SealSpell.java seal()",
+  "replaces": [
+   "ANVIL_LAND"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "joint_cast",
+  "spell_ru": "Совместный каст",
+  "event": "pohsmp_core:spell.joint_cast.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/joint_cast_cast_1.ogg",
+   "spell/higher/joint_cast_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/joint_cast_cast_1.mp3",
+   "docs/sounds/mp3/joint_cast_cast_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "JointCast.java merge()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/milky_way_cast_1.ogg",
+   "spell/higher/milky_way_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_cast_1.mp3",
+   "docs/sounds/mp3/milky_way_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java getCastStartSound(); MilkyWaySpell.java start()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/higher/milky_way_charge_powerup_1.ogg",
+   "spell/higher/milky_way_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_charge_powerup_1.mp3",
+   "docs/sounds/mp3/milky_way_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java onServerCastTick()",
+  "replaces": [
+   "BEACON_POWER_SELECT",
+   "WARDEN_SONIC_CHARGE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.charge_resonate",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/higher/milky_way_charge_resonate_1.ogg",
+   "spell/higher/milky_way_charge_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_charge_resonate_1.mp3",
+   "docs/sounds/mp3/milky_way_charge_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — нарастание во время каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java onServerCastTick()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.charge_roar",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/higher/milky_way_charge_roar_1.ogg",
+   "spell/higher/milky_way_charge_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_charge_roar_1.mp3",
+   "docs/sounds/mp3/milky_way_charge_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — нарастание во время каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java onServerCastTick()",
+  "replaces": [
+   "ELDER_GUARDIAN_CURSE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.end",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/higher/milky_way_end_1.ogg",
+   "spell/higher/milky_way_end_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_end_1.mp3",
+   "docs/sounds/mp3/milky_way_end_2.mp3"
+  ],
+  "what": "спад, «выключение» — конец / снятие / смерть (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java tick()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/milky_way_hit_1.ogg",
+   "spell/higher/milky_way_hit_2.ogg",
+   "spell/higher/milky_way_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_hit_1.mp3",
+   "docs/sounds/mp3/milky_way_hit_2.mp3",
+   "docs/sounds/mp3/milky_way_hit_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java tick()",
+  "replaces": [
+   "AMETHYST_BLOCK_BREAK",
+   "AMETHYST_CLUSTER_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/milky_way_loop_1.ogg",
+   "spell/higher/milky_way_loop_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_loop_1.mp3",
+   "docs/sounds/mp3/milky_way_loop_2.mp3"
+  ],
+  "what": "долгий резонанс — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java tick()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.release_boom",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/milky_way_release_boom_1.ogg",
+   "spell/higher/milky_way_release_boom_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_release_boom_1.mp3",
+   "docs/sounds/mp3/milky_way_release_boom_2.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java launch()",
+  "replaces": [
+   "WARDEN_SONIC_BOOM"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "milky_way",
+  "spell_ru": "Млечный путь",
+  "event": "pohsmp_core:spell.milky_way.release_portal",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/milky_way_release_portal_1.ogg",
+   "spell/higher/milky_way_release_portal_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/milky_way_release_portal_1.mp3",
+   "docs/sounds/mp3/milky_way_release_portal_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MilkyWaySpell.java launch()",
+  "replaces": [
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "mirror_prison",
+  "spell_ru": "Зеркальная темница",
+  "event": "pohsmp_core:spell.mirror_prison.cast_form",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/mirror_prison_cast_form_1.ogg",
+   "spell/higher/mirror_prison_cast_form_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_prison_cast_form_1.mp3",
+   "docs/sounds/mp3/mirror_prison_cast_form_2.mp3"
+  ],
+  "what": "кристалл/стекло встаёт — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MirrorPrisonSpell.java onCast()",
+  "replaces": [
+   "GLASS_PLACE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "mirror_prison",
+  "spell_ru": "Зеркальная темница",
+  "event": "pohsmp_core:spell.mirror_prison.cast_magic",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/mirror_prison_cast_magic_1.ogg",
+   "spell/higher/mirror_prison_cast_magic_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_prison_cast_magic_1.mp3",
+   "docs/sounds/mp3/mirror_prison_cast_magic_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MirrorPrisonSpell.java onCast()",
+  "replaces": [
+   "ILLUSIONER_MIRROR_MOVE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "mirror_prison",
+  "spell_ru": "Зеркальная темница",
+  "event": "pohsmp_core:spell.mirror_prison.cast_resonate",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/mirror_prison_cast_resonate_1.ogg",
+   "spell/higher/mirror_prison_cast_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_prison_cast_resonate_1.mp3",
+   "docs/sounds/mp3/mirror_prison_cast_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MirrorPrisonSpell.java onCast()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "mirror_prison",
+  "spell_ru": "Зеркальная темница",
+  "event": "pohsmp_core:spell.mirror_prison.end",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/higher/mirror_prison_end_1.ogg",
+   "spell/higher/mirror_prison_end_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_prison_end_1.mp3",
+   "docs/sounds/mp3/mirror_prison_end_2.mp3"
+  ],
+  "what": "раскол, осколки — конец / снятие / смерть (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MirrorPrisonSpell.java release()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "mirror_prison",
+  "spell_ru": "Зеркальная темница",
+  "event": "pohsmp_core:spell.mirror_prison.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/mirror_prison_release_1.ogg",
+   "spell/higher/mirror_prison_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_prison_release_1.mp3",
+   "docs/sounds/mp3/mirror_prison_release_2.mp3"
+  ],
+  "what": "заклятие плетётся — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "MirrorPrisonSpell.java getCastFinishSound()",
+  "replaces": [
+   "ILLUSIONER_MIRROR_MOVE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "nightmare_cradle",
+  "spell_ru": "Колыбель кошмара",
+  "event": "pohsmp_core:spell.nightmare_cradle.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/nightmare_cradle_cast_1.ogg",
+   "spell/higher/nightmare_cradle_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/nightmare_cradle_cast_1.mp3",
+   "docs/sounds/mp3/nightmare_cradle_cast_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CradleSpell.java getCastStartSound(); CradleSpell.java sleep()",
+  "replaces": [
+   "ILLUSIONER_CAST_SPELL",
+   "ILLUSIONER_PREPARE_BLINDNESS"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "nightmare_cradle",
+  "spell_ru": "Колыбель кошмара",
+  "event": "pohsmp_core:spell.nightmare_cradle.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/nightmare_cradle_hit_1.ogg",
+   "spell/higher/nightmare_cradle_hit_2.ogg",
+   "spell/higher/nightmare_cradle_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/nightmare_cradle_hit_1.mp3",
+   "docs/sounds/mp3/nightmare_cradle_hit_2.mp3",
+   "docs/sounds/mp3/nightmare_cradle_hit_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CradleSpell.java tick()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "nightmare_cradle",
+  "spell_ru": "Колыбель кошмара",
+  "event": "pohsmp_core:spell.nightmare_cradle.loop_roar",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/nightmare_cradle_loop_roar_1.ogg",
+   "spell/higher/nightmare_cradle_loop_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/nightmare_cradle_loop_roar_1.mp3",
+   "docs/sounds/mp3/nightmare_cradle_loop_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CradleSpell.java tick()",
+  "replaces": [
+   "WARDEN_ROAR"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "nightmare_cradle",
+  "spell_ru": "Колыбель кошмара",
+  "event": "pohsmp_core:spell.nightmare_cradle.loop_soul",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/nightmare_cradle_loop_soul_1.ogg",
+   "spell/higher/nightmare_cradle_loop_soul_2.ogg",
+   "spell/higher/nightmare_cradle_loop_soul_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/nightmare_cradle_loop_soul_1.mp3",
+   "docs/sounds/mp3/nightmare_cradle_loop_soul_2.mp3",
+   "docs/sounds/mp3/nightmare_cradle_loop_soul_3.mp3"
+  ],
+  "what": "душа / вздох духа — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "CradleSpell.java tick()",
+  "replaces": [
+   "SOUL_ESCAPE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "oblivion_blades",
+  "spell_ru": "Клинки забвения",
+  "event": "pohsmp_core:spell.oblivion_blades.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/oblivion_blades_hit_1.ogg",
+   "spell/higher/oblivion_blades_hit_2.ogg",
+   "spell/higher/oblivion_blades_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/oblivion_blades_hit_1.mp3",
+   "docs/sounds/mp3/oblivion_blades_hit_2.mp3",
+   "docs/sounds/mp3/oblivion_blades_hit_3.mp3"
+  ],
+  "what": "тяжёлый металлический удар — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "OblivionBladesSpell.java tick()",
+  "replaces": [
+   "PLAYER_ATTACK_STRONG"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "oblivion_blades",
+  "spell_ru": "Клинки забвения",
+  "event": "pohsmp_core:spell.oblivion_blades.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/oblivion_blades_loop_1.ogg",
+   "spell/higher/oblivion_blades_loop_2.ogg",
+   "spell/higher/oblivion_blades_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/oblivion_blades_loop_1.mp3",
+   "docs/sounds/mp3/oblivion_blades_loop_2.mp3",
+   "docs/sounds/mp3/oblivion_blades_loop_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "OblivionBladesSpell.java tick()",
+  "replaces": [
+   "PLAYER_ATTACK_SWEEP"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "oblivion_blades",
+  "spell_ru": "Клинки забвения",
+  "event": "pohsmp_core:spell.oblivion_blades.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/oblivion_blades_release_1.ogg",
+   "spell/higher/oblivion_blades_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/oblivion_blades_release_1.mp3",
+   "docs/sounds/mp3/oblivion_blades_release_2.mp3"
+  ],
+  "what": "заклятие плетётся — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "OblivionBladesSpell.java getCastFinishSound()",
+  "replaces": [
+   "ENCHANTMENT_TABLE_USE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "scarlet_cut",
+  "spell_ru": "Алый разрез",
+  "event": "pohsmp_core:spell.scarlet_cut.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/scarlet_cut_hit_boom_1.ogg",
+   "spell/higher/scarlet_cut_hit_boom_2.ogg",
+   "spell/higher/scarlet_cut_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/scarlet_cut_hit_boom_1.mp3",
+   "docs/sounds/mp3/scarlet_cut_hit_boom_2.mp3",
+   "docs/sounds/mp3/scarlet_cut_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "ScarletCutSpell.java burst()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "scarlet_cut",
+  "spell_ru": "Алый разрез",
+  "event": "pohsmp_core:spell.scarlet_cut.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/scarlet_cut_hit_shatter_1.ogg",
+   "spell/higher/scarlet_cut_hit_shatter_2.ogg",
+   "spell/higher/scarlet_cut_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/scarlet_cut_hit_shatter_1.mp3",
+   "docs/sounds/mp3/scarlet_cut_hit_shatter_2.mp3",
+   "docs/sounds/mp3/scarlet_cut_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "ScarletCutSpell.java burst(); ScarletCutSpell.java cut()",
+  "replaces": [
+   "AMETHYST_BLOCK_BREAK",
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "scarlet_cut",
+  "spell_ru": "Алый разрез",
+  "event": "pohsmp_core:spell.scarlet_cut.hit_whoosh",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/scarlet_cut_hit_whoosh_1.ogg",
+   "spell/higher/scarlet_cut_hit_whoosh_2.ogg",
+   "spell/higher/scarlet_cut_hit_whoosh_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/scarlet_cut_hit_whoosh_1.mp3",
+   "docs/sounds/mp3/scarlet_cut_hit_whoosh_2.mp3",
+   "docs/sounds/mp3/scarlet_cut_hit_whoosh_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "ScarletCutSpell.java cut()",
+  "replaces": [
+   "PLAYER_ATTACK_SWEEP"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "school_higher",
+  "spell_ru": "Школа: Высшая",
+  "event": "pohsmp_core:school.higher.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/higher_cast_1.ogg",
+   "spell/higher/higher_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/higher_cast_1.mp3",
+   "docs/sounds/mp3/higher_cast_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "Reg.java Reg()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "singularity",
+  "spell_ru": "Сингулярность",
+  "event": "pohsmp_core:spell.singularity.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/singularity_hit_boom_1.ogg",
+   "spell/higher/singularity_hit_boom_2.ogg",
+   "spell/higher/singularity_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/singularity_hit_boom_1.mp3",
+   "docs/sounds/mp3/singularity_hit_boom_2.mp3",
+   "docs/sounds/mp3/singularity_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SingularitySpell.java collapse()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "singularity",
+  "spell_ru": "Сингулярность",
+  "event": "pohsmp_core:spell.singularity.hit_portal",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/singularity_hit_portal_1.ogg",
+   "spell/higher/singularity_hit_portal_2.ogg",
+   "spell/higher/singularity_hit_portal_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/singularity_hit_portal_1.mp3",
+   "docs/sounds/mp3/singularity_hit_portal_2.mp3",
+   "docs/sounds/mp3/singularity_hit_portal_3.mp3"
+  ],
+  "what": "разрыв пространства, переход — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SingularitySpell.java collapse()",
+  "replaces": [
+   "ENDERMAN_TELEPORT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "singularity",
+  "spell_ru": "Сингулярность",
+  "event": "pohsmp_core:spell.singularity.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/singularity_loop_1.ogg",
+   "spell/higher/singularity_loop_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/singularity_loop_1.mp3",
+   "docs/sounds/mp3/singularity_loop_2.mp3"
+  ],
+  "what": "гул / фон — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SingularitySpell.java tick()",
+  "replaces": [
+   "BEACON_AMBIENT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "singularity",
+  "spell_ru": "Сингулярность",
+  "event": "pohsmp_core:spell.singularity.open",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/higher/singularity_open_1.ogg",
+   "spell/higher/singularity_open_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/singularity_open_1.mp3",
+   "docs/sounds/mp3/singularity_open_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — раскрытие (печать, купол, разрыв) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SingularitySpell.java open()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "singularity",
+  "spell_ru": "Сингулярность",
+  "event": "pohsmp_core:spell.singularity.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/singularity_release_1.ogg",
+   "spell/higher/singularity_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/singularity_release_1.mp3",
+   "docs/sounds/mp3/singularity_release_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "SingularitySpell.java getCastFinishSound()",
+  "replaces": [
+   "WARDEN_SONIC_CHARGE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "star_fall",
+  "spell_ru": "Падение звезды",
+  "event": "pohsmp_core:spell.star_fall.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/star_fall_cast_1.ogg",
+   "spell/higher/star_fall_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/star_fall_cast_1.mp3",
+   "docs/sounds/mp3/star_fall_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "StarFallSpell.java begin(); StarFallSpell.java getCastStartSound()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "star_fall",
+  "spell_ru": "Падение звезды",
+  "event": "pohsmp_core:spell.star_fall.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/star_fall_hit_boom_1.ogg",
+   "spell/higher/star_fall_hit_boom_2.ogg",
+   "spell/higher/star_fall_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/star_fall_hit_boom_1.mp3",
+   "docs/sounds/mp3/star_fall_hit_boom_2.mp3",
+   "docs/sounds/mp3/star_fall_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "StarFallSpell.java impact()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "star_fall",
+  "spell_ru": "Падение звезды",
+  "event": "pohsmp_core:spell.star_fall.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/star_fall_hit_shatter_1.ogg",
+   "spell/higher/star_fall_hit_shatter_2.ogg",
+   "spell/higher/star_fall_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/star_fall_hit_shatter_1.mp3",
+   "docs/sounds/mp3/star_fall_hit_shatter_2.mp3",
+   "docs/sounds/mp3/star_fall_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "StarFallSpell.java impact()",
+  "replaces": [
+   "AMETHYST_CLUSTER_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "star_fall",
+  "spell_ru": "Падение звезды",
+  "event": "pohsmp_core:spell.star_fall.hit_thunder",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/star_fall_hit_thunder_1.ogg",
+   "spell/higher/star_fall_hit_thunder_2.ogg",
+   "spell/higher/star_fall_hit_thunder_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/star_fall_hit_thunder_1.mp3",
+   "docs/sounds/mp3/star_fall_hit_thunder_2.mp3",
+   "docs/sounds/mp3/star_fall_hit_thunder_3.mp3"
+  ],
+  "what": "раскат грома — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "StarFallSpell.java impact()",
+  "replaces": [
+   "LIGHTNING_BOLT_THUNDER"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "star_fall",
+  "spell_ru": "Падение звезды",
+  "event": "pohsmp_core:spell.star_fall.loop_chime",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/star_fall_loop_chime_1.ogg",
+   "spell/higher/star_fall_loop_chime_2.ogg",
+   "spell/higher/star_fall_loop_chime_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/star_fall_loop_chime_1.mp3",
+   "docs/sounds/mp3/star_fall_loop_chime_2.mp3",
+   "docs/sounds/mp3/star_fall_loop_chime_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "StarFallSpell.java tick()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "star_fall",
+  "spell_ru": "Падение звезды",
+  "event": "pohsmp_core:spell.star_fall.loop_powerup",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/star_fall_loop_powerup_1.ogg",
+   "spell/higher/star_fall_loop_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/star_fall_loop_powerup_1.mp3",
+   "docs/sounds/mp3/star_fall_loop_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "StarFallSpell.java tick()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "star_fall",
+  "spell_ru": "Падение звезды",
+  "event": "pohsmp_core:spell.star_fall.loop_whoosh",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/star_fall_loop_whoosh_1.ogg",
+   "spell/higher/star_fall_loop_whoosh_2.ogg",
+   "spell/higher/star_fall_loop_whoosh_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/star_fall_loop_whoosh_1.mp3",
+   "docs/sounds/mp3/star_fall_loop_whoosh_2.mp3",
+   "docs/sounds/mp3/star_fall_loop_whoosh_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "StarFallSpell.java tick()",
+  "replaces": [
+   "ELYTRA_FLYING",
+   "FIREWORK_ROCKET_LAUNCH"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "wind_ascension",
+  "spell_ru": "Вознесение ветра",
+  "event": "pohsmp_core:spell.wind_ascension.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/wind_ascension_cast_1.ogg",
+   "spell/higher/wind_ascension_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_ascension_cast_1.mp3",
+   "docs/sounds/mp3/wind_ascension_cast_2.mp3"
+  ],
+  "what": "свист, взмах, порыв — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AscensionSpell.java rise()",
+  "replaces": [
+   "PHANTOM_FLAP"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "wind_ascension",
+  "spell_ru": "Вознесение ветра",
+  "event": "pohsmp_core:spell.wind_ascension.hit_chime",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/wind_ascension_hit_chime_1.ogg",
+   "spell/higher/wind_ascension_hit_chime_2.ogg",
+   "spell/higher/wind_ascension_hit_chime_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_ascension_hit_chime_1.mp3",
+   "docs/sounds/mp3/wind_ascension_hit_chime_2.mp3",
+   "docs/sounds/mp3/wind_ascension_hit_chime_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AscensionSpell.java beam(); AscensionSpell.java land()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME",
+   "FIREWORK_ROCKET_TWINKLE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "wind_ascension",
+  "spell_ru": "Вознесение ветра",
+  "event": "pohsmp_core:spell.wind_ascension.hit_powerdown",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/wind_ascension_hit_powerdown_1.ogg",
+   "spell/higher/wind_ascension_hit_powerdown_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_ascension_hit_powerdown_1.mp3",
+   "docs/sounds/mp3/wind_ascension_hit_powerdown_2.mp3"
+  ],
+  "what": "спад, «выключение» — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AscensionSpell.java land()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "wind_ascension",
+  "spell_ru": "Вознесение ветра",
+  "event": "pohsmp_core:spell.wind_ascension.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/wind_ascension_hit_shatter_1.ogg",
+   "spell/higher/wind_ascension_hit_shatter_2.ogg",
+   "spell/higher/wind_ascension_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_ascension_hit_shatter_1.mp3",
+   "docs/sounds/mp3/wind_ascension_hit_shatter_2.mp3",
+   "docs/sounds/mp3/wind_ascension_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AscensionSpell.java beam()",
+  "replaces": [
+   "AMETHYST_CLUSTER_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "wind_ascension",
+  "spell_ru": "Вознесение ветра",
+  "event": "pohsmp_core:spell.wind_ascension.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/higher/wind_ascension_release_1.ogg",
+   "spell/higher/wind_ascension_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_ascension_release_1.mp3",
+   "docs/sounds/mp3/wind_ascension_release_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — выпуск заклинания (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "AscensionSpell.java getCastFinishSound()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "world_rift",
+  "spell_ru": "Разлом мира",
+  "event": "pohsmp_core:spell.world_rift.cast_boom",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/world_rift_cast_boom_1.ogg",
+   "spell/higher/world_rift_cast_boom_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_rift_cast_boom_1.mp3",
+   "docs/sounds/mp3/world_rift_cast_boom_2.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "WorldRiftSpell.java onCast()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "world_rift",
+  "spell_ru": "Разлом мира",
+  "event": "pohsmp_core:spell.world_rift.cast_earth",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/higher/world_rift_cast_earth_1.ogg",
+   "spell/higher/world_rift_cast_earth_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_rift_cast_earth_1.mp3",
+   "docs/sounds/mp3/world_rift_cast_earth_2.mp3"
+  ],
+  "what": "земля, камень, корни — начало каста (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "WorldRiftSpell.java getCastStartSound()",
+  "replaces": [
+   "WARDEN_DIG"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "world_rift",
+  "spell_ru": "Разлом мира",
+  "event": "pohsmp_core:spell.world_rift.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/higher/world_rift_hit_1.ogg",
+   "spell/higher/world_rift_hit_2.ogg",
+   "spell/higher/world_rift_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_rift_hit_1.mp3",
+   "docs/sounds/mp3/world_rift_hit_2.mp3",
+   "docs/sounds/mp3/world_rift_hit_3.mp3"
+  ],
+  "what": "земля, камень, корни — удар / взрыв / попадание (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "WorldRiftSpell.java tick()",
+  "replaces": [
+   "DRIPSTONE_BLOCK_BREAK"
+  ]
+ },
+ {
+  "school": "higher",
+  "school_ru": "Высшая",
+  "spell": "world_rift",
+  "spell_ru": "Разлом мира",
+  "event": "pohsmp_core:spell.world_rift.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/higher/world_rift_loop_1.ogg",
+   "spell/higher/world_rift_loop_2.ogg",
+   "spell/higher/world_rift_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_rift_loop_1.mp3",
+   "docs/sounds/mp3/world_rift_loop_2.mp3",
+   "docs/sounds/mp3/world_rift_loop_3.mp3"
+  ],
+  "what": "вспышка пламени — пока действует (тики) (подпись школы: алый звон: металлический гонг с обратным наплывом, кольцевое «дрожание»)",
+  "where": "WorldRiftSpell.java tick()",
+  "replaces": [
+   "WITHER_SHOOT"
+  ]
  }
 ]

@@ -1249,9 +1249,9 @@ def stage_fx():
 
 def spell_fx():
     # ---------------------------------------------------------------- «Дом, которого нет» (Высшее): каст 50 тиков
-    fx('nightmare_house_seal', '«Дом, которого нет»: печать под заклинателем на время каста — играть, только если SchoolSeals.shown(caster) '
+    fx('nightmare_house_that_isnt_seal', '«Дом, которого нет»: печать под заклинателем на время каста — играть, только если SchoolSeals.shown(caster) '
                                '== false (иначе две печати).', 'nightmare', -1, [E('sigil', 0, 'caster+0,0.05,0', id='nightmare_house_ground', follow=True)])
-    fx('nightmare_house_cast', '«Дом, которого нет», каст 2.5 с (50 тиков; caster + target): над целью раскрывается печать-коридор '
+    fx('nightmare_house_that_isnt_cast', '«Дом, которого нет», каст 2.5 с (50 тиков; caster + target): над целью раскрывается печать-коридор '
                                '(никаких линий к цели), у ладони — око; на 44 тике печать «втягивается», на 46 — у ног цели чернила '
                                'смыкаются (видят все: цель «проваливается» только для себя). Анимация pohsmp_nightmare_house_cast.',
        'nightmare', 56, [
@@ -1268,15 +1268,15 @@ def spell_fx():
            E('sprites', 46, 'target+0,0.2,0', duration=3, texture='mote_ink', count=30, rate=10, area=1.2, speed=0.14, gravity=0.012,
              size=[0.22, 0.08], life=20, color=INKC, blend='translucent'),
        ])
-    fx('nightmare_house_enter', '«Дом»: вход в коридор — ТОЛЬКО ЖЕРТВЕ (follow, 30 тиков): мир тонет в черноте за 10 тиков (tint 1.0), '
+    fx('nightmare_house_that_isnt_enter', '«Дом»: вход в коридор — ТОЛЬКО ЖЕРТВЕ (follow, 30 тиков): мир тонет в черноте за 10 тиков (tint 1.0), '
                                 'падение (код: лёгкий крен/опускание камеры), из темноты проступает коридор (код включает модули на 20 тике).',
        'nightmare', 30, [
            E('tint', 0, 'caster', duration=30, radius=64, color='#000000', strength=1.0, **{'in': ease(10, 'easeInCubic'), 'out': ease(10, 'easeOutSine')}),
            E('sprites', 0, 'caster+0,2.5,0', duration=10, follow=True, texture='mote_ink', count=60, rate=6, area=3, speed=0.0, gravity=0.03,
              size=[0.3, 0.2], life=14, color=INKC, blend='translucent'),
            E('flash', 18, 'caster+0,1.4,0', duration=6, size=2.0, color=CRIMSON, brightness=0.4)])
-    fx('nightmare_house_corridor', '«Дом»: атмосфера коридора у жертвы (follow, 1200 тиков = 1 мин; гасить Fx.stop при выходе): пыль в луче '
-                                   'лампы, туман у пола, капли с потолка; тени — nightmare_house_shadow. Модули — fx/meshes/nightmare_corridor (код).',
+    fx('nightmare_house_that_isnt_corridor', '«Дом»: атмосфера коридора у жертвы (follow, 1200 тиков = 1 мин; гасить Fx.stop при выходе): пыль в луче '
+                                   'лампы, туман у пола, капли с потолка; тени — nightmare_house_that_isnt_shadow. Модули — fx/meshes/nightmare_corridor (код).',
        'nightmare', 1200, [
            E('sprites', 0, 'caster+0,1.2,0', duration=1200, follow=True, texture='spark_soft', count=99999, rate=0.6, area=4, speed=0.003,
              gravity=-0.0002, size=[0.04, 0.0], life=60, color='#A89070', brightness=0.4),
@@ -1285,7 +1285,7 @@ def spell_fx():
            E('sprites', 0, 'caster+0,3.3,0', duration=1200, follow=True, texture='mote_ink', count=99999, rate=0.3, area=3, speed=0.0,
              gravity=0.02, size=[0.1, 0.06], life=20, color=INKC, blend='translucent'),
            E('tint', 0, 'caster', duration=1200, radius=64, color='#120A08', strength=0.25, **{'in': ease(20), 'out': ease(20)})])
-    fx('nightmare_house_shadow', '«Дом»: тень выходит из двери (жертва; caster = точка двери на полу коридора, yaw — внутрь коридора; '
+    fx('nightmare_house_that_isnt_shadow', '«Дом»: тень выходит из двери (жертва; caster = точка двери на полу коридора, yaw — внутрь коридора; '
                                  '40 тиков): дверь распахивается (mesh nightmare_door, петля), из проёма вытекает тьма, проступает силуэт '
                                  '(через 12 тиков код ставит на это место тень — модель nm_lurker с appear). ',
        'nightmare', 40, [
@@ -1298,16 +1298,16 @@ def spell_fx():
              size=[1.0, 2.6], life=14, color='#030104', blend='translucent'),
            E('decal', 8, 'caster+0,0.05,0.8', duration=32, texture='nightmare_shadow_reach', radius=1.6, grow=12, blend='translucent',
              color='#050208')])
-    fx('nightmare_house_exit', '«Дом»: выход из коридора (жертва, 30 тиков): коридор растворяется чернилами вверх, свет возвращается '
+    fx('nightmare_house_that_isnt_exit', '«Дом»: выход из коридора (жертва, 30 тиков): коридор растворяется чернилами вверх, свет возвращается '
                                'бледной вспышкой; дальше — стадия 2 (nightmare_stage2).', 'nightmare', 30, [
         E('tint', 0, 'caster', duration=30, radius=64, color='#000000', strength=0.9, **{'in': ease(4), 'out': ease(24, 'easeOutSine')}),
         E('sprites', 0, 'caster+0,0.5,0', duration=12, follow=True, texture='mote_ink', count=80, rate=7, area=4, speed=0.02, gravity=-0.02,
           size=[0.24, 0.1], life=20, color=INKC, blend='translucent'),
         E('flash', 4, 'caster+0,1.5,0', duration=10, size=2.4, color=PALE, brightness=0.4)])
     # ---------------------------------------------------------------- «Ночь без рассвета» (Высшее): каст 60 тиков, зона r24 на 2 мин
-    fx('nightmare_night_seal', '«Ночь без рассвета»: печать под заклинателем на время каста (правило SchoolSeals.shown).', 'nightmare', -1,
+    fx('nightmare_endless_night_seal', '«Ночь без рассвета»: печать под заклинателем на время каста (правило SchoolSeals.shown).', 'nightmare', -1,
        [E('sigil', 0, 'caster+0,0.05,0', id='nightmare_night_ground', follow=True)])
-    fx('nightmare_night_cast', '«Ночь без рассвета», каст 3 с (60 тиков): левая ладонь гасит «свет» (око у ладони), правая поднимается к '
+    fx('nightmare_endless_night_cast', '«Ночь без рассвета», каст 3 с (60 тиков): левая ладонь гасит «свет» (око у ладони), правая поднимается к '
                                'небу — над заклинателем всходит красная луна (печать nightmare_red_moon, растёт), с 30 тика небо темнеет; '
                                'на 56 тике — «закат навсегда»: тёмная волна по земле до r24. Анимация pohsmp_nightmare_night_cast.',
        'nightmare', 70, [
@@ -1320,7 +1320,7 @@ def spell_fx():
            E('wave', 56, 'caster+0,1,0', duration=20, shape='sphere', radius=6, rim=1.0, color=CRIMSON, brightness=0.6),
            E('flash', 56, 'caster+0,1.4,0', duration=10, size=3.0, color=CRIMSON, brightness=0.7, screen=0.2),
        ])
-    fx('nightmare_night_zone', '«Ночь без рассвета», зона 2 мин (2400 тиков; caster = центр зоны, не follow; гасить Fx.stop): печать по '
+    fx('nightmare_endless_night', '«Ночь без рассвета», зона 2 мин (2400 тиков; caster = центр зоны, не follow; гасить Fx.stop): печать по '
                                'земле r24, по краю — тёмная завеса (вертикальные струи тьмы), внутри — сумрак с красным отливом (tint r24), '
                                'хлопья тьмы и капли. Вечная ночь и красная луна неба у врагов внутри — код (см. письмо); nightmare_red_moon — '
                                'запасной диск в небе.', 'nightmare', 2400, [
@@ -1334,12 +1334,12 @@ def spell_fx():
         E('sprites', 0, 'caster+0,0.2,0', duration=2400, texture='glow', count=999999, rate=1.0, area=24, speed=0.002, gravity=-0.0004,
           size=[1.6, 2.6], life=90, color='#14040C', brightness=0.6, blend='translucent'),
     ])
-    fx('nightmare_night_pulse', '«Ночь»: каждые 8 с — «стадия глубже» (caster = центр зоны, 36 тиков): от края зоны к центру бежит тёмное '
+    fx('nightmare_endless_night_pulse', '«Ночь»: каждые 8 с — «стадия глубже» (caster = центр зоны, 36 тиков): от края зоны к центру бежит тёмное '
                                 'кольцо (сжатие), удар сердца — багровая вспышка в центре на 20 тике.', 'nightmare', 36, [
         E('wave', 0, 'caster', duration=20, shape='ring', radius=24, thickness=2.5, color=INKC, brightness=1.0, reverse=True, followTerrain=True),
         E('flash', 20, 'caster+0,1,0', duration=10, size=4, color=CRIMSON, brightness=0.6),
         E('wave', 20, 'caster', duration=14, shape='ring', radius=6, color='@secondary', brightness=0.7)])
-    fx('nightmare_night_light', '«Ночь»: настоящий свет (блочный ≥ 10) удерживает стадию — на источнике (caster = точка блока) бледный '
+    fx('nightmare_endless_night_light', '«Ночь»: настоящий свет (блочный ≥ 10) удерживает стадию — на источнике (caster = точка блока) бледный '
                                 'ореол-сопротивление, тьма вокруг отступает кольцом (40 тиков; показывать жертве, когда свет её спас).',
        'nightmare', 40, [
            E('flash', 0, 'caster+0,0.5,0', duration=30, size=2.4, color='#FFE8C0', brightness=0.5),
@@ -1386,12 +1386,12 @@ def spell_fx():
         E('sprites', 236, 'caster+0,1.4,0', duration=3, texture='mote_ink', count=80, rate=30, spread=1.0, speed=0.35, gravity=0.01,
           size=[0.3, 0.1], life=30, color=INKC, blend='translucent'),
     ]
-    fx('nightmare_abyss_cast', '«Пробуждение не наступит», каст 12 с = 240 тиков + хвост 20 (caster; видят все в r64 — это ролик). '
+    fx('nightmare_no_awakening_cast', '«Пробуждение не наступит», каст 12 с = 240 тиков + хвост 20 (caster; видят все в r64 — это ролик). '
                                'Шкала = ролик (ТЗ T25, «Ролик») и анимация pohsmp_nightmare_abyss_cast: 0–2 печать и чернила из трещин; '
                                '2–4 лужа до r16, капли вверх, ленты; 4–6 небо гаснет, печать-небо, тени-руки; 6–8 стена чернил r22–30, '
                                'воронка; 8–10 глаза в чернилах, 9 с — удар сердца (облик мага → nm_dread у жертв); 10–11.8 тьма и тишина; '
                                '11.8 (236 тик) — вспышка, волна до r64, у всех жертв — стадия 3.', 'nightmare', 260, cast)
-    fx('nightmare_abyss_world', '«Пробуждение не наступит»: мир-кошмар жертвы на 5 мин (follow, 6000 тиков; гасить Fx.stop при снятии): '
+    fx('nightmare_no_awakening_world', '«Пробуждение не наступит»: мир-кошмар жертвы на 5 мин (follow, 6000 тиков; гасить Fx.stop при снятии): '
                                 'всё стадии 3 + гуще: чернильный дождь, глаза в темноте ближе и чаще, тени у ног шире, багровый туман. '
                                 'Подмены мира/неба/лиц, чудовища, сны-места (дом жертвы тенями) — код.', 'nightmare', 6000, [
         E('decal', 0, 'caster+0,0.06,0', duration=6000, follow=True, texture='nightmare_shadow_reach', radius=11, blend='translucent',
@@ -1404,7 +1404,7 @@ def spell_fx():
         E('sprites', 0, 'caster+0,0.2,0', duration=6000, follow=True, texture='glow', count=999999, rate=0.8, area=14, speed=0.002,
           gravity=0.0, size=[2.0, 3.0], life=90, color='#18040C', brightness=0.7, blend='translucent'),
         E('sigil', 0, 'caster+0,0.08,0', follow=True, id='nightmare_hands_ground', scale=2.0, until=5990)])
-    fx('nightmare_abyss_thicken', '«Пробуждение не наступит»: каждую минуту кошмар сгущается (жертва, 60 тиков): мир на миг гаснет '
+    fx('nightmare_no_awakening_thicken', '«Пробуждение не наступит»: каждую минуту кошмар сгущается (жертва, 60 тиков): мир на миг гаснет '
                                   '(tint к чёрному за 6 тиков), два удара сердца (багровые вспышки на 10 и 22 тике), тьма сжимается кольцом к '
                                   'жертве, глаза вокруг разом открываются. Шаги сгущения (больше галлюцинаций → союзники нападают → ники '
                                   'пропадают) — код; эффект один и тот же.', 'nightmare', 60, [
@@ -1414,7 +1414,7 @@ def spell_fx():
         E('wave', 8, 'caster', duration=24, shape='ring', radius=16, thickness=3, color=INKC, brightness=1.0, reverse=True),
         E('sprites', 22, 'caster+0,1.6,0', duration=4, texture='mote_eye_n', count=40, rate=10, area=8, speed=0.0, gravity=0.0,
           size=[0.45, 0.0], life=30, color=GLOWRED, glow=0.9)])
-    fx('nightmare_abyss_dispel', '«Пробуждение не наступит»: кошмар рассеивается (заклинатель убит / «Благословение»; у каждой жертвы, '
+    fx('nightmare_no_awakening_dispel', '«Пробуждение не наступит»: кошмар рассеивается (заклинатель убит / «Благословение»; у каждой жертвы, '
                                  '40 тиков): чернила стекают вниз и уходят в землю, бледная вспышка, тьма кольцом наружу.', 'nightmare', 40, [
         E('tint', 0, 'caster', duration=40, radius=64, color='#000000', strength=0.6, **{'in': ease(2), 'out': ease(36, 'easeOutSine')}),
         E('flash', 2, 'caster+0,1.6,0', duration=14, size=4, color=PALE, brightness=0.5, screen=0.3),
@@ -1576,7 +1576,7 @@ def mesh_corridor():
 
 
 def mesh_door():
-    """Створка двери 1×2.2 (петля у x = −0.5, ручка у x = +0.35; лицом к −z) — для nightmare_house_shadow (поворот на петле — hinge)."""
+    """Створка двери 1×2.2 (петля у x = −0.5, ручка у x = +0.35; лицом к −z) — для nightmare_house_that_isnt_shadow (поворот на петле — hinge)."""
     T0, T1, KN, INKT = 0, 1, 2, 3
     b = [bx(-0.5, 0, -0.04, 0.5, 2.2, 0.04, T0)]
     for (y0, y1) in ((0.12, 1.0), (1.15, 2.08)):
@@ -1841,7 +1841,6 @@ LANG = {
     'ui.pohsmp_core.nightmare.stage.3': ('кошмар', 'nightmare'),
     'ui.pohsmp_core.nightmare.resisted': ('Рассудок устоял', 'Your mind held'),
     'ui.pohsmp_core.nightmare.no_target': ('Нет цели', 'No target'),
-    'ui.pohsmp_core.nightmare.light_holds': ('Свет удерживает кошмар', 'The light holds the nightmare back'),
     'ui.pohsmp_core.house_that_isnt.time': ('Дом: %s с', 'House: %s s'),
     'ui.pohsmp_core.endless_night.zone': ('Ночь: радиус %s, %s с', 'Night: radius %s, %s s'),
     'ui.pohsmp_core.no_awakening.cast': ('Мир тонет…', 'The world is drowning…'),
@@ -1867,8 +1866,8 @@ def lang():
         path = os.path.join(A, 'lang', code + '.json')
         with open(path, encoding='utf-8') as fh:
             data = json.load(fh)
-        for k, v in LANG.items():
-            data[k] = v[idx]
+        for k, v in LANG.items():          # только недостающие: тексты, которые уже завёл чат Кодинга, не трогаем
+            data.setdefault(k, v[idx])
         with open(path, 'w', encoding='utf-8', newline='\n') as fh:
             json.dump(data, fh, ensure_ascii=False, indent=2)
             fh.write('\n')

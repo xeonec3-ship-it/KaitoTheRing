@@ -1686,7 +1686,7 @@ HOUSE_PULL_R = _fk(pitch=-40, yaw=-6, roll=22, bend=-62)          # рывок �
 HOUSE_DROP_R = _fk(pitch=-14, yaw=-4, roll=14, bend=-30)          # кисть отпущена вниз — цель «провалилась»
 
 
-def nightmare_house_cast():
+def nightmare_house_that_isnt_cast():
     """«Дом, которого нет» (Высшее), 2.5 с = 50 тиков: левый палец к губам («тсс», 0–0.5), правая рука к цели — берётся за невидимую
     ручку (0.5); медленно поворачивает кисть, как ключ (0.6–1.6, у ладони — око); тянет на себя (1.6–2.2) — дверь открыта; на 2.2 с
     (44 тик) кисть резко разжимается и падает — на 46 тике цель проваливается. Держит позу."""
@@ -1709,7 +1709,7 @@ NIGHT_SKY_R = _fk(pitch=-172, yaw=0, roll=-8, bend=-6)            # правая
 NIGHT_SLAM_R = _fk(pitch=-20, yaw=4, roll=34, bend=-40)           # кулак вниз-в сторону — «закат навсегда»
 
 
-def nightmare_night_cast():
+def nightmare_endless_night_cast():
     """«Ночь без рассвета» (Высшее), 3 с = 60 тиков: левая ладонь вперёд (око у ладони, 0–0.5), сжимается в кулак и уводится вниз —
     «гасит свет» (0.6–1.4); правая медленно поднимается к небу ладонью вверх, взгляд за ней (1.0–2.6) — всходит луна; на 2.8 с
     (56 тик) кулак правой падает вниз-в сторону, корпус клонится — тьма бежит по земле. Держит позу."""
@@ -1734,7 +1734,7 @@ def nightmare_night_cast():
 ABYSS_T = 12.0
 
 
-def nightmare_abyss_cast():
+def nightmare_no_awakening_cast():
     """«Пробуждение не наступит» (Мифическое), 12 с = 240 тиков (планы ролика — ТЗ T25, «Ролик»):
     0–2 ладони зажимают уши, голова опущена, медленное покачивание, как над колыбелью (звучит сломанная колыбельная);
     2–4 ладони сползают и опускаются вниз ладонями к земле — «поднимает» чернила: руки медленно идут вверх до пояса ладонями вверх;
@@ -1786,9 +1786,9 @@ def _t25(fn, name, length, head):
     return [lambda: fn()[0], lambda: _finish(name, *fn()[1][:3], head=head, legs=fn()[1][3], body_y=fn()[1][4], length=length)]
 
 
-_T25 = (_t25(nightmare_house_cast, 'pohsmp_nightmare_house_finish', 1.0, _HL(pitch=10, yaw=4))
-        + _t25(nightmare_night_cast, 'pohsmp_nightmare_night_finish', 1.2, _HL(pitch=-2, yaw=6))
-        + _t25(nightmare_abyss_cast, 'pohsmp_nightmare_abyss_finish', 1.5, _HL(pitch=-6)))
+_T25 = (_t25(nightmare_house_that_isnt_cast, 'pohsmp_nightmare_house_finish', 1.0, _HL(pitch=10, yaw=4))
+        + _t25(nightmare_endless_night_cast, 'pohsmp_nightmare_night_finish', 1.2, _HL(pitch=-2, yaw=6))
+        + _t25(nightmare_no_awakening_cast, 'pohsmp_nightmare_abyss_finish', 1.5, _HL(pitch=-6)))
 
 
 def pose_gallery():

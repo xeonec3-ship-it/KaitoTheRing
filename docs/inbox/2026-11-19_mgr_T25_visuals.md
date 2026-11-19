@@ -29,6 +29,8 @@
   `no_awakening`, `house_that_isnt`.
 
 ## 2. Эффекты (`fx/*.json`) — точки и параметры
+Имена — по шаблону кода `nightmare_<id заклинания>[_часть]`: `nightmare_endless_night_cast` и `nightmare_endless_night` совпадают с тем, что уже
+зовёт `EndlessNightSpell` (каст 60 тиков; зона рассчитана на r24 — ваш `.scale(r / 24.0)` и `.duration(ticks)` подходят).
 Все длительности — тики. `caster`/`target` — как в ctx; «жертва» = эффект шлётся **только ей** (её клиент), если не сказано иное.
 
 | fx | длит. | кто/где | заметки |
@@ -37,21 +39,21 @@
 | `nightmare_stage_up` / `_down` | 24 / 30 | жертва | переход стадии глубже (тьма схлопывается, удар сердца на 6 тике) / спад |
 | `nightmare_silhouette_0..2` | 8 | жертва; caster = точка на земле | мелькающий силуэт (высокий / ребёнок / сгорбленный). Ставить в 8–16 бл. под углом 50–80° от взгляда, 2–6 раз в минуту на стадии 1+ |
 | `nightmare_mark` | −1 | над жертвой; слать заклинателю и союзникам | око-метка «под кошмаром» (жертве не слать) |
-| `nightmare_house_seal` | −1 | caster | печать-коридор под ногами — **только если `SchoolSeals.shown(caster) == false`** |
-| `nightmare_house_cast` | 56 | caster + target | каст **2.5 с (50 тиков)**: печать-коридор над целью (+2.6), чернила смыкаются у её ног; **на 46 тике цель «проваливается»** (включайте ей коридор). Анимация `pohsmp_nightmare_house_cast` |
-| `nightmare_house_enter` | 30 | жертва | мир тонет в черноте за 10 тиков; **на 20 тике** показывать модули коридора |
-| `nightmare_house_corridor` | 1200 | жертва, follow | атмосфера коридора на 1 мин (пыль, туман у пола, капли); гасить при выходе |
-| `nightmare_house_shadow` | 40 | жертва; caster = точка двери на полу, yaw — внутрь коридора | дверь распахивается (меш `nightmare_door` на петле), из проёма вытекает тьма и силуэт; **на 12 тике** ставьте тень (модель `nm_lurker` + анимация `appear`) |
-| `nightmare_house_exit` | 30 | жертва | выход: коридор растворяется, бледная вспышка; дальше `nightmare_stage2` |
-| `nightmare_night_seal` | −1 | caster | печать под ногами (правило `SchoolSeals.shown`) |
-| `nightmare_night_cast` | 70 | caster | каст **3 с (60 тиков)**: всходит красная луна над магом, небо темнеет; **на 56 тике** — тёмная волна до r24 (старт зоны). Анимация `pohsmp_nightmare_night_cast` |
-| `nightmare_night_zone` | 2400 | caster = центр зоны (не follow) | печать r24 по земле (`nightmare_night_floor`), завеса тьмы по краю, tint r24, хлопья; `nightmare_red_moon` в небе (+40) — запасной диск, если код не подменяет луну |
-| `nightmare_night_pulse` | 36 | центр зоны | каждые 8 с: кольцо тьмы бежит к центру, удар сердца на 20 тике |
-| `nightmare_night_light` | 40 | точка блока света; жертве | свет ≥ 10 удержал стадию — бледный ореол, тьма отступает |
-| `nightmare_abyss_cast` | 260 | caster; видят все в r64 | каст **12 с = 240 тиков** + хвост. Шкала = ролик (ТЗ) и анимация `pohsmp_nightmare_abyss_cast`. **9.0 с (180 тик)** — облик мага → `nm_dread` у жертв; **236 тик** — вспышка, волна r64, у всех жертв стадия 3. Печать (`nightmare_abyss_ground`) — внутри эффекта: отметьте его как «каст со своей печатью» (без знака школы и печати ступени) |
-| `nightmare_abyss_world` | 6000 | жертва, follow | мир-кошмар на 5 мин; гасить `Fx.stop` при снятии |
-| `nightmare_abyss_thicken` | 60 | жертва | сгущение каждую минуту (60/120/180/240 с) |
-| `nightmare_abyss_dispel` | 40 | жертва | рассеивание (маг убит / «Благословение») |
+| `nightmare_house_that_isnt_seal` | −1 | caster | печать-коридор под ногами — **только если `SchoolSeals.shown(caster) == false`** |
+| `nightmare_house_that_isnt_cast` | 56 | caster + target | каст **2.5 с (50 тиков)**: печать-коридор над целью (+2.6), чернила смыкаются у её ног; **на 46 тике цель «проваливается»** (включайте ей коридор). Анимация `pohsmp_nightmare_house_cast` |
+| `nightmare_house_that_isnt_enter` | 30 | жертва | мир тонет в черноте за 10 тиков; **на 20 тике** показывать модули коридора |
+| `nightmare_house_that_isnt_corridor` | 1200 | жертва, follow | атмосфера коридора на 1 мин (пыль, туман у пола, капли); гасить при выходе |
+| `nightmare_house_that_isnt_shadow` | 40 | жертва; caster = точка двери на полу, yaw — внутрь коридора | дверь распахивается (меш `nightmare_door` на петле), из проёма вытекает тьма и силуэт; **на 12 тике** ставьте тень (модель `nm_lurker` + анимация `appear`) |
+| `nightmare_house_that_isnt_exit` | 30 | жертва | выход: коридор растворяется, бледная вспышка; дальше `nightmare_stage2` |
+| `nightmare_endless_night_seal` | −1 | caster | печать под ногами (правило `SchoolSeals.shown`) |
+| `nightmare_endless_night_cast` | 70 | caster | каст **3 с (60 тиков)**: всходит красная луна над магом, небо темнеет; **на 56 тике** — тёмная волна до r24 (старт зоны). Анимация `pohsmp_nightmare_night_cast` |
+| `nightmare_endless_night` | 2400 | caster = центр зоны (не follow) | печать r24 по земле (`nightmare_night_floor`), завеса тьмы по краю, tint r24, хлопья; `nightmare_red_moon` в небе (+40) — запасной диск, если код не подменяет луну |
+| `nightmare_endless_night_pulse` | 36 | центр зоны | каждые 8 с: кольцо тьмы бежит к центру, удар сердца на 20 тике |
+| `nightmare_endless_night_light` | 40 | точка блока света; жертве | свет ≥ 10 удержал стадию — бледный ореол, тьма отступает |
+| `nightmare_no_awakening_cast` | 260 | caster; видят все в r64 | каст **12 с = 240 тиков** + хвост. Шкала = ролик (ТЗ) и анимация `pohsmp_nightmare_abyss_cast`. **9.0 с (180 тик)** — облик мага → `nm_dread` у жертв; **236 тик** — вспышка, волна r64, у всех жертв стадия 3. Печать (`nightmare_abyss_ground`) — внутри эффекта: отметьте его как «каст со своей печатью» (без знака школы и печати ступени) |
+| `nightmare_no_awakening_world` | 6000 | жертва, follow | мир-кошмар на 5 мин; гасить `Fx.stop` при снятии |
+| `nightmare_no_awakening_thicken` | 60 | жертва | сгущение каждую минуту (60/120/180/240 с) |
+| `nightmare_no_awakening_dispel` | 40 | жертва | рассеивание (маг убит / «Благословение») |
 | `nm_spawn` / `nm_despawn` | 24 / 24 | caster = кошмар-моб | появление из лужи / рассыпается чернилами (вместе с анимациями `appear` / `vanish`) |
 | `nm_hands_grab` | 30 | жертва (у ног) | «Руки из земли» хватают, 1.5 с удержания |
 | `nm_maw_roar` | 40 | caster = Пасть | тёмная волна из пасти (вместе с `roar`) |
@@ -94,7 +96,7 @@ GeckoLib есть в сборке (`geckolib-forge-1.20.1:4.8.4`, compileOnly �
 или `nm_mimic`, паук → `nm_crawler`, крупные → `nm_maw`), анимации `walk`/`attack` по состоянию моба; хитбокс и урон — моба.
 
 ## 4. Мир-кошмар стадии 3, тени стадии 1, силуэты
-- **Экранные накладки** (рисовать поверх всего экрана, растянуть, альфа как есть): `textures/fx/nightmare_stage1.png` (тьма по краям с пальцами теней),
+- **Экранные накладки** (рисовать поверх всего экрана, растянуть, альфа как есть; могут заменить/дополнить вашу виньетку из `NightmareClient`): `textures/fx/nightmare_stage1.png` (тьма по краям с пальцами теней),
   `nightmare_stage2.png` (гуще + проступают багровые вены), `nightmare_stage3.png` (тяжёлые чернила текут сверху, багровый отлив);
   `nightmare_ink_screen.png` (чернила стекают сверху — ролик/сгущение), `nightmare_moths_screen.png` (мотыльки на краях — атака роя).
 - **Подмены вида мира (только у жертвы):** `textures/block/nightmare/grass_block_top`, `grass_block_side`, `leaves_dead` (почти прозрачная — деревья голые),
@@ -112,7 +114,7 @@ GeckoLib есть в сборке (`geckolib-forge-1.20.1:4.8.4`, compileOnly �
 - Меш-модуль `fx/meshes/nightmare_corridor`: 3 (x, −1.5…1.5) × 3.5 (y) × 4 (z, 0…4) блока, ставить подряд вдоль +z — стыкуется без шва. Обои, панель,
   плинтус, карниз, кессоны потолка, тусклая лампа (свет `#FFB070`), пустые рамы, пятна, потёки чернил по стенам, чернила из-под дверей.
   **Двери** — по одной на каждой стене в середине модуля: центр проёма (±1.45, 0…2.2, z0 + 2). Открытая — меш `nightmare_door`
-  (1×2.2, петля x = −0.5; в `nightmare_house_shadow` поворот на петле ключами) или текстура `textures/fx/nightmare_door_open.png`.
+  (1×2.2, петля x = −0.5; в `nightmare_house_that_isnt_shadow` поворот на петле ключами) или текстура `textures/fx/nightmare_door_open.png`.
 - «Коридор едет с жертвой»: держите 5–7 модулей вокруг неё, при сдвиге на 4 бл. переставляйте задний вперёд; повороты коридора не нужны.
 - Если удобнее рисовать своими квадами — материалы `textures/fx/nightmare_wall.png`, `nightmare_floor.png`, `nightmare_ceiling.png` (по 256 px на блок,
   тайлятся), `nightmare_door.png` / `nightmare_door_open.png` (128×256 на 1×2 бл.).
@@ -125,11 +127,13 @@ GeckoLib есть в сборке (`geckolib-forge-1.20.1:4.8.4`, compileOnly �
 | `pohsmp_nightmare_abyss_cast` / `_finish` | **12 с = 240 тиков** (hold) / 1.5 с | зажимает уши и качается → поднимает чернила → руки V к небу → обнимает себя → 9 с удар сердца, выгиб → тьма, голова набок → 11.8 голова к зрителю, когти |
 Касты замирают в последней позе — после каста играть `_finish`.
 
-## 7. lang (ru/en, 47 ключей)
+## 7. lang (ru/en)
+Пока я работал, чат Кодинга уже завёл часть ключей (школа, атрибуты, фокус, `immersion`, `death.attack.nightmare_magic*`, заклинания и их `.guide`,
+`ui.pohsmp_core.endless_night.*`) — **их тексты не трогал**, генератор дописывает только недостающие (`setdefault`). Мои ключи (всего в генераторе 46):
 `school.pohsmp_core.nightmare`; `attribute.pohsmp_core.nightmare_spell_power` / `nightmare_magic_resist`; `item.pohsmp_core.broken_lullaby` (+`.desc`);
 `death.attack.nightmare_magic` (+`.item`, `.player`) — под тип урона `nightmare_magic` (JSON типа урона — код); `spell.pohsmp_core.<3 id>` + `.guide`;
 `effect.pohsmp_core.<immersion|endless_night|no_awakening|house_that_isnt>` + `.description`; `fx.pohsmp_core.no_awakening.title`;
-`entity.pohsmp_core.nm_<9 id>`; ui: `ui.pohsmp_core.nightmare.{stage,stage.1..3,resisted,no_target,light_holds}`, `house_that_isnt.time`,
+`entity.pohsmp_core.nm_<9 id>`; ui: `ui.pohsmp_core.nightmare.{stage,stage.1..3,resisted,no_target}`, `house_that_isnt.time`,
 `endless_night.zone`, `no_awakening.{cast,time,thicken.1..4}` (формат `%s` как у соседей; лишнее — удалим).
 
 ## Вопросы / что нужно

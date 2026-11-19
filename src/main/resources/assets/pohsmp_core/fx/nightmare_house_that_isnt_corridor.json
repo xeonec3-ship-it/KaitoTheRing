@@ -1,5 +1,5 @@
 {
- "comment": "«Дом»: атмосфера коридора у жертвы (follow, 1200 тиков = 1 мин; гасить Fx.stop при выходе): пыль в луче лампы, туман у пола, капли с потолка; тени — nightmare_house_shadow. Модули — fx/meshes/nightmare_corridor (код). Сгенерировано tools/gen_nightmare_fx.py.",
+ "comment": "«Дом»: атмосфера коридора у жертвы (follow, 1200 тиков = 1 мин; гасить Fx.stop при выходе): пыль в луче лампы, туман у пола, капли с потолка; тени — nightmare_house_that_isnt_shadow. Модули — fx/meshes/nightmare_corridor (код). Сгенерировано tools/gen_nightmare_fx.py.",
  "style": "nightmare",
  "duration": 1200,
  "elements": [

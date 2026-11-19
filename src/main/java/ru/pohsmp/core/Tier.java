@@ -19,7 +19,8 @@ public enum Tier {
     HIGHER("higher", 0xFF3B3B, false),
     MYTHIC("mythic", 0xB45CFF, true),
     DIVINE("divine", 0xFFD34D, true),
-    CREATION("creation", 0xD4A017, true);
+    CREATION("creation", 0xD4A017, true),
+    UNKNOWN("unknown", 0x7FFFD0, true);
 
     public static final String NBT = "pohsmp_tier";
     private static final Map<String, Tier> BUILTIN = builtin();
@@ -31,6 +32,7 @@ public enum Tier {
         for (String p : Reg.MYTHIC_SPELLS) m.put(PohCore.MODID + ":" + p, MYTHIC);
         for (String p : Reg.HIGHER_SPELLS) m.put(PohCore.MODID + ":" + p, HIGHER);
         for (String p : Reg.CREATION_SPELLS) m.put(PohCore.MODID + ":" + p, CREATION);
+        for (String p : Reg.UNKNOWN_SPELLS) m.put(PohCore.MODID + ":" + p, UNKNOWN);
         return m;
     }
 

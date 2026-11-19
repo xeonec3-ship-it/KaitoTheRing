@@ -30,12 +30,33 @@ public final class GateStaff {
     /** Ticks from the scene start when the left hand takes the staff, and the scene length. */
     private static final int TAKE = 760, END = 1300;
 
-    private record Run(int caster, long start) {}
+    /**
+     * "Downfall": the staff went through the head at the start of the cast (manager 19.11). Until this tick it is out of the hand and
+     * hangs upright to the right of the caster, then the normal staff in the hand.
+     */
+    private static final int DOWNFALL_HANG = 53;
+
+    private record Run(int caster, long start, int scene) {
+        boolean downfall() { return scene == ru.pohsmp.core.spell.Cutscene.DOWNFALL; }
+        int end() { return downfall() ? DOWNFALL_HANG : END + 40; }
+    }
 
     private static final Map<Integer, Run> RUNS = new HashMap<>();
 
     public static void start(int key, int casterId, long now) {
-        RUNS.put(key, new Run(casterId, now));
+        RUNS.put(key, new Run(casterId, now, ru.pohsmp.core.spell.Cutscene.SILENT_GATE));
+    }
+
+    /** "Downfall" scene start: hide the held staff and hang it beside the caster until {@link #DOWNFALL_HANG}. */
+    public static void startDownfall(int key, int casterId, long now) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null || !(mc.level.getEntity(casterId) instanceof LivingEntity le) || !isStaff(le.getMainHandItem())) return;
+        HiddenHands.hide(le, DOWNFALL_HANG, 0, true);
+        RUNS.put(key, new Run(casterId, now, ru.pohsmp.core.spell.Cutscene.DOWNFALL));
+    }
+
+    private static boolean isStaff(ItemStack s) {
+        return s.getItem() instanceof io.redspace.ironsspellbooks.item.weapons.StaffItem;
     }
 
     /**
@@ -62,12 +83,12 @@ public final class GateStaff {
         double now = mc.level.getGameTime() + pt;
         Vec3 cam = e.getCamera().getPosition();
         MultiBufferSource.BufferSource buf = mc.renderBuffers().bufferSource();
-        RUNS.values().removeIf(r -> now - r.start() > END + 40);
+        RUNS.values().removeIf(r -> now - r.start() > r.end());
         for (Run r : RUNS.values()) {
             Entity en = mc.level.getEntity(r.caster());
             if (!(en instanceof LivingEntity le) || !le.isAlive()) continue;
             ItemStack st = le.getMainHandItem();
-            if (!(st.getItem() instanceof SilentWitchStaff)) continue;
+            if (r.downfall() ? !isStaff(st) : !(st.getItem() instanceof SilentWitchStaff)) continue;
             double t = now - r.start();
             float body = net.minecraft.util.Mth.rotLerp(pt, le.yBodyRotO, le.yBodyRot);
             Vec3 p = le.getPosition(pt);
@@ -75,7 +96,10 @@ public final class GateStaff {
             ps.pushPose();
             ps.translate(p.x - cam.x, p.y - cam.y, p.z - cam.z);
             ps.mulPose(Axis.YP.rotationDegrees(-body));   // local: +x left, +z forward
-            if (t < TAKE) {   // floating upright, front-left, slow sway and bob
+            if (r.downfall()) {   // hanging upright to the right, a little forward, slow sway
+                ps.translate(-0.8, 1.1 + 0.05 * Math.sin(t * 0.08), 0.25);
+                ps.mulPose(Axis.ZP.rotationDegrees((float) (3 * Math.sin(t * 0.06))));
+            } else if (t < TAKE) {   // floating upright, front-left, slow sway and bob
                 ps.translate(0.75, 1.15 + 0.08 * Math.sin(t * 0.06), 0.65);
                 ps.mulPose(Axis.ZP.rotationDegrees((float) (4 * Math.sin(t * 0.045))));
                 ps.mulPose(Axis.XP.rotationDegrees((float) (3 * Math.sin(t * 0.037 + 1))));

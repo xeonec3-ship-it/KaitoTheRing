@@ -173,9 +173,14 @@ def dome():
         a = 2 * math.pi * i / 36
         h = 0.05 if i % 3 else 0.09
         B.seg3((1.05 * math.cos(a), -0.08, 1.05 * math.sin(a)), (1.11 * math.cos(a), -0.08 + h * 0.2, 1.11 * math.sin(a)), 0.014, 4)
-    return mesh_doc('Купол Барьера (T20): шестиугольные ячейки, узлы-огоньки, грани, кольцо с рунами; радиус 1 — масштаб эффекта задаёт радиус. '
-                    'Сгенерировано tools/gen_silent_staff_fx.py.', 'silent', B, ['#6E8AA0', '#7FD8C8', '#BFF6E8', '#DFFFF6', '#FFFFFF'], [3, 4], 0.16,
-                    {'delay': 0, 'duration': 18, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.2}, 18, collapse=10, blend='additive')
+    doc = mesh_doc('Купол Барьера (T20): шестиугольные ячейки, узлы-огоньки, грани, кольцо с рунами; радиус 1 — масштаб эффекта задаёт радиус. '
+                   'Удар по куполу (T08, Fx.hit) — рябь: кольцо света бежит по ячейкам от точки удара к противоположной стороне. '
+                   'Сгенерировано tools/gen_silent_staff_fx.py.', 'silent', B, ['#6E8AA0', '#7FD8C8', '#BFF6E8', '#DFFFF6', '#FFFFFF'], [3, 4], 0.16,
+                   {'delay': 0, 'duration': 18, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.2}, 18, collapse=10, blend='additive')
+    # T08: рябь по куполу (docs/sigils.md «Отклик на удар», для меша — расстояние по сфере, docs/fx.md «hit у меша»)
+    doc['hit'] = {'duration': 12, 'width': 0.2, 'rings': 3, 'spacing': 0.42, 'strength': 1.3, 'shake': 0.012, 'shakePeriod': 5,
+                  'flash': 1.0, 'sparks': 14, 'sparkSpeed': 0.14, 'color': '#E8FFF6'}
+    return doc
 
 
 # ---------------------------------------------------------------- тень дракона: матрицы и локальные системы координат

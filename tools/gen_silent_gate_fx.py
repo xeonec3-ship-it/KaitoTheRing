@@ -49,19 +49,27 @@ def build():
     # 0–14 с: редкие искры у ведьмы
     el(type='sprites', delay=0, duration=T(14), at='caster+0,0.8,0', texture='@sparks', count=60, rate=0.25, spread=2.2,
        speed=0.015, gravity=-0.002, size=[0.12, 0.05], life=60, color='@primary')
-    # 14.6–26 с: ОТ ПАЛЬЦА (как в аниме и в видео мода) — веер изогнутых струй света с искрами: начинаются широко за спиной
-    # и по сторонам ведьмы и сходятся воронкой на кончике указательного пальца; искры текут по струям К пальцу.
-    # Элемент vortex, повёрнутый осью «палец → за спину» (`to`), вершина воронки — в `at` (кончик пальца), `flow: -1` — к вершине.
-    for k, (col, arms, rad, ln, turns, w, d) in enumerate((('@primary', 9, 6.5, 8.0, 0.45, 0.16, 0.0),
-                                                         ('#7AE8A0', 7, 5.0, 6.5, -0.38, 0.12, 0.4),
-                                                         ('@secondary', 6, 7.5, 9.0, 0.3, 0.07, 0.8))):
-        el(type='vortex', delay=T(14.6 + d * 0.5), duration=T(11.4 - d * 0.5), at='caster.hand', to='caster+0,1.4,-7', radius=rad, height=ln,
-           funnel=0.0, turns=turns, arms=arms, width=w, speed=2.5 * (1 if k % 2 == 0 else -1), pull=0.9, flow=-1, particles=90, life=36,
-           size=0.11, texture='@sparks', color=col, **{'in': {'duration': T(1.6), 'easing': 'easeOutCubic'}, 'out': {'duration': T(1.6), 'easing': 'easeInSine'}})
-    el(type='flash', delay=T(14.6), duration=T(11.4), at='caster.hand', size=0.7, rays=6, color='@core', brightness=0.9,
-       **{'in': {'duration': T(0.6)}, 'out': {'duration': T(1.2)}})
-    el(type='sprites', delay=T(14.6), duration=T(11), at='caster+0,1.4,-1.5', texture='@sparks', count=900, rate=4, spread=4.5,
-       speed=0.006, gravity=0.0, size=[0.07, 0.02], life=50, color='@core', comment='блёстки в воздухе вокруг струй')
+    # 14.6–26 с: ОТ РУКИ — точь-в-точь как в видео мода: из поднятой руки вперёд-вверх (по взгляду) конусом раскрывается
+    # «туманность» — плотный поток мельчайших белых и бледно-бирюзовых искр с розово-лиловым отливом, мягкие светящиеся облачка,
+    # в потоке мерцают крупные четырёхлучевые звёздочки (textures/fx/glint4.png); у кисти — мягкое белое ядро.
+    # Никаких лучей-лент от руки к вратам (решение владельца 19.11).
+    hand = dict(delay=T(14.6), duration=T(11.4), at='caster.hand', follow=True)
+    fade = {'in': {'duration': T(1.0), 'easing': 'easeOutCubic'}, 'out': {'duration': T(1.6), 'easing': 'easeInSine'}}
+    el(type='flash', size=0.9, rays=0, color='#FFFFFF', brightness=0.9, **hand, **fade, comment='мягкое белое ядро у кисти')
+    el(type='sprites', texture='spark_soft', count=4000, rate=24, cone=50, speed=0.085, gravity=-0.0006, size=[0.07, 0.02], life=48,
+       glow=0.25, color='#FFFFFF', **hand, comment='мельчайшие белые искры — основа потока')
+    el(type='sprites', texture='spark_soft', count=2200, rate=13, cone=62, speed=0.065, gravity=-0.0004, size=[0.09, 0.02], life=56,
+       glow=0.3, color='#BFF4FF', **hand, comment='бледно-бирюзовые')
+    el(type='sprites', texture='spark_soft', count=1200, rate=7, cone=74, speed=0.05, gravity=-0.0003, size=[0.08, 0.02], life=60,
+       glow=0.3, color='#F2C6EE', **hand, comment='розово-лиловый отлив по краям')
+    el(type='sprites', texture='glow', count=260, rate=1.6, cone=44, speed=0.045, gravity=-0.0002, size=[0.7, 2.4], life=64,
+       color='#6E5C8E', **hand, comment='мягкие светящиеся облачка туманности (тусклые, аддитивно)')
+    el(type='sprites', texture='glow', count=160, rate=1.0, cone=36, speed=0.055, gravity=-0.0002, size=[0.5, 1.8], life=56,
+       color='#4E7E8E', **hand)
+    el(type='sprites', texture='glint4', count=420, rate=2.6, cone=58, speed=0.06, gravity=-0.0004, spin=60, size=[0.42, 0.06], life=42,
+       glow=0.5, color='#FFFFFF', **hand, comment='крупные четырёхлучевые звёздочки в потоке')
+    el(type='sprites', delay=T(14.6), duration=T(11.4), at='caster+0,1.6,1.5', texture='glint4', count=160, rate=0.8, spread=6,
+       speed=0.004, gravity=0.0, spin=30, size=[0.0, 0.5], life=50, color='#FFFFFF', comment='редкие звёздочки, мерцающие в воздухе вокруг')
     # 49.9 с: рука прямо вперёд — вспышка у руки
     el(type='flash', delay=T(49.9), duration=T(0.6), at='caster.hand', size=1.6, anamorphic=4, rays=6, color='@core')
     # 20 с: над местом врат плашмя собирается магический круг; 21.8–27 с врата МЕДЛЕННО выходят из него вниз — опускаются сквозь круг

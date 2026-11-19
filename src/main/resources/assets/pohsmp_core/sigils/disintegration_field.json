@@ -7,6 +7,7 @@
   "hold": -1,
   "groundLight": { "radius": 1.1, "strength": 0.6 },
   "blockGlow": { "radius": 1.8, "strength": 0.35, "falloff": 1.5 },
+  "hit": { "duration": 10, "width": 0.1, "rings": 3, "spacing": 0.16, "tilt": 1.5, "sparks": 12, "color": "#FFF2C0" },
   "layers": [
     {
       "id": "arcs",

@@ -23,5 +23,6 @@
   ],
   "expand": { "scale": 2.5, "delay": 6, "duration": 24, "easing": "easeOutCubic" },
   "formedFlash": { "color": "#E6DCFF", "size": 1.2, "duration": 12, "sparks": 30 },
+  "reactsToHits": true,
   "dissolve": { "modes": ["reverse", "collapse"], "duration": 20, "stagger": 3 }
 }

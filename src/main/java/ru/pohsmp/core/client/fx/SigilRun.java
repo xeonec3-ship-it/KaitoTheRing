@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.fx.sigil.SigilDef;
+import ru.pohsmp.core.fx.sigil.SigilHit;
 
 /** One sigil being drawn on this client: definition, where, how it is turned, when it started and stopped. */
 public final class SigilRun {
@@ -32,6 +33,22 @@ public final class SigilRun {
     /** Surface heights cached by {@link SigilLight} (groundLight / blockGlow). */
     Object light;
     public final List<SigilRun> children = new ArrayList<>();
+    /** T08: hits drawn now, in plane coordinates (SigilHit); filled from {@link #pending} by SigilDraw, which knows the plane. */
+    public final List<SigilHit.Event> hits = new ArrayList<>();
+    /** T08: hits that came in since the last frame: world offset from the centre, tick since start, power, seed. */
+    final List<Pending> pending = new ArrayList<>();
+
+    record Pending(Vec3 offset, double at, double power, int seed) {}
+
+    /**
+     * A hit at world point {@code at} (FxMsg HIT), {@code tick} ticks after this sigil started. Ignored by sigils without
+     * {@code hit} / {@code reactsToHits} and while dissolving. Children get it too (each keeps it if it is near enough).
+     */
+    public void hit(Vec3 at, double tick, double power, int seed) {
+        if (def != null && def.hit() != null && Double.isNaN(stopAt) && pending.size() < 16)
+            pending.add(new Pending(at.subtract(pos(0)), tick, power, seed));
+        for (SigilRun c : children) c.hit(at, tick - (c.start - start), power, seed * 31 + 7);
+    }
 
     public Vec3 pos(float pt) {
         if (follow != null && follow.isAlive()) return follow.getPosition(pt).add(offset);

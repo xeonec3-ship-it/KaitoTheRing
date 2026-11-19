@@ -12,6 +12,8 @@ import ru.pohsmp.core.client.fx.FxDraw.Frame;
 import ru.pohsmp.core.fx.FxMath;
 import ru.pohsmp.core.fx.FxStyle;
 import ru.pohsmp.core.fx.sigil.Easing;
+import ru.pohsmp.core.fx.sigil.SigilDef;
+import ru.pohsmp.core.fx.sigil.SigilHit;
 
 /**
  * Generated structures described by parts (docs/fx.md, "mesh"): seed polyhedron, rings that tumble into the plane,
@@ -38,6 +40,26 @@ public final class MeshDraw {
         public void stop(double t) {
             if (Double.isNaN(stopAt)) stopAt = Math.max(0, t);
         }
+
+        /** T08: hits waiting to be placed (world point) and the placed ones (unit direction from the centre, local axes). */
+        final java.util.List<Object[]> pending = new java.util.ArrayList<>();
+        final java.util.List<DomeHit> hits = new java.util.ArrayList<>();
+
+        /** A hit at world point {@code at}, {@code tick} ticks after the start (FxMsg HIT); only meshes with "hit" answer. */
+        public void hit(Vec3 at, double tick, double power, int seed) {
+            if (def != null && hitOf(def) != null && Double.isNaN(stopAt) && pending.size() < 16) pending.add(new Object[] {at, tick, power, seed});
+        }
+    }
+
+    /** A hit on a dome-like mesh: direction from its centre (local, unit) and the timing/power/seed. */
+    record DomeHit(Vector3f dir, SigilHit.Event e) {}
+
+    private static final java.util.Map<JsonObject, java.util.Optional<SigilDef.Hit>> HIT_DEFS =
+            java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+
+    /** "hit" of a mesh file (same fields as a sigil's, docs/sigils.md), or null. */
+    static SigilDef.Hit hitOf(JsonObject def) {
+        return HIT_DEFS.computeIfAbsent(def, d -> java.util.Optional.ofNullable(SigilDef.parseHit(d))).orElse(null);
     }
 
     /** Ticks after the start at which the structure is complete ("formedAt" in the file). */
@@ -91,6 +113,25 @@ public final class MeshDraw {
             }
         }
         Axes ax = new Axes(o, right, up, fwd, s, hc, hs, hx, hz);
+        SigilDef.Hit hit = hitOf(r.def);
+        if (hit != null) {                       // T08: place new hits (directions on the dome), flinch while they last
+            for (Object[] p : r.pending) {
+                Vec3 d = ((Vec3) p[0]).subtract(o);
+                Vector3f dir = new Vector3f((float) d.dot(ax.x()), (float) d.dot(ax.y()), (float) d.dot(ax.z()));
+                if (dir.lengthSquared() < 1e-8) continue;
+                dir.normalize();
+                r.hits.removeIf(h -> !SigilHit.alive(hit, h.e(), t));
+                while (r.hits.size() >= hit.max()) r.hits.remove(0);
+                r.hits.add(new DomeHit(dir, new SigilHit.Event(0, 0, (double) p[1], (double) p[2], (int) p[3])));
+            }
+            r.pending.clear();
+            r.hits.removeIf(h -> !SigilHit.alive(hit, h.e(), t));
+            if (!r.hits.isEmpty()) {
+                double k = 1;
+                for (DomeHit h : r.hits) k *= SigilHit.flinch(hit, h.e(), t);
+                ax = new Axes(o, right, up, fwd, s * k, hc, hs, hx, hz);
+            }
+        } else r.pending.clear();
         if (!r.def.has("parts")) return true;
         for (JsonElement pe : r.def.getAsJsonArray("parts")) {
             JsonObject p = pe.getAsJsonObject();
@@ -107,11 +148,35 @@ public final class MeshDraw {
                 case "ring" -> ring(f, ax, p, t, e, lin, col, a);
                 case "polygon" -> polygon(f, ax, p, t, e, lin, col, a);
                 case "disc" -> disc(f, ax, p, t, e, lin, col, a);
-                case "boxes" -> boxes(f, ax, p, r.style, t >= delay ? e : 0, a);
+                case "boxes" -> boxes(f, ax, p, r.style, t >= delay ? e : 0, a, hit, r.hits, t);
                 default -> {}
             }
         }
+        if (hit != null && !r.hits.isEmpty()) domeHits(f, ax, r, hit, t);
         return true;
+    }
+
+    /** Flash where the dome was struck and sparks flying off its surface (outward along the normal there). */
+    private static void domeHits(Frame f, Axes ax, Run r, SigilDef.Hit h, double t) {
+        int col = h.color() >= 0 ? h.color() : r.style.color("@core");
+        VertexConsumer glow = f.add(FxDraw.tex("glow"));
+        for (DomeHit dh : r.hits) {
+            double age = t - dh.e().at();
+            FxDraw.billboard(glow, f, ax.at(dh.dir()), ax.s() * 0.18 * (1 + age / 6), 0, col, dh.e().power() * Math.exp(-age / 3) * r.alpha);
+        }
+        if (f.low()) return;
+        VertexConsumer spark = f.add(FxDraw.tex("spark_soft"));
+        for (DomeHit dh : r.hits) {
+            Vec3 n = ax.x().scale(dh.dir().x).add(ax.y().scale(dh.dir().y)).add(ax.z().scale(dh.dir().z)).normalize();
+            Vec3 u = n.cross(Math.abs(n.y) > 0.9 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0)).normalize(), v = n.cross(u);
+            Vec3 at = ax.at(dh.dir());
+            for (int i = 0, k = SigilHit.sparkCount(h, dh.e()); i < k; i++) {
+                SigilHit.Spark s = SigilHit.spark(h, dh.e(), i, t);
+                if (s.alpha() <= 0.002) continue;
+                Vec3 q = at.add(u.scale(s.u())).add(v.scale(s.v())).add(n.scale(s.n())).add(0, -s.drop(), 0);
+                FxDraw.billboard(spark, f, q, s.size(), 0, col, s.alpha() * r.alpha);
+            }
+        }
     }
 
     /** Local (x, y, z) -> world: x right, y up, z forward, scaled. */
@@ -302,7 +367,8 @@ public final class MeshDraw {
      * the others translucent with `opacity` and shaded by face. Appear "reveal: down": a front runs from bounds[1] to bounds[0], a box shows
      * once the front passes its centre ("up": from bounds[0] upwards, the crystal growing) (a band `front` blocks wide fades it in with a white flash), and a bright bar marks the front.
      */
-    private static void boxes(Frame f, Axes ax, JsonObject p, FxStyle style, double e, double a) {
+    private static void boxes(Frame f, Axes ax, JsonObject p, FxStyle style, double e, double a, SigilDef.Hit hit,
+                              java.util.List<DomeHit> hits, double t) {
         if (a <= 1e-3) return;
         Box[] bs = prepare(p);
         if (bs.length == 0) return;
@@ -330,10 +396,22 @@ public final class MeshDraw {
             int base = tones[Math.max(0, Math.min(tones.length - 1, b.tone()))];
             boolean gl = glow.contains(b.tone());
             if (sweep && k < 1) base = toWhite(base, 0.85 * (1 - k));   // the white flash at the front
+            double rip = 0;                                              // T08: ripple — the wave of SigilHit along the sphere
+            if (hit != null && !hits.isEmpty()) {
+                Vector3f c0 = b.c()[0], c7 = b.c()[7];
+                Vector3f cen = new Vector3f((c0.x + c7.x) / 2, (c0.y + c7.y) / 2, (c0.z + c7.z) / 2);
+                if (cen.lengthSquared() > 1e-8) {
+                    cen.normalize();
+                    for (DomeHit dh : hits) rip += SigilHit.wave(hit, dh.e(), Math.PI, Math.acos(Math.max(-1, Math.min(1, cen.dot(dh.dir())))), t);
+                    rip = Math.min(rip, 2 * hit.strength());
+                }
+                if (rip > 0.01) base = toWhite(base, Math.min(0.8, 0.5 * rip));
+            }
+            double lit = 1 + rip * (gl ? 1.5 : 5);
             for (int fi = 0; fi < 6; fi++) {
                 int[] q = FACES[fi];
-                if (gl) FxDraw.quad(add, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], base, a * k);
-                else FxDraw.quad(solid, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], mul(base, b.shade()[fi]), Math.min(1, a * k * opacity));
+                if (gl) FxDraw.quad(add, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], base, a * k * lit);
+                else FxDraw.quad(solid, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], mul(base, b.shade()[fi]), Math.min(1, a * k * opacity * lit));
             }
         }
         if (sweep && e > 0 && e < 1)   // the light front sweeping down (or up: the crystal grows from the ground)

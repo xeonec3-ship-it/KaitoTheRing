@@ -98,6 +98,14 @@
   "duration": 10,
   "sparks": 40
  },
+ "hit": {
+  "duration": 8,
+  "rings": 3,
+  "shake": 0.025,
+  "tilt": 4,
+  "sparks": 12,
+  "color": "#E8FFF6"
+ },
  "dissolve": {
   "modes": [
    "reverse",

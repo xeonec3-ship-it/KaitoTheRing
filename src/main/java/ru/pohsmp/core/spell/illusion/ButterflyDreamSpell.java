@@ -41,7 +41,6 @@ import net.minecraftforge.network.PacketDistributor;
 import ru.pohsmp.core.Reg;
 import ru.pohsmp.core.ServerConfig;
 import ru.pohsmp.core.fx.Fx;
-import ru.pohsmp.core.illusion.Copies;
 import ru.pohsmp.core.illusion.Illusions;
 import ru.pohsmp.core.net.HideMsg;
 import ru.pohsmp.core.net.IlluMsg;
@@ -53,8 +52,8 @@ import ru.pohsmp.core.spell.HigherSpell;
 /**
  * T22 «Сон бабочки» (Mythic, reworked by the owner 19.11): a 12 s cast with the camera scene (Cutscene.BUTTERFLY_DREAM) and the music.
  * Then for 2 minutes every enemy player within 64 blocks is in the mirror world (left and right swapped): the caster and its allies are not
- * drawn for it (a strike or a cast shows the one who did it for 1 s), 3-5 copies of the caster of its own hunt it. Every hit by the caster,
- * its allies and the copies is not real: it takes illusory health only; at none left the victim «dies» in the dream and wakes up elsewhere in
+ * drawn for it (a strike or a cast shows the one who did it for 1 s). Rework 19.11: no hunters - a quiet dream with whispers in its chat,
+ * flowers blooming in its steps, and a cocoon of butterflies over it that everyone else sees. Every hit by the caster and its allies is not real: it takes illusory health only; at none left the victim «dies» in the dream and wakes up elsewhere in
  * it. The waking deals nothing - it was just a dream. Hits from outside the dream stay real.
  */
 public class ButterflyDreamSpell extends IllusionBase {
@@ -81,7 +80,7 @@ public class ButterflyDreamSpell extends IllusionBase {
     @Override
     public List<MutableComponent> getUniqueInfo(int level, LivingEntity caster) {
         return List.of(ui("cast", CAST / 20), ui("zone", n(d(ServerConfig.BD_RADIUS)), n(d(ServerConfig.BD_SECONDS))),
-                ui("fake"), ui("death"));
+                ui("fake"), ui("death"), ui("nightmare"));
     }
 
     // ---------------------------------------------------------------- the cast and its scene
@@ -183,10 +182,13 @@ public class ButterflyDreamSpell extends IllusionBase {
      * «Death» in the dream (owner 19.11): the dark screen lasts DEATH_SCREEN, the victim is moved on DEATH_MOVE under it, and takes no dream
      * damage for DEATH_GRACE. The new place: random within the dream, on solid ground, not closer than MIN_FROM_CASTER to the caster.
      */
-    private static final int DEATH_SCREEN = 30, DEATH_MOVE = 22, DEATH_GRACE = 50, COPY_REFILL = 160;
+    private static final int DEATH_SCREEN = 30, DEATH_MOVE = 22, DEATH_GRACE = 50;
     /** The waking scene starts this long before the glass breaks at wakeAll (130.3 s of the track, visual letter 19.11). */
     private static final int WAKE_SCENE = 34;
-    private static final double MIN_FROM_CASTER = 12, COPY_LEASH = 28;
+    private static final double MIN_FROM_CASTER = 12;
+    /** Rework 19.11: «шёпот сна» every WHISPER_MIN..MAX ticks, WHISPERS lines; a blooming step every STEP blocks walked. */
+    private static final int WHISPER_MIN = 500, WHISPER_MAX = 900, WHISPERS = 10;
+    private static final double STEP = 1.3;
 
     private static final class Dream {
         final LivingEntity caster;
@@ -203,10 +205,10 @@ public class ButterflyDreamSpell extends IllusionBase {
         final Map<UUID, Double> lost = new HashMap<>();
         /** victim -> no dream damage till (it has just «died») */
         final Map<UUID, Long> grace = new HashMap<>();
-        /** victim -> its own copies of the caster, how many it keeps, when a broken one comes back */
-        final Map<UUID, List<Copies.Copy>> copies = new HashMap<>();
-        final Map<UUID, Integer> copyCount = new HashMap<>();
-        final Map<UUID, Long> nextCopy = new HashMap<>();
+        /** victim -> its next whisper, the cocoon fx the others see over it, where its last flower bloomed */
+        final Map<UUID, Long> nextWhisper = new HashMap<>();
+        final Map<UUID, Integer> cocoon = new HashMap<>();
+        final Map<UUID, Vec3> lastStep = new HashMap<>();
         /** victim -> its dream wounds (the butterflies around it, up to 12) */
         final Map<UUID, Integer> wounds = new HashMap<>();
         final int tag;
@@ -235,6 +237,11 @@ public class ButterflyDreamSpell extends IllusionBase {
         long now = Illusions.now();
         for (ServerPlayer v : Illusions.victims(sl, caster, r)) {
             if (v.isCreative()) continue;
+            if (ru.pohsmp.core.nightmare.Immersion.stage(v) >= 1) {   // owner 19.11: one in a nightmare does not dream - it does not wake up
+                music(sl, v.getUUID(), 1, 40);
+                ru.pohsmp.core.nightmare.NoAwakeningSpell.into(sl, caster, v);
+                continue;
+            }
             int t = Illusions.duration(v, ticks);
             UUID id = v.getUUID();
             d.victims.put(id, now + t);
@@ -247,10 +254,11 @@ public class ButterflyDreamSpell extends IllusionBase {
             v.addEffect(new MobEffectInstance(Reg.BUTTERFLY_DREAM.get(), t, 0, false, false, true));
             fx(sl, Fx.fx("illusion_dream_enter").at(v.position()).caster(v).attach(v).only(v), "illusion_dream_enter");
             d.lost.put(id, 0.0);
-            d.copies.put(id, new ArrayList<>());
-            int n = 3 + sl.random.nextInt(3);   // 3-5 copies, each victim its own
-            d.copyCount.put(id, n);
-            for (int k = 0; k < n; k++) spawnCopy(d, v);
+            d.nextWhisper.put(id, now + 100 + sl.random.nextInt(200));
+            d.lastStep.put(id, v.position());
+            // the cocoon: a ring of butterflies and a small Heavenly butterfly over the sleeper, for everyone but it
+            int cf = fx(sl, Fx.fx("illusion_dream_cocoon").at(v.position()).caster(v).attach(v).duration(t).not(v), "illusion_dream_cocoon");
+            if (cf >= 0) d.cocoon.put(id, cf);
         }
         if (d.victims.isEmpty()) d.wakeAll = now + ticks;
         sl.playSound(null, caster.getX(), caster.getY() + 1, caster.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 3f, 0.5f);
@@ -261,25 +269,34 @@ public class ButterflyDreamSpell extends IllusionBase {
         return d.sl.getServer().getPlayerList().getPlayer(id);
     }
 
-    /** One more copy of the caster for v only, 5-9 blocks from it: it walks up and strikes (illusory, like everything in the dream). */
-    private static void spawnCopy(Dream d, ServerPlayer v) {
-        Long end = d.victims.get(v.getUUID());
-        List<Copies.Copy> l = d.copies.get(v.getUUID());
-        if (end == null || l == null) return;
-        long left = end - Illusions.now();
-        if (left < 20) return;
-        Vec3 at = near(d.sl, v.position(), 5, 9);
-        if (at == null) return;
-        // owner 19.11: the hunters wear the looks of random players of the server (not the victim's own); alone - the caster's
-        List<ServerPlayer> pool = new ArrayList<>(d.sl.getServer().getPlayerList().getPlayers());
-        pool.remove(v);
-        ServerPlayer face = pool.isEmpty() ? null : pool.get(d.sl.random.nextInt(pool.size()));
-        Copies.Copy c = Copies.spawn(d.caster, Copies.Mode.HUNTER, at, null, (int) left, i(ServerConfig.MI_HITS), 0, List.of(v), face);
-        c.damage = (float) d(ServerConfig.BD_COPY_DAMAGE);
-        c.damageReturn = 20;
-        c.tag = d.tag;
-        l.add(c);
-        fx(d.sl, Fx.fx("illusion_mirror_image_spawn").at(at).only(v), "illusion_mirror_image_spawn");
+    /** «Шёпот сна»: a quiet italic line in v's chat, no system colours. */
+    private static void whisper(Dream d, ServerPlayer v) {
+        int k = 1 + d.sl.random.nextInt(WHISPERS);
+        v.sendSystemMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.butterfly_dream.whisper." + k)
+                .withStyle(net.minecraft.ChatFormatting.GRAY, net.minecraft.ChatFormatting.ITALIC));
+    }
+
+    /** A glowing flower where v stepped: it blooms and sheds its petals in a few seconds (v's dream only). */
+    private static void bloom(Dream d, ServerPlayer v) {
+        Vec3 at = v.position();
+        if (fx(d.sl, Fx.fx("illusion_dream_bloom").at(at).caster(v).only(v), "illusion_dream_bloom") >= 0) return;
+        d.sl.sendParticles(v, net.minecraft.core.particles.ParticleTypes.CHERRY_LEAVES, false, at.x, at.y + 0.15, at.z, 3, 0.2, 0.05, 0.2, 0);
+        d.sl.sendParticles(v, new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(1f, 0.82f, 0.95f), 0.8f), false,
+                at.x, at.y + 0.1, at.z, 4, 0.18, 0.02, 0.18, 0);
+    }
+
+    /** The cocoon without its fx: a turning ring of lilac and gold motes over the sleeper, for everyone but it. */
+    private static void cocoonMotes(Dream d, ServerPlayer v, long now) {
+        double y = v.getY() + v.getBbHeight() + 0.5, a0 = now * 0.12;
+        for (ServerPlayer o : d.sl.players()) {
+            if (o == v || o.distanceToSqr(v) > 64 * 64) continue;
+            for (int k = 0; k < 6; k++) {
+                double a = a0 + k * Math.PI / 3;
+                var col = k % 2 == 0 ? new org.joml.Vector3f(0.78f, 0.6f, 1f) : new org.joml.Vector3f(1f, 0.85f, 0.45f);
+                d.sl.sendParticles(o, new net.minecraft.core.particles.DustParticleOptions(col, 0.7f), false,
+                        v.getX() + Math.cos(a) * 0.8, y + Math.sin(a * 2) * 0.1, v.getZ() + Math.sin(a) * 0.8, 1, 0, 0, 0, 0);
+            }
+        }
     }
 
     /** A standing place min..max blocks from around (same height +-4), or null. */
@@ -374,12 +391,6 @@ public class ButterflyDreamSpell extends IllusionBase {
         fx(d.sl, Fx.fx("illusion_dream_death").at(v.position()).caster(v).only(v), "illusion_dream_death");
         Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.DREAM_DEATH, v.getId(), DEATH_SCREEN, 0, null, "", 0, 0, 0, 0, 0));
         v.playNotifySound(SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 1f, 0.5f);
-        List<Copies.Copy> l = d.copies.get(id);
-        if (l != null) {
-            for (Copies.Copy c : new ArrayList<>(l)) Copies.gone(c);
-            l.clear();
-        }
-        d.nextCopy.put(id, 0L);
         Vec3 to = respawnSpot(d, v);
         int[] t = {0};
         ru.pohsmp.core.spell.Tasks.add(() -> {
@@ -394,7 +405,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             ripple(d.sl, to);
             fx(d.sl, Fx.fx("illusion_dream_respawn").at(to).caster(v).attach(v).only(v), "illusion_dream_respawn");
             fakeHp(v, 0);
-            for (int k = d.copyCount.getOrDefault(id, 3); k > 0; k--) spawnCopy(d, v);
+            d.lastStep.put(id, to);
             return false;
         });
     }
@@ -405,12 +416,13 @@ public class ButterflyDreamSpell extends IllusionBase {
         if (f != null) Fx.stop(d.sl, f, "");
         d.lost.remove(id);
         d.grace.remove(id);
-        d.nextCopy.remove(id);
+        d.nextWhisper.remove(id);
+        d.lastStep.remove(id);
+        Integer cf = d.cocoon.remove(id);
+        if (cf != null) Fx.stop(d.sl, cf, "");
         ServerPlayer w = player(d, id);
         if (w != null) wounds(d, w, 0);
         d.wounds.remove(id);
-        List<Copies.Copy> l = d.copies.remove(id);
-        if (l != null) for (Copies.Copy c : new ArrayList<>(l)) Copies.gone(c);
         ServerPlayer v = player(d, id);
         if (v == null) return;
         Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.ZONE_END, d.caster.getId(), 0, IlluMsg.Z_DREAM, null, "", 0, 0, 0, 0, 0));
@@ -446,30 +458,23 @@ public class ButterflyDreamSpell extends IllusionBase {
                 .withStyle(s -> s.withColor(Reg.ILLUSION_COLOR)), true);
     }
 
-    /** Every tick for a dreamer: a «death» when the lost health reaches the real one (real hits from outside count too); copies come back. */
+    /** Every tick for a dreamer: a «death» when the lost health reaches the real one (real hits from outside count too); whispers, flowers, cocoon. */
     private static void tend(Dream d, ServerPlayer v, long now) {
         UUID id = v.getUUID();
         if (now >= d.grace.getOrDefault(id, 0L) && d.lost.getOrDefault(id, 0.0) >= v.getHealth()) {
             dreamDeath(d, v);
             return;
         }
-        if (now % 10 != 0) return;
-        List<Copies.Copy> l = d.copies.get(id);
-        if (l == null) return;
-        l.removeIf(c -> {
-            if (c.gone()) return true;
-            if (c.pos().distanceToSqr(v.position()) <= COPY_LEASH * COPY_LEASH) return false;
-            Copies.gone(c);   // left far behind (a pearl, a fall): it comes back near
-            return true;
-        });
-        int want = d.copyCount.getOrDefault(id, 3);
-        if (l.size() >= want || now < d.grace.getOrDefault(id, 0L)) return;
-        long next = d.nextCopy.getOrDefault(id, 0L);
-        if (next == 0) d.nextCopy.put(id, now + COPY_REFILL);   // a broken copy: a new one in 8 s
-        else if (now >= next) {
-            spawnCopy(d, v);
-            d.nextCopy.put(id, 0L);
+        if (now >= d.nextWhisper.getOrDefault(id, Long.MAX_VALUE)) {
+            whisper(d, v);
+            d.nextWhisper.put(id, now + WHISPER_MIN + d.sl.random.nextInt(WHISPER_MAX - WHISPER_MIN));
         }
+        Vec3 last = d.lastStep.get(id);
+        if (v.onGround() && (last == null || last.distanceToSqr(v.position()) >= STEP * STEP)) {
+            d.lastStep.put(id, v.position());
+            bloom(d, v);
+        }
+        if (now % 4 == 0 && !d.cocoon.containsKey(id)) cocoonMotes(d, v, now);
     }
 
     /** Hits by the caster, its allies or its copies (the illusion damage type has the caster as its source) are dream hits. */

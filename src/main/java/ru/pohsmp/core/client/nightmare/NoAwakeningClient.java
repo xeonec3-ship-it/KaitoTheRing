@@ -33,7 +33,12 @@ public final class NoAwakeningClient {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLiving(RenderLivingEvent.Pre<?, ?> e) {
         LivingEntity le = e.getEntity();
-        if (le instanceof NightmareMob || le == Minecraft.getInstance().player || e.isCanceled()) return;
+        if (le instanceof NightmareMob || e.isCanceled()) return;
+        if (ru.pohsmp.core.client.DownfallCut.morphed(le)) {   // the scene's turning: everyone watching (the caster too) sees the Dread
+            NmStandIn.draw(e, le, NightmareMob.Kind.DREAD);
+            return;
+        }
+        if (le == Minecraft.getInstance().player) return;
         Zones.Zone z = Zones.active(Zones.NO_AWAKENING);
         if (z == null) return;
         if (le.getId() == z.caster()) NmStandIn.draw(e, le, NightmareMob.Kind.DREAD);
@@ -43,6 +48,10 @@ public final class NoAwakeningClient {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onName(RenderNameTagEvent e) {
         Entity en = e.getEntity();
+        if (ru.pohsmp.core.client.DownfallCut.morphed(en)) {
+            e.setResult(Event.Result.DENY);
+            return;
+        }
         if (en == Minecraft.getInstance().player) return;
         Zones.Zone z = Zones.active(Zones.NO_AWAKENING);
         if (z == null) return;

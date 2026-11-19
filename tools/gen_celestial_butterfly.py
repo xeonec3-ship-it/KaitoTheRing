@@ -17,7 +17,7 @@ T22 «Сон бабочки» — новый образ «Небесная ба�
                    illusion_isle_s / _m / _l (парящие островки: трава, цветы, земля, корни)
   fx/              illusion_butterfly_cast, illusion_butterfly_world, illusion_dream_enter/_exit/_wound/_death/_respawn/_ripple,
                    illusion_dream_wake, illusion_butterfly_wake, illusion_butterfly_wake_hit (переписаны),
-                   illusion_dream_bloom_step, illusion_dream_cocoon (новые)
+                   illusion_dream_bloom, illusion_dream_cocoon (новые; имена — как уже зовёт ButterflyDreamSpell)
 Новое для кода (docs/inbox/2026-11-19_mgr_T22_celestial_visuals.md): часть mesh `quad` (текстурная плоскость на петле с ключами),
 `mesh.move.keys`, у `sprites` — `wrap`, `avoid`, `path`.
 Запуск: python3 tools/gen_celestial_butterfly.py  (или вместе со школой: python3 tools/gen_illusion_fx.py)
@@ -1124,8 +1124,8 @@ def small_fx():
         E('sprites', 0, 'caster+0,1,0', duration=3, texture='mote_dream_petal', count=10, rate=4, spread=0.5, speed=0.03, gravity=0.002,
           sway=0.8, tumble=1, spin=200, size=[0.16, 0.12], life=14, color=PINK, glow=0.3),
     ])
-    fx('illusion_dream_bloom_step', 'Сон бабочки — цветущий след (только жертве): код играет на каждом шаге жертвы по земле (каждые ≈0.9 бл. пути, '
-                                    'точка — под стопой: 0.16 бл. вбок от центра, ноги по очереди; не чаще раза в 6 тиков; живых следов ≤ 24). '
+    fx('illusion_dream_bloom', 'Сон бабочки — цветущий след (только жертве): код играет на шагах жертвы по земле (сейчас каждые 1.3 бл., можно ≈0.9 бл.; '
+                                    'лучше точка под стопой: 0.16 бл. вбок от центра, ноги по очереди; не чаще раза в 6 тиков; живых следов ≤ 24). '
                                     'Цветы распускаются за 6 тиков и светятся, держатся ≈3 с, на 46–70 тике осыпаются лепестками.',
        'illusion', 80, [
            E('decal', 0, 'caster+0,0.02,0', duration=66, texture='illusion_dream_bloom', radius=0.55, grow=6, glow=0.3, color=WHITE, fadeOut=20,

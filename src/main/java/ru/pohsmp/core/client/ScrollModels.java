@@ -46,6 +46,7 @@ public final class ScrollModels {
         own(new ResourceLocation(PohCore.MODID, Reg.ILLUSION_MYTHIC));
         for (String p : Reg.CREATION_SPELLS) if (!p.equals("downfall")) own(new ResourceLocation(PohCore.MODID, p));   // T24 erased_name
         for (String p : List.of("world_tree", "abyss_eye", "last_dawn")) own(new ResourceLocation(PohCore.MODID, p));   // T23
+        own(new ResourceLocation(PohCore.MODID, ru.pohsmp.core.nightmare.NightmareSpells.NO_AWAKENING));   // T25: the house and the night come with HIGHER_SPELLS
         for (String p : List.of(SageBarrierSpell.PATH, WindSpearsSpell.PATH, SilentVolleySpell.PATH, WorganFlameSpell.PATH))
             own(new ResourceLocation(PohCore.MODID, p));
     }

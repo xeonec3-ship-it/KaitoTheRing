@@ -37,6 +37,34 @@ public final class Immersion {
         int floor, sent = -1;
         /** who put it there last (its client always sees that one as the Dread from stage 2) */
         UUID caster;
+        /** owner 19.11: from stage 2 the mobs round the victim are the faceless monster (fx on each, for it only): mob id -> fx */
+        final Map<Integer, Integer> masks = new HashMap<>();
+        long nextMasks;
+    }
+
+    private static final int MASK_R = 40, MASK_MAX = 32, MASK_EVERY = 50;
+
+    /** A real mob the victim's client shows as the faceless monster from stage 2 (not our nightmares, not CustomNPCs people). */
+    public static boolean maskable(net.minecraft.world.entity.Entity e) {
+        return e instanceof net.minecraft.world.entity.Mob && !(e instanceof NightmareMob) && !e.getClass().getName().startsWith("noppes.npcs");
+    }
+
+    private static void masks(ServerPlayer v, State s) {
+        unmask(v, s);
+        var sl = v.serverLevel();
+        java.util.List<net.minecraft.world.entity.Mob> near = sl.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,
+                v.getBoundingBox().inflate(MASK_R), m -> m.isAlive() && !m.isInvisible() && maskable(m));
+        near.sort((a, b) -> Double.compare(a.distanceToSqr(v), b.distanceToSqr(v)));
+        for (var m : near.subList(0, Math.min(MASK_MAX, near.size()))) {
+            int f = ru.pohsmp.core.spell.illusion.IllusionBase.fx(sl, ru.pohsmp.core.fx.Fx.fx("illusion_nightmare_monster").at(m.position())
+                    .caster(m).attach(m).scale(m.getBbHeight() / 1.95).duration(MASK_EVERY + 12).only(v), "illusion_nightmare_monster");
+            if (f >= 0) s.masks.put(m.getId(), f);
+        }
+    }
+
+    private static void unmask(ServerPlayer v, State s) {
+        for (int f : s.masks.values()) ru.pohsmp.core.fx.Fx.stop(v.serverLevel(), f, "");
+        s.masks.clear();
     }
 
     /** The caster behind v's immersion now (the spells call it after deepen/hold); the client is told at once. */
@@ -101,7 +129,10 @@ public final class Immersion {
     public static boolean clear(LivingEntity v) {
         State s = STATES.remove(v.getUUID());
         if (s == null) return false;
-        if (v instanceof ServerPlayer sp) send(sp, 0, 0, null);
+        if (v instanceof ServerPlayer sp) {
+            unmask(sp, s);
+            send(sp, 0, 0, null);
+        }
         v.removeEffect(Reg.IMMERSION.get());
         return true;
     }
@@ -145,6 +176,7 @@ public final class Immersion {
             }
             if (s.sent > 0 && !v.hasEffect(Reg.IMMERSION.get())) {   // owner 19.11: the effect taken off (/effect clear, milk) - all of it goes
                 it.remove();
+                unmask(v, s);
                 send(v, 0, 0, null);
                 continue;
             }
@@ -156,11 +188,21 @@ public final class Immersion {
             }
             if (s.progress < 1 && now >= s.floorUntil) {
                 it.remove();
+                unmask(v, s);
                 send(v, 0, 0, null);
                 v.removeEffect(Reg.IMMERSION.get());
                 continue;
             }
             sync(v, s);
+            if (stage(s) >= 2) {
+                if (now >= s.nextMasks) {
+                    masks(v, s);
+                    s.nextMasks = now + MASK_EVERY;
+                }
+            } else if (!s.masks.isEmpty()) {
+                unmask(v, s);
+                s.nextMasks = 0;
+            }
         }
     }
 

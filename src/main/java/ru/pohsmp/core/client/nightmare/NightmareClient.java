@@ -166,7 +166,8 @@ public final class NightmareClient {
         for (int s = 1; s <= 3; s++) {   // the helper's stage overlays: each fades in as the stage comes, over the one before
             float k = Math.max(0, Math.min(1, level - (s - 1)));
             if (k <= 0.01f) break;
-            RenderSystem.setShaderColor(1, 1, 1, k * (s == 3 ? 0.85f + 0.15f * pulse : 1f));
+            // owner 19.11: the stage 3 veins at about 30% («слишком залито кровью»)
+            RenderSystem.setShaderColor(1, 1, 1, k * (s == 3 ? 0.27f + 0.06f * pulse : 1f));
             g.blit(STAGE[s - 1], 0, 0, 0, 0, w, h, w, h);
         }
         if (moths > 0.01f) {

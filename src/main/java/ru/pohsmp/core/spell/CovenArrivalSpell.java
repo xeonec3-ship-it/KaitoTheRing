@@ -585,6 +585,7 @@ public class CovenArrivalSpell extends PohSpell {
         keep(ar, to);
         HIDDEN.remove(le.getUUID());
         Hidden.show(le);
+        unhideEverywhere(ar, le.getUUID());
         LivingEntity m;
         if (le == caster) {   // the caster's animation walks him out by itself: he is set at the end point at once
             m = move(le, ar, to, a.yaw);
@@ -604,6 +605,23 @@ public class CovenArrivalSpell extends PohSpell {
             LOG.info("[pohsmp] coven arrival: {} steps out to {}", where(m), to);
         }
         return true;
+    }
+
+    /**
+     * Owner 19.11 («на дальние расстояния НПС просто не появляются»): Hidden.show reaches only the players tracking the entity at that
+     * moment; a client that got the hide near the cast spot and re-tracks it at the far arena later keeps it hidden. So the «shown» goes
+     * to everyone in the arena's dimension, now and again at 1, 3 and 6 s.
+     */
+    private static void unhideEverywhere(ServerLevel ar, UUID id) {
+        int[] t = {0};
+        Tasks.add(() -> {
+            if (t[0] == 0 || t[0] == 20 || t[0] == 60 || t[0] == 120) {
+                Entity e = ar.getEntity(id);
+                if (e != null && !Hidden.isHidden(e))
+                    Net.CH.send(net.minecraftforge.network.PacketDistributor.DIMENSION.with(ar::dimension), new ru.pohsmp.core.net.HideMsg(e.getId(), 0));
+            }
+            return ++t[0] <= 120;
+        });
     }
 
     private static void ritual(LivingEntity caster, Arrival a) {
@@ -641,6 +659,7 @@ public class CovenArrivalSpell extends PohSpell {
             LivingEntity le = find(ar.getServer(), u);
             Walk w = a.walks.get(u);
             if (le != null && w != null && !(le instanceof Player) && le.level() == ar) le.teleportTo(w.to().x, w.to().y, w.to().z);
+            if (le != null && !(le instanceof Player) && le.level() == ar) unhideEverywhere(ar, u);
             if (HIDDEN.remove(u) == null || le == null) continue;
             Hidden.show(le);   // cut short while still inside the portal: they appear where they waited, behind the portal
         }

@@ -487,8 +487,15 @@ public final class DownfallCut {
     // ---- T25 «Пробуждение не наступит» (docs/specs/tasks/T25_nightmare_school.md, «Ролик»): 240 ticks of cast + 20 after ----
 
     private static final int ABYSS = ru.pohsmp.core.spell.Cutscene.NO_AWAKENING;
-    private static final int[] AB_AT = {0, 40, 80, 120, 160, 180, 236};
-    private static final boolean[] AB_CUT = {false, true, true, false, false, true, true};
+    private static final int[] AB_AT = {0, 40, 80, 120, 160, 180, 236, ru.pohsmp.core.nightmare.NoAwakeningSpell.MORPH_AT, 310};
+    private static final boolean[] AB_CUT = {false, true, true, false, false, true, true, true, false};
+    /** Owner 19.11: the title at 12 s, then (MORPH_AT) the caster turns into the Dread in front of everyone who watches. */
+    private static final int AB_TITLE = 240;
+
+    /** e is the caster of the «Пробуждение не наступит» scene this client watches, past its turning: drawn as the Dread. */
+    public static boolean morphed(Entity e) {
+        return active && scene == ABYSS && e.getId() == casterId && now(0) >= ru.pohsmp.core.nightmare.NoAwakeningSpell.MORPH_AT;
+    }
 
     /** dir: the caster's look when it began (flat), side: its left. Returns pos, look, (shake, roll, 0). */
     private static Vec3[] abyss(double t, Vec3 c, Vec3 dir, Vec3 side, double baseYaw) {
@@ -537,11 +544,22 @@ public final class DownfallCut {
                 look = face;
                 if (t < 186) shake = 0.04;
             }
-            default -> {   // 11.8 s: the head turns to the camera - a jerk 0.3 closer, then still till the end
+            case 6 -> {   // 11.8 s: the head turns to the camera - a jerk 0.3 closer, then still under the title
                 double j = Math.min(1, (t - 236) / 3.0);
                 pos = c.add(dir.scale(1.2 - 0.3 * j)).add(0, 1.6, 0);
                 look = face;
                 if (t < 242) shake = 0.03;
+            }
+            case 7 -> {   // the turning: cut low and wide in front, looking up as the Dread rises out of the caster; push 6 -> 4.5
+                pos = c.add(dir.scale(6 - 1.5 * k)).add(0, 0.4, 0);
+                look = c.add(0, 2.2, 0);
+                double m = t - AB_AT[7];
+                if (m < 10) shake = 0.06 * (1 - m / 10.0);
+            }
+            default -> {   // it stands: a slow orbit of 25° at 5, height 2.4, at its head
+                double a = Math.atan2(dir.z, dir.x) + Math.toRadians(25 * k);
+                pos = c.add(Math.cos(a) * 5, 2.4, Math.sin(a) * 5);
+                look = c.add(0, 2.2, 0);
             }
         }
         return new Vec3[] {pos, look, new Vec3(shake, roll, 0)};
@@ -1077,7 +1095,7 @@ public final class DownfallCut {
             return;
         }
         // Star Fall: the title appears while the star is in flight (owner, 19.11.2026), not after the impact
-        double tt = scene == 6 ? ru.pohsmp.core.spell.StarFallSpell.FALL_AT : dur * 0.88;
+        double tt = scene == 6 ? ru.pohsmp.core.spell.StarFallSpell.FALL_AT : scene == ABYSS ? AB_TITLE : dur * 0.88;
         if (t > tt) {
             float a = (float) Math.min(1, (t - tt) / 15.0);
             Font font = Minecraft.getInstance().font;

@@ -190,6 +190,19 @@ public class HouseThatIsntSpell extends NightmareSpells.Base {
         }
     }
 
+    /**
+     * Owner 19.11: now and then the faceless monster (illusion_nightmare, as in «Кошмар наяву») stands in the corridor 2-3 modules ahead
+     * or behind, facing the victim, for 3 s, and is gone. It does nothing; only the victim sees it.
+     */
+    private static void stander(House h, ServerPlayer p) {
+        int k = h.base + (p.getRandom().nextBoolean() ? 2 : -2) + (p.getRandom().nextBoolean() ? 1 : 0) * (p.getRandom().nextBoolean() ? 1 : -1);
+        Vec3 at = h.origin.add(h.fwd.scale(k * MODULE_LEN + MODULE_LEN / 2.0)).add(h.right.scale(h.side));
+        at = new Vec3(at.x, h.y, at.z);
+        Vec3 to = p.position().subtract(at);
+        float face = (float) Math.toDegrees(Math.atan2(-to.x, to.z));
+        fx(h.sl, Fx.fx("illusion_nightmare_monster").at(at).yaw(face).only(p), "illusion_nightmare_monster");
+    }
+
     /** A door of the corridor opens near the victim (ahead or behind, a random side) and a shadow comes out of it. */
     private static void shadow(House h, ServerPlayer p) {
         int k = h.base + (p.getRandom().nextBoolean() ? 1 : -1) * (1 + p.getRandom().nextInt(2));
@@ -200,6 +213,7 @@ public class HouseThatIsntSpell extends NightmareSpells.Base {
         fx(h.sl, Fx.fx("nightmare_house_that_isnt_shadow").at(door).yaw(inward).only(p), "nightmare_house_that_isnt_shadow");
         p.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(net.minecraft.core.Holder.direct(SoundEvents.WOODEN_DOOR_OPEN),
                 SoundSource.HOSTILE, door.x, door.y + 1, door.z, 1f, 0.5f, p.getRandom().nextLong()));
+        if (p.getRandom().nextInt(2) == 0) stander(h, p);
         if (!Bestiary.SPAWNING) return;   // owner 19.11: no monsters - the door opens and the darkness flows out, no one comes
         Vec3 g = Bestiary.ground(h.sl, door.x - h.right.x * s * 0.6, door.y, door.z - h.right.z * s * 0.6);
         if (g == null) g = new Vec3(door.x - h.right.x * s * 0.6, h.y, door.z - h.right.z * s * 0.6);

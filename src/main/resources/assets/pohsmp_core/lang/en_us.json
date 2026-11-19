@@ -539,5 +539,6 @@
   "ui.pohsmp_core.abyss_eye.warn": "Don't look up…",
   "ui.pohsmp_core.last_dawn.zone": "Dawn within %s, %s s",
   "ui.pohsmp_core.last_dawn.undying": "Allies cannot die; afterwards they heal %s%% of the damage taken",
-  "ui.pohsmp_core.last_dawn.burn": "The undead, Blood and Forbidden mages burn in the light"
+  "ui.pohsmp_core.last_dawn.burn": "The undead, Blood and Forbidden mages burn in the light",
+  "subtitles.pohsmp_core.music.butterfly_dream": "Music: Butterfly Dream"
 }

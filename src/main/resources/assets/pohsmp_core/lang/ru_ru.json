@@ -539,5 +539,6 @@
   "ui.pohsmp_core.abyss_eye.warn": "Не смотри вверх…",
   "ui.pohsmp_core.last_dawn.zone": "Рассвет в радиусе %s, %s с",
   "ui.pohsmp_core.last_dawn.undying": "Союзники не могут умереть; после — лечение на %s%% полученного урона",
-  "ui.pohsmp_core.last_dawn.burn": "Нежить, маги Крови и Запретной горят в свете"
+  "ui.pohsmp_core.last_dawn.burn": "Нежить, маги Крови и Запретной горят в свете",
+  "subtitles.pohsmp_core.music.butterfly_dream": "Музыка: Сон бабочки"
 }

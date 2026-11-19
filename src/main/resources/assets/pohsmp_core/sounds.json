@@ -84,5 +84,15 @@
         "stream": true
       }
     ]
+  },
+  "music.butterfly_dream": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.butterfly_dream",
+    "sounds": [
+      {
+        "name": "pohsmp_core:music/butterfly_dream",
+        "stream": true
+      }
+    ]
   }
 }

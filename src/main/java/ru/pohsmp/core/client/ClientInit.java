@@ -15,6 +15,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(DisintegrationFx.class);
         MinecraftForge.EVENT_BUS.register(HigherFx.class);
         MinecraftForge.EVENT_BUS.register(HiddenHands.class);
+        MinecraftForge.EVENT_BUS.register(HiddenEntities.class);
         MinecraftForge.EVENT_BUS.register(PohHud.class);
         MinecraftForge.EVENT_BUS.register(DownfallCut.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.fx.FxClient.class);

@@ -61,6 +61,39 @@ public final class Api {
         return ru.pohsmp.core.fx.Fx.play(sl, s);
     }
 
+    /**
+     * Hides an entity from everyone (model, name, shadow, held items; CNPC NPCs too) for ticks (0 = until {@link #show}).
+     * entity: a CNPC script entity (npc, player, e.npc...) or a Minecraft entity.
+     */
+    public static void hide(Object entity, int ticks) {
+        Hidden.hide(mc(entity), ticks);
+    }
+
+    /** Same, with options: no damage while hidden, no pushing/collisions, kept in place. */
+    public static void hide(Object entity, int ticks, boolean noDamage, boolean noCollide, boolean freeze) {
+        Hidden.hide(mc(entity), ticks, noDamage, noCollide, freeze);
+    }
+
+    public static void show(Object entity) {
+        Hidden.show(mc(entity));
+    }
+
+    public static boolean isHidden(Object entity) {
+        return Hidden.isHidden(mc(entity));
+    }
+
+    /** A CNPC script wrapper (IEntity) or a Minecraft entity to the Minecraft entity; null if neither. */
+    static net.minecraft.world.entity.Entity mc(Object o) {
+        if (o instanceof net.minecraft.world.entity.Entity e) return e;
+        if (o == null) return null;
+        try {
+            Object r = o.getClass().getMethod("getMCEntity").invoke(o);
+            return r instanceof net.minecraft.world.entity.Entity e ? e : null;
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
     /** Runs a command as the server at the level's spawn, with no feedback in chat or log. Returns the command result. */
     public static int cmd(Level level, String command) {
         if (!(level instanceof ServerLevel sl)) return 0;

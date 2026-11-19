@@ -54,6 +54,26 @@ label.check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
 .json pre { margin: 0; overflow-x: auto; font-family: var(--f-mono); font-size: 12px; line-height: 1.45; max-height: 420px; }
 .notes p { margin: 0; max-width: 72ch; }
 code { font-family: var(--f-mono); font-size: 13px; }
+.editor { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.editor[hidden] { display: none; }
+.ed-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.ed-field { display: grid; gap: 4px; font-size: 13px; min-width: 0; }
+.ed-field > span { color: var(--muted); font-size: 12px; display: flex; justify-content: space-between; gap: 6px; }
+.ed-field > span b { font-family: var(--f-mono); font-weight: 500; color: var(--fg); }
+.ed-field input[type="range"] { width: 100%; accent-color: var(--accent); }
+.ed-field select, .ed-field input[type="number"], .ed-field input[type="text"] { width: 100%; min-height: 36px; padding: 6px 8px; font: inherit; font-size: 14px;
+  color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
+.ed-field input[type="color"] { width: 100%; height: 36px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); padding: 2px; }
+.ed-layers { display: grid; gap: 10px; }
+.ed-layer { border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: grid; gap: 10px; }
+.ed-layer header { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; }
+.ed-layer header strong { font-family: var(--f-mono); font-size: 13px; }
+.ed-layer header button { min-height: 32px; padding: 4px 10px; font-size: 13px; }
+.ed-modes { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 13px; }
+.ed-modes label { display: flex; gap: 4px; align-items: center; }
+.ed-note { color: var(--muted); font-size: 13px; margin: 0; }
+textarea.ed-paste { width: 100%; min-height: 90px; font-family: var(--f-mono); font-size: 12px; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
 </style>
 
 <div class="wrap">
@@ -98,6 +118,28 @@ code { font-family: var(--f-mono); font-size: 13px; }
       <ol class="layers" id="layers"></ol>
     </div>
   </div>
+
+  <section class="editor" id="editor" hidden aria-label="Редактор печати">
+    <span class="label">Редактор печати</span>
+    <p class="ed-note">Меняйте слои — печать в сцене пересобирается сразу. Готовую печать скопируйте кнопкой «Скопировать JSON» и пришлите в чат. Черновик хранится в этом браузере.</p>
+    <div class="row">
+      <select id="edBase" aria-label="Начать с печати"></select>
+      <button type="button" id="edLoad">Взять за основу</button>
+      <label class="check"><input type="checkbox" id="edFormed"> Сразу сформированной</label>
+    </div>
+    <div class="ed-grid" id="edSigil"></div>
+    <div class="ed-layers" id="edLayers"></div>
+    <div class="row">
+      <button type="button" id="edAdd">+ Слой</button>
+      <button class="primary" type="button" id="edCopy">Скопировать JSON</button>
+      <span class="time" id="edMsg" role="status"></span>
+    </div>
+    <details>
+      <summary>Вставить JSON печати</summary>
+      <textarea class="ed-paste" id="edPaste" aria-label="JSON печати"></textarea>
+      <div class="row"><button type="button" id="edApply">Загрузить</button></div>
+    </details>
+  </section>
 
   <section class="json">
     <span class="label" id="jsonTitle">JSON</span>
@@ -578,6 +620,13 @@ class FxRun {
 }
 
 // ---------------------------------------------------------------- сцены превью
+// черновик редактора: из браузера или копия небесной печати
+const ED_KEY = "pohsmp.sigilEditor.v1";
+DATA.sigils.__edit = (() => {
+  try { const s = localStorage.getItem(ED_KEY); if (s) return JSON.parse(s); } catch (e) {}
+  return JSON.parse(JSON.stringify(DATA.sigils.silent_gate_sky));
+})();
+
 const SCENES = {
   "Silent Gate: земля и небо": () => [new Sigil("silent_gate_ground", new THREE.Vector3(0, 0.02, 0)), new Sigil("silent_gate_sky", new THREE.Vector3(0, 9, 0), { t0: 24 })],
   "Небесная печать": () => [new Sigil("silent_gate_sky", new THREE.Vector3(0, 9, 0))],
@@ -593,11 +642,12 @@ const SCENES = {
   "Дезинтеграция (аниме)": () => [new FxRun("disintegration")],
   "Дезинтеграция: Реплика": () => [new FxRun("disintegration_replica")],
   "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
+  "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
-const MAIN_ID = { "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
+const MAIN_ID = { "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
-const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
+const VIEW_FOR = { "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -662,5 +712,120 @@ function frame(now) {
   renderer.render(scene, cam);
   requestAnimationFrame(frame);
 }
+// ---------------------------------------------------------------- редактор печати
+const ED = { MODES: ["grow", "fade", "draw", "twist", "unfold", "assemble", "pieces"], TYPES: ["disc", "band", "arcs", "spokes"],
+  EASE: Object.keys(EASE), ORIENT: ["ground", "sky", "facing", "billboard"], TEX: Object.keys(DATA.textures).sort() };
+function edDef() { return DATA.sigils.__edit; }
+function edSave() { try { localStorage.setItem(ED_KEY, JSON.stringify(edDef())); } catch (e) {} }
+let edTimer = null;
+function edChanged() {                        // пересобрать сцену (с небольшой задержкой, пока тянут ползунок)
+  edSave();
+  clearTimeout(edTimer);
+  edTimer = setTimeout(() => {
+    if (cur !== "Редактор печати") return;
+    start();
+    if ($("edFormed").checked) { const T = timings(edDef()); t = T.formedAt + 1; INST.forEach((s) => s.update(t, 0)); }
+  }, 120);
+}
+function field(label, input, value) {
+  const w = document.createElement("label"); w.className = "ed-field";
+  const s = document.createElement("span"); s.textContent = label;
+  if (value !== undefined) { const b = document.createElement("b"); b.textContent = value; s.appendChild(b); w.valueEl = b; }
+  w.append(s, input); return w;
+}
+function slider(label, get, set, min, max, step, fmt = (v) => v) {
+  const i = document.createElement("input"); i.type = "range"; i.min = min; i.max = max; i.step = step; i.value = get();
+  const f = field(label, i, fmt(get()));
+  i.addEventListener("input", () => { set(+i.value); f.valueEl.textContent = fmt(+i.value); edChanged(); });
+  return f;
+}
+function choice(label, options, get, set, rerender) {
+  const s = document.createElement("select"); options.forEach((o) => { const op = document.createElement("option"); op.value = o; op.textContent = o; s.appendChild(op); });
+  s.value = get(); s.addEventListener("change", () => { set(s.value); edChanged(); if (rerender) edRender(); });
+  return field(label, s);
+}
+function colorIn(label, get, set) {
+  const i = document.createElement("input"); i.type = "color"; i.value = get();
+  i.addEventListener("input", () => { set(i.value.toUpperCase()); edChanged(); });
+  return field(label, i);
+}
+function textIn(label, get, set) {
+  const i = document.createElement("input"); i.type = "text"; i.value = get();
+  i.addEventListener("change", () => { set(i.value.trim() || get()); edChanged(); });
+  return field(label, i);
+}
+function edRender() {
+  const d = edDef(), G = $("edSigil"); G.innerHTML = "";
+  G.append(
+    slider("Размер, блоков", () => d.size, (v) => (d.size = v), 0.25, 12, 0.05, (v) => v.toFixed(2)),
+    colorIn("Цвет", () => d.color || "#FFFFFF", (v) => (d.color = v)),
+    choice("Ориентация", ED.ORIENT, () => d.orientation || "ground", (v) => (d.orientation = v)),
+    slider("Рост ×", () => (d.expand ? d.expand.scale : 1), (v) => { if (v <= 1.001) delete d.expand; else d.expand = { ...(d.expand || { delay: 4, duration: 20, easing: "easeOutCubic" }), scale: v }; }, 1, 6, 0.1, (v) => (v <= 1.001 ? "нет" : v.toFixed(1))),
+    slider("Удержание, тиков", () => d.hold ?? 120, (v) => (d.hold = v), 20, 400, 10),
+    choice("Разборка", ["reverse+collapse", "collapse", "fade", "reverse", "shatter"], () => (d.dissolve?.modes || ["fade"]).join("+"),
+      (v) => (d.dissolve = { modes: v.split("+"), duration: 20, stagger: v.includes("reverse") ? 3 : 0 })));
+  const L = $("edLayers"); L.innerHTML = "";
+  d.layers.forEach((l, i) => {
+    const ap = (l.appear = l.appear || { delay: 0, duration: 10, modes: ["fade"] }), card = document.createElement("div"); card.className = "ed-layer";
+    const head = document.createElement("header"), name = document.createElement("strong"); name.textContent = `${i + 1}. ${l.id || l.type}`;
+    const btns = document.createElement("div"); btns.className = "row";
+    const mk = (txt, aria, fn) => { const b = document.createElement("button"); b.type = "button"; b.textContent = txt; b.setAttribute("aria-label", aria); b.addEventListener("click", () => { fn(); edChanged(); edRender(); }); return b; };
+    btns.append(mk("↑", "Слой выше", () => { if (i > 0) [d.layers[i - 1], d.layers[i]] = [d.layers[i], d.layers[i - 1]]; }),
+      mk("↓", "Слой ниже", () => { if (i < d.layers.length - 1) [d.layers[i + 1], d.layers[i]] = [d.layers[i], d.layers[i + 1]]; }),
+      mk("Копия", "Копия слоя", () => d.layers.splice(i + 1, 0, { ...JSON.parse(JSON.stringify(l)), id: (l.id || "layer") + "_2" })),
+      mk("Удалить", "Удалить слой", () => d.layers.splice(i, 1)));
+    head.append(name, btns);
+    const g = document.createElement("div"); g.className = "ed-grid";
+    g.append(
+      textIn("id", () => l.id || "", (v) => { l.id = v; name.textContent = `${i + 1}. ${v}`; }),
+      choice("Тип", ED.TYPES, () => l.type || "disc", (v) => (l.type = v), true),
+      choice("Текстура", ED.TEX, () => l.texture || (l.type === "arcs" ? "arc_strip" : "core"), (v) => (l.texture = v)),
+      colorIn("Цвет слоя", () => l.color || d.color || "#FFFFFF", (v) => (l.color = v)),
+      slider("Радиус", () => l.radius ?? 1, (v) => (l.radius = v), 0.05, 1.6, 0.01, (v) => v.toFixed(2)),
+      slider("Яркость", () => l.brightness ?? 1, (v) => (l.brightness = v), 0, 2, 0.05, (v) => v.toFixed(2)),
+      slider("Появление, тик", () => ap.delay || 0, (v) => (ap.delay = v), 0, 160, 1),
+      slider("Длительность, тиков", () => ap.duration || 10, (v) => (ap.duration = v), 1, 80, 1),
+      choice("Плавность", ED.EASE, () => ap.easing || "linear", (v) => (ap.easing = v)),
+      slider("Вращение, °/с", () => l.rotation?.speed || 0, (v) => (l.rotation = { ...(l.rotation || {}), speed: v }), -120, 120, 1),
+      slider("Разгон при появлении", () => l.rotation?.boost || 0, (v) => (l.rotation = { ...(l.rotation || { speed: 0 }), boost: v }), 0, 4, 0.1, (v) => v.toFixed(1)));
+    if (l.type === "band") g.append(slider("Внутр. край", () => l.inner ?? 0.85, (v) => (l.inner = v), 0.3, 0.98, 0.01, (v) => v.toFixed(2)),
+      slider("Повторов текстуры", () => l.repeat || 6, (v) => (l.repeat = v), 1, 24, 1));
+    if (l.type === "arcs") g.append(slider("Дуг", () => l.count || 4, (v) => (l.count = v), 2, 12, 1), slider("Длина дуги, °", () => l.arcLength || 45, (v) => (l.arcLength = v), 10, 170, 1));
+    if ((ap.modes || []).includes("pieces")) {
+      const pc = (ap.pieces = ap.pieces || {});
+      g.append(slider("Частей", () => pc.count || 8, (v) => (pc.count = v), 2, 32, 1),
+        choice("Порядок частей", ["scatter", "around", "alternate"], () => pc.order || "scatter", (v) => (pc.order = v)),
+        slider("Вылет частей", () => pc.fly ?? 0.9, (v) => (pc.fly = v), 0, 2, 0.05, (v) => v.toFixed(2)),
+        slider("Подъём частей", () => pc.lift ?? 0.5, (v) => (pc.lift = v), 0, 2, 0.05, (v) => v.toFixed(2)),
+        slider("Кувырок, °", () => pc.tilt ?? 75, (v) => (pc.tilt = v), 0, 180, 5));
+    }
+    const modes = document.createElement("div"); modes.className = "ed-modes"; modes.setAttribute("role", "group"); modes.setAttribute("aria-label", "Режимы появления");
+    ED.MODES.forEach((m) => {
+      const lb = document.createElement("label"), cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = (ap.modes || []).includes(m);
+      cb.addEventListener("change", () => { const s = new Set(ap.modes || []); cb.checked ? s.add(m) : s.delete(m); ap.modes = [...s]; if (!ap.modes.length) ap.modes = ["fade"]; edChanged(); if (m === "pieces") edRender(); });
+      lb.append(cb, document.createTextNode(m)); modes.appendChild(lb);
+    });
+    card.append(head, g, modes); L.appendChild(card);
+  });
+}
+function edLoad(def) { DATA.sigils.__edit = JSON.parse(JSON.stringify(def)); edSave(); edRender(); edChanged(); }
+Object.keys(DATA.sigils).filter((k) => k !== "__edit").sort().forEach((k) => { const o = document.createElement("option"); o.value = k; o.textContent = k; $("edBase").appendChild(o); });
+$("edBase").value = "silent_gate_sky";
+$("edLoad").addEventListener("click", () => edLoad(DATA.sigils[$("edBase").value]));
+$("edAdd").addEventListener("click", () => { edDef().layers.push({ id: "layer" + (edDef().layers.length + 1), type: "disc", texture: "thin_ring", radius: 0.8,
+  appear: { delay: 0, duration: 10, easing: "easeOutCubic", modes: ["grow", "fade"] } }); edRender(); edChanged(); });
+$("edFormed").addEventListener("change", edChanged);
+$("edCopy").addEventListener("click", async () => {
+  const txt = JSON.stringify(edDef(), null, 2);
+  try { await navigator.clipboard.writeText(txt); $("edMsg").textContent = "Скопировано"; }
+  catch (e) { $("edPaste").value = txt; $("edPaste").closest("details").open = true; $("edPaste").select(); $("edMsg").textContent = "Выделено — скопируйте вручную"; }
+});
+$("edApply").addEventListener("click", () => {
+  try { const d = JSON.parse($("edPaste").value); if (!Array.isArray(d.layers)) throw 0; edLoad(d); $("edMsg").textContent = "Загружено"; }
+  catch (e) { $("edMsg").textContent = "Не похоже на JSON печати"; }
+});
+sel.addEventListener("change", () => { $("editor").hidden = cur !== "Редактор печати"; });
+edRender();
+$("editor").hidden = cur !== "Редактор печати";
 start(); requestAnimationFrame(frame);
 </script>

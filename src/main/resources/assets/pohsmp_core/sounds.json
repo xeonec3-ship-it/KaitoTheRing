@@ -1,0 +1,7 @@
+{
+  "music.silent_gate": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.silent_gate",
+    "sounds": [ { "name": "pohsmp_core:music/silent_gate", "stream": true } ]
+  }
+}

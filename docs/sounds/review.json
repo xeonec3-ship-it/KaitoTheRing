@@ -1075,5 +1075,691 @@
   "replaces": [
    "WARDEN_HEARTBEAT"
   ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "banishment",
+  "spell_ru": "Изгнание",
+  "event": "pohsmp_core:spell.banishment.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ender/banishment_cast_1.ogg",
+   "spell/ender/banishment_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/banishment_cast_1.mp3",
+   "docs/sounds/mp3/banishment_cast_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — начало каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "BanishmentSpell.java onCast()",
+  "replaces": [
+   "ENDERMAN_TELEPORT",
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.cast_chime",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ender/coven_arrival_cast_chime_1.ogg",
+   "spell/ender/coven_arrival_cast_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_cast_chime_1.mp3",
+   "docs/sounds/mp3/coven_arrival_cast_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java toggle()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.cast_hum",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ender/coven_arrival_cast_hum_1.ogg",
+   "spell/ender/coven_arrival_cast_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_cast_hum_1.mp3",
+   "docs/sounds/mp3/coven_arrival_cast_hum_2.mp3"
+  ],
+  "what": "гул / фон — начало каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java begin()",
+  "replaces": [
+   "BEACON_AMBIENT"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.cast_powerup",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ender/coven_arrival_cast_powerup_1.ogg",
+   "spell/ender/coven_arrival_cast_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_cast_powerup_1.mp3",
+   "docs/sounds/mp3/coven_arrival_cast_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java getCastStartSound()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.charge_hum",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/ender/coven_arrival_charge_hum_1.ogg",
+   "spell/ender/coven_arrival_charge_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_charge_hum_1.mp3",
+   "docs/sounds/mp3/coven_arrival_charge_hum_2.mp3"
+  ],
+  "what": "гул / фон — нарастание во время каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java step()",
+  "replaces": [
+   "BEACON_AMBIENT"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.charge_portal",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/ender/coven_arrival_charge_portal_1.ogg",
+   "spell/ender/coven_arrival_charge_portal_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_charge_portal_1.mp3",
+   "docs/sounds/mp3/coven_arrival_charge_portal_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — нарастание во время каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java step()",
+  "replaces": [
+   "ENDER_EYE_DEATH"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/ender/coven_arrival_charge_powerup_1.ogg",
+   "spell/ender/coven_arrival_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_charge_powerup_1.mp3",
+   "docs/sounds/mp3/coven_arrival_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java ritual()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.charge_resonate",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/ender/coven_arrival_charge_resonate_1.ogg",
+   "spell/ender/coven_arrival_charge_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_charge_resonate_1.mp3",
+   "docs/sounds/mp3/coven_arrival_charge_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — нарастание во время каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java step()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.end_chime",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/ender/coven_arrival_end_chime_1.ogg",
+   "spell/ender/coven_arrival_end_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_end_chime_1.mp3",
+   "docs/sounds/mp3/coven_arrival_end_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — конец / снятие / смерть (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java exit()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.end_portal",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/ender/coven_arrival_end_portal_1.ogg",
+   "spell/ender/coven_arrival_end_portal_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_end_portal_1.mp3",
+   "docs/sounds/mp3/coven_arrival_end_portal_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — конец / снятие / смерть (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java exit()",
+  "replaces": [
+   "ENDERMAN_TELEPORT"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.fail_click",
+  "role": "fail",
+  "role_ru": "отказ / ошибка",
+  "files": [
+   "spell/ender/coven_arrival_fail_click_1.ogg",
+   "spell/ender/coven_arrival_fail_click_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_fail_click_1.mp3",
+   "docs/sounds/mp3/coven_arrival_fail_click_2.mp3"
+  ],
+  "what": "щелчок — отказ / ошибка (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java onUseItem()",
+  "replaces": [
+   "UI_BUTTON_CLICK"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.fail_resonate",
+  "role": "fail",
+  "role_ru": "отказ / ошибка",
+  "files": [
+   "spell/ender/coven_arrival_fail_resonate_1.ogg",
+   "spell/ender/coven_arrival_fail_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_fail_resonate_1.mp3",
+   "docs/sounds/mp3/coven_arrival_fail_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — отказ / ошибка (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java checkPreCastConditions()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.open",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/ender/coven_arrival_open_1.ogg",
+   "spell/ender/coven_arrival_open_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_open_1.mp3",
+   "docs/sounds/mp3/coven_arrival_open_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — раскрытие (печать, купол, разрыв) (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java openCasterPortal(); CovenArrivalSpell.java openPortal()",
+  "replaces": [
+   "ENDERMAN_TELEPORT",
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "coven_arrival",
+  "spell_ru": "Появление Ковена",
+  "event": "pohsmp_core:spell.coven_arrival.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/ender/coven_arrival_release_1.ogg",
+   "spell/ender/coven_arrival_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/coven_arrival_release_1.mp3",
+   "docs/sounds/mp3/coven_arrival_release_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — выпуск заклинания (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "CovenArrivalSpell.java getCastFinishSound()",
+  "replaces": [
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "frozen_hour",
+  "spell_ru": "Застывший час",
+  "event": "pohsmp_core:spell.frozen_hour.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ender/frozen_hour_cast_1.ogg",
+   "spell/ender/frozen_hour_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frozen_hour_cast_1.mp3",
+   "docs/sounds/mp3/frozen_hour_cast_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "FrozenHourSpell.java getCastStartSound()",
+  "replaces": [
+   "BELL_RESONATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "frozen_hour",
+  "spell_ru": "Застывший час",
+  "event": "pohsmp_core:spell.frozen_hour.end_bell",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/ender/frozen_hour_end_bell_1.ogg",
+   "spell/ender/frozen_hour_end_bell_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frozen_hour_end_bell_1.mp3",
+   "docs/sounds/mp3/frozen_hour_end_bell_2.mp3"
+  ],
+  "what": "колокол — конец / снятие / смерть (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "FrozenHourSpell.java stop()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "frozen_hour",
+  "spell_ru": "Застывший час",
+  "event": "pohsmp_core:spell.frozen_hour.end_powerdown",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/ender/frozen_hour_end_powerdown_1.ogg",
+   "spell/ender/frozen_hour_end_powerdown_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frozen_hour_end_powerdown_1.mp3",
+   "docs/sounds/mp3/frozen_hour_end_powerdown_2.mp3"
+  ],
+  "what": "спад, «выключение» — конец / снятие / смерть (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "FrozenHourSpell.java stop()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "frozen_hour",
+  "spell_ru": "Застывший час",
+  "event": "pohsmp_core:spell.frozen_hour.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/ender/frozen_hour_hit_1.ogg",
+   "spell/ender/frozen_hour_hit_2.ogg",
+   "spell/ender/frozen_hour_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frozen_hour_hit_1.mp3",
+   "docs/sounds/mp3/frozen_hour_hit_2.mp3",
+   "docs/sounds/mp3/frozen_hour_hit_3.mp3"
+  ],
+  "what": "тяжёлый металлический удар — удар / взрыв / попадание (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "FrozenHourSpell.java free()",
+  "replaces": [
+   "PLAYER_ATTACK_CRIT"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "frozen_hour",
+  "spell_ru": "Застывший час",
+  "event": "pohsmp_core:spell.frozen_hour.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/ender/frozen_hour_loop_1.ogg",
+   "spell/ender/frozen_hour_loop_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frozen_hour_loop_1.mp3",
+   "docs/sounds/mp3/frozen_hour_loop_2.mp3"
+  ],
+  "what": "долгий резонанс — пока действует (тики) (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "FrozenHourSpell.java onServerTick()",
+  "replaces": [
+   "BELL_RESONATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ender/space_closure_cast_1.ogg",
+   "spell/ender/space_closure_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_cast_1.mp3",
+   "docs/sounds/mp3/space_closure_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java getCastStartSound()",
+  "replaces": [
+   "END_PORTAL_FRAME_FILL"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.charge_hum",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/ender/space_closure_charge_hum_1.ogg",
+   "spell/ender/space_closure_charge_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_charge_hum_1.mp3",
+   "docs/sounds/mp3/space_closure_charge_hum_2.mp3"
+  ],
+  "what": "гул / фон — нарастание во время каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java onServerCastTick()",
+  "replaces": [
+   "BEACON_AMBIENT"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/ender/space_closure_charge_powerup_1.ogg",
+   "spell/ender/space_closure_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_charge_powerup_1.mp3",
+   "docs/sounds/mp3/space_closure_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java onServerCastTick()",
+  "replaces": [
+   "RESPAWN_ANCHOR_CHARGE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.end_powerdown",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/ender/space_closure_end_powerdown_1.ogg",
+   "spell/ender/space_closure_end_powerdown_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_end_powerdown_1.mp3",
+   "docs/sounds/mp3/space_closure_end_powerdown_2.mp3"
+  ],
+  "what": "спад, «выключение» — конец / снятие / смерть (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java close()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.end_shatter",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/ender/space_closure_end_shatter_1.ogg",
+   "spell/ender/space_closure_end_shatter_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_end_shatter_1.mp3",
+   "docs/sounds/mp3/space_closure_end_shatter_2.mp3"
+  ],
+  "what": "раскол, осколки — конец / снятие / смерть (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java close()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.hit_powerup",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/ender/space_closure_hit_powerup_1.ogg",
+   "spell/ender/space_closure_hit_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_hit_powerup_1.mp3",
+   "docs/sounds/mp3/space_closure_hit_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — удар / взрыв / попадание (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java hit()",
+  "replaces": [
+   "RESPAWN_ANCHOR_SET_SPAWN"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.hit_resonate",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/ender/space_closure_hit_resonate_1.ogg",
+   "spell/ender/space_closure_hit_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_hit_resonate_1.mp3",
+   "docs/sounds/mp3/space_closure_hit_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — удар / взрыв / попадание (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java hit()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.open_portal",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/ender/space_closure_open_portal_1.ogg",
+   "spell/ender/space_closure_open_portal_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_open_portal_1.mp3",
+   "docs/sounds/mp3/space_closure_open_portal_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — раскрытие (печать, купол, разрыв) (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java open()",
+  "replaces": [
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.open_powerup",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/ender/space_closure_open_powerup_1.ogg",
+   "spell/ender/space_closure_open_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_open_powerup_1.mp3",
+   "docs/sounds/mp3/space_closure_open_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — раскрытие (печать, купол, разрыв) (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java open()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.open_roar",
+  "role": "open",
+  "role_ru": "раскрытие (печать, купол, разрыв)",
+  "files": [
+   "spell/ender/space_closure_open_roar_1.ogg",
+   "spell/ender/space_closure_open_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_open_roar_1.mp3",
+   "docs/sounds/mp3/space_closure_open_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — раскрытие (печать, купол, разрыв) (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java open()",
+  "replaces": [
+   "WITHER_SPAWN"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "space_closure",
+  "spell_ru": "Закрытие Пространства",
+  "event": "pohsmp_core:spell.space_closure.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/ender/space_closure_release_1.ogg",
+   "spell/ender/space_closure_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/space_closure_release_1.mp3",
+   "docs/sounds/mp3/space_closure_release_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — выпуск заклинания (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SpaceClosureSpell.java getCastFinishSound()",
+  "replaces": [
+   "END_PORTAL_SPAWN"
+  ]
+ },
+ {
+  "school": "ender",
+  "school_ru": "Эндер",
+  "spell": "swap",
+  "spell_ru": "Подмена",
+  "event": "pohsmp_core:spell.swap.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ender/swap_cast_1.ogg",
+   "spell/ender/swap_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/swap_cast_1.mp3",
+   "docs/sounds/mp3/swap_cast_2.mp3"
+  ],
+  "what": "разрыв пространства, переход — начало каста (подпись школы: искажённый гул, пространство «плывёт», портал)",
+  "where": "SwapSpell.java onCast()",
+  "replaces": [
+   "ENDERMAN_TELEPORT"
+  ]
  }
 ]

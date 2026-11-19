@@ -1060,5 +1060,412 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.banishment.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.banishment.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/banishment_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/banishment_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.cast_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.cast_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_cast_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_cast_chime_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.cast_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.cast_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_cast_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_cast_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.cast_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.cast_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_cast_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_cast_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.charge_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.charge_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.charge_portal": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.charge_portal",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_portal_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_portal_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.charge_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.charge_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_charge_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.end_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.end_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_end_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_end_chime_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.end_portal": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.end_portal",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_end_portal_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_end_portal_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.fail_click": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.fail_click",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_fail_click_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_fail_click_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.fail_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.fail_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_fail_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_fail_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.open": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.open",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_open_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_open_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.coven_arrival.release": {
+    "subtitle": "subtitles.pohsmp_core.spell.coven_arrival.release",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_release_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/coven_arrival_release_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.frozen_hour.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.frozen_hour.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.frozen_hour.end_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.frozen_hour.end_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_end_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_end_bell_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.frozen_hour.end_powerdown": {
+    "subtitle": "subtitles.pohsmp_core.spell.frozen_hour.end_powerdown",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_end_powerdown_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_end_powerdown_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.frozen_hour.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.frozen_hour.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.frozen_hour.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.frozen_hour.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/frozen_hour_loop_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.charge_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.charge_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_charge_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_charge_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.end_powerdown": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.end_powerdown",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_end_powerdown_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_end_powerdown_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.end_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.end_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_end_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_end_shatter_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.hit_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.hit_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_hit_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_hit_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.hit_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.hit_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_hit_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_hit_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.open_portal": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.open_portal",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_open_portal_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_open_portal_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.open_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.open_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_open_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_open_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.open_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.open_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_open_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_open_roar_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.space_closure.release": {
+    "subtitle": "subtitles.pohsmp_core.spell.space_closure.release",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_release_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/space_closure_release_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.swap.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.swap.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ender/swap_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ender/swap_cast_2",
+        "volume": 0.5
+      }
+    ]
   }
 }

@@ -94,5 +94,243 @@
         "stream": true
       }
     ]
+  },
+  "nightmare.heartbeat": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.heartbeat",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/heartbeat_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/heartbeat_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/heartbeat_3"
+      }
+    ]
+  },
+  "nightmare.child_laugh": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.child_laugh",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/child_laugh_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/child_laugh_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/child_laugh_3"
+      }
+    ]
+  },
+  "nightmare.whisper": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.whisper",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/whisper_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/whisper_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/whisper_3"
+      }
+    ]
+  },
+  "nightmare.scrape": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.scrape",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/scrape_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/scrape_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/scrape_3"
+      }
+    ]
+  },
+  "nightmare.crawler_step": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.crawler_step",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/crawler_step_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/crawler_step_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/crawler_step_3"
+      }
+    ]
+  },
+  "nightmare.crawler_hiss": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.crawler_hiss",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/crawler_hiss_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/crawler_hiss_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/crawler_hiss_3"
+      }
+    ]
+  },
+  "nightmare.maw_roar": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.maw_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/maw_roar_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/maw_roar_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/maw_roar_3"
+      }
+    ]
+  },
+  "nightmare.maw_bite": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.maw_bite",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/maw_bite_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/maw_bite_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/maw_bite_3"
+      }
+    ]
+  },
+  "nightmare.weeper_cry": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.weeper_cry",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/weeper_cry_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/weeper_cry_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/weeper_cry_3"
+      }
+    ]
+  },
+  "nightmare.weeper_wail": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.weeper_wail",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/weeper_wail_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/weeper_wail_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/weeper_wail_3"
+      }
+    ]
+  },
+  "nightmare.moths": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.moths",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/moths_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/moths_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/moths_3"
+      }
+    ]
+  },
+  "nightmare.hands_grab": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.hands_grab",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/hands_grab_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/hands_grab_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/hands_grab_3"
+      }
+    ]
+  },
+  "nightmare.ink_rise": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.ink_rise",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/ink_rise_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/ink_rise_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/ink_rise_3"
+      }
+    ]
+  },
+  "nightmare.ink_fall": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.ink_fall",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/ink_fall_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/ink_fall_2"
+      },
+      {
+        "name": "pohsmp_core:nightmare/ink_fall_3"
+      }
+    ]
+  },
+  "nightmare.cast_house": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.cast_house",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/cast_house_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/cast_house_2"
+      }
+    ]
+  },
+  "nightmare.cast_night": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.cast_night",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/cast_night_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/cast_night_2"
+      }
+    ]
+  },
+  "nightmare.cast_no_awakening": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.cast_no_awakening",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/cast_no_awakening_1",
+        "stream": true
+      }
+    ]
+  },
+  "nightmare.thicken": {
+    "subtitle": "subtitles.pohsmp_core.nightmare.thicken",
+    "sounds": [
+      {
+        "name": "pohsmp_core:nightmare/thicken_1"
+      },
+      {
+        "name": "pohsmp_core:nightmare/thicken_2"
+      }
+    ]
   }
 }

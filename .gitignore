@@ -10,3 +10,4 @@ out/
 bin/
 libs/*.jar
 __pycache__/
+run-libs/*.jar

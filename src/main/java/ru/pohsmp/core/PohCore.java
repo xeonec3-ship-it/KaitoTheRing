@@ -54,6 +54,8 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.CovenArrivalSpell.CovenArrivalEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.Fx.FxServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.FxCommands.class);
+        MinecraftForge.EVENT_BUS.register(Charges.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.JointCast.class);
         if (FMLEnvironment.dist == Dist.CLIENT) ClientInit.init(modBus);
     }
 

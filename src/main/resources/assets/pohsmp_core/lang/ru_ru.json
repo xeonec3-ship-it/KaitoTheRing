@@ -310,5 +310,8 @@
   "ui.pohsmp_core.wind_mark.time": "Метка: %s с",
   "ui.pohsmp_core.world_rift.length": "Длина: %s блоков",
   "ui.pohsmp_core.world_rift.pillars": "Столбы тьмы: %s урона",
-  "ui.pohsmp_core.world_rift.toss": "Подброс: %s урона"
+  "ui.pohsmp_core.world_rift.toss": "Подброс: %s урона",
+  "tooltip.pohsmp_core.charges": "Заряды: %s/%s",
+  "ui.pohsmp_core.joint_cast": "Совместный каст: %s",
+  "ui.pohsmp_core.joint_cast.done": "Совместный каст завершён"
 }

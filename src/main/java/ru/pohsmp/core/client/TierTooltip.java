@@ -30,6 +30,15 @@ public final class TierTooltip {
         }
     }
 
+    /** Scrolls with charges (T16): "Charges: 2/3" right under the name. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onChargesTooltip(ItemTooltipEvent e) {
+        Component line = ru.pohsmp.core.Charges.tooltip(e.getItemStack());
+        if (line == null) return;
+        List<Component> lines = e.getToolTip();
+        lines.add(Math.min(1, lines.size()), line);
+    }
+
     private static boolean has(Component c) {
         if (c.getContents() instanceof TranslatableContents tc && RARITY_KEY.equals(tc.getKey())) return true;
         for (Component s : c.getSiblings()) if (has(s)) return true;

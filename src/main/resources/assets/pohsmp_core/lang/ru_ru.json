@@ -652,5 +652,10 @@
   "subtitles.pohsmp_core.spell.last_dawn.end_fanfare": "Последний рассвет: торжество",
   "subtitles.pohsmp_core.spell.living_shield.cast": "Живой щит: сила нарастает",
   "subtitles.pohsmp_core.spell.sanctuary.cast": "Святилище: сила нарастает",
-  "subtitles.pohsmp_core.spell.sanctuary.end": "Святилище: сила угасает"
+  "subtitles.pohsmp_core.spell.sanctuary.end": "Святилище: сила угасает",
+  "subtitles.pohsmp_core.spell.blood_gift.cast": "Кровный дар: хлюпает",
+  "subtitles.pohsmp_core.spell.blood_mark.cast": "Кровавая метка: бьётся сердце",
+  "subtitles.pohsmp_core.spell.hemorrhage.cast": "Кровотечение: хлюпает",
+  "subtitles.pohsmp_core.spell.magic_madness.cast": "Магическое безумие: рёв",
+  "subtitles.pohsmp_core.spell.magic_madness.loop": "Магическое безумие: бьётся сердце"
 }

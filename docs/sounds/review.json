@@ -962,5 +962,118 @@
   "replaces": [
    "BEACON_DEACTIVATE"
   ]
+ },
+ {
+  "school": "blood",
+  "school_ru": "Кровь",
+  "spell": "blood_gift",
+  "spell_ru": "Кровный дар",
+  "event": "pohsmp_core:spell.blood_gift.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/blood/blood_gift_cast_1.ogg",
+   "spell/blood/blood_gift_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blood_gift_cast_1.mp3",
+   "docs/sounds/mp3/blood_gift_cast_2.mp3"
+  ],
+  "what": "влажный удар, кровь — начало каста (подпись школы: влажный пульс, сердцебиение, глухо)",
+  "where": "BloodGiftSpell.java onCast()",
+  "replaces": [
+   "HONEY_DRINK",
+   "PLAYER_HURT_SWEET_BERRY_BUSH"
+  ]
+ },
+ {
+  "school": "blood",
+  "school_ru": "Кровь",
+  "spell": "blood_mark",
+  "spell_ru": "Кровавая метка",
+  "event": "pohsmp_core:spell.blood_mark.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/blood/blood_mark_cast_1.ogg",
+   "spell/blood/blood_mark_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blood_mark_cast_1.mp3",
+   "docs/sounds/mp3/blood_mark_cast_2.mp3"
+  ],
+  "what": "удар сердца — начало каста (подпись школы: влажный пульс, сердцебиение, глухо)",
+  "where": "BloodMarkSpell.java onCast()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
+ },
+ {
+  "school": "blood",
+  "school_ru": "Кровь",
+  "spell": "hemorrhage",
+  "spell_ru": "Кровотечение",
+  "event": "pohsmp_core:spell.hemorrhage.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/blood/hemorrhage_cast_1.ogg",
+   "spell/blood/hemorrhage_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/hemorrhage_cast_1.mp3",
+   "docs/sounds/mp3/hemorrhage_cast_2.mp3"
+  ],
+  "what": "влажный удар, кровь — начало каста (подпись школы: влажный пульс, сердцебиение, глухо)",
+  "where": "HemorrhageSpell.java onCast()",
+  "replaces": [
+   "PLAYER_HURT_SWEET_BERRY_BUSH"
+  ]
+ },
+ {
+  "school": "blood",
+  "school_ru": "Кровь",
+  "spell": "magic_madness",
+  "spell_ru": "Магическое безумие",
+  "event": "pohsmp_core:spell.magic_madness.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/blood/magic_madness_cast_1.ogg",
+   "spell/blood/magic_madness_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/magic_madness_cast_1.mp3",
+   "docs/sounds/mp3/magic_madness_cast_2.mp3"
+  ],
+  "what": "рёв / грозный гул — начало каста (подпись школы: влажный пульс, сердцебиение, глухо)",
+  "where": "MadnessSpell.java onCast()",
+  "replaces": [
+   "WARDEN_ROAR"
+  ]
+ },
+ {
+  "school": "blood",
+  "school_ru": "Кровь",
+  "spell": "magic_madness",
+  "spell_ru": "Магическое безумие",
+  "event": "pohsmp_core:spell.magic_madness.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/blood/magic_madness_loop_1.ogg",
+   "spell/blood/magic_madness_loop_2.ogg",
+   "spell/blood/magic_madness_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/magic_madness_loop_1.mp3",
+   "docs/sounds/mp3/magic_madness_loop_2.mp3",
+   "docs/sounds/mp3/magic_madness_loop_3.mp3"
+  ],
+  "what": "удар сердца — пока действует (тики) (подпись школы: влажный пульс, сердцебиение, глухо)",
+  "where": "MadnessSpell.java madTick(); PohHud.java onClientTick()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
  }
 ]

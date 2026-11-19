@@ -991,5 +991,74 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.blood_gift.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.blood_gift.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/blood/blood_gift_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/blood/blood_gift_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.blood_mark.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.blood_mark.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/blood/blood_mark_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/blood/blood_mark_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.hemorrhage.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.hemorrhage.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/blood/hemorrhage_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/blood/hemorrhage_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.magic_madness.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.magic_madness.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/blood/magic_madness_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/blood/magic_madness_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.magic_madness.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.magic_madness.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/blood/magic_madness_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/blood/magic_madness_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/blood/magic_madness_loop_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

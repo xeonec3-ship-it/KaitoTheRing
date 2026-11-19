@@ -837,8 +837,8 @@ def write_docs(sites, skipped, names):
             fh.write('| `%s` | `%s` | %d | `SoundEvents.%s` | `pohsmp_core:%s` |\n' % (s['file'], s['method'], s['line'], s['vanilla'], s['event']))
     with open(os.path.join(DOCS, 'sources.md'), 'w', encoding='utf-8', newline='\n') as fh:
         fh.write('# Источники звуков магии\n\nВсе записи — с OpenGameArt.org; обработаны в `tools/gen_spell_sounds.py` (высота/скорость, реверс, '
-                 'реверберация, фильтры, кольцевая модуляция, «распад», слои). Владелец 19.11 разрешил не ограничиваться CC0 — лицензия '
-                 'указана у каждого; для CC-BY/CC-BY-SA нужна строка в титрах мода (авторы ниже).\n\n'
+                 'реверберация, фильтры, кольцевая модуляция, «распад», слои). Владелец 19.11: «на лицензии не проверять, мод в интернет '
+                 'не уйдёт» — источники записаны для себя (найти/заменить), лицензия — справочно.\n\n'
                  '| файл | автор | лицензия | страница |\n|---|---|---|---|\n')
         for f, (page, au, lic) in SOURCES.items():
             fh.write('| `%s` | %s | %s | https://opengameart.org/content/%s |\n' % (f.replace('%20', ' '), au, lic, page))

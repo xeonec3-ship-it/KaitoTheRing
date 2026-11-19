@@ -35,7 +35,7 @@ import ru.pohsmp.core.spell.silent.SilentSpell;
  * <li>Heat (0..100) grows with hits and cools down without them; the HUD shows it over the hotbar (client/EmberHud).</li>
  * <li>Two hits in a row heat the blade into the whip form: each hit then also lashes a flaming arc 6 blocks long.
  *     Without hits for {@link #COOL_TICKS} the fire goes out.</li>
- * <li>Full heat + right click: special attack by form. Sword form: "Last Ember" — the blade into the ground, three waves of
+ * <li>Full heat: special attack by form, the Epic Fight weapon skill (without Epic Fight: right click). Sword form: "Last Ember" — the blade into the ground, three waves of
  *     fire pillars (3/5/7 blocks), the heat to zero, the blade cools down. Whip form: "Fire Vortex" — a full turn of the whip,
  *     a ring of fire r 5 that burns and throws everyone out; the whip stays hot.</li>
  * </ul>
@@ -223,20 +223,21 @@ public class EmberBlade extends SwordItem {
         return new Vec3(Math.cos(yaw + a), 0, Math.sin(yaw + a));
     }
 
-    // ---------------------------------------------------------------- special attack (full heat + right click)
+    // ---------------------------------------------------------------- special attack (full heat: the Epic Fight weapon skill, EmberEpicFight)
 
+    /** Only without Epic Fight: full heat + right click. With Epic Fight the right click is the guard (owner 19.11). */
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
         ItemStack s = p.getItemInHand(hand);
-        if (hand != InteractionHand.MAIN_HAND || heat(s) < MAX_HEAT) return InteractionResultHolder.pass(s);
+        if (EmberEpicFight.ON || hand != InteractionHand.MAIN_HAND || heat(s) < MAX_HEAT) return InteractionResultHolder.pass(s);
         if (level instanceof ServerLevel && p instanceof net.minecraft.server.level.ServerPlayer sp) special(sp, s);
         return InteractionResultHolder.sidedSuccess(s, level.isClientSide);
     }
 
     /**
      * The special attack by form (full heat): plays the Epic Fight animation, spends the heat at once and starts the effect and the
-     * damage on the strike of the animation (at once without Epic Fight). Called by the right click now; the Epic Fight weapon skill
-     * (owner 19.11: the right click should stay the block) should call this too. Returns false when the heat is not full.
+     * damage on the strike of the animation (at once without Epic Fight). Called by the Epic Fight weapon skill
+     * (EmberEpicFight.Special), without Epic Fight by the right click. Returns false when the heat is not full.
      */
     public static boolean special(net.minecraft.server.level.ServerPlayer p, ItemStack s) {
         if (!(s.getItem() instanceof EmberBlade item) || heat(s) < MAX_HEAT || !(p.level() instanceof ServerLevel sl)) return false;

@@ -49,8 +49,8 @@ def build():
     # 0–14 с: редкие искры у ведьмы
     el(type='sprites', delay=0, duration=T(14), at='caster+0,0.8,0', texture='@sparks', count=60, rate=0.25, spread=2.2,
        speed=0.015, gravity=-0.002, size=[0.12, 0.05], life=60, color='@primary')
-    # МАНА (1–9 с, 14.6–26 с и весь каст) — больше НЕ элементы эффекта: временная «туманность» (печати silent_hand_nebula,
-    # искры и звёздочки у посоха) убрана 19.11 — ману рисует код, перенос из мода God Wand (MIT): client/fx/gate/GateMana —
+    # МАНА (1–9 с, 14.6–26 с и весь каст) — больше НЕ элементы эффекта: временная «туманность» (печати silent_hand_nebula /
+    # silent_staff_nebula, искры и звёздочки у посоха) убрана 19.11 — ману рисует код, перенос из мода God Wand (MIT): client/fx/gate/GateMana —
     # «ветер» искр, полосы-марли, след посоха (ленты и осыпающиеся искры). См. docs/third_party/god-wand-MIT.txt.
     # 49.9 с: рука прямо вперёд — вспышка у руки
     el(type='flash', delay=T(49.9), duration=T(0.6), at='caster.hand', size=1.6, anamorphic=4, rays=6, color='@core')

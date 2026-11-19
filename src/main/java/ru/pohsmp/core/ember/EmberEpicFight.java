@@ -33,7 +33,7 @@ import yesman.epicfight.world.capabilities.item.WeaponCapability;
  * <li>Animations (assets/pohsmp_core/animmodels/animations/biped/ember/*.json, made by tools/gen_epicfight_anims.py,
  *     preview tools/ember_anims_preview.html): the special attacks "Last Ember" and "Fire Vortex" and the 3-lash whip combo.</li>
  * <li>Weapon type pohsmp_core:ember_blade (data/pohsmp_core/capabilities/weapons/ember_blade.json): a sword; sword form —
- *     the Epic Fight sword combo and its Sweeping Edge, whip form (the blade is hot) — style TWO_HAND with our lashes.</li>
+ *     the Epic Fight sword combo, whip form (the blade is hot) — style TWO_HAND with our lashes.</li>
  * </ul>
  * The timings below must match the generator (TIMING there).
  */
@@ -50,6 +50,7 @@ public final class EmberEpicFight {
     /** Called from PohCore with the mod event bus when Epic Fight is present. */
     public static void init(IEventBus modBus) {
         modBus.addListener(Impl::registerAnimations);
+        modBus.addListener(Impl::registerSkill);
         modBus.addListener(Impl::registerWeaponType);
     }
 
@@ -100,9 +101,44 @@ public final class EmberEpicFight {
                     .newStyleCombo(CapabilityItem.Styles.ONE_HAND, Animations.SWORD_AUTO1, Animations.SWORD_AUTO2, Animations.SWORD_AUTO3,
                             Animations.SWORD_DASH, Animations.SWORD_AIR_SLASH)
                     .newStyleCombo(CapabilityItem.Styles.TWO_HAND, WHIP1, WHIP2, WHIP3, Animations.SWORD_DASH, Animations.SWORD_AIR_SLASH)
-                    .innateSkill(CapabilityItem.Styles.ONE_HAND, s -> EpicFightSkills.SWEEPING_EDGE)
+                    .innateSkill(CapabilityItem.Styles.ONE_HAND, s -> special)
+                    .innateSkill(CapabilityItem.Styles.TWO_HAND, s -> special)
                     .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
                     .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD));
+        }
+
+        static yesman.epicfight.skill.Skill special;
+
+        /**
+         * T14 (manager 19.11): the special attack is the weapon innate skill pohsmp_core:ember_special of both forms. No Epic Fight
+         * charge: ready only at full heat (the icon stays grey until then); it calls EmberBlade.special.
+         */
+        static void registerSkill(yesman.epicfight.api.forgeevent.SkillBuildEvent e) {
+            special = e.createRegistryWorker(PohCore.MODID).build("ember_special", Special::new,
+                    new yesman.epicfight.skill.SkillBuilder<Special>().setCategory(yesman.epicfight.skill.SkillCategories.WEAPON_INNATE)
+                            .setActivateType(yesman.epicfight.skill.Skill.ActivateType.ONE_SHOT)
+                            .setResource(yesman.epicfight.skill.Skill.Resource.NONE));
+        }
+
+        static final class Special extends yesman.epicfight.skill.weaponinnate.WeaponInnateSkill {
+            Special(yesman.epicfight.skill.SkillBuilder<? extends yesman.epicfight.skill.weaponinnate.WeaponInnateSkill> b) {
+                super(b);
+            }
+
+            @Override
+            public boolean checkExecuteCondition(yesman.epicfight.skill.SkillContainer c) {
+                ItemStack s = ((Player) c.getExecutor().getOriginal()).getMainHandItem();
+                return s.getItem() instanceof EmberBlade && EmberBlade.heat(s) >= EmberBlade.MAX_HEAT;
+            }
+
+            @Override
+            public void executeOnServer(yesman.epicfight.skill.SkillContainer c, net.minecraft.network.FriendlyByteBuf buf) {
+                ServerPlayer p = c.getServerExecutor().getOriginal();
+                ItemStack s = p.getMainHandItem();
+                if (!(s.getItem() instanceof EmberBlade) || EmberBlade.heat(s) < EmberBlade.MAX_HEAT) return;
+                super.executeOnServer(c, buf);
+                EmberBlade.special(p, s);
+            }
         }
 
         private static boolean hot(ItemStack s) {

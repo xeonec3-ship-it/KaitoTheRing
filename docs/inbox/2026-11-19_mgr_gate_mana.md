@@ -29,9 +29,9 @@
 (`commandAge` = тики от пакета COMMAND, `GateOrder.commandAt`) — не меньше 0.7, **плотность ×0.4** (как у них), гаснет к концу удара
 (приказ + 247…302 тика).
 
-**Генератор эффекта.** Из `tools/gen_silent_gate_fx.py` убраны временные элементы туманности (6 печатей `silent_hand_nebula`,
+**Генератор эффекта.** Из `tools/gen_silent_gate_fx.py` убраны временные элементы туманности (печати `silent_hand_nebula` и — после слияния с 417cb1b — `silent_staff_nebula`,
 вспышка у посоха, искры `spark_soft` и звёздочки `glint4` в 1–9 с и 14.6–26 с); `fx/silent_gate.json` пересобран (21 элемент).
-`silent_staff_nebula` в репозитории нет. Печать `silent_hand_nebula` и `tools/gen_silent_nebula.py` остались, но эффектом больше не используются.
+Печати `silent_hand_nebula`/`silent_staff_nebula`, их текстуры и `tools/gen_silent_nebula.py` остались в репозитории, но эффектом «Врат» больше не используются (удалить — на ваше решение).
 
 ## Камера (`client/DownfallCut`, сцена 7) — по `SilentGateCinematic`
 

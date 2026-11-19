@@ -1,0 +1,110 @@
+{
+ "comment": "«Безмолвные врата»: полоса туманности от посоха — горизонтальный рукав (облака, струи, звёзды, дымка). Сгенерировано tools/gen_silent_nebula.py.",
+ "size": 6.0,
+ "color": "#FFFFFF",
+ "orientation": "billboard",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "haze",
+   "type": "disc",
+   "texture": "silent_band_haze",
+   "radius": 1.7,
+   "heightOffset": -0.1,
+   "brightness": 0.845,
+   "appear": {
+    "delay": 0,
+    "duration": 36,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "cloud_back",
+   "type": "disc",
+   "texture": "silent_band_cloud",
+   "radius": 1.25,
+   "heightOffset": -0.06,
+   "brightness": 0.36,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade",
+     "twist"
+    ],
+    "twist": -40
+   }
+  },
+  {
+   "id": "cloud",
+   "type": "disc",
+   "texture": "silent_band_cloud",
+   "radius": 1.05,
+   "heightOffset": 0.0,
+   "brightness": 0.528,
+   "appear": {
+    "delay": 6,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade",
+     "twist"
+    ],
+    "twist": 50
+   }
+  },
+  {
+   "id": "wisp",
+   "type": "disc",
+   "texture": "silent_band_wisp",
+   "radius": 1.05,
+   "heightOffset": 0.03,
+   "brightness": 0.72,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "stars",
+   "type": "disc",
+   "texture": "silent_band_stars",
+   "radius": 1.1,
+   "heightOffset": 0.06,
+   "appear": {
+    "delay": 4,
+    "duration": 24,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.18,
+    "period": 26
+   },
+   "brightness": 1.0
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 24
+ }
+}

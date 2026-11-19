@@ -597,13 +597,7 @@ public final class HigherFx {
             gyro(c, rc, 4, 3.4f * k, x.a + 5, cr, cg, cb, fd * 0.75f);
             flat(c.vc(CIRCLE_A), c.pose, x.pos.add(0, 0.05, 0), UP, 7f * k, (float) (-tm * 0.03), cr, cg, cb, fd * 0.8f);
         }
-        if (t > 260) {
-            float k = (float) Math.min(1, (t - 260) / 20.0);
-            Vec3 top = cp.add(0, 2.4, 0);
-            float w = 0.08f + 0.04f * (float) Math.sin(tm * 0.4);
-            beamLine(c.vc(BEAM), c.pose, top, rc, c.cam, w, cr, cg, cb, fd * k);
-            beamLine(c.vc(BEAM), c.pose, top, rc, c.cam, w * 3f, cr * 0.5f, cg * 0.4f, cb * 0.2f, fd * k * 0.5f);
-        }
+        // owner 19.11: no golden thread from the caster to the rift
         if (t > 380) {
             VertexConsumer bm = c.vc(BEAM);
             for (int i = 0; i < 14; i++) {

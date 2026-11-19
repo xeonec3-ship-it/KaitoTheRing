@@ -193,14 +193,7 @@ public class DownfallSpell extends PohSpell {
                 DivineEvents.particle(sl, ParticleTypes.LARGE_SMOKE, r.x + Math.cos(ang) * d, r.y + 0.1, r.z + Math.sin(ang) * d, 1, 0, 0.01);
             }
         }
-        if (t >= 300 && t % 3 == 0) {   // golden thread from the staff to the rift
-            Vec3 from = caster.getEyePosition().add(0, 0.8, 0);
-            for (int i = 0; i < 14; i++) {
-                double k = ((i / 14.0) + t * 0.02) % 1.0;
-                Vec3 q = from.lerp(rc, k);
-                DivineEvents.particle(sl, GOLD, q.x, q.y + Math.sin(k * Math.PI) * 1.5, q.z, 1, 0, 0);
-            }
-        }
+        // owner 19.11: no golden thread from the staff to the rift (no line from the caster)
         if (t >= 400 && t % 20 == 0) CameraShakeManager.addCameraShake(new CameraShakeData(sl, 14, rc, 60));
         if (t >= 440 && t % 10 == 0) bolt(sl, r.add((sl.random.nextDouble() - 0.5) * 6, 0, (sl.random.nextDouble() - 0.5) * 6));
     }

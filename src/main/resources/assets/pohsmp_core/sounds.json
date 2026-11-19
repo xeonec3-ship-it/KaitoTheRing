@@ -3516,5 +3516,367 @@
         "volume": 0.5
       }
     ]
+  },
+  "school.illusion.cast": {
+    "subtitle": "subtitles.pohsmp_core.school.illusion.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.borrowed_face.cast_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.borrowed_face.cast_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/borrowed_face_cast_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/borrowed_face_cast_chime_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.borrowed_face.cast_magic": {
+    "subtitle": "subtitles.pohsmp_core.spell.borrowed_face.cast_magic",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/borrowed_face_cast_magic_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/borrowed_face_cast_magic_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.borrowed_face.end": {
+    "subtitle": "subtitles.pohsmp_core.spell.borrowed_face.end",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/borrowed_face_end_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/borrowed_face_end_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.butterfly_dream.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.butterfly_dream.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.butterfly_dream.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.butterfly_dream.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.butterfly_dream.charge_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.butterfly_dream.charge_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_charge_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_charge_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.butterfly_dream.charge_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.butterfly_dream.charge_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_charge_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_charge_shatter_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.butterfly_dream.end": {
+    "subtitle": "subtitles.pohsmp_core.spell.butterfly_dream.end",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_end_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_end_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.butterfly_dream.hit_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.butterfly_dream.hit_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_hit_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_hit_chime_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_hit_chime_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.butterfly_dream.hit_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.butterfly_dream.hit_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_hit_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_hit_shatter_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/butterfly_dream_hit_shatter_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.false_step.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.false_step.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/false_step_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/false_step_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.illusion_copies.hit_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.illusion_copies.hit_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_copies_hit_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_copies_hit_chime_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_copies_hit_chime_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.illusion_copies.hit_wet": {
+    "subtitle": "subtitles.pohsmp_core.spell.illusion_copies.hit_wet",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_copies_hit_wet_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_copies_hit_wet_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/illusion_copies_hit_wet_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.mirror_images.cast_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.mirror_images.cast_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_images_cast_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_images_cast_chime_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.mirror_images.cast_magic": {
+    "subtitle": "subtitles.pohsmp_core.spell.mirror_images.cast_magic",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_images_cast_magic_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_images_cast_magic_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.mirror_labyrinth.cast_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.mirror_labyrinth.cast_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_labyrinth_cast_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_labyrinth_cast_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.mirror_labyrinth.cast_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.mirror_labyrinth.cast_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_labyrinth_cast_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_labyrinth_cast_shatter_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.mirror_labyrinth.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.mirror_labyrinth.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_labyrinth_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_labyrinth_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/mirror_labyrinth_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.phantom_pain.cast_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.phantom_pain.cast_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/phantom_pain_cast_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/phantom_pain_cast_chime_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.phantom_pain.cast_soul": {
+    "subtitle": "subtitles.pohsmp_core.spell.phantom_pain.cast_soul",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/phantom_pain_cast_soul_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/phantom_pain_cast_soul_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.phantom_pain.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.phantom_pain.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/phantom_pain_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/phantom_pain_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/phantom_pain_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.veil.cast_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.veil.cast_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/veil_cast_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/veil_cast_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.veil.cast_soul": {
+    "subtitle": "subtitles.pohsmp_core.spell.veil.cast_soul",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/veil_cast_soul_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/veil_cast_soul_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.waking_nightmare.cast_heart": {
+    "subtitle": "subtitles.pohsmp_core.spell.waking_nightmare.cast_heart",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/waking_nightmare_cast_heart_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/waking_nightmare_cast_heart_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.waking_nightmare.cast_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.waking_nightmare.cast_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/illusion/waking_nightmare_cast_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/illusion/waking_nightmare_cast_roar_2",
+        "volume": 0.5
+      }
+    ]
   }
 }

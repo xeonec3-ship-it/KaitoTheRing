@@ -4988,5 +4988,592 @@
   "replaces": [
    "FIRE_AMBIENT"
   ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "borrowed_face",
+  "spell_ru": "Чужое лицо",
+  "event": "pohsmp_core:spell.borrowed_face.cast_chime",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/borrowed_face_cast_chime_1.ogg",
+   "spell/illusion/borrowed_face_cast_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/borrowed_face_cast_chime_1.mp3",
+   "docs/sounds/mp3/borrowed_face_cast_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "BorrowedFaceSpell.java onCast()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "borrowed_face",
+  "spell_ru": "Чужое лицо",
+  "event": "pohsmp_core:spell.borrowed_face.cast_magic",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/borrowed_face_cast_magic_1.ogg",
+   "spell/illusion/borrowed_face_cast_magic_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/borrowed_face_cast_magic_1.mp3",
+   "docs/sounds/mp3/borrowed_face_cast_magic_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "BorrowedFaceSpell.java onCast()",
+  "replaces": [
+   "ILLUSIONER_PREPARE_MIRROR"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "borrowed_face",
+  "spell_ru": "Чужое лицо",
+  "event": "pohsmp_core:spell.borrowed_face.end",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/illusion/borrowed_face_end_1.ogg",
+   "spell/illusion/borrowed_face_end_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/borrowed_face_end_1.mp3",
+   "docs/sounds/mp3/borrowed_face_end_2.mp3"
+  ],
+  "what": "раскол, осколки — конец / снятие / смерть (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "BorrowedFaceSpell.java end()",
+  "replaces": [
+   "AMETHYST_CLUSTER_BREAK"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "butterfly_dream",
+  "spell_ru": "Сон бабочки",
+  "event": "pohsmp_core:spell.butterfly_dream.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/butterfly_dream_cast_1.ogg",
+   "spell/illusion/butterfly_dream_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/butterfly_dream_cast_1.mp3",
+   "docs/sounds/mp3/butterfly_dream_cast_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "ButterflyDreamSpell.java getCastStartSound()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "butterfly_dream",
+  "spell_ru": "Сон бабочки",
+  "event": "pohsmp_core:spell.butterfly_dream.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/illusion/butterfly_dream_charge_powerup_1.ogg",
+   "spell/illusion/butterfly_dream_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/butterfly_dream_charge_powerup_1.mp3",
+   "docs/sounds/mp3/butterfly_dream_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "ButterflyDreamSpell.java onServerCastTick()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "butterfly_dream",
+  "spell_ru": "Сон бабочки",
+  "event": "pohsmp_core:spell.butterfly_dream.charge_resonate",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/illusion/butterfly_dream_charge_resonate_1.ogg",
+   "spell/illusion/butterfly_dream_charge_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/butterfly_dream_charge_resonate_1.mp3",
+   "docs/sounds/mp3/butterfly_dream_charge_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — нарастание во время каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "ButterflyDreamSpell.java onServerCastTick()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "butterfly_dream",
+  "spell_ru": "Сон бабочки",
+  "event": "pohsmp_core:spell.butterfly_dream.charge_shatter",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/illusion/butterfly_dream_charge_shatter_1.ogg",
+   "spell/illusion/butterfly_dream_charge_shatter_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/butterfly_dream_charge_shatter_1.mp3",
+   "docs/sounds/mp3/butterfly_dream_charge_shatter_2.mp3"
+  ],
+  "what": "раскол, осколки — нарастание во время каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "ButterflyDreamSpell.java onServerCastTick()",
+  "replaces": [
+   "AMETHYST_CLUSTER_BREAK",
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "butterfly_dream",
+  "spell_ru": "Сон бабочки",
+  "event": "pohsmp_core:spell.butterfly_dream.end",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/illusion/butterfly_dream_end_1.ogg",
+   "spell/illusion/butterfly_dream_end_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/butterfly_dream_end_1.mp3",
+   "docs/sounds/mp3/butterfly_dream_end_2.mp3"
+  ],
+  "what": "раскол, осколки — конец / снятие / смерть (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "ButterflyDreamSpell.java dreamDeath(); ButterflyDreamSpell.java wakeFx()",
+  "replaces": [
+   "AMETHYST_BLOCK_BREAK",
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "butterfly_dream",
+  "spell_ru": "Сон бабочки",
+  "event": "pohsmp_core:spell.butterfly_dream.hit_chime",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/illusion/butterfly_dream_hit_chime_1.ogg",
+   "spell/illusion/butterfly_dream_hit_chime_2.ogg",
+   "spell/illusion/butterfly_dream_hit_chime_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/butterfly_dream_hit_chime_1.mp3",
+   "docs/sounds/mp3/butterfly_dream_hit_chime_2.mp3",
+   "docs/sounds/mp3/butterfly_dream_hit_chime_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — удар / взрыв / попадание (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "ButterflyDreamSpell.java dream(); ButterflyDreamSpell.java ripple()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "butterfly_dream",
+  "spell_ru": "Сон бабочки",
+  "event": "pohsmp_core:spell.butterfly_dream.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/illusion/butterfly_dream_hit_shatter_1.ogg",
+   "spell/illusion/butterfly_dream_hit_shatter_2.ogg",
+   "spell/illusion/butterfly_dream_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/butterfly_dream_hit_shatter_1.mp3",
+   "docs/sounds/mp3/butterfly_dream_hit_shatter_2.mp3",
+   "docs/sounds/mp3/butterfly_dream_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "ButterflyDreamSpell.java onTick()",
+  "replaces": [
+   "AMETHYST_CLUSTER_BREAK",
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "false_step",
+  "spell_ru": "Ложный шаг",
+  "event": "pohsmp_core:spell.false_step.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/false_step_cast_1.ogg",
+   "spell/illusion/false_step_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/false_step_cast_1.mp3",
+   "docs/sounds/mp3/false_step_cast_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "FalseStepSpell.java onCast()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "illusion_copies",
+  "spell_ru": "Иллюзорные копии",
+  "event": "pohsmp_core:spell.illusion_copies.hit_chime",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/illusion/illusion_copies_hit_chime_1.ogg",
+   "spell/illusion/illusion_copies_hit_chime_2.ogg",
+   "spell/illusion/illusion_copies_hit_chime_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/illusion_copies_hit_chime_1.mp3",
+   "docs/sounds/mp3/illusion_copies_hit_chime_2.mp3",
+   "docs/sounds/mp3/illusion_copies_hit_chime_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — удар / взрыв / попадание (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "IllusionAllies.java onInteract(); Illusions.java self()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "illusion_copies",
+  "spell_ru": "Иллюзорные копии",
+  "event": "pohsmp_core:spell.illusion_copies.hit_wet",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/illusion/illusion_copies_hit_wet_1.ogg",
+   "spell/illusion/illusion_copies_hit_wet_2.ogg",
+   "spell/illusion/illusion_copies_hit_wet_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/illusion_copies_hit_wet_1.mp3",
+   "docs/sounds/mp3/illusion_copies_hit_wet_2.mp3",
+   "docs/sounds/mp3/illusion_copies_hit_wet_3.mp3"
+  ],
+  "what": "влажный удар, кровь — удар / взрыв / попадание (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "Copies.java handle()",
+  "replaces": [
+   "PLAYER_HURT"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "mirror_images",
+  "spell_ru": "Отражения",
+  "event": "pohsmp_core:spell.mirror_images.cast_chime",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/mirror_images_cast_chime_1.ogg",
+   "spell/illusion/mirror_images_cast_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_images_cast_chime_1.mp3",
+   "docs/sounds/mp3/mirror_images_cast_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "MirrorImagesSpell.java onCast()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "mirror_images",
+  "spell_ru": "Отражения",
+  "event": "pohsmp_core:spell.mirror_images.cast_magic",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/mirror_images_cast_magic_1.ogg",
+   "spell/illusion/mirror_images_cast_magic_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_images_cast_magic_1.mp3",
+   "docs/sounds/mp3/mirror_images_cast_magic_2.mp3"
+  ],
+  "what": "заклятие плетётся — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "MirrorImagesSpell.java onCast()",
+  "replaces": [
+   "ILLUSIONER_MIRROR_MOVE"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "mirror_labyrinth",
+  "spell_ru": "Зеркальный лабиринт",
+  "event": "pohsmp_core:spell.mirror_labyrinth.cast_resonate",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/mirror_labyrinth_cast_resonate_1.ogg",
+   "spell/illusion/mirror_labyrinth_cast_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_labyrinth_cast_resonate_1.mp3",
+   "docs/sounds/mp3/mirror_labyrinth_cast_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "MirrorLabyrinthSpell.java getCastStartSound(); MirrorLabyrinthSpell.java onCast()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "mirror_labyrinth",
+  "spell_ru": "Зеркальный лабиринт",
+  "event": "pohsmp_core:spell.mirror_labyrinth.cast_shatter",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/mirror_labyrinth_cast_shatter_1.ogg",
+   "spell/illusion/mirror_labyrinth_cast_shatter_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_labyrinth_cast_shatter_1.mp3",
+   "docs/sounds/mp3/mirror_labyrinth_cast_shatter_2.mp3"
+  ],
+  "what": "раскол, осколки — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "MirrorLabyrinthSpell.java onCast()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "mirror_labyrinth",
+  "spell_ru": "Зеркальный лабиринт",
+  "event": "pohsmp_core:spell.mirror_labyrinth.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/illusion/mirror_labyrinth_hit_1.ogg",
+   "spell/illusion/mirror_labyrinth_hit_2.ogg",
+   "spell/illusion/mirror_labyrinth_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/mirror_labyrinth_hit_1.mp3",
+   "docs/sounds/mp3/mirror_labyrinth_hit_2.mp3",
+   "docs/sounds/mp3/mirror_labyrinth_hit_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "MirrorLabyrinthSpell.java tick()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "phantom_pain",
+  "spell_ru": "Фантомная боль",
+  "event": "pohsmp_core:spell.phantom_pain.cast_chime",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/phantom_pain_cast_chime_1.ogg",
+   "spell/illusion/phantom_pain_cast_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/phantom_pain_cast_chime_1.mp3",
+   "docs/sounds/mp3/phantom_pain_cast_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "PhantomPainSpell.java onCast()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "phantom_pain",
+  "spell_ru": "Фантомная боль",
+  "event": "pohsmp_core:spell.phantom_pain.cast_soul",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/phantom_pain_cast_soul_1.ogg",
+   "spell/illusion/phantom_pain_cast_soul_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/phantom_pain_cast_soul_1.mp3",
+   "docs/sounds/mp3/phantom_pain_cast_soul_2.mp3"
+  ],
+  "what": "душа / вздох духа — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "PhantomPainSpell.java onCast()",
+  "replaces": [
+   "ALLAY_AMBIENT_WITHOUT_ITEM"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "phantom_pain",
+  "spell_ru": "Фантомная боль",
+  "event": "pohsmp_core:spell.phantom_pain.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/illusion/phantom_pain_hit_1.ogg",
+   "spell/illusion/phantom_pain_hit_2.ogg",
+   "spell/illusion/phantom_pain_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/phantom_pain_hit_1.mp3",
+   "docs/sounds/mp3/phantom_pain_hit_2.mp3",
+   "docs/sounds/mp3/phantom_pain_hit_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — удар / взрыв / попадание (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "PhantomPainSpell.java mark()",
+  "replaces": [
+   "AMETHYST_CLUSTER_HIT"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "school_illusion",
+  "spell_ru": "Школа: Иллюзии",
+  "event": "pohsmp_core:school.illusion.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/illusion_cast_1.ogg",
+   "spell/illusion/illusion_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/illusion_cast_1.mp3",
+   "docs/sounds/mp3/illusion_cast_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "Reg.java Reg()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "veil",
+  "spell_ru": "Пелена",
+  "event": "pohsmp_core:spell.veil.cast_resonate",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/veil_cast_resonate_1.ogg",
+   "spell/illusion/veil_cast_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/veil_cast_resonate_1.mp3",
+   "docs/sounds/mp3/veil_cast_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "VeilSpell.java onCast()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "veil",
+  "spell_ru": "Пелена",
+  "event": "pohsmp_core:spell.veil.cast_soul",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/veil_cast_soul_1.ogg",
+   "spell/illusion/veil_cast_soul_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/veil_cast_soul_1.mp3",
+   "docs/sounds/mp3/veil_cast_soul_2.mp3"
+  ],
+  "what": "душа / вздох духа — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "VeilSpell.java onCast()",
+  "replaces": [
+   "ALLAY_AMBIENT_WITHOUT_ITEM"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "waking_nightmare",
+  "spell_ru": "Кошмар наяву",
+  "event": "pohsmp_core:spell.waking_nightmare.cast_heart",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/waking_nightmare_cast_heart_1.ogg",
+   "spell/illusion/waking_nightmare_cast_heart_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/waking_nightmare_cast_heart_1.mp3",
+   "docs/sounds/mp3/waking_nightmare_cast_heart_2.mp3"
+  ],
+  "what": "удар сердца — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "WakingNightmareSpell.java start()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
+ },
+ {
+  "school": "illusion",
+  "school_ru": "Иллюзии",
+  "spell": "waking_nightmare",
+  "spell_ru": "Кошмар наяву",
+  "event": "pohsmp_core:spell.waking_nightmare.cast_roar",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/illusion/waking_nightmare_cast_roar_1.ogg",
+   "spell/illusion/waking_nightmare_cast_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/waking_nightmare_cast_roar_1.mp3",
+   "docs/sounds/mp3/waking_nightmare_cast_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — начало каста (подпись школы: стекло и зеркала, мерцающее эхо)",
+  "where": "WakingNightmareSpell.java getCastStartSound()",
+  "replaces": [
+   "SCULK_SHRIEKER_SHRIEK"
+  ]
  }
 ]

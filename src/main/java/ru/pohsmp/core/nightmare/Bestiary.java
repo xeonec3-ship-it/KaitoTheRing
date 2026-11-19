@@ -38,9 +38,8 @@ public final class Bestiary {
 
     static {
         for (NightmareMob.Kind k : NightmareMob.Kind.values()) {
-            float w = 0.6f * k.scale, h = 1.95f * k.scale;
             TYPES.put(k, ENTITIES.register(k.id, () -> EntityType.Builder.<NightmareMob>of((t, l) -> new NightmareMob(t, l, k), MobCategory.MISC)
-                    .sized(w, k == NightmareMob.Kind.HANDS ? 0.6f : h).clientTrackingRange(6).updateInterval(2).noSummon().build(k.id)));
+                    .sized(k.width, k.height).clientTrackingRange(6).updateInterval(2).noSummon().build(k.id)));
         }
     }
 
@@ -48,9 +47,24 @@ public final class Bestiary {
         for (var t : TYPES.values()) e.put(t.get(), NightmareMob.attributes().build());
     }
 
-    /** TrackedEntityMixin: a nightmare is not sent to a player who is not immersed deep enough for it. */
+    /** TrackedEntityMixin: a nightmare is sent to its own victim only, and only while it is immersed deep enough for it. */
     public static boolean hiddenFrom(Entity e, ServerPlayer viewer) {
-        return e instanceof NightmareMob m && Immersion.stage(viewer) < m.kind.stage;
+        return e instanceof NightmareMob m && (!viewer.getUUID().equals(m.victim()) || Immersion.stage(viewer) < m.kind.stage);
+    }
+
+    /** Health the victim's hearts hide after the nightmares' blows (nothing is really taken); shown back when the time is up. */
+    private static final Map<UUID, double[]> FAKE = new HashMap<>();
+
+    static void fakeHit(ServerPlayer v, float dmg, int returnTicks) {
+        double[] f = FAKE.computeIfAbsent(v.getUUID(), k -> new double[2]);
+        f[0] = Math.min(Math.max(0, v.getHealth() - 1), f[0] + dmg);   // never shown as dead
+        f[1] = Immersion.now() + returnTicks;
+        sendFake(v, (float) f[0]);
+    }
+
+    private static void sendFake(ServerPlayer v, float loss) {
+        ru.pohsmp.core.net.Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> v),
+                new ru.pohsmp.core.net.IlluMsg(ru.pohsmp.core.net.IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", loss, 0, 0, 0, 0));
     }
 
     /** The weeping of a Weeper near it hastens the others (x1.3). */
@@ -134,8 +148,16 @@ public final class Bestiary {
 
         @SubscribeEvent
         public static void onTick(TickEvent.ServerTickEvent e) {
-            if (e.phase != TickEvent.Phase.END || Immersion.now() % 40 != 7) return;
+            if (e.phase != TickEvent.Phase.END) return;
             var server = e.getServer();
+            if (!FAKE.isEmpty() && Immersion.now() % 5 == 0)
+                FAKE.entrySet().removeIf(f -> {
+                    ServerPlayer p = server.getPlayerList().getPlayer(f.getKey());
+                    if (p != null && Immersion.now() < f.getValue()[1] && Immersion.stage(p) > 0) return false;
+                    if (p != null) sendFake(p, 0);   // the hearts come back
+                    return true;
+                });
+            if (Immersion.now() % 40 != 7) return;
             EXTRA.values().removeIf(x -> Immersion.now() >= x[1]);
             Map<UUID, Integer> per = new HashMap<>();
             int total = 0;
@@ -164,6 +186,7 @@ public final class Bestiary {
         @SubscribeEvent
         public static void onStopping(ServerStoppingEvent e) {
             EXTRA.clear();
+            FAKE.clear();
         }
     }
 }

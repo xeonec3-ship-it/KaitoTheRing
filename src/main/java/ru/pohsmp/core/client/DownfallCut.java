@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
-import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -683,15 +682,40 @@ public final class DownfallCut {
         if (active) e.setCanceled(true);
     }
 
+    private static boolean hidHud, hudWas;
+
+    /**
+     * Owner 19.11: during every cutscene the HUD is off for all who watch, as with F1 (other mods' HUDs too). Called each frame from
+     * GameRendererMixin before anything is drawn; F1 pressed during a scene does nothing, after it the player's own choice comes back.
+     */
+    public static void syncHud() {
+        Minecraft mc = Minecraft.getInstance();
+        if (active) {
+            if (!hidHud) {
+                hudWas = mc.options.hideGui;
+                hidHud = true;
+            }
+            mc.options.hideGui = true;
+        } else if (hidHud) {
+            hidHud = false;
+            mc.options.hideGui = hudWas;
+        }
+    }
+
+    /** Fallback if the mixin did not apply: the HUD then stays on and RenderGuiEvent still runs, so the bars are drawn here. */
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGui(RenderGuiEvent.Post e) {
+    public static void onGui(net.minecraftforge.client.event.RenderGuiEvent.Post e) {
+        if (!hidHud) drawBars(e.getGuiGraphics(), e.getPartialTick());
+    }
+
+    /** The bars and titles: drawn by GameRendererMixin after the (hidden) HUD, so they show with hideGui on. */
+    public static void drawBars(GuiGraphics g, float pt) {
         if (!active) return;
-        GuiGraphics g = e.getGuiGraphics();
         int w = g.guiWidth(), h = g.guiHeight();
-        double t = now(e.getPartialTick());
+        double t = now(pt);
         float in = (float) Math.min(1, t / 12.0);
         if (releaseAt >= 0 && Minecraft.getInstance().level != null)   // T21: the bars go with the camera
-            in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + e.getPartialTick() - releaseAt) / RELEASE));
+            in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + pt - releaseAt) / RELEASE));
         int bar = (int) (h * 0.11 * in);
         g.fill(0, 0, w, bar, 0xFF000000);
         g.fill(0, h - bar, w, h, 0xFF000000);

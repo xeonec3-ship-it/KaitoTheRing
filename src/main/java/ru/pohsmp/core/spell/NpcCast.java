@@ -123,6 +123,9 @@ public final class NpcCast {
         if (target instanceof LivingEntity lt && md.getAdditionalCastData() instanceof TargetEntityCastData td && td.getTarget(sl) != lt)
             md.setAdditionalCastData(new TargetEntityCastData(lt));
         int ticks = spell.getCastType() == CastType.INSTANT ? 0 : spell.getEffectiveCastTime(lv, caster);
+        // Iron's gives synced spell data only to players and its own casting mobs: a CNPC NPC has none and initiateCast NPEs
+        // (seen on the test server, 19.11.2026)
+        if (md.getSyncedData() == null) md.setSyncedData(new io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData(caster));
         md.initiateCast(spell, lv, ticks, CastSource.MOB, "mainhand");
         CASTS.put(caster.getUUID(), c);
         send(caster, new Net.NpcCastMsg(Net.NpcCastMsg.START, caster.getId(), spell.getSpellId(), lv, ticks));

@@ -188,7 +188,8 @@ public final class ServerConfig {
         SW_STEALTH_RANGE = b.comment("6. Hood: mobs farther than this do not notice the wearer").defineInRange("stealthRange", 12, 0, 256);
         SW_EXPOSE_SECONDS = b.comment("6. After the wearer attacks or casts, mobs see them normally for this long (seconds)").defineInRange("exposeSeconds", 10, 0, 600);
         SW_TEAM = b.comment("6/11. Also put the wearer in a scoreboard team with nameTagVisibility=never so clients without the mod do not draw the name",
-                "(only when the player is in no other team)").define("nameTagTeam", true);
+                "(only when the player is in no other team). Off by default (owner 19.11): every wearer lands in ONE team, so minimaps paint",
+                "them as teammates (green); and clients without this mod cannot join anyway (the network channel is strict)").define("nameTagTeam", false);
         SW_GATE_SPELL = b.comment("10. The Gate spell id (cast only in the full outfit)").define("gateSpell", "pohsmp_core:silent_gate");
         SW_GATE_MAGIC_IMMUNE = b.comment("10. Full set: no magic damage while casting the Gate").define("gateMagicImmune", true);
         b.pop();

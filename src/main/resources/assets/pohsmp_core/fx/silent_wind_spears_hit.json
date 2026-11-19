@@ -1,0 +1,45 @@
+{
+ "comment": "Попадание копья ветра (T20): кольцо ветра, вспышка, искры. Код играет в точке попадания. Сгенерировано tools/gen_silent_staff_fx.py.",
+ "style": "silent",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 6,
+   "at": "caster",
+   "size": 1.8,
+   "anamorphic": 4,
+   "rays": 6,
+   "color": "@core"
+  },
+  {
+   "type": "wave",
+   "shape": "sphere",
+   "delay": 0,
+   "duration": 8,
+   "at": "caster",
+   "radius": 1.4,
+   "rim": 0.9,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 4,
+   "at": "caster",
+   "texture": "@sparks",
+   "count": 30,
+   "rate": 30,
+   "spread": 0.3,
+   "speed": 0.18,
+   "gravity": 0.01,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 14,
+   "color": "@primary"
+  }
+ ]
+}

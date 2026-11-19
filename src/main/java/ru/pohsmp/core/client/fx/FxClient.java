@@ -102,11 +102,6 @@ public final class FxClient {
             return;
         }
         if (m.op != FxMsg.START) return;
-        if (LIVE.size() >= ClientConfig.FX_MAX.get()) {
-            Iterator<Integer> it = LIVE.keySet().iterator();
-            it.next();
-            it.remove();
-        }
         Inst i = new Inst();
         i.start = now - m.age;
         Vec3 base = new Vec3(m.x, m.y, m.z);
@@ -174,8 +169,29 @@ public final class FxClient {
             i.mesh = r;
             if (m.duration >= 0) i.meshStopAt = m.duration;
         }
+        if (!LIVE.containsKey(m.inst) && LIVE.size() >= ClientConfig.FX_MAX.get() && !makeRoom() && !scene(i)) return;
         Inst old = LIVE.put(m.inst, i);
         if (old != null) old.stop(now);
+    }
+
+    /**
+     * Owner 19.11 («Врата»: no circles in the sky, only over the foes): at the limit the oldest instance went — the shot beams (one per
+     * shot) pushed out the whole field of the gate. Now only the oldest short one goes; long scenes stay. False: nothing to drop.
+     */
+    private static boolean makeRoom() {
+        Iterator<Inst> it = LIVE.values().iterator();
+        while (it.hasNext())
+            if (!scene(it.next())) {
+                it.remove();
+                return true;
+            }
+        return false;
+    }
+
+    /** A long scene (no end of its own, or over 30 s): never pushed out by the limit; it may go over it. */
+    private static boolean scene(Inst i) {
+        double len = i.fx != null ? i.fx.length() : i.sigil != null ? i.sigil.stopAfter : i.meshStopAt;
+        return len < 0 || len > 600;
     }
 
     private static MultiBufferSource.BufferSource src() {

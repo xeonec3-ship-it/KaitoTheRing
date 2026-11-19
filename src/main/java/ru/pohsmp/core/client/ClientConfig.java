@@ -24,7 +24,9 @@ public final class ClientConfig {
         b.push("fx");
         FX_DISTANCE = b.comment("Sigils and effects farther than this from the camera are not drawn (blocks)")
                 .defineInRange("maxDistance", 128.0, 16.0, 512.0);
-        FX_MAX = b.comment("At most this many effects at once; the oldest is dropped").defineInRange("maxInstances", 96, 8, 1024);
+        // new key (19.11): old client configs hold maxInstances = 96, which pushed the gate's sky field out
+        FX_MAX = b.comment("At most this many short effects at once; the oldest short one is dropped (long scenes are never dropped)")
+                .defineInRange("maxShortInstances", 256, 8, 2048);
         FX_QUALITY = b.comment("high or low (fewer particles, sparks and curtain beams)").defineInList("quality", "high", List.of("high", "low"));
         b.pop();
         SPEC = b.build();

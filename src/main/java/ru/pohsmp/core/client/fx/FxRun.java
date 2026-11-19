@@ -19,6 +19,8 @@ public final class FxRun {
     public Entity caster, target, attach;
     public Vec3 targetPos, look;
     public final Map<String, Vec3> points = new HashMap<>();
+    /** text slots of this instance (Fx.Spec.text), handed to its sigil elements (T24: the nameplate) */
+    public final Map<String, String> texts = new HashMap<>();
     public double scale = 1;
     public long seed;
     public int color = -1;

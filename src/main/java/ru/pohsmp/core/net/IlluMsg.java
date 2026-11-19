@@ -33,6 +33,10 @@ public final class IlluMsg {
     public static final int ZONE_END = 9;
     /** player entity plays the Iron's / PlayerAnimator animation text (e.g. pohsmp_illusion_butterfly_wake). */
     public static final int ANIM = 10;
+    /** «Сон бабочки»: this client's hearts show x less health than it has (the held back damage); x = 0 ends it. */
+    public static final int FAKE_HP = 11;
+    /** T24: this client's player is erased for ticks more (its screen, its quiet); 0 = back in the world. */
+    public static final int ERASED = 12;
     /** zone kinds (i of ZONE / ZONE_END) */
     public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4;
 

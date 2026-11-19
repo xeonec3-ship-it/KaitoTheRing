@@ -33,6 +33,7 @@ public final class IllusionSpells {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.illusion.Illusions.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.illusion.Copies.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.illusion.Voices.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.illusion.IllusionAllies.class);
         MinecraftForge.EVENT_BUS.register(PhantomPainSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(BorrowedFaceSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(MirrorImagesSpell.Events.class);

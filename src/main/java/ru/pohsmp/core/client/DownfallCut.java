@@ -47,8 +47,9 @@ public final class DownfallCut {
         casterId = m.a;
         scene = Math.max(0, m.b);
         dur = m.dur;
-        boolean rite = scene == RITE_SEAL || scene == RITE_BLESS;
+        boolean rite = scene == RITE_SEAL || scene == RITE_BLESS || scene == ERASED;
         targetId = rite ? m.i : -1;   // T21: i = the target's entity id (the other scenes: a time offset)
+        hushed = false;
         start = rite ? now : now - Math.max(0, m.i);
         releaseAt = -1;
         rift = new Vec3(m.x, m.y, m.z);
@@ -73,12 +74,77 @@ public final class DownfallCut {
 
     public static void stop(int k) {
         if (!active || k != key) return;
-        if (scene != RITE_SEAL && scene != RITE_BLESS && scene != BUTTERFLY) {
+        if (scene != RITE_SEAL && scene != RITE_BLESS && scene != BUTTERFLY && scene != ERASED) {
             active = false;
             return;
         }
+        unhush();
         ClientLevel lvl = Minecraft.getInstance().level;   // T21: the camera glides back to the player in 1 s
         if (releaseAt < 0 && lvl != null) releaseAt = lvl.getGameTime();
+    }
+
+    // ---- T24 «Стёртое имя» (docs/specs/tasks/T24_erased_name.md, «Ролик»): rift = the target's place, targetId = the target ----
+
+    private static final int ERASED = ru.pohsmp.core.spell.Cutscene.ERASED_NAME;
+    private static boolean hushed;
+
+    /** 14.0-14.5 s: every sound paused for all who watch (owner's plan: «полная тишина»). */
+    private static void hush(double t) {
+        boolean in = t >= 280 && t < 290;
+        if (in && !hushed) {
+            Minecraft.getInstance().getSoundManager().pause();
+            hushed = true;
+        } else if (!in && hushed) unhush();
+    }
+
+    private static void unhush() {
+        if (!hushed) return;
+        hushed = false;
+        Minecraft.getInstance().getSoundManager().resume();
+    }
+
+    /** The shots of the plan by ticks; all hard cuts except the slow moves inside a shot. Returns pos, look, (shake, roll). */
+    private static Vec3[] erased(double t, Vec3 c, Vec3 tg, Vec3 dir, Vec3 side) {
+        Vec3 mid = c.lerp(tg, 0.5), plate = tg.add(0, 2.75, 0), chest = tg.add(0, 1.3, 0);
+        Vec3 pos, look;
+        double shake = 0, roll = 0;
+        if (t < 40) {   // wide: both in frame from the side of the axis, rising 4 -> 5, turning 10° to the target
+            double k = smooth(t / 40);
+            pos = mid.add(side.scale(9)).add(0, 4 + k, 0);
+            look = mid.lerp(tg, 0.1 * k).add(0, 1.2, 0);
+        } else if (t < 80) {   // the name: before the target from the caster's side, looking up at the plate; push 2.4 -> 2.0
+            double k = smooth((t - 40) / 40);
+            pos = tg.subtract(dir.scale(2.4 - 0.4 * k)).add(0, 1.3, 0);
+            look = plate;
+        } else if (t < 124) {   // the caster close: the gesture; a small turn after the hand at 117-122
+            double a = Math.toRadians(30), k = smooth((t - 117) / 5.0);
+            Vec3 off = dir.scale(Math.cos(a)).add(side.scale(Math.sin(a))).scale(2.6);
+            pos = c.add(off).add(0, 1.7, 0);
+            look = c.add(0, 1.5, 0).add(side.scale(-0.3 * k));
+        } else if (t < 140) {   // the crossed-out name close
+            pos = plate.subtract(dir.scale(1.8));
+            look = plate;
+            if (t < 126) shake = 0.04;
+        } else if (t < 230) {   // the world fades, lines run over the target: an orbit of 120° at 4.5, rising 1.6 -> 2.4
+            double k = smooth((t - 140) / 90), a = Math.atan2(-dir.z, -dir.x) + Math.toRadians(-60 + 120 * k);
+            pos = tg.add(Math.cos(a) * 4.5, 1.6 + 0.8 * k, Math.sin(a) * 4.5);
+            look = chest;
+        } else if (t < 264) {   // the target's face: falling apart; a very slow push, a light tremble towards 13 s
+            double k = smooth((t - 230) / 34);
+            pos = tg.subtract(dir.scale(1.6 - 0.2 * k)).add(0, 1.7, 0);
+            look = tg.add(0, 1.6, 0);
+            shake = 0.02 * k;
+        } else if (t < 300) {   // over the caster's right shoulder along the axis; still in the silence; a push at 290
+            pos = c.add(side.scale(-0.6)).subtract(dir.scale(2.0)).add(0, 2.0, 0);
+            if (t >= 290 && t < 296) pos = pos.add(dir.scale(0.2 * Math.sin(Math.PI * (t - 290) / 6)));
+            look = chest;
+            if (t < 280) shake = 0.015;
+        } else {   // the empty place: 3 -> 3.6 away, eye 1.4
+            double k = smooth((t - 300) / 30);
+            pos = tg.subtract(dir.scale(3 + 0.6 * k)).add(0, 1.4, 0);
+            look = tg.add(0, 0.6, 0);
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, roll, 0)};
     }
 
     // ---- T21 «Печать души» / «Благословение» (docs/specs/tasks/T21_soul_seal_blessing.md, «Ролики камеры») ----
@@ -215,11 +281,13 @@ public final class DownfallCut {
         float pt = (float) e.getPartialTick();
         double t = now(pt);
         boolean riteScene = scene == RITE_SEAL || scene == RITE_BLESS;
-        boolean glide = riteScene || scene == BUTTERFLY;   // these glide back to the player on the server's stop
-        if (t > dur + (riteScene ? ru.pohsmp.core.spell.RiteSpell.HOLD + 40 : scene == BUTTERFLY ? 40 : 20) || t < 0) {
+        boolean glide = riteScene || scene == BUTTERFLY || scene == ERASED;   // these glide back to the player on the server's stop
+        if (t > dur + (riteScene ? ru.pohsmp.core.spell.RiteSpell.HOLD + 40 : scene == BUTTERFLY || scene == ERASED ? 40 : 20) || t < 0) {
             active = false;
+            unhush();
             return;
         }
+        if (scene == ERASED) hush(t);
         Entity ce = mc.level.getEntity(casterId);
         Vec3 c = ce != null ? ce.getPosition(pt) : casterPos;
         Vec3 side = new Vec3(-dir.z, 0, dir.x), r = rift, rc = rift.add(0, 2.6, 0);
@@ -247,6 +315,13 @@ public final class DownfallCut {
             pos = pl[0];
             look = pl[1];
             shake = pl[2].x;
+        } else if (scene == ERASED) {
+            Entity te = targetId >= 0 ? mc.level.getEntity(targetId) : null;
+            Vec3[] pl = erased(t, c, te != null ? te.getPosition(pt) : rift, dir, side);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+            roll = pl[2].y;
         } else if (scene == BUTTERFLY) {
             Vec3[] pl = butterfly(t, c, dir, side, baseYaw);
             pos = pl[0];
@@ -705,6 +780,34 @@ public final class DownfallCut {
                 case 4 -> { pos = c.add(0, 150 - 40 * k, 0).add(side.scale(0.05)); look = c; roll = -70 * k; }
                 default -> { double a = yaw + Math.PI + k * 0.5; pos = c.add(Math.cos(a) * (14 - 9 * k), 2.5 + 1.5 * k, Math.sin(a) * (14 - 9 * k)); look = c.add(0, 1.6 + 4 * k, 0); shake = 0.03 + 0.12 * k; }
             }
+        } else if (sc == ru.pohsmp.core.spell.Cutscene.WORLD_TREE) {   // T23 «Древо мира» (draft until the visual plan): f = the tree's foot
+            Vec3 ft = f.add(0, 2, 0);
+            switch (i) {
+                case 0 -> { double a = yaw + Math.PI + Math.toRadians(-60 + 120 * k); pos = c.add(Math.cos(a) * 3, 1.5, Math.sin(a) * 3); look = c.add(0, 1.3, 0); }
+                case 1 -> { pos = f.add(side.scale(3)).add(0, 0.4, 0); look = ft; }
+                case 2 -> { double a = yaw + k * Math.PI * 0.7; pos = f.add(Math.cos(a) * 10, 2 + 14 * k, Math.sin(a) * 10); look = f.add(0, 2 + 16 * k, 0); }
+                case 3 -> { double a = yaw + Math.PI * 0.7 + k * Math.PI * 0.5; pos = f.add(Math.cos(a) * 34, 20 + 8 * k, Math.sin(a) * 34); look = f.add(0, 18, 0); }
+                case 4 -> { pos = c.add(dir.scale(-4)).add(side.scale(1.5)).add(0, 2, 0); look = f.add(0, 10 + 20 * k, 0); }
+                default -> { pos = f.add(dir.scale(-(30 - 8 * k))).add(0, 6, 0); look = f.add(0, 20, 0); shake = 0.03 + 0.06 * k; }
+            }
+        } else if (sc == ru.pohsmp.core.spell.Cutscene.ABYSS_EYE) {   // T23 «Око бездны» (draft): f = the eye in the sky over the caster
+            switch (i) {
+                case 0 -> { double a = yaw + Math.toRadians(-70 + 140 * k); pos = c.add(Math.cos(a) * 3.2, 1.5, Math.sin(a) * 3.2); look = c.add(0, 1.4, 0); }
+                case 1 -> { pos = c.add(side.scale(1.8)).add(0, 0.2, 0); look = c.add(0, 6 + 30 * k, 0); roll = 6 * k; }
+                case 2 -> { double a = yaw + k * Math.PI; pos = c.add(Math.cos(a) * (8 + 20 * k), 3 + 12 * k, Math.sin(a) * (8 + 20 * k)); look = f; }
+                case 3 -> { pos = f.add(0, -14 + 4 * k, 0).add(side.scale(0.05)); look = f; roll = 40 * k; shake = 0.02; }
+                case 4 -> { double a = yaw + Math.PI + k * 0.8; pos = c.add(Math.cos(a) * 14, 2, Math.sin(a) * 14); look = f.lerp(c.add(0, 1.5, 0), 0.4 * (1 - k)); }
+                default -> { pos = c.add(dir.scale(3 - k)).add(0, 1.2, 0); look = f; shake = 0.04 + 0.12 * k; }
+            }
+        } else if (sc == ru.pohsmp.core.spell.Cutscene.LAST_DAWN) {   // T23 «Последний рассвет» (draft): f = the sunrise point on the horizon
+            switch (i) {
+                case 0 -> { double a = yaw + Math.PI + Math.toRadians(-50 + 100 * k); pos = c.add(Math.cos(a) * 3, 1.5, Math.sin(a) * 3); look = c.add(0, 1.4, 0); }
+                case 1 -> { pos = c.add(dir.scale(-3)).add(0, 1.8, 0); look = f; }
+                case 2 -> { double a = yaw + Math.PI + k * Math.PI * 0.4; pos = c.add(Math.cos(a) * 10, 4 + 4 * k, Math.sin(a) * 10); look = c.add(0, 1.5, 0); }
+                case 3 -> { pos = c.add(dir.scale(-1.2)).add(side.scale(0.8)).add(0, 1.7, 0); look = f.add(0, 8 * k, 0); }
+                case 4 -> { pos = c.add(dir.scale(4)).add(0, 1.4, 0); look = c.add(0, 1.5, 0); }
+                default -> { pos = c.add(dir.scale(-(6 + 8 * k))).add(0, 2 + 3 * k, 0); look = f.add(0, 10, 0); shake = 0.02; }
+            }
         } else {   // Divine Taboo: f = the seal 56 blocks over the caster
             switch (i) {
                 case 0 -> { double a = yaw + Math.toRadians(-70 + 140 * k); pos = c.add(Math.cos(a) * 3.4, 1.4 + 0.4 * k, Math.sin(a) * 3.4); look = c.add(0, 1.4, 0); }
@@ -723,8 +826,10 @@ public final class DownfallCut {
 
     private static final String[] TITLES = {"fx.pohsmp_core.downfall.title", "fx.pohsmp_core.milky_way.title", "fx.pohsmp_core.soul_devour.title", "fx.pohsmp_core.divine_taboo.title",
             "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title", "fx.pohsmp_core.silent_gate.title",
-            "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title", "fx.pohsmp_core.butterfly_dream.title"};
-    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A, 0xC9A8FF};
+            "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title", "fx.pohsmp_core.butterfly_dream.title",
+            "fx.pohsmp_core.world_tree.title", "fx.pohsmp_core.abyss_eye.title", "fx.pohsmp_core.last_dawn.title", "fx.pohsmp_core.erased_name.title"};
+    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A, 0xC9A8FF,
+            0x7FD46A, 0x8E5BD9, 0xFFC860, 0xE9E4D8};
 
     private static boolean apply(Camera cam, Vec3 pos) {
         try {

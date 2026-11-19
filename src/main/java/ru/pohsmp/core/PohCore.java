@@ -67,6 +67,8 @@ public class PohCore {
         ru.pohsmp.core.silent.compat.Compat.common(modBus);
         MinecraftForge.EVENT_BUS.register(Hidden.class);
         ru.pohsmp.core.spell.illusion.IllusionSpells.registerEvents();   // T22
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.Erased.class);   // T24
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.ErasedNameSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.NpcCast.Events.class);
         MinecraftForge.EVENT_BUS.register(Charges.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.JointCast.class);

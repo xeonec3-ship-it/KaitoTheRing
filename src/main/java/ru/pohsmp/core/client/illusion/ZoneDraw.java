@@ -18,6 +18,7 @@ import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.TickEvent;
 import org.joml.Matrix4f;
 import ru.pohsmp.core.PohCore;
 import ru.pohsmp.core.illusion.Maze;
@@ -123,8 +124,39 @@ public final class ZoneDraw {
             e.setResult(Event.Result.DENY);
     }
 
+    /** «Сон бабочки»: health the hearts hide (the held back damage, owner 19.11), drawn as if already lost. */
+    static float fakeLoss;
+    private static float realHealth = -1;
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onHeartsPre(net.minecraftforge.client.event.RenderGuiOverlayEvent.Pre e) {
+        var p = Minecraft.getInstance().player;
+        if (fakeLoss <= 0 || p == null || !e.getOverlay().id().equals(net.minecraftforge.client.gui.overlay.VanillaGuiOverlay.PLAYER_HEALTH.id())) return;
+        realHealth = p.getHealth();
+        p.setHealth(Math.max(0.5f, realHealth - fakeLoss));   // client copy only, for this one draw; put back in Post
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onHeartsPost(net.minecraftforge.client.event.RenderGuiOverlayEvent.Post e) {
+        restore();
+    }
+
+    /** Also when another handler cancels the hearts' Pre (no Post comes then): put the health back the next frame. */
+    @SubscribeEvent
+    public static void onFrame(TickEvent.RenderTickEvent e) {
+        if (e.phase == TickEvent.Phase.START) restore();
+    }
+
+    private static void restore() {
+        var p = Minecraft.getInstance().player;
+        if (realHealth >= 0 && p != null) p.setHealth(realHealth);
+        realHealth = -1;
+    }
+
     static void clear() {
         maze = null;
         mazeKey = "";
+        fakeLoss = 0;
+        realHealth = -1;
     }
 }

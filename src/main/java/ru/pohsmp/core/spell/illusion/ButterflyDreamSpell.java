@@ -163,6 +163,8 @@ public class ButterflyDreamSpell extends IllusionBase {
         final Map<UUID, Integer> worldFx = new HashMap<>();
         /** hidden one's id -> shown till */
         final Map<Integer, Long> revealed = new HashMap<>();
+        /** victim -> the held back part of the hits on it (strikes at the waking) */
+        final Map<UUID, Double> deferred = new HashMap<>();
         final int tag;
         long wakeAll;
         boolean woke;
@@ -206,34 +208,55 @@ public class ButterflyDreamSpell extends IllusionBase {
         return d.sl.getServer().getPlayerList().getPlayer(id);
     }
 
-    /** The dream is over for v (waking, Blessing, gone): the hidden ones are drawn again, its mirror world goes. */
+    /** The dream is over for v (waking, Blessing, gone): the hidden ones are drawn again, its mirror world goes; the held back part is
+     * dropped here (Blessing, logout, death: it burns) - the waking takes it before. */
     private static void release(Dream d, UUID id) {
         Integer f = d.worldFx.remove(id);
         if (f != null) Fx.stop(d.sl, f, "");
+        d.deferred.remove(id);
         ServerPlayer v = player(d, id);
         if (v == null) return;
         Net.CH.send(PacketDistributor.PLAYER.with(() -> v), IlluMsg.of(IlluMsg.ZONE_END, d.caster.getId(), 0));
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", 0, 0, 0, 0, 0));
         for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), 0));
         v.removeEffect(Reg.BUTTERFLY_DREAM.get());
     }
 
-    /** Waking of v: the shards fly in, on tick 8 its illusory part of the dream becomes real (one strike). */
+    /**
+     * Waking of v (owner 19.11): the shards fly in, on tick 8 the held back part of every hit in the dream strikes at once as real damage
+     * (it can kill). Till then the victim's hearts show the full damage (FAKE_HP), so the strike looks like nothing new on its bar.
+     */
     private static void wake(Dream d, UUID id) {
-        release(d, id);
+        double owed = d.deferred.getOrDefault(id, 0.0);
+        d.deferred.remove(id);
         ServerPlayer v = player(d, id);
+        // the dream goes, but the hearts keep showing the full damage until the strike lands
+        Integer f = d.worldFx.remove(id);
+        if (f != null) Fx.stop(d.sl, f, "");
+        if (v != null) {
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> v), IlluMsg.of(IlluMsg.ZONE_END, d.caster.getId(), 0));
+            for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), 0));
+            v.removeEffect(Reg.BUTTERFLY_DREAM.get());
+        }
         if (v == null || !v.isAlive()) return;
         fx(d.sl, Fx.fx("illusion_butterfly_wake_hit").at(v.position()).caster(d.caster).target(v).attach(v), "illusion_butterfly_wake_hit");
         int[] t = {0};
-        int tag = d.tag;
+        LivingEntity caster = d.caster;
         ServerLevel sl = d.sl;
         ru.pohsmp.core.spell.Tasks.add(() -> {
             if (++t[0] < WAKE_HIT) return true;
-            if (!v.isAlive()) return false;
-            double lost = Illusions.realize(v, tag);
-            if (lost > 0.01) {
-                sl.getChunkSource().broadcastAndSend(v, new ClientboundHurtAnimationPacket(v));
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", 0, 0, 0, 0, 0));
+            if (!v.isAlive() || v.hasDisconnected()) return false;
+            if (owed > 0.01) {
+                if (owed < v.getHealth()) {   // the part already went through armour once: straight off the health
+                    v.setHealth((float) (v.getHealth() - owed));
+                    sl.getChunkSource().broadcastAndSend(v, new ClientboundHurtAnimationPacket(v));
+                } else {
+                    v.invulnerableTime = 0;
+                    v.hurt(Illusions.source(sl, caster), 1_000_000f);
+                }
                 sl.playSound(null, v.getX(), v.getY() + 1, v.getZ(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1f, 1f);
-                v.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.butterfly_dream.wake", n(Math.round(lost * 10) / 10.0))
+                v.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.butterfly_dream.wake", n(Math.round(owed * 10) / 10.0))
                         .withStyle(s -> s.withColor(Reg.ILLUSION_COLOR)), true);
             }
             sl.playSound(null, v.getX(), v.getY() + 1, v.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.2f, 1.3f);
@@ -287,8 +310,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             boolean any = false;
             for (Dream d : DREAMS)
                 if (d.victims.remove(t.getUUID()) != null) {
-                    release(d, t.getUUID());
-                    Illusions.settleNow(t, d.tag);
+                    release(d, t.getUUID());   // the held back part burns (owner 19.11)
                     any = true;
                 }
             return any;
@@ -350,18 +372,21 @@ public class ButterflyDreamSpell extends IllusionBase {
             if (!DREAMS.isEmpty() && !e.getEntity().level().isClientSide) reveal(e.getEntity());
         }
 
-        /** Hits on a dreamer are full; their share is written down as illusory, due long after the waking (the waking makes it real). */
+        /**
+         * Owner 19.11: «половина сейчас, половина при пробуждении». Of each hit on a dreamer only (1 - share) really goes through; the
+         * rest is held back and strikes at the waking. The victim's own hearts show the full damage (FAKE_HP: the held back sum).
+         */
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onDamage(LivingDamageEvent e) {
             if (DREAMS.isEmpty() || e.isCanceled() || e.getAmount() <= 0) return;
-            LivingEntity t = e.getEntity();
-            if (t.level().isClientSide) return;
+            if (!(e.getEntity() instanceof ServerPlayer v)) return;
             for (Dream d : DREAMS) {
-                Long until = d.victims.get(t.getUUID());
-                if (until == null) continue;
-                double share = IllusionBase.cfg(ServerConfig.BD_SHARE::get, 0.5);
-                float a = Math.min(e.getAmount(), t.getHealth());
-                if (a < t.getHealth()) Illusions.owe(t, a * share, (int) (until - Illusions.now()) + 200, d.tag);
+                if (!d.victims.containsKey(v.getUUID())) continue;
+                double share = Math.max(0, Math.min(1, IllusionBase.cfg(ServerConfig.BD_SHARE::get, 0.5)));
+                float held = (float) (e.getAmount() * share);
+                e.setAmount(e.getAmount() - held);
+                double sum = d.deferred.merge(v.getUUID(), (double) held, Double::sum);
+                Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", sum, 0, 0, 0, 0));
                 return;
             }
         }

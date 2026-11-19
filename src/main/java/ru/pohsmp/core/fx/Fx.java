@@ -176,6 +176,8 @@ public final class Fx {
         boolean stopped;
         Vec3 attachOffset;
         long lastHit = Long.MIN_VALUE;
+        /** T08: game time of the last sigil.hit sound of this instance (at most once in 3 ticks) */
+        long lastSound = Long.MIN_VALUE;
         Set<UUID> sent = new HashSet<>();
         UUID owner, only;
     }
@@ -238,6 +240,12 @@ public final class Fx {
         m.scale = (float) Math.max(0, Math.min(1, power));
         m.seed = sl.random.nextInt();
         sendTo(sl, a, m);
+        long now = sl.getGameTime();
+        if (now - a.lastSound >= 3) {
+            a.lastSound = now;
+            sl.playSound(null, at.x, at.y, at.z, ru.pohsmp.core.Reg.SIGIL_HIT.get(), net.minecraft.sounds.SoundSource.PLAYERS,
+                    0.5f + 0.5f * m.scale, 0.9f + sl.random.nextFloat() * 0.25f);
+        }
     }
 
     /** Where the instance is now: its followed entity (plus the offset it started with) or its last position. */

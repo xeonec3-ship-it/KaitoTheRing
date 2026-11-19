@@ -157,8 +157,7 @@ public class SageBarrierSpell extends SilentSpell {
     public static void ripple(Dome d, Vec3 at) {
         ServerLevel sl = d.level;
         if (d.fxInst >= 0 && Fx.running(d.fxInst)) {
-            Fx.hit(sl, d.fxInst, at, 0.85);
-            sl.playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 0.8f, 1.4f);
+            Fx.hit(sl, d.fxInst, at, 0.85);   // plays sigil.hit itself
             return;
         }
         Vec3 n = at.subtract(d.center()).normalize();
@@ -172,7 +171,7 @@ public class SageBarrierSpell extends SilentSpell {
             }
         }
         particles(sl, ParticleTypes.END_ROD, at, 4, 0.08, 0.02);
-        sl.playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 0.8f, 1.4f);
+        sl.playSound(null, at.x, at.y, at.z, ru.pohsmp.core.Reg.SIGIL_HIT.get(), SoundSource.PLAYERS, 0.8f, 0.9f + sl.random.nextFloat() * 0.25f);
     }
 
     /** Stand-in look of the dome: a lattice of turquoise points rising from the ground, then a slowly turning shell. */

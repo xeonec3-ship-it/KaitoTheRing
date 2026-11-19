@@ -141,6 +141,9 @@ public final class Reg {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, PohCore.MODID);
     public static final RegistryObject<SoundEvent> MUSIC_SILENT_GATE = SOUNDS.register("music.silent_gate",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate")));
+    /** T08: a sigil struck (Fx.hit, the Sage Barrier dome). */
+    public static final RegistryObject<SoundEvent> SIGIL_HIT = SOUNDS.register("sigil.hit",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "sigil.hit")));
 
     public static final DeferredRegister<AbstractSpell> SPELLS = DeferredRegister.create(SpellRegistry.SPELL_REGISTRY_KEY, PohCore.MODID);
     public static final RegistryObject<AbstractSpell> DISINTEGRATION = SPELLS.register("disintegration", DisintegrationSpell::new);

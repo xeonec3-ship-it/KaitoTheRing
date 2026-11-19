@@ -453,7 +453,7 @@ def soul_fx():
     binds = [E('sigil', 128 + 7 * k, off('target', 0, h, 0), follow=True, id='soul_seal_bind', until=188) for k, h in enumerate((0.55, 1.05, 1.55))]
     fx('soul_seal_cast', 'Печать души, каст 10 с (200 тиков). Точки: caster — заклинатель, target — цель. '
                          '0–2 с печать под заклинателем, свет стягивается к рукам; 2–6 с из лучей над целью собирается печать-замок, '
-                         'малый замок у ладони; 6–9 с цепи тянутся от замка к груди и сжимаются, кольца цепи стягивают тело; '
+                         'малый замок у ладони (нитей от заклинателя к цели нет — как у других эффектов); 6–9 с цепи тянутся от замка к груди и сжимаются, кольца цепи стягивают тело; '
                          '9.3–9.8 с замок сжимается в точку и луч вбивает его в грудь. Финал — fx/soul_seal_lock_in (код, на 200 тике).',
        'soul_seal', 200, [
            E('sigil', 0, 'caster+0,0.05,0', id='soul_seal_ground', until=196),
@@ -463,8 +463,6 @@ def soul_fx():
              particles=60, life=20, size=0.12, color='@primary', comment='руки собирают свет'),
            E('flash', 34, 'caster+0,1.25,0.45', duration=10, size=1.1, rays=6, color=S_WHITE),
            E('sigil', 40, 'caster.hand', follow=True, id='soul_seal_hand', until=190),
-           E('beam', 44, 'caster.hand', to=lock, follow=True, duration=146, width=0.035, core=0.6, grow=16, flicker=0.2, scroll=1.2,
-             color=S_WHITE, brightness=0.7, comment='тонкий луч от ладони к замку'),
            E('aura', 40, 'target', target='target', duration=152, thickness=0.08, pulse=[0.25, 24], motes=10, texture='spark_soft',
              color=S_VIOLET, **{'in': ease(20), 'out': ease(8)}),
            *rays,
@@ -544,8 +542,6 @@ def bless_fx():
              **{'in': ease(30, 'easeInOutSine'), 'out': ease(10)}, comment='столб мягкого света сверху'),
            E('curtain', 60, 'target', duration=130, radius=[1.1, 2.3], count=14, height=16, grow=40, width=[0.04, 0.1],
              brightness=[0.2, 0.5], flicker=0.2, texture='beam_fade', color=B_BLUE, **{'out': ease(12)}),
-           E('beam', 70, 'caster.hand', to='target+0,1.3,0', follow=True, duration=118, width=0.05, core=0.5, grow=24, flicker=0.12,
-             scroll=-0.8, color=B_WARM, brightness=0.7, **{'out': ease(8)}, comment='нить света от ладоней к цели'),
            E('halo', 110, 'target', follow=True, duration=90, size=0.42, spin=2, color='@primary', **{'in': ease(12), 'out': ease(8)}),
            E('beam', 120, halo, to='target+0,0.1,0', follow=True, duration=70, width=0.55, core=0.3, grow=40, easing='easeInOutSine',
              color='@secondary', brightness=0.8, **{'out': ease(10)}, comment='свет опускается на цель'),

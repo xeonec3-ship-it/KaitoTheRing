@@ -90,8 +90,10 @@ public class SageBarrierSpell extends SilentSpell {
     }
 
     @Override public CastType getCastType() { return CastType.LONG; }
-    @Override public AnimationHolder getCastStartAnimation() { return SpellAnimations.CHARGE_RAISED_HAND; }
-    @Override public AnimationHolder getCastFinishAnimation() { return SpellAnimations.SELF_CAST_ANIMATION; }
+    private static final AnimationHolder ANIM_CAST = ru.pohsmp.core.spell.CastAnims.of("sage_barrier_cast"),
+            ANIM_FINISH = ru.pohsmp.core.spell.CastAnims.of("sage_barrier_finish");
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
+    @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
 
     private static double radius() { return cfg(ServerConfig.BARRIER_RADIUS::get, 5.0); }
     private static int seconds() { return cfg(ServerConfig.BARRIER_SECONDS::get, 8); }

@@ -64,9 +64,16 @@ public class StarFallSpell extends HigherSpell {
     @Override public boolean allowLooting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.BEACON_ACTIVATE); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
-    // Temporary: the ideas chat makes the own animation (arms to the sky, then a sharp swing down), see T05.
-    @Override public AnimationHolder getCastStartAnimation() { return SpellAnimations.ANIMATION_LONG_CAST; }
-    @Override public AnimationHolder getCastFinishAnimation() { return SpellAnimations.ANIMATION_LONG_CAST_FINISH; }
+    /** Own animation (T05, manager): arms to the sky, then a sharp swing down; the hand items are hidden for the cast. */
+    private static final AnimationHolder ANIM_CAST = CastAnims.of("star_fall_cast"), ANIM_FINISH = CastAnims.of("star_fall_finish");
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
+    @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
+
+    @Override
+    public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, net.minecraft.world.InteractionHand hand, @javax.annotation.Nullable MagicData md) {
+        super.onClientPreCast(level, spellLevel, entity, hand, md);
+        CastAnims.hideHands(level, entity, getEffectiveCastTime(spellLevel, entity));
+    }
 
     @Override
     public List<MutableComponent> getUniqueInfo(int level, LivingEntity caster) {

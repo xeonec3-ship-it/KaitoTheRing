@@ -56,8 +56,10 @@ public class WorganFlameSpell extends SilentSpell {
     }
 
     @Override public CastType getCastType() { return CastType.LONG; }
-    @Override public AnimationHolder getCastStartAnimation() { return SpellAnimations.CHARGE_RAISED_HAND; }
-    @Override public AnimationHolder getCastFinishAnimation() { return SpellAnimations.ONE_HANDED_RAY_SHOOT; }
+    private static final AnimationHolder ANIM_CAST = ru.pohsmp.core.spell.CastAnims.of("worgan_flame_cast"),
+            ANIM_FINISH = ru.pohsmp.core.spell.CastAnims.of("worgan_flame_finish");
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
+    @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
 
     private static int breath() { return cfg(ServerConfig.FLAME_BREATH::get, 60); }
     private static double range() { return cfg(ServerConfig.FLAME_RANGE::get, 12.0); }
@@ -72,14 +74,14 @@ public class WorganFlameSpell extends SilentSpell {
                 ui("burn", burnSec(), n(dmg(caster, cfg(ServerConfig.FLAME_BURN_DPS::get, 1.5)))));
     }
 
-    /** The dragon's head: over the right shoulder, a little behind. */
+    /** The dragon's head as in fx/meshes/worgan_dragon.json (manager 19.11): over the right shoulder, forward; risen = 3.15. */
     private static Vec3 headPos(LivingEntity c, double rise) {
-        return local(c, 0.95, c.getBbHeight() + 0.2 + 0.9 * rise, -0.25);
+        return local(c, 0.92, 2.25 + 0.9 * rise, 1.25);
     }
 
-    /** The jaws, where the flame comes from: in front of the head along the look. */
+    /** The jaws, where the flame comes from (the model's mouth). */
     private static Vec3 mouth(LivingEntity c) {
-        return headPos(c, 1).add(c.getLookAngle().scale(0.7));
+        return local(c, 0.92, 2.65, 1.8);
     }
 
     @Override

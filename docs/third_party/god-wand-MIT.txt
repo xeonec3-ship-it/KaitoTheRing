@@ -1,0 +1,36 @@
+God Wand (HyIsNoob) — уведомление MIT для перенесённого кода
+===========================================================
+
+Источник: https://github.com/HyIsNoob/god-wand (common/src/main/java/net/godwand/client/: GateMana.java, GateDraw.java,
+GateAtlas.java, GatePose.java, SilentGateCinematic.java). По файлу LICENSE этого репозитория Java-код (`**/src/main/java/`)
+распространяется по MIT; ассеты (`assets/`) — All Rights Reserved, их мы НЕ копируем: атлас частиц генерируется кодом.
+Название и брендинг God Wand не используются; мод pohsmp_core не является официальным релизом God Wand.
+
+Перенесённые / изменённые файлы мода (каждый — с этим уведомлением в шапке):
+  src/main/java/ru/pohsmp/core/client/fx/gate/GateAtlasGen.java  (из GateAtlas: GLOW, STAR, SILK, CLOUD, WISP, SOLID)
+  src/main/java/ru/pohsmp/core/client/fx/gate/GateDraw.java      (из GateDraw: sprite, halo, streamer, gradient, tex)
+  src/main/java/ru/pohsmp/core/client/fx/gate/GateMana.java      (из GateMana: flow, bands, wandTrail; manaGain из GatePose)
+  src/main/java/ru/pohsmp/core/client/DownfallCut.java           (планы камеры по SilentGateCinematic: raiseShot, circleShot — только формулы)
+
+-----------------------------------------------------------------------------
+MIT License
+
+Copyright (c) 2026 HyIsNoob (God Wand contributors)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

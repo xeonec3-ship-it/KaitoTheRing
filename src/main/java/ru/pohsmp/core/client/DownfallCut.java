@@ -290,22 +290,49 @@ public final class DownfallCut {
         return new Vec3[] {pos, look, new Vec3(0, 0, 0)};
     }
 
+    /** God Wand SilentGateCinematic.raiseShot (MIT): at u 0..1, camera {1.5-1.3u fwd, 3.5-0.4u right, 1.35+0.15u up}, look {0.3-0.5u fwd, 1.45 up}. */
+    private static Vec3[] gateSide(double u, Vec3 c, Vec3 side) {
+        Vec3 pos = c.add(dir.scale(1.5 - 1.3 * u)).add(side.scale(3.5 - 0.4 * u)).add(0, 1.35 + 0.15 * u, 0);
+        Vec3 look = c.add(dir.scale(0.3 - 0.5 * u)).add(0, 1.45, 0);
+        return new Vec3[] {pos, look};
+    }
+
+    /** God Wand's FLOW curve: a move already under way when the shot opens and still going when it is cut (speed .55 of the mean at the ends). */
+    private static double flow(double k) {
+        k = Math.max(0, Math.min(1, k));
+        return 0.55 * k + 0.45 * k * k * (3 - 2 * k);
+    }
+
+    private static double smoother(double x) {
+        x = Math.max(0, Math.min(1, x));
+        return x * x * x * (x * (6 * x - 15) + 10);
+    }
+
     private static Vec3[] gate(double s, Vec3 c, Vec3 side, double yaw) {
         Vec3 f = rift, g = f.add(0, ru.pohsmp.core.spell.silent.SilentGateSpell.GATE_H, 0), face = c.add(0, 1.6, 0);
         Vec3 pos, look;
         double shake = 0, roll = 0;
-        if (s < 14) {                                   // quiet intro: slow wide orbit, the caster small in the land
-            double k = smooth(s / 14), a = yaw + Math.PI + Math.toRadians(-40 + 80 * k);
-            pos = c.add(Math.cos(a) * (22 - 6 * k), 9 - 3 * k, Math.sin(a) * (22 - 6 * k));
+        // 0–9 s and 14–21 s: the side shot of God Wand's Silent Gate (SilentGateCinematic.raiseShot, MIT, docs/third_party/god-wand-MIT.txt):
+        // beside the caster on the right and a little before them, low — the witch whole, the staff afloat and the wind of mana streaming
+        // back past her across the frame; the camera drifts back with the stream (their FLOW curve: never at rest).
+        if (s < 9) {
+            Vec3[] r = gateSide(flow(s / 9), c, side);
+            pos = r[0];
+            look = r[1];
+        } else if (s < 14) {                            // quiet intro: slow wide orbit, the caster small in the land
+            double k = smooth((s - 9) / 5), a = yaw + Math.PI + Math.toRadians(-20 + 60 * k);
+            pos = c.add(Math.cos(a) * (19 - 3 * k), 7.5 - 1.5 * k, Math.sin(a) * (19 - 3 * k));
             look = c.add(0, 1.2, 0);
+        } else if (s < 21) {                            // the finger points: the side shot again (owner 19.11: «сбоку», as in the mod's video)
+            Vec3[] r = gateSide(flow((s - 14) / 7), c, side);
+            pos = r[0];
+            look = r[1];
         } else if (s < 26) {
-            // the finger points forward and up, the stream of sparks goes from the hand toward the sky, the gate comes out of the
-            // circle: over the right shoulder, a little to the side, so the hand and the whole stream are in frame (owner 19.11, as
-            // in the mod's video); a slow push-in, the look follows the stream up and at the end settles on the gate
-            double k = smooth((s - 14) / 12), kg = smooth(Math.max(0, (s - 21) / 5));
-            pos = c.subtract(dir.scale(2.6 - 0.6 * k)).add(side.scale(1.35 - 0.2 * k)).add(0, 1.9 + 0.3 * k, 0);
-            Vec3 stream = c.add(dir.scale(5 + 3 * k)).add(0, 2.5 + 4 * k, 0);
-            look = stream.lerp(g, kg);
+            // the gate comes out of the circle: God Wand's circleShot — over the caster's shoulder from the ground, one glide of a tilt up
+            // into the sky (their 28→52°, here to 60° so the gate 48 up and 26 ahead ends in frame)
+            double u = smoother((s - 21) / 5);
+            pos = c.add(dir.scale(-7 + 2.5 * u)).add(side.scale(3)).add(0, 1.2 + 1.5 * u, 0);
+            look = c.add(dir.scale(26)).add(side.scale(-0.5)).add(0, 1.2 + 26 * Math.tan(Math.toRadians(28 + 32 * u)), 0);
         } else if (s < 36) {                            // the gate hangs, the halo behind it: slow orbit, gentle sway
             double k = smooth((s - 26) / 10), a = yaw + Math.PI + Math.toRadians(-35 + 70 * k);
             pos = g.add(Math.cos(a) * 40, -14 + 3 * k, Math.sin(a) * 40);

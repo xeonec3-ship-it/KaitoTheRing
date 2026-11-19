@@ -20,15 +20,15 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ru.pohsmp.core.SilentWitchStaff;
 
 /**
- * "Gate" (T03): the staff is not in the witch's hands during the scene (HiddenHands hides the held item). Until 38 s it floats upright
- * before her on the left, swaying slowly; from 38 s she holds it in the left hand, low and slanted, to the end of the scene.
+ * "Gate" (T03): the staff is not in the witch's hands during the scene (HiddenHands hides the held item). Until 37.4 s it floats upright
+ * before her on the left, swaying slowly; then it glides into her left fist and stands upright there to the end of the scene.
  * Drawn from the CUT packet of the scene (Cutscene SILENT_GATE) for everyone who watches it.
  */
 public final class GateStaff {
     private GateStaff() {}
 
-    /** Ticks from the scene start when the left hand takes the staff, and the scene length. */
-    private static final int TAKE = 760, END = ru.pohsmp.core.spell.silent.SilentGateSpell.SCENE_MAX;   // «Приказ»: the STOP packet ends it earlier
+    /** The scene length (the left hand takes the staff at 37.4–38.4 s: fx/gate/GateStaffPose). */
+    private static final int END = ru.pohsmp.core.spell.silent.SilentGateSpell.SCENE_MAX;   // «Приказ»: the STOP packet ends it earlier
 
     /**
      * "Downfall": the staff went through the head at the start of the cast (manager 19.11). Until this tick it is out of the hand and
@@ -42,6 +42,15 @@ public final class GateStaff {
     }
 
     private static final Map<Integer, Run> RUNS = new HashMap<>();
+
+    /** A running «Безмолвные врата» scene: its key, the caster and the game time it started (for the mana, fx/gate/GateManaRender). */
+    public record GateRun(int key, int caster, long start) {}
+
+    public static java.util.List<GateRun> gateRuns() {
+        java.util.List<GateRun> out = new java.util.ArrayList<>();
+        RUNS.forEach((k, r) -> { if (!r.downfall()) out.add(new GateRun(k, r.caster(), r.start())); });
+        return out;
+    }
 
     public static void start(int key, int casterId, long now) {
         RUNS.put(key, new Run(casterId, now, ru.pohsmp.core.spell.Cutscene.SILENT_GATE));
@@ -99,12 +108,11 @@ public final class GateStaff {
             if (r.downfall()) {   // hanging upright to the right, a little forward, slow sway
                 ps.translate(-0.8, 1.1 + 0.05 * Math.sin(t * 0.08), 0.25);
                 ps.mulPose(Axis.ZP.rotationDegrees((float) (3 * Math.sin(t * 0.06))));
-            } else if (t < TAKE) {   // floating upright, front-left, slow sway and bob
-                ps.translate(0.75, 1.15 + 0.08 * Math.sin(t * 0.06), 0.65);
-                ps.mulPose(Axis.ZP.rotationDegrees((float) (4 * Math.sin(t * 0.045))));
-                ps.mulPose(Axis.XP.rotationDegrees((float) (3 * Math.sin(t * 0.037 + 1))));
-            } else {          // in the left fist at the belt, a little forward (pose STAFF_L): the staff stands upright (owner 19.11)
-                ps.translate(0.36, 0.98, 0.3);
+            } else {   // floating upright front-left, then glides into the left fist (STAFF_L): fx/gate/GateStaffPose, the mana trail uses it too
+                double[] l = ru.pohsmp.core.client.fx.gate.GateStaffPose.local(t);
+                ps.translate(l[0], l[1], l[2]);
+                ps.mulPose(Axis.ZP.rotationDegrees((float) l[3]));
+                ps.mulPose(Axis.XP.rotationDegrees((float) l[4]));
             }
             int light = LevelRenderer.getLightColor(mc.level, BlockPos.containing(p.add(0, 1, 0)));
             mc.getItemRenderer().renderStatic(st, ItemDisplayContext.NONE, light, OverlayTexture.NO_OVERLAY, ps, buf, mc.level, en.getId());

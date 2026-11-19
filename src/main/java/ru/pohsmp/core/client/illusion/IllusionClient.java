@@ -67,6 +67,8 @@ public final class IllusionClient {
             case IlluMsg.FAKE_HP -> ZoneDraw.fakeLoss = Math.max(0, m.x);
             case IlluMsg.ERASED -> ErasedClient.set(m.ticks);
             case IlluMsg.GHOST -> Ghosts.set(m.entity, m.ticks);
+            case IlluMsg.DREAM_DEATH -> ZoneDraw.dreamDeath(m.ticks);
+            case IlluMsg.DREAM_MUSIC -> DreamMusic.handle(m.i, m.ticks);
             case IlluMsg.SKY ->ru.pohsmp.core.client.mythic.SkyClient.set(m.i, m.ticks);
             case IlluMsg.ANIM -> {
                 var lvl = Minecraft.getInstance().level;

@@ -59,7 +59,7 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue BF_COOLDOWN, BF_SECONDS, BF_MEMORY;
     public static final ForgeConfigSpec.DoubleValue LAB_RADIUS, LAB_SECONDS, LAB_WALL_DAMAGE, LAB_WALL_RETURN, LAB_PUSH;
     public static final ForgeConfigSpec.DoubleValue NM_RANGE, NM_SECONDS;
-    public static final ForgeConfigSpec.DoubleValue BD_RADIUS, BD_SECONDS, BD_SHARE;
+    public static final ForgeConfigSpec.DoubleValue BD_RADIUS, BD_SECONDS, BD_COPY_DAMAGE;
     // [mythic_t23] - T23 Mythic: World Tree, Abyss Eye, Last Dawn
     public static final ForgeConfigSpec.DoubleValue WT_RANGE, WT_RADIUS, WT_SECONDS, WT_PULL, WT_ROOT_COOLDOWN, WT_CROWN, WT_BLOOM_RADIUS;
     public static final ForgeConfigSpec.IntValue WT_ROOT_HITS;
@@ -120,9 +120,10 @@ public final class ServerConfig {
         NM_SECONDS = b.comment("Lifetime (seconds)").defineInRange("seconds", 12.0, 1.0, 600.0);
         b.pop();
         b.push("butterfly_dream");
-        BD_RADIUS = b.comment("Enemies within this radius fall into the dream (blocks)").defineInRange("radius", 32.0, 2.0, 128.0);
-        BD_SECONDS = b.comment("Dream lifetime (seconds)").defineInRange("seconds", 25.0, 1.0, 600.0);
-        BD_SHARE = b.comment("Share of every hit on a dreamer that is illusory; at the wake it all becomes real at once").defineInRange("illusoryShare", 0.5, 0.0, 1.0);
+        // keys renamed 19.11 (radius 32 -> 64, 25 s -> 120 s): old files get the new values instead of keeping the old ones
+        BD_RADIUS = b.comment("Enemies within this radius fall into the dream (blocks)").defineInRange("dreamRadius", 64.0, 2.0, 128.0);
+        BD_SECONDS = b.comment("Dream lifetime (seconds)").defineInRange("dreamSeconds", 120.0, 1.0, 600.0);
+        BD_COPY_DAMAGE = b.comment("Illusory damage of a dream copy's strike (all damage in the dream is illusory)").defineInRange("copyDamage", 3.0, 0.0, 1000.0);
         b.pop();
         b.pop();
         b.comment("T23 Mythic spells. Damage is multiplied by the caster's school spell power.").push("mythic_t23");

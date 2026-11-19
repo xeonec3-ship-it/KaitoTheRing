@@ -176,6 +176,9 @@ public final class Reg {
     /** Coven Arrival scene music (owner 19.11), the first 92 s of the track with a fade-out. */
     public static final RegistryObject<SoundEvent> MUSIC_COVEN_ARRIVAL = SOUNDS.register("music.coven_arrival",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.coven_arrival")));
+    /** T22 «Сон бабочки» (owner 19.11): 158 s, 0 s = the cast begins, 132 s = the waking. */
+    public static final RegistryObject<SoundEvent> MUSIC_BUTTERFLY_DREAM = SOUNDS.register("music.butterfly_dream",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.butterfly_dream")));
     /** T08: a sigil struck (Fx.hit, the Sage Barrier dome). */
     public static final RegistryObject<SoundEvent> SIGIL_HIT = SOUNDS.register("sigil.hit",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "sigil.hit")));

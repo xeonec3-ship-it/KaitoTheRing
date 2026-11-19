@@ -39,18 +39,27 @@ public final class FxDraw extends RenderType {
         RenderSystem.defaultBlendFunc();
     });
 
-    private static final Map<ResourceLocation, RenderType> ADD = new HashMap<>(), TRANS = new HashMap<>();
+    private static final Map<ResourceLocation, RenderType> ADD = new HashMap<>(), TRANS = new HashMap<>(), SOLID = new HashMap<>();
 
     private static RenderType make(String name, ResourceLocation tex, TransparencyStateShard tr) {
+        return make(name, tex, tr, COLOR_WRITE);
+    }
+
+    private static RenderType make(String name, ResourceLocation tex, TransparencyStateShard tr, WriteMaskStateShard mask) {
         return create(name, DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1 << 16, false, true,
                 CompositeState.builder()
                         .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_EMISSIVE_SHADER)
                         .setTextureState(new TextureStateShard(tex, false, false))
                         .setTransparencyState(tr)
                         .setCullState(NO_CULL)
-                        .setWriteMaskState(COLOR_WRITE)
+                        .setWriteMaskState(mask)
                         .setOverlayState(OVERLAY)
                         .createCompositeState(false));
+    }
+
+    /** Translucent that also writes depth: volumes (mesh "boxes") hide their own back faces. */
+    public static RenderType solid(ResourceLocation tex) {
+        return SOLID.computeIfAbsent(tex, t -> make("pohsmp_fx_solid", t, TRANSLUCENT_TRANSPARENCY, COLOR_DEPTH_WRITE));
     }
 
     public static RenderType additive(ResourceLocation tex) {
@@ -93,6 +102,10 @@ public final class FxDraw extends RenderType {
 
         public VertexConsumer trans(ResourceLocation t) {
             return buf.getBuffer(translucent(t));
+        }
+
+        public VertexConsumer solid(ResourceLocation t) {
+            return buf.getBuffer(FxDraw.solid(t));
         }
 
         public Vec3 left() {

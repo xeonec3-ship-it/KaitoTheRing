@@ -82,6 +82,11 @@ public final class SilentMusic {
         if (track != null) track.fadeOut();
     }
 
+    /** True while the game's sounds are muted for a Gate scene. */
+    public static boolean silent() {
+        return silent;
+    }
+
     private static void reset() {
         silent = false;
         if (track != null) Minecraft.getInstance().getSoundManager().stop(track);

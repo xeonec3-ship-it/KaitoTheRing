@@ -249,11 +249,11 @@ public final class DownfallCut {
     /**
      * Scene 7, Gate (65 s, by seconds s, = time in the music track). c: caster, rift: strike point, dir: from the caster to it.
      * Shots as in the anime: wide shot of the land, the hand close, the gate from below, the gate with its halo, the face ("shh"),
-     * the row of circles from above, the finger up from below, the sky full of seals, the main beam, the wide shot, the crystal.
+     * the row of circles from above, the finger up from below, the sky full of seals, the rays close, the wide shot, the crystal (no main beam).
      * Returns camera position, look point and (shake, roll, 0).
      */
     private static Vec3[] gate(double s, Vec3 c, Vec3 side, double yaw) {
-        Vec3 f = rift, g = f.add(0, 26, 0), face = c.add(0, 1.6, 0);
+        Vec3 f = rift, g = f.add(0, ru.pohsmp.core.spell.silent.SilentGateSpell.GATE_H, 0), face = c.add(0, 1.6, 0);
         Vec3 pos, look;
         double shake = 0, roll = 0;
         if (s < 14) {                                   // quiet intro: slow wide orbit, the caster small in the land
@@ -262,15 +262,16 @@ public final class DownfallCut {
             look = c.add(0, 1.2, 0);
         } else if (s < 22) {                            // the finger points forward and up: the hand close, the sparks wind round it
             double k = smooth((s - 14) / 8);
-            pos = c.add(side.scale(1.3 - 0.3 * k)).add(dir.scale(0.4 + 0.6 * k)).add(0, 1.45, 0);
-            look = c.add(dir.scale(3)).add(0, 2.2 + 1.2 * k, 0);
+            // in front and to the side of the caster, looking back at the raised hand and the sparks around it
+            pos = c.add(dir.scale(2.2 - 0.4 * k)).add(side.scale(1.6 - 0.3 * k)).add(0, 1.3 + 0.2 * k, 0);
+            look = c.add(side.scale(0.3)).add(dir.scale(0.3)).add(0, 1.6 + 0.2 * k, 0);
         } else if (s < 26) {                            // the gate appears out of light: from below
             double k = smooth((s - 22) / 4);
             pos = f.subtract(dir.scale(10 - 3 * k)).add(side.scale(3)).add(0, 1.2, 0);
             look = g.add(0, 4 * (1 - k), 0);
         } else if (s < 36) {                            // the gate hangs, the halo behind it: slow orbit, gentle sway
             double k = smooth((s - 26) / 10), a = yaw + Math.PI + Math.toRadians(-35 + 70 * k);
-            pos = g.add(Math.cos(a) * 30, -9 + 2 * k, Math.sin(a) * 30);
+            pos = g.add(Math.cos(a) * 40, -14 + 3 * k, Math.sin(a) * 40);
             look = g;
             roll = 3 * Math.sin(s * 0.6);
         } else if (s < 42) {                            // pause, then the finger to the lips: the face from the front
@@ -292,15 +293,15 @@ public final class DownfallCut {
             pos = f.subtract(dir.scale(34 - 4 * k)).add(0, 9, 0);
             look = f.add(0, 16, 0);
             shake = 0.05;
-        } else if (s < 56) {                            // the main beam from the gate: close, side on
+        } else if (s < 56) {                            // rays pierce the area: low, side on, tilting up from the hits to the seals
             double k = smooth((s - 52) / 4);
-            pos = f.subtract(dir.scale(11 - 2 * k)).add(side.scale(7)).add(0, 3 + 2 * k, 0);
-            look = f.add(0, 4 + 6 * k, 0);
-            shake = 0.18 * (1 - k) + 0.04;
+            pos = f.subtract(dir.scale(12 - 2 * k)).add(side.scale(8)).add(0, 2.5, 0);
+            look = f.add(0, 3 + 15 * k, 0);
+            shake = 0.06;
         } else if (s < 63) {                            // wide: the gate glowing in the centre, the field of seals, the rays go on
             double k = smooth((s - 56) / 7), a = yaw + Math.PI * 0.6 + k * 0.9;
-            pos = f.add(Math.cos(a) * 44, 22 - 4 * k, Math.sin(a) * 44);
-            look = f.add(0, 12, 0);
+            pos = f.add(Math.cos(a) * 58, 26 - 4 * k, Math.sin(a) * 58);
+            look = f.add(0, 24, 0);
             shake = 0.03;
         } else {                                        // the crystal mountain; the caster stands before it
             double k = smooth((s - 63) / 2);

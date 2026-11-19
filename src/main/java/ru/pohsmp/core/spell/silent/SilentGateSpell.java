@@ -18,6 +18,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -43,27 +45,26 @@ import ru.pohsmp.core.spell.HigherSpell;
 /**
  * "Gate" (T03): Silent school, Unknown tier, only from the Silent Witch's staff and only in her full outfit (T18/T19, see {@link SilentWitch}).
  * A 50 s cast that nothing interrupts, all of it to the music track: every player within 64 blocks of the caster or of the strike point
- * hears it (not positional, client: SilentMusic) with every other game sound muted, and watches the camera scene (Cutscene 6).
- * From 50 s (the spell is cast) to 63 s rays fall on the area (radius 20) and on every foe in it; at 52 s the main beam hits the aimed
- * creature (or the centre); at 64 s an ice crystal mountain rises (only a look). The scene ends at 65 s. Cancel = the track fades in 1 s.
+ * hears it (not positional, client: SilentMusic) with every other game sound muted, and watches the camera scene (Cutscene 7).
+ * From 50 s (the spell is cast) to 63 s rays fall on the area (radius 20) and on every foe in it (no main beam -
+ * owner's decision); at 64 s an ice crystal mountain rises (only a look). The scene ends at 65 s. Cancel = the track fades in 1 s.
  * Damage: Silent magic (through armor, Silent power, Silent resistance), numbers in [silent_gate]. Afterwards "Silence": the spell's own
- * cooldown, 3 min. The caster, the caster's team, its pets and allied CNPC NPCs are never hit.
+ * cooldown, 3 min. Only hostile entities are hit (see {@link #target}); players never.
  */
 public class SilentGateSpell extends SilentStaffSpell {
     public static final String PATH = "silent_gate";
-    /** Ticks: cast (= 50 s in the track), first rays, main beam, last rays, crystal, end of the scene, crystal life. */
-    public static final int CAST = 1000, RAYS_FROM = 1000, MAIN = 1040, RAYS_TO = 1260, CRYSTAL = 1280, END = 1300, CRYSTAL_LIFE = 600;
-    /** Height of the gate over the strike point (the placeholder effect and the main beam start there). */
-    public static final double GATE_H = 26;
+    /** Ticks: cast (= 50 s in the track), first rays, last rays, crystal, end of the scene, crystal life. */
+    public static final int CAST = 1000, RAYS_FROM = 1000, RAYS_TO = 1260, CRYSTAL = 1280, END = 1300, CRYSTAL_LIFE = 600;
+    /** Height of the gate over the strike point (owner: much higher than the seals; the camera uses it too). */
+    public static final double GATE_H = 48;
     /** Effect ids of the ideas chat (T03); while they are not in the mod the placeholders built from the existing seals are used. */
-    private static final String FX_SCENE = "silent_gate", FX_RAY = "silent_gate_ray", FX_MAIN = "silent_gate_main", FX_CRYSTAL = "silent_gate_crystal";
+    private static final String FX_SCENE = "silent_gate", FX_RAY = "silent_gate_ray", FX_CRYSTAL = "silent_gate_crystal";
 
     private static final class Cast {
         LivingEntity caster;
         ServerLevel sl;
         Vec3 at, hit;
         float yaw;
-        LivingEntity aim;
         int age, cutKey, scene = -1;
         boolean cast, done;
         List<UUID> watchers = new ArrayList<>();
@@ -74,7 +75,6 @@ public class SilentGateSpell extends SilentStaffSpell {
     private static final Map<UUID, Cast> CASTS = new HashMap<>();
     /** Running scenes (cast or strike phase), for the tick loop. */
     private static final List<Cast> RUNNING = new ArrayList<>();
-    private static boolean hitting;
 
     public SilentGateSpell() {
         super(PATH, 180, CAST, 0);
@@ -91,16 +91,10 @@ public class SilentGateSpell extends SilentStaffSpell {
     /** "Silence": Gate's own cooldown. */
     @Override public int getSpellCooldown() { return ServerConfig.GATE_SILENCE_SECONDS.get() * 20; }
 
-    /** True while the Gate is dealing its damage (Cutscene lets it through to the frozen watchers). */
-    public static boolean hitting() {
-        return hitting;
-    }
-
     @Override
     public List<MutableComponent> getUniqueInfo(int level, LivingEntity caster) {
         return List.of(ui("cast", CAST / 20),
                 ui("rays", n(ServerConfig.GATE_RAY_DAMAGE.get() * ServerConfig.GATE_SET_BONUS.get()), n(ServerConfig.GATE_AREA.get())),
-                ui("main", (int) Math.round(ServerConfig.GATE_MAIN_PERCENT.get() * 100) + "%", n(ServerConfig.GATE_MAIN_FLAT.get())),
                 ui("silence", ServerConfig.GATE_SILENCE_SECONDS.get() / 60));
     }
 
@@ -135,7 +129,6 @@ public class SilentGateSpell extends SilentStaffSpell {
         if (bh.getType() != HitResult.Type.MISS) end = bh.getLocation();
         EntityHitResult eh = ProjectileUtil.getEntityHitResult(sl, caster, eye, end, new AABB(eye, end).inflate(1),
                 e -> e instanceof LivingEntity && e != caster && !e.isSpectator() && e.isPickable() && !(e instanceof ArmorStand));
-        if (eh != null && eh.getEntity() instanceof LivingEntity le && !friendly(caster, le)) c.aim = le;
         Vec3 p = eh != null ? eh.getEntity().position() : end;
         if (hdist(caster, p) < 8) {
             Vec3 fw = caster.getLookAngle().multiply(1, 0, 1);
@@ -186,6 +179,7 @@ public class SilentGateSpell extends SilentStaffSpell {
     /** Cast stopped before 50 s: the scene, effects and music end (the client fades the track in 1 s). */
     private static void cancel(Cast c) {
         if (c.done) return;
+        ru.pohsmp.core.PohCore.LOG.info("[gate] {} cancelled at {} s", c.caster.getName().getString(), c.age / 20);
         c.done = true;
         RUNNING.remove(c);
         if (c.scene >= 0) Fx.stop(c.sl, c.scene, "collapse");
@@ -207,7 +201,6 @@ public class SilentGateSpell extends SilentStaffSpell {
             return;
         }
         if (t <= RAYS_TO) rays(c, t);
-        if (t == MAIN) mainBeam(c);
         if (t == CRYSTAL) crystal(c);
         if (t >= END) {
             c.done = true;
@@ -226,7 +219,7 @@ public class SilentGateSpell extends SilentStaffSpell {
             ray(c, p, t);
         }
         if ((t - RAYS_FROM) % ServerConfig.GATE_AIM_INTERVAL.get() == 0)
-            for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && !friendly(c.caster, e)))
+            for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e)))
                 ray(c, e.position(), t);
     }
 
@@ -237,29 +230,13 @@ public class SilentGateSpell extends SilentStaffSpell {
         double r = ServerConfig.GATE_RAY_RADIUS.get();
         float dmg = (float) (ServerConfig.GATE_RAY_DAMAGE.get() * ServerConfig.GATE_SET_BONUS.get() * power(c));
         int cd = ServerConfig.GATE_HIT_COOLDOWN.get();
-        for (LivingEntity e : HigherSpell.around(c.sl, p, r + 1.5, e -> !friendly(c.caster, e))) {
+        for (LivingEntity e : HigherSpell.around(c.sl, p, r + 1.5, e -> target(c.caster, e))) {
             if (e.getBoundingBox().inflate(r).contains(p.add(0, Math.min(1, e.getBbHeight() / 2), 0)) || e.position().distanceToSqr(p) <= r * r) {
                 Integer last = c.lastHit.get(e.getUUID());
                 if (last != null && t - last < cd) continue;
                 c.lastHit.put(e.getUUID(), t);
                 hurt(c, e, dmg);
             }
-        }
-    }
-
-    private static void mainBeam(Cast c) {
-        LivingEntity a = c.aim;
-        boolean onAim = a != null && a.isAlive() && a.level() == c.sl && hdist(a, c.hit) <= ServerConfig.GATE_AREA.get() + 8;
-        Vec3 p = onAim ? a.position() : c.hit;
-        String id = FxLib.fx(FX_MAIN) != null ? FX_MAIN : FX_MAIN + "_placeholder";
-        Fx.play(c.sl, Fx.fx(id).at(p).yaw(c.yaw).point("p", p).point("gate", c.hit.add(0, GATE_H, 0)));
-        Cutscene.flash(c.sl, c.watchers, 16, 0xE8FFFF);
-        double r = ServerConfig.GATE_MAIN_RADIUS.get();
-        double mult = ServerConfig.GATE_SET_BONUS.get() * power(c);
-        for (LivingEntity e : HigherSpell.around(c.sl, p, r + 2, e -> !friendly(c.caster, e))) {
-            if (e != a && e.position().distanceToSqr(p) > r * r && !e.getBoundingBox().inflate(r).contains(p)) continue;
-            float dmg = (float) ((e.getMaxHealth() * ServerConfig.GATE_MAIN_PERCENT.get() + ServerConfig.GATE_MAIN_FLAT.get()) * mult);
-            hurt(c, e, dmg);
         }
     }
 
@@ -282,19 +259,19 @@ public class SilentGateSpell extends SilentStaffSpell {
     private static void hurt(Cast c, LivingEntity e, float dmg) {
         SilentGateSpell g = spell();
         if (g == null || !e.isAlive() || dmg <= 0) return;
-        hitting = true;
-        try {
-            g.hit(c.caster, e, dmg);
-        } finally {
-            hitting = false;
-        }
+        g.hit(c.caster, e, dmg);
     }
 
-    /** Never hit: the caster, its team, its pets, armor stands, spectators, and NPCs of a CNPC faction friendly to the caster. */
-    public static boolean friendly(LivingEntity caster, Entity e) {
-        if (HigherSpell.friendly(caster, e)) return true;
-        if (e instanceof Player p && (p.isCreative() || p.isSpectator())) return true;
-        return CnpcHooks.friendlyTo(e, caster) || CnpcHooks.friendlyTo(caster, e);
+    /**
+     * Owner's decision (19.11): only hostile entities are targets. Monsters ({@code Enemy}) and mobs now aggressive to the caster or its allies;
+     * CNPC NPCs only of factions hostile to the caster. Players are never targets (not even in PvP), nor peaceful animals, villagers, pets,
+     * the caster's team, armor stands.
+     */
+    public static boolean target(LivingEntity caster, LivingEntity e) {
+        if (!e.isAlive() || e instanceof Player || HigherSpell.friendly(caster, e)) return false;
+        if (CnpcHooks.isNpc(e)) return CnpcHooks.hostileTo(e, caster);
+        if (e instanceof Enemy) return true;
+        return e instanceof Mob m && m.getTarget() != null && m.getTarget().isAlive() && HigherSpell.friendly(caster, m.getTarget());
     }
 
     public static final class SilentGateEvents {

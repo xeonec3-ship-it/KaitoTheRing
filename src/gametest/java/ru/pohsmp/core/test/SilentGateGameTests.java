@@ -36,7 +36,7 @@ import ru.pohsmp.core.spell.silent.SilentGateSpell;
 /**
  * "Gate" (T03) on a real server through Iron's own cast path (attemptInitiateCast from the Silent Witch staff):
  * the cast runs 50 s and is not interrupted, the watchers are held by the scene, rays and the main beam hit foes in the area
- * with the configured numbers, the caster's pet is spared, the scene ends at 65 s; a cancel stops everything; no staff - no cast.
+ * with the configured numbers (no main beam), players, peaceful animals and the caster's pet are spared, the scene ends at 65 s; a cancel stops everything; no staff - no cast.
  * Outfit: T19 items are not registered yet, so SilentWitch counts the set as worn (stub).
  */
 @GameTestHolder(PohCore.MODID)
@@ -112,8 +112,14 @@ public final class SilentGateGameTests {
         pet.setNoAi(true);
         pet.tame(p);
         h.getLevel().addFreshEntity(pet);
+        // owner's rule: players and peaceful creatures are never hit, even right next to a foe
+        ServerPlayer bystander = mage(h, "bystander", 4 + 8, 2 + 22);
+        Vec3 cp = top(h, me.add(-3, 0, 14));
+        var cow = EntityType.COW.create(h.getLevel());
+        cow.moveTo(cp.x, cp.y, cp.z, 0, 0);
+        cow.setNoAi(true);
+        h.getLevel().addFreshEntity(cow);
         double ray = ServerConfig.GATE_RAY_DAMAGE.get() * ServerConfig.GATE_SET_BONUS.get();
-        double main = (HP * ServerConfig.GATE_MAIN_PERCENT.get() + ServerConfig.GATE_MAIN_FLAT.get()) * ServerConfig.GATE_SET_BONUS.get();
         float[] before = new float[1];
         h.runAfterDelay(2, () -> {
             Vec3 eye = p.getEyePosition(), t = aim.position().add(0, aim.getBbHeight() * 0.6, 0), d = t.subtract(eye);
@@ -138,18 +144,21 @@ public final class SilentGateGameTests {
             check(HP - other.getHealth() >= ray - 0.5, "no aimed ray on the foe in the area: " + other.getHealth());
             before[0] = aim.getHealth();
         });
-        h.runAfterDelay(SilentGateSpell.MAIN + 2 + 2, () -> {   // 52 s: the main beam on the aimed one
+        h.runAfterDelay(1040 + 2 + 4, () -> {   // 52 s: no main beam (owner) - only rays: at most 12 per 2 s on one creature
             double got = before[0] - aim.getHealth();
-            check(got >= main - 1 && got <= main + 6 * ray + 1, "main beam took " + got + ", expected about " + main);
+            check(got <= 6 * ray + 1, "the aimed creature took " + got + " in 2 s - a main beam?");
         });
         h.runAfterDelay(SilentGateSpell.END + 2 + 5, () -> {
             check(pet.getHealth() == pet.getMaxHealth(), "the caster's pet was hit");
+            check(bystander.getHealth() == bystander.getMaxHealth(), "a player was hit: " + bystander.getHealth());
+            check(cow.getHealth() == cow.getMaxHealth(), "a peaceful animal was hit");
             check(far.getHealth() == HP, "a creature outside the area was hit");
             double otherLost = HP - other.getHealth();
             check(otherLost >= 20 * ray && otherLost <= 40 * ray, "foe in the area lost " + otherLost);
             check(!Cutscene.frozen().contains(p.getUUID()), "scene did not end");
             check(MagicData.getPlayerMagicData(p).getPlayerCooldowns().isOnCooldown(Reg.SILENT_GATE.get()), "no Silence cooldown");
             p.server.getPlayerList().remove(p);
+            bystander.server.getPlayerList().remove(bystander);
             h.succeed();
         });
     }

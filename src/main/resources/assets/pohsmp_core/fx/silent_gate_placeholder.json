@@ -1,6 +1,6 @@
 {
- "comment": "PLACEHOLDER for T03 'Gate' until the ideas chat ships fx/silent_gate.json (then the spell uses that one automatically). Built from the existing seals silent_gate_sky / silent_gate_pieces. Points: c - caster's feet, hit - strike point, gate - 26 above it. Rays, the main beam and the crystal are separate effects started by the server (silent_gate_ray/_main/_crystal).",
- "style": "divine",
+ "comment": "PLACEHOLDER for T03 'Gate' until the ideas chat ships fx/silent_gate.json (then the spell uses that one automatically). The gate is the ideas chat's mesh fx/meshes/silent_gate.json (style silent); the rest is built from the existing seals silent_gate_sky / silent_gate_pieces. Points: c - caster's feet, hit - strike point, gate - 26 above it. Rays and the crystal are separate effects started by the server (silent_gate_ray/_main/_crystal).",
+ "style": "silent",
  "duration": 1300,
  "elements": [
   {
@@ -59,14 +59,12 @@
    "color": "#FFFFFF"
   },
   {
-   "type": "sigil",
-   "id": "silent_gate_sky",
+   "type": "mesh",
+   "model": "silent_gate",
    "delay": 440,
    "duration": 840,
-   "at": "point:gate",
-   "scale": 3.2,
-   "orientation": "sky",
-   "color": "#FFFFFF"
+   "at": "point:gate+0,-6,0",
+   "scale": 1.6
   },
   {
    "type": "sigil",
@@ -257,7 +255,7 @@
    "delay": 1008,
    "duration": 250,
    "at": "point:hit+-7.4,24.2,-15.1",
-   "scale": 0.84,
+   "scale": 0.34,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -267,7 +265,7 @@
    "delay": 1009,
    "duration": 250,
    "at": "point:hit+-7.9,25.0,11.3",
-   "scale": 0.91,
+   "scale": 0.36,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -277,7 +275,7 @@
    "delay": 1001,
    "duration": 250,
    "at": "point:hit+-0.7,21.2,10.8",
-   "scale": 1.53,
+   "scale": 0.61,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -287,7 +285,7 @@
    "delay": 1001,
    "duration": 250,
    "at": "point:hit+2.3,25.4,-1.7",
-   "scale": 1.7,
+   "scale": 0.68,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -297,7 +295,7 @@
    "delay": 1001,
    "duration": 250,
    "at": "point:hit+9.7,28.4,8.4",
-   "scale": 1.56,
+   "scale": 0.62,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -307,7 +305,7 @@
    "delay": 1006,
    "duration": 250,
    "at": "point:hit+-5.1,26.7,3.1",
-   "scale": 1.13,
+   "scale": 0.45,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -317,7 +315,7 @@
    "delay": 1002,
    "duration": 250,
    "at": "point:hit+14.3,24.0,-1.0",
-   "scale": 1.55,
+   "scale": 0.62,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -327,7 +325,7 @@
    "delay": 1001,
    "duration": 250,
    "at": "point:hit+8.8,24.5,-2.6",
-   "scale": 1.56,
+   "scale": 0.62,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -337,7 +335,7 @@
    "delay": 1001,
    "duration": 250,
    "at": "point:hit+-5.5,25.5,4.5",
-   "scale": 1.26,
+   "scale": 0.5,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -347,7 +345,7 @@
    "delay": 1009,
    "duration": 250,
    "at": "point:hit+-17.9,28.9,4.8",
-   "scale": 0.74,
+   "scale": 0.3,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -357,7 +355,7 @@
    "delay": 1008,
    "duration": 250,
    "at": "point:hit+-13.3,22.4,1.7",
-   "scale": 1.64,
+   "scale": 0.66,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -367,7 +365,7 @@
    "delay": 1006,
    "duration": 250,
    "at": "point:hit+7.3,18.3,-6.0",
-   "scale": 1.14,
+   "scale": 0.46,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -377,7 +375,7 @@
    "delay": 1007,
    "duration": 250,
    "at": "point:hit+-6.9,29.2,-13.7",
-   "scale": 0.94,
+   "scale": 0.38,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -387,7 +385,7 @@
    "delay": 1004,
    "duration": 250,
    "at": "point:hit+-13.4,23.5,9.3",
-   "scale": 0.97,
+   "scale": 0.39,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -397,7 +395,7 @@
    "delay": 1006,
    "duration": 250,
    "at": "point:hit+0.5,21.7,-5.3",
-   "scale": 0.72,
+   "scale": 0.29,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -407,7 +405,7 @@
    "delay": 1000,
    "duration": 250,
    "at": "point:hit+12.4,25.9,5.5",
-   "scale": 0.81,
+   "scale": 0.32,
    "orientation": "sky",
    "color": "#FFFFFF"
   },
@@ -417,7 +415,7 @@
    "delay": 1006,
    "duration": 250,
    "at": "point:hit+-3.1,19.5,-4.2",
-   "scale": 0.94,
+   "scale": 0.38,
    "orientation": "sky",
    "color": "#7FFFD0"
   },
@@ -427,7 +425,7 @@
    "delay": 1010,
    "duration": 250,
    "at": "point:hit+-6.2,25.4,1.3",
-   "scale": 1.57,
+   "scale": 0.63,
    "orientation": "sky",
    "color": "#FFFFFF"
   },

@@ -149,8 +149,6 @@ public final class Cutscene {
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         public static void onAttack(LivingAttackEvent e) {
             if (FROZEN.isEmpty() || !(e.getEntity() instanceof ServerPlayer sp) || !FROZEN.containsKey(sp.getUUID())) return;
-            // the Gate's rays and main beam are part of its scene: they hit the watchers in their area
-            if (ru.pohsmp.core.spell.silent.SilentGateSpell.hitting()) return;
             if (!e.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) e.setCanceled(true);
         }
 

@@ -22,10 +22,8 @@ N = 512
 
 
 def arm(t):
-    """Ось рукава: дуга из нижнего левого угла вверх-вправо, загибается к верху."""
-    a = math.radians(200 + 140 * t)
-    r = 150 + 40 * t
-    return 256 + r * math.cos(a) * 1.15 + 40 * t, 330 - 60 * t + r * math.sin(a) * 0.9
+    """Ось облака (как в видео мода): пышный столб снизу от центра вверх и вправо, слегка изогнутый (не дуга-радуга)."""
+    return 220 + 120 * t + 30 * math.sin(t * 3.0), 430 - 360 * t
 
 
 def blobs(rnd, n, size0, size1, spread):
@@ -66,7 +64,7 @@ def save(rgb, name):
 def main():
     rnd = random.Random(1514)
     core, mid, edge = (255, 255, 255), (246, 196, 238), (110, 214, 236)
-    cloud = blobs(rnd, 260, 14, 46, 26) + 0.6 * blobs(rnd, 120, 30, 70, 40)
+    cloud = blobs(rnd, 320, 18, 56, 38) + 0.7 * blobs(rnd, 140, 40, 90, 55)
     def smooth_noise(res, seed, blur):
         a = (np.random.RandomState(seed).rand(res, res) * 255).astype(np.uint8)
         im = Image.fromarray(a).resize((N, N), Image.BICUBIC).filter(ImageFilter.GaussianBlur(blur))
@@ -75,6 +73,9 @@ def main():
     cloud *= 0.35 + 1.3 * noise
     cloud = np.array(Image.fromarray(np.clip(cloud / cloud.max() * 255, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(3)), np.float32)
     save(colorize(cloud, core, mid, edge) * 255, 'silent_nebula_cloud')
+    haze = blobs(rnd, 60, 70, 140, 70)
+    hz = colorize(haze, (255, 236, 250), (226, 160, 214), (150, 110, 170)) * 255 * 0.8
+    save(hz, 'silent_nebula_haze')
     # струи-завитки: тонкие светлые нити вдоль рукава
     w = np.zeros((N, N), np.float32)
     im = Image.new('L', (N, N), 0)
@@ -95,15 +96,15 @@ def main():
     # звёзды
     st = Image.new('RGB', (N, N), (0, 0, 0))
     dr = ImageDraw.Draw(st)
-    for i in range(900):
+    for i in range(1500):
         t = rnd.random(); x, y = arm(t)
-        x += rnd.gauss(0, 55 * (0.6 + t)); y += rnd.gauss(0, 55 * (0.6 + t))
+        x += rnd.gauss(0, 75 * (0.6 + t)); y += rnd.gauss(0, 40 * (0.6 + t))
         b = int(rnd.uniform(120, 255)); r = rnd.choice((0.6, 0.8, 1.0, 1.3))
         c = rnd.choice(((b, b, b), (int(b * 0.85), b, b), (b, int(b * 0.85), b)))
         dr.ellipse((x - r, y - r, x + r, y + r), fill=c)
     st = st.filter(ImageFilter.GaussianBlur(0.6))
     big = Image.new('RGB', (N, N), (0, 0, 0)); db = ImageDraw.Draw(big)
-    for i in range(34):
+    for i in range(46):
         t = rnd.random(); x, y = arm(t)
         x += rnd.gauss(0, 45); y += rnd.gauss(0, 45)
         L = rnd.uniform(8, 22)
@@ -118,9 +119,11 @@ def main():
                    'звёзды и светлые струи; billboard, слои медленно вращаются. Сгенерировано tools/gen_silent_nebula.py.',
         'size': 4.0, 'color': '#FFFFFF', 'orientation': 'billboard', 'lifetime': -1, 'hold': -1,
         'layers': [
-            {'id': 'cloud_back', 'type': 'disc', 'texture': 'silent_nebula_cloud', 'radius': 1.2, 'heightOffset': -0.06, 'brightness': 0.38,
+            {'id': 'haze', 'type': 'disc', 'texture': 'silent_nebula_haze', 'radius': 1.7, 'heightOffset': -0.1, 'brightness': 0.65,
+             'appear': {'delay': 0, 'duration': 36, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade']}, 'rotation': {'speed': 0.4}},
+            {'id': 'cloud_back', 'type': 'disc', 'texture': 'silent_nebula_cloud', 'radius': 1.25, 'heightOffset': -0.06, 'brightness': 0.24,
              'appear': {'delay': 0, 'duration': 30, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade', 'twist'], 'twist': -40}, 'rotation': {'speed': 0.8}},
-            {'id': 'cloud', 'type': 'disc', 'texture': 'silent_nebula_cloud', 'radius': 1.0, 'heightOffset': 0.0, 'brightness': 0.55,
+            {'id': 'cloud', 'type': 'disc', 'texture': 'silent_nebula_cloud', 'radius': 1.05, 'heightOffset': 0.0, 'brightness': 0.33,
              'appear': {'delay': 6, 'duration': 30, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade', 'twist'], 'twist': 50}, 'rotation': {'speed': -1.2}},
             {'id': 'wisp', 'type': 'disc', 'texture': 'silent_nebula_wisp', 'radius': 1.05, 'heightOffset': 0.03, 'brightness': 0.8,
              'appear': {'delay': 10, 'duration': 30, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade']}, 'rotation': {'speed': 2.0}},

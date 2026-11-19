@@ -7,12 +7,32 @@
  "hold": -1,
  "layers": [
   {
+   "id": "haze",
+   "type": "disc",
+   "texture": "silent_nebula_haze",
+   "radius": 1.7,
+   "heightOffset": -0.1,
+   "brightness": 0.65,
+   "appear": {
+    "delay": 0,
+    "duration": 36,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 0.4
+   }
+  },
+  {
    "id": "cloud_back",
    "type": "disc",
    "texture": "silent_nebula_cloud",
-   "radius": 1.2,
+   "radius": 1.25,
    "heightOffset": -0.06,
-   "brightness": 0.38,
+   "brightness": 0.24,
    "appear": {
     "delay": 0,
     "duration": 30,
@@ -32,9 +52,9 @@
    "id": "cloud",
    "type": "disc",
    "texture": "silent_nebula_cloud",
-   "radius": 1.0,
+   "radius": 1.05,
    "heightOffset": 0.0,
-   "brightness": 0.55,
+   "brightness": 0.33,
    "appear": {
     "delay": 6,
     "duration": 30,

@@ -1180,7 +1180,7 @@ class FxRun {
     }
   }
   stop(t) { if (this.stopAt === null) { this.stopAt = t; this.sigils.forEach((s) => s.stop(t)); } }
-  done(t) { return t > (this.def.duration > 0 ? this.def.duration : 160) + 20; }   // -1 — «пока не остановят»: в превью 8 с
+  done(t) { return t > (this.def.duration > 0 ? this.def.duration : (this.id === "silent_gate" ? 1100 : 160)) + 20; }   // -1 — «пока не остановят»: в превью 8 с
   dispose() { scene.remove(this.root); this.sigils.forEach((s) => s.dispose()); screenFlash.style.opacity = 0; tintLayer.style.opacity = 0; if (targetFig) targetFig.visible = false; caster.position.set(0, 0, 0); }
   update(t, dt) {
     const lt = t - this.t0;

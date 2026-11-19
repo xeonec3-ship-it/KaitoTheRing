@@ -56,10 +56,10 @@ def build():
     # Указ рукой (14.6–26 с) — ТУМАННОСТЬ как в видео мода (владелец 19.11: «как на видео»): большое мягкое светящееся облако-рукав
     # галактики перед ведьмой и над ней (печать silent_hand_nebula, billboard: облака в два слоя, светлые струи, звёзды с ореолами;
     # медленно вращаются), вокруг редкие мерцающие звёздочки. Ни лучей к вратам, ни частиц из пальца.
-    el(type='sigil', id='silent_hand_nebula', delay=T(14.6), until=T(26), at='caster+0,2.5,2.0', orientation='billboard')
-    el(type='sprites', delay=T(14.8), duration=T(11), at='caster+0,2.5,2.0', texture='glint4', count=90, rate=0.4, spread=3.2, speed=0.006,
+    el(type='sigil', id='silent_hand_nebula', delay=T(14.6), until=T(26), at='caster+0,2.6,1.6', orientation='billboard')
+    el(type='sprites', delay=T(14.8), duration=T(11), at='caster+0,2.6,1.6', texture='glint4', count=90, rate=0.4, spread=3.2, speed=0.006,
        gravity=-0.001, spin=40, size=[0.0, 0.35], life=44, color='#FFFFFF', comment='мерцающие звёздочки в облаке')
-    el(type='sprites', delay=T(14.8), duration=T(11), at='caster+0,2.5,2.0', texture='spark_soft', count=160, rate=0.7, spread=3.6, speed=0.008,
+    el(type='sprites', delay=T(14.8), duration=T(11), at='caster+0,2.6,1.6', texture='spark_soft', count=160, rate=0.7, spread=3.6, speed=0.008,
        gravity=-0.0015, size=[0.08, 0.02], life=50, color='#F2D8F2', comment='редкие пылинки света')
     # 49.9 с: рука прямо вперёд — вспышка у руки
     el(type='flash', delay=T(49.9), duration=T(0.6), at='caster.hand', size=1.6, anamorphic=4, rays=6, color='@core')

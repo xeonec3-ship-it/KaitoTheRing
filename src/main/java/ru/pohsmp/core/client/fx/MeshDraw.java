@@ -259,7 +259,7 @@ public final class MeshDraw {
     /**
      * Volume of boxes [x0, y0, z0, x1, y1, z1, tone, [rx, ry, rz]?] (docs/fx.md, "boxes"). Glowing tones are additive at full brightness,
      * the others translucent with `opacity` and shaded by face. Appear "reveal: down": a front runs from bounds[1] to bounds[0], a box shows
-     * once the front passes its centre (a band `front` blocks wide fades it in with a white flash), and a bright bar marks the front.
+     * once the front passes its centre ("up": from bounds[0] upwards, the crystal growing) (a band `front` blocks wide fades it in with a white flash), and a bright bar marks the front.
      */
     private static void boxes(Frame f, Axes ax, JsonObject p, FxStyle style, double e, double a) {
         if (a <= 1e-3) return;
@@ -271,27 +271,29 @@ public final class MeshDraw {
         java.util.Set<Integer> glow = new java.util.HashSet<>();
         if (p.has("glowTones")) for (JsonElement g : p.getAsJsonArray("glowTones")) glow.add(g.getAsInt());
         JsonObject ap = p.has("appear") ? p.getAsJsonObject("appear") : new JsonObject();
-        boolean down = "down".equals(str(ap, "reveal", ""));
+        String reveal = str(ap, "reveal", "");
+        boolean down = "down".equals(reveal), up = "up".equals(reveal), sweep = down || up;
         JsonArray bounds = p.has("bounds") ? p.getAsJsonArray("bounds") : null;
         double lo = bounds != null ? bounds.get(0).getAsDouble() : 0, hi = bounds != null ? bounds.get(1).getAsDouble() : 0;
-        double band = Math.max(0.05, num(ap, "front", 0.8)), front = hi - (hi - lo + 2) * FxDraw.clamp01(e);
+        double band = Math.max(0.05, num(ap, "front", 0.8));
+        double front = down ? hi - (hi - lo + 2) * FxDraw.clamp01(e) : lo + (hi - lo + 2) * FxDraw.clamp01(e);
         double opacity = num(p, "opacity", 1);
         VertexConsumer solid = f.solid(FxDraw.WHITE), add = f.add(FxDraw.WHITE);
         Vec3[] w = new Vec3[8];
         for (Box b : bs) {
-            double k = down ? FxDraw.clamp01((b.y() - front + band) / band) : FxDraw.clamp01(e * 3);
+            double k = down ? FxDraw.clamp01((b.y() - front + band) / band) : up ? FxDraw.clamp01((front - b.y() + band) / band) : FxDraw.clamp01(e * 3);
             if (k <= 1e-3) continue;
             for (int j = 0; j < 8; j++) w[j] = ax.at(b.c()[j]);
             int base = tones[Math.max(0, Math.min(tones.length - 1, b.tone()))];
             boolean gl = glow.contains(b.tone());
-            if (down && k < 1) base = toWhite(base, 0.85 * (1 - k));   // the white flash at the front
+            if (sweep && k < 1) base = toWhite(base, 0.85 * (1 - k));   // the white flash at the front
             for (int fi = 0; fi < 6; fi++) {
                 int[] q = FACES[fi];
                 if (gl) FxDraw.quad(add, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], base, a * k);
                 else FxDraw.quad(solid, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], mul(base, b.shade()[fi]), Math.min(1, a * k * opacity));
             }
         }
-        if (down && e > 0 && e < 1)   // the light front sweeping down
+        if (sweep && e > 0 && e < 1)   // the light front sweeping down (or up: the crystal grows from the ground)
             FxDraw.line(add, f, ax.at(-6, front, 0), ax.at(6, front, 0), 0.25 * ax.s, 0xFFFFFF, 0.8 * a);
     }
 

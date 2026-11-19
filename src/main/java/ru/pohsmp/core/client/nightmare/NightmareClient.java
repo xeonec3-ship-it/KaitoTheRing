@@ -24,7 +24,7 @@ public final class NightmareClient {
     private NightmareClient() {}
 
     private static final ResourceLocation VIGNETTE = new ResourceLocation("minecraft", "textures/misc/vignette.png");
-    private static int stage, age, flicker, nextFlicker = 100, nextBeat = 40, nightLeft;
+    private static int stage, age, flicker, nextFlicker = 100, nextBeat = 40, nextVoice = 200, nightLeft;
     /** smooth 0..3 following the stage; 0..1 for the night */
     private static float level, night;
     private static long realTime = Long.MIN_VALUE, lastSet = Long.MIN_VALUE;
@@ -84,9 +84,19 @@ public final class NightmareClient {
             nextFlicker = (int) (40 + mc.level.random.nextInt(160) / Math.max(1, level));
         }
         if (--nextBeat <= 0 && mc.player != null) {
-            float v = 0.25f + 0.2f * level;
-            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WARDEN_HEARTBEAT, 0.9f + 0.1f * level, v));
-            nextBeat = Math.max(12, 40 - Math.round(level * 8));
+            float v = Math.min(1f, 0.45f + 0.18f * level);   // the approved sound is ~2 s long: one beat at a time
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(ru.pohsmp.core.nightmare.NmSounds.HEARTBEAT, 0.95f + 0.05f * level, v));
+            nextBeat = Math.max(44, 90 - Math.round(level * 15));
+        }
+        if (--nextVoice <= 0 && mc.player != null) {   // whispers around the victim; from stage 2 scrapes and a far child's laugh
+            var r = mc.level.random;
+            var s = level >= 1.5f && r.nextInt(3) == 0 ? (r.nextBoolean() ? ru.pohsmp.core.nightmare.NmSounds.SCRAPE
+                    : ru.pohsmp.core.nightmare.NmSounds.CHILD_LAUGH) : ru.pohsmp.core.nightmare.NmSounds.WHISPER;
+            double a = r.nextDouble() * Math.PI * 2, d = 3 + r.nextDouble() * 5;
+            var p = mc.player.position();
+            mc.getSoundManager().play(new SimpleSoundInstance(s, net.minecraft.sounds.SoundSource.AMBIENT, Math.min(1f, 0.4f + 0.2f * level), 1f,
+                    r, p.x + Math.cos(a) * d, p.y + 1, p.z + Math.sin(a) * d));
+            nextVoice = (int) (300 + r.nextInt(400) / Math.max(1, level));
         }
     }
 

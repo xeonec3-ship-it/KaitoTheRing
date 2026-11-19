@@ -220,6 +220,7 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
         }
         if (life == 1) {
             fx(v, "nm_spawn");
+            sound(v, NmSounds.INK_RISE, 1f, 1f);
             if (kind == Kind.MIMIC) wear(v);
             if (kind == Kind.WEEPER) aura = Fx.play(sl, Fx.fx("nm_weeper_aura").at(position()).caster(this).attach(this).only(v));
         }
@@ -231,8 +232,7 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
             entityData.set(COMES, entityData.get(COMES) + 1);
             fx(v, "nm_spawn");
             play("laugh");
-            sound(v, SoundEvents.ALLAY_AMBIENT_WITHOUT_ITEM, 0.9f, 0.5f);
-            sound(v, SoundEvents.VEX_AMBIENT, 0.7f, 1.4f);
+            sound(v, NmSounds.CHILD_LAUGH, 1f, 1f);
             return;
         }
         if (blinkIn >= 0) return;
@@ -270,6 +270,7 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
                     unseenFor = 0;
                     entityData.set(GOING, true);
                     fx(v, "nm_despawn");
+                    sound(v, NmSounds.INK_FALL, 0.7f, 1.2f);
                     blinkIn = 8;
                 }
             }
@@ -280,8 +281,8 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
                     weepCd = 80 + random.nextInt(60);
                     if (random.nextInt(3) == 0) {
                         play("wail");
-                        sound(v, SoundEvents.GHAST_SCREAM, 0.8f, 0.8f);
-                    } else sound(v, SoundEvents.GHAST_AMBIENT, 0.5f, 1.4f);
+                        sound(v, NmSounds.WEEPER_WAIL, 1f, 1f);
+                    } else sound(v, NmSounds.WEEPER_CRY, 0.8f, 1f);
                 }
             }
             case HANDS -> {   // out of the ground under the feet: grab, hold 1.5 s, one strike, gone
@@ -290,7 +291,7 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
                     fx(v, "nm_hands_grab");
                     v.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 30, 6, false, false, false));
                     v.addEffect(new MobEffectInstance(MobEffects.JUMP, 30, 128, false, false, false));   // 128+: no jump
-                    sound(v, SoundEvents.SLIME_SQUISH, 1f, 0.5f);
+                    sound(v, NmSounds.HANDS_GRAB, 1f, 1f);
                 }
                 if (life == APPEAR + 14) land(v, 0);
                 if (life > APPEAR + 32) vanish(v);
@@ -299,7 +300,7 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
                 Vec3 eye = v.getEyePosition().add(new Vec3(Math.cos(life * 0.12), 0, Math.sin(life * 0.12)).scale(1.4)).subtract(0, 0.5, 0);
                 getMoveControl().setWantedPosition(eye.x, eye.y, eye.z, speed(1));
                 setDeltaMovement(eye.subtract(position()).scale(0.25));
-                if (life % 30 == 0) sound(v, SoundEvents.PHANTOM_FLAP, 0.4f, 1.8f);
+                if (life % 30 == 0) sound(v, NmSounds.MOTHS, 0.6f, 1f);
                 if (strikeCd <= 0 && d < 3) {
                     strike(v, "attack");
                     v.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 50, 0, false, false, false));   // the wings over the eyes
@@ -311,8 +312,7 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
                     roarCd = 180 + random.nextInt(80);
                     play("roar");
                     fx(v, "nm_maw_roar");
-                    sound(v, SoundEvents.RAVAGER_ROAR, 1f, 0.6f);
-                    sound(v, SoundEvents.WARDEN_ROAR, 0.8f, 0.8f);
+                    sound(v, NmSounds.MAW_ROAR, 1f, 1f);
                     v.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 1, false, false, false));
                     v.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 50, 0, false, false, false));
                 }
@@ -320,7 +320,9 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
             }
             case CRAWLER -> {
                 chase(v, d);
-                if (life % 70 == 0) sound(v, SoundEvents.SPIDER_AMBIENT, 0.8f, 0.6f);
+                if (life % 70 == 0) sound(v, NmSounds.CRAWLER_HISS, 0.8f, 1f);
+                if (life % 7 == 0 && getNavigation().isInProgress()) sound(v, NmSounds.CRAWLER_STEP, 0.5f, 1f);
+                if (life % 200 == 100) sound(v, NmSounds.SCRAPE, 0.7f, 1f);
             }
             case MIMIC -> {
                 chase(v, d);
@@ -380,8 +382,9 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
         sound(v, SoundEvents.PLAYER_HURT, 1f, 1f);
         Bestiary.fakeHit(v, (float) (double) ServerConfig.get(ServerConfig.IM_DAMAGE), (int) Math.round(ServerConfig.get(ServerConfig.IM_RETURN) * 20));
         switch (kind) {
-            case MAW -> sound(v, SoundEvents.EVOKER_FANGS_ATTACK, 1f, 0.6f);
+            case MAW -> sound(v, NmSounds.MAW_BITE, 1f, 1f);
             case HANDS -> sound(v, SoundEvents.MUD_BREAK, 1f, 0.5f);
+            case CRAWLER -> sound(v, NmSounds.CRAWLER_HISS, 1f, 1.1f);
             default -> sound(v, SoundEvents.PHANTOM_BITE, 0.9f, 0.7f);
         }
         Immersion.touch(v);
@@ -403,7 +406,7 @@ public class NightmareMob extends PathfinderMob implements GeoEntity {
         goneIn = VANISH;
         if (v != null) {
             fx(v, "nm_despawn");
-            if (kind == Kind.HANDS) sound(v, SoundEvents.HONEY_BLOCK_SLIDE, 0.8f, 0.5f);
+            sound(v, NmSounds.INK_FALL, 1f, 1f);
         }
     }
 }

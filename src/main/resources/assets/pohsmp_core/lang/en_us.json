@@ -392,5 +392,7 @@
   "item.pohsmp_core.silent_witch_skirt.desc1": "Your steps, jumps, landings and swimming make no sound",
   "item.pohsmp_core.silent_witch_skirt.desc2": "You cause no vibrations: sculk and the Warden do not hear you",
   "item.pohsmp_core.silent_witch_staff.gate": "Full set: unlocks the Gate of the Silent Witch's staff",
-  "subtitles.pohsmp_core.sigil.hit": "Sigil rings from a hit"
+  "subtitles.pohsmp_core.sigil.hit": "Sigil rings from a hit",
+  "subtitles.pohsmp_core.music.silent_gate_wait": "The gate awaits a command",
+  "ui.pohsmp_core.silent_gate.command": "Left click to command the gate"
 }

@@ -217,15 +217,38 @@ def main():
     hand_stream_meshes()
     aimed_beam()
     build()
+    # «Приказ» (владелец 19.11): врата готовы → ведьма ждёт ЛКМ (сколько угодно, код ограничивает тайм-аутом) → по приказу удар.
+    # Поэтому эффект делится: silent_gate.json — всё до приказа (держится, пока код не остановит: duration -1, у долгих элементов нет until);
+    # silent_gate_strike.json — удар, отсчёт от приказа (всё, что было на ≥ 49.9 с, сдвинуто на −49.9 с).
+    CUT = T(49.9)
+    strike = []
+    main_ = []
+    for e in E:
+        if e.get('delay', 0) >= CUT - 1:
+            e = dict(e)
+            e['delay'] = max(0, e['delay'] - CUT)
+            if 'until' in e:
+                e['until'] = e['until'] - CUT
+            strike.append(e)
+        else:
+            e = dict(e)
+            if 'until' in e and e['until'] > CUT:
+                del e['until']             # нимб, врата, круги за спиной — держатся до остановки эффекта кодом
+            if e.get('type') == 'tint':
+                e['duration'] = T(600)
+                e.pop('out', None)
+            main_.append(e)
     doc = {
-        'comment': 'Эффект «Безмолвные врата» (T03) на всю шкалу под музыку (0–65 с). Сгенерировано tools/gen_silent_gate_fx.py — правьте генератор.',
-        'style': 'silent',
-        'duration': T(96),
-        'elements': E,
-    }
+        'comment': 'Эффект «Безмолвные врата» (T03), часть 1: от начала каста до приказа (0–49.9 с и ожидание ЛКМ); держится, пока код не '
+                   'остановит (после удара). Удар — fx/silent_gate_strike.json. Сгенерировано tools/gen_silent_gate_fx.py — правьте генератор.',
+        'style': 'silent', 'duration': -1, 'elements': main_}
     json.dump(doc, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print(f'silent_gate fx: {len(E)} elements')
-
+    doc2 = {
+        'comment': 'Эффект «Безмолвные врата» (T03), часть 2: удар по приказу (ЛКМ) — отсчёт от приказа: вспышка у руки, поле печатей неба, '
+                   'лучи градом; наведённые выстрелы во врагов — код (fx/silent_gate_beam.json). 15 с. Сгенерировано tools/gen_silent_gate_fx.py.',
+        'style': 'silent', 'duration': T(15.2), 'elements': strike}
+    json.dump(doc2, open(os.path.join(os.path.dirname(OUT), 'silent_gate_strike.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print(f'silent_gate fx: {len(main_)} elements; silent_gate_strike: {len(strike)}')
 
 if __name__ == '__main__':
     main()

@@ -27,4 +27,4 @@
   бирюзовые искры; `flash` — вспышка сферы.
 - Файлы (готовит чат идей генератором `tools/gen_silent_staff.py`): `geo/item/silent_witch_staff.geo.json`,
   `animations/item/silent_witch_staff.animation.json`, `textures/item/silent_witch_staff.png` + `_glowmask.png`, `models/item/silent_witch_staff.json`.
-- Комплект с одеждой ведьмы (T19) усиливает «Врата».
+- «Врата» с посоха кастуются **только в полном комплекте одежды ведьмы** (T19); без него посох — обычный посох с бонусами.

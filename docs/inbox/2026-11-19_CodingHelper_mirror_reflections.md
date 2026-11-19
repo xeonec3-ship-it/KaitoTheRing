@@ -52,7 +52,8 @@
 
 ## Проверка сборкой
 
-Jar'ы зависимостей скачал в облако `tools/fetch_libs.py` и voicechat с Modrinth. Результат `./gradlew build`: см. раздел ниже.
+Jar'ы зависимостей скачал в облако: `tools/fetch_libs.py` и voicechat 2.6.20 с Modrinth. `./gradlew build` прошёл: **BUILD SUCCESSFUL**,
+`pohsmp_core-1.16.0.jar`. Это проверка компиляции; в игре ничего не проверено. Jar на сервер и в сборки не раскладывал.
 
 ## Риски
 

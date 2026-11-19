@@ -630,5 +630,10 @@
   "subtitles.pohsmp_core.spell.heaven_fall.charge_thunder": "Падение небес: раскат",
   "subtitles.pohsmp_core.spell.heaven_fall.hit_boom": "Падение небес: грохот",
   "subtitles.pohsmp_core.spell.heaven_fall.hit_roar": "Падение небес: рёв",
-  "subtitles.pohsmp_core.spell.heaven_fall.loop": "Падение небес: пламя"
+  "subtitles.pohsmp_core.spell.heaven_fall.loop": "Падение небес: пламя",
+  "subtitles.pohsmp_core.spell.frost_spike_wall.cast_form": "Стена ледяных шипов: вырастает",
+  "subtitles.pohsmp_core.spell.frost_spike_wall.cast_shatter": "Стена ледяных шипов: раскалывается",
+  "subtitles.pohsmp_core.spell.frost_spike_wall.hit": "Стена ледяных шипов: раскалывается",
+  "subtitles.pohsmp_core.spell.glacial_tombs.cast_shatter": "Ледяные гробницы: раскалывается",
+  "subtitles.pohsmp_core.spell.glacial_tombs.cast_snow": "Ледяные гробницы: метёт снег"
 }

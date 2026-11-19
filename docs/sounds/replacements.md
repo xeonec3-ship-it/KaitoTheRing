@@ -36,7 +36,7 @@
 | `erased/ErasedNameSpell.java` | `onServerCastTick` | 161 | `SoundEvents.SAND_BREAK` | `pohsmp_core:spell.erased_name.charge_paper` |
 | `erased/ErasedNameSpell.java` | `onCast` | 171 | `SoundEvents.ELYTRA_FLYING` | `pohsmp_core:spell.erased_name.cast_whoosh` |
 | `illusion/IllusionAllies.java` | `onInteract` | 111 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
-| `illusion/Illusions.java` | `onTick` | 247 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.loop` |
+| `illusion/Illusions.java` | `self` | 279 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
 | `mythic/AbyssEyeSpell.java` | `getCastStartSound` | 43 | `SoundEvents.AMBIENT_CAVE` | `pohsmp_core:spell.abyss_eye.cast` |
 | `mythic/AbyssEyeSpell.java` | `castTick` | 70 | `SoundEvents.AMBIENT_SOUL_SAND_VALLEY_MOOD` | `pohsmp_core:spell.abyss_eye.charge_hum` |
 | `mythic/AbyssEyeSpell.java` | `castTick` | 71 | `SoundEvents.LIGHTNING_BOLT_THUNDER` | `pohsmp_core:spell.abyss_eye.charge_thunder` |
@@ -339,14 +339,14 @@
 | `spell/illusion/MirrorLabyrinthSpell.java` | `getCastStartSound` | 55 | `SoundEvents.AMETHYST_BLOCK_RESONATE` | `pohsmp_core:spell.mirror_labyrinth.cast_resonate` |
 | `spell/illusion/MirrorLabyrinthSpell.java` | `onCast` | 118 | `SoundEvents.GLASS_BREAK` | `pohsmp_core:spell.mirror_labyrinth.cast_shatter` |
 | `spell/illusion/MirrorLabyrinthSpell.java` | `onCast` | 119 | `SoundEvents.AMETHYST_BLOCK_RESONATE` | `pohsmp_core:spell.mirror_labyrinth.cast_resonate` |
-| `spell/illusion/MirrorLabyrinthSpell.java` | `onTick` | 190 | `SoundEvents.GLASS_BREAK` | `pohsmp_core:spell.mirror_labyrinth.hit` |
+| `spell/illusion/MirrorLabyrinthSpell.java` | `tick` | 212 | `SoundEvents.GLASS_BREAK` | `pohsmp_core:spell.mirror_labyrinth.hit` |
 | `spell/illusion/PhantomPainSpell.java` | `onCast` | 74 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.phantom_pain.cast_chime` |
 | `spell/illusion/PhantomPainSpell.java` | `onCast` | 75 | `SoundEvents.ALLAY_AMBIENT_WITHOUT_ITEM` | `pohsmp_core:spell.phantom_pain.cast_soul` |
 | `spell/illusion/PhantomPainSpell.java` | `mark` | 89 | `SoundEvents.AMETHYST_CLUSTER_HIT` | `pohsmp_core:spell.phantom_pain.hit` |
 | `spell/illusion/VeilSpell.java` | `onCast` | 90 | `SoundEvents.AMETHYST_BLOCK_RESONATE` | `pohsmp_core:spell.veil.cast_resonate` |
 | `spell/illusion/VeilSpell.java` | `onCast` | 91 | `SoundEvents.ALLAY_AMBIENT_WITHOUT_ITEM` | `pohsmp_core:spell.veil.cast_soul` |
 | `spell/illusion/WakingNightmareSpell.java` | `getCastStartSound` | 56 | `SoundEvents.SCULK_SHRIEKER_SHRIEK` | `pohsmp_core:spell.waking_nightmare.cast_roar` |
-| `spell/illusion/WakingNightmareSpell.java` | `start` | 132 | `SoundEvents.WARDEN_HEARTBEAT` | `pohsmp_core:spell.waking_nightmare.cast_heart` |
+| `spell/illusion/WakingNightmareSpell.java` | `start` | 137 | `SoundEvents.WARDEN_HEARTBEAT` | `pohsmp_core:spell.waking_nightmare.cast_heart` |
 | `spell/silent/SilentStaffSpell.java` | `getCastFinishSound` | 45 | `SoundEvents.AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.silent_staff.release` |
 | `spell/silent/WindSpearsSpell.java` | `tick` | 124 | `SoundEvents.PLAYER_ATTACK_SWEEP` | `pohsmp_core:spell.wind_spears.loop` |
 | `spell/silent/WindSpearsSpell.java` | `strike` | 184 | `SoundEvents.AMETHYST_BLOCK_BREAK` | `pohsmp_core:spell.wind_spears.hit` |

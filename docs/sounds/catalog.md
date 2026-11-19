@@ -2,7 +2,7 @@
 
 Все места, где заклинания играют ванильные `SoundEvents.*`: заклинание → школа/ступень → место (файл:строка, метод) → роль → текущий ванильный звук → наше событие. Собирается `tools/gen_spell_sounds.py --docs-only`.
 
-Мест: **348**, заклинаний: **77**, наших событий: **293**. Пропущено (уже свои / не магия): 25.
+Мест: **348**, заклинаний: **77**, наших событий: **292**. Пропущено (уже свои / не магия): 10.
 
 Роли: `cast` — начало каста; `charge` — нарастание во время каста; `release` — выпуск заклинания; `open` — раскрытие (печать, купол, разрыв); `loop` — пока действует (тики); `hit` — удар / взрыв / попадание; `end` — конец / снятие / смерть; `fail` — отказ / ошибка.
 
@@ -723,7 +723,7 @@
 |---|---|---|---|---|
 | `client/illusion/Copies.java:86` | `handle` | удар / взрыв / попадание | `PLAYER_HURT` | `pohsmp_core:spell.illusion_copies.hit_wet` |
 | `illusion/IllusionAllies.java:111` | `onInteract` | удар / взрыв / попадание | `AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
-| `illusion/Illusions.java:247` | `onTick` | пока действует (тики) | `AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.loop` |
+| `illusion/Illusions.java:279` | `self` | удар / взрыв / попадание | `AMETHYST_BLOCK_CHIME` | `pohsmp_core:spell.illusion_copies.hit_chime` |
 
 ### Отражения (`mirror_images`) — ступень: RARE
 
@@ -739,7 +739,7 @@
 | `spell/illusion/MirrorLabyrinthSpell.java:55` | `getCastStartSound` | начало каста | `AMETHYST_BLOCK_RESONATE` | `pohsmp_core:spell.mirror_labyrinth.cast_resonate` |
 | `spell/illusion/MirrorLabyrinthSpell.java:118` | `onCast` | начало каста | `GLASS_BREAK` | `pohsmp_core:spell.mirror_labyrinth.cast_shatter` |
 | `spell/illusion/MirrorLabyrinthSpell.java:119` | `onCast` | начало каста | `AMETHYST_BLOCK_RESONATE` | `pohsmp_core:spell.mirror_labyrinth.cast_resonate` |
-| `spell/illusion/MirrorLabyrinthSpell.java:190` | `onTick` | удар / взрыв / попадание | `GLASS_BREAK` | `pohsmp_core:spell.mirror_labyrinth.hit` |
+| `spell/illusion/MirrorLabyrinthSpell.java:212` | `tick` | удар / взрыв / попадание | `GLASS_BREAK` | `pohsmp_core:spell.mirror_labyrinth.hit` |
 
 ### Фантомная боль (`phantom_pain`) — ступень: UNCOMMON
 
@@ -767,7 +767,7 @@
 | место | метод | роль | ванильный звук | наше событие |
 |---|---|---|---|---|
 | `spell/illusion/WakingNightmareSpell.java:56` | `getCastStartSound` | начало каста | `SCULK_SHRIEKER_SHRIEK` | `pohsmp_core:spell.waking_nightmare.cast_roar` |
-| `spell/illusion/WakingNightmareSpell.java:132` | `start` | начало каста | `WARDEN_HEARTBEAT` | `pohsmp_core:spell.waking_nightmare.cast_heart` |
+| `spell/illusion/WakingNightmareSpell.java:137` | `start` | начало каста | `WARDEN_HEARTBEAT` | `pohsmp_core:spell.waking_nightmare.cast_heart` |
 
 ## Пропущено
 
@@ -775,28 +775,13 @@
 |---|---|---|
 | `Reg.java:164` | `WARDEN_HEARTBEAT` | школа Кошмаров — уже свои звуки (nightmare.heartbeat) |
 | `silent/SilentWitchArmor.java:179` | `ARMOR_EQUIP_LEATHER` | не магия: звук надевания мантии |
-| `nightmare/EndlessNightSpell.java:49` | `WARDEN_HEARTBEAT` | Кошмары — уже свои звуки (nightmare.cast_night) |
-| `nightmare/EndlessNightSpell.java:105` | `WARDEN_HEARTBEAT` | Кошмары — уже свои звуки (nightmare.cast_night) |
-| `nightmare/EndlessNightSpell.java:106` | `AMBIENT_CAVE` | Кошмары — уже свои звуки (nightmare.cast_night) |
-| `nightmare/NightmareMob.java:234` | `ALLAY_AMBIENT_WITHOUT_ITEM` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:235` | `VEX_AMBIENT` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:250` | `SOUL_ESCAPE` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:262` | `ENDERMAN_SCREAM` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:283` | `GHAST_SCREAM` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:284` | `GHAST_AMBIENT` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:293` | `SLIME_SQUISH` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:302` | `PHANTOM_FLAP` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:314` | `RAVAGER_ROAR` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:315` | `WARDEN_ROAR` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:319` | `SKELETON_STEP` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:323` | `SPIDER_AMBIENT` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:329` | `VILLAGER_AMBIENT` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:342` | `WARDEN_ROAR` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:380` | `PLAYER_HURT` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:383` | `EVOKER_FANGS_ATTACK` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:384` | `MUD_BREAK` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:385` | `PHANTOM_BITE` | Кошмары — уже свои звуки (nightmare.*) |
-| `nightmare/NightmareMob.java:406` | `HONEY_BLOCK_SLIDE` | Кошмары — уже свои звуки (nightmare.*) |
-| `client/nightmare/NightmareClient.java:88` | `WARDEN_HEARTBEAT` | Кошмары — уже свои звуки (nightmare.heartbeat) |
+| `nightmare/NightmareMob.java:303` | `SOUL_ESCAPE` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/NightmareMob.java:315` | `ENDERMAN_SCREAM` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/NightmareMob.java:371` | `SKELETON_STEP` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/NightmareMob.java:383` | `VILLAGER_AMBIENT` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/NightmareMob.java:396` | `WARDEN_ROAR` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/NightmareMob.java:434` | `PLAYER_HURT` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/NightmareMob.java:438` | `MUD_BREAK` | Кошмары — уже свои звуки (nightmare.*) |
+| `nightmare/NightmareMob.java:440` | `PHANTOM_BITE` | Кошмары — уже свои звуки (nightmare.*) |
 
 Также уже свои и не трогаются: музыка Врат (`music.silent_gate*`), Ковена (`music.coven_arrival`), Сна бабочки (`music.butterfly_dream`), все `nightmare.*`.

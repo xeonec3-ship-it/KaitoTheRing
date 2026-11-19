@@ -630,5 +630,10 @@
   "subtitles.pohsmp_core.spell.heaven_fall.charge_thunder": "Heaven's Fall: thunderclap",
   "subtitles.pohsmp_core.spell.heaven_fall.hit_boom": "Heaven's Fall: blast",
   "subtitles.pohsmp_core.spell.heaven_fall.hit_roar": "Heaven's Fall: roar",
-  "subtitles.pohsmp_core.spell.heaven_fall.loop": "Heaven's Fall: flames"
+  "subtitles.pohsmp_core.spell.heaven_fall.loop": "Heaven's Fall: flames",
+  "subtitles.pohsmp_core.spell.frost_spike_wall.cast_form": "Frost Spike Wall: forms",
+  "subtitles.pohsmp_core.spell.frost_spike_wall.cast_shatter": "Frost Spike Wall: shatters",
+  "subtitles.pohsmp_core.spell.frost_spike_wall.hit": "Frost Spike Wall: shatters",
+  "subtitles.pohsmp_core.spell.glacial_tombs.cast_shatter": "Glacial Tombs: shatters",
+  "subtitles.pohsmp_core.spell.glacial_tombs.cast_snow": "Glacial Tombs: snow swirls"
 }

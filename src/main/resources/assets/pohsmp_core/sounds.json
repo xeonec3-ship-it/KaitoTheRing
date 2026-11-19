@@ -685,5 +685,74 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.frost_spike_wall.cast_form": {
+    "subtitle": "subtitles.pohsmp_core.spell.frost_spike_wall.cast_form",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ice/frost_spike_wall_cast_form_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ice/frost_spike_wall_cast_form_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.frost_spike_wall.cast_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.frost_spike_wall.cast_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ice/frost_spike_wall_cast_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ice/frost_spike_wall_cast_shatter_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.frost_spike_wall.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.frost_spike_wall.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ice/frost_spike_wall_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ice/frost_spike_wall_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ice/frost_spike_wall_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.glacial_tombs.cast_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.glacial_tombs.cast_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ice/glacial_tombs_cast_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ice/glacial_tombs_cast_shatter_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.glacial_tombs.cast_snow": {
+    "subtitle": "subtitles.pohsmp_core.spell.glacial_tombs.cast_snow",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/ice/glacial_tombs_cast_snow_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/ice/glacial_tombs_cast_snow_2",
+        "volume": 0.5
+      }
+    ]
   }
 }

@@ -466,5 +466,117 @@
   "replaces": [
    "BLAZE_SHOOT"
   ]
+ },
+ {
+  "school": "ice",
+  "school_ru": "Лёд",
+  "spell": "frost_spike_wall",
+  "spell_ru": "Стена ледяных шипов",
+  "event": "pohsmp_core:spell.frost_spike_wall.cast_form",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ice/frost_spike_wall_cast_form_1.ogg",
+   "spell/ice/frost_spike_wall_cast_form_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frost_spike_wall_cast_form_1.mp3",
+   "docs/sounds/mp3/frost_spike_wall_cast_form_2.mp3"
+  ],
+  "what": "кристалл/стекло встаёт — начало каста (подпись школы: хрусталь, треск и звон льда, холодный ветер)",
+  "where": "FrostSpikeWallSpell.java build()",
+  "replaces": [
+   "GLASS_PLACE"
+  ]
+ },
+ {
+  "school": "ice",
+  "school_ru": "Лёд",
+  "spell": "frost_spike_wall",
+  "spell_ru": "Стена ледяных шипов",
+  "event": "pohsmp_core:spell.frost_spike_wall.cast_shatter",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ice/frost_spike_wall_cast_shatter_1.ogg",
+   "spell/ice/frost_spike_wall_cast_shatter_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frost_spike_wall_cast_shatter_1.mp3",
+   "docs/sounds/mp3/frost_spike_wall_cast_shatter_2.mp3"
+  ],
+  "what": "раскол, осколки — начало каста (подпись школы: хрусталь, треск и звон льда, холодный ветер)",
+  "where": "FrostSpikeWallSpell.java build()",
+  "replaces": [
+   "AMETHYST_BLOCK_BREAK"
+  ]
+ },
+ {
+  "school": "ice",
+  "school_ru": "Лёд",
+  "spell": "frost_spike_wall",
+  "spell_ru": "Стена ледяных шипов",
+  "event": "pohsmp_core:spell.frost_spike_wall.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/ice/frost_spike_wall_hit_1.ogg",
+   "spell/ice/frost_spike_wall_hit_2.ogg",
+   "spell/ice/frost_spike_wall_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/frost_spike_wall_hit_1.mp3",
+   "docs/sounds/mp3/frost_spike_wall_hit_2.mp3",
+   "docs/sounds/mp3/frost_spike_wall_hit_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: хрусталь, треск и звон льда, холодный ветер)",
+  "where": "FrostSpikeWallSpell.java tick()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "ice",
+  "school_ru": "Лёд",
+  "spell": "glacial_tombs",
+  "spell_ru": "Ледяные гробницы",
+  "event": "pohsmp_core:spell.glacial_tombs.cast_shatter",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ice/glacial_tombs_cast_shatter_1.ogg",
+   "spell/ice/glacial_tombs_cast_shatter_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/glacial_tombs_cast_shatter_1.mp3",
+   "docs/sounds/mp3/glacial_tombs_cast_shatter_2.mp3"
+  ],
+  "what": "раскол, осколки — начало каста (подпись школы: хрусталь, треск и звон льда, холодный ветер)",
+  "where": "GlacialTombsSpell.java onCast()",
+  "replaces": [
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "ice",
+  "school_ru": "Лёд",
+  "spell": "glacial_tombs",
+  "spell_ru": "Ледяные гробницы",
+  "event": "pohsmp_core:spell.glacial_tombs.cast_snow",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/ice/glacial_tombs_cast_snow_1.ogg",
+   "spell/ice/glacial_tombs_cast_snow_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/glacial_tombs_cast_snow_1.mp3",
+   "docs/sounds/mp3/glacial_tombs_cast_snow_2.mp3"
+  ],
+  "what": "снег и мороз — начало каста (подпись школы: хрусталь, треск и звон льда, холодный ветер)",
+  "where": "GlacialTombsSpell.java onCast()",
+  "replaces": [
+   "POWDER_SNOW_PLACE"
+  ]
  }
 ]

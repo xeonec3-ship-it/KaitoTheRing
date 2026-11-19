@@ -1,0 +1,151 @@
+{
+ "comment": "Табу, каст 25 с (ролик камеры): печать под кастером, искры, ярусы-печати поднимаются по растущему столбу, великая печать в небе дорастает до размера зоны; пузырь вокруг кастера, в конце — ливень лучей и засветка.",
+ "style": "divine",
+ "duration": 500,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "taboo_ground",
+   "until": 500
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster",
+   "duration": 480,
+   "texture": "spark_soft",
+   "count": 1440,
+   "rate": 3,
+   "area": 3.2,
+   "speed": 0.015,
+   "gravity": -0.004,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "vortex",
+   "delay": 60,
+   "at": "caster",
+   "duration": 440,
+   "radius": 3.2,
+   "height": 6,
+   "arms": 4,
+   "speed": 1.0,
+   "pull": 0,
+   "texture": "rune_taboo",
+   "color": "@primary",
+   "comment": "вихрь рун вокруг кастера (рисует движок элементов; если тип не поддержан — пропускается)"
+  },
+  {
+   "type": "beam",
+   "delay": 150,
+   "at": "caster",
+   "to": "caster+0,56,0",
+   "duration": 350,
+   "width": 2.6,
+   "core": 0.28,
+   "grow": 130,
+   "flicker": 0.1,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "delay": 150,
+   "at": "caster+0,10,0",
+   "id": "taboo_tier_0",
+   "until": 500
+  },
+  {
+   "type": "sigil",
+   "delay": 180,
+   "at": "caster+0,22,0",
+   "id": "taboo_tier_1",
+   "until": 500
+  },
+  {
+   "type": "sigil",
+   "delay": 210,
+   "at": "caster+0,34,0",
+   "id": "taboo_tier_2",
+   "until": 500
+  },
+  {
+   "type": "sigil",
+   "delay": 240,
+   "at": "caster+0,46,0",
+   "id": "taboo_tier_3",
+   "until": 500
+  },
+  {
+   "type": "sigil",
+   "delay": 280,
+   "at": "caster+0,56,0",
+   "id": "taboo_sky_cast",
+   "until": 500
+  },
+  {
+   "type": "wave",
+   "delay": 380,
+   "at": "caster+0,1.2,0",
+   "duration": 110,
+   "shape": "sphere",
+   "radius": 4.5,
+   "rim": 1.0,
+   "color": "@primary"
+  },
+  {
+   "type": "curtain",
+   "delay": 400,
+   "at": "caster",
+   "duration": 100,
+   "radius": [
+    5,
+    9
+   ],
+   "count": 24,
+   "height": 56,
+   "grow": 40,
+   "fromTop": true,
+   "width": [
+    0.1,
+    0.3
+   ],
+   "brightness": [
+    0.3,
+    0.7
+   ],
+   "texture": "beam_fade",
+   "color": "@secondary"
+  },
+  {
+   "type": "beam_rain",
+   "delay": 440,
+   "at": "caster",
+   "duration": 60,
+   "area": 22,
+   "count": 36,
+   "interval": 2,
+   "width": 0.35,
+   "height": 40,
+   "impact": "golden_halo",
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 490,
+   "at": "caster+0,1.5,0",
+   "duration": 12,
+   "size": 9,
+   "anamorphic": 34,
+   "rays": 16,
+   "screen": 0.6,
+   "color": "#FFFFFF"
+  }
+ ]
+}

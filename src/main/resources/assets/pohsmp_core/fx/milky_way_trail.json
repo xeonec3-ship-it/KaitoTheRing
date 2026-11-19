@@ -1,0 +1,45 @@
+{
+ "comment": "Млечный путь: звёзды и пыль вокруг летящей галактики (следует за ней).",
+ "style": "astral",
+ "duration": 160,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 160,
+   "texture": "spark_sharp",
+   "count": 640,
+   "rate": 4,
+   "spread": 6,
+   "speed": 0.02,
+   "size": [
+    0.3,
+    0.04
+   ],
+   "spin": 200,
+   "life": 24,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 160,
+   "texture": "glow",
+   "count": 80,
+   "rate": 0.5,
+   "spread": 5,
+   "speed": 0.01,
+   "size": [
+    2.5,
+    4
+   ],
+   "life": 40,
+   "color": "#5A3AB0",
+   "brightness": 0.4
+  }
+ ]
+}

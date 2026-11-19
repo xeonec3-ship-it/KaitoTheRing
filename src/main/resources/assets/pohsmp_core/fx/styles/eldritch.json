@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «eldritch» для знаков при касте (fx/school_eldritch.json): потустороннее: щупальца с завитками, бирюзовые огоньки.",
+ "palette": {
+  "primary": "#3FD6B8",
+  "secondary": "#B8FFF0",
+  "core": "#FFFFFF",
+  "shadow": "#0A3A30"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_eldritch_band",
+  "shards": "soul_mote",
+  "sigil": "sigil_eldritch"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

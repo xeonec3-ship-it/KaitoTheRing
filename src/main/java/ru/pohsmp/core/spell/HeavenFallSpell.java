@@ -29,7 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Mythic, level 1. "Heaven's Fall": a 10 s cast under a darkening sky, then for 20 s meteors rain within 20 blocks of the cast point.
@@ -44,8 +44,7 @@ public class HeavenFallSpell extends PohSpell {
 
     private static final class Cast {
         Vec3 at;
-        int age;
-        final List<Integer> keys = new ArrayList<>();
+        int age, fx = -1;
     }
 
     private static final Map<UUID, Cast> CASTS = new HashMap<>();
@@ -87,11 +86,8 @@ public class HeavenFallSpell extends PohSpell {
             c = CASTS.get(caster.getUUID());
         }
         c.age++;
-        if (c.age % 50 == 1 && c.keys.size() < 4) {   // the sky closes in rings
-            int k = HigherSpell.key();
-            c.keys.add(k);
-            double y = c.at.y + 30 + c.keys.size() * 3;
-            HigherSpell.fx(sl, c.at.x, y, c.at.z, new Net.HFx(Net.HFx.SKY, k, -1, -1, CAST + RAIN, c.at.x, y, c.at.z, (float) (R + 6 - c.keys.size() * 3), COLOR));
+        if (c.age == 1) c.fx = Fx.play(sl, Fx.fx("heaven_fall").at(c.at).yaw(caster.getYRot()));   // the sky closes in four rings of fire
+        if (c.age % 50 == 1 && c.age <= 151) {
             sl.playSound(null, c.at.x, c.at.y, c.at.z, SoundEvents.AMBIENT_CAVE.value(), SoundSource.PLAYERS, 4f, 0.5f);
         }
         if (c.age % 3 == 0)
@@ -114,7 +110,7 @@ public class HeavenFallSpell extends PohSpell {
     @Override
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity entity, MagicData md, boolean cancelled) {
         Cast c = CASTS.remove(entity.getUUID());
-        if (c != null && level instanceof ServerLevel sl) for (int k : c.keys) HigherSpell.stop(sl, c.at.x, c.at.y + 30, c.at.z, k);
+        if (c != null && c.fx >= 0 && level instanceof ServerLevel sl) Fx.stop(sl, c.fx, "");
         super.onServerCastComplete(level, spellLevel, entity, md, cancelled);
     }
 
@@ -140,7 +136,7 @@ public class HeavenFallSpell extends PohSpell {
                     meteor(sl, caster, ground(sl, caster, p.add(0, 6, 0)));
                 }
                 if (age > RAIN + WARN + FALL) {
-                    for (int k : cast.keys) HigherSpell.stop(sl, o.x, o.y + 30, o.z, k);
+                    if (cast.fx >= 0) Fx.stop(sl, cast.fx, "");
                     return false;
                 }
                 return true;
@@ -156,6 +152,7 @@ public class HeavenFallSpell extends PohSpell {
             @Override
             public boolean tick() {
                 age++;
+                if (age == 1) Fx.play(sl, Fx.fx("meteor").at(c).yaw(sl.random.nextFloat() * 360));   // mark, fiery trail, impact (in sync with the rock)
                 if (age <= WARN) {
                     if (age % 2 == 0) {
                         int n = 18;
@@ -181,7 +178,6 @@ public class HeavenFallSpell extends PohSpell {
                 if (f < FALL) return true;
                 Disp.kill(rock);
                 Disp.kill(core);
-                HigherSpell.burst(sl, c.x, c.y + 0.1, c.z, HIT_R * 1.4, COLOR);
                 DivineEvents.particle(sl, ParticleTypes.EXPLOSION_EMITTER, c.x, c.y + 0.5, c.z, 1, 0, 0);
                 DivineEvents.particle(sl, ParticleTypes.LAVA, c.x, c.y + 0.5, c.z, 25, HIT_R * 0.4, 0.1);
                 sl.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 3f, 0.7f);

@@ -540,6 +540,105 @@ def chain_band():
 FX_OUT = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core', 'textures', 'fx')
 
 
+def _scroll(d, cx, cy, r, a0, turns, cw, width):
+    """Завиток-волюта: спираль от радиуса r внутрь, начало под углом a0."""
+    pts = []
+    n = int(90 * turns)
+    for k in range(n + 1):
+        u = k / n
+        th = a0 + cw * 2 * math.pi * turns * u
+        rho = r * (1 - 0.85 * u)
+        pts.append((cx + rho * math.cos(th), cy + rho * math.sin(th)))
+    d.line(pts, fill=255, width=int(width), joint='curve')
+
+
+def _diamond(d, cx, cy, w, h, width, fill=None):
+    pts = [(cx, cy - h), (cx + w, cy), (cx, cy + h), (cx - w, cy), (cx, cy - h)]
+    if fill is not None:
+        d.polygon(pts[:4], fill=fill)
+    d.line(pts, fill=255, width=int(width), joint='curve')
+
+
+def silent_nimbus():
+    """Нимб «Безмолвной ведьмы» (за вратами, по кадрам аниме): двойной обод, лента мелкого текста, пояс симметричных завитков
+    с ромбами, внутреннее кольцо, малые завитки и ромбы в центре."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    ring(d, C * 0.97, 5 * SS)
+    ring(d, C * 0.93, 2 * SS)
+    ring(d, C * 0.845, 3 * SS)
+    rng = random.Random(77)                       # лента мелкого «текста»: короткие штрихи разной длины
+    n = 220
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        h = rng.choice([0.012, 0.018, 0.024, 0.03])
+        r0 = C * (0.865 + rng.random() * 0.02)
+        d.line([polar(r0, a), polar(r0 + C * h, a + rng.uniform(-0.004, 0.004))], fill=255, width=2 * SS)
+        if rng.random() < 0.3:
+            d.line([polar(C * 0.875, a), polar(C * 0.875, a + 0.012)], fill=255, width=2 * SS)
+    k = 6                                         # пояс плавных волн-лоз: волна вдоль кольца, на концах — волюты внутрь и наружу
+    for i in range(k):
+        base = 2 * math.pi * i / k - math.pi / 2
+        span = 2 * math.pi / k * 0.78
+        pts = []
+        for j in range(160):
+            t = j / 159
+            a = base - span / 2 + span * t
+            r = C * (0.72 + 0.07 * math.sin(2 * math.pi * t))
+            pts.append(polar(r, a))
+        d.line(pts, fill=255, width=5 * SS, joint='curve')
+        a_end = base - span / 2
+        _scroll(d, *polar(C * 0.70, a_end), C * 0.05, a_end + math.pi / 2, 1.4, -1, 4 * SS)
+        a_end = base + span / 2
+        _scroll(d, *polar(C * 0.74, a_end), C * 0.05, a_end - math.pi / 2, 1.4, 1, 4 * SS)
+        for t, side in ((0.25, 1), (0.75, -1)):   # листики-усики от гребней волны
+            a = base - span / 2 + span * t
+            r = C * (0.72 + 0.07 * math.sin(2 * math.pi * t))
+            _scroll(d, *polar(r - side * C * 0.055, a + 0.05), C * 0.035, a, 1.1, side, 3 * SS)
+        dx, dy = polar(C * 0.735, base + math.pi / k)
+        _diamond(d, dx, dy, C * 0.03, C * 0.05, 3 * SS)
+        _diamond(d, dx, dy, C * 0.01, C * 0.018, 2 * SS, fill=255)
+    ring(d, C * 0.57, 4 * SS)
+    ring(d, C * 0.535, 2 * SS)
+    for i in range(k):                            # малые завитки внутри и ромбы-лучи
+        base = 2 * math.pi * (i + 0.5) / k - math.pi / 2
+        cx, cy = polar(C * 0.38, base)
+        _scroll(d, cx, cy, C * 0.06, base + math.pi / 2, 1.25, 1, 4 * SS)
+        _scroll(d, cx, cy, C * 0.06, base - math.pi / 2, 1.25, -1, 4 * SS)
+        _diamond(d, *polar(C * 0.47, base + math.pi / k), C * 0.02, C * 0.035, 2 * SS)
+    ring(d, C * 0.2, 4 * SS)
+    ring(d, C * 0.12, 2 * SS)
+    save(img, 'silent_nimbus')
+
+
+def silent_coin():
+    """Золотой резной круг (ряд кругов перед ведьмой): толстый обод с насечками, кольцо бусин, розетка из дуг в центре."""
+    img = canvas()
+    d = ImageDraw.Draw(img)
+    d.ellipse([C - C * 0.96, C - C * 0.96, C + C * 0.96, C + C * 0.96], fill=70)      # полупрозрачный диск — круг «плотный»
+    ring(d, C * 0.96, 9 * SS)
+    ring(d, C * 0.86, 3 * SS)
+    for i in range(48):
+        a = 2 * math.pi * i / 48
+        d.line([polar(C * 0.865, a), polar(C * 0.93, a)], fill=255, width=2 * SS)
+    for i in range(16):
+        a = 2 * math.pi * (i + 0.5) / 16
+        x, y = polar(C * 0.74, a)
+        r = C * 0.06
+        d.ellipse([x - r, y - r, x + r, y + r], outline=255, width=3 * SS)
+    ring(d, C * 0.62, 4 * SS)
+    for i in range(8):                            # розетка: восемь перекрывающихся кругов-лепестков
+        a = 2 * math.pi * i / 8
+        x, y = polar(C * 0.2, a)
+        r = C * 0.2
+        d.ellipse([x - r, y - r, x + r, y + r], outline=255, width=3 * SS)
+    for i in range(8):
+        a = 2 * math.pi * (i + 0.5) / 8
+        _scroll(d, *polar(C * 0.47, a), C * 0.05, a, 1.2, 1, 3 * SS)
+    ring(d, C * 0.1, 5 * SS)
+    save(img, 'silent_coin')
+
+
 def save_fx(img, name, size=128, blur=0.0):
     small = img.resize((size, size), Image.LANCZOS)
     if blur:
@@ -641,3 +740,5 @@ if __name__ == '__main__':
     dodeca_ring()
     hex_ring()
     beam_fade()
+    silent_nimbus()
+    silent_coin()

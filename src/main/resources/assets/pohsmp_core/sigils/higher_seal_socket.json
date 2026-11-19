@@ -1,0 +1,13 @@
+{
+  "comment": "Печать запрета: маленький вращающийся круг-гнездо на земле под каждой руной.",
+  "size": 0.5, "color": "#FF3B3B", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.2, "color": "#7A0A1E",
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "rim", "type": "disc", "texture": "rim", "radius": 1.0, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutBack", "modes": ["grow"] }, "rotation": { "speed": 60 } },
+    { "id": "spokes", "type": "spokes", "texture": "spokes", "radius": 0.6, "heightOffset": 0.02, "color": "#FF8A7A",
+      "appear": { "delay": 2, "duration": 6, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "rotation": { "speed": -120 } }
+  ],
+  "dissolve": { "modes": ["shatter"], "duration": 10 }
+}

@@ -1,0 +1,15 @@
+{
+  "comment": "Колыбель кошмара: цель проснулась сама, в ужасе, и её отбрасывает — тёмная волна, вспышка, рваные огоньки, мир у проснувшегося на миг темнеет, на земле гаснет след колыбели. Играть с caster = цель.",
+  "style": "higher",
+  "duration": 40,
+  "elements": [
+    { "type": "flash", "delay": 0, "duration": 10, "at": "caster+0,1,0", "size": 3.2, "rays": 8, "anamorphic": 6, "color": "#8A4DFF" },
+    { "type": "wave", "shape": "ring", "delay": 0, "duration": 18, "at": "caster", "radius": 3.5, "color": "#8A4DFF" },
+    { "type": "wave", "shape": "sphere", "delay": 0, "duration": 12, "at": "caster+0,1,0", "radius": 2.5, "rim": 1.0, "color": "#5A2AAA" },
+    { "type": "sprites", "delay": 0, "duration": 30, "at": "caster+0,1,0", "texture": "soul_mote", "count": 40, "rate": 0, "spread": 0.4, "speed": 0.16,
+      "gravity": 0.004, "size": [0.3, 0.05], "life": 26, "color": "#6A3ADF" },
+    { "type": "decal", "delay": 0, "duration": 40, "at": "caster", "texture": "cradle_dream", "radius": 1.8, "fadeOut": 34, "color": "#5A2AAA" },
+    { "type": "tint", "delay": 0, "duration": 30, "at": "caster", "radius": 2.5, "color": "#2A0A4A", "strength": 0.5,
+      "out": { "duration": 24, "easing": "easeInSine" } }
+  ]
+}

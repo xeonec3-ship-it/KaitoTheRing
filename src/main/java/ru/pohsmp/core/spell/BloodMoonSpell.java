@@ -16,7 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /** Higher: a crimson moon hangs over the caster for 20 s; enemies within 16 lose 1% of max health each second, the caster heals by the sum. */
 public class BloodMoonSpell extends HigherSpell {
@@ -42,8 +42,7 @@ public class BloodMoonSpell extends HigherSpell {
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
         if (level instanceof ServerLevel sl) {
-            int k = key();
-            fx(sl, caster.getX(), caster.getY(), caster.getZ(), new Net.HFx(Net.HFx.MOON, k, caster.getId(), -1, LIFE, caster.getX(), caster.getY(), caster.getZ(), (float) R, COLOR));
+            int k = Fx.play(sl, Fx.fx("blood_moon").caster(caster).duration(LIFE));   // red moon overhead, blood seal underfoot, world turns red
             Tasks.add(new Tasks.Task() {
                 int age;
 
@@ -51,7 +50,7 @@ public class BloodMoonSpell extends HigherSpell {
                 public boolean tick() {
                     age++;
                     if (!caster.isAlive() || caster.isRemoved()) {
-                        stop(sl, caster.getX(), caster.getY(), caster.getZ(), k);
+                        Fx.stop(sl, k, "");
                         return false;
                     }
                     Vec3 c = caster.position();
@@ -62,18 +61,14 @@ public class BloodMoonSpell extends HigherSpell {
                         }
                     if (age % 20 == 0) {
                         float sum = 0;
+                        int threads = 0;
                         for (LivingEntity e : around(sl, c, R, e -> !friendly(caster, e))) {
                             float before = e.getHealth();
                             hurt(sl, caster, e, dmg(e.getMaxHealth() * PCT));
                             float lost = Math.max(0, before - e.getHealth());
                             sum += lost;
-                            if (lost > 0) {   // a thread of blood to the caster
-                                Vec3 a = e.position().add(0, e.getBbHeight() * 0.6, 0), b = c.add(0, caster.getBbHeight() * 0.6, 0);
-                                for (int i = 0; i <= 8; i++) {
-                                    Vec3 p = a.lerp(b, i / 8.0);
-                                    DivineEvents.particle(sl, RED, p.x, p.y + Math.sin(i * 0.4) * 0.4, p.z, 1, 0.02, 0);
-                                }
-                            }
+                            if (lost > 0 && threads++ < 8)   // a thread of blood to the caster
+                                Fx.play(sl, Fx.fx("blood_drain").at(e.position()).caster(caster).target(e));
                         }
                         if (sum > 0) caster.heal(sum);
                         sl.playSound(null, c.x, c.y, c.z, SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 2f, 0.6f);

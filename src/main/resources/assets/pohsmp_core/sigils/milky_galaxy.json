@@ -1,0 +1,113 @@
+{
+ "comment": "Млечный путь: катящаяся галактика (вертикальная, к направлению полёта), рукава вращаются.",
+ "size": 6.0,
+ "color": "#A07CFF",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.9,
+   "heightOffset": -0.02,
+   "brightness": 0.5,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 16
+   }
+  },
+  {
+   "id": "arms",
+   "type": "disc",
+   "texture": "galaxy_arms",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "twist": -200,
+   "appear": {
+    "delay": 0,
+    "duration": 16,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "twist"
+    ]
+   },
+   "rotation": {
+    "speed": -140
+   }
+  },
+  {
+   "id": "stars",
+   "type": "disc",
+   "texture": "galaxy_stars",
+   "radius": 1.05,
+   "heightOffset": 0.01,
+   "color": "#D8DCFF",
+   "appear": {
+    "delay": 4,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -90
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "orbit_stars",
+   "radius": 1.2,
+   "heightOffset": 0.02,
+   "appear": {
+    "delay": 8,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 40
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "spark_soft",
+   "radius": 0.3,
+   "heightOffset": 0.03,
+   "color": "#FFFFFF",
+   "brightness": 1.2,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow"
+    ]
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "shatter"
+  ],
+  "duration": 24,
+  "stagger": 2
+ }
+}

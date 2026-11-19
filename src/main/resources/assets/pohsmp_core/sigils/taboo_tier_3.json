@@ -1,0 +1,78 @@
+{
+ "comment": "Табу, каст: ярус столба (circle_taboo), раскрывается разворотом и вращается.",
+ "size": 10,
+ "color": "#FFD36B",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.8,
+   "heightOffset": -0.02,
+   "brightness": 0.3,
+   "appear": {
+    "delay": 0,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "pattern",
+   "type": "disc",
+   "texture": "circle_taboo",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 24,
+    "easing": "easeOutBack",
+    "modes": [
+     "unfold",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -12,
+    "boost": 4
+   }
+  },
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.1,
+   "heightOffset": 0.01,
+   "brightness": 0.7,
+   "inner": 0.98,
+   "repeat": 1,
+   "appear": {
+    "delay": 10,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.2,
+  "duration": 8,
+  "sparks": 16
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

@@ -90,13 +90,67 @@ public abstract class SilentSpell extends SilentStaffSpell {
         return !friendly(caster, le) && le.isPickable();
     }
 
-    /** A real enemy: a monster, a mob hunting the caster, a player, or whoever hurt the caster lately. Animals are left alone. */
+    /**
+     * Silent Witch magic only hurts hostile creatures (owner 19.11): monsters, mobs hunting the caster or its allies, CNPC NPCs
+     * of factions hostile to the caster (or attacking it), and a player only for a while after that player hit the caster
+     * ({@link Aggro}, [silent_staff] playerAggroSeconds, renewed by every hit). Peaceful animals, villagers, tamed pets - never.
+     */
     public static boolean enemy(LivingEntity caster, Entity e) {
         if (!hittable(caster, e)) return false;
         LivingEntity le = (LivingEntity) e;
-        if (le instanceof Enemy || le instanceof Player) return true;
-        if (le instanceof Mob m && m.getTarget() == caster) return true;
+        if (le instanceof Player p) return Aggro.hostile(caster, p);
+        if (le instanceof Mob m && m.getTarget() != null && (m.getTarget() == caster || friendly(caster, m.getTarget()))) return true;
+        if (ru.pohsmp.core.spell.CnpcHooks.isNpc(le)) return caster instanceof Player p && npcHostile(le, p);
+        if (le instanceof Enemy) return true;
         return caster.getLastHurtByMob() == le || caster.getLastHurtMob() == le;
+    }
+
+    /** Players who hit someone lately: they count as hostile to that one for playerAggroSeconds after the last hit. */
+    public static final class Aggro {
+        private Aggro() {}
+
+        /** victim -> (player -> game time of the last hit) */
+        private static final java.util.Map<java.util.UUID, java.util.Map<java.util.UUID, Long>> HITS = new java.util.HashMap<>();
+
+        private static long window() {
+            return 20L * cfg(ru.pohsmp.core.ServerConfig.SILENT_PLAYER_AGGRO::get, 60);
+        }
+
+        public static boolean hostile(LivingEntity victim, Player p) {
+            if (victim == null) return false;
+            var m = HITS.get(victim.getUUID());
+            Long t = m == null ? null : m.get(p.getUUID());
+            return t != null && victim.level().getGameTime() - t <= window();
+        }
+
+        @net.minecraftforge.eventbus.api.SubscribeEvent
+        public static void onHurt(net.minecraftforge.event.entity.living.LivingHurtEvent e) {
+            LivingEntity v = e.getEntity();
+            if (v.level().isClientSide || !(e.getSource().getEntity() instanceof Player p) || p == v) return;
+            long now = v.level().getGameTime();
+            var m = HITS.computeIfAbsent(v.getUUID(), k -> new java.util.HashMap<>());
+            m.put(p.getUUID(), now);
+            if (HITS.size() > 256) HITS.values().forEach(x -> x.values().removeIf(t -> now - t > window()));
+            HITS.values().removeIf(java.util.Map::isEmpty);
+        }
+
+        @net.minecraftforge.eventbus.api.SubscribeEvent
+        public static void onStopping(net.minecraftforge.event.server.ServerStoppingEvent e) {
+            HITS.clear();
+        }
+    }
+
+    /** CNPC: the NPC's faction is aggressive to this player (read by reflection; false if CNPC changed or is missing). */
+    private static boolean npcHostile(LivingEntity npc, Player p) {
+        try {
+            Object faction = npc.getClass().getField("faction").get(npc);
+            if (faction == null) return false;
+            for (java.lang.reflect.Method m : faction.getClass().getMethods())
+                if (m.getName().equals("isAggressiveToPlayer") && m.getParameterCount() == 1 && m.getParameterTypes()[0].isInstance(p))
+                    return Boolean.TRUE.equals(m.invoke(faction, p));
+        } catch (ReflectiveOperationException | RuntimeException ignored) {
+        }
+        return false;
     }
 
     /** Living in a cone (full angle in degrees) from the eye along the look, sorted by the angle to the aim (nearest to the crosshair first). */
@@ -104,7 +158,7 @@ public abstract class SilentSpell extends SilentStaffSpell {
         double cos = Math.cos(Math.toRadians(fullDeg / 2));
         List<LivingEntity> out = new ArrayList<>();
         List<double[]> ang = new ArrayList<>();
-        for (Entity e : sl.getEntities(caster, new AABB(eye, eye).inflate(range), e -> hittable(caster, e))) {
+        for (Entity e : sl.getEntities(caster, new AABB(eye, eye).inflate(range), e -> enemy(caster, e))) {
             LivingEntity le = (LivingEntity) e;
             Vec3 to = aimPoint(le).subtract(eye);
             double d = to.length();

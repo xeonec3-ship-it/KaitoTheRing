@@ -1,0 +1,25 @@
+{
+ "comment": "Души: бирюза на чёрном; огоньки душ, клетки, спирали.",
+ "palette": {
+  "primary": "#46E0D8",
+  "secondary": "#0B4F57",
+  "core": "#DFFFFB",
+  "shadow": "#020A0C"
+ },
+ "textures": {
+  "sparks": "soul_mote",
+  "runes": "rune_band",
+  "shards": "soul_mote",
+  "sigil": "spiral_ring"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.6,
+  "jitter": 0.0,
+  "easing": "easeOutSine",
+  "pulse": {
+   "amp": 0.3,
+   "period": 30
+  }
+ }
+}

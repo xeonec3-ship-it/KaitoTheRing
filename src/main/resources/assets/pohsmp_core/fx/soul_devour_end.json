@@ -1,0 +1,55 @@
+{
+ "comment": "Пожирание душ: душа вырвана — вспышка, огоньки разлетаются вверх, тёмный след печати гаснет.",
+ "style": "soul",
+ "duration": 90,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 14,
+   "size": 6,
+   "rays": 10,
+   "anamorphic": 12,
+   "screen": 0.4,
+   "color": "#BFFFF8"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 5,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 3,
+   "texture": "soul_mote",
+   "count": 80,
+   "rate": 80,
+   "spread": 0.4,
+   "speed": 0.18,
+   "gravity": -0.012,
+   "size": [
+    0.45,
+    0.08
+   ],
+   "life": 40,
+   "color": "@primary"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 80,
+   "texture": "sigil_ender",
+   "radius": 2.5,
+   "fadeOut": 40,
+   "color": "@primary"
+  }
+ ]
+}

@@ -408,10 +408,11 @@ function lit(color, blend) {
     blending: blend === "translucent" ? THREE.NormalBlending : THREE.AdditiveBlending });
 }
 class Portal {
-  constructor(id, origin) {
-    this.id = id; this.def = DATA.meshes[id]; this.t0 = 0; this.stopAt = null; this.isMesh = true;
+  constructor(id, origin, opts = {}) {
+    this.id = id; this.def = DATA.meshes[id]; this.t0 = opts.t0 ?? 0; this.stopAt = null; this.isMesh = true; this.s = opts.scale ?? 1; this.noAuto = !!opts.noAuto;
     this.T = { layersEnd: this.def.formedAt, expandStart: this.def.formedAt, formedAt: this.def.formedAt };
     this.root = new THREE.Group(); this.root.position.copy(origin).add(new THREE.Vector3(0, this.def.center, 0)); scene.add(this.root);
+    if (opts.yaw) this.root.rotation.y = opts.yaw * D2R;
     this.parts = this.def.parts.map((p) => this.make(p));
   }
   make(p) {
@@ -448,7 +449,7 @@ class Portal {
         const m = shadeMats[b[6]].clone(); P.mats.push(m);
         const mesh = add(new THREE.BoxGeometry(Math.max(0.01, b[3] - b[0]), Math.max(0.01, b[4] - b[1]), Math.max(0.01, b[5] - b[2])), m);
         mesh.position.set((b[0] + b[3]) / 2, (b[1] + b[4]) / 2, (b[2] + b[5]) / 2);
-        if (b[7]) mesh.rotation.set(b[7][0] * D2R, b[7][1] * D2R, b[7][2] * D2R, "XYZ");
+        if (b[7]) mesh.rotation.set(b[7][0] * D2R, b[7][1] * D2R, b[7][2] * D2R, "YXZ");   // сначала roll, потом наклон (pitch), потом направление (yaw)
         P.boxes.push({ m, y: (b[1] + b[4]) / 2, glow: glow.has(b[6]) });
       }
       P.flash = add(new THREE.BoxGeometry(12, 0.25, 3), lit("#FFFFFF"));
@@ -461,7 +462,7 @@ class Portal {
   update(t, dt) {
     const lt = t - this.t0;
     const col = this.stopAt === null ? 1 : 1 - ease(this.def.collapse.easing, (t - this.stopAt) / this.def.collapse.duration);
-    this.root.scale.setScalar(Math.max(0.0001, col));
+    this.root.scale.setScalar(Math.max(0.0001, col * this.s)); this.root.visible = lt >= 0;
     for (const P of this.parts) {
       const p = P.def, ap = p.appear || { delay: 0, duration: 1 }, k = clamp01((lt - ap.delay) / ap.duration), e = ease(ap.easing, k);
       let alpha = lt >= ap.delay ? clamp01(k * 3) : 0;
@@ -483,9 +484,10 @@ class Portal {
         continue;
       }
       if (p.type === "boxes") {
-        const [lo, hi] = p.bounds, front = hi - (hi - lo + 2) * clamp01(e), band = (p.appear && p.appear.front) || 0.8;
+        const [lo, hi] = p.bounds, up = p.appear && p.appear.reveal === "up", band = (p.appear && p.appear.front) || 0.8;
+        const front = up ? lo - 1 + (hi - lo + 2) * clamp01(e) : hi - (hi - lo + 2) * clamp01(e);
         for (const B of P.boxes) {
-          const k = clamp01((B.y - front + band) / band);                    // 0 — ещё не проявился, 1 — готов (сверху вниз)
+          const k = up ? clamp01((front - B.y + band) / band) : clamp01((B.y - front + band) / band);   // 0 — ещё нет, 1 — готов
           B.m.opacity = k * (B.glow ? 1 : (p.opacity ?? 1));
           if (B.m.emissive) B.m.emissiveIntensity = 0.06 + 1.4 * (1 - k) * (k > 0 ? 1 : 0);   // у фронта — вспышка белым
         }
@@ -503,7 +505,7 @@ class Portal {
       }
       P.mats.forEach((m) => (m.opacity = (p.type === "disc" ? clamp01(e) : alpha) * (p.brightness ?? 1)));
     }
-    if (autoStop && this.stopAt === null && lt >= this.def.formedAt + 140) this.stop(t);
+    if (autoStop && !this.noAuto && this.stopAt === null && lt >= this.def.formedAt + 140) this.stop(t);
   }
 }
 
@@ -514,6 +516,7 @@ const screenFlash = (() => { const d = document.createElement("div"); d.style.cs
 const FIG = { caster: new THREE.Vector3(0, 0, -11), target: new THREE.Vector3(0, 0, 0) };
 let targetFig = null;
 function anchor(str) {   // "caster+1,2,3": смещение в осях взгляда кастера (смотрит в +Z, вправо = -X)
+  if (str.startsWith("caster.hand")) str = "caster+0.4,1.35,0.4" + (str.includes("+") ? "" : "");
   const [base, off] = str.split("+"), p = (FIG[base] || FIG.caster).clone();
   if (off) { const [x, y, z] = off.split(",").map(Number); p.add(new THREE.Vector3(-(x || 0), y || 0, z || 0)); }
   return p;
@@ -523,8 +526,9 @@ function addMat(color, op = 0) {
 }
 const hash = (i, t) => { const x = Math.sin(i * 127.1 + Math.floor(t) * 311.7) * 43758.5; return x - Math.floor(x); };
 class FxRun {
-  constructor(id) {
+  constructor(id, opts = {}) {
     this.id = id; this.def = DATA.fx[id]; this.t0 = 0; this.stopAt = null; this.isFx = true;
+    FIG.caster.copy(opts.caster || new THREE.Vector3(0, 0, -11));
     this.T = { layersEnd: 200, expandStart: 200, formedAt: 200 };
     this.root = new THREE.Group(); scene.add(this.root);
     this.sigils = []; this.items = [];
@@ -572,10 +576,20 @@ class FxRun {
       m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), b.clone().sub(a).normalize()); g.add(m); it.m = m;
     } else if (e.type === "flash") {
       const m = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("glow", this.col(e.color))); m.position.copy(anchor(e.at)); g.add(m); it.m = m;
+    } else if (e.type === "beam_rain") {
+      it.rays = []; const c = anchor(e.at);
+      for (let i = 0; i < Math.min(e.count, 160); i++) {
+        const a = hash(i, 1) * 6.283, r = Math.sqrt(hash(i, 2)) * e.area, x = c.x + Math.cos(a) * r, z = c.z + Math.sin(a) * r;
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(e.width, e.width, e.height, 6, 1, true), addMat(this.col(e.color)));
+        m.position.set(x, c.y + e.height / 2, z); g.add(m); it.rays.push({ m, at: i * e.interval });
+      }
+    } else if (e.type === "wave") {
+      it.m = new THREE.Mesh(new THREE.RingGeometry(0.9, 1, 96), addMat(this.col(e.color))); it.m.rotation.x = -Math.PI / 2;
+      it.m.position.copy(anchor(e.at)).add(new THREE.Vector3(0, 0.1, 0)); g.add(it.m);
     } else if (e.type === "sprites") {
       const n = Math.min(e.count, 600), pos = new Float32Array(n * 3), base = anchor(e.at);
       it.p = []; for (let i = 0; i < n; i++) {
-        const a = Math.random() * Math.PI * 2, d = Math.sqrt(Math.random()) * (e.area || 0.3);
+        const a = Math.random() * Math.PI * 2, d = Math.sqrt(Math.random()) * (e.area || e.spread || 0.3);
         const born = e.rate >= e.count ? 0 : i / (e.rate || 1);
         const dir = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.3, Math.random() - 0.5).normalize();
         it.p.push({ born, x: base.x + Math.cos(a) * d, y: base.y + (e.area ? 0 : 0), z: base.z + Math.sin(a) * d, dir });
@@ -586,7 +600,7 @@ class FxRun {
     }
   }
   stop(t) { if (this.stopAt === null) { this.stopAt = t; this.sigils.forEach((s) => s.stop(t)); } }
-  done(t) { return t > this.def.duration + 20; }
+  done(t) { return t > (this.def.duration > 0 ? this.def.duration : 160) + 20; }   // -1 — «пока не остановят»: в превью 8 с
   dispose() { scene.remove(this.root); this.sigils.forEach((s) => s.dispose()); screenFlash.style.opacity = 0; tintLayer.style.opacity = 0; if (targetFig) targetFig.visible = false; caster.position.set(0, 0, 0); }
   update(t, dt) {
     const lt = t - this.t0;
@@ -595,8 +609,13 @@ class FxRun {
     let screen = 0;
     for (const it of this.items) {
       const e = it.e, k = lt - e.delay;
+      if (e.type === "mesh") {
+        if (!it.made && k >= 0) { it.made = true; it.s = new Portal(e.model || e.id, anchor(e.at), { t0: t, yaw: e.yaw || 0, scale: e.scale || 1, noAuto: true }); this.sigils.push(it.s); }
+        if (it.s && e.until && lt >= e.until) it.s.stop(t);
+        continue;
+      }
       if (e.type === "sigil") {
-        if (!it.made && k >= 0) { it.made = true; it.s = new Sigil(e.id, anchor(e.at), { t0: t }); this.sigils.push(it.s); }
+        if (!it.made && k >= 0) { it.made = true; it.s = new Sigil(e.id, anchor(e.at), { t0: t, orientation: e.orientation, scale: e.scale || 1 }); this.sigils.push(it.s); }
         if (it.s && e.until && lt >= e.until) it.s.stop(t);
         continue;
       }
@@ -621,7 +640,11 @@ class FxRun {
           r.position.set(it.base.x, it.base.y + y, it.base.z); r.material.opacity = op * (0.8 + 0.2 * Math.sin(lt * 0.6 + i));
         });
       } else if (e.type === "beam") {
-        it.m.material.opacity = life * clamp01(k / 4) * (1 - (e.flicker || 0) * hash(3, lt));
+        it.m.material.opacity = life * clamp01(k / 4) * (1 - (e.flicker || 0) * hash(3, lt)) * (e.brightness ?? 1);
+      } else if (e.type === "beam_rain") {
+        it.rays.forEach((r) => { const a = k - r.at; r.m.material.opacity = end || a < 0 || a > 8 ? 0 : 1 - a / 8; });
+      } else if (e.type === "wave") {
+        const f = clamp01(k / dur); it.m.scale.setScalar(Math.max(0.01, e.radius * ease("easeOutCubic", f))); it.m.material.opacity = end ? 0 : 1 - f;
       } else if (e.type === "flash") {
         const f = clamp01(k / dur); it.m.scale.setScalar(Math.max(0.0001, e.size * (0.4 + 0.6 * ease("easeOutCubic", f))));
         it.m.quaternion.copy(cam.quaternion); it.m.material.opacity = end ? 0 : (1 - f);
@@ -666,13 +689,18 @@ const SCENES = {
   "Дезинтеграция (аниме)": () => [new FxRun("disintegration")],
   "Дезинтеграция: Реплика": () => [new FxRun("disintegration_replica")],
   "Врата (модель)": () => [new Portal("silent_gate", new THREE.Vector3(0, 2, -3))],
+  "Врата (весь эффект)": () => [new FxRun("silent_gate")],
+  "Копьё ветра (модель)": () => [new Portal("silent_spear", new THREE.Vector3(0, 1.6, 0), { scale: 2.5, yaw: 60, noAuto: true })],
+  "Купол Барьера (модель)": () => [new Portal("silent_dome", new THREE.Vector3(0, 0.1, 0), { scale: 5, noAuto: true })],
+  "Тень дракона (модель)": () => [new Portal("worgan_dragon", new THREE.Vector3(0, 3, 0), { scale: 1.6, yaw: 60, noAuto: true })],
+  "Безмолвный залп": () => [new FxRun("silent_volley", { caster: new THREE.Vector3(0, 0, 0) })],
   "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
-const MAIN_ID = { "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
+const MAIN_ID = { "Копьё ветра (модель)": "silent_spear", "Купол Барьера (модель)": "silent_dome", "Тень дракона (модель)": "worgan_dragon", "Безмолвный залп": "silent_volley", "Врата (весь эффект)": "silent_gate", "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
-const VIEW_FOR = { "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
+const VIEW_FOR = { "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -703,7 +731,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [1.2, 0.15, 9, 2.6], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

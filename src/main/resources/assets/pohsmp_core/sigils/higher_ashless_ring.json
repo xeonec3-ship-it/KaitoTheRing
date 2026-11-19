@@ -1,0 +1,16 @@
+{
+  "comment": "Без пепла: огненное кольцо, бегущее по земле от 1 до 9 блоков ровно за 30 тиков (линейно, как урон в AshlessSpell: r = 1 + 8·a/30). Три пояса языков пламени на высотах 0, 0.45 и 0.85 (стена огня — видно, что надо перепрыгнуть), белая кромка внизу. AshlessSpell запускает три таких кольца на тиках 6, 14, 22 (на тик раньше урона: кольцо расширяется с первого тика).",
+  "size": 1.0, "color": "#4DA6FF", "orientation": "ground", "lifetime": -1, "hold": 0,
+  "layers": [
+    { "id": "edge", "type": "disc", "texture": "thin_ring", "radius": 1.0, "heightOffset": 0.03, "color": "#FFFFFF",
+      "appear": { "delay": 0, "duration": 1, "easing": "linear", "modes": ["fade"] } },
+    { "id": "flames", "type": "band", "texture": "ashless_flames", "radius": 1.0, "inner": 0.9, "repeat": 8, "heightOffset": 0.05, "color": "#6FB8FF",
+      "appear": { "delay": 0, "duration": 1, "easing": "linear", "modes": ["fade"] } },
+    { "id": "mid", "type": "band", "texture": "ashless_flames", "radius": 0.995, "inner": 0.92, "repeat": 8, "heightOffset": 0.45, "color": "#4DA6FF",
+      "brightness": 0.55, "appear": { "delay": 0, "duration": 1, "easing": "linear", "modes": ["fade"] } },
+    { "id": "top", "type": "disc", "texture": "thin_ring", "radius": 0.99, "heightOffset": 0.85, "color": "#2A6ABF", "brightness": 0.4,
+      "appear": { "delay": 0, "duration": 1, "easing": "linear", "modes": ["fade"] } }
+  ],
+  "expand": { "scale": 9.0, "delay": 0, "duration": 30, "easing": "linear" },
+  "dissolve": { "modes": ["fade"], "duration": 4 }
+}

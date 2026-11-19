@@ -1,5 +1,5 @@
 {
- "comment": "PLACEHOLDER (T03): one ray of 'Gate' at point p, started by the server for every hit (8/s + aimed ones).",
+ "comment": "PLACEHOLDER (T03) while fx/silent_gate_beam.json is missing: one aimed beam from a sky seal (point from) into the foe (point p).",
  "style": "divine",
  "duration": 14,
  "elements": [
@@ -7,8 +7,7 @@
    "type": "beam",
    "delay": 0,
    "duration": 12,
-   "at": "point:p",
-   "fromSky": 26,
+   "at": "point:from",
    "width": 0.4,
    "core": 0.35,
    "grow": 3,
@@ -16,7 +15,8 @@
    "out": {
     "duration": 7,
     "easing": "easeInSine"
-   }
+   },
+   "to": "point:p"
   },
   {
    "type": "flash",

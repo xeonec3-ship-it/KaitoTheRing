@@ -1,0 +1,373 @@
+{
+ "comment": "Разлом мира: трещина бежит вперёд (точки p0…p6 каждые 3 блока), под ней светится разлом; через 1.5 с из трещины бьют столбы.",
+ "style": "rift",
+ "duration": 72,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "point:p0",
+   "duration": 70,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "fadeOut": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "point:p0+0,0.3,0",
+   "duration": 40,
+   "texture": "spark_sharp",
+   "count": 20,
+   "rate": 1,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 30,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 30,
+   "at": "point:p0",
+   "to": "point:p0+0,9,0",
+   "duration": 30,
+   "width": 1.2,
+   "core": 0.3,
+   "grow": 4,
+   "color": "@primary",
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "point:p0+0,0.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8D0FF"
+  },
+  {
+   "type": "decal",
+   "delay": 1,
+   "at": "point:p1",
+   "duration": 70,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "fadeOut": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 1,
+   "at": "point:p1+0,0.3,0",
+   "duration": 40,
+   "texture": "spark_sharp",
+   "count": 20,
+   "rate": 1,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 30,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 30,
+   "at": "point:p1",
+   "to": "point:p1+0,9,0",
+   "duration": 30,
+   "width": 1.2,
+   "core": 0.3,
+   "grow": 4,
+   "color": "@primary",
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "point:p1+0,0.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8D0FF"
+  },
+  {
+   "type": "decal",
+   "delay": 2,
+   "at": "point:p2",
+   "duration": 70,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "fadeOut": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "point:p2+0,0.3,0",
+   "duration": 40,
+   "texture": "spark_sharp",
+   "count": 20,
+   "rate": 1,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 30,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 30,
+   "at": "point:p2",
+   "to": "point:p2+0,9,0",
+   "duration": 30,
+   "width": 1.2,
+   "core": 0.3,
+   "grow": 4,
+   "color": "@primary",
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "point:p2+0,0.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8D0FF"
+  },
+  {
+   "type": "decal",
+   "delay": 3,
+   "at": "point:p3",
+   "duration": 70,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "fadeOut": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 3,
+   "at": "point:p3+0,0.3,0",
+   "duration": 40,
+   "texture": "spark_sharp",
+   "count": 20,
+   "rate": 1,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 30,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 30,
+   "at": "point:p3",
+   "to": "point:p3+0,9,0",
+   "duration": 30,
+   "width": 1.2,
+   "core": 0.3,
+   "grow": 4,
+   "color": "@primary",
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "point:p3+0,0.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8D0FF"
+  },
+  {
+   "type": "decal",
+   "delay": 4,
+   "at": "point:p4",
+   "duration": 70,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "fadeOut": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "point:p4+0,0.3,0",
+   "duration": 40,
+   "texture": "spark_sharp",
+   "count": 20,
+   "rate": 1,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 30,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 30,
+   "at": "point:p4",
+   "to": "point:p4+0,9,0",
+   "duration": 30,
+   "width": 1.2,
+   "core": 0.3,
+   "grow": 4,
+   "color": "@primary",
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "point:p4+0,0.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8D0FF"
+  },
+  {
+   "type": "decal",
+   "delay": 5,
+   "at": "point:p5",
+   "duration": 70,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "fadeOut": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "at": "point:p5+0,0.3,0",
+   "duration": 40,
+   "texture": "spark_sharp",
+   "count": 20,
+   "rate": 1,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 30,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 30,
+   "at": "point:p5",
+   "to": "point:p5+0,9,0",
+   "duration": 30,
+   "width": 1.2,
+   "core": 0.3,
+   "grow": 4,
+   "color": "@primary",
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "point:p5+0,0.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8D0FF"
+  },
+  {
+   "type": "decal",
+   "delay": 6,
+   "at": "point:p6",
+   "duration": 70,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "fadeOut": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "point:p6+0,0.3,0",
+   "duration": 40,
+   "texture": "spark_sharp",
+   "count": 20,
+   "rate": 1,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 30,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 30,
+   "at": "point:p6",
+   "to": "point:p6+0,9,0",
+   "duration": 30,
+   "width": 1.2,
+   "core": 0.3,
+   "grow": 4,
+   "color": "@primary",
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "point:p6+0,0.5,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#E8D0FF"
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "size": 3,
+   "screen": 0.25,
+   "color": "#E8D0FF"
+  }
+ ]
+}

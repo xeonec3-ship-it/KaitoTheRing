@@ -1,0 +1,76 @@
+{
+ "comment": "Закрытие пространства: рябь на оболочке, где в неё ударились (ставится вертикально, наружу).",
+ "size": 3.5,
+ "color": "#8A6CFF",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": 6,
+ "layers": [
+  {
+   "id": "cell",
+   "type": "disc",
+   "texture": "dome_cell",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.2,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "ring",
+   "radius": 0.7,
+   "heightOffset": 0.01,
+   "color": "#FFFFFF",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow"
+    ]
+   }
+  },
+  {
+   "id": "coven",
+   "type": "disc",
+   "texture": "circle_coven",
+   "radius": 0.6,
+   "heightOffset": 0.02,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "twist"
+    ]
+   },
+   "rotation": {
+    "speed": 60
+   }
+  }
+ ],
+ "expand": {
+  "scale": 1.6,
+  "delay": 0,
+  "duration": 14,
+  "easing": "easeOutCubic"
+ },
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

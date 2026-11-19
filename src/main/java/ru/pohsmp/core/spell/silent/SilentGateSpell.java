@@ -38,7 +38,10 @@ import ru.pohsmp.core.ServerConfig;
 import ru.pohsmp.core.SilentWitch;
 import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.fx.FxLib;
+import ru.pohsmp.core.fx.FxMath;
+import ru.pohsmp.core.spell.CastAnims;
 import ru.pohsmp.core.spell.CnpcHooks;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import ru.pohsmp.core.spell.Cutscene;
 import ru.pohsmp.core.spell.HigherSpell;
 
@@ -46,8 +49,8 @@ import ru.pohsmp.core.spell.HigherSpell;
  * "Gate" (T03): Silent school, Unknown tier, only from the Silent Witch's staff and only in her full outfit (T18/T19, see {@link SilentWitch}).
  * A 50 s cast that nothing interrupts, all of it to the music track: every player within 64 blocks of the caster or of the strike point
  * hears it (not positional, client: SilentMusic) with every other game sound muted, and watches the camera scene (Cutscene 7).
- * From 50 s (the spell is cast) to 63 s rays fall on the area (radius 20) and on every foe in it (no main beam -
- * owner's decision); at 64 s an ice crystal mountain rises (only a look). The scene ends at 65 s. Cancel = the track fades in 1 s.
+ * No cast point: the gate stands in the sky 26 blocks ahead, 48 up; the area (radius 20) is under it. From 50 s (the spell is cast)
+ * to 63 s aimed beam volleys hit every foe in the area (no main beam - owner's decision); at 64 s an ice crystal mountain rises (only a look). The scene ends at 65 s. Cancel = the track fades in 1 s.
  * Damage: Silent magic (through armor, Silent power, Silent resistance), numbers in [silent_gate]. Afterwards "Silence": the spell's own
  * cooldown, 3 min. Only hostile entities are hit (see {@link #target}); players never.
  */
@@ -55,10 +58,16 @@ public class SilentGateSpell extends SilentStaffSpell {
     public static final String PATH = "silent_gate";
     /** Ticks: cast (= 50 s in the track), first rays, last rays, crystal, end of the scene, crystal life. */
     public static final int CAST = 1000, RAYS_FROM = 1000, RAYS_TO = 1260, CRYSTAL = 1280, END = 1300, CRYSTAL_LIFE = 600;
-    /** Height of the gate over the strike point (owner: much higher than the seals; the camera uses it too). */
-    public static final double GATE_H = 48;
-    /** Effect ids of the ideas chat (T03); while they are not in the mod the placeholders built from the existing seals are used. */
-    private static final String FX_SCENE = "silent_gate", FX_RAY = "silent_gate_ray", FX_CRYSTAL = "silent_gate_crystal";
+    /**
+     * No cast point (owner): the gate stands in the sky FWD blocks ahead of the caster (by the view at the cast start), GATE_H over the area;
+     * the area of the rays is under it. Same numbers as tools/gen_silent_gate_fx.py (FWD, GATE_UP); the camera uses them too.
+     * GATE_H: "much higher" (owner 19.11, was 16).
+     */
+    public static final double FWD = 26, GATE_H = 48;
+    /** Sky seals of the field the aimed beams start from (as in fx/silent_gate.json): height over the area and radius. */
+    private static final double SKY_LO = 17, SKY_HI = 32, SKY_R = 24;
+    /** Effects of the ideas chat (T03): the whole scene and one aimed beam; placeholders while they are missing. */
+    private static final String FX_SCENE = "silent_gate", FX_BEAM = "silent_gate_beam";
 
     private static final class Cast {
         LivingEntity caster;
@@ -69,7 +78,7 @@ public class SilentGateSpell extends SilentStaffSpell {
         boolean cast, done;
         List<UUID> watchers = new ArrayList<>();
         final Map<UUID, Integer> lastHit = new HashMap<>();
-        double rayDebt;
+        boolean placeholder;
     }
 
     private static final Map<UUID, Cast> CASTS = new HashMap<>();
@@ -86,6 +95,20 @@ public class SilentGateSpell extends SilentStaffSpell {
     /** No spell sounds: only the music (T03). */
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
+    /** The witch's gestures (tools/gen_player_anims.py): point, look up, "shh" taking the staff, finger up; the finish holds the arm out. */
+    private static final AnimationHolder ANIM_CAST = CastAnims.of("silent_gate_cast"), ANIM_FINISH = CastAnims.of("silent_gate_finish");
+    /** Length of the finish animation (the strike, 50-64 s). */
+    private static final int FINISH_TICKS = 280;
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
+    @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
+
+    /** The staff is not in the hands for the scene: it floats before the witch, then she holds it in the left hand (client: GateStaff). */
+    @Override
+    public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, net.minecraft.world.InteractionHand hand, @javax.annotation.Nullable MagicData md) {
+        super.onClientPreCast(level, spellLevel, entity, hand, md);
+        CastAnims.hideHands(level, entity, CAST + FINISH_TICKS - CastAnims.FINISH_TICKS);
+    }
+
     /** The cast is bound to the music: nothing shortens it (cast time reduction, the robe's Silent Reading). */
     @Override public int getEffectiveCastTime(int spellLevel, LivingEntity entity) { return CAST; }
     /** "Silence": Gate's own cooldown. */
@@ -123,28 +146,19 @@ public class SilentGateSpell extends SilentStaffSpell {
         c.sl = sl;
         c.at = caster.position();
         c.yaw = caster.getYRot();
-        double range = ServerConfig.GATE_RANGE.get();
-        Vec3 eye = caster.getEyePosition(), end = eye.add(caster.getLookAngle().scale(range));
-        BlockHitResult bh = sl.clip(new ClipContext(eye, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, caster));
-        if (bh.getType() != HitResult.Type.MISS) end = bh.getLocation();
-        EntityHitResult eh = ProjectileUtil.getEntityHitResult(sl, caster, eye, end, new AABB(eye, end).inflate(1),
-                e -> e instanceof LivingEntity && e != caster && !e.isSpectator() && e.isPickable() && !(e instanceof ArmorStand));
-        Vec3 p = eh != null ? eh.getEntity().position() : end;
-        if (hdist(caster, p) < 8) {
-            Vec3 fw = caster.getLookAngle().multiply(1, 0, 1);
-            fw = fw.lengthSqr() < 1e-4 ? new Vec3(0, 0, 1) : fw.normalize();
-            p = c.at.add(fw.scale(12)).add(0, 1, 0);
-        }
-        c.hit = ground(sl, caster, p);
+        FxMath.Vec f = FxMath.forward(c.yaw);
+        c.hit = c.at.add(f.x() * FWD, 0, f.z() * FWD);   // the centre of the area, as "caster+0,0,FWD" in the effect
         c.cutKey = HigherSpell.key();
         Vec3 d = c.hit.subtract(c.at);
         float ang = (float) Math.atan2(-d.z, -d.x);
         // camera + music + silence for everyone within 64 of the caster or of the strike point
         c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.SILENT_GATE, END, c.hit, ang, Cutscene.R, sl, c.hit);
-        String scene = FxLib.fx(FX_SCENE) != null ? FX_SCENE : FX_SCENE + "_placeholder";
-        // fixed points, not the caster (its head turns would swing the offsets): c - the caster's feet, hit, gate
-        c.scene = Fx.play(sl, Fx.fx(scene).at(c.at).yaw(c.yaw).target(c.hit).point("c", c.at).point("hit", c.hit)
-                .point("gate", c.hit.add(0, GATE_H, 0)).duration(END));
+        c.placeholder = FxLib.fx(FX_SCENE) == null;
+        // anchored at the caster's feet with the start yaw, not to the caster entity: its head turns would swing the whole sky.
+        // The ideas chat's effect runs its own length (the crystal stays 30 s after the scene); the placeholder ends with the scene.
+        Fx.Spec spec = Fx.fx(c.placeholder ? FX_SCENE + "_placeholder" : FX_SCENE).at(c.at).yaw(c.yaw).target(c.hit).point("c", c.at)
+                .point("hit", c.hit).point("gate", c.hit.add(0, GATE_H, 0));
+        c.scene = Fx.play(sl, c.placeholder ? spec.duration(END) : spec);
         CASTS.put(caster.getUUID(), c);
         RUNNING.add(c);
     }
@@ -209,40 +223,50 @@ public class SilentGateSpell extends SilentStaffSpell {
         }
     }
 
+    /**
+     * Aimed volleys (as in the mod video): every aimedInterval ticks each foe in the area gets 3-5 beams from different seals of the sky
+     * field; the hit (rayRadius around the foe) counts once per volley and at most once per hitCooldownTicks per creature. The random rain
+     * of the effect (beam_rain) is only a look.
+     */
     private static void rays(Cast c, int t) {
+        if ((t - RAYS_FROM) % ServerConfig.GATE_AIM_INTERVAL.get() != 0) return;
         double area = ServerConfig.GATE_AREA.get();
-        c.rayDebt += ServerConfig.GATE_RAYS_PER_SECOND.get() / 20.0;
-        while (c.rayDebt >= 1) {
-            c.rayDebt -= 1;
-            double a = c.sl.random.nextDouble() * Math.PI * 2, r = Math.sqrt(c.sl.random.nextDouble()) * area;
-            Vec3 p = ground(c.sl, c.caster, c.hit.add(Math.cos(a) * r, 8, Math.sin(a) * r));
-            ray(c, p, t);
+        int lo = ServerConfig.GATE_BEAMS_MIN.get(), hi = Math.max(lo, ServerConfig.GATE_BEAMS_MAX.get());
+        for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e))) {
+            int n = lo + c.sl.random.nextInt(hi - lo + 1);
+            for (int i = 0; i < n; i++) beam(c, e);
+            strike(c, e.position(), t);
         }
-        if ((t - RAYS_FROM) % ServerConfig.GATE_AIM_INTERVAL.get() == 0)
-            for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e)))
-                ray(c, e.position(), t);
     }
 
-    /** One ray: the look for everyone near, the damage in its radius. */
-    private static void ray(Cast c, Vec3 p, int t) {
-        String id = FxLib.fx(FX_RAY) != null ? FX_RAY : FX_RAY + "_placeholder";
-        Fx.play(c.sl, Fx.fx(id).at(p).yaw(c.yaw).point("p", p).point("gate", c.hit.add(0, GATE_H, 0)));
+    /** One beam from a random seal of the sky field into the foe (look only). */
+    private static void beam(Cast c, LivingEntity e) {
+        double a = c.sl.random.nextDouble() * Math.PI * 2, r = Math.sqrt(c.sl.random.nextDouble()) * SKY_R;
+        Vec3 from = c.hit.add(Math.cos(a) * r, SKY_LO + c.sl.random.nextDouble() * (SKY_HI - SKY_LO), Math.sin(a) * r);
+        if (c.placeholder) {
+            Fx.play(c.sl, Fx.fx(FX_BEAM + "_placeholder").at(e.position()).yaw(c.yaw).point("p", e.position()).point("from", from));
+            return;
+        }
+        Fx.play(c.sl, Fx.fx(FX_BEAM).at(from).yaw(c.yaw).point("from", from).target(e));
+    }
+
+    /** The damage of a volley: every foe within rayRadius of the point, not more often than hitCooldownTicks. */
+    private static void strike(Cast c, Vec3 p, int t) {
         double r = ServerConfig.GATE_RAY_RADIUS.get();
         float dmg = (float) (ServerConfig.GATE_RAY_DAMAGE.get() * ServerConfig.GATE_SET_BONUS.get() * power(c));
         int cd = ServerConfig.GATE_HIT_COOLDOWN.get();
         for (LivingEntity e : HigherSpell.around(c.sl, p, r + 1.5, e -> target(c.caster, e))) {
-            if (e.getBoundingBox().inflate(r).contains(p.add(0, Math.min(1, e.getBbHeight() / 2), 0)) || e.position().distanceToSqr(p) <= r * r) {
-                Integer last = c.lastHit.get(e.getUUID());
-                if (last != null && t - last < cd) continue;
-                c.lastHit.put(e.getUUID(), t);
-                hurt(c, e, dmg);
-            }
+            if (!e.getBoundingBox().inflate(r).contains(p.add(0, Math.min(1, e.getBbHeight() / 2), 0)) && e.position().distanceToSqr(p) > r * r) continue;
+            Integer last = c.lastHit.get(e.getUUID());
+            if (last != null && t - last < cd) continue;
+            c.lastHit.put(e.getUUID(), t);
+            hurt(c, e, dmg);
         }
     }
 
+    /** The placeholder scene has no crystal of its own. */
     private static void crystal(Cast c) {
-        String id = FxLib.fx(FX_CRYSTAL) != null ? FX_CRYSTAL : FX_CRYSTAL + "_placeholder";
-        Fx.play(c.sl, Fx.fx(id).at(c.hit).yaw(c.yaw).point("p", c.hit).duration(CRYSTAL_LIFE));
+        if (c.placeholder) Fx.play(c.sl, Fx.fx("silent_gate_crystal_placeholder").at(c.hit).yaw(c.yaw).point("p", c.hit).duration(CRYSTAL_LIFE));
     }
 
     /** The registered spell (Iron's damage source and power multiplier). */
@@ -263,15 +287,12 @@ public class SilentGateSpell extends SilentStaffSpell {
     }
 
     /**
-     * Owner's decision (19.11): only hostile entities are targets. Monsters ({@code Enemy}) and mobs now aggressive to the caster or its allies;
-     * CNPC NPCs only of factions hostile to the caster. Players are never targets (not even in PvP), nor peaceful animals, villagers, pets,
-     * the caster's team, armor stands.
+     * Owner's decision (19.11): only hostile creatures, the rule of all Silent Witch magic ({@link SilentSpell#enemy}): monsters,
+     * mobs hunting the caster or its allies, hostile CNPC factions, and a player only for a minute after hitting the caster.
+     * Peaceful animals, villagers, pets, the caster's team - never.
      */
     public static boolean target(LivingEntity caster, LivingEntity e) {
-        if (!e.isAlive() || e instanceof Player || HigherSpell.friendly(caster, e)) return false;
-        if (CnpcHooks.isNpc(e)) return CnpcHooks.hostileTo(e, caster);
-        if (e instanceof Enemy) return true;
-        return e instanceof Mob m && m.getTarget() != null && m.getTarget().isAlive() && HigherSpell.friendly(caster, m.getTarget());
+        return SilentSpell.enemy(caster, e);
     }
 
     public static final class SilentGateEvents {

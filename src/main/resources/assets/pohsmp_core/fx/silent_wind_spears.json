@@ -1,0 +1,43 @@
+{
+ "comment": "Одно копьё ветра (T20): модель вдоль полёта и шлейф; сервер двигает экземпляр (Fx.move, yaw — к цели) и гасит при попадании. Сгенерировано tools/gen_silent_staff_fx.py.",
+ "style": "silent",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 6,
+   "at": "caster",
+   "follow": true,
+   "size": 0.9,
+   "rays": 4,
+   "color": "@core"
+  },
+  {
+   "type": "mesh",
+   "model": "silent_spear",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "scale": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 200,
+   "at": "caster",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 400,
+   "rate": 3,
+   "spread": 0.25,
+   "speed": 0.01,
+   "size": [
+    0.14,
+    0.03
+   ],
+   "life": 8,
+   "color": "@primary"
+  }
+ ]
+}

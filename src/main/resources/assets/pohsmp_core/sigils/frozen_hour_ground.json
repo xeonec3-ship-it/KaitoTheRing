@@ -1,0 +1,122 @@
+{
+ "comment": "Застывший час: циферблат на земле по границе зоны (радиус = размер), римские цифры и засечки; тонкие кольца внутри.",
+ "size": 24.0,
+ "color": "#F2C86B",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "numerals",
+   "type": "band",
+   "texture": "roman_band",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.9,
+   "inner": 0.93,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   }
+  },
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 0.9,
+   "heightOffset": 0.01,
+   "color": "#CFE6FF",
+   "brightness": 0.6,
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 4,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  },
+  {
+   "id": "spiral",
+   "type": "disc",
+   "texture": "spiral_ring",
+   "radius": 0.32,
+   "heightOffset": 0.02,
+   "color": "#CFE6FF",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 6,
+    "duration": 14,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -4
+   }
+  },
+  {
+   "id": "hourglass",
+   "type": "disc",
+   "texture": "hourglass",
+   "radius": 0.12,
+   "heightOffset": 0.03,
+   "brightness": 0.9,
+   "appear": {
+    "delay": 10,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "inner",
+   "type": "band",
+   "texture": "rim",
+   "radius": 0.16,
+   "heightOffset": 0.04,
+   "inner": 0.8,
+   "repeat": 1,
+   "appear": {
+    "delay": 10,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 10
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#CFE6FF",
+  "size": 1.05,
+  "duration": 10,
+  "sparks": 0
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 16,
+  "stagger": 2
+ }
+}

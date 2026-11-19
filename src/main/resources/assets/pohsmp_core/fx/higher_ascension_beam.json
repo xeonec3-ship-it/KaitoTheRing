@@ -1,0 +1,13 @@
+{
+  "comment": "Вознесение: луч с неба в ближайшего врага (каждые 0.5 с зависания, 5 урона). Точка эффекта — ноги врага.",
+  "style": "divine",
+  "duration": 20,
+  "elements": [
+    { "type": "beam", "delay": 0, "duration": 14, "at": "caster", "fromSky": 24, "width": 0.5, "core": 0.35, "grow": 3, "color": "#FFF2B0",
+      "out": { "duration": 10, "easing": "easeInSine" } },
+    { "type": "flash", "delay": 2, "duration": 8, "at": "caster+0,0.3,0", "size": 2, "rays": 6, "color": "#FFFFFF" },
+    { "type": "sigil", "id": "higher_asc_strike", "delay": 2, "at": "caster+0,0.05,0" },
+    { "type": "sprites", "delay": 2, "duration": 16, "at": "caster+0,0.5,0", "texture": "spark_soft", "count": 16, "rate": 0, "spread": 0.3, "speed": 0.12,
+      "gravity": 0.008, "size": [0.2, 0.04], "life": 14, "color": "#FFF2B0" }
+  ]
+}

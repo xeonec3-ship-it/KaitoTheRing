@@ -26,7 +26,7 @@ public class GeoStaffClient extends ClientStaffItemExtensions {
     @Override
     public BlockEntityWithoutLevelRenderer getCustomRenderer() {
         if (renderer == null) {
-            renderer = new GeoItemRenderer<>(new DefaultedItemGeoModel<>(new ResourceLocation(PohCore.MODID, modelName())));
+            renderer = new StaffRenderer(new DefaultedItemGeoModel<>(new ResourceLocation(PohCore.MODID, modelName())));
             renderer.addRenderLayer(new AutoGlowingGeoLayer<>(renderer));
         }
         return renderer;

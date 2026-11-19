@@ -13,6 +13,10 @@ import java.util.Map;
  */
 public record FxDef(String id, String style, int duration, List<Element> elements) {
 
+    /** Element types the client draws (client.fx.ElementDraw); anything else is skipped. Kept in step with the table in docs/fx.md. */
+    public static final java.util.Set<String> TYPES = java.util.Set.of("sigil", "mesh", "flash", "wave", "beam", "beam_rain", "sprites",
+            "curtain", "column", "tint", "decal", "trail", "ribbon", "slash", "lightning", "vortex", "chains", "aura", "wings", "halo");
+
     public record Element(String type, int delay, int duration, Anchor at, Anchor to, boolean follow, String color,
                           double brightness, double scale, JsonObject params) {
         public int end() {
@@ -46,8 +50,13 @@ public record FxDef(String id, String style, int duration, List<Element> element
                 Anchor.parse(e.has("at") ? e.get("at").getAsString() : "caster"),
                 e.has("to") ? Anchor.parse(e.get("to").getAsString()) : null,
                 e.has("follow") && e.get("follow").getAsBoolean(), e.has("color") ? e.get("color").getAsString() : null,
-                // brightness may be [from, to] (curtain picks per beam from params): then the element itself is 1
-                e.has("brightness") && e.get("brightness").isJsonPrimitive() ? e.get("brightness").getAsDouble() : 1, e.has("scale") ? e.get("scale").getAsDouble() : 1, e);
+                single(e, "brightness"), single(e, "scale"), e);
+    }
+
+    /** A plain number, else 1: a [from, to] range (curtain brightness) belongs to the element type, not to the common multiplier. */
+    private static double single(JsonObject e, String key) {
+        JsonElement v = e.get(key);
+        return v != null && v.isJsonPrimitive() && v.getAsJsonPrimitive().isNumber() ? v.getAsDouble() : 1;
     }
 
     /** Where an element is: "caster", "target", "caster.eyes", "caster.hand", "point:name", "look:24", each with an optional "+x,y,z". */

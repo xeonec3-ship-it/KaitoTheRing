@@ -24,7 +24,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.DivineEvents;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Ashley: 1.5 s cast with a blue circle under the target, then a pillar of blue fire (14 in r1.5, burning 5 s)
@@ -62,9 +62,8 @@ public class AshlessSpell extends HigherSpell {
         if (!(level instanceof ServerLevel sl)) return;
         LivingEntity t = target(sl, md);
         if (t == null) return;
-        int k = key();
-        TELE.put(entity.getUUID(), k);
-        fx(sl, t.getX(), t.getY(), t.getZ(), new Net.HFx(Net.HFx.TELE, k, -1, t.getId(), CAST, t.getX(), t.getY(), t.getZ(), 1.8, COLOR));
+        Integer old = TELE.put(entity.getUUID(), Fx.play(sl, Fx.fx("higher_ashless_cast").at(t.position()).caster(entity).target(t)));
+        if (old != null) Fx.stop(sl, old, "");
     }
 
     @Override
@@ -79,7 +78,7 @@ public class AshlessSpell extends HigherSpell {
     @Override
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity entity, MagicData md, boolean cancelled) {
         Integer k = TELE.remove(entity.getUUID());
-        if (k != null && level instanceof ServerLevel sl) stop(sl, entity.getX(), entity.getY(), entity.getZ(), k);
+        if (k != null && level instanceof ServerLevel sl) Fx.stop(sl, k, "");
         super.onServerCastComplete(level, spellLevel, entity, md, cancelled);
     }
 
@@ -94,8 +93,7 @@ public class AshlessSpell extends HigherSpell {
     }
 
     private static void erupt(ServerLevel sl, LivingEntity caster, Vec3 c) {
-        fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.PILLAR, key(), -1, -1, 25, c.x, c.y, c.z, PILLAR_R, COLOR));
-        burst(sl, c.x, c.y + 0.1, c.z, 3, COLOR);
+        Fx.play(sl, Fx.fx("higher_ashless_erupt").at(c));
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 2.5f, 0.5f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 3f, 0.8f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.2f, 1.6f);
@@ -115,8 +113,9 @@ public class AshlessSpell extends HigherSpell {
                 boolean any = false;
                 for (int k = 0; k < RING_AT.length; k++) {
                     int a = age - RING_AT[k];
+                    // the ring sigil grows 1 -> RING_R linearly over RING_LIFE from its first tick: start it one tick early to match the damage radius
+                    if (a == -1) Fx.play(sl, Fx.sigil("higher_ashless_ring").at(c.add(0, 0.02, 0)));
                     if (a == 0) {
-                        fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.RING, key(), -1, -1, RING_LIFE, c.x, c.y, c.z, RING_R, COLOR));
                         sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 2f, 0.6f + 0.2f * k);
                     }
                     if (a < 0 || a > RING_LIFE) {

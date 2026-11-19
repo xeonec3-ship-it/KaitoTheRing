@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «lightning» для знаков при касте (fx/school_lightning.json): молния: ломаная молния по ободу, резкие искры.",
+ "palette": {
+  "primary": "#6BE6FF",
+  "secondary": "#E6FBFF",
+  "core": "#FFFFFF",
+  "shadow": "#1A3A8A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_lightning_band",
+  "shards": "spark_sharp",
+  "sigil": "sigil_lightning"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

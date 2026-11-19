@@ -203,6 +203,54 @@ def build():
         feathers(cx + s * 0.8, 2.2, -0.05, s, 4, 0.9, 45, -20 if s > 0 else 200, d=0.22, t=2, rows=2)
 
 
+def crystals():
+    """Ледяная кристаллическая гора (финал «Врат», 64 с): десятки граненых шипов из земли, в центре выше всех, наклонены наружу.
+    Каждый шип — шестигранник из брусков, сужается к острию; тона: 2 светлый, 3 белый, 4 светящаяся сердцевина."""
+    import random
+    rnd = random.Random(64)
+    C = []
+
+    def shard(x, z, h, r, lean_x, lean_z):
+        n = 6
+        segs = 5
+        for k in range(segs):
+            y0, y1 = h * k / segs, h * (k + 1) / segs
+            rr = r * (1 - 0.8 * k / segs)
+            cxk, czk = x + lean_x * (y0 + y1) / 2, z + lean_z * (y0 + y1) / 2
+            side = 2 * rr * math.tan(math.pi / n) + 0.02
+            for i in range(n):
+                a = 2 * math.pi * (i + 0.5) / n
+                t = 3 if i % 2 == 0 else 2
+                b = [R3(cxk + (rr - 0.06) * math.cos(a) - 0.06), R3(y0), R3(czk + (rr - 0.06) * math.sin(a) - side / 2),
+                     R3(cxk + (rr - 0.06) * math.cos(a) + 0.06), R3(y1), R3(czk + (rr - 0.06) * math.sin(a) + side / 2), t,
+                     [R3(-math.degrees(math.atan(lean_z))), R3(-math.degrees(a)), R3(math.degrees(math.atan(lean_x)))]]
+                C.append(b)
+            C.append([R3(cxk - rr * 0.5), R3(y0), R3(czk - rr * 0.5), R3(cxk + rr * 0.5), R3(y1), R3(czk + rr * 0.5), 4])
+        tip_x, tip_z = x + lean_x * h, z + lean_z * h
+        C.append([R3(tip_x - 0.08), R3(h), R3(tip_z - 0.08), R3(tip_x + 0.08), R3(h + r * 0.6), R3(tip_z + 0.08), 3])
+
+    shard(0, 0, 9.0, 1.4, 0, 0)
+    for i in range(22):
+        a = rnd.uniform(0, 2 * math.pi)
+        d = rnd.uniform(0.8, 4.2)
+        h = 8.0 * (1 - d / 5.0) * rnd.uniform(0.6, 1.0) + 1.0
+        r = rnd.uniform(0.35, 0.9) * (1.2 - d / 6)
+        shard(d * math.cos(a), d * math.sin(a), h, r, 0.12 * math.cos(a) * d / 4, 0.12 * math.sin(a) * d / 4)
+    ys = [b[1] for b in C] + [b[4] for b in C]
+    doc = {
+        'comment': 'Ледяная гора — финал «Врат» (T03), по кадру аниме. Сгенерировано tools/gen_silent_gate.py.',
+        'style': 'silent', 'center': 0, 'formedAt': 30,
+        'collapse': {'duration': 40, 'easing': 'easeInSine'},
+        'parts': [{
+            'type': 'boxes', 'tones': ['#5E7286', '#9CC4DC', '#CFE8F6', '#F2FAFF', '#9FF4FF'], 'glowTones': [4],
+            'blend': 'translucent', 'opacity': 0.82, 'shade': True, 'boxes': C,
+            'appear': {'delay': 0, 'duration': 30, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 1.5},
+            'bounds': [min(ys), max(ys)]}]}
+    out = OUT.replace('silent_gate.json', 'silent_crystal.json')
+    json.dump(doc, open(out, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    print(f'silent_crystal: {len(C)} boxes')
+
+
 def main():
     build()
     ys = [b[1] for b in B] + [b[4] for b in B]
@@ -227,6 +275,7 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(doc, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     print(f'silent_gate: {len(B)} boxes, height {min(ys):.1f}..{max(ys):.1f} blocks')
+    crystals()
 
 
 if __name__ == '__main__':

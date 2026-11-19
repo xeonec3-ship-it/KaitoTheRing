@@ -1,0 +1,12 @@
+{
+  "comment": "Вознесение: нимб над головой мага, раскрывается разворотом из ребра.",
+  "size": 0.45, "color": "#FFF4D6", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.4, "color": "#FFD36B", "brightness": 0.8,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.25, "period": 24 } },
+    { "id": "halo", "type": "disc", "texture": "asc_halo", "radius": 1.0, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 12, "easing": "easeOutBack", "modes": ["unfold", "fade"] }, "rotation": { "speed": -40 } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.4, "duration": 8, "sparks": 8 },
+  "dissolve": { "modes": ["fade"], "duration": 10 }
+}

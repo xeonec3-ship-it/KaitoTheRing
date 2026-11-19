@@ -1,0 +1,90 @@
+{
+ "comment": "Низвержение: открытый разлом (минута). Прорезь, кольца, печать на земле, угли в разлом, вспышка при открытии и закрытии.",
+ "style": "forbidden",
+ "duration": 1200,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,2.6,0",
+   "duration": 14,
+   "size": 10,
+   "anamorphic": 24,
+   "rays": 12,
+   "screen": 0.5,
+   "color": "#FFE6A0"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 8,
+   "color": "@primary"
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "downfall_rift",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "downfall_ground",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.6,0",
+   "id": "downfall_rift_ring",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.6,0",
+   "id": "downfall_rift_glow",
+   "until": 1190
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.4,0",
+   "duration": 1180,
+   "texture": "spark_sharp",
+   "count": 2360,
+   "rate": 2,
+   "area": 3,
+   "speed": 0.03,
+   "gravity": -0.003,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 40,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 1180,
+   "at": "caster",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 5,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 1186,
+   "at": "caster+0,2.6,0",
+   "duration": 12,
+   "size": 6,
+   "color": "#FFE6A0"
+  }
+ ]
+}

@@ -7,6 +7,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -217,6 +218,59 @@ public final class FxDraw extends RenderType {
         vert(vc, f, p[1], 0, 0, rgb, a);
         vert(vc, f, p[2], 0, 1, rgb, a);
         vert(vc, f, p[3], 1, 1, rgb, a);
+    }
+
+    /**
+     * Ribbon through pts (at least 2): per-point width w and alpha a, v runs 0 at pts[0] to 1 at the end, u across.
+     * sides == null: each point turns to face the camera (a glowing line); else sides[i] is the unit direction across.
+     */
+    public static void strip(VertexConsumer vc, Frame f, List<Vec3> pts, double[] w, double[] a, int rgb, Vec3[] sides) {
+        int n = pts.size();
+        if (n < 2) return;
+        Vec3[] l = new Vec3[n], r = new Vec3[n];
+        for (int i = 0; i < n; i++) {
+            Vec3 p = pts.get(i);
+            Vec3 side;
+            if (sides != null) side = sides[i];
+            else {
+                Vec3 tan = pts.get(Math.min(n - 1, i + 1)).subtract(pts.get(Math.max(0, i - 1)));
+                side = tan.cross(p.subtract(f.camPos()));
+                side = side.lengthSqr() < 1e-12 ? f.left() : side.normalize();
+            }
+            Vec3 h = side.scale(w[i] / 2);
+            l[i] = p.subtract(h);
+            r[i] = p.add(h);
+        }
+        for (int i = 0; i + 1 < n; i++) {
+            if (a[i] <= 0.002 && a[i + 1] <= 0.002) continue;
+            float v0 = (float) i / (n - 1), v1 = (float) (i + 1) / (n - 1);
+            vert(vc, f, l[i], 0, v0, rgb, a[i]);
+            vert(vc, f, r[i], 1, v0, rgb, a[i]);
+            vert(vc, f, r[i + 1], 1, v1, rgb, a[i + 1]);
+            vert(vc, f, l[i + 1], 0, v1, rgb, a[i + 1]);
+        }
+    }
+
+    /** Two-layer glowing line: a wide soft halo in the colour and a narrow hot core whitened toward `core` share. */
+    public static void glowStrip(Frame f, List<Vec3> pts, double[] w, double[] a, int rgb, Vec3[] sides, double halo) {
+        VertexConsumer vc = f.add(tex("strip_soft"));
+        int n = pts.size();
+        double[] wh = new double[n], ah = new double[n], wc = new double[n];
+        for (int i = 0; i < n; i++) {
+            wh[i] = w[i] * halo;
+            ah[i] = a[i] * 0.45;
+            wc[i] = w[i];
+        }
+        strip(vc, f, pts, wh, ah, rgb, null);
+        strip(vc, f, pts, wc, a, mix(rgb, 0xFFFFFF, 0.55), sides);
+    }
+
+    /** Colour between a and b (t = 0 -> a). */
+    public static int mix(int a, int b, double t) {
+        int r = (int) Math.round(((a >> 16) & 255) + ((((b >> 16) & 255) - ((a >> 16) & 255)) * t));
+        int g = (int) Math.round(((a >> 8) & 255) + ((((b >> 8) & 255) - ((a >> 8) & 255)) * t));
+        int bl = (int) Math.round((a & 255) + (((b & 255) - (a & 255)) * t));
+        return (r & 255) << 16 | (g & 255) << 8 | (bl & 255);
     }
 
     public static Vec3 lerp(Vec3 a, Vec3 b, double t) {

@@ -1,0 +1,1091 @@
+{
+ "comment": "Эффект «Врата» (T03) на всю шкалу под музыку (0–65 с). Сгенерировано tools/gen_silent_gate_fx.py — правьте генератор.",
+ "style": "silent",
+ "duration": 1920,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "duration": 1300,
+   "at": "caster",
+   "radius": 64,
+   "color": "#1E4A5A",
+   "strength": 0.28,
+   "in": {
+    "duration": 120,
+    "easing": "easeInOutSine"
+   },
+   "out": {
+    "duration": 50,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 280,
+   "at": "caster+0,0.8,0",
+   "texture": "@sparks",
+   "count": 60,
+   "rate": 0.25,
+   "spread": 2.2,
+   "speed": 0.015,
+   "gravity": -0.002,
+   "size": [
+    0.12,
+    0.05
+   ],
+   "life": 60,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_gate_ground",
+   "delay": 20,
+   "until": 1280,
+   "at": "caster",
+   "color": "@primary",
+   "scale": 0.8
+  },
+  {
+   "type": "sprites",
+   "delay": 280,
+   "duration": 160,
+   "at": "caster.hand",
+   "texture": "@sparks",
+   "count": 220,
+   "rate": 6,
+   "spread": 0.6,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 180,
+   "tumble": 0.4,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 40,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 290,
+   "duration": 160,
+   "at": "caster.hand",
+   "texture": "@sparks",
+   "count": 220,
+   "rate": 6,
+   "spread": 1.0,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 240,
+   "tumble": 0.4,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 40,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 300,
+   "duration": 160,
+   "at": "caster.hand",
+   "texture": "@sparks",
+   "count": 220,
+   "rate": 6,
+   "spread": 1.4,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 300,
+   "tumble": 0.4,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 40,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 310,
+   "duration": 160,
+   "at": "caster.hand",
+   "texture": "@sparks",
+   "count": 220,
+   "rate": 6,
+   "spread": 1.8000000000000003,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 360,
+   "tumble": 0.4,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 40,
+   "color": "@secondary"
+  },
+  {
+   "type": "beam",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster.hand",
+   "to": "caster+0,48,26",
+   "width": 0.08,
+   "core": 0.6,
+   "taper": 0.8,
+   "grow": 24,
+   "flicker": 0.2,
+   "color": "@primary",
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 292,
+   "duration": 228,
+   "at": "caster.hand",
+   "to": "caster+0,48,26",
+   "width": 0.22,
+   "core": 0.0,
+   "taper": 0.8,
+   "grow": 24,
+   "color": "@primary",
+   "brightness": 0.35,
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 998,
+   "duration": 12,
+   "at": "caster.hand",
+   "size": 1.6,
+   "anamorphic": 4,
+   "rays": 6,
+   "color": "@core"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_nimbus",
+   "delay": 400,
+   "until": 1260,
+   "at": "caster+0,58,28",
+   "orientation": "facing",
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 436,
+   "duration": 24,
+   "at": "caster+0,48,26",
+   "size": 8,
+   "anamorphic": 18,
+   "rays": 10,
+   "screen": 0.25,
+   "color": "@core"
+  },
+  {
+   "type": "mesh",
+   "model": "silent_gate",
+   "delay": 440,
+   "until": 1260,
+   "at": "caster+0,48,26",
+   "yaw": 180,
+   "scale": 1.5
+  },
+  {
+   "type": "beam",
+   "delay": 446,
+   "duration": 64,
+   "at": "caster+-5.0,60,26",
+   "to": "caster+-3.5,43,26",
+   "width": 0.18,
+   "core": 0.4,
+   "taper": 0.6,
+   "grow": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "beam",
+   "delay": 453,
+   "duration": 64,
+   "at": "caster+-3.3,60,26",
+   "to": "caster+-2.3,43,26",
+   "width": 0.3,
+   "core": 0.4,
+   "taper": 0.6,
+   "grow": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "beam",
+   "delay": 460,
+   "duration": 64,
+   "at": "caster+-1.7,60,26",
+   "to": "caster+-1.2,43,26",
+   "width": 0.18,
+   "core": 0.4,
+   "taper": 0.6,
+   "grow": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "beam",
+   "delay": 467,
+   "duration": 64,
+   "at": "caster+0.0,60,26",
+   "to": "caster+0.0,43,26",
+   "width": 0.3,
+   "core": 0.4,
+   "taper": 0.6,
+   "grow": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "beam",
+   "delay": 474,
+   "duration": 64,
+   "at": "caster+1.7,60,26",
+   "to": "caster+1.2,43,26",
+   "width": 0.18,
+   "core": 0.4,
+   "taper": 0.6,
+   "grow": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "beam",
+   "delay": 481,
+   "duration": 64,
+   "at": "caster+3.3,60,26",
+   "to": "caster+2.3,43,26",
+   "width": 0.3,
+   "core": 0.4,
+   "taper": 0.6,
+   "grow": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "beam",
+   "delay": 488,
+   "duration": 64,
+   "at": "caster+5.0,60,26",
+   "to": "caster+3.5,43,26",
+   "width": 0.18,
+   "core": 0.4,
+   "taper": 0.6,
+   "grow": 10,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "flash",
+   "delay": 520,
+   "duration": 200,
+   "at": "caster+0,58,28",
+   "size": 10,
+   "anamorphic": 0,
+   "rays": 14,
+   "screen": 0.0,
+   "color": "@primary",
+   "brightness": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 480,
+   "duration": 760,
+   "at": "caster+0,48,26",
+   "texture": "@sparks",
+   "count": 300,
+   "rate": 1.2,
+   "spread": 9,
+   "speed": 0.01,
+   "gravity": 0.0015,
+   "size": [
+    0.18,
+    0.06
+   ],
+   "life": 120,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 840,
+   "duration": 160,
+   "at": "caster",
+   "texture": "@sparks",
+   "count": 400,
+   "rate": 8,
+   "spread": 1.6,
+   "speed": 0.07,
+   "gravity": -0.006,
+   "size": [
+    0.12,
+    0.04
+   ],
+   "life": 36,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_coin",
+   "delay": 780,
+   "until": 1260,
+   "at": "caster+-3.19,1.5,-1.24",
+   "orientation": "facing",
+   "color": "@gold"
+  },
+  {
+   "type": "column",
+   "delay": 924,
+   "duration": 336,
+   "at": "caster+-3.19,1.5,-1.24",
+   "radius": 0.28,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@gold",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_orb",
+   "delay": 800,
+   "until": 1260,
+   "at": "caster+-2.70,1.5,-1.74",
+   "orientation": "facing",
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 926,
+   "duration": 334,
+   "at": "caster+-2.70,1.5,-1.74",
+   "radius": 0.18,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@primary",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_coin",
+   "delay": 820,
+   "until": 1260,
+   "at": "caster+-1.95,1.5,-2.13",
+   "orientation": "facing",
+   "color": "@gold"
+  },
+  {
+   "type": "column",
+   "delay": 928,
+   "duration": 332,
+   "at": "caster+-1.95,1.5,-2.13",
+   "radius": 0.28,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@gold",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_orb",
+   "delay": 840,
+   "until": 1260,
+   "at": "caster+-1.02,1.5,-2.38",
+   "orientation": "facing",
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 930,
+   "duration": 330,
+   "at": "caster+-1.02,1.5,-2.38",
+   "radius": 0.18,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@primary",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_coin",
+   "delay": 860,
+   "until": 1260,
+   "at": "caster+0.00,1.5,-2.47",
+   "orientation": "facing",
+   "color": "@gold"
+  },
+  {
+   "type": "column",
+   "delay": 932,
+   "duration": 328,
+   "at": "caster+0.00,1.5,-2.47",
+   "radius": 0.28,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@gold",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_orb",
+   "delay": 840,
+   "until": 1260,
+   "at": "caster+1.02,1.5,-2.38",
+   "orientation": "facing",
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 934,
+   "duration": 326,
+   "at": "caster+1.02,1.5,-2.38",
+   "radius": 0.18,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@primary",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_coin",
+   "delay": 820,
+   "until": 1260,
+   "at": "caster+1.95,1.5,-2.13",
+   "orientation": "facing",
+   "color": "@gold"
+  },
+  {
+   "type": "column",
+   "delay": 936,
+   "duration": 324,
+   "at": "caster+1.95,1.5,-2.13",
+   "radius": 0.28,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@gold",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_orb",
+   "delay": 800,
+   "until": 1260,
+   "at": "caster+2.70,1.5,-1.74",
+   "orientation": "facing",
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 938,
+   "duration": 322,
+   "at": "caster+2.70,1.5,-1.74",
+   "radius": 0.18,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@primary",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_coin",
+   "delay": 780,
+   "until": 1260,
+   "at": "caster+3.19,1.5,-1.24",
+   "orientation": "facing",
+   "color": "@gold"
+  },
+  {
+   "type": "column",
+   "delay": 940,
+   "duration": 320,
+   "at": "caster+3.19,1.5,-1.24",
+   "radius": 0.28,
+   "height": 7,
+   "fill": 0.55,
+   "color": "@gold",
+   "brightness": 0.6,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 1000,
+   "duration": 16,
+   "at": "caster+0,2,0",
+   "size": 4,
+   "anamorphic": 10,
+   "rays": 6,
+   "screen": 0.45,
+   "color": "@core"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1000,
+   "until": 1256,
+   "at": "caster+-12.6,27.0,36.2",
+   "orientation": "sky",
+   "scale": 0.5213015660476795
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1004,
+   "until": 1256,
+   "at": "caster+-16.5,22.5,21.9",
+   "orientation": "sky",
+   "scale": 0.3788850257788827
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1011,
+   "until": 1256,
+   "at": "caster+21.4,29.5,25.8",
+   "orientation": "sky",
+   "scale": 0.4790215667965876
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1001,
+   "until": 1256,
+   "at": "caster+3.3,23.6,23.2",
+   "orientation": "sky",
+   "scale": 0.5209200225881608
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1010,
+   "until": 1256,
+   "at": "caster+-18.8,25.3,13.3",
+   "orientation": "sky",
+   "scale": 0.30053889541158735
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1011,
+   "until": 1256,
+   "at": "caster+12.3,17.2,20.7",
+   "orientation": "sky",
+   "scale": 0.41994614568401833
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1001,
+   "until": 1256,
+   "at": "caster+4.2,20.4,3.3",
+   "orientation": "sky",
+   "scale": 0.3953789460985363
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1004,
+   "until": 1256,
+   "at": "caster+21.1,17.3,27.5",
+   "orientation": "sky",
+   "scale": 0.43824578107599843
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1006,
+   "until": 1256,
+   "at": "caster+6.7,25.8,3.3",
+   "orientation": "sky",
+   "scale": 0.3319014345128134
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1013,
+   "until": 1256,
+   "at": "caster+15.4,30.7,35.7",
+   "orientation": "sky",
+   "scale": 0.4288567369294245
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1002,
+   "until": 1256,
+   "at": "caster+-9.9,21.6,45.7",
+   "orientation": "sky",
+   "scale": 0.391176612215167
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1004,
+   "until": 1256,
+   "at": "caster+-0.3,24.1,1.3",
+   "orientation": "sky",
+   "scale": 0.29971968025312457
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1007,
+   "until": 1256,
+   "at": "caster+20.4,22.1,14.0",
+   "orientation": "sky",
+   "scale": 0.3696331874261087
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1006,
+   "until": 1256,
+   "at": "caster+1.1,22.1,40.2",
+   "orientation": "sky",
+   "scale": 0.4516009710940193
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1010,
+   "until": 1256,
+   "at": "caster+-4.6,30.5,16.4",
+   "orientation": "sky",
+   "scale": 0.4697680392389645
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1001,
+   "until": 1256,
+   "at": "caster+16.7,23.5,24.4",
+   "orientation": "sky",
+   "scale": 0.36990330585605824
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1016,
+   "until": 1256,
+   "at": "caster+21.8,22.3,15.7",
+   "orientation": "sky",
+   "scale": 0.37709354310395815
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1001,
+   "until": 1256,
+   "at": "caster+7.6,27.7,10.6",
+   "orientation": "sky",
+   "scale": 0.48403545084253174
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1012,
+   "until": 1256,
+   "at": "caster+8.9,20.1,3.9",
+   "orientation": "sky",
+   "scale": 0.5146320966554246
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1006,
+   "until": 1256,
+   "at": "caster+13.1,30.7,28.9",
+   "orientation": "sky",
+   "scale": 0.43583241874646383
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1004,
+   "until": 1256,
+   "at": "caster+-0.2,31.4,44.3",
+   "orientation": "sky",
+   "scale": 0.5298859803185261
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1000,
+   "until": 1256,
+   "at": "caster+-2.5,23.3,14.0",
+   "orientation": "sky",
+   "scale": 0.5545470737301554
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1004,
+   "until": 1256,
+   "at": "caster+-15.9,31.6,11.4",
+   "orientation": "sky",
+   "scale": 0.4984865134072524
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1005,
+   "until": 1256,
+   "at": "caster+-11.8,27.9,40.4",
+   "orientation": "sky",
+   "scale": 0.3984478079193969
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1015,
+   "until": 1256,
+   "at": "caster+-4.9,17.7,13.2",
+   "orientation": "sky",
+   "scale": 0.5437292542543136
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1011,
+   "until": 1256,
+   "at": "caster+-5.0,17.6,10.0",
+   "orientation": "sky",
+   "scale": 0.5793114701484466
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1007,
+   "until": 1256,
+   "at": "caster+5.2,25.7,44.7",
+   "orientation": "sky",
+   "scale": 0.48259222951025094
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1009,
+   "until": 1256,
+   "at": "caster+-19.6,20.5,32.6",
+   "orientation": "sky",
+   "scale": 0.5615316656183393
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1005,
+   "until": 1256,
+   "at": "caster+-6.7,28.3,7.5",
+   "orientation": "sky",
+   "scale": 0.31846389334108816
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1013,
+   "until": 1256,
+   "at": "caster+0.0,17.3,43.0",
+   "orientation": "sky",
+   "scale": 0.595878719650256
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1000,
+   "until": 1256,
+   "at": "caster+-14.5,22.1,11.5",
+   "orientation": "sky",
+   "scale": 0.5259768006310038
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1011,
+   "until": 1256,
+   "at": "caster+-5.5,24.3,4.3",
+   "orientation": "sky",
+   "scale": 0.5359768488334751
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1009,
+   "until": 1256,
+   "at": "caster+12.0,27.7,12.4",
+   "orientation": "sky",
+   "scale": 0.39174913976663905
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1009,
+   "until": 1256,
+   "at": "caster+-10.9,25.8,47.6",
+   "orientation": "sky",
+   "scale": 0.558976642716327
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1002,
+   "until": 1256,
+   "at": "caster+-4.1,24.8,32.9",
+   "orientation": "sky",
+   "scale": 0.301266931628875
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1010,
+   "until": 1256,
+   "at": "caster+14.1,18.8,38.3",
+   "orientation": "sky",
+   "scale": 0.4831526225835401
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1015,
+   "until": 1256,
+   "at": "caster+-10.8,18.6,10.8",
+   "orientation": "sky",
+   "scale": 0.5370627139686899
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1015,
+   "until": 1256,
+   "at": "caster+-8.0,20.9,7.9",
+   "orientation": "sky",
+   "scale": 0.4305404155156525
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1015,
+   "until": 1256,
+   "at": "caster+16.7,23.2,35.7",
+   "orientation": "sky",
+   "scale": 0.5944558299080591
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1006,
+   "until": 1256,
+   "at": "caster+-5.3,22.5,15.4",
+   "orientation": "sky",
+   "scale": 0.2998897213941096
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1009,
+   "until": 1256,
+   "at": "caster+9.1,23.6,22.2",
+   "orientation": "sky",
+   "scale": 0.558662355835249
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1008,
+   "until": 1256,
+   "at": "caster+14.7,29.6,9.5",
+   "orientation": "sky",
+   "scale": 0.34883027786160964
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1015,
+   "until": 1256,
+   "at": "caster+-15.2,30.3,14.6",
+   "orientation": "sky",
+   "scale": 0.3306643983089722
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1007,
+   "until": 1256,
+   "at": "caster+3.9,28.5,38.8",
+   "orientation": "sky",
+   "scale": 0.4906578777630025
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1004,
+   "until": 1256,
+   "at": "caster+7.9,29.5,3.7",
+   "orientation": "sky",
+   "scale": 0.5530724316193667
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_white",
+   "delay": 1009,
+   "until": 1256,
+   "at": "caster+2.7,18.9,14.2",
+   "orientation": "sky",
+   "scale": 0.36818740342891443
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1008,
+   "until": 1256,
+   "at": "caster+-4.0,26.9,28.9",
+   "orientation": "sky",
+   "scale": 0.5010621986190064
+  },
+  {
+   "type": "sigil",
+   "id": "silent_field_green",
+   "delay": 1001,
+   "until": 1256,
+   "at": "caster+-7.6,22.1,49.4",
+   "orientation": "sky",
+   "scale": 0.594027203461948
+  },
+  {
+   "type": "beam_rain",
+   "delay": 1010,
+   "duration": 240,
+   "at": "caster+0,0,26",
+   "area": 22,
+   "count": 200,
+   "interval": 1.2,
+   "width": 0.22,
+   "height": 26,
+   "color": "@secondary",
+   "impact": "silent_impact"
+  },
+  {
+   "type": "mesh",
+   "model": "silent_crystal",
+   "delay": 1256,
+   "until": 1900,
+   "at": "caster+0,0,26",
+   "yaw": 0,
+   "scale": 1.2
+  },
+  {
+   "type": "flash",
+   "delay": 1256,
+   "duration": 24,
+   "at": "caster+0,3,26",
+   "size": 8,
+   "anamorphic": 12,
+   "rays": 8,
+   "screen": 0.35,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 1256,
+   "duration": 400,
+   "at": "caster+0,4,26",
+   "texture": "@shards",
+   "count": 80,
+   "rate": 4,
+   "spread": 5,
+   "speed": 0.02,
+   "gravity": 0.004,
+   "spin": 60,
+   "tumble": 0.6,
+   "size": [
+    0.3,
+    0.1
+   ],
+   "life": 80,
+   "color": "@secondary"
+  }
+ ]
+}

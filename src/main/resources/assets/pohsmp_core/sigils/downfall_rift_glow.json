@@ -1,0 +1,59 @@
+{
+ "comment": "Низвержение: сияние в разломе (всегда к камере).",
+ "size": 1.2,
+ "color": "#D4A017",
+ "orientation": "billboard",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.8,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 12
+   }
+  },
+  {
+   "id": "rays",
+   "type": "spokes",
+   "texture": "rays",
+   "radius": 2.2,
+   "heightOffset": 0.01,
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 60,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 12
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

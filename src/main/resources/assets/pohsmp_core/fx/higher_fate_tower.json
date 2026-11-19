@@ -1,0 +1,165 @@
+{
+ "comment": "Звезда судьбы, карта Башни: башня под молнией, двойной удар по цели и отдача магу. Созвездие над целью 3 с (следует за ней), под целью карта; на 46-м тике звезда падает лучом, на 60-м удар (тики совпадают с FateStarSpell.FALL). Цвет созвездия — цвет карты.",
+ "style": "higher",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "higher_fate_sky",
+   "delay": 0,
+   "at": "target+0,7,0",
+   "follow": true,
+   "until": 62,
+   "color": "#FF4D4D"
+  },
+  {
+   "type": "sigil",
+   "id": "higher_fate_card_tower",
+   "delay": 6,
+   "at": "target+0,0.05,0",
+   "follow": true,
+   "until": 62
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 56,
+   "at": "target+0,7,0",
+   "follow": true,
+   "texture": "shard",
+   "count": 40,
+   "rate": 0.8,
+   "spread": 2.6,
+   "speed": 0.01,
+   "gravity": 0.0,
+   "spin": 60,
+   "size": [
+    0.25,
+    0.05
+   ],
+   "life": 30,
+   "color": "#FFB0A0"
+  },
+  {
+   "type": "beam",
+   "delay": 46,
+   "duration": 16,
+   "at": "target+0,7,0",
+   "to": "target",
+   "follow": true,
+   "width": 0.5,
+   "core": 0.3,
+   "taper": 0.6,
+   "grow": 14,
+   "color": "#FF4D4D",
+   "in": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 46,
+   "duration": 16,
+   "at": "target+0,7,0",
+   "follow": true,
+   "size": 2.6,
+   "rays": 6,
+   "color": "#FFB0A0"
+  },
+  {
+   "type": "flash",
+   "delay": 60,
+   "duration": 14,
+   "at": "target+0,0.4,0",
+   "size": 6,
+   "anamorphic": 12,
+   "rays": 10,
+   "screen": 0.2,
+   "color": "#FF4D4D"
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 60,
+   "duration": 22,
+   "at": "target",
+   "radius": 4.5,
+   "color": "#FF4D4D"
+  },
+  {
+   "type": "wave",
+   "shape": "sphere",
+   "delay": 60,
+   "duration": 14,
+   "at": "target+0,0.5,0",
+   "radius": 3.2,
+   "rim": 0.9,
+   "color": "#FFB0A0",
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "higher_fate_impact",
+   "delay": 60,
+   "at": "target+0,0.06,0",
+   "color": "#FF4D4D"
+  },
+  {
+   "type": "sprites",
+   "delay": 60,
+   "duration": 30,
+   "at": "target+0,0.6,0",
+   "texture": "shard",
+   "count": 40,
+   "rate": 0,
+   "spread": 0.6,
+   "speed": 0.22,
+   "gravity": 0.01,
+   "spin": 200,
+   "size": [
+    0.35,
+    0.08
+   ],
+   "life": 28,
+   "color": "#FFB0A0"
+  },
+  {
+   "type": "decal",
+   "delay": 62,
+   "duration": 60,
+   "at": "target",
+   "texture": "fate_card_tower",
+   "radius": 2.4,
+   "fadeOut": 50,
+   "color": "#FF4D4D",
+   "brightness": 0.6
+  },
+  {
+   "type": "lightning",
+   "delay": 52,
+   "duration": 12,
+   "at": "target+0,7,0",
+   "to": "target",
+   "follow": true,
+   "branches": 3,
+   "jaggedness": 0.5,
+   "regen": 2,
+   "width": 0.18,
+   "color": "#FFD0C0"
+  },
+  {
+   "type": "decal",
+   "delay": 62,
+   "duration": 80,
+   "at": "target",
+   "texture": "higher_cracks",
+   "radius": 3,
+   "fadeOut": 40,
+   "color": "#FF4D4D"
+  }
+ ]
+}

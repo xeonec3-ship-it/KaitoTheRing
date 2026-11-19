@@ -1,0 +1,21 @@
+{
+ "comment": "Звёзды: фиолетовый и серебро, белое ядро; созвездия, орбиты, туманности.",
+ "palette": {
+  "primary": "#A07CFF",
+  "secondary": "#D8DCFF",
+  "core": "#FFFFFF",
+  "shadow": "#1A0F40"
+ },
+ "textures": {
+  "sparks": "spark_sharp",
+  "runes": "rune_band",
+  "shards": "shard",
+  "sigil": "constellation"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutSine"
+ }
+}

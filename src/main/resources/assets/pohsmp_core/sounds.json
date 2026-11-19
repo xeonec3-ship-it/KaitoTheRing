@@ -2,6 +2,46 @@
   "music.silent_gate": {
     "category": "record",
     "subtitle": "subtitles.pohsmp_core.music.silent_gate",
-    "sounds": [ { "name": "pohsmp_core:music/silent_gate", "stream": true } ]
+    "sounds": [
+      {
+        "name": "pohsmp_core:music/silent_gate",
+        "stream": true
+      }
+    ]
+  },
+  "sigil.hit": {
+    "subtitle": "subtitles.pohsmp_core.sigil.hit",
+    "sounds": [
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "pitch": 1.25,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.amethyst_block.chime",
+        "type": "event",
+        "pitch": 1.55,
+        "volume": 0.9
+      },
+      {
+        "name": "minecraft:block.amethyst_cluster.hit",
+        "type": "event",
+        "pitch": 1.15,
+        "volume": 0.9
+      },
+      {
+        "name": "minecraft:block.note_block.chime",
+        "type": "event",
+        "pitch": 1.6,
+        "volume": 0.55
+      },
+      {
+        "name": "minecraft:block.amethyst_block.resonate",
+        "type": "event",
+        "pitch": 1.35,
+        "volume": 0.7
+      }
+    ]
   }
 }

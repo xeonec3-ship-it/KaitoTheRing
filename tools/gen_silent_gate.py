@@ -8,7 +8,7 @@
 - Под створками — переплетённые завитки и подвеска: ромб-камень и лезвие-крест вниз.
 Проявляются из света сверху вниз.
 
-Пишет fx/meshes/silent_gate.json — часть mesh типа `boxes` (docs/fx.md): бруски [x0, y0, z0, x1, y1, z1, тон] и необязательный
+Пишет fx/meshes/silent_gate.json (рама), silent_gate_door_l/_r.json (створки на петлях), silent_gate_light.json (свет проёма) — часть mesh типа `boxes` (docs/fx.md): бруски [x0, y0, z0, x1, y1, z1, тон] и необязательный
 поворот [rx, ry, rz] (градусы, вокруг центра бруска) — в блоках; центр низа створок — (0,0,0), +y вверх, +z — лицом к заклинателю.
 Тона: 0 тень, 1 камень, 2 светлый камень, 3 белый, 4 светящееся (бирюза, аддитивно).
 Запуск: python3 tools/gen_silent_gate.py
@@ -20,6 +20,7 @@ import os
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core', 'fx', 'meshes', 'silent_gate.json')
 B = []
+GROUP = ['frame']          # текущая группа брусков: 'frame' (рама, колонны, шпиль, подвеска) или 'door' (створки, делятся на левую/правую)
 R3 = lambda v: round(v, 3)
 
 
@@ -27,7 +28,7 @@ def box(x0, y0, z0, x1, y1, z1, t=1, rot=None):
     b = [R3(min(x0, x1)), R3(min(y0, y1)), R3(min(z0, z1)), R3(max(x0, x1)), R3(max(y0, y1)), R3(max(z0, z1)), t]
     if rot and any(abs(a) > 1e-6 for a in rot):
         b.append([R3(a) for a in rot])
-    B.append(b)
+    B.append((GROUP[0], b))
 
 
 def cbox(cx, cy, cz, sx, sy, sz, t=1, rot=None):
@@ -118,16 +119,21 @@ def build():
     W, H, D = 3.0, 6.0, 0.6                  # полуширина створок, высота до арки, полутолщина плиты
     AR = W                                    # радиус скругления арки
     # --- плита створок и ступенчатая рамка
+    GROUP[0] = 'door'
     box(-W, 0, -D, W, H, D, 2)
     for i in range(14):                       # скруглённая арка ступенями
         y0 = H + AR * i / 14
         y1 = H + AR * (i + 1) / 14
         hw = math.sqrt(max(0, AR * AR - (y0 - H) ** 2))
         box(-hw, y0, -D, hw, y1, D, 2)
-    box(-W - 0.3, -0.05, -D - 0.15, W + 0.3, H, -D + 0.25, 1)          # задняя рамка шире
-    arc(0, H, D + 0.06, AR - 0.12, 0, 180, 0.24, 0.3, 3, n=20)          # профиль арки по краю лица
+    GROUP[0] = 'frame'
+    for s in (-1, 1):                                                     # задняя рамка — кольцом вокруг проёма (за ней свет)
+        box(s * W, -0.05, -D - 0.15, s * (W + 0.3), H, -D + 0.25, 1)
+    arc(0, H, -D + 0.05, AR + 0.15, 0, 180, 0.3, 0.4, 1, n=20)
+    arc(0, H, D + 0.06, AR + 0.12, 0, 180, 0.24, 0.3, 3, n=20)          # профиль арки по краю лица (снаружи створок)
     for s in (-1, 1):
-        box(s * (W - 0.24), 0, D, s * W, H, D + 0.2, 3)                  # вертикальные края рамки
+        box(s * W, 0, -D, s * (W + 0.24), H, D + 0.2, 3)                 # вертикальные края рамки (снаружи створок)
+    GROUP[0] = 'door'
     # --- желобки по фону (вертикальные полоски), шов, оси
     x = -W + 0.45
     while x < W - 0.4:
@@ -168,6 +174,7 @@ def build():
         cbox(s * 0.5, 0.6, D + 0.15, 0.1, 0.1, 0.1, 3)
         cbox(s * (W - 0.6), 2.1, D + 0.15, 0.1, 0.1, 0.1, 3)
     # --- шпиль с крылатой фигуркой над аркой
+    GROUP[0] = 'frame'
     box(-0.08, H + AR - 0.1, -0.08, 0.08, H + AR + 1.3, 0.08, 3)
     bird(0, H + AR + 0.4, 0.15, 0.7)
     cbox(0, H + AR + 1.4, 0, 0.22, 0.3, 0.22, 4, [0, 45, 0])
@@ -251,31 +258,53 @@ def crystals():
     print(f'silent_crystal: {len(C)} boxes')
 
 
+def _split_doors(W):
+    """Створки: брусок по центру бруска — в левую (x < 0) или правую; прямые бруски через шов режутся по x = 0."""
+    L, R = [], []
+    for g, b in B:
+        if g != 'door':
+            continue
+        x0, x1 = b[0], b[3]
+        if len(b) == 7 and x0 < -0.001 and x1 > 0.001:
+            L.append([x0, b[1], b[2], 0.0] + b[4:])
+            R.append([0.0, b[1], b[2], x1] + b[4:])
+        elif (x0 + x1) / 2 < 0:
+            L.append(b)
+        else:
+            R.append(b)
+    return L, R
+
+
+def _mesh(name, boxes, comment, appear, tones=None, blend='translucent', opacity=0.95):
+    ys = [b[1] for b in boxes] + [b[4] for b in boxes]
+    doc = {'comment': comment + ' Сгенерировано tools/gen_silent_gate.py — правьте генератор.', 'style': 'silent', 'center': 0, 'formedAt': appear['duration'],
+           'collapse': {'duration': 30, 'easing': 'easeInCubic'},
+           'parts': [{'type': 'boxes', 'tones': tones or ['#5E7286', '#9FB2C2', '#C4D3DF', '#EAF1F7', '@primary'], 'glowTones': [4], 'blend': blend,
+                      'opacity': opacity, 'shade': True, 'boxes': boxes, 'appear': appear, 'bounds': [min(ys), max(ys)]}]}
+    out = os.path.join(os.path.dirname(OUT), name + '.json')
+    json.dump(doc, open(out, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+    print(f'{name}: {len(boxes)} boxes')
+
+
 def main():
     build()
-    ys = [b[1] for b in B] + [b[4] for b in B]
-    doc = {
-        'comment': 'Врата «Безмолвной ведьмы» (T03), по кадрам аниме. Сгенерировано tools/gen_silent_gate.py — правьте генератор.',
-        'style': 'silent',
-        'center': 0,
-        'formedAt': 80,
-        'collapse': {'duration': 30, 'easing': 'easeInCubic'},
-        'parts': [{
-            'type': 'boxes',
-            'tones': ['#5E7286', '#9FB2C2', '#C4D3DF', '#EAF1F7', '@primary'],
-            'glowTones': [4],
-            'blend': 'translucent',
-            'opacity': 0.95,
-            'shade': True,
-            'boxes': B,
-            'appear': {'delay': 0, 'duration': 80, 'easing': 'easeInOutSine', 'reveal': 'down', 'front': 0.8},
-            'bounds': [min(ys), max(ys)],
-        }],
-    }
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    json.dump(doc, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
-    print(f'silent_gate: {len(B)} boxes, height {min(ys):.1f}..{max(ys):.1f} blocks')
-    crystals()
+    W, H, D = 3.0, 6.0, 0.6
+    reveal = {'delay': 0, 'duration': 100, 'easing': 'easeInOutSine', 'reveal': 'down', 'front': 0.8}
+    frame = [b for g, b in B if g == 'frame']
+    left, right = _split_doors(W)
+    _mesh('silent_gate', frame, 'Врата «Безмолвных врат» (T03): рама, колонны, шпиль, подвеска — без створок (створки — silent_gate_door_l/_r, '
+          'петли на x = ∓3, свет проёма — silent_gate_light). Центр низа створок — (0,0,0), +z — к заклинателю.', reveal)
+    _mesh('silent_gate_door_l', left, 'Левая створка «Безмолвных врат»: петля — вертикаль x = -3, z = 0; открывается внутрь (от заклинателя), '
+          'поворот вокруг петли на +100°.', reveal)
+    _mesh('silent_gate_door_r', right, 'Правая створка «Безмолвных врат»: петля — вертикаль x = +3, z = 0; открывается внутрь, поворот на -100°.', reveal)
+    light = [[-W, 0, -D - 0.1, W, H, -D + 0.05, 4]]
+    for i in range(14):
+        y0, y1 = H + W * i / 14, H + W * (i + 1) / 14
+        hw = math.sqrt(max(0, W * W - (y0 - H) ** 2))
+        light.append([R3(-hw), R3(y0), -D - 0.1, R3(hw), R3(y1), -D + 0.05, 4])
+    _mesh('silent_gate_light', light, 'Свет в проёме «Безмолвных врат» — виден, когда створки открываются (белое сияние за ними).',
+          {'delay': 0, 'duration': 30, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 1.0},
+          tones=['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF', '#E8FFF8'], blend='additive', opacity=1.0)
 
 
 if __name__ == '__main__':

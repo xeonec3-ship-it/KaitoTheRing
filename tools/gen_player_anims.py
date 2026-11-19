@@ -849,7 +849,7 @@ POINT_R = _fk(pitch=-100, yaw=8, roll=-6, bend=-4)
 POINT_HI_R = _fk(pitch=-128, yaw=6, roll=-4, bend=-2)
 SKY_R = _fk(pitch=-172, yaw=0, roll=-8, bend=-2)
 FWD_R = _fk(pitch=-90, yaw=4, roll=-4, bend=0)          # рука прямо вперёд — момент удара
-STAFF_L = _fk(pitch=-34, yaw=-14, roll=10, bend=-22)      # левая рука держит посох низко впереди, по диагонали
+STAFF_L = _fk(pitch=-16, yaw=-6, roll=-10, bend=-58)      # левая рука держит посох сбоку, кулак у пояса чуть впереди, посох вертикально (как в видео мода)
 
 
 def silent_gate_cast():

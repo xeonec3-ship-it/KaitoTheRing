@@ -414,11 +414,16 @@ class Portal {
     this.root = new THREE.Group(); this.root.position.copy(origin).add(new THREE.Vector3(0, this.def.center, 0)); scene.add(this.root);
     if (opts.yaw) this.root.rotation.y = opts.yaw * D2R;
     this.mirror = opts.mirror ? -1 : 1;   // как в игре: +x модели — вправо от заклинателя (здесь вправо = -X)
+    this.base = this.root.position.clone(); this.move = opts.move; this.hinge = opts.hinge;
+    if (this.hinge) {   // створка на петле: поворот вокруг вертикали через pivot (в координатах модели)
+      const pv = this.hinge.pivot; this.hg = new THREE.Group(); this.hp = new THREE.Group();
+      this.hg.position.set(pv[0], pv[1], pv[2]); this.hp.position.set(-pv[0], -pv[1], -pv[2]); this.root.add(this.hg); this.hg.add(this.hp);
+    }
     this.parts = this.def.parts.map((p) => this.make(p));
   }
   make(p) {
     const color = styleColor(this.def.style, p.color), g = new THREE.Group(), P = { def: p, g, rot: 0, mats: [] };
-    this.root.add(g);
+    (this.hp || this.root).add(g);
     const add = (geo, m) => { const mesh = new THREE.Mesh(geo, m); P.mats.push(m); g.add(mesh); return mesh; };
     if (p.type === "seed") {
       const geo = new THREE.OctahedronGeometry(p.radius);
@@ -463,7 +468,14 @@ class Portal {
   update(t, dt) {
     const lt = t - this.t0;
     const col = this.stopAt === null ? 1 : 1 - ease(this.def.collapse.easing, (t - this.stopAt) / this.def.collapse.duration);
-    this.root.scale.setScalar(Math.max(0.0001, col * this.s)); this.root.scale.x *= this.mirror; this.root.visible = lt >= 0;
+    let ms = 1;
+    if (this.move) {   // выход из точки: смещение from (оси взгляда заклинателя: x вправо, y вверх, z вперёд) и масштаб scaleFrom → 1
+      const mv = this.move, e = ease(mv.easing || "easeOutCubic", clamp01((lt - (mv.delay || 0)) / (mv.duration || 1))), f = mv.from || [0, 0, 0];
+      this.root.position.copy(this.base).add(new THREE.Vector3(-f[0], f[1], f[2]).multiplyScalar(1 - e));
+      ms = (mv.scaleFrom ?? 1) + (1 - (mv.scaleFrom ?? 1)) * e;
+    }
+    if (this.hinge) { const h = this.hinge; this.hg.rotation.y = (h.angle || 0) * D2R * ease(h.easing || "easeInOutCubic", clamp01((lt - (h.delay || 0)) / (h.duration || 1))); }
+    this.root.scale.setScalar(Math.max(0.0001, col * this.s * ms)); this.root.scale.x *= this.mirror; this.root.visible = lt >= 0;
     for (const P of this.parts) {
       const p = P.def, ap = p.appear || { delay: 0, duration: 1 }, k = clamp01((lt - ap.delay) / ap.duration), e = ease(ap.easing, k);
       let alpha = lt >= ap.delay ? clamp01(k * 3) : 0;
@@ -628,7 +640,7 @@ class FxRun {
     for (const it of this.items) {
       const e = it.e, k = lt - e.delay;
       if (e.type === "mesh") {
-        if (!it.made && k >= 0) { it.made = true; it.s = new Portal(e.model || e.id, anchor(e.at), { t0: t, yaw: e.yaw || 0, scale: e.scale || 1, noAuto: true, mirror: this.mirrorMeshes }); this.sigils.push(it.s); }
+        if (!it.made && k >= 0) { it.made = true; it.s = new Portal(e.model || e.id, anchor(e.at), { t0: t, yaw: e.yaw || 0, scale: e.scale || 1, noAuto: true, mirror: this.mirrorMeshes, move: e.move, hinge: e.hinge }); this.sigils.push(it.s); }
         if (it.s && e.until && lt >= e.until) it.s.stop(t);
         continue;
       }

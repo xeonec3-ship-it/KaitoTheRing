@@ -9,6 +9,74 @@
 - **Помощники для скриптов CNPC**: `var Core = Java.type("ru.pohsmp.core.Api")`
   - `Core.version()` — версия мода;
   - `Core.cmd(world.getMCLevel(), "команда")` — тихая команда от сервера (без вывода в чат и лог), возвращает результат.
+  - **Каст заклинаний NPC-магом** (1.12.0, `spell/NpcCast`) — см. раздел «NPC-маги» ниже.
+
+## NPC-маги: `Core.cast`
+NPC CustomNPCs (или любой моб, кроме игрока) кастует заклинание этого мода или Iron's так же, как игрок:
+поворачивается к цели, проходит проверки самого заклинания (дальность, прямая видимость, свои условия),
+дальше идут те же шаги Iron's, что у игрока: начало, тик каста, каст и завершение. Поэтому у NPC работают
+эффекты, печати, ролик камеры (Низвержение, Млечный Путь и др.) и удержание цели (Дезинтеграция).
+Анимация каста игрока (Iron's или своя, `pohsmp_*`) проигрывается на модели NPC у всех игроков рядом.
+Маны и перезарядки у NPC нет, как у мобов Iron's.
+
+| Вызов | Что делает |
+|---|---|
+| `Core.cast(npc, "pohsmp_core:disintegration", target)` | каст на максимальном уровне заклинания; `true`, если каст начался |
+| `Core.cast(npc, id, target, level)` | то же с уровнем (обрезается до уровней заклинания; 0 — максимальный) |
+| `Core.cast(npc, id, x, y, z)` / `Core.cast(npc, id, x, y, z, level)` | каст в точку |
+| `Core.cancelCast(npc)` | прервать каст; `false`, если NPC не кастует или заклинание неотменяемое |
+| `Core.cancelCast(npc, true)` | прервать любой каст (сброс босса, смена фазы) |
+| `Core.isCasting(npc)` | идёт ли каст |
+| `Core.castingSpell(npc)` | id заклинания в касте или `""` |
+
+- `npc` — `e.npc` из события или любой `IEntity` (подойдёт и сущность Minecraft).
+- `id` — `"pohsmp_core:…"` или `"irons_spellbooks:…"`; без префикса ищется сначала в этом моде, потом в Iron's.
+- `target` бывает трёх видов. Существо: `IEntity`, например `e.npc.getAttackTarget()` или игрок. Точка: `IPos`
+  (берётся центр блока), массив `[x, y, z]` или объект `{x:…, y:…, z:…}`. `null`: цель атаки NPC, а если её нет,
+  то прямо по взгляду. Существо-цель NPC отслеживает весь каст, точка остаётся неподвижной.
+- Почему каст не начался, видно в логе сервера: `[pohsmp_core] Core.cast …: причина`. Причины: цель вне дальности
+  или не видна, NPC уже кастует, нет такого заклинания и т. п.
+- Правила заклинаний действуют как у игрока:
+  - долгий каст, который заклинание разрешает сбить, прерывается уроном по NPC;
+  - неотменяемый каст (Дезинтеграция и др.) урон не сбивает, и `Core.cancelCast(npc)` его не прерывает,
+    это может только `Core.cancelCast(npc, true)`;
+  - если цель удержания пропала (умерла, ушла в другое измерение), заклинание само прерывает каст;
+  - смерть или выгрузка NPC прерывает каст.
+- Во время долгого каста NPC стоит на месте и смотрит на цель.
+- Когда каст закончился (успешно или прерван), мод вызывает в скрипте NPC функцию `pohsmp_cast_end(e)`, если она есть.
+  Поля `e`: `npc`, `spell` (id), `cancelled` (`true`, если каст прерван), `x`, `y`, `z`.
+  У мгновенных заклинаний каст проходит сразу, поэтому функция вызывается ещё внутри `Core.cast`.
+- Команды для проверки (оп 2): `/pohsmp npccast <кто> "<id>" [уровень] [entity <цель> | at <x y z>]`
+  и `/pohsmp npccancel <кто> [true]`. Во втором аргументе id заклинания пишется в кавычках.
+
+Пример: босс раз в 15 секунд кастует по цели Дезинтеграцию, а при 50% здоровья прерывает каст и переходит
+ко второй фазе. Скрипт вешается на NPC во вкладку «Скрипты», язык ECMAScript.
+
+```javascript
+var Core = Java.type("ru.pohsmp.core.Api");
+var phase2 = false;
+
+function init(e) { e.npc.getTimers().forceStart(1, 300, true); }   // таймер 1: каждые 15 с
+
+function timer(e) {
+    if (e.id != 1 || Core.isCasting(e.npc)) return;
+    var t = e.npc.getAttackTarget();
+    if (t == null) return;
+    if (!phase2) Core.cast(e.npc, "pohsmp_core:disintegration", t);
+    else Core.cast(e.npc, "irons_spellbooks:fireball", t, 5);           // Iron's, уровень 5
+}
+
+function damaged(e) {
+    if (phase2 || e.npc.getHealth() > e.npc.getMaxHealth() / 2) return;
+    phase2 = true;
+    Core.cancelCast(e.npc, true);                                      // Дезинтеграцию можно прервать только так
+    Core.cast(e.npc, "pohsmp_core:singularity", e.npc.getX(), e.npc.getY() + 1, e.npc.getZ() + 6);  // в точку
+}
+
+function pohsmp_cast_end(e) {
+    if (!e.cancelled) e.npc.say("§6" + e.spell + "!");
+}
+```
 
 - **Школа Iron's «Божественная»** (`pohsmp_core:divine`, атрибуты `divine_spell_power` / `divine_magic_resist`, тип урона `divine_magic` сквозь броню).
 - **Заклинание «Дезинтеграция»** (`pohsmp_core:disintegration`, уровень 1, каст 10 с, урон не сбивает): цель в 48 блоках
@@ -46,6 +114,9 @@
 - Настройки сервера: `world/serverconfig/pohsmp_core-server.toml`.
 
 ## Сборка
+Для компиляции нужны jar из `libs/README.md` (Iron's, GeckoLib, PlayerAnimator). Анимация каста на модели NPC
+делается миксином `mixin/HumanoidModelMixin` (`pohsmp_core.mixins.json`, только клиент).
+
 Iron's и GeckoLib для компиляции лежат в `C:\Users\xeone\pohcore-build\libs` (копии из модов Prism, `compileOnly fg.deobf`).
 
 Исходник здесь, собирается в `C:\Users\xeone\pohcore-build` (вне OneDrive): скопировать `src`, `gradle.properties`, `build.gradle`,

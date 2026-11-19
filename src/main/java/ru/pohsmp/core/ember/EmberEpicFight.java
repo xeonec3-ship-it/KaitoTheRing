@@ -15,6 +15,7 @@ import yesman.epicfight.api.animation.LivingMotions;
 import yesman.epicfight.api.animation.property.AnimationProperty.ActionAnimationProperty;
 import yesman.epicfight.api.animation.property.AnimationProperty.AttackAnimationProperty;
 import yesman.epicfight.api.animation.types.ActionAnimation;
+import yesman.epicfight.api.animation.types.AttackAnimation;
 import yesman.epicfight.api.animation.types.BasicAttackAnimation;
 import yesman.epicfight.api.animation.types.MovementAnimation;
 import yesman.epicfight.api.animation.types.StaticAnimation;
@@ -97,16 +98,65 @@ public final class EmberEpicFight {
          * Server, every player tick: during whip1-3 the lash goes at the contact start of each swing (hit or miss); a new swing (another
          * whip animation, or the same one started again) resets the swing in EmberBlade.
          */
+        // ---- manager 19.11: hits from Weapons of Miracles when it is loaded (soft dependency, read by reflection; else ours) ----
+        // sword forms 0/1 = the Herrscher combo (auto 1-3, dash Verdammnis, air Ausrottung — as WOM's own Herrscher preset);
+        // whip = Blackstar's 1st hit (WOM's Blackstar preset opens with AnimsNapoleon.NAPOLEON_AUTO_1), Moonless's 2nd, Orbit's 3rd.
+        static AnimationAccessor<? extends AttackAnimation> S1, S2, S3, S4, SDASH, SAIR, W1, W2, W3;
+        static boolean womUsed;
+        private static boolean resolved;
+
+        static synchronized void resolve() {
+            if (resolved) return;
+            resolved = true;
+            boolean wom = ModList.get().isLoaded("wom");
+            S1 = wom(wom, "AnimsHerrscher", "HERRSCHER_AUTO_1", SWORD1);
+            S2 = wom(wom, "AnimsHerrscher", "HERRSCHER_AUTO_2", SWORD2);
+            S3 = wom(wom, "AnimsHerrscher", "HERRSCHER_AUTO_3", SWORD3);
+            SDASH = wom(wom, "AnimsHerrscher", "HERRSCHER_VERDAMMNIS", SWORD_DASH);
+            SAIR = wom(wom, "AnimsHerrscher", "HERRSCHER_AUSROTTUNG", SWORD_AIR);
+            W1 = wom(wom, "AnimsNapoleon", "NAPOLEON_AUTO_1", WHIP1);
+            W2 = wom(wom, "AnimsMoonless", "MOONLESS_AUTO_2", WHIP2);
+            W3 = wom(wom, "AnimsOrbit", "ORBIT_ATTACK_3", WHIP3);
+            womUsed = S1 != SWORD1 || W1 != WHIP1;
+            S4 = S1 != SWORD1 ? null : SWORD4;   // Herrscher has 3 hits; ours had a 4th finisher
+            PohCore.LOG.info("Ember: Epic Fight hits from {}", womUsed ? "Weapons of Miracles (Herrscher / Blackstar, Moonless, Orbit)" : "pohsmp_core");
+        }
+
+        @SuppressWarnings("unchecked")
+        private static AnimationAccessor<? extends AttackAnimation> wom(boolean on, String cls, String field, AnimationAccessor<? extends AttackAnimation> def) {
+            if (!on) return def;
+            try {
+                Object v = Class.forName("reascer.wom.gameasset.animations.weapons." + cls).getField(field).get(null);
+                if (v instanceof AnimationAccessor<?> a && a.get() instanceof AttackAnimation) return (AnimationAccessor<? extends AttackAnimation>) a;
+                PohCore.LOG.warn("Ember: WOM {}.{} is not an attack animation", cls, field);
+            } catch (Throwable t) {   // WOM renamed something: our own hits stay
+                PohCore.LOG.warn("Ember: WOM {}.{} not found ({})", cls, field, t.toString());
+            }
+            return def;
+        }
+
+        /** Start of the first contact of a whip hit (seconds): the lash goes then; from the animation's phases when it is WOM's. */
+        static float contact(Object anim) {
+            if (anim == WHIP3) return WHIP3_CONTACT;
+            if (anim == WHIP1 || anim == WHIP2) return WHIP_CONTACT;
+            try {
+                if (anim instanceof AnimationAccessor<?> a && a.get() instanceof AttackAnimation at && at.phases.length > 0) return at.phases[0].contact;
+            } catch (RuntimeException ignored) {
+            }
+            return WHIP_CONTACT;
+        }
+
         static void watchSwing(net.minecraftforge.event.TickEvent.PlayerTickEvent e) {
             if (e.phase != net.minecraftforge.event.TickEvent.Phase.END || !(e.player instanceof ServerPlayer p)) return;
             Object anim = null;
             AnimationPlayer pl = null;
             if (p.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.hot(p)) {
                 try {
+                    resolve();
                     ServerPlayerPatch patch = EpicFightCapabilities.getEntityPatch(p, ServerPlayerPatch.class);
                     pl = patch == null ? null : patch.getAnimator().getPlayerFor(null);
                     Object real = pl == null ? null : pl.getRealAnimation();
-                    if (WHIP1 != null && (WHIP1.equals(real) || WHIP2.equals(real) || WHIP3.equals(real))) anim = real;
+                    if (W1 != null && real != null && (W1.equals(real) || W2.equals(real) || W3.equals(real))) anim = real;
                 } catch (RuntimeException ex) {   // an API change in Epic Fight must not break the tick
                     anim = null;
                 }
@@ -122,7 +172,7 @@ public final class EmberEpicFight {
             float t = pl.getElapsedTime(), t0 = pl.getPrevElapsedTime();
             if (!anim.equals(last) || t < t0) EmberBlade.swingStart(p);   // a new lash
             SWING_ANIM.put(p.getUUID(), anim);
-            float c = WHIP3.equals(anim) ? WHIP3_CONTACT : WHIP_CONTACT;
+            float c = contact(anim);
             if (t >= c && (t0 < c || !anim.equals(last) || t < t0)) EmberBlade.swingContact(p);
         }
 
@@ -168,20 +218,25 @@ public final class EmberEpicFight {
         }
 
         static void registerWeaponType(WeaponCapabilityPresetRegistryEvent e) {
-            e.getTypeEntry().put(new ResourceLocation(PohCore.MODID, EmberBlade.NAME), item -> WeaponCapability.builder()
+            e.getTypeEntry().put(new ResourceLocation(PohCore.MODID, EmberBlade.NAME), item -> {
+                resolve();   // the presets are built after the animations are registered: WOM's accessors are there by now
+                return WeaponCapability.builder()
                     .category(CapabilityItem.WeaponCategories.SWORD)
+                    // forms 0/1 (cold, burning sword): ONE_HAND; form 2 (whip): TWO_HAND
                     .styleProvider(patch -> hot(patch.getOriginal()) ? CapabilityItem.Styles.TWO_HAND : CapabilityItem.Styles.ONE_HAND)
                     .collider(ColliderPreset.SWORD)
                     .hitSound(EpicFightSounds.BLADE_HIT.get())
-                    .newStyleCombo(CapabilityItem.Styles.ONE_HAND, SWORD1, SWORD2, SWORD3, SWORD4, SWORD_DASH, SWORD_AIR)
-                    .newStyleCombo(CapabilityItem.Styles.TWO_HAND, WHIP1, WHIP2, WHIP3, Animations.SWORD_DASH, Animations.SWORD_AIR_SLASH)
+                    .newStyleCombo(CapabilityItem.Styles.ONE_HAND, S4 == null ? new AnimationAccessor[] {S1, S2, S3, SDASH, SAIR}
+                            : new AnimationAccessor[] {S1, S2, S3, S4, SDASH, SAIR})
+                    .newStyleCombo(CapabilityItem.Styles.TWO_HAND, W1, W2, W3, Animations.SWORD_DASH, Animations.SWORD_AIR_SLASH)
                     .innateSkill(CapabilityItem.Styles.ONE_HAND, s -> special)
                     .innateSkill(CapabilityItem.Styles.TWO_HAND, s -> special)
                     .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
                     .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
                     .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, WHIP_IDLE)
                     .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.WALK, WHIP_WALK)
-                    .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.RUN, WHIP_RUN));
+                    .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.RUN, WHIP_RUN);
+            });
         }
 
         static yesman.epicfight.skill.Skill special;
@@ -205,14 +260,14 @@ public final class EmberEpicFight {
             @Override
             public boolean checkExecuteCondition(yesman.epicfight.skill.SkillContainer c) {
                 Player p = (Player) c.getExecutor().getOriginal();
-                return p.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.heat(p) >= EmberBlade.MAX_HEAT;
+                return p.getMainHandItem().getItem() instanceof EmberBlade && EmberBlade.ready(p);
             }
 
             @Override
             public void executeOnServer(yesman.epicfight.skill.SkillContainer c, net.minecraft.network.FriendlyByteBuf buf) {
                 ServerPlayer p = c.getServerExecutor().getOriginal();
                 ItemStack s = p.getMainHandItem();
-                if (!(s.getItem() instanceof EmberBlade) || EmberBlade.heat(p) < EmberBlade.MAX_HEAT) return;
+                if (!(s.getItem() instanceof EmberBlade) || !EmberBlade.ready(p)) return;
                 super.executeOnServer(c, buf);
                 EmberBlade.special(p, s);
             }
@@ -242,9 +297,10 @@ public final class EmberEpicFight {
         static int lashDir(ServerPlayer p) {
             try {
                 ServerPlayerPatch patch = EpicFightCapabilities.getEntityPatch(p, ServerPlayerPatch.class);
-                if (patch == null || WHIP2 == null) return 1;
+                resolve();
+                if (patch == null || W2 == null) return 1;
                 AnimationPlayer player = patch.getAnimator().getPlayerFor(null);
-                return player != null && WHIP2.equals(player.getRealAnimation()) ? -1 : 1;
+                return player != null && W2.equals(player.getRealAnimation()) ? -1 : 1;
             } catch (RuntimeException ex) {   // an API change in Epic Fight must not break the hit
                 return 1;
             }

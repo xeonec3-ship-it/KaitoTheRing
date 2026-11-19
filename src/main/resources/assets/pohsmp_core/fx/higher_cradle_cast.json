@@ -3,13 +3,61 @@
   "style": "higher",
   "duration": 40,
   "elements": [
-    { "type": "sigil", "id": "higher_cradle_lull", "delay": 0, "at": "target+0,0.05,0", "follow": true },
-    { "type": "beam", "delay": 4, "at": "caster.hand", "to": "target+0,1,0", "follow": true, "width": 0.12, "core": 0.3, "flicker": 0.6, "grow": 10,
-      "color": "#B48CFF", "in": { "duration": 6, "easing": "easeOutCubic" } },
-    { "type": "sprites", "delay": 0, "at": "caster.hand", "follow": true, "texture": "spark_soft", "count": 40, "rate": 1, "spread": 0.2, "speed": 0.01,
-      "size": [0.16, 0.04], "life": 14, "color": "#8A4DFF" },
-    { "type": "sprites", "delay": 4, "at": "target", "follow": true, "texture": "crescent", "count": 36, "rate": 1, "area": 1.7, "speed": 0.004,
-      "gravity": -0.002, "spin": 30, "sway": 0.4, "size": [0.2, 0.06], "life": 26, "color": "#C8A8FF" },
-    { "type": "tint", "delay": 0, "at": "target", "radius": 3, "color": "#20103A", "strength": 0.3, "in": { "duration": 30, "easing": "easeInSine" } }
+    {
+      "type": "sigil",
+      "id": "higher_cradle_lull",
+      "delay": 0,
+      "at": "target+0,0.05,0",
+      "follow": true
+    },
+    {
+      "type": "sprites",
+      "delay": 0,
+      "at": "caster.hand",
+      "follow": true,
+      "texture": "spark_soft",
+      "count": 40,
+      "rate": 1,
+      "spread": 0.2,
+      "speed": 0.01,
+      "size": [
+        0.16,
+        0.04
+      ],
+      "life": 14,
+      "color": "#8A4DFF"
+    },
+    {
+      "type": "sprites",
+      "delay": 4,
+      "at": "target",
+      "follow": true,
+      "texture": "crescent",
+      "count": 36,
+      "rate": 1,
+      "area": 1.7,
+      "speed": 0.004,
+      "gravity": -0.002,
+      "spin": 30,
+      "sway": 0.4,
+      "size": [
+        0.2,
+        0.06
+      ],
+      "life": 26,
+      "color": "#C8A8FF"
+    },
+    {
+      "type": "tint",
+      "delay": 0,
+      "at": "target",
+      "radius": 3,
+      "color": "#20103A",
+      "strength": 0.3,
+      "in": {
+        "duration": 30,
+        "easing": "easeInSine"
+      }
+    }
   ]
 }

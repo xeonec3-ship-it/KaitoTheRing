@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "11";   // 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
+    private static final String V = "12";   // 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -41,28 +41,29 @@ public final class Net {
     public static final class EmberMsg {
         public final int entity;
         public final float heat;
-        public final boolean hot;
+        /** 0 cold blade, 1 burning sword, 2 whip */
+        public final int form;
 
-        public EmberMsg(int entity, float heat, boolean hot) {
+        public EmberMsg(int entity, float heat, int form) {
             this.entity = entity;
             this.heat = heat;
-            this.hot = hot;
+            this.form = form;
         }
 
         public EmberMsg(FriendlyByteBuf b) {
             entity = b.readVarInt();
             heat = b.readFloat();
-            hot = b.readBoolean();
+            form = b.readByte();
         }
 
         public void encode(FriendlyByteBuf b) {
             b.writeVarInt(entity);
             b.writeFloat(heat);
-            b.writeBoolean(hot);
+            b.writeByte(form);
         }
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
-            ru.pohsmp.core.ember.EmberBlade.clientSet(entity, heat, hot);
+            ru.pohsmp.core.ember.EmberBlade.clientSet(entity, heat, form);
         }
     }
 
@@ -89,7 +90,8 @@ public final class Net {
                 CUT = 13, DOWN = 14, RIFT = 15, TABOO = 16, SIGIL = 17, WARD = 18, MILKY = 19, GALAXY = 20, SOUL = 21, TABOO_CAST = 22, BLIZZARD = 23,
                 CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27,
                 JOINT = 28,   // joint cast: a = caster, b = partner, dur, f = sigil radius, i = (school sigil << 24) | color
-                WHIP = 29;    // T14 whip strike: a = holder, b = 0 lash / 1 vortex, dur = ticks, x = facing angle atan2(z, x), y = lash direction ±1, f = half arc
+                WHIP = 29,    // T14 whip strike: a = holder, b = 0 lash / 1 vortex, dur = ticks, x = facing angle atan2(z, x), y = lash direction ±1, f = half arc
+                CLOSURE_CRACK = 30;   // cracks on a barrier dome: a, b = normal yaw/pitch x1000, x y z = touch point, dur = ticks, f = radius, i = color
         public final byte kind;
         public final int key, a, b, dur, i;
         public final float x, y, z, f;

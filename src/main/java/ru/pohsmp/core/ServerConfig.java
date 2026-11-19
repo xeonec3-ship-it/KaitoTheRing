@@ -138,7 +138,7 @@ public final class ServerConfig {
                 .defineInRange("bossPushDamagePct", 0.2, 0.0, 1.0);
         b.pop();
         b.push("ember");
-        EMBER_HITS_TO_BURN = b.comment("Hits of the cold sword that set it burning (form 1)").defineInRange("heatHitsToBurn", 15, 1, 1000);
+        EMBER_HITS_TO_BURN = b.comment("Hits of the cold sword that set it burning (form 1). 5 for the Herrscher hits (WOM); 15 if fast dagger hits are used").defineInRange("heatHitsToBurn", 5, 1, 1000);
         EMBER_HITS_TO_SPECIAL = b.comment("Hits of the burning sword that fill the heat for its special attack").defineInRange("hitsToSpecial", 5, 1, 1000);
         b.pop();
         b.push("worgan_flame");

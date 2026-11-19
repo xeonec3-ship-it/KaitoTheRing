@@ -159,4 +159,87 @@ public final class BarrierGuard {
             e.hurt(source(sl), dmg);
         }
     }
+
+    // ---- streams against the shell (Milky Way, manager 19.11) and the cracks they leave ----
+
+    /** One live barrier shell of the level: owner (the zone or dome object, for the crack limit), centre, radius, colour. */
+    public record Shell(Object owner, Vec3 c, double r, int color) {}
+
+    /** Where a stream stops: the shell, the stopped centre, the touch point on the shell, and whether the stream is inside it. */
+    public record Stop(Shell shell, Vec3 at, Vec3 touch, boolean inside) {}
+
+    public static java.util.List<Shell> shells(net.minecraft.world.level.Level lvl) {
+        java.util.List<Shell> out = new java.util.ArrayList<>();
+        SpaceClosureSpell.shells(lvl, out);
+        ru.pohsmp.core.spell.silent.SageBarrierSpell.shells(lvl, out);
+        return out;
+    }
+
+    /**
+     * A stream of radius rad moving from cur to next: if next comes closer than rad to a shell from cur's side (outside: |c - o| < r + rad,
+     * inside: > r - rad), the stop at that distance along the shell normal; null when nothing is in the way.
+     */
+    public static Stop stream(net.minecraft.world.level.Level lvl, Vec3 cur, Vec3 next, double rad) {
+        for (Shell s : shells(lvl)) {
+            boolean inside = cur.distanceToSqr(s.c()) < s.r() * s.r();
+            if (inside && s.r() <= rad) continue;   // a stream wider than the dome it starts in (Barrier r 5 vs Milky Way 6): no room to stop in
+            Vec3 d = next.subtract(s.c());
+            double len = d.length();
+            if (inside ? len <= s.r() - rad : len >= s.r() + rad) continue;
+            Vec3 n = len < 1e-6 ? new Vec3(1, 0, 0) : d.scale(1 / len);
+            double keep = inside ? Math.max(0, s.r() - rad) : s.r() + rad;
+            return new Stop(s, s.c().add(n.scale(keep)), s.c().add(n.scale(s.r())), inside);
+        }
+        return null;
+    }
+
+    /** True when a and b are on the same side of every shell of the level (a stream does not reach through a barrier). */
+    public static boolean sameSide(net.minecraft.world.level.Level lvl, Vec3 a, Vec3 b) {
+        for (Shell s : shells(lvl)) {
+            double r2 = s.r() * s.r();
+            if ((a.distanceToSqr(s.c()) < r2) != (b.distanceToSqr(s.c()) < r2)) return false;
+        }
+        return true;
+    }
+
+    public static final int CRACK_TICKS = 66, CRACK_EVERY = 10, CRACK_MAX = 4;
+    private static final Map<Object, java.util.ArrayDeque<Long>> CRACKS = new java.util.WeakHashMap<>();
+
+    /**
+     * Cracks where a stream presses on a shell (client HigherFx.closureCrack, textures/fx/barrier_cracks.png): at most one per 0.5 s
+     * and 4 at once per shell; a flash and the lattice ripple with the glass breaking at the start, a high chime when it has healed (3.3 s).
+     * Visual only. Placed near the touch point, a little apart each time, so several do not lie on one another.
+     */
+    public static void crack(ServerLevel sl, Stop st) {
+        Shell s = st.shell();
+        long now = sl.getGameTime();
+        java.util.ArrayDeque<Long> q = CRACKS.computeIfAbsent(s.owner(), k -> new java.util.ArrayDeque<>());
+        while (!q.isEmpty() && now - q.peekFirst() >= CRACK_TICKS) q.pollFirst();
+        if (q.size() >= CRACK_MAX || (!q.isEmpty() && now - q.peekLast() < CRACK_EVERY)) return;
+        q.addLast(now);
+        Vec3 n = st.touch().subtract(s.c()).normalize();
+        double jit = Math.min(3.5, s.r() * 0.3);
+        Vec3 off = new Vec3(sl.random.nextGaussian(), sl.random.nextGaussian(), sl.random.nextGaussian());
+        off = off.subtract(n.scale(off.dot(n)));
+        if (off.lengthSqr() > 1e-6) off = off.normalize().scale(jit * Math.sqrt(sl.random.nextDouble()));
+        Vec3 p = s.c().add(st.touch().add(off).subtract(s.c()).normalize().scale(s.r()));
+        Vec3 pn = p.subtract(s.c()).normalize();
+        int yaw = (int) Math.round(Math.atan2(pn.z, pn.x) * 1000), pitch = (int) Math.round(Math.asin(Math.max(-1, Math.min(1, pn.y))) * 1000);
+        float rad = (float) Math.min(6.5, s.r() * 0.75);
+        ru.pohsmp.core.net.Net.sendNear(sl, p.x, p.y, p.z, p.x, p.y, p.z, new ru.pohsmp.core.net.Net.HFx(ru.pohsmp.core.net.Net.HFx.CLOSURE_CRACK, HigherSpell.key(),
+                yaw, pitch, CRACK_TICKS, p.x, p.y, p.z, rad, s.color()));
+        ru.pohsmp.core.net.Net.sendNear(sl, p.x, p.y, p.z, p.x, p.y, p.z, new ru.pohsmp.core.net.Net.HFx(ru.pohsmp.core.net.Net.HFx.CLOSURE_HIT, HigherSpell.key(),
+                yaw, pitch, 24, p.x, p.y, p.z, rad * 0.55, s.color()));
+        sl.playSound(null, p.x, p.y, p.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.2f, 0.6f + 0.2f * sl.random.nextFloat());
+        Tasks.add(new Tasks.Task() {
+            int age;
+
+            @Override
+            public boolean tick() {
+                if (++age < CRACK_TICKS) return true;
+                sl.playSound(null, p.x, p.y, p.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.2f, 1.4f);
+                return false;
+            }
+        });
+    }
 }

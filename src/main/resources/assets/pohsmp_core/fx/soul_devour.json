@@ -72,32 +72,6 @@
    "color": "@primary"
   },
   {
-   "type": "beam",
-   "delay": 100,
-   "at": "target+0,1.1,0",
-   "to": "caster.hand",
-   "follow": true,
-   "duration": 400,
-   "width": 0.22,
-   "core": 0.3,
-   "grow": 40,
-   "flicker": 0.4,
-   "color": "@primary"
-  },
-  {
-   "type": "chains",
-   "delay": 160,
-   "at": "target+0,1.2,0",
-   "to": "caster+0,1.2,0",
-   "follow": true,
-   "duration": 340,
-   "link": 0.3,
-   "sag": 0.5,
-   "tension": 0.4,
-   "color": "@secondary",
-   "comment": "цепи души (движок элементов)"
-  },
-  {
    "type": "sigil",
    "delay": 250,
    "at": "target+0,14,0",

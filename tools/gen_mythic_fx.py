@@ -508,10 +508,7 @@ def soul_devour():
            E('sigil', 40, 'caster.hand', follow=True, id='soul_hand', until=500),
            E('sprites', 40, 'target+0,1,0', duration=460, texture='soul_mote', count=920, rate=2, spread=0.6, speed=0.02,
              gravity=-0.003, size=[0.3, 0.06], life=50, color='@primary'),
-           E('beam', 100, 'target+0,1.1,0', to='caster.hand', follow=True, duration=400, width=0.22, core=0.3, grow=40, flicker=0.4,
-             color='@primary'),
-           E('chains', 160, 'target+0,1.2,0', to='caster+0,1.2,0', follow=True, duration=340, link=0.3, sag=0.5, tension=0.4,
-             color='@secondary', comment='цепи души (движок элементов)'),
+           # луч и цепи от цели к заклинателю убраны (владелец 19.11: никакого «луча» к цели в заклинаниях с анимацией)
            E('sigil', 250, 'target+0,14,0', id='soul_sky', until=500),
            E('curtain', 300, 'target', duration=200, radius=[2.5, 4], count=24, height=14, grow=40, fromTop=True, width=[0.05, 0.15],
              brightness=[0.2, 0.5], texture='beam_fade', color='@primary'),
@@ -763,8 +760,7 @@ def others():
              gravity=-0.004, size=[0.2, 0.05], life=50, color='@primary'),
        ])
     fx('blood_drain', 'Кровавая луна: нить крови от жертвы к кастеру.', 'blood', 16, [
-        E('beam', 0, 'target+0,1,0', to='caster+0,1.2,0', follow=True, duration=14, width=0.14, core=0.4, grow=6, flicker=0.3,
-          color='@primary', **{'out': ease(6)}),
+        # луч от цели к заклинателю убран (владелец 19.11)
         E('sprites', 0, 'target+0,1,0', duration=8, texture='spark_soft', count=8, rate=1, spread=0.4, speed=0.03, size=[0.2, 0.05],
           life=14, color='@secondary'),
     ])

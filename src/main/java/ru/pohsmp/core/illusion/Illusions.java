@@ -228,6 +228,7 @@ public final class Illusions {
         hub("immersion", () -> ru.pohsmp.core.nightmare.Immersion.onTick(e));
         hub("endless_night", () -> ru.pohsmp.core.nightmare.EndlessNightSpell.Events.onTick(e));
         hub("house_that_isnt", () -> ru.pohsmp.core.nightmare.HouseThatIsntSpell.Events.onTick(e));
+        hub("no_awakening", () -> ru.pohsmp.core.nightmare.NoAwakeningSpell.Events.onTick(e));
         hub("bestiary", () -> ru.pohsmp.core.nightmare.Bestiary.Events.onTick(e));
     }
 

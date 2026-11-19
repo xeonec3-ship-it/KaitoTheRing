@@ -142,12 +142,12 @@ public final class ServerConfig {
         IM_RETURN = b.comment("...that comes back after this many seconds if the victim lives").defineInRange("illusoryReturnSeconds", 10.0, 0.5, 600.0);
         b.push("house_that_isnt");
         HOUSE_RANGE = b.comment("Target range (blocks)").defineInRange("range", 24.0, 1.0, 128.0);
-        HOUSE_SECONDS = b.comment("The victim is in the corridor this long (seconds)").defineInRange("seconds", 60.0, 1.0, 600.0);
+        HOUSE_SECONDS = b.comment("The victim is in the corridor this long (seconds)").defineInRange("seconds", 15.0, 1.0, 600.0);
         HOUSE_FALL = b.comment("Walking in the corridor the victim cannot step off an edge higher than this (blocks)").defineInRange("maxFall", 3.0, 0.0, 64.0);
         b.pop();
         b.push("endless_night");
         NIGHT_RADIUS = b.comment("Zone radius (blocks)").defineInRange("radius", 24.0, 2.0, 128.0);
-        NIGHT_SECONDS = b.comment("Lifetime (seconds)").defineInRange("seconds", 120.0, 1.0, 600.0);
+        NIGHT_SECONDS = b.comment("Lifetime (seconds)").defineInRange("seconds", 30.0, 1.0, 600.0);
         NIGHT_STEP = b.comment("A victim inside goes one stage deeper this often (seconds)").defineInRange("stageEverySeconds", 8.0, 0.5, 600.0);
         NIGHT_LIGHT = b.comment("Block light at the victim at least this keeps its stage from going deeper").defineInRange("holdingLight", 10, 0, 15);
         b.pop();

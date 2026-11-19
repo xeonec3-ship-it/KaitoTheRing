@@ -74,7 +74,7 @@ public final class DownfallCut {
 
     public static void stop(int k) {
         if (!active || k != key) return;
-        if (scene != RITE_SEAL && scene != RITE_BLESS && scene != BUTTERFLY && scene != ERASED) {
+        if (scene != RITE_SEAL && scene != RITE_BLESS && scene != BUTTERFLY && scene != ERASED && scene != ABYSS) {
             active = false;
             return;
         }
@@ -281,8 +281,8 @@ public final class DownfallCut {
         float pt = (float) e.getPartialTick();
         double t = now(pt);
         boolean riteScene = scene == RITE_SEAL || scene == RITE_BLESS;
-        boolean glide = riteScene || scene == BUTTERFLY || scene == ERASED;   // these glide back to the player on the server's stop
-        if (t > dur + (riteScene ? ru.pohsmp.core.spell.RiteSpell.HOLD + 40 : scene == BUTTERFLY || scene == ERASED ? 40 : 20) || t < 0) {
+        boolean glide = riteScene || scene == BUTTERFLY || scene == ERASED || scene == ABYSS;   // these glide back to the player on the server's stop
+        if (t > dur + (riteScene ? ru.pohsmp.core.spell.RiteSpell.HOLD + 40 : scene == BUTTERFLY || scene == ERASED || scene == ABYSS ? 40 : 20) || t < 0) {
             active = false;
             unhush();
             return;
@@ -318,6 +318,12 @@ public final class DownfallCut {
         } else if (scene == ERASED) {
             Entity te = targetId >= 0 ? mc.level.getEntity(targetId) : null;
             Vec3[] pl = erased(t, c, te != null ? te.getPosition(pt) : rift, dir, side);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+            roll = pl[2].y;
+        } else if (scene == ABYSS) {
+            Vec3[] pl = abyss(t, c, dir, side, baseYaw);
             pos = pl[0];
             look = pl[1];
             shake = pl[2].x;
@@ -476,6 +482,78 @@ public final class DownfallCut {
             }
         }
         return new Vec3[] {pos, look, new Vec3(shake, roll, 0)};
+    }
+
+    // ---- T25 «Пробуждение не наступит» (docs/specs/tasks/T25_nightmare_school.md, «Ролик»): 240 ticks of cast + 20 after ----
+
+    private static final int ABYSS = ru.pohsmp.core.spell.Cutscene.NO_AWAKENING;
+    private static final int[] AB_AT = {0, 40, 80, 120, 160, 180, 236};
+    private static final boolean[] AB_CUT = {false, true, true, false, false, true, true};
+
+    /** dir: the caster's look when it began (flat), side: its left. Returns pos, look, (shake, roll, 0). */
+    private static Vec3[] abyss(double t, Vec3 c, Vec3 dir, Vec3 side, double baseYaw) {
+        int i = 0;
+        while (i < AB_AT.length - 1 && t >= AB_AT[i + 1]) i++;
+        Vec3[] now = abShot(i, t, c, dir, side, baseYaw);
+        if (i == 0 || AB_CUT[i] || t - AB_AT[i] >= BLEND) return now;
+        Vec3[] prev = abShot(i - 1, AB_AT[i], c, dir, side, baseYaw);
+        double u = sine((t - AB_AT[i]) / BLEND);
+        return new Vec3[] {prev[0].lerp(now[0], u), prev[1].lerp(now[1], u), now[2]};
+    }
+
+    private static Vec3[] abShot(int i, double t, Vec3 c, Vec3 dir, Vec3 side, double baseYaw) {
+        double end = i + 1 < AB_AT.length ? AB_AT[i + 1] : AB_AT[i] + 24;
+        double k = sine((t - AB_AT[i]) / Math.max(1, end - AB_AT[i]));
+        Vec3 face = c.add(0, 1.6, 0);
+        Vec3 pos, look;
+        double shake = 0, roll = 0;
+        switch (i) {
+            case 0 -> {   // the lullaby: from the front and below at 2.2 -> 1.8, height 1.0, up at the face; the camera sways ±1.5°
+                pos = c.add(dir.scale(2.2 - 0.4 * k)).add(0, 1.0, 0);
+                look = face;
+                roll = 1.5 * Math.sin(t * 0.16);
+            }
+            case 1 -> {   // cut: the ink rises - from the side at 6, at the ink's surface 0.4, rising to 2.5
+                pos = c.add(side.scale(6)).add(0, 0.4 + 2.1 * k, 0);
+                look = c.add(0, 1.2, 0);
+            }
+            case 2 -> {   // cut: the sky goes out - from under the caster, 3 behind, height 0.3, up past it at the seal at 24; a 60° orbit by 6 s
+                double a = Math.atan2(-dir.z, -dir.x) + Math.toRadians(60 * k);
+                pos = c.add(Math.cos(a) * 3, 0.3, Math.sin(a) * 3);
+                look = c.add(0, 24, 0);
+            }
+            case 3 -> {   // the world drowns: wide at 14, height 6 -> 2 (the wall closes the horizon), a tremble towards 8 s
+                double a = baseYaw + Math.toRadians(30);
+                pos = c.add(Math.cos(a) * 14, 6 - 4 * k, Math.sin(a) * 14);
+                look = c.add(0, 1.4, 0);
+                shake = 0.03 * k;
+            }
+            case 4 -> {   // the eyes: a slow push at the caster from the front 6 -> 3.5
+                pos = c.add(dir.scale(6 - 2.5 * k)).add(0, 1.6, 0);
+                look = face;
+            }
+            case 5 -> {   // 9.0 s cut: the face close (1.2), it breaks; then the darkness, the same shot, still
+                pos = c.add(dir.scale(1.2)).add(0, 1.6, 0);
+                look = face;
+                if (t < 186) shake = 0.04;
+            }
+            default -> {   // 11.8 s: the head turns to the camera - a jerk 0.3 closer, then still till the end
+                double j = Math.min(1, (t - 236) / 3.0);
+                pos = c.add(dir.scale(1.2 - 0.3 * j)).add(0, 1.6, 0);
+                look = face;
+                if (t < 242) shake = 0.03;
+            }
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, roll, 0)};
+    }
+
+    /** The darkness of 10-11.8 s (almost black, a dim crimson heartbeat at 11.0 s), going after the eyes open. */
+    private static void abyssOverlay(GuiGraphics g, int w, int h, double t) {
+        double a = t < 196 ? 0 : t < 202 ? 0.94 * (t - 196) / 6.0 : t < 236 ? 0.94 : Math.max(0, 0.94 * (1 - (t - 236) / 10.0));
+        if (t >= 220 && t < 226) a -= 0.25 * Math.sin(Math.PI * (t - 220) / 6.0);   // the heartbeat shows the silhouette for a moment
+        if (a <= 0.01) return;
+        int alpha = (int) (Math.min(1, a) * 255);
+        g.fill(0, 0, w, h, (alpha << 24) | 0x020103);
     }
 
     private static final net.minecraft.resources.ResourceLocation WORLD_CRACKS =
@@ -882,9 +960,9 @@ public final class DownfallCut {
     private static final String[] TITLES = {"fx.pohsmp_core.downfall.title", "fx.pohsmp_core.milky_way.title", "fx.pohsmp_core.soul_devour.title", "fx.pohsmp_core.divine_taboo.title",
             "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title", "fx.pohsmp_core.silent_gate.title",
             "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title", "fx.pohsmp_core.butterfly_dream.title",
-            "fx.pohsmp_core.world_tree.title", "fx.pohsmp_core.abyss_eye.title", "fx.pohsmp_core.last_dawn.title", "fx.pohsmp_core.erased_name.title"};
+            "fx.pohsmp_core.world_tree.title", "fx.pohsmp_core.abyss_eye.title", "fx.pohsmp_core.last_dawn.title", "fx.pohsmp_core.erased_name.title", "fx.pohsmp_core.no_awakening.title"};
     private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A, 0xC9A8FF,
-            0x7FD46A, 0x8E5BD9, 0xFFC860, 0xE9E4D8};
+            0x7FD46A, 0x8E5BD9, 0xFFC860, 0xE9E4D8, 0xE0285A};
 
     private static boolean apply(Camera cam, Vec3 pos) {
         try {
@@ -966,6 +1044,7 @@ public final class DownfallCut {
             in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + pt - releaseAt) / RELEASE));
         int bar = (int) (h * 0.11 * in);
         if (scene == BUTTERFLY) butterflyOverlay(g, w, h, t);
+        if (scene == ABYSS) abyssOverlay(g, w, h, t);
         g.fill(0, 0, w, bar, 0xFF000000);
         g.fill(0, h - bar, w, h, 0xFF000000);
         if (scene == 5) {

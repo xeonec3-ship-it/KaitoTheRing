@@ -41,6 +41,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.NightmareWorld.class);   // T25 stage 3: the world rots
         modBus.addListener(ru.pohsmp.core.client.nightmare.NightmareWorld::colors);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.HouseClient.class);   // T25 «Дом, которого нет»
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.NoAwakeningClient.class);   // T25 «Пробуждение не наступит»
         modBus.register(ScrollModels.class);
         modBus.addListener(TargetPoseClient::setup);
         MinecraftForge.EVENT_BUS.register(EmberHud.class);

@@ -54,7 +54,8 @@
     позиции печатей — `SilentVolleySpell.seal`: дуга 200° за спиной, r 2.5, два ряда 1.15 / 2.15 над ногами).
   - `silent_barrier_dome` — `caster` + `attach`, `scale` = радиус, длительность = время купола.
   - `silent_worgan_flame` — `caster` + `attach`, длительность = каст + выдох + 1.5 с (тень дракона над правым плечом: `WorganFlameSpell.headPos`).
-- Анимации игрока — пока из Iron's (`ONE_HANDED_RAY_*`, `CHARGE_RAISED_HAND`); жест щелчка из T12 подключить в `getCastStartAnimation`.
+- Анимации игрока: «Ветряные копья» — щелчок пальцами `pohsmp_finger_snap` (T12, с 1.15.0; финал `pass`, жест доигрывает);
+  остальные — пока из Iron's (`CHARGE_RAISED_HAND`, `ONE_HANDED_RAY_SHOOT`, `SELF_CAST_ANIMATION`).
 - Звука произнесения нет; в конце каста — короткий хрустальный «дзынь» посоха (`SilentStaffSpell`), тихие звуки на попадании (аметист), выдох — приглушённый.
 
 ## Цели (решения владельца 19.11)

@@ -5,7 +5,6 @@ import ru.pohsmp.core.spell.Tasks;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
-import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ import ru.pohsmp.core.fx.Fx;
  * of wind (turquoise outline) appears for each, hangs for 0.5 s, then all fly at once (3 blocks a tick) and strike the head:
  * 14 damage each, knockback 0.6. Spears follow the head, stop on a Barrier dome. Look: fx/silent_wind_spears.json (one instance per spear, moved and turned along
  * its flight) and silent_wind_spears_hit.json on the hit;
- * gesture: a snap of the right hand's fingers (pose library T12) - until then Iron's one-handed cast.
+ * gesture: a snap of the right hand's fingers (pohsmp_finger_snap, pose library T12).
  */
 public class WindSpearsSpell extends SilentSpell {
     public static final String PATH = "wind_spears";
@@ -38,8 +37,10 @@ public class WindSpearsSpell extends SilentSpell {
     }
 
     @Override public CastType getCastType() { return CastType.LONG; }
-    @Override public AnimationHolder getCastStartAnimation() { return SpellAnimations.ONE_HANDED_RAY_CHARGE; }
-    @Override public AnimationHolder getCastFinishAnimation() { return SpellAnimations.ONE_HANDED_RAY_SHOOT; }
+    /** A snap of the right hand's fingers (T12); no finish: the snap plays to its end (1.1 s, the cast is 1 s). */
+    private static final AnimationHolder ANIM_SNAP = ru.pohsmp.core.spell.CastAnims.of("finger_snap");
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_SNAP; }
+    @Override public AnimationHolder getCastFinishAnimation() { return AnimationHolder.pass(); }
 
     private static int targets() { return cfg(ServerConfig.SPEARS_TARGETS::get, 5); }
     private static double range() { return cfg(ServerConfig.SPEARS_RANGE::get, 32.0); }

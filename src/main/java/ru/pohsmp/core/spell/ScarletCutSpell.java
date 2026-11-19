@@ -3,6 +3,7 @@ package ru.pohsmp.core.spell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import java.util.List;
 import java.util.Optional;
 import net.minecraft.network.chat.MutableComponent;
@@ -24,7 +25,8 @@ import ru.pohsmp.core.fx.FxMath;
  * Scarlet Cut (T02): instant. A series of [scarlet_cut] cutsMin..cutsMax cuts, one every `interval` ticks, each along the caster's
  * view at that moment: everyone `near`..`far` blocks ahead and within `width`/2 of the view line takes `damage` (higher magic).
  * Under every cut a crack opens on the ground; after `crackDelay` ticks it bursts with shards: `shardDamage` within
- * `shardRadius` of the crack line, pushed up by `knockUp`. Look: fx/scarlet_cut.json, one instance per cut.
+ * `shardRadius` of the crack line, pushed up by `knockUp`. Look: fx/scarlet_cut.json, one instance per cut;
+ * gesture: pohsmp_scarlet_cut_cast (wind-up and 5 slashes).
  */
 public class ScarletCutSpell extends HigherSpell {
     public static final String PATH = "scarlet_cut";
@@ -35,6 +37,10 @@ public class ScarletCutSpell extends HigherSpell {
     }
 
     @Override public CastType getCastType() { return CastType.INSTANT; }
+    /** Wind-up and 5 slashes, one per 4 ticks like the cuts (T12, tools/gen_player_anims.py); no finish: it plays to its end. */
+    private static final AnimationHolder ANIM_CAST = CastAnims.of("scarlet_cut_cast");
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
+    @Override public AnimationHolder getCastFinishAnimation() { return AnimationHolder.pass(); }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
 

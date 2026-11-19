@@ -24,5 +24,6 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(NpcCastClient.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.fx.FxClient.class);
         modBus.register(ScrollModels.class);
+        modBus.addListener(TargetPoseClient::setup);
     }
 }

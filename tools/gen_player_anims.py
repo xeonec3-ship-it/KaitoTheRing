@@ -152,6 +152,7 @@ def _fix(info):
 class Anim:
     def __init__(self, name, seconds, hold=True):
         self.name, self.end, self.hold = name, int(round(seconds * TPS)), hold
+        self.loop_from = None                # hold: с какой секунды повторять (None — замереть в последней позе)
         self.keys = {}                       # part -> [(tick, {channel: value}, easing)]
 
     def key(self, t, part, ease='easeInOutSine', **ch):
@@ -187,7 +188,8 @@ class Anim:
         emote = {'beginTick': 0, 'endTick': self.end, 'stopTick': self.end, 'degrees': True,
                  'easeBeforeKeyframe': True, 'moves': moves}
         if self.hold:
-            emote.update({'isLoop': True, 'returnTick': self.end})
+            ret = self.end if self.loop_from is None else int(round(self.loop_from * TPS))
+            emote.update({'isLoop': True, 'returnTick': ret})
         return {'version': 3, 'name': self.name, 'author': 'pohsmp_core', 'emote': emote}
 
 
@@ -954,6 +956,7 @@ def held_target():
     a.sway(0.8, 4.0, 0.9, 'leftArm', h['leftArm'], 'roll', -3)
     a.sway(0.8, 4.0, 2.0, 'head', h['head'], 'yaw', 6)
     a.sway(0.8, 4.0, 1.6, 'body', h['body'], 'y', 0.06)
+    a.loop_from = 0.8   # петля — с 0.8 с (поза уже взята): дрожь и покачивание повторяются, пока держат
     return a
 
 

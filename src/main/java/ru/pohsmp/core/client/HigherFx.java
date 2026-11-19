@@ -96,7 +96,11 @@ public final class HigherFx {
             }
             return;
         }
-        if (m.kind == HFx.ANIM) {   // a = player id, b = animation (0: pohsmp_coven_ritual)
+        if (m.kind == HFx.ANIM) {   // a = entity id, b = animation (0: pohsmp_coven_ritual; 1/2: held target pose on/off, T13)
+            if (m.b == ru.pohsmp.core.spell.TargetPose.HELD_START || m.b == ru.pohsmp.core.spell.TargetPose.HELD_STOP) {
+                TargetPoseClient.handle(m.a, m.b);
+                return;
+            }
             if (lvl.getEntity(m.a) instanceof net.minecraft.world.entity.player.Player p && m.b == 0)
                 io.redspace.ironsspellbooks.player.ClientSpellCastHelper.animatePlayerStart(p, new ResourceLocation("irons_spellbooks", "pohsmp_coven_ritual"));
             return;

@@ -195,7 +195,7 @@ public class DisintegrationSpell extends AbstractSpell {
         int startTick;
         double x, y, z;
         int age;
-        boolean noGravity;
+        boolean noGravity, released;
         int fx = -1;
     }
 
@@ -206,6 +206,8 @@ public class DisintegrationSpell extends AbstractSpell {
         LivingEntity t = td.getTarget(sl);
         if (t == null) return null;
         if (t.isPassenger()) t.stopRiding();
+        Hold old = HOLDS.remove(caster.getUUID());
+        if (old != null) release(old);   // a second pre-cast: free the old hold first (gravity, pose)
         Hold h = new Hold();
         h.caster = caster;
         h.startTick = caster.tickCount;
@@ -215,6 +217,7 @@ public class DisintegrationSpell extends AbstractSpell {
         h.z = t.getZ();
         h.noGravity = t.isNoGravity();
         HOLDS.put(caster.getUUID(), h);
+        TargetPose.hold(t);   // T13: arms spread and bound, head thrown back, for every client
         // "target" anchor = the target's feet at the start; the hold keeps it on this x/z, lifted above the ground seal
         h.fx = Fx.play(sl, Fx.fx(fxId()).caster(caster).target(new Vec3(h.x, h.y, h.z)));
         sl.playSound(null, h.x, h.y, h.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 2f, pitch(0.6f));
@@ -256,6 +259,9 @@ public class DisintegrationSpell extends AbstractSpell {
     }
 
     private static void release(Hold h) {
+        if (h.released) return;
+        h.released = true;
+        TargetPose.release(h.target);
         h.target.setNoGravity(h.noGravity);
         h.target.fallDistance = 0;
     }

@@ -25,7 +25,6 @@ import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.ServerConfig;
 import ru.pohsmp.core.fx.Fx;
-import ru.pohsmp.core.fx.FxLib;
 
 /**
  * Higher school and tier (T05, owner's decision). "Star Fall": an 8 s cast at the point the caster looks at (up to 48 blocks).
@@ -43,8 +42,8 @@ public class StarFallSpell extends HigherSpell {
     public static final double RANGE = 48, R = 8;
     /** The star comes from behind the target (as seen by the caster): this far back and this high. Same numbers in DownfallCut. */
     public static final double SKY_BACK = 45, SKY_UP = 90;
-    /** fx/star_fall.json from the ideas chat; until it exists, the temporary star_fall_temp.json. */
-    public static final String FX = "star_fall", FX_TEMP = "star_fall_temp";
+    /** fx/star_fall.json (ideas chat, tools/gen_higher_fx.py). */
+    public static final String FX = "star_fall";
     private static final int COLOR = 0xFF2A3A;
 
     private static final class Cast {
@@ -99,8 +98,7 @@ public class StarFallSpell extends HigherSpell {
         c.dir = d.lengthSqr() < 1e-4 ? look : d.normalize();
         c.cutKey = HigherSpell.key();
         c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.STAR_FALL, CAST + AFTER, c.impact, Math.atan2(c.dir.z, c.dir.x));
-        String id = FxLib.fx(FX) != null ? FX : FX_TEMP;
-        c.fx = Fx.play(sl, Fx.fx(id).style("higher").caster(caster).at(c.impact).yaw(caster.getYRot())
+        c.fx = Fx.play(sl, Fx.fx(FX).style("higher").caster(caster).at(c.impact).yaw(caster.getYRot())
                 .point("impact", c.impact).point("sky", sky(c.impact, c.dir)));
         CASTS.put(caster.getUUID(), c);
         sl.playSound(null, c.at.x, c.at.y, c.at.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 3f, 0.6f);

@@ -32,6 +32,7 @@ public class PohCore {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         MinecraftForge.EVENT_BUS.register(DivineEvents.class);
         MinecraftForge.EVENT_BUS.register(DisintegrationSpell.DisintegrationEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.TargetPose.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DisintegrationReplicaSpell.ReplicaEvents.class);
         MinecraftForge.EVENT_BUS.register(HigherEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.Tasks.class);

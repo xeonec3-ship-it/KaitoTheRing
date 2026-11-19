@@ -73,6 +73,17 @@ public final class NpcCastClient {
         return true;
     }
 
+    /** A looping pose by its PlayerAnimator id (T13: the held target), until {@link #stop}. */
+    public static void loop(LivingEntity e, ResourceLocation id) {
+        if (e instanceof Player) return;
+        KeyframeAnimation a = PlayerAnimationRegistry.getAnimation(id);
+        if (a != null) ANIMS.put(e.getId(), new KeyframeAnimationPlayer(a));
+    }
+
+    public static void stop(LivingEntity e) {
+        ANIMS.remove(e.getId());
+    }
+
     public static boolean animating(LivingEntity e) {
         return ANIMS.containsKey(e.getId());
     }

@@ -367,6 +367,6 @@
    }
   ],
   "isLoop": true,
-  "returnTick": 80
+  "returnTick": 16
  }
 }

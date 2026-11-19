@@ -13,3 +13,8 @@
 - `pohsmp_held_target` (4 с, петля) — для T13.
 **Основному:** подключить `CastAnims.of("scarlet_cut_cast")` в `ScarletCutSpell` и `CastAnims.of("finger_snap")` в «Копьях ветра»
 (и других заклинаниях посоха со щелчком) вместо анимаций Iron's.
+
+**Подключено в коде (1.15.0, основной):** `ScarletCutSpell` — `getCastStartAnimation` = `CastAnims.of("scarlet_cut_cast")`,
+финал `AnimationHolder.pass()` (жест доигрывает до конца, 1.9 с); `WindSpearsSpell` — `CastAnims.of("finger_snap")`, финал `pass()`
+(каст 1 с, щелчок 1.1 с). Других заклинаний посоха со щелчком в T20 нет (залп, барьер, пламя — анимации Iron's).
+Не проверено в игре.

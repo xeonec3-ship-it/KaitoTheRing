@@ -1,0 +1,21 @@
+{
+ "comment": "Древо мира: живая зелень, светлая листва, золото света; кора тёмная.",
+ "palette": {
+  "primary": "#7EE04A",
+  "secondary": "#D8FF9A",
+  "core": "#FFFFFF",
+  "shadow": "#2A5A10"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "mote_leaf",
+  "sigil": "yggdrasil"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.5,
+  "jitter": 0.0,
+  "easing": "easeInOutSine"
+ }
+}

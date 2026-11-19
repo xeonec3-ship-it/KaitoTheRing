@@ -1,0 +1,71 @@
+{
+ "comment": "Око бездны: взгляд на Око (caster = жертва). Магента-вспышка в глазах (засветка экрана жертвы), «глазки» разлетаются от головы, тёмная сфера; бирюзовая оболочка — застывание 1 с.",
+ "style": "abyss_eye",
+ "duration": 26,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster.eyes",
+   "follow": true,
+   "duration": 8,
+   "size": 1.4,
+   "rays": 8,
+   "screen": 0.45,
+   "color": "#C02A6A"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 22,
+   "thickness": 0.12,
+   "pulse": [
+    0.4,
+    6
+   ],
+   "motes": 12,
+   "texture": "mote_eye",
+   "color": "#3FD6B8",
+   "in": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.7,0",
+   "follow": true,
+   "duration": 3,
+   "texture": "mote_eye",
+   "count": 18,
+   "rate": 6,
+   "spread": 0.4,
+   "speed": 0.08,
+   "gravity": 0,
+   "spin": 60,
+   "size": [
+    0.35,
+    0.15
+   ],
+   "life": 18,
+   "color": "#B8FFF0"
+  },
+  {
+   "type": "wave",
+   "delay": 1,
+   "at": "caster+0,1.2,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 1.8,
+   "rim": 1.3,
+   "color": "#C02A6A"
+  }
+ ]
+}

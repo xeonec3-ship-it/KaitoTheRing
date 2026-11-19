@@ -1,0 +1,21 @@
+{
+ "comment": "Око бездны: бирюза и маджента в фиолетово-чёрных тучах, бледная склера, тьма.",
+ "palette": {
+  "primary": "#3FD6B8",
+  "secondary": "#B8FFF0",
+  "core": "#FFFFFF",
+  "shadow": "#1A0A2A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "mote_eye",
+  "sigil": "abyss_sigil"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.7,
+  "jitter": 0.0,
+  "easing": "easeInOutSine"
+ }
+}

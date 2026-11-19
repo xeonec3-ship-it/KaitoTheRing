@@ -1,0 +1,60 @@
+{
+ "comment": "Древо мира: граница зоны корней r24 — тонкое кольцо и лента рун природы, медленно вращается.",
+ "size": 24.0,
+ "color": "#7EE04A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_nature_band",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.7,
+   "inner": 0.985,
+   "repeat": 48,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -0.6
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 0.99,
+   "heightOffset": 0.01,
+   "color": "#FFE38A",
+   "brightness": 0.8,
+   "inner": 0.996,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 24,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

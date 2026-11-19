@@ -1,0 +1,57 @@
+{
+ "comment": "Древо мира: корень сломан (caster = точка корня/жертва): щепки, листья, зелёная вспышка. Перед ним — Fx.stop у world_tree_root.",
+ "style": "world_tree",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.9,0",
+   "duration": 6,
+   "size": 1.4,
+   "rays": 5,
+   "color": "#D8FF9A"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.8,0",
+   "duration": 3,
+   "texture": "shard",
+   "count": 26,
+   "rate": 9,
+   "spread": 0.5,
+   "speed": 0.12,
+   "gravity": 0.012,
+   "tumble": 1,
+   "size": [
+    0.2,
+    0.08
+   ],
+   "life": 22,
+   "color": "#6A4628",
+   "blend": "translucent",
+   "comment": "щепки"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 3,
+   "texture": "mote_leaf",
+   "count": 16,
+   "rate": 6,
+   "spread": 0.5,
+   "speed": 0.08,
+   "gravity": 0.004,
+   "sway": 1,
+   "tumble": 1,
+   "size": [
+    0.25,
+    0.15
+   ],
+   "life": 30,
+   "color": "#7EE04A"
+  }
+ ]
+}

@@ -1,0 +1,131 @@
+{
+ "comment": "Древо мира: печать в точке, где растёт дерево (под заклинателем — та же, scale 0.5). Древо девяти миров прорисовывается, кольцо рун природы, надпись «ДРЕВО МИРА ✦ КОРНИ ДЕВЯТИ МИРОВ», золотой обод.",
+ "size": 8.0,
+ "color": "#7EE04A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.01,
+   "color": "#3E8A2A",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 24,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 50
+   }
+  },
+  {
+   "id": "tree",
+   "type": "disc",
+   "texture": "yggdrasil",
+   "radius": 0.92,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": -90
+   },
+   "rotation": {
+    "speed": 2,
+    "boost": 2
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_nature_band",
+   "radius": 1.06,
+   "heightOffset": 0.01,
+   "color": "#D8FF9A",
+   "inner": 0.95,
+   "repeat": 10,
+   "appear": {
+    "delay": 16,
+    "duration": 26,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -3
+   }
+  },
+  {
+   "id": "words",
+   "type": "text",
+   "radius": 1.14,
+   "heightOffset": 0.015,
+   "color": "#FFE38A",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 26,
+    "duration": 34,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 1.5
+   },
+   "text": "ДРЕВО МИРА ✦ КОРНИ ДЕВЯТИ МИРОВ ✦ ",
+   "font": "cyrillic",
+   "size": 0.045,
+   "repeat": 2,
+   "side": "outer"
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.22,
+   "heightOffset": 0.02,
+   "color": "#FFE38A",
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 34,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": -90,
+    "direction": -1
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#D8FF9A",
+  "size": 1.2,
+  "duration": 16,
+  "sparks": 40
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 3
+ }
+}

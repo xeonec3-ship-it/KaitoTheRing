@@ -1,0 +1,24 @@
+{
+ "comment": "Око бездны: зрачок (отдельный экземпляр, код запускает на 228 тике каста в точке центра глаза — над заклинателем на +29.3 — и двигает Fx.move: смещение к цели по горизонтали ≤3 бл., yaw — на цель; Fx.stop в конце).",
+ "style": "abyss_eye",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "model": "abyss_eye_pupil"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 12,
+   "size": 6,
+   "rays": 6,
+   "color": "#3FD6B8"
+  }
+ ]
+}

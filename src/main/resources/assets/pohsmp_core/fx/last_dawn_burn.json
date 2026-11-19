@@ -1,0 +1,36 @@
+{
+ "comment": "Последний рассвет: нежить / Кровь / Запретная горят в свете (каждую секунду, caster = жертва): бело-золотое пламя по телу, искры.",
+ "style": "last_dawn",
+ "duration": 22,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.9,0",
+   "follow": true,
+   "duration": 14,
+   "texture": "mote_flame",
+   "count": 24,
+   "rate": 1.8,
+   "spread": 0.4,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.35,
+    0.1
+   ],
+   "life": 16,
+   "color": "#FFE9A0"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "follow": true,
+   "duration": 6,
+   "size": 1.0,
+   "rays": 4,
+   "color": "#FFFFFF"
+  }
+ ]
+}

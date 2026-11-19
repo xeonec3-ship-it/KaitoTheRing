@@ -1,0 +1,302 @@
+{
+ "comment": "Око бездны, каст 12 с (240) + 15 с Ока (300) + закрытие. caster — заклинатель (глаз над ним на +32). 0–3 с небо темнеет, тучи начинают закручиваться (печать-спираль r40); 3–8 с тучи быстрее, молнии внутри; 7.5 с веки; 8–11.5 с глаз раскрывается от щели к векам; на 228 тике код ставит зрачок (fx/abyss_eye_pupil, отдельный экземпляр — код ведёт его к цели); 11.5 с вспышка-взгляд, волна до r40. 12–27 с Око смотрит; 27 с закрывается (сжатие), тучи расходятся.",
+ "style": "abyss_eye",
+ "duration": 600,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "abyss_seal",
+   "until": 236
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 580,
+   "radius": 40,
+   "color": "#140A22",
+   "strength": 0.55,
+   "in": {
+    "duration": 80,
+    "easing": "easeInOutSine"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,35,0",
+   "id": "abyss_sky",
+   "until": 550
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,33,0",
+   "duration": 540,
+   "texture": "mote_cloud",
+   "count": 100000,
+   "rate": 3.5,
+   "area": 36,
+   "speed": 0.006,
+   "gravity": 0,
+   "size": [
+    7,
+    12
+   ],
+   "life": 140,
+   "color": "#0A0612",
+   "blend": "translucent",
+   "comment": "тёмные тучи"
+  },
+  {
+   "type": "vortex",
+   "delay": 20,
+   "at": "caster+0,33.5,0",
+   "duration": 520,
+   "radius": 30,
+   "height": 0,
+   "arms": 5,
+   "speed": 0.9,
+   "pull": 1,
+   "texture": "mote_cloud",
+   "particles": 160,
+   "life": 80,
+   "size": 3.5,
+   "color": "#3A1A5A",
+   "in": {
+    "duration": 60,
+    "easing": "easeOutCubic"
+   },
+   "comment": "тучи закручиваются"
+  },
+  {
+   "type": "vortex",
+   "delay": 100,
+   "at": "caster+0,34,0",
+   "duration": 440,
+   "radius": 22,
+   "height": 0,
+   "arms": 3,
+   "speed": 1.8,
+   "pull": 1,
+   "texture": "spark_soft",
+   "particles": 120,
+   "life": 40,
+   "size": 0.5,
+   "color": "#3FD6B8",
+   "brightness": 0.6
+  },
+  {
+   "type": "lightning",
+   "delay": 48,
+   "at": "caster+-15.3,34,-14.9",
+   "to": "caster+-0.57,33,-24.75",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#C02A6A",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 59,
+   "at": "caster+16.11,34,2.97",
+   "to": "caster+9.42,33,18.54",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#3FD6B8",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 79,
+   "at": "caster+-16.37,34,17.04",
+   "to": "caster+-19.86,33,6.05",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#C02A6A",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 95,
+   "at": "caster+-9.45,34,6.15",
+   "to": "caster+-10.84,33,-3.59",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#3FD6B8",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 115,
+   "at": "caster+12.3,34,14.63",
+   "to": "caster+4.8,33,22.6",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#C02A6A",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 133,
+   "at": "caster+3.73,34,-25",
+   "to": "caster+11.95,33,-20.85",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#3FD6B8",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 154,
+   "at": "caster+-19.59,34,-4.93",
+   "to": "caster+-20.09,33,-14.34",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#C02A6A",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 170,
+   "at": "caster+-4.38,34,13.83",
+   "to": "caster+-7.76,33,8.49",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#3FD6B8",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 189,
+   "at": "caster+7.62,34,-16.91",
+   "to": "caster+19.09,33,-7.15",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#C02A6A",
+   "brightness": 1.3
+  },
+  {
+   "type": "lightning",
+   "delay": 202,
+   "at": "caster+6.95,34,-15.13",
+   "to": "caster+13.9,33,-11.93",
+   "duration": 6,
+   "branches": 2,
+   "jaggedness": 0.25,
+   "width": 0.18,
+   "color": "#3FD6B8",
+   "brightness": 1.3
+  },
+  {
+   "type": "mesh",
+   "delay": 150,
+   "at": "caster+0,32,0",
+   "model": "abyss_eye_lids",
+   "duration": 390,
+   "comment": "7.5 с: веки"
+  },
+  {
+   "type": "mesh",
+   "delay": 160,
+   "at": "caster+0,32,0",
+   "model": "abyss_eye",
+   "duration": 380,
+   "comment": "8–11.5 с: раскрывается от щели"
+  },
+  {
+   "type": "flash",
+   "delay": 160,
+   "at": "caster+0,29.4,0",
+   "duration": 40,
+   "size": 12,
+   "anamorphic": 30,
+   "color": "#C02A6A",
+   "brightness": 0.8,
+   "in": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 26,
+    "easing": "easeOutCubic"
+   },
+   "comment": "свет в щели"
+  },
+  {
+   "type": "flash",
+   "delay": 230,
+   "at": "caster+0,29.4,0",
+   "duration": 16,
+   "size": 26,
+   "rays": 12,
+   "color": "#B8FFF0",
+   "comment": "11.5 с: Око смотрит"
+  },
+  {
+   "type": "wave",
+   "delay": 232,
+   "at": "caster+0,0.2,0",
+   "duration": 36,
+   "shape": "ring",
+   "radius": 40,
+   "thickness": 2.0,
+   "color": "#C02A6A"
+  },
+  {
+   "type": "sprites",
+   "delay": 240,
+   "at": "caster+0,28,0",
+   "duration": 300,
+   "texture": "mote_eye",
+   "count": 100000,
+   "rate": 0.8,
+   "area": 30,
+   "speed": 0.004,
+   "gravity": 0.004,
+   "spin": 30,
+   "size": [
+    0.6,
+    0.3
+   ],
+   "life": 160,
+   "color": "#3FD6B8",
+   "brightness": 0.8,
+   "comment": "«глазки» осыпаются из туч"
+  },
+  {
+   "type": "flash",
+   "delay": 540,
+   "at": "caster+0,29.4,0",
+   "duration": 20,
+   "size": 16,
+   "anamorphic": 20,
+   "color": "#C02A6A",
+   "comment": "27 с: Око закрывается"
+  }
+ ]
+}

@@ -1,0 +1,245 @@
+{
+ "comment": "Древо мира, каст 12 с (240 тиков) + 20 с корней + цветение. Точки: caster — заклинатель, point:tree — точка взгляда (до 32 бл., на земле). 0–1 с печать под заклинателем и в точке; 1–2 с земля трескается, бьёт росток; 1–11.5 с ствол растёт из ростка (scale 0.05→1 и проявление снизу вверх по секциям), по нему вьются ленты света; 7–11 с крона; 11.8 с вспышка кроны, волна до r24 — зона корней. 12–32 с дерево стоит (корни — fx/world_tree_root, код). На 640 тике код запускает fx/world_tree_bloom (цветение) — дерево рассыпается листвой к 700.",
+ "style": "world_tree",
+ "duration": 720,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "world_tree_seal",
+   "scale": 0.5,
+   "until": 236
+  },
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "point:tree+0,0.05,0",
+   "id": "world_tree_seal",
+   "until": 250
+  },
+  {
+   "type": "decal",
+   "delay": 20,
+   "at": "point:tree+0,0.06,0",
+   "duration": 240,
+   "texture": "higher_cracks",
+   "radius": 4.2,
+   "grow": 24,
+   "fadeOut": 60,
+   "color": "#7EE04A",
+   "brightness": 0.7,
+   "comment": "земля трескается светом"
+  },
+  {
+   "type": "flash",
+   "delay": 22,
+   "at": "point:tree+0,0.6,0",
+   "duration": 12,
+   "size": 2.5,
+   "rays": 6,
+   "color": "#D8FF9A",
+   "comment": "бьёт росток"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "point:tree+0,0.3,0",
+   "duration": 40,
+   "texture": "mote_leaf",
+   "count": 80,
+   "rate": 2,
+   "area": 2.0,
+   "speed": 0.06,
+   "gravity": 0.004,
+   "spin": 90,
+   "tumble": 1,
+   "size": [
+    0.3,
+    0.15
+   ],
+   "life": 40,
+   "color": "#7EE04A"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "point:tree+0,0.2,0",
+   "duration": 220,
+   "texture": "spark_soft",
+   "count": 600,
+   "rate": 2.8,
+   "area": 6.0,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.2,
+    0.03
+   ],
+   "life": 60,
+   "color": "#D8FF9A",
+   "glow": 0.5,
+   "comment": "свет поднимается от земли к стволу"
+  },
+  {
+   "type": "mesh",
+   "delay": 20,
+   "at": "point:tree",
+   "model": "world_tree",
+   "duration": 640,
+   "move": {
+    "from": [
+     0,
+     0,
+     0
+    ],
+    "scaleFrom": 0.05,
+    "delay": 0,
+    "duration": 210,
+    "easing": "easeInOutSine"
+   },
+   "comment": "рост по секциям: проявление снизу вверх 200 тиков"
+  },
+  {
+   "type": "mesh",
+   "delay": 20,
+   "at": "point:tree",
+   "model": "world_tree_crown",
+   "duration": 640,
+   "move": {
+    "from": [
+     0,
+     0,
+     0
+    ],
+    "scaleFrom": 0.05,
+    "delay": 0,
+    "duration": 210,
+    "easing": "easeInOutSine"
+   },
+   "comment": "крона проявляется с 7 с (appear.delay в модели — 120)"
+  },
+  {
+   "type": "trail",
+   "delay": 40,
+   "at": "point:tree+0,0.5,0",
+   "duration": 190,
+   "width": 0.35,
+   "length": 26,
+   "count": 3,
+   "color": "@secondary",
+   "brightness": 1.2,
+   "orbit": {
+    "radius": 4.0,
+    "speed": 4.5,
+    "climb": 3.2,
+    "rise": 0.3,
+    "risePeriod": 30
+   },
+   "comment": "ленты света вьются вверх по стволу"
+  },
+  {
+   "type": "trail",
+   "delay": 60,
+   "at": "point:tree+0,0.5,0",
+   "duration": 170,
+   "width": 0.22,
+   "length": 20,
+   "count": 2,
+   "color": "#FFE38A",
+   "orbit": {
+    "radius": 5.2,
+    "speed": -3.5,
+    "climb": 3.6
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 160,
+   "at": "point:tree+0,30,0",
+   "duration": 560,
+   "texture": "mote_leaf",
+   "count": 2000,
+   "rate": 1.4,
+   "area": 14,
+   "speed": 0.002,
+   "gravity": 0.0015,
+   "sway": 1.2,
+   "tumble": 0.6,
+   "size": [
+    0.4,
+    0.3
+   ],
+   "life": 200,
+   "color": "#7EE04A",
+   "brightness": 0.9,
+   "comment": "листья опадают с кроны"
+  },
+  {
+   "type": "sprites",
+   "delay": 200,
+   "at": "point:tree+0,4,0",
+   "duration": 500,
+   "texture": "spark_soft",
+   "count": 2000,
+   "rate": 1.2,
+   "area": 16,
+   "speed": 0.004,
+   "gravity": -0.0006,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 90,
+   "color": "#FFE38A",
+   "glow": 0.6,
+   "comment": "светлячки под кроной"
+  },
+  {
+   "type": "flash",
+   "delay": 234,
+   "at": "point:tree+0,30,0",
+   "duration": 16,
+   "size": 22,
+   "rays": 10,
+   "anamorphic": 6,
+   "color": "#D8FF9A",
+   "comment": "11.7 с: крона вспыхивает"
+  },
+  {
+   "type": "wave",
+   "delay": 236,
+   "at": "point:tree+0,0.1,0",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 24,
+   "thickness": 1.6,
+   "color": "#7EE04A"
+  },
+  {
+   "type": "sigil",
+   "delay": 240,
+   "at": "point:tree+0,0.06,0",
+   "id": "world_tree_zone",
+   "until": 640,
+   "comment": "граница зоны корней r24"
+  },
+  {
+   "type": "tint",
+   "delay": 200,
+   "at": "point:tree",
+   "duration": 460,
+   "radius": 26,
+   "color": "#B8F07A",
+   "strength": 0.12,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

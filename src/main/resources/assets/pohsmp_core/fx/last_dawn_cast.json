@@ -1,0 +1,376 @@
+{
+ "comment": "Последний рассвет, каст 10 с (200) + 12 с рассвета (240) + закат. caster — заклинатель; солнце — впереди по взгляду (+42 вперёд, итог +9 вверх). 0–2 с печать, молитва; 0.5–3 с круг r30; 1–10 с на горизонте разгорается заря (полоса света), 2–10 с солнце восходит из-за горизонта, с 7.5 с веер лучей; 10 с — солнце взошло: вспышка, тёплый tint r30 (день — код). 10–22 с золотые искры и перья в круге. 22 с — солнце гаснет.",
+ "style": "last_dawn",
+ "duration": 500,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "dawn_seal",
+   "until": 196
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 60,
+   "texture": "spark_soft",
+   "count": 120,
+   "rate": 2,
+   "area": 3,
+   "speed": 0.01,
+   "gravity": -0.005,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 36,
+   "color": "#FFF4D6",
+   "glow": 0.4
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,0.06,0",
+   "id": "dawn_ring",
+   "until": 440
+  },
+  {
+   "type": "flash",
+   "delay": 20,
+   "at": "caster+0,1.5,42",
+   "duration": 200,
+   "size": 12,
+   "anamorphic": 36,
+   "color": "#FF9A3A",
+   "brightness": 0.9,
+   "in": {
+    "duration": 160,
+    "easing": "easeInSine"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "comment": "заря: полоса света на горизонте"
+  },
+  {
+   "type": "flash",
+   "delay": 60,
+   "at": "caster+0,3,44",
+   "duration": 170,
+   "size": 26,
+   "color": "#FFB38A",
+   "brightness": 0.35,
+   "in": {
+    "duration": 140,
+    "easing": "easeInSine"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "comment": "розовое небо над горизонтом"
+  },
+  {
+   "type": "mesh",
+   "delay": 40,
+   "at": "caster+0,9,42",
+   "model": "dawn_sun",
+   "duration": 420,
+   "move": {
+    "from": [
+     0,
+     -20,
+     0
+    ],
+    "scaleFrom": 0.75,
+    "delay": 0,
+    "duration": 160,
+    "easing": "easeOutSine"
+   },
+   "comment": "солнце восходит"
+  },
+  {
+   "type": "beam",
+   "delay": 170,
+   "at": "caster+0,9,42",
+   "to": "caster+-44.43,20.91,48",
+   "duration": 300,
+   "width": 0.9,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFB38A",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 166,
+   "at": "caster+0,9,42",
+   "to": "caster+-39.84,32,48",
+   "duration": 300,
+   "width": 0.5,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFD36B",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 162,
+   "at": "caster+0,9,42",
+   "to": "caster+-32.53,41.53,48",
+   "duration": 300,
+   "width": 0.9,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFB38A",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 158,
+   "at": "caster+0,9,42",
+   "to": "caster+-23,48.84,48",
+   "duration": 300,
+   "width": 0.5,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFD36B",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 154,
+   "at": "caster+0,9,42",
+   "to": "caster+-11.91,53.43,48",
+   "duration": 300,
+   "width": 0.9,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFB38A",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 150,
+   "at": "caster+0,9,42",
+   "to": "caster+0,55,48",
+   "duration": 300,
+   "width": 0.5,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFD36B",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 154,
+   "at": "caster+0,9,42",
+   "to": "caster+11.91,53.43,48",
+   "duration": 300,
+   "width": 0.9,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFB38A",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 158,
+   "at": "caster+0,9,42",
+   "to": "caster+23,48.84,48",
+   "duration": 300,
+   "width": 0.5,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFD36B",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 162,
+   "at": "caster+0,9,42",
+   "to": "caster+32.53,41.53,48",
+   "duration": 300,
+   "width": 0.9,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFB38A",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 166,
+   "at": "caster+0,9,42",
+   "to": "caster+39.84,32,48",
+   "duration": 300,
+   "width": 0.5,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFD36B",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 170,
+   "at": "caster+0,9,42",
+   "to": "caster+44.43,20.91,48",
+   "duration": 300,
+   "width": 0.9,
+   "core": 0.25,
+   "grow": 40,
+   "taper": 0.7,
+   "brightness": 0.35,
+   "color": "#FFB38A",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 200,
+   "at": "caster+0,9,42",
+   "duration": 20,
+   "size": 34,
+   "rays": 14,
+   "anamorphic": 10,
+   "screen": 0.35,
+   "color": "#FFFFFF",
+   "comment": "10 с: солнце взошло"
+  },
+  {
+   "type": "wave",
+   "delay": 200,
+   "at": "caster+0,0.2,0",
+   "duration": 34,
+   "shape": "ring",
+   "radius": 30,
+   "thickness": 1.8,
+   "color": "#FFD36B"
+  },
+  {
+   "type": "tint",
+   "delay": 196,
+   "at": "caster",
+   "duration": 300,
+   "radius": 30,
+   "color": "#FFC98A",
+   "strength": 0.3,
+   "in": {
+    "duration": 24,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 200,
+   "at": "caster+0,0.5,0",
+   "duration": 240,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 4,
+   "area": 28,
+   "speed": 0.006,
+   "gravity": -0.003,
+   "size": [
+    0.18,
+    0.04
+   ],
+   "life": 80,
+   "color": "#FFD36B",
+   "glow": 0.5,
+   "comment": "золотые искры в круге"
+  },
+  {
+   "type": "sprites",
+   "delay": 200,
+   "at": "caster+0,9,0",
+   "duration": 240,
+   "texture": "mote_feather",
+   "count": 100000,
+   "rate": 0.6,
+   "area": 24,
+   "speed": 0.002,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "tumble": 0.6,
+   "size": [
+    0.4,
+    0.3
+   ],
+   "life": 180,
+   "color": "#FFF4D6"
+  },
+  {
+   "type": "flash",
+   "delay": 440,
+   "at": "caster+0,9,42",
+   "duration": 40,
+   "size": 24,
+   "anamorphic": 20,
+   "color": "#FF9A3A",
+   "out": {
+    "duration": 36,
+    "easing": "easeOutCubic"
+   },
+   "comment": "22 с: закат"
+  }
+ ]
+}

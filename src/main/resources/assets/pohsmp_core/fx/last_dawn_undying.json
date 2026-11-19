@@ -1,0 +1,56 @@
+{
+ "comment": "Последний рассвет: союзник не умер (урон срезан до 1 hp; caster = союзник). Золотая вспышка у груди, нимб, перья.",
+ "style": "last_dawn",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "follow": true,
+   "duration": 10,
+   "size": 2.2,
+   "rays": 8,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "halo",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 20,
+   "size": 0.4,
+   "spin": 4,
+   "color": "#FFD36B",
+   "in": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "follow": true,
+   "duration": 3,
+   "texture": "mote_feather",
+   "count": 12,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.06,
+   "gravity": 0.002,
+   "sway": 1,
+   "tumble": 1,
+   "size": [
+    0.3,
+    0.2
+   ],
+   "life": 30,
+   "color": "#FFF4D6"
+  }
+ ]
+}

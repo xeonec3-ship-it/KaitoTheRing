@@ -1390,6 +1390,16 @@ const SCENES = {
   "Стёртое имя: табличка с именем": () => [new Sigil("erased_nameplate", new THREE.Vector3(0, 2.0, 0), { stopAfter: 200 })],
   "Стёртое имя: печать под целью": () => [new Sigil("erased_target", new THREE.Vector3(0, 0.03, 0), { stopAfter: 160 })],
   "Стёртое имя: небесная книга": () => [new Sigil("erased_sky", new THREE.Vector3(0, 6, 0), { stopAfter: 160 })],
+  "Древо мира: каст и зона (T23)": () => [new FxRun("world_tree_cast", { caster: new THREE.Vector3(0, 0, -14), noTarget: true, points: { tree: [0, 0, 6] } })],
+  "Древо мира: модель (ствол, крона, цветы)": () => { caster.visible = false; return [new Portal("world_tree", new THREE.Vector3(0, 0, 0), { noAuto: true }), new Portal("world_tree_crown", new THREE.Vector3(0, 0, 0), { noAuto: true }), new Portal("world_tree_bloom", new THREE.Vector3(0, 0, 0), { noAuto: true, t0: 0 })]; },
+  "Древо мира: корень на жертве": () => [new FxRun("world_tree_root", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Древо мира: цветение": () => [new FxRun("world_tree_bloom", { caster: new THREE.Vector3(0, 0, 0), noTarget: true }), new Portal("world_tree", new THREE.Vector3(0, 0, 0), { noAuto: true }), new Portal("world_tree_crown", new THREE.Vector3(0, 0, 0), { noAuto: true })],
+  "Око бездны: каст (T23)": () => [new FxRun("abyss_eye_cast", { caster: new THREE.Vector3(0, 0, 0), noTarget: true }), new Portal("abyss_eye_pupil", new THREE.Vector3(1.5, 29.2, 0.8), { noAuto: true, yaw: 30, t0: 228 })],
+  "Око бездны: модель (глаз, веки, зрачок)": () => { caster.visible = false; return [new Portal("abyss_eye", new THREE.Vector3(0, 6, 0), { noAuto: true }), new Portal("abyss_eye_lids", new THREE.Vector3(0, 6, 0), { noAuto: true }), new Portal("abyss_eye_pupil", new THREE.Vector3(0, 6 - 2.75, 0), { noAuto: true })]; },
+  "Око бездны: взгляд на Око": () => [new FxRun("abyss_eye_gaze", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Последний рассвет: каст (T23)": () => [new FxRun("last_dawn_cast", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Последний рассвет: солнце (модель)": () => { caster.visible = false; return [new Portal("dawn_sun", new THREE.Vector3(0, 10, 0), { noAuto: true })]; },
+  "Последний рассвет: союзник не умер": () => [new FxRun("last_dawn_undying", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
 // небесная печать Silent Gate с разборкой «трещины» — только для превью (сам файл не меняется)
@@ -1446,6 +1456,16 @@ MAIN_ID["Стёртое имя: возвращение в мир"] = "erased_ret
 MAIN_ID["Стёртое имя: табличка с именем"] = "erased_nameplate"; VIEW_FOR["Стёртое имя: табличка с именем"] = "t21chest";
 MAIN_ID["Стёртое имя: печать под целью"] = "erased_target"; VIEW_FOR["Стёртое имя: печать под целью"] = "above";
 MAIN_ID["Стёртое имя: небесная книга"] = "erased_sky"; VIEW_FOR["Стёртое имя: небесная книга"] = "t21lock";
+MAIN_ID["Древо мира: каст и зона (T23)"] = "world_tree_cast"; VIEW_FOR["Древо мира: каст и зона (T23)"] = "tree";
+MAIN_ID["Древо мира: модель (ствол, крона, цветы)"] = "world_tree"; VIEW_FOR["Древо мира: модель (ствол, крона, цветы)"] = "tree";
+MAIN_ID["Древо мира: корень на жертве"] = "world_tree_root"; VIEW_FOR["Древо мира: корень на жертве"] = "close";
+MAIN_ID["Древо мира: цветение"] = "world_tree_bloom"; VIEW_FOR["Древо мира: цветение"] = "tree";
+MAIN_ID["Око бездны: каст (T23)"] = "abyss_eye_cast"; VIEW_FOR["Око бездны: каст (T23)"] = "eyeSky";
+MAIN_ID["Око бездны: модель (глаз, веки, зрачок)"] = "abyss_eye"; VIEW_FOR["Око бездны: модель (глаз, веки, зрачок)"] = "eyeModel";
+MAIN_ID["Око бездны: взгляд на Око"] = "abyss_eye_gaze"; VIEW_FOR["Око бездны: взгляд на Око"] = "close";
+MAIN_ID["Последний рассвет: каст (T23)"] = "last_dawn_cast"; VIEW_FOR["Последний рассвет: каст (T23)"] = "dawn";
+MAIN_ID["Последний рассвет: солнце (модель)"] = "dawn_sun"; VIEW_FOR["Последний рассвет: солнце (модель)"] = "sun";
+MAIN_ID["Последний рассвет: союзник не умер"] = "last_dawn_undying"; VIEW_FOR["Последний рассвет: союзник не умер"] = "close";
 
 let hitQueue = [], nextAutoHit = 24;
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -1483,6 +1503,7 @@ VIEWS.t21 = [1.15, 0.2, 13, 1.8]; VIEWS.t21lock = [0.4, -0.35, 6.5, 2.6]; VIEWS.
 VIEWS.school = [0.55, 0.55, 9.5, 1.1]; VIEWS.gallery = [0.0, 1.32, 27, 0];   // сцены «Школа: …» (T06)
 VIEWS.dome = [0.6, 0.35, 40, 3]; VIEWS.dream = [0.5, 0.3, 22, 3];   // T22, «Иллюзии»
 VIEWS.t24 = [1.0, 0.22, 15, 2.2];   // T24, «Стёртое имя»
+VIEWS.tree = [0.7, 0.12, 62, 17]; VIEWS.eyeSky = [0.5, -0.75, 34, 18]; VIEWS.eyeModel = [0.5, -0.55, 36, 4]; VIEWS.dawn = [3.14, 0.1, 22, 6]; VIEWS.sun = [3.14, 0.05, 40, 10];   // T23
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

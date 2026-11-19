@@ -1,0 +1,109 @@
+{
+ "comment": "Око бездны: тучи над заклинателем (r40, лицом вниз) — два рукава спирали туч крутятся навстречу, в центре — знак Ока, где раскроется глаз. Светятся тускло (бирюза и маджента), тьму даёт tint и тёмные облака-спрайты.",
+ "size": 40.0,
+ "color": "#3FD6B8",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "swirl",
+   "type": "disc",
+   "texture": "abyss_swirl",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#5A2A8A",
+   "brightness": 0.55,
+   "appear": {
+    "delay": 0,
+    "duration": 80,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "twist"
+    ],
+    "twist": 120
+   },
+   "rotation": {
+    "speed": 7,
+    "boost": 3
+   }
+  },
+  {
+   "id": "swirl2",
+   "type": "disc",
+   "texture": "abyss_swirl",
+   "radius": 0.72,
+   "heightOffset": 0.05,
+   "color": "#3FD6B8",
+   "brightness": 0.32,
+   "appear": {
+    "delay": 30,
+    "duration": 80,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "twist"
+    ],
+    "twist": -90
+   },
+   "rotation": {
+    "speed": -11,
+    "boost": 2
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "abyss_sigil",
+   "radius": 0.3,
+   "heightOffset": 0.1,
+   "color": "#C02A6A",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 60,
+    "duration": 60,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -6
+   },
+   "pulse": {
+    "amp": 0.3,
+    "period": 24
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.0,
+   "heightOffset": 0.12,
+   "color": "#3FD6B8",
+   "brightness": 0.5,
+   "inner": 0.995,
+   "repeat": 1,
+   "appear": {
+    "delay": 20,
+    "duration": 60,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 40,
+  "stagger": 2
+ }
+}

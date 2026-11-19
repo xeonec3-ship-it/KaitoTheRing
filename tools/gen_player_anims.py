@@ -1584,6 +1584,99 @@ _T24 = [lambda: erased_name_cast()[0],
                         body_y=-0.06, length=1.2)]
 
 
+# ---------------------------------------------------------------- T23: Мифические — «Древо мира» (12 с), «Око бездны» (12 с), «Последний рассвет» (10 с)
+# Шкалы — docs/specs/tasks/T23_mythic_four.md (раздел «Ролики») и fx/world_tree_cast.json, abyss_eye_cast.json, last_dawn_cast.json
+# (tools/gen_mythic_t23_fx.py). Без посоха. Касты замирают в последней позе (hold), к каждому — финал *_finish.
+KNEEL_R_LEG = _TO(pitch=8, roll=2, bend=92)
+KNEEL_L_LEG = _TO(pitch=-84, roll=-4, bend=86)
+
+
+def world_tree_cast():
+    """«Древо мира», 12 с: 0–1.2 опускается на колено, правая ладонь к земле (1 с — росток); 1.2–3 ладонь прижата, левая на колене;
+    3–6.5 встаёт, обе ладони вверх перед собой — «поднимает» дерево; 6.5–9.5 руки медленно расходятся в стороны (ветви);
+    9.5–11.6 руки к небу буквой V, голова запрокинута (крона); 11.7 руки чуть раскрываются — вспышка кроны."""
+    a, r = Anim('pohsmp_world_tree_cast', 12.0), Rig()
+    _start(a)
+    ground_r = _fk(pitch=-28, yaw=-4, roll=6, bend=-30)                  # ладонь к земле (с колена)
+    knee_l = r.L(3.0, 13.0, 5.0, elbow_out=1.4)
+    a.pose(1.1, 'easeOutCubic', rightLeg=KNEEL_R_LEG, leftLeg=KNEEL_L_LEG, body={'y': -0.34}, rightArm=ground_r, leftArm=knee_l,
+           torso=_TO(pitch=24, bend=10), head=_HL(pitch=20))
+    a.sway(1.1, 3.0, 0.8, 'torso', _TO(pitch=24, bend=10), 'pitch', 1.5)
+    lift_r, lift_l = r.R(-3.0, 17.0, 7.0, elbow_out=1.3), r.L(3.0, 17.0, 7.0, elbow_out=1.3)
+    a.pose(3.6, 'easeInOutSine', rightLeg=ZERO_LEG, leftLeg=ZERO_LEG, body={'y': 0}, rightArm=lift_r, leftArm=lift_l, torso=_TO(pitch=4, bend=3),
+           head=_HL(pitch=4))
+    up_r, up_l = r.R(-3.4, 25.5, 7.2, elbow_out=1.3), r.L(3.4, 25.5, 7.2, elbow_out=1.3)
+    a.pose(6.4, 'easeInOutSine', rightArm=up_r, leftArm=up_l, torso=_TO(pitch=-4, bend=-2), head=_HL(pitch=-22))
+    wide = _fk(pitch=-40, yaw=-6, roll=70, bend=-12)
+    a.pose(9.3, 'easeInOutSine', rightArm=wide, leftArm=mirror(wide), torso=_TO(pitch=-5, bend=-3), head=_HL(pitch=-28),
+           rightLeg=_TO(pitch=0, roll=5), leftLeg=_TO(pitch=0, roll=-5))
+    a.sway(9.3, 9.6, 0.3, 'body', {'y': 0}, 'y', 0.02)
+    sky = _fk(pitch=-18, roll=140, bend=-10)
+    a.pose(11.5, 'easeInOutCubic', rightArm=sky, leftArm=mirror(sky), torso=_TO(pitch=-9, bend=-6), head=_HL(pitch=-36), body={'y': 0.03})
+    end = _fk(pitch=-24, roll=118, bend=-8)
+    a.pose(11.75, 'easeOutBack', rightArm=end, leftArm=mirror(end), torso=_TO(pitch=-8, bend=-5), head=_HL(pitch=-32), body={'y': 0.03})
+    a.pose(12.0, rightArm=end, leftArm=mirror(end), torso=_TO(pitch=-8, bend=-5), head=_HL(pitch=-32), body={'y': 0.03})
+    return a, (end, mirror(end), _TO(pitch=-8, bend=-5), (_TO(pitch=0, roll=5), _TO(pitch=0, roll=-5)), 0.03)
+
+
+def abyss_eye_cast():
+    """«Око бездны», 12 с: 0–2 ладони закрывают лицо, голова опущена; 2–6 пальцы медленно сползают с лица (когти), голова поднимается;
+    6–8.5 правая рука-коготь к небу, левая прижата к груди; 8.5–11.3 обе руки вверх, ладони раскрыты, голова запрокинута (глаз
+    раскрывается 8–11.5); 11.4–11.6 рывок: голова вперёд, руки вниз-в стороны — Око смотрит."""
+    a, r = Anim('pohsmp_abyss_eye_cast', 12.0), Rig()
+    _start(a)
+    a.pose(0.2, 'easeInQuad', rightArm=r.R(-2.6, 21.0, 10.0, elbow_out=1.3), leftArm=r.L(2.6, 21.0, 10.0, elbow_out=1.3))
+    face_r, face_l = r.R(-1.6, 27.0, 8.6, elbow_out=1.4), r.L(1.6, 27.0, 8.6, elbow_out=1.4)
+    a.pose(0.9, 'easeOutCubic', rightArm=face_r, leftArm=face_l, torso=_TO(pitch=10, bend=6), head=_HL(pitch=22))
+    a.sway(0.9, 2.0, 0.9, 'torso', _TO(pitch=10, bend=6), 'pitch', 2)
+    claw_r, claw_l = r.R(-3.2, 21.0, 8.8, elbow_out=1.5), r.L(3.2, 21.0, 8.8, elbow_out=1.5)
+    a.pose(5.8, 'easeInOutSine', rightArm=claw_r, leftArm=claw_l, torso=_TO(pitch=2, bend=1), head=_HL(pitch=-8))
+    a.sway(2.0, 5.8, 0.16, 'head', _HL(pitch=4), 'roll', 2)
+    sky_claw = _fk(pitch=-160, yaw=6, roll=-10, bend=-38)
+    chest_l = r.L(1.4, 19.0, 5.0, elbow_out=1.5)
+    a.pose(7.0, 'easeOutCubic', rightArm=sky_claw, leftArm=chest_l, torso=_TO(pitch=-6, bend=-3), head=_HL(pitch=-30))
+    a.sway(7.0, 8.5, 0.14, 'rightArm', sky_claw, 'roll', 2)
+    up = _fk(pitch=-20, roll=148, bend=-10)
+    a.pose(9.2, 'easeInOutSine', rightArm=up, leftArm=mirror(up), torso=_TO(pitch=-12, bend=-8), head=_HL(pitch=-42), body={'y': 0.03})
+    a.sway(9.2, 11.3, 0.2, 'body', {'y': 0.03}, 'y', 0.015)
+    a.pose(11.35, rightArm=merge(up, {'roll': 152}), leftArm=mirror(merge(up, {'roll': 152})), torso=_TO(pitch=-13, bend=-9), head=_HL(pitch=-44))
+    down = _fk(pitch=-12, yaw=6, roll=42, bend=-26)
+    end_t = _TO(pitch=12, bend=6)
+    legs = (_TO(pitch=-12, roll=6, bend=14), _TO(pitch=12, roll=-6, bend=8))
+    a.pose(11.6, 'easeOutQuart', rightArm=down, leftArm=mirror(down), torso=end_t, head=_HL(pitch=-6), body={'y': -0.08},
+           rightLeg=legs[0], leftLeg=legs[1])
+    a.pose(12.0, rightArm=down, leftArm=mirror(down), torso=end_t, head=_HL(pitch=-4), body={'y': -0.08})
+    return a, (down, mirror(down), end_t, legs, -0.08)
+
+
+def last_dawn_cast():
+    """«Последний рассвет», 10 с: 0–1.5 молитва у груди; 1.5–5 на колено, молитва, голова склонена (заря разгорается);
+    5–7.5 встаёт, руки раскрываются вперёд-вверх навстречу солнцу; 7.5–9.5 руки к солнцу широкой V, голова поднята; 10 с — взошло."""
+    a, r = Anim('pohsmp_last_dawn_cast', 10.0), Rig()
+    _start(a)
+    pray_r, pray_l = r.R(-0.55, 21.6, 5.6), r.L(0.55, 21.6, 5.6)
+    a.pose(1.2, rightArm=pray_r, leftArm=pray_l, torso=_TO(pitch=4, bend=4), head=_HL(pitch=14))
+    a.pose(2.4, 'easeOutCubic', rightLeg=KNEEL_R_LEG, leftLeg=KNEEL_L_LEG, body={'y': -0.34}, torso=_TO(pitch=8, bend=6), head=_HL(pitch=24))
+    a.sway(2.4, 5.0, 1.3, 'torso', _TO(pitch=8, bend=6), 'pitch', 1.5)
+    open_r, open_l = r.R(-5.0, 21.5, 8.4, elbow_out=1.3), r.L(5.0, 21.5, 8.4, elbow_out=1.3)
+    a.pose(6.6, 'easeInOutSine', rightLeg=ZERO_LEG, leftLeg=ZERO_LEG, body={'y': 0}, rightArm=open_r, leftArm=open_l, torso=_TO(pitch=0),
+           head=_HL(pitch=-8))
+    a.sway(6.6, 7.6, 0.5, 'rightArm', open_r, 'pitch', 2)
+    v = _fk(pitch=-70, yaw=-8, roll=58, bend=-6)
+    a.pose(9.4, 'easeInOutCubic', rightArm=v, leftArm=mirror(v), torso=_TO(pitch=-8, bend=-5), head=_HL(pitch=-20), body={'y': 0.03})
+    a.pose(10.0, rightArm=merge(v, {'pitch': -74}), leftArm=mirror(merge(v, {'pitch': -74})), torso=_TO(pitch=-9, bend=-6), head=_HL(pitch=-22),
+           body={'y': 0.04})
+    return a, (merge(v, {'pitch': -74}), mirror(merge(v, {'pitch': -74})), _TO(pitch=-9, bend=-6), (ZERO_LEG, ZERO_LEG), 0.04)
+
+
+def _t23(fn, name, length, head):
+    return [lambda: fn()[0], lambda: _finish(name, *fn()[1][:3], head=head, legs=fn()[1][3], body_y=fn()[1][4], length=length)]
+
+
+_T23 = (_t23(world_tree_cast, 'pohsmp_world_tree_finish', 1.5, _HL(pitch=-32)) + _t23(abyss_eye_cast, 'pohsmp_abyss_eye_finish', 1.0, _HL(pitch=-4))
+        + _t23(last_dawn_cast, 'pohsmp_last_dawn_finish', 1.5, _HL(pitch=-22)))
+
+
 def pose_gallery():
     """Только для превью: по 1.4 с на каждую позу библиотеки."""
     out = []
@@ -1620,7 +1713,7 @@ _BL = (lambda: blessing_cast()[0],
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
          scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
          silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish,
-         *_SS, *_BL, *_T22, *_T24]
+         *_SS, *_BL, *_T22, *_T24, *_T23]
 
 
 def main():

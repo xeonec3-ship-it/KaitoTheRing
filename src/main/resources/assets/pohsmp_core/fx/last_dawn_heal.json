@@ -1,0 +1,50 @@
+{
+ "comment": "Последний рассвет: после 12 с союзник лечится на 50% записанного урона за 2 с (caster = союзник, follow): золотые искры поднимаются, тёплая оболочка.",
+ "style": "last_dawn",
+ "duration": 44,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 40,
+   "thickness": 0.1,
+   "pulse": [
+    0.2,
+    10
+   ],
+   "motes": 24,
+   "texture": "spark_soft",
+   "color": "#FFD36B",
+   "in": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.4,0",
+   "follow": true,
+   "duration": 40,
+   "texture": "spark_soft",
+   "count": 80,
+   "rate": 2,
+   "area": 0.6,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 26,
+   "color": "#FFD36B",
+   "glow": 0.6
+  }
+ ]
+}

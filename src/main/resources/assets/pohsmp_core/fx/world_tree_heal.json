@@ -1,0 +1,49 @@
+{
+ "comment": "Древо мира: союзник под кроной (Регенерация II), каждые ~2 с (caster = союзник, follow): листья опадают светом и тают у плеч, мягкие искры.",
+ "style": "world_tree",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.8,0",
+   "follow": true,
+   "duration": 20,
+   "texture": "mote_leaf",
+   "count": 10,
+   "rate": 0.5,
+   "area": 0.7,
+   "speed": 0.002,
+   "gravity": 0.002,
+   "sway": 1,
+   "tumble": 0.5,
+   "size": [
+    0.25,
+    0.12
+   ],
+   "life": 26,
+   "color": "#D8FF9A",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,1.0,0",
+   "follow": true,
+   "duration": 20,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 0.8,
+   "spread": 0.4,
+   "speed": 0.006,
+   "gravity": -0.004,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 20,
+   "color": "#FFE38A",
+   "glow": 0.5
+  }
+ ]
+}

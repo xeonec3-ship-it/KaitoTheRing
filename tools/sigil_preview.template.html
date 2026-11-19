@@ -438,6 +438,20 @@ class Portal {
       P.mesh = add(geo, lit(color));
     } else if (p.type === "disc") {
       const m = lit(color, p.blend); m.map = TEX[p.texture]; add(discGeo(2 * Math.PI, 0), m); g.scale.setScalar(p.radius);
+    } else if (p.type === "boxes") {
+      // бруски [x0,y0,z0,x1,y1,z1,тон]; тона из стиля; светящиеся тона — аддитивно; проявление сверху вниз
+      P.boxes = [];
+      const tones = p.tones.map((c) => styleColor(this.def.style, c)), glow = new Set(p.glowTones || []);
+      const shadeMats = tones.map((c, i) => glow.has(i) ? lit(c) : new THREE.MeshLambertMaterial({ color: new THREE.Color(c), transparent: true, opacity: 0, emissive: new THREE.Color(c), emissiveIntensity: 0.06 }));
+      if (!scene.userData.gateLight) { const dl = new THREE.DirectionalLight(0xffffff, 1.0); dl.position.set(-6, 7, 9); scene.add(dl); const d2 = new THREE.DirectionalLight(0x9fd8ff, 0.35); d2.position.set(8, -2, 4); scene.add(d2); scene.add(new THREE.AmbientLight(0x8095b0, 0.38)); scene.userData.gateLight = true; }
+      for (const b of p.boxes) {
+        const m = shadeMats[b[6]].clone(); P.mats.push(m);
+        const mesh = add(new THREE.BoxGeometry(Math.max(0.01, b[3] - b[0]), Math.max(0.01, b[4] - b[1]), Math.max(0.01, b[5] - b[2])), m);
+        mesh.position.set((b[0] + b[3]) / 2, (b[1] + b[4]) / 2, (b[2] + b[5]) / 2);
+        if (b[7]) mesh.rotation.set(b[7][0] * D2R, b[7][1] * D2R, b[7][2] * D2R, "XYZ");
+        P.boxes.push({ m, y: (b[1] + b[4]) / 2, glow: glow.has(b[6]) });
+      }
+      P.flash = add(new THREE.BoxGeometry(12, 0.25, 3), lit("#FFFFFF"));
     }
     return P;
   }
@@ -466,6 +480,16 @@ class Portal {
         v.forEach((q, i) => { const x = q[0] - c[0], y = q[1] - c[1]; pos.setXYZ(i, c[0] + x * cs - y * sn, c[1] + x * sn + y * cs, q[2]); });
         pos.needsUpdate = true; P.mesh.geometry.computeBoundingSphere();
         P.mats[0].opacity = alpha * (p.brightness ?? 1);
+        continue;
+      }
+      if (p.type === "boxes") {
+        const [lo, hi] = p.bounds, front = hi - (hi - lo + 2) * clamp01(e), band = (p.appear && p.appear.front) || 0.8;
+        for (const B of P.boxes) {
+          const k = clamp01((B.y - front + band) / band);                    // 0 — ещё не проявился, 1 — готов (сверху вниз)
+          B.m.opacity = k * (B.glow ? 1 : (p.opacity ?? 1));
+          if (B.m.emissive) B.m.emissiveIntensity = 0.06 + 1.4 * (1 - k) * (k > 0 ? 1 : 0);   // у фронта — вспышка белым
+        }
+        P.flash.position.set(0, front, 0); P.flash.material.opacity = lt >= ap.delay && e < 1 ? 0.8 : 0;
         continue;
       }
       P.rot += (p.spin || 0) * dt / TPS;
@@ -641,13 +665,14 @@ const SCENES = {
   "Запретная: цепи": () => [new Sigil("forbidden_chains", new THREE.Vector3(0, 0.02, 0))],
   "Дезинтеграция (аниме)": () => [new FxRun("disintegration")],
   "Дезинтеграция: Реплика": () => [new FxRun("disintegration_replica")],
+  "Врата (модель)": () => [new Portal("silent_gate", new THREE.Vector3(0, 2, -3))],
   "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
-const MAIN_ID = { "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
+const MAIN_ID = { "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
-const VIEW_FOR = { "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
+const VIEW_FOR = { "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -678,7 +703,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

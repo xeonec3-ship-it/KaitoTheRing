@@ -279,8 +279,8 @@ public class CovenArrivalSpell extends PohSpell {
         final Map<UUID, Vec3> pre = new HashMap<>();
         /** CNPC NPCs: the model animation they had before the arrival changed it. */
         final Map<UUID, Integer> poses = new HashMap<>();
-        /** CNPC NPCs: their home before the scene (held at the spot the scene keeps them, given back at the end). */
-        final Map<UUID, net.minecraft.core.BlockPos> homes = new HashMap<>();
+        /** CNPC NPCs whose «return home» flag the scene turned off (it stays off; their home is moved to where they end up). */
+        final Map<UUID, Boolean> homes = new HashMap<>();
         /** Retinue members whose exit came while they could not be found (chunk not loaded yet): retried every tick. */
         final Map<UUID, Vec3> pendingExit = new HashMap<>();
     }
@@ -439,9 +439,10 @@ public class CovenArrivalSpell extends PohSpell {
                 continue;
             }
             if (le.position().distanceToSqr(p) > 0.0004) le.teleportTo(p.x, p.y, p.z);
-            // CNPC shows the model animation (bow, ritual) only at the NPC's home: home = where the scene holds it
-            net.minecraft.core.BlockPos old = CnpcHooks.home(le, net.minecraft.core.BlockPos.containing(p));
+            // CNPC drops the model animation (bow) of an NPC away from its home: no «return home» while the scene holds it
+            Boolean old = CnpcHooks.returnHome(le, false);
             if (old != null) a.homes.putIfAbsent(le.getUUID(), old);
+            if (le instanceof net.minecraft.world.entity.Mob mob) mob.getNavigation().stop();   // a path also drops the pose
             le.fallDistance = 0;
             le.setDeltaMovement(Vec3.ZERO);
             le.setYRot(yaw);
@@ -618,9 +619,11 @@ public class CovenArrivalSpell extends PohSpell {
             LivingEntity le = find(ar.getServer(), p.getKey());
             if (le != null) CnpcHooks.anim(le, p.getValue());
         }
-        for (var h : a.homes.entrySet()) {
-            LivingEntity le = find(ar.getServer(), h.getKey());
-            if (le != null) CnpcHooks.home(le, h.getValue());
+        // owner 19.11: no going back to where it stood before the teleport — the «return home» flag stays off and the home is
+        // where the NPC ends the scene
+        for (UUID u : a.homes.keySet()) {
+            LivingEntity le = find(ar.getServer(), u);
+            if (le != null) CnpcHooks.setHome(le, le.blockPosition());
         }
         HIDDEN.values().removeIf(c -> c.equals(caster.getUUID()));
         if (cancelled) {

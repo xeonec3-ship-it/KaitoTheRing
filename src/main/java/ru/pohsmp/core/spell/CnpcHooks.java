@@ -118,20 +118,35 @@ public final class CnpcHooks {
     }
 
     /**
-     * Sets the NPC's home (DataAI start position) and returns the previous one (null if not a CNPC NPC or on failure). Owner 19.11
-     * («the NPCs have no animations again»): CNPC's EntityAIAnimation shows the chosen model animation only while a returning NPC is
-     * very near its home; carried off to the portal and the arena, it fell back to the normal pose every tick.
+     * Sets the NPC's «return to its home» flag (DataAI.returnToStart) and returns the previous value (null if not a CNPC NPC or on
+     * failure). Owner 19.11 («the NPCs have no animations again»): CNPC's EntityAIAnimation drops a standing animation (bow 11 ...)
+     * to the normal pose while a returning NPC is not within 0.2 block of its home's centre — and the scene carries it off to the
+     * portal and the arena. With the flag off it keeps the pose and does not try to walk home.
      */
-    public static net.minecraft.core.BlockPos home(Entity npc, net.minecraft.core.BlockPos to) {
+    public static Boolean returnHome(Entity npc, boolean on) {
         if (!isNpc(npc)) return null;
         try {
             Object ais = field(npc.getClass(), "ais").get(npc);
-            net.minecraft.core.BlockPos old = (net.minecraft.core.BlockPos) ais.getClass().getMethod("startPos").invoke(ais);
-            if (!to.equals(old)) ais.getClass().getMethod("setStartPos", net.minecraft.core.BlockPos.class).invoke(ais, to);
+            Field f = field(ais.getClass(), "returnToStart");
+            boolean old = f.getBoolean(ais);
+            if (old != on) f.setBoolean(ais, on);
             return old;
         } catch (Throwable t) {
-            LOG.warn("[pohsmp] CNPC home for {} failed: {}", npc.getUUID(), t.toString());
+            LOG.warn("[pohsmp] CNPC returnToStart for {} failed: {}", npc.getUUID(), t.toString());
             return null;
+        }
+    }
+
+    /** Moves the NPC's home (DataAI start position) to pos; false if not a CNPC NPC or on failure. */
+    public static boolean setHome(Entity npc, net.minecraft.core.BlockPos pos) {
+        if (!isNpc(npc)) return false;
+        try {
+            Object ais = field(npc.getClass(), "ais").get(npc);
+            ais.getClass().getMethod("setStartPos", net.minecraft.core.BlockPos.class).invoke(ais, pos);
+            return true;
+        } catch (Throwable t) {
+            LOG.warn("[pohsmp] CNPC home for {} failed: {}", npc.getUUID(), t.toString());
+            return false;
         }
     }
 

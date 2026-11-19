@@ -2,6 +2,7 @@ package ru.pohsmp.core.client;
 
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SpellData;
+import java.util.List;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -15,6 +16,12 @@ import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ru.pohsmp.core.PohCore;
+import ru.pohsmp.core.Reg;
+import ru.pohsmp.core.spell.DisintegrationSpell;
+import ru.pohsmp.core.spell.silent.SageBarrierSpell;
+import ru.pohsmp.core.spell.silent.SilentVolleySpell;
+import ru.pohsmp.core.spell.silent.WindSpearsSpell;
+import ru.pohsmp.core.spell.silent.WorganFlameSpell;
 
 /**
  * Own 32x32 scroll pictures for single spells (Explosion, Heaven's Fall, Frozen Hour): the Iron's scroll model is wrapped,
@@ -23,11 +30,21 @@ import ru.pohsmp.core.PohCore;
 public final class ScrollModels {
     private ScrollModels() {}
 
-    private static final Map<String, ResourceLocation> OWN = Map.of(
-            PohCore.MODID + ":explosion", new ResourceLocation(PohCore.MODID, "item/scroll_explosion"),
-            PohCore.MODID + ":heaven_fall", new ResourceLocation(PohCore.MODID, "item/scroll_heaven_fall"),
-            PohCore.MODID + ":frozen_hour", new ResourceLocation(PohCore.MODID, "item/scroll_frozen_hour"),
-            PohCore.MODID + ":space_closure", new ResourceLocation(PohCore.MODID, "item/scroll_space_closure"));
+    /** spell id -> item/scroll_&lt;path&gt;: the mythic four, every Divine and Higher spell, Disintegration, the four silent scrolls. */
+    private static final Map<String, ResourceLocation> OWN = new java.util.HashMap<>();
+
+    private static void own(ResourceLocation spell) {
+        OWN.put(spell.toString(), new ResourceLocation(spell.getNamespace(), "item/scroll_" + spell.getPath()));
+    }
+
+    static {
+        for (String p : List.of("explosion", "heaven_fall", "frozen_hour", "space_closure")) own(new ResourceLocation(PohCore.MODID, p));
+        for (String p : Reg.DIVINE_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
+        for (String p : Reg.HIGHER_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
+        own(DisintegrationSpell.ID);
+        for (String p : List.of(SageBarrierSpell.PATH, WindSpearsSpell.PATH, SilentVolleySpell.PATH, WorganFlameSpell.PATH))
+            own(new ResourceLocation(PohCore.MODID, p));
+    }
 
     @SubscribeEvent
     public static void onRegister(ModelEvent.RegisterAdditional e) {

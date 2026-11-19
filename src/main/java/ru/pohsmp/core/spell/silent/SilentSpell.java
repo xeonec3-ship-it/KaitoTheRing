@@ -25,8 +25,8 @@ import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.fx.FxLib;
 
 /**
- * The four finished Silent Witch staff spells (T20) on top of {@link SilentStaffSpell} (school, tier, staff in the main hand,
- * no scrolls, no cast voice - only the staff's short crystal chime; no outfit needed). Cast time, mana and cooldown come from the
+ * The four finished Silent Witch staff spells (T20) on top of {@link SilentStaffSpell} (school, tier; from the staff or from a
+ * scroll - no staff needed since 19.11, no cast voice - only the staff's short crystal chime; no outfit needed). Cast time, mana and cooldown come from the
  * [silent_staff] section of the server config; damage is multiplied by the caster's Silent spell power. Shared target and effect helpers.
  */
 public abstract class SilentSpell extends SilentStaffSpell {
@@ -62,6 +62,8 @@ public abstract class SilentSpell extends SilentStaffSpell {
     }
 
     @Override protected boolean ready() { return true; }
+    /** Manager 19.11: these four are cast from scrolls too (and crafted on the inscription table); only the Gate stays staff-only. */
+    @Override protected boolean needsStaff() { return false; }
     @Override public int getCastTime(int level) { return getCastType() == io.redspace.ironsspellbooks.api.spells.CastType.INSTANT ? 0 : cfg(castCfg::get, castDef); }
     @Override public int getManaCost(int level) { return cfg(manaCfg::get, manaDef); }
     @Override public int getSpellCooldown() { return (int) Math.round(cfg(cooldownCfg::get, cooldownDef) * 20); }

@@ -33,8 +33,13 @@ public abstract class SilentStaffSpell extends PohSpell {
         return false;
     }
 
+    /** Only from the staff in the main hand (the Gate); the four finished spells of T20 also go from scrolls (manager 19.11). */
+    protected boolean needsStaff() {
+        return true;
+    }
+
     @Override public CastType getCastType() { return castTime > 0 ? CastType.LONG : CastType.INSTANT; }
-    @Override public boolean allowCrafting() { return false; }
+    @Override public boolean allowCrafting() { return ready() && !needsStaff(); }
     @Override public boolean allowLooting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.of(SoundEvents.AMETHYST_BLOCK_CHIME); }
@@ -52,7 +57,7 @@ public abstract class SilentStaffSpell extends PohSpell {
     @Override
     public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData md) {
         MutableComponent why = null;
-        if (!(entity.getMainHandItem().getItem() instanceof SilentWitchStaff)) why = Component.translatable("ui.pohsmp_core.silent_staff.need_staff");
+        if (needsStaff() && !(entity.getMainHandItem().getItem() instanceof SilentWitchStaff)) why = Component.translatable("ui.pohsmp_core.silent_staff.need_staff");
         else if (!ready()) why = Component.translatable("ui.pohsmp_core.silent_staff.not_ready");
         else {
             String k = whyNot(level, entity);

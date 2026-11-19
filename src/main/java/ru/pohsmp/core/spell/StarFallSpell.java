@@ -61,7 +61,6 @@ public class StarFallSpell extends HigherSpell {
 
     @Override public CastType getCastType() { return CastType.LONG; }
     @Override public boolean canBeInterrupted(Player player) { return false; }
-    @Override public boolean allowLooting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.BEACON_ACTIVATE); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
     /** Own animation (T05, manager): arms to the sky, then a sharp swing down; the hand items are hidden for the cast. */

@@ -270,7 +270,11 @@ public class ButterflyDreamSpell extends IllusionBase {
         if (left < 20) return;
         Vec3 at = near(d.sl, v.position(), 5, 9);
         if (at == null) return;
-        Copies.Copy c = Copies.spawn(d.caster, Copies.Mode.HUNTER, at, null, (int) left, i(ServerConfig.MI_HITS), 0, List.of(v));
+        // owner 19.11: the hunters wear the looks of random players of the server (not the victim's own); alone - the caster's
+        List<ServerPlayer> pool = new ArrayList<>(d.sl.getServer().getPlayerList().getPlayers());
+        pool.remove(v);
+        ServerPlayer face = pool.isEmpty() ? null : pool.get(d.sl.random.nextInt(pool.size()));
+        Copies.Copy c = Copies.spawn(d.caster, Copies.Mode.HUNTER, at, null, (int) left, i(ServerConfig.MI_HITS), 0, List.of(v), face);
         c.damage = (float) d(ServerConfig.BD_COPY_DAMAGE);
         c.damageReturn = 20;
         c.tag = d.tag;

@@ -61,6 +61,9 @@ public final class Copies {
         public int damageReturn, tag;
         /** strikes and arrows go through it as through air («Пелена») */
         public boolean ghost;
+        /** whose look it wears (skin, name, armour on the clients); null = the owner's */
+        UUID face;
+        String faceName;
         boolean gone;
 
         Copy(int id, LivingEntity owner, Mode mode, Vec3 pos, int maxHits, int delay, long until) {
@@ -119,7 +122,17 @@ public final class Copies {
 
     /** A new copy of owner at pos for the victims; it lives ticks. delay - ticks behind the caster (MIRROR). */
     public static Copy spawn(LivingEntity owner, Mode mode, Vec3 pos, Vec3 vel, int ticks, int maxHits, int delay, List<ServerPlayer> victims) {
+        return spawn(owner, mode, pos, vel, ticks, maxHits, delay, victims, null);
+    }
+
+    /** The same, wearing another player's look (face may be null: the owner's own). */
+    public static Copy spawn(LivingEntity owner, Mode mode, Vec3 pos, Vec3 vel, int ticks, int maxHits, int delay, List<ServerPlayer> victims,
+                             net.minecraft.world.entity.player.Player face) {
         Copy c = new Copy(NEXT++, owner, mode, pos, maxHits, delay, now + ticks);
+        if (face != null) {
+            c.face = face.getUUID();
+            c.faceName = face.getGameProfile().getName();
+        }
         c.offset = pos.subtract(owner.position());
         c.vel = vel == null ? Vec3.ZERO : vel;
         if (mode == Mode.RUNNER) c.swingAt = Math.max(2, ticks / 2);
@@ -133,8 +146,9 @@ public final class Copies {
     public static void show(Copy c, ServerPlayer p) {
         if (c.gone || !c.victims.add(p.getUUID())) return;
         int left = (int) Math.max(1, c.until - now);
-        Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.COPY_SPAWN, c.owner.getId(), left, c.id, c.owner.getUUID(),
-                c.owner.getName().getString(), c.pos.x, c.pos.y, c.pos.z, c.yaw, c.pitch));
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.COPY_SPAWN, c.owner.getId(), left, c.id,
+                c.face != null ? c.face : c.owner.getUUID(), c.face != null ? c.faceName : c.owner.getName().getString(),
+                c.pos.x, c.pos.y, c.pos.z, c.yaw, c.pitch));
     }
 
     public static List<Copy> of(LivingEntity owner) {

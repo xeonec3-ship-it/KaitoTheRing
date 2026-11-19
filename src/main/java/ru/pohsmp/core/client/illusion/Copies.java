@@ -113,9 +113,14 @@ public final class Copies {
         lvl.removeEntity(c.clientId, Entity.RemovalReason.DISCARDED);
     }
 
-    /** The caster's armour and hand items on the copy (the copy changes when the caster does). */
+    /**
+     * The armour and hand items of the one whose look the copy wears (the caster, or the player the server gave it: «Сон бабочки»), when
+     * this client knows that player; else the caster's. The copy changes when they do.
+     */
     private static void dress(ClientLevel lvl, Copy c) {
-        if (!(lvl.getEntity(c.ownerId) instanceof LivingEntity o)) return;
+        LivingEntity o = c.owner == null ? null : lvl.getPlayerByUUID(c.owner);
+        if (o == null && lvl.getEntity(c.ownerId) instanceof LivingEntity le) o = le;
+        if (o == null) return;
         for (EquipmentSlot s : EquipmentSlot.values()) {
             var want = o.getItemBySlot(s);
             if (!net.minecraft.world.item.ItemStack.matches(want, c.body.getItemBySlot(s))) c.body.setItemSlot(s, want.copy());

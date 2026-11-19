@@ -24,9 +24,9 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.net.Net;
 import ru.pohsmp.core.spell.HigherSpell;
 import ru.pohsmp.core.spell.Tasks;
-import ru.pohsmp.core.spell.silent.SilentSpell;
 
 /**
  * T14: the fire sword-whip (working name "Раскалённые угли"), handed out by an admin. Damage of a diamond sword, every hit sets
@@ -39,8 +39,9 @@ import ru.pohsmp.core.spell.silent.SilentSpell;
  *     fire pillars (3/5/7 blocks), the heat to zero, the blade cools down. Whip form: "Fire Vortex" — a full turn of the whip,
  *     a ring of fire r 5 that burns and throws everyone out; the whip stays hot.</li>
  * </ul>
- * Looks (pillar and ring effects, HUD texture, swing animations) — the manager; here they are temporary particles and the
- * fire_whip mesh of the Fire Whip spell.
+ * Looks (pillar and ring effects, HUD texture, swing animations) — the manager. The whip itself is a physics rope drawn on the
+ * client (client/EmberWhipClient, ember/WhipSim): it hangs from the hilt in the whip form, follows the hand of any animation and
+ * lashes when the server sends {@link Net.HFx#WHIP} (a lash here, the turn of "Fire Vortex").
  */
 public class EmberBlade extends SwordItem {
     public static final String NAME = "ember_blade";
@@ -189,38 +190,17 @@ public class EmberBlade extends SwordItem {
         }
         sl.playSound(null, o.x, o.y, o.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 0.7f, 1.3f);
         int dir = EmberEpicFight.lashDir(p);   // the 2nd lash of the Epic Fight combo goes left to right
-        sweep(sl, o, yaw, -WHIP_HALF * dir, WHIP_HALF * dir, 4, false);
+        // the whip on every client: the physics rope sweeps from -WHIP_HALF*dir to +WHIP_HALF*dir (client/EmberWhipClient)
+        whip(sl, p, LASH, yaw, dir, LASH_TICKS);
     }
 
-    /** Turns the fire_whip model from a0 to a1 (radians from the facing, + = left) over n ticks, flames along the arc. */
-    private static void sweep(ServerLevel sl, Vec3 o, double yaw, double a0, double a1, int n, boolean ring) {
-        int whip = Fx.play(sl, Fx.mesh("ember_whip").at(o).yaw(SilentSpell.yawOf(dir(yaw, a0))).duration(n + 15));
-        Tasks.add(new Tasks.Task() {
-            int age;
+    /** {@link Net.HFx#WHIP} modes (b) and the ticks of a lash / of the vortex turn for the client whip. */
+    public static final int LASH = 0, VORTEX = 1, LASH_TICKS = 6, VORTEX_TICKS = 10;
 
-            @Override
-            public boolean tick() {
-                age++;
-                double from = a0 + (a1 - a0) * (age - 1) / n, to = a0 + (a1 - a0) * age / n;
-                Fx.move(sl, whip, o, SilentSpell.yawOf(dir(yaw, to)));
-                double len = ring ? VORTEX_R : WHIP_LEN;
-                for (double a = from; Math.abs(a - from) <= Math.abs(to - from); a += Math.signum(a1 - a0) * 0.12)
-                    for (double r = 1.5; r <= len; r += 1.5) {
-                        double sag = ring ? 0 : Math.sin(r / len * Math.PI) * 0.6;
-                        Vec3 q = o.add(dir(yaw, a).scale(r));
-                        DivineEvents.particle(sl, ParticleTypes.FLAME, q.x, q.y - sag - (ring ? 0.8 : 0), q.z, 1, 0.03, 0.01);
-                    }
-                if (age >= n) {
-                    Fx.stop(sl, whip, "");
-                    return false;
-                }
-                return true;
-            }
-        });
-    }
-
-    private static Vec3 dir(double yaw, double a) {
-        return new Vec3(Math.cos(yaw + a), 0, Math.sin(yaw + a));
+    /** Tells the clients near the holder that the physics whip strikes (they draw it, the crack and its sound are theirs). */
+    private static void whip(ServerLevel sl, Player p, int mode, double facing, int dir, int ticks) {
+        Net.sendNear(sl, p.getX(), p.getY(), p.getZ(), p.getX(), p.getY(), p.getZ(),
+                new Net.HFx(Net.HFx.WHIP, 0, p.getId(), mode, ticks, facing, dir, 0, WHIP_HALF, 0));
     }
 
     // ---------------------------------------------------------------- special attack (full heat: the Epic Fight weapon skill, EmberEpicFight)
@@ -331,6 +311,7 @@ public class EmberBlade extends SwordItem {
         float dmg = damage(p) * 1.1f;
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.6f);
         int fx = Fx.play(sl, Fx.fx("ember_vortex").at(c).yaw(p.getYRot()));
+        whip(sl, p, VORTEX, Math.atan2(f.z, f.x), 1, VORTEX_TICKS);   // the whip goes round with the ring (ember_vortex turns the same way)
         Fx.at(sl, fx, VORTEX_HIT, () -> {
             if (!p.isAlive()) return;
             for (LivingEntity e : HigherSpell.around(sl, c, VORTEX_R + 0.5, e -> e != p && !HigherSpell.friendly(p, e))) {

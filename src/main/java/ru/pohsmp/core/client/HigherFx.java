@@ -88,6 +88,10 @@ public final class HigherFx {
             PohHud.flash(m.dur, m.i);
             return;
         }
+        if (m.kind == HFx.WHIP) {   // T14: the physics whip of the fire sword-whip strikes
+            EmberWhipClient.strike(m);
+            return;
+        }
         if (m.kind == HFx.CUT) {
             DownfallCut.start(m, now);
             if (m.b == ru.pohsmp.core.spell.Cutscene.SILENT_GATE) {

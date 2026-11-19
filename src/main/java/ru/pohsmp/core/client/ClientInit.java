@@ -29,6 +29,7 @@ public final class ClientInit {
         modBus.register(ScrollModels.class);
         modBus.addListener(TargetPoseClient::setup);
         MinecraftForge.EVENT_BUS.register(EmberHud.class);
+        MinecraftForge.EVENT_BUS.register(EmberWhipClient.class);   // T14: the physics whip of the whip form
         modBus.addListener(EmberHud::setup);
     }
 }

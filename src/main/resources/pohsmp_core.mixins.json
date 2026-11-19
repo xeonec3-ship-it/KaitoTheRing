@@ -6,6 +6,7 @@
   "client": [
     "HumanoidModelMixin",
     "EntityRenderDispatcherMixin",
+    "ItemRendererMixin",
     "XaeroRadarMixin",
     "XaeroMinimapTrackerMixin",
     "XaeroWorldMapTrackerMixin"

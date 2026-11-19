@@ -75,6 +75,7 @@ public final class HigherFx {
             m.put(RenderType.eyes(DOME_CELL), new BufferBuilder(262144));
             for (ResourceLocation t : PATTERNS) m.put(RenderType.eyes(t), new BufferBuilder(4096));
             for (ResourceLocation t : SIGILS) m.put(RenderType.eyes(t), new BufferBuilder(4096));
+            for (int f = 0; f < BarrierCracks.FRAMES; f++) m.put(RenderType.eyes(BarrierCracks.frameName(f)), new BufferBuilder(1024));
             SRC = MultiBufferSource.immediateWithBuffers(m, new BufferBuilder(256));
         }
         return SRC;
@@ -174,6 +175,12 @@ public final class HigherFx {
         ps.translate(-cp.x, -cp.y, -cp.z);
         PoseStack.Pose pose = ps.last();
         MultiBufferSource.BufferSource buf = src();
+        CRACKS.clear();
+        for (Inst x : LIVE.values())
+            if (x.kind == HFx.CLOSURE_CRACK) {
+                double k = crackOpen(time - x.start);
+                if (k > 0) CRACKS.add(new double[] {x.pos.x, x.pos.y, x.pos.z, x.f * k});
+            }
         Iterator<Inst> it = LIVE.values().iterator();
         while (it.hasNext()) {
             Inst x = it.next();
@@ -212,6 +219,7 @@ public final class HigherFx {
                 case HFx.CLOSURE_CAST -> closureCast(c, x);
                 case HFx.CLOSURE -> closure(c, x);
                 case HFx.CLOSURE_HIT -> closureHit(c, x);
+                case HFx.CLOSURE_CRACK -> closureCrack(c, x);
                 case HFx.JOINT -> joint(c, x);
                 default -> {}
             }
@@ -1116,6 +1124,50 @@ public final class HigherFx {
         billboard(c.vc(FLARE), c.pose, x.pos, c.cam, x.f * 0.5f, 0.9f, 0.85f, 1f, a);
     }
 
+    /** Cracks open this frame: x, y, z, current radius (cells of a dome inside it are drawn dimmer). */
+    private static final java.util.List<double[]> CRACKS = new java.util.ArrayList<>();
+    private static final int CRACK_OPEN = 5, CRACK_HOLD = 45, CRACK_END = 66;
+
+    /** How far the cracks reach (0..1 of the radius) at age t: open in 0.25 s, hold, heal back to the centre by 3.3 s. */
+    private static double crackOpen(double t) {
+        if (t < 0 || t >= CRACK_END) return 0;
+        if (t < CRACK_OPEN) return smooth(t / CRACK_OPEN);
+        if (t < CRACK_HOLD) return 1;
+        return 1 - smooth((t - CRACK_HOLD) / (CRACK_END - CRACK_HOLD));
+    }
+
+    /**
+     * Cracks where the Milky Way presses on a barrier (manager 19.11, textures/fx/barrier_cracks.png): a quad tangent to the shell,
+     * the cracks running out from the touch point in 0.25 s with a flash, flickering while the stream presses, then healing back
+     * to the centre with a bright running edge and a small flash at the end. a, b: normal yaw/pitch x1000, f: radius, i: dome colour.
+     */
+    private static void closureCrack(Ctx c, Inst x) {
+        double t = c.age;
+        double k = crackOpen(t);
+        double yaw = x.a / 1000.0, pitch = x.b / 1000.0;
+        Vec3 n = new Vec3(Math.cos(yaw) * Math.cos(pitch), Math.sin(pitch), Math.sin(yaw) * Math.cos(pitch));
+        Vec3 p = x.pos.add(n.scale(0.06));
+        int col = x.i;
+        float cr = 0.55f + 0.45f * r(col), cg = 0.55f + 0.45f * g(col), cb = 0.55f + 0.45f * b(col);
+        float spin = (float) ((x.start * 2.39996) % (Math.PI * 2));   // each crack turned its own way
+        float a = (float) Math.min(1.0, 0.4 + c.age / 3.0);   // no slow fade-in: the glass breaks at once
+        if (t >= CRACK_OPEN && t < CRACK_HOLD) a *= 0.85f + 0.15f * (float) Math.abs(Math.sin(t * 1.7 + x.start));
+        ResourceLocation tex = BarrierCracks.frame(k);
+        if (tex != null) {
+            flat(c.vc(tex), c.pose, p, n, x.f, spin, cr, cg, cb, a);
+            flat(c.vc(tex), c.pose, p, n, x.f, spin, 1f, 1f, 1f, a * 0.35f);   // white core over the tint
+        }
+        if (t < CRACK_OPEN + 3)   // the flash of the break
+            billboard(c.vc(FLARE), c.pose, p, c.cam, x.f * 0.6f, 1f, 0.95f, 1f, (float) (1 - t / (CRACK_OPEN + 3)));
+        if (t >= CRACK_HOLD && t < CRACK_END) {   // the running edge of the healing
+            float e = (float) Math.sin(Math.PI * (t - CRACK_HOLD) / (CRACK_END - CRACK_HOLD));
+            flat(c.vc(RING), c.pose, p, n, x.f * (float) Math.max(0.05, k) * 1.05f, 0, 1f, 1f, 1f, 0.9f * Math.max(0.3f, e));
+            flat(c.vc(RING), c.pose, p, n, x.f * (float) Math.max(0.05, k), 0, cr, cg, cb, 0.8f);
+        }
+        if (t >= CRACK_END - 4 && t < CRACK_END + 4)   // healed: a small flash at the centre
+            billboard(c.vc(FLARE), c.pose, p, c.cam, x.f * 0.25f, 1f, 1f, 1f, (float) (1 - Math.abs(t - CRACK_END) / 4));
+    }
+
     /**
      * A lattice sphere of radius R around o (lat x lon cells of the dome texture), with a bright band sweeping up and down
      * and a soft shimmer per cell.
@@ -1138,6 +1190,16 @@ public final class HigherFx {
                 v[3] = sph(o, R, t0, p1);
                 float sh = 0.8f + 0.2f * (float) Math.sin(c.time * 0.07 + i * 1.7 + j * 2.3);
                 float a = alpha * glow * sh;
+                if (!CRACKS.isEmpty()) {   // cells under open cracks dimmer, so the cracks read on the shell
+                    float cx = (v[0].x + v[2].x) / 2, cy = (v[0].y + v[2].y) / 2, cz = (v[0].z + v[2].z) / 2;
+                    for (double[] k : CRACKS) {
+                        double dx = cx - k[0], dy = cy - k[1], dz = cz - k[2];
+                        if (dx * dx + dy * dy + dz * dz < k[3] * k[3]) {
+                            a *= 0.45f;
+                            break;
+                        }
+                    }
+                }
                 quad(vc, c.pose, v, cr * a, cg * a, cb * a, 1f);
             }
         }

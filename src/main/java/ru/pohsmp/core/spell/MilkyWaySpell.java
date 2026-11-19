@@ -164,12 +164,34 @@ public class MilkyWaySpell extends HigherSpell {
         CameraShakeManager.addCameraShake(new CameraShakeData(sl, 20, c0, 30));
         Tasks.add(new Tasks.Task() {
             int age;
+            Vec3 cur = c0;
+            /** Manager 19.11: the stream stopped at a barrier (it keeps turning and pressing there until LIFE), or null while it flies. */
+            BarrierGuard.Stop stuck;
 
             @Override
             public boolean tick() {
                 age++;
-                Vec3 c = center(at, dir, Math.min(age, LIFE));
+                Vec3 c;
+                if (stuck != null) c = stuck.at();
+                else {
+                    c = center(at, dir, Math.min(age, LIFE));
+                    BarrierGuard.Stop st = BarrierGuard.stream(sl, cur, c, RAD);
+                    if (st != null) {
+                        stuck = st;
+                        c = st.at();
+                        sl.playSound(null, st.touch().x, st.touch().y, st.touch().z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 3f, 0.6f);
+                    }
+                }
+                cur = c;
                 Disp.move(anchor, c.x, c.y, c.z, yaw);
+                if (stuck != null && age <= LIFE) {   // pressing: cracks on the shell, a weak shake for those near the wall inside
+                    BarrierGuard.crack(sl, stuck);
+                    if (age % 20 == 0) {
+                        Vec3 tp = stuck.touch();
+                        sl.playSound(null, tp.x, tp.y, tp.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.4f);
+                        if (!stuck.inside()) CameraShakeManager.addCameraShake(new CameraShakeData(sl, 10, tp, 12));
+                    }
+                }
                 if (age == 2) {   // a tick later than the anchor, so clients already know it
                     Vec3 p = anchor != null ? anchor.position() : c;
                     Fx.Spec g = Fx.sigil("milky_galaxy").at(p).yaw(yaw).duration(LIFE - 2), f = Fx.sigil("milky_galaxy_flat").at(p).yaw(yaw).duration(LIFE - 2),
@@ -189,12 +211,15 @@ public class MilkyWaySpell extends HigherSpell {
                     return false;
                 }
                 boolean toss = age % TOSS_EVERY == TOSS_EVERY / 2;
-                for (LivingEntity e : around(sl, c, RAD + 1, e -> !friendly(caster, e) && Math.abs(e.getY() + e.getBbHeight() / 2 - c.y) < 4.5)) {
+                final Vec3 cc = c;
+                for (LivingEntity e : around(sl, c, RAD + 1, e -> !friendly(caster, e) && Math.abs(e.getY() + e.getBbHeight() / 2 - cc.y) < 4.5
+                        && BarrierGuard.sameSide(sl, cc, e.position().add(0, e.getBbHeight() / 2, 0)))) {   // nothing behind a barrier is touched
                     Vec3 ec = e.position().add(0, e.getBbHeight() / 2, 0);
                     Vec3 to = c.subtract(ec);
                     double d = Math.max(0.3, to.length());
                     Vec3 swirl = dir.cross(to).normalize().scale(0.18);   // the arms carry them around the core
-                    Vec3 v = e.getDeltaMovement().scale(0.55).add(dir.scale(SPEED * 0.95)).add(to.scale(Math.min(0.3, 0.05 + 0.03 * d) / d)).add(swirl);
+                    Vec3 fwd = stuck != null ? Vec3.ZERO : dir.scale(SPEED * 0.95);   // stopped: they keep turning at the wall, not into it
+                    Vec3 v = e.getDeltaMovement().scale(0.55).add(fwd).add(to.scale(Math.min(0.3, 0.05 + 0.03 * d) / d)).add(swirl);
                     if (toss) {
                         v = new Vec3(v.x, 0.95, v.z);
                         DivineEvents.particle(sl, ParticleTypes.END_ROD, e.getX(), e.getY() + 0.3, e.getZ(), 14, 0.25, 0.25);

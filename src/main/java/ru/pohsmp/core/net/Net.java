@@ -89,7 +89,8 @@ public final class Net {
                 CUT = 13, DOWN = 14, RIFT = 15, TABOO = 16, SIGIL = 17, WARD = 18, MILKY = 19, GALAXY = 20, SOUL = 21, TABOO_CAST = 22, BLIZZARD = 23,
                 CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27,
                 JOINT = 28,   // joint cast: a = caster, b = partner, dur, f = sigil radius, i = (school sigil << 24) | color
-                WHIP = 29;    // T14 whip strike: a = holder, b = 0 lash / 1 vortex, dur = ticks, x = facing angle atan2(z, x), y = lash direction ±1, f = half arc
+                WHIP = 29,    // T14 whip strike: a = holder, b = 0 lash / 1 vortex, dur = ticks, x = facing angle atan2(z, x), y = lash direction ±1, f = half arc
+                CLOSURE_CRACK = 30;   // cracks on a barrier dome: a, b = normal yaw/pitch x1000, x y z = touch point, dur = ticks, f = radius, i = color
         public final byte kind;
         public final int key, a, b, dur, i;
         public final float x, y, z, f;

@@ -132,6 +132,11 @@ public class SageBarrierSpell extends SilentSpell {
         return false;
     }
 
+    /** The live domes of this level as shells, for streams that stop at them (BarrierGuard.stream). */
+    public static void shells(Level level, List<ru.pohsmp.core.spell.BarrierGuard.Shell> out) {
+        for (Dome d : DOMES) if (d.alive() && d.level == level) out.add(new ru.pohsmp.core.spell.BarrierGuard.Shell(d, d.center(), d.radius, COLOR));
+    }
+
     /** The dome that shields this entity (it is inside and the owner's side), or null. */
     public static Dome shielding(Entity e) {
         for (Dome d : DOMES) if (d.alive() && d.protects(e)) return d;

@@ -304,6 +304,19 @@ public final class DownfallCut {
         return x * x * x * (x * (6 * x - 15) + 10);
     }
 
+    /** «Тсс» of the gate scene (seconds): the camera stands still (owner 19.11: the staff was hardly seen in the push-in). */
+    private static final double HUSH_FROM = 38.8, HUSH_TO = 47.2;
+
+    /**
+     * The still «тсс» shot: in front of her and a touch to her right (where the staff's head hangs low), 2.9 blocks out at chest
+     * height, looking between the lips and the staff on the chest — face, finger and the staff across her chest all in frame.
+     */
+    private static Vec3[] hush(Vec3 c, Vec3 side) {
+        Vec3 pos = c.add(dir.scale(2.9)).add(side.scale(0.35)).add(0, 1.3, 0);   // side = her right (dir x up)
+        Vec3 look = c.add(dir.scale(0.2)).add(side.scale(0.1)).add(0, 1.22, 0);
+        return new Vec3[] {pos, look};
+    }
+
     private static Vec3[] gate(double s, Vec3 c, Vec3 side, double yaw) {
         Vec3 f = rift, g = f.add(0, ru.pohsmp.core.spell.silent.SilentGateSpell.GATE_H, 0), face = c.add(0, 1.6, 0);
         Vec3 pos, look;
@@ -334,12 +347,17 @@ public final class DownfallCut {
             pos = g.add(Math.cos(a) * 40, -14 + 3 * k, Math.sin(a) * 40);
             look = g;
             roll = 3 * Math.sin(s * 0.6);
-        } else if (s < 42) {                            // pause, then the finger to the lips: the face from the front
-            double k = smooth((s - 36) / 6);
-            pos = face.add(dir.scale(2.4 - 0.9 * k)).add(side.scale(0.25));
-            look = face;
+        } else if (s < HUSH_FROM) {                     // pause: the camera comes round to the front of her
+            double k = smooth((s - 36) / (HUSH_FROM - 36));
+            Vec3[] h = hush(c, side);
+            pos = c.add(0, 1.6, 0).add(dir.scale(3.6)).add(side.scale(0.6)).lerp(h[0], k);
+            look = face.lerp(h[1], k);
+        } else if (s < HUSH_TO) {                       // the finger to the lips (manager 19.11): a still shot from the front, wide
+            Vec3[] h = hush(c, side);                   // enough for the face, the finger and the staff across her chest
+            pos = h[0];
+            look = h[1];
         } else if (s < 49) {                            // green threads rise, golden circles and spheres line up in an arc: from above
-            double k = smooth((s - 42) / 7), a = yaw + k * 0.8;
+            double k = smooth((s - HUSH_TO) / (49 - HUSH_TO)), a = yaw + k * 0.8;
             Vec3 mid = c.add(dir.scale(2.5));
             pos = mid.add(Math.cos(a) * 0.05, 11 - 3 * k, Math.sin(a) * 0.05);
             look = mid;

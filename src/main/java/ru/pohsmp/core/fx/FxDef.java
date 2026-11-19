@@ -46,7 +46,8 @@ public record FxDef(String id, String style, int duration, List<Element> element
                 Anchor.parse(e.has("at") ? e.get("at").getAsString() : "caster"),
                 e.has("to") ? Anchor.parse(e.get("to").getAsString()) : null,
                 e.has("follow") && e.get("follow").getAsBoolean(), e.has("color") ? e.get("color").getAsString() : null,
-                e.has("brightness") ? e.get("brightness").getAsDouble() : 1, e.has("scale") ? e.get("scale").getAsDouble() : 1, e);
+                // brightness may be [from, to] (curtain picks per beam from params): then the element itself is 1
+                e.has("brightness") && e.get("brightness").isJsonPrimitive() ? e.get("brightness").getAsDouble() : 1, e.has("scale") ? e.get("scale").getAsDouble() : 1, e);
     }
 
     /** Where an element is: "caster", "target", "caster.eyes", "caster.hand", "point:name", "look:24", each with an optional "+x,y,z". */

@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -115,6 +116,24 @@ public final class Reg {
             .addAttributeModifier(Attributes.MOVEMENT_SPEED, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0a", -0.35, AttributeModifier.Operation.MULTIPLY_TOTAL)
             .addAttributeModifier(Attributes.ATTACK_DAMAGE, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0b", -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL));
 
+    /** "Silent" school (T18): the Silent Witch's magic, spells only from her staff. Turquoise-green. */
+    public static final int SILENT_COLOR = 0x7FFFD0;
+    public static final RegistryObject<Attribute> SILENT_POWER = ATTRS.register("silent_spell_power",
+            () -> new RangedAttribute("attribute.pohsmp_core.silent_spell_power", 1.0, 0.0, 10.0).setSyncable(true));
+    public static final RegistryObject<Attribute> SILENT_RESIST = ATTRS.register("silent_magic_resist",
+            () -> new RangedAttribute("attribute.pohsmp_core.silent_magic_resist", 1.0, -100.0, 100.0).setSyncable(true));
+    public static final ResourceKey<DamageType> SILENT_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, "silent_magic"));
+    public static final TagKey<Item> SILENT_FOCUS = ItemTags.create(new ResourceLocation(PohCore.MODID, "silent_focus"));
+    public static final ResourceLocation SILENT_ID = new ResourceLocation(PohCore.MODID, "silent");
+    public static final RegistryObject<SchoolType> SILENT = SCHOOLS.register("silent", () -> new SchoolType(SILENT_ID, SILENT_FOCUS,
+            Component.translatable("school.pohsmp_core.silent").withStyle(Style.EMPTY.withColor(SILENT_COLOR)),
+            SILENT_POWER, SILENT_RESIST, () -> SoundEvents.AMETHYST_BLOCK_CHIME, SILENT_DAMAGE, false, false));
+
+    /** Sounds of sounds.json that the code plays. */
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, PohCore.MODID);
+    public static final RegistryObject<SoundEvent> MUSIC_SILENT_GATE = SOUNDS.register("music.silent_gate",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate")));
+
     public static final DeferredRegister<AbstractSpell> SPELLS = DeferredRegister.create(SpellRegistry.SPELL_REGISTRY_KEY, PohCore.MODID);
     public static final RegistryObject<AbstractSpell> DISINTEGRATION = SPELLS.register("disintegration", DisintegrationSpell::new);
     public static final RegistryObject<AbstractSpell> CRADLE = SPELLS.register(CradleSpell.PATH, CradleSpell::new);
@@ -180,6 +199,11 @@ public final class Reg {
     public static final List<String> CREATION_SPELLS = List.of(ru.pohsmp.core.spell.DownfallSpell.PATH);
     public static final RegistryObject<AbstractSpell> DOWNFALL = SPELLS.register(ru.pohsmp.core.spell.DownfallSpell.PATH, ru.pohsmp.core.spell.DownfallSpell::new);
 
+    /** "Unknown" tier (T18): only through the Silent Witch's staff, no scrolls. Wind Spears & co. (T20) join when they exist. */
+    public static final List<String> UNKNOWN_SPELLS = List.of(ru.pohsmp.core.spell.SilentGateSpell.PATH);
+    public static final RegistryObject<AbstractSpell> SILENT_GATE = SPELLS.register(ru.pohsmp.core.spell.SilentGateSpell.PATH,
+            ru.pohsmp.core.spell.SilentGateSpell::new);
+
     /** Spells with the built-in Higher tier, in tab order. */
     public static final List<String> HIGHER_SPELLS = List.of(CradleSpell.PATH, FateStarSpell.PATH, SingularitySpell.PATH,
             SealSpell.PATH, AscensionSpell.PATH, AshlessSpell.PATH, ru.pohsmp.core.spell.BloodMoonSpell.PATH,
@@ -239,6 +263,7 @@ public final class Reg {
         EFFECTS.register(modBus);
         SCHOOLS.register(modBus);
         SPELLS.register(modBus);
+        SOUNDS.register(modBus);
         ITEMS.register(modBus);
         TABS.register(modBus);
     }

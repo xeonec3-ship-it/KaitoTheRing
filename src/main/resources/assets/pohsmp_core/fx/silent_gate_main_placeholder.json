@@ -1,0 +1,62 @@
+{
+ "comment": "PLACEHOLDER (T03): the main beam of 'Gate' from the gate to point p (52-56 s).",
+ "style": "divine",
+ "duration": 90,
+ "elements": [
+  {
+   "type": "beam",
+   "delay": 0,
+   "duration": 80,
+   "at": "point:gate",
+   "to": "point:p",
+   "width": 3.2,
+   "core": 0.45,
+   "grow": 6,
+   "flicker": 0.2,
+   "color": "#FFFFFF",
+   "in": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 4,
+   "duration": 30,
+   "at": "point:p+0,1,0",
+   "size": 10,
+   "anamorphic": 30,
+   "rays": 14,
+   "screen": 0.4,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 6,
+   "duration": 30,
+   "at": "point:p",
+   "radius": 9,
+   "thickness": 0.8,
+   "color": "#CFE8FF",
+   "out": {
+    "duration": 14,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "silent_gate_sky",
+   "delay": 0,
+   "duration": 70,
+   "at": "point:p+0,0.1,0",
+   "scale": 1.2,
+   "orientation": "ground",
+   "color": "#7FFFD0"
+  }
+ ]
+}

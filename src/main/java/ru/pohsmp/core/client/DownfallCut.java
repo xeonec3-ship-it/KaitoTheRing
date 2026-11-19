@@ -103,6 +103,12 @@ public final class DownfallCut {
             pos = pl[0];
             look = pl[1];
             shake = pl[2].x;
+        } else if (scene == 6) {
+            Vec3[] pl = gate(t / 20.0, c, side, baseYaw);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+            roll = pl[2].y;
         } else if (scene != 0) {
             Vec3[] pl = new Vec3[2];
             double[] rs = new double[2];
@@ -234,6 +240,70 @@ public final class DownfallCut {
         return new Vec3[] {pos, look, new Vec3(shake, 0, 0)};
     }
 
+    /**
+     * Scene 6, Gate (65 s, by seconds s, = time in the music track). c: caster, rift: strike point, dir: from the caster to it.
+     * Shots as in the anime: wide shot of the land, the hand close, the gate from below, the gate with its halo, the face ("shh"),
+     * the row of circles from above, the finger up from below, the sky full of seals, the main beam, the wide shot, the crystal.
+     * Returns camera position, look point and (shake, roll, 0).
+     */
+    private static Vec3[] gate(double s, Vec3 c, Vec3 side, double yaw) {
+        Vec3 f = rift, g = f.add(0, 26, 0), face = c.add(0, 1.6, 0);
+        Vec3 pos, look;
+        double shake = 0, roll = 0;
+        if (s < 14) {                                   // quiet intro: slow wide orbit, the caster small in the land
+            double k = smooth(s / 14), a = yaw + Math.PI + Math.toRadians(-40 + 80 * k);
+            pos = c.add(Math.cos(a) * (22 - 6 * k), 9 - 3 * k, Math.sin(a) * (22 - 6 * k));
+            look = c.add(0, 1.2, 0);
+        } else if (s < 22) {                            // the finger points forward and up: the hand close, the sparks wind round it
+            double k = smooth((s - 14) / 8);
+            pos = c.add(side.scale(1.3 - 0.3 * k)).add(dir.scale(0.4 + 0.6 * k)).add(0, 1.45, 0);
+            look = c.add(dir.scale(3)).add(0, 2.2 + 1.2 * k, 0);
+        } else if (s < 26) {                            // the gate appears out of light: from below
+            double k = smooth((s - 22) / 4);
+            pos = f.subtract(dir.scale(10 - 3 * k)).add(side.scale(3)).add(0, 1.2, 0);
+            look = g.add(0, 4 * (1 - k), 0);
+        } else if (s < 36) {                            // the gate hangs, the halo behind it: slow orbit, gentle sway
+            double k = smooth((s - 26) / 10), a = yaw + Math.PI + Math.toRadians(-35 + 70 * k);
+            pos = g.add(Math.cos(a) * 30, -9 + 2 * k, Math.sin(a) * 30);
+            look = g;
+            roll = 3 * Math.sin(s * 0.6);
+        } else if (s < 42) {                            // pause, then the finger to the lips: the face from the front
+            double k = smooth((s - 36) / 6);
+            pos = face.add(dir.scale(2.4 - 0.9 * k)).add(side.scale(0.25));
+            look = face;
+        } else if (s < 49) {                            // green threads rise, golden circles and spheres line up in an arc: from above
+            double k = smooth((s - 42) / 7), a = yaw + k * 0.8;
+            Vec3 mid = c.add(dir.scale(2.5));
+            pos = mid.add(Math.cos(a) * 0.05, 11 - 3 * k, Math.sin(a) * 0.05);
+            look = mid;
+            roll = 25 * k;
+        } else if (s < 50) {                            // the finger up: low angle behind the caster, looking up
+            double k = smooth(s - 49);
+            pos = c.subtract(dir.scale(2.2)).add(side.scale(0.9)).add(0, 0.35, 0);
+            look = c.add(0, 5 + 10 * k, 0);
+        } else if (s < 52) {                            // the music bursts: the whole sky of seals and their rays
+            double k = smooth((s - 50) / 2);
+            pos = f.subtract(dir.scale(34 - 4 * k)).add(0, 9, 0);
+            look = f.add(0, 16, 0);
+            shake = 0.05;
+        } else if (s < 56) {                            // the main beam from the gate: close, side on
+            double k = smooth((s - 52) / 4);
+            pos = f.subtract(dir.scale(11 - 2 * k)).add(side.scale(7)).add(0, 3 + 2 * k, 0);
+            look = f.add(0, 4 + 6 * k, 0);
+            shake = 0.18 * (1 - k) + 0.04;
+        } else if (s < 63) {                            // wide: the gate glowing in the centre, the field of seals, the rays go on
+            double k = smooth((s - 56) / 7), a = yaw + Math.PI * 0.6 + k * 0.9;
+            pos = f.add(Math.cos(a) * 44, 22 - 4 * k, Math.sin(a) * 44);
+            look = f.add(0, 12, 0);
+            shake = 0.03;
+        } else {                                        // the crystal mountain; the caster stands before it
+            double k = smooth((s - 63) / 2);
+            pos = c.subtract(dir.scale(4.5 - k)).add(side.scale(1.6)).add(0, 2 + 0.5 * k, 0);
+            look = f.add(0, 5, 0);
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, roll, 0)};
+    }
+
     /** Shot boundaries (fractions of the cast) shared by the scenes 1-3. */
     private static final double[] CUTS = {0, 0.16, 0.32, 0.5, 0.68, 0.84, 1.0001};
 
@@ -294,8 +364,8 @@ public final class DownfallCut {
     }
 
     private static final String[] TITLES = {"fx.pohsmp_core.downfall.title", "fx.pohsmp_core.milky_way.title", "fx.pohsmp_core.soul_devour.title", "fx.pohsmp_core.divine_taboo.title",
-            "fx.pohsmp_core.space_closure.title"};
-    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF};
+            "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.silent_gate.title"};
+    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0x7FFFD0};
 
     /** Lift the camera out of solid blocks (up to 6). */
     private static Vec3 free(ClientLevel lvl, Vec3 p) {

@@ -86,6 +86,41 @@ public final class CnpcHooks {
         }
     }
 
+    /**
+     * CNPC factions: is `npc` (a CNPC NPC) an ally of `other`? A player: the NPC's faction is friendly to them. Another NPC: same faction,
+     * or neither faction attacks the other. Unknown or failed lookups count as not allied.
+     */
+    public static boolean friendlyTo(Entity npc, Entity other) {
+        if (!isNpc(npc)) return false;
+        try {
+            Object f = faction(npc);
+            if (f == null) return false;
+            if (other instanceof net.minecraft.world.entity.player.Player p) {
+                Method m = f.getClass().getMethod("isFriendlyToPlayer", net.minecraft.world.entity.player.Player.class);
+                return (Boolean) m.invoke(f, p);
+            }
+            if (!isNpc(other)) return false;
+            Object g = faction(other);
+            if (g == null) return false;
+            int a = field(f.getClass(), "id").getInt(f), b = field(g.getClass(), "id").getInt(g);
+            if (a == b) return true;
+            java.util.Collection<?> fa = (java.util.Collection<?>) field(f.getClass(), "attackFactions").get(f);
+            java.util.Collection<?> ga = (java.util.Collection<?>) field(g.getClass(), "attackFactions").get(g);
+            return !fa.contains(b) && !ga.contains(a);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    private static Object faction(Entity npc) throws Exception {
+        try {
+            Method m = npc.getClass().getMethod("getFaction");
+            return m.invoke(npc);
+        } catch (NoSuchMethodException e) {
+            return field(npc.getClass(), "faction").get(npc);
+        }
+    }
+
     private static Field field(Class<?> c, String name) throws NoSuchFieldException {
         for (Class<?> k = c; k != null; k = k.getSuperclass()) {
             try {

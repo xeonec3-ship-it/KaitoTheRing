@@ -48,6 +48,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DownfallSpell.DownfallEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.EightShieldsSpell.EightShieldsEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.Cutscene.CutsceneEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.SilentGateSpell.SilentGateEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MilkyWaySpell.MilkyWayEvents.class);
         MinecraftForge.EVENT_BUS.register(AnimatedStaff.StaffAnimEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.SpaceClosureSpell.SpaceClosureEvents.class);
@@ -70,6 +71,8 @@ public class PohCore {
             if (!e.has(type, Reg.HIGHER_RESIST.get())) e.add(type, Reg.HIGHER_RESIST.get());
             if (!e.has(type, Reg.FORBIDDEN_POWER.get())) e.add(type, Reg.FORBIDDEN_POWER.get());
             if (!e.has(type, Reg.FORBIDDEN_RESIST.get())) e.add(type, Reg.FORBIDDEN_RESIST.get());
+            if (!e.has(type, Reg.SILENT_POWER.get())) e.add(type, Reg.SILENT_POWER.get());
+            if (!e.has(type, Reg.SILENT_RESIST.get())) e.add(type, Reg.SILENT_RESIST.get());
         }
     }
 }

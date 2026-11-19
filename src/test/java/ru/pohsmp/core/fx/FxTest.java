@@ -60,6 +60,25 @@ class FxTest {
     }
 
     @Test
+    void everyEffectParsesAndGatePlaceholdersUseExistingSigils() throws IOException {
+        Path sigils = Path.of("src/main/resources/assets/pohsmp_core/sigils");
+        try (var files = Files.list(FX)) {
+            for (Path p : files.filter(f -> f.toString().endsWith(".json")).toList()) {
+                String id = p.getFileName().toString().replace(".json", "");
+                FxDef fx = FxDef.parse(id, read(p));
+                assertTrue(!fx.elements().isEmpty(), id);
+                for (FxDef.Element e : fx.elements()) {
+                    e.at().resolve(ctx(0));
+                    if (id.startsWith("silent_gate") && e.type().equals("sigil"))
+                        assertTrue(Files.exists(sigils.resolve(e.str("id", "") + ".json")), id + ": " + e.str("id", ""));
+                }
+            }
+        }
+        FxDef gate = FxDef.parse("silent_gate_placeholder", read(FX.resolve("silent_gate_placeholder.json")));
+        assertEquals(1300, gate.duration());
+    }
+
+    @Test
     void anchorsParseWithOffsets() {
         FxDef.Anchor a = FxDef.Anchor.parse("caster+0,9,0");
         assertEquals("caster", a.kind());

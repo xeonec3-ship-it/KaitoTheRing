@@ -21,7 +21,7 @@ import ru.pohsmp.core.net.Net;
 
 /**
  * Cast cutscenes of the great spells (client: DownfallCut). Every player within R of the caster is frozen in place,
- * cannot be hurt and watches the scene until it ends (or the cast stops). Scenes: 0 Downfall, 1 Milky Way, 2 Soul Devour, 3 Divine Taboo.
+ * cannot be hurt and watches the scene until it ends (or the cast stops). Scenes: 0 Downfall, 1 Milky Way, 2 Soul Devour, 3 Divine Taboo, 4 Closing of Space, 5 Coven Arrival, 6 Gate.
  */
 public final class Cutscene {
     private Cutscene() {}
@@ -29,7 +29,7 @@ public final class Cutscene {
     public static final double R = 64;
     /** Coven Arrival: watchers within this of the arena and of the caster (the other scenes use R). */
     public static final double R_COVEN = 98;
-    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5;
+    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, SILENT_GATE = 6;
 
     /**
      * Starts the scene for everyone within r of the caster (in the caster's level) or of `extra` in `extraLevel` (may be another dimension).
@@ -143,6 +143,8 @@ public final class Cutscene {
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         public static void onAttack(LivingAttackEvent e) {
             if (FROZEN.isEmpty() || !(e.getEntity() instanceof ServerPlayer sp) || !FROZEN.containsKey(sp.getUUID())) return;
+            // the Gate's rays and main beam are part of its scene: they hit the watchers in their area
+            if (SilentGateSpell.hitting()) return;
             if (!e.getSource().is(DamageTypeTags.BYPASSES_INVULNERABILITY)) e.setCanceled(true);
         }
 

@@ -72,6 +72,7 @@ public final class IllusionClient {
             case IlluMsg.IMMERSION -> ru.pohsmp.core.client.nightmare.NightmareClient.set(m.i, m.ticks);
             case IlluMsg.NIGHT -> ru.pohsmp.core.client.nightmare.NightmareClient.night(m.ticks);
             case IlluMsg.SKY ->ru.pohsmp.core.client.mythic.SkyClient.set(m.i, m.ticks);
+            case IlluMsg.WALK -> ru.pohsmp.core.client.ScriptedWalk.start(m.entity, m.x, m.y, m.z, m.ticks, m.yaw);
             case IlluMsg.ANIM -> {
                 var lvl = Minecraft.getInstance().level;
                 if (lvl != null && lvl.getEntity(m.entity) instanceof Player p)

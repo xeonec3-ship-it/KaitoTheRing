@@ -126,12 +126,14 @@ public class MirrorLabyrinthSpell extends IllusionBase {
     private static void enter(Lab lab, ServerPlayer p) {
         if (!lab.inside.add(p.getUUID())) return;
         int left = (int) Math.max(1, Math.min(lab.until - Illusions.now(), Illusions.duration(p, (int) (lab.until - Illusions.now()))));
+        // owner 19.11 («the labyrinth does not work on the player»): the client of Helm_Mertimer never got a zone; who gets it, for the log
+        ru.pohsmp.core.PohCore.LOG.info("[pohsmp] mirror_labyrinth: zone -> {} for {} ticks", p.getGameProfile().getName(), left);
         Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE, lab.caster.getId(), left, IlluMsg.Z_LABYRINTH, null,
                 Long.toString(lab.seed), lab.maze.cx, lab.maze.cy, lab.maze.cz, (float) lab.maze.r, 0));
     }
 
     private static void leave(Lab lab, ServerPlayer p) {
-        Net.CH.send(PacketDistributor.PLAYER.with(() -> p), IlluMsg.of(IlluMsg.ZONE_END, lab.caster.getId(), 0));
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE_END, lab.caster.getId(), 0, IlluMsg.Z_LABYRINTH, null, "", 0, 0, 0, 0, 0));
     }
 
     static {

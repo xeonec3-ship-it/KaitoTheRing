@@ -50,6 +50,8 @@ public final class IlluMsg {
     public static final int IMMERSION = 17;
     /** T25 «Ночь без рассвета»: this client's night (midnight, the red moon) for ticks more; 0 = it ends. */
     public static final int NIGHT = 18;
+    /** A walk led by a spell (Coven Arrival, the retinue players): this client's own player walks to x y z within ticks and faces yaw at the end. */
+    public static final int WALK = 19;
     /** zone kinds (i of ZONE / ZONE_END) */
     public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4;
 

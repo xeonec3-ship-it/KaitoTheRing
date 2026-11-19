@@ -380,7 +380,7 @@ public class ButterflyDreamSpell extends IllusionBase {
         if (l != null) for (Copies.Copy c : new ArrayList<>(l)) Copies.gone(c);
         ServerPlayer v = player(d, id);
         if (v == null) return;
-        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), IlluMsg.of(IlluMsg.ZONE_END, d.caster.getId(), 0));
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.ZONE_END, d.caster.getId(), 0, IlluMsg.Z_DREAM, null, "", 0, 0, 0, 0, 0));
         fakeHp(v, 0);
         for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), 0));
         v.removeEffect(Reg.BUTTERFLY_DREAM.get());

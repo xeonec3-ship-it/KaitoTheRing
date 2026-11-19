@@ -126,7 +126,7 @@ public class VeilSpell extends IllusionBase {
         for (UUID id : v.inside) {
             ServerPlayer p = v.sl.getServer().getPlayerList().getPlayer(id);
             if (p == null) continue;
-            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), IlluMsg.of(IlluMsg.ZONE_END, v.caster.getId(), 0));
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE_END, v.caster.getId(), 0, IlluMsg.Z_VEIL, null, "", 0, 0, 0, 0, 0));
             for (LivingEntity g : v.guarded) Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new HideMsg(g.getId(), 0));
         }
     }
@@ -137,7 +137,7 @@ public class VeilSpell extends IllusionBase {
             for (Veil v : VEILS)
                 if (v.inside.remove(t.getUUID()) && t instanceof ServerPlayer p) {
                     any = true;
-                    Net.CH.send(PacketDistributor.PLAYER.with(() -> p), IlluMsg.of(IlluMsg.ZONE_END, v.caster.getId(), 0));
+                    Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE_END, v.caster.getId(), 0, IlluMsg.Z_VEIL, null, "", 0, 0, 0, 0, 0));
                     for (LivingEntity g : v.guarded) Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new HideMsg(g.getId(), 0));
                     for (Copies.Copy d : new ArrayList<>(v.doubles)) if (d.victims.contains(p.getUUID())) Copies.gone(d);
                 }

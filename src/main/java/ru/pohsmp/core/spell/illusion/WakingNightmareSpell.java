@@ -142,7 +142,7 @@ public class WakingNightmareSpell extends IllusionBase {
         d.monsters.clear();
         d.target.removeEffect(Reg.WAKING_NIGHTMARE.get());
         if (d.target instanceof ServerPlayer p)
-            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), IlluMsg.of(IlluMsg.ZONE_END, d.caster.getId(), 0));
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE_END, d.caster.getId(), 0, IlluMsg.Z_NIGHTMARE, null, "", 0, 0, 0, 0, 0));
     }
 
     /** A faceless monster on every living thing round the victim, only for the victim (refreshed, as the fx lives 60 ticks). */

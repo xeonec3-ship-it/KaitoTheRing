@@ -75,15 +75,37 @@ public final class Cutscene {
     /** A frozen player was moved by the spell: hold them at the new place instead of pulling them back. */
     public static void refreeze(ServerPlayer sp, Vec3 pos) {
         Frozen f = FROZEN.get(sp.getUUID());
-        if (f != null) f.pos = pos;
+        if (f == null) return;
+        f.pos = pos;
+        f.walkUntil = 0;   // moved by the spell: a walk of its own is over
     }
 
     /** The same, and the body faces yaw (a walk led by the spell: the player's own mouse is locked in the scene). */
     public static void refreeze(ServerPlayer sp, Vec3 pos, float yaw) {
         Frozen f = FROZEN.get(sp.getUUID());
-        if (f == null) return;
+        if (f == null || sp.level().getGameTime() < f.walkUntil) return;   // a walk of its own holds the goal itself
         f.pos = pos;
         f.yaw = yaw;
+    }
+
+    /**
+     * A frozen player walks to `to` by itself within ticks (its client: ScriptedWalk), facing yaw at the end: the freeze lets it move
+     * meanwhile and holds it at the goal afterwards (a client that could not walk is put there then).
+     */
+    public static void walk(ServerPlayer sp, Vec3 to, int ticks, float yaw) {
+        Frozen f = FROZEN.get(sp.getUUID());
+        if (f == null) return;
+        f.pos = to;
+        f.yaw = yaw;
+        f.walkUntil = sp.level().getGameTime() + ticks + 6;
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> sp),
+                new ru.pohsmp.core.net.IlluMsg(ru.pohsmp.core.net.IlluMsg.WALK, sp.getId(), ticks, 0, null, "", to.x, to.y, to.z, yaw, 0));
+    }
+
+    /** True while a frozen player walks by itself (Cutscene.walk). */
+    public static boolean walking(ServerPlayer sp) {
+        Frozen f = FROZEN.get(sp.getUUID());
+        return f != null && sp.level().getGameTime() < f.walkUntil;
     }
 
     /** Lets the watchers move, be hurt and be thrown again while their camera keeps playing (Star Fall: the impact inside the scene). */
@@ -106,6 +128,7 @@ public final class Cutscene {
         long until;
         UUID caster;
         float yaw = Float.NaN;
+        long walkUntil;
     }
 
     private static final Map<UUID, Frozen> FROZEN = new HashMap<>();
@@ -168,6 +191,10 @@ public final class Cutscene {
             if (f == null) return;
             if (sp.level().getGameTime() > f.until || sp.isSpectator()) {
                 FROZEN.remove(sp.getUUID());
+                return;
+            }
+            if (sp.level().getGameTime() < f.walkUntil) {   // walking by itself: free to move, not hurt by the fall
+                sp.fallDistance = 0;
                 return;
             }
             boolean turn = !Float.isNaN(f.yaw) && Math.abs(net.minecraft.util.Mth.wrapDegrees(f.yaw - sp.getYRot())) > 1;

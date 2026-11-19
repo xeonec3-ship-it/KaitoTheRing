@@ -90,13 +90,30 @@ public abstract class SilentSpell extends SilentStaffSpell {
         return !friendly(caster, le) && le.isPickable();
     }
 
-    /** A real enemy: a monster, a mob hunting the caster, a player, or whoever hurt the caster lately. Animals are left alone. */
+    /**
+     * A hostile creature (Silent Volley, like the Gate): monsters, mobs hunting the caster or its allies, CNPC NPCs of factions
+     * hostile to the caster (or attacking it). Players never; peaceful animals, villagers and tamed pets neither (owner 19.11).
+     */
     public static boolean enemy(LivingEntity caster, Entity e) {
-        if (!hittable(caster, e)) return false;
+        if (!hittable(caster, e) || e instanceof Player) return false;
         LivingEntity le = (LivingEntity) e;
-        if (le instanceof Enemy || le instanceof Player) return true;
-        if (le instanceof Mob m && m.getTarget() == caster) return true;
+        if (le instanceof Mob m && m.getTarget() != null && (m.getTarget() == caster || friendly(caster, m.getTarget()))) return true;
+        if (ru.pohsmp.core.spell.CnpcHooks.isNpc(le)) return caster instanceof Player p && npcHostile(le, p);
+        if (le instanceof Enemy) return true;
         return caster.getLastHurtByMob() == le || caster.getLastHurtMob() == le;
+    }
+
+    /** CNPC: the NPC's faction is aggressive to this player (read by reflection; false if CNPC changed or is missing). */
+    private static boolean npcHostile(LivingEntity npc, Player p) {
+        try {
+            Object faction = npc.getClass().getField("faction").get(npc);
+            if (faction == null) return false;
+            for (java.lang.reflect.Method m : faction.getClass().getMethods())
+                if (m.getName().equals("isAggressiveToPlayer") && m.getParameterCount() == 1 && m.getParameterTypes()[0].isInstance(p))
+                    return Boolean.TRUE.equals(m.invoke(faction, p));
+        } catch (ReflectiveOperationException | RuntimeException ignored) {
+        }
+        return false;
     }
 
     /** Living in a cone (full angle in degrees) from the eye along the look, sorted by the angle to the aim (nearest to the crosshair first). */

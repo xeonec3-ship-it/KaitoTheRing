@@ -18,7 +18,11 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import ru.pohsmp.core.fx.sigil.SigilDef;
+import ru.pohsmp.core.fx.sigil.SigilHit;
 import ru.pohsmp.core.fx.sigil.SigilTimeline;
 import ru.pohsmp.core.net.FxMsg;
 import ru.pohsmp.core.net.Net;
@@ -168,6 +172,10 @@ public final class Fx {
         ResourceKey<Level> dim;
         FxMsg msg;
         long start, end = Long.MAX_VALUE;
+        /** Dissolving (stop was called): no more hits. attachOffset: where the instance sat relative to the followed entity. */
+        boolean stopped;
+        Vec3 attachOffset;
+        long lastHit = Long.MIN_VALUE;
         Set<UUID> sent = new HashSet<>();
         UUID owner, only;
     }
@@ -187,6 +195,7 @@ public final class Fx {
         long life = lifetime(m);
         if (life >= 0) a.end = a.start + life;
         if (m.caster >= 0 && sl.getEntity(m.caster) instanceof ServerPlayer sp) a.owner = sp.getUUID();
+        if (m.attach >= 0 && sl.getEntity(m.attach) != null) a.attachOffset = new Vec3(m.x, m.y, m.z).subtract(sl.getEntity(m.attach).position());
         ACTIVE.put(m.inst, a);
         for (ServerPlayer p : sl.players()) offer(sl, p, a);
         return m.inst;
@@ -208,6 +217,36 @@ public final class Fx {
         m.mode = mode == null ? "" : mode.toLowerCase(Locale.ROOT);
         sendTo(sl, a, m);
         a.end = Math.min(a.end, sl.getGameTime() + 60);
+        a.stopped = true;
+    }
+
+    /**
+     * T08: something was struck at {@code at} inside the instance — its sigils with {@code hit} (docs/sigils.md) answer: a ring of
+     * light from the point, a flinch, sparks. power 0..1 (see {@link SigilHit#powerFromDamage}). Sigils of a whole effect (fx) get
+     * it too, each if the point is on it. Spells call it directly (e.g. a projectile stopped by a barrier); hurt entities standing
+     * in a sigil instance trigger it on their own ({@link FxServerEvents#onHurt}).
+     */
+    public static void hit(ServerLevel sl, int inst, Vec3 at, double power) {
+        Active a = ACTIVE.get(inst);
+        if (a == null || a.stopped) return;
+        FxMsg m = new FxMsg();
+        m.op = FxMsg.HIT;
+        m.inst = inst;
+        m.x = at.x;
+        m.y = at.y;
+        m.z = at.z;
+        m.scale = (float) Math.max(0, Math.min(1, power));
+        m.seed = sl.random.nextInt();
+        sendTo(sl, a, m);
+    }
+
+    /** Where the instance is now: its followed entity (plus the offset it started with) or its last position. */
+    private static Vec3 center(ServerLevel sl, Active a) {
+        if (a.msg.attach >= 0 && a.attachOffset != null) {
+            Entity e = sl.getEntity(a.msg.attach);
+            if (e != null && e.isAlive()) return e.position().add(a.attachOffset);
+        }
+        return new Vec3(a.msg.x, a.msg.y, a.msg.z);
     }
 
     public static void move(ServerLevel sl, int inst, Vec3 p, float yaw) {
@@ -320,6 +359,36 @@ public final class Fx {
 
     public static final class FxServerEvents {
         private FxServerEvents() {}
+
+        /**
+         * T08: an entity hurt while standing in a sigil instance whose sigil has {@code hit}: the sigil answers at the point under
+         * (over, in front of) it. At most one hit per instance per tick; not while the sigil is still forming its first half or
+         * dissolving. Sigils inside whole effects (fx) are not checked here — spells call {@link Fx#hit} for those.
+         */
+        @SubscribeEvent(priority = EventPriority.LOWEST)
+        public static void onHurt(LivingHurtEvent e) {
+            if (ACTIVE.isEmpty() || e.isCanceled() || e.getAmount() <= 0 || !(e.getEntity().level() instanceof ServerLevel sl)) return;
+            LivingEntity v = e.getEntity();
+            Vec3 body = v.position().add(0, v.getBbHeight() * 0.5, 0);
+            long now = sl.getGameTime();
+            for (var en : new HashMap<>(ACTIVE).entrySet()) {
+                Active a = en.getValue();
+                if (a.stopped || a.dim != sl.dimension() || a.msg.kind != FxMsg.SIGIL || a.lastHit == now) continue;
+                SigilDef d = FxLib.sigil(a.msg.id);
+                if (d == null || d.hit() == null) continue;
+                double age = now - a.start;
+                if (age < SigilTimeline.timings(d).layersEnd() * 0.5) continue;
+                double radius = SigilTimeline.globalScale(d, age, Double.NaN, a.msg.scale) * d.reach();
+                if (radius < 0.05) continue;
+                SigilDef.Orientation o = a.msg.orientation >= 0 && a.msg.orientation < SigilDef.Orientation.values().length
+                        ? SigilDef.Orientation.values()[a.msg.orientation] : d.orientation();
+                Vec3 c = center(sl, a);
+                double[] p = SigilHit.contact(o, c.x, c.y, c.z, a.msg.yaw, radius, body.x, body.y, body.z);
+                if (p == null) continue;
+                a.lastHit = now;
+                hit(sl, en.getKey(), new Vec3(p[0], p[1], p[2]), SigilHit.powerFromDamage(e.getAmount()));
+            }
+        }
 
         @SubscribeEvent
         public static void onServerTick(TickEvent.ServerTickEvent e) {

@@ -38,6 +38,14 @@ h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(22px, 5vw
 .hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 12px; color: rgba(232, 228, 242, .6); pointer-events: none; }
 .panel { display: grid; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
 .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row[hidden], .hitbox[hidden] { display: none; }
+.hitbox { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+.hitbox input[type="range"] { accent-color: var(--accent); flex: 1 1 120px; min-width: 0; }
+.hitbox .val { font-family: var(--f-mono); font-size: 13px; color: var(--muted); min-width: 3ch; font-variant-numeric: tabular-nums; }
+.hit-ping { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .8);
+  pointer-events: none; animation: ping .45s ease-out forwards; }
+@keyframes ping { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hit-ping { animation: none; opacity: 0; } }
 button, select { font: inherit; font-size: 14px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; min-height: 40px; cursor: pointer; }
 button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 600; }
@@ -87,7 +95,7 @@ textarea.ed-paste { width: 100%; min-height: 90px; font-family: var(--f-mono); f
     <div class="stage" id="stage">
       <canvas id="cv" aria-label="Печать в трёхмерной сцене"></canvas>
       <div class="hud"><span class="chip" id="sceneName">—</span><span class="chip state" id="stateChip">—</span></div>
-      <div class="hint">Тяните, чтобы повернуть камеру</div>
+      <div class="hint" id="hint">Тяните, чтобы повернуть камеру</div>
     </div>
     <div class="panel">
       <div class="row">
@@ -99,6 +107,20 @@ textarea.ed-paste { width: 100%; min-height: 90px; font-family: var(--f-mono); f
         <span class="time" id="time">0.00 с</span>
       </div>
       <label class="check"><input type="checkbox" id="auto" checked> Разбирать сама после удержания</label>
+      <div class="hitbox" id="hitBox" hidden role="group" aria-label="Удар по печати">
+        <span class="label">Удар по печати (T08)</span>
+        <div class="row">
+          <button class="primary" id="hitBtn" type="button">Ударить</button>
+          <button id="hitCenter" type="button">В центр</button>
+          <button id="hitBurst" type="button">Серия ×3</button>
+        </div>
+        <div class="row">
+          <span class="label">Сила</span>
+          <input type="range" id="hitPow" min="0.1" max="1" step="0.05" value="0.8" aria-label="Сила удара">
+          <span class="val" id="hitPowV">0.80</span>
+        </div>
+        <label class="check"><input type="checkbox" id="hitAuto" checked> Удары сами, раз в 1.5 с</label>
+      </div>
       <div class="row" role="group" aria-label="Скорость">
         <span class="label">Скорость</span>
         <button type="button" data-speed="0.25">×¼</button>
@@ -147,6 +169,7 @@ textarea.ed-paste { width: 100%; min-height: 90px; font-family: var(--f-mono); f
   </section>
   <section class="json notes">
     <span class="label">Как читать</span>
+    <p>Отклик на удар (<code>hit</code>): щелчок по печати в сценах «Отклик на урон» — удар в эту точку: от неё к краю бежит кольцо яркости (и рябь за ним), печать вздрагивает и качается, летят искры. Разборка <code>cracks</code>: от центра бегут трещины, печать раскалывается по ним на осколки, они подпрыгивают, кувыркаются, падают вниз и гаснут, из трещин сыплется пыль.</p>
     <p>Время в JSON — в тиках (20 в секунду). Печать «сформирована», когда закончились появление всех слоёв и рост (<code>expand</code>): в этот момент вспышка (<code>formedFlash</code>) и дочерние печати (<code>onFormed</code>). После <code>hold</code> тиков (или по команде) — разборка (<code>dissolve</code>). Схема формата — <code>docs/sigils.md</code>.</p>
   </section>
 </div>
@@ -220,6 +243,69 @@ function bandGeo(inner, len, start, repeat, u0 = 0) {
   return g;
 }
 
+// плотная полярная сетка для волны удара (как слой: диск — UV по положению, лента — u вдоль окружности); цвет — в вершинах
+function polarGrid(band, inner, repeat) {
+  const radii = band ? [inner, inner + (1 - inner) / 3, inner + 2 * (1 - inner) / 3, 1] : Array.from({ length: 33 }, (_, i) => i / 32);
+  const NS = 112, pos = [], uv = [], col = [], idx = [];
+  radii.forEach((r, ri) => {
+    for (let si = 0; si <= NS; si++) {
+      const a = 2 * Math.PI * si / NS, x = Math.cos(a) * r, y = Math.sin(a) * r;
+      pos.push(x, y, 0); col.push(0, 0, 0);
+      uv.push(band ? si / NS * repeat : 0.5 + x / 2, band ? (r - inner) / (1 - inner) : 0.5 + y / 2);
+      if (ri > 0 && si < NS) { const a0 = (ri - 1) * (NS + 1) + si, b0 = ri * (NS + 1) + si; idx.push(a0, b0, a0 + 1, a0 + 1, b0, b0 + 1); }
+    }
+  });
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+  g.setAttribute("color", new THREE.Float32BufferAttribute(col, 3)); g.setIndex(idx);
+  return g;
+}
+// осколок (k, j) одного слоя: область между трещинами k и k+1 от кольца j до j+1, обрезанная по слою; координаты — от центра осколка
+function shardGeo(c, seed, reach, k, j, L, cx, cy) {
+  const l = L.def, rho = L.k, band = l.type === "band", arcs = l.type === "arcs";
+  const inner = band ? (l.inner ?? 0.85) : arcs ? 1 - (l.width || 0.05) : 0;
+  // внешнее кольцо осколков забирает всё, что за reach (свечение, дуги шире обода)
+  const ra = Math.max(CR.ring(c, j, reach), inner * rho), rb = Math.min(j === c.rings ? Infinity : CR.ring(c, j + 1, reach), rho);
+  if (rb - ra < 1e-4) return null;
+  const radii = [ra];
+  for (let i = 1; i < CR.KNOTS; i++) { const r = reach * i / CR.KNOTS; if (r > ra + 1e-6 && r < rb - 1e-6) radii.push(r); }
+  radii.push(rb); radii.sort((x, y) => x - y);
+  const fine = [radii[0]];
+  for (let i = 1; i < radii.length; i++) { const steps = Math.max(1, Math.ceil((radii[i] - radii[i - 1]) / (reach / 14))); for (let q = 1; q <= steps; q++) fine.push(radii[i - 1] + (radii[i] - radii[i - 1]) * q / steps); }
+  const mid = (ra + rb) / 2, M = Math.max(3, Math.ceil((CR.angle(c, seed, k + 1, mid, reach) - CR.angle(c, seed, k, mid, reach)) / 4));
+  const pos = [], uv = [], idx = [], closed = 360 / (l.count || 4);
+  fine.forEach((r, ri) => {
+    const a0 = CR.angle(c, seed, k, r, reach), a1 = CR.angle(c, seed, k + 1, r, reach);
+    for (let q = 0; q <= M; q++) {
+      const th = a0 + (a1 - a0) * q / M, ph = th - L.ang, x = Math.cos(th * D2R) * r, y = Math.sin(th * D2R) * r, lr = r / rho;
+      pos.push(x - cx, y - cy, 0);
+      if (band) uv.push(ph / 360 * (l.repeat || 6), (lr - inner) / (1 - inner));
+      else if (arcs) { const n = Math.round(ph / closed); uv.push((ph - (n * closed - closed / 2)) / 360, (lr - inner) / (1 - inner)); }
+      else uv.push(0.5 + Math.cos(ph * D2R) * lr / 2, 0.5 + Math.sin(ph * D2R) * lr / 2);
+      if (ri > 0 && q < M) { const a = (ri - 1) * (M + 1) + q, b = ri * (M + 1) + q; idx.push(a, b, a + 1, a + 1, b, b + 1); }
+    }
+  });
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+  return g;
+}
+// светящиеся линии: ленты шириной w вдоль ломаных; v поперёк (0..1) — текстура glow даёт яркую середину
+function ribbons(lines, w) {
+  const pos = [], uv = [], idx = [];
+  for (const pts of lines) {
+    const base = pos.length / 3;
+    pts.forEach((p, i) => {
+      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+      let dx = b[0] - a[0], dy = b[1] - a[1]; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+      pos.push(p[0] - dy * w / 2, p[1] + dx * w / 2, 0, p[0] + dy * w / 2, p[1] - dx * w / 2, 0); uv.push(0.5, 0, 0.5, 1);
+      if (i > 0) { const q = base + (i - 1) * 2; idx.push(q, q + 1, q + 2, q + 1, q + 3, q + 2); }
+    });
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
+  return g;
+}
+
 // ---------------------------------------------------------------- сборка по частям (appear.modes "pieces"), как SigilTimeline.piece
 const PIECES_DEFAULT = { count: 8, pieceTime: 0.45, order: "scatter", fly: 0.9, lift: 0.5, orbit: 40, tilt: 75, spin: 120, lockFlash: 0.8 };
 function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
@@ -240,6 +326,147 @@ function pieceState(def, l, k, t, stopAt) {
     brightness: 1 + pc.lockFlash * (stopped ? 0 : Math.max(0, 1 - Math.abs(t - (start + fly)) / 5)) };
 }
 
+// ---------------------------------------------------------------- общий хеш (как SigilHit.hash в Java: те же числа)
+function ihash(a, b) {
+  let h = Math.imul(a, 0x27D4EB2D) ^ Math.imul(b, 0x165667B1);
+  h ^= h >>> 15; h = Math.imul(h, 0x2C1B3C6D); h ^= h >>> 12; h = Math.imul(h, 0x297A2D39); h ^= h >>> 15;
+  return h | 0;
+}
+const rnd = (a, b) => (ihash(a, b) >>> 8) / 16777216;
+const sigilReach = (def) => Math.max(1, ...def.layers.map((l) => l.radius ?? 1));
+const hexToInt = (c) => parseInt(String(c).replace("#", ""), 16);
+
+// ---------------------------------------------------------------- отклик на удар (T08), как SigilHit
+const HIT_DEFAULT = { duration: 8, width: 0.1, strength: 1.0, rings: 3, spacing: 0.26, shake: 0.02, shakePeriod: 4, tilt: 2.5, flash: 0.9,
+  sparks: 10, sparkSpeed: 0.16, color: null, max: 4, cooldown: 2, sheen: 0.35 };
+function hitParams(def) {
+  if (def.hit === false || (!def.hit && !def.reactsToHits)) return null;
+  return { ...HIT_DEFAULT, ...(typeof def.hit === "object" ? def.hit : {}) };
+}
+const HIT = {
+  life: (h) => Math.max(h.duration + 6, 18),
+  front(h, e, reach, t) {
+    const f = (t - e.at) / h.duration, span = Math.hypot(e.x, e.y) + reach;
+    if (f <= 0) return 0;
+    return f <= 1 ? span * f * (1.6 - 0.6 * f) : span * (1 + 0.4 * (f - 1));
+  },
+  envelope(h, e, t) { const age = t - e.at; if (age < 0) return 0; return (1 - 0.45 * Math.min(1, age / h.duration)) * clamp01((h.duration + 6 - age) / 6); },
+  glow1(h, e, reach, x, y, t) { return HIT.wave(h, e, Math.hypot(e.x, e.y) + reach, Math.hypot(x - e.x, y - e.y), t); },
+  // та же волна на любой поверхности по расстоянию d вдоль неё; span — до самой дальней точки (купол радиуса 1: угол, span = π)
+  wave(h, e, span, d, t) {
+    const age = t - e.at; if (age < 0 || age > h.duration + 6) return 0;
+    const f = age / h.duration, front = f <= 0 ? 0 : f <= 1 ? span * f * (1.6 - 0.6 * f) : span * (1 + 0.4 * (f - 1));
+    let sum = 0, amp = 1;
+    for (let i = 0; i < h.rings; i++) {
+      const c = front - i * h.spacing;
+      if (c > -h.width) { const k = (d - c) / h.width; sum += amp * Math.exp(-k * k) * clamp01(c / h.width + 1); }
+      amp *= 0.55;
+    }
+    const wave = h.strength * HIT.envelope(h, e, t) * sum / (1 + 0.6 * d);
+    const core = h.flash * Math.exp(-((d / (h.width * 1.2)) ** 2)) * Math.exp(-age / 2.5);
+    return e.power * (wave + core);
+  },
+  glow(h, hits, reach, x, y, t) { let s = 0; for (const e of hits) s += HIT.glow1(h, e, reach, x, y, t); return Math.min(s, 2 * Math.max(h.strength, h.flash)); },
+  flinch(h, e, t) { const age = t - e.at; return age < 0 ? 1 : 1 - h.shake * e.power * Math.exp(-age / (0.7 * h.duration)) * Math.sin(2 * Math.PI * age / h.shakePeriod); },
+  scale(h, hits, t) { let s = 1; for (const e of hits) s *= HIT.flinch(h, e, t); return Math.max(0.8, Math.min(1.2, s)); },
+  wobble(h, hits, t) {
+    let wx = 0, wy = 0;
+    if (h.tilt) for (const e of hits) {
+      const age = t - e.at, d = Math.hypot(e.x, e.y); if (age < 0 || d < 1e-6) continue;
+      const a = h.tilt * e.power * Math.exp(-age / (0.7 * h.duration)) * Math.sin(2 * Math.PI * age / (1.6 * h.shakePeriod)) * Math.min(1, d / 0.3);
+      wx += -e.y / d * a; wy += e.x / d * a;
+    }
+    const len = Math.hypot(wx, wy);
+    return len < 1e-9 ? { ax: 1, ay: 0, angle: 0 } : { ax: wx / len, ay: wy / len, angle: Math.max(-12, Math.min(12, len)) };
+  },
+  sparkCount: (h, e) => Math.round(h.sparks * (0.4 + 0.6 * clamp01(e.power))),
+  spark(h, e, i, t) {
+    const age = t - e.at, r1 = rnd(e.seed, i * 4), r2 = rnd(e.seed, i * 4 + 1), r3 = rnd(e.seed, i * 4 + 2), r4 = rnd(e.seed, i * 4 + 3);
+    const life = 9 + 7 * r4;
+    if (age < 0 || age > life) return { u: 0, v: 0, n: 0, drop: 0, alpha: 0, size: 0 };
+    const th = 2 * Math.PI * r1, up = 0.35 + 0.65 * r2, side = Math.sqrt(1 - up * up), speed = h.sparkSpeed * (0.55 + 0.9 * r3), k = life * 0.5;
+    const dist = speed * k * (1 - Math.exp(-age / k)), fade = 1 - age / life;
+    return { u: Math.cos(th) * side * dist, v: Math.sin(th) * side * dist, n: up * dist, drop: 0.5 * 0.03 * age * age, alpha: Math.pow(fade, 1.2), size: 0.03 + 0.04 * fade };
+  },
+  accept(h, hits, e) {
+    for (let i = hits.length - 1; i >= 0; i--) if (e.at - hits[i].at > HIT.life(h)) hits.splice(i, 1);
+    for (const o of hits) if (Math.abs(e.at - o.at) <= h.cooldown && Math.hypot(e.x - o.x, e.y - o.y) <= 0.25) { o.power = Math.max(o.power, e.power); return false; }
+    while (hits.length >= h.max) hits.shift();
+    hits.push(e); return true;
+  },
+};
+
+// ---------------------------------------------------------------- разборка «трещины» (T09), как SigilCracks
+const CRACKS_DEFAULT = { count: 9, rings: 1, irregular: 0.35, jag: 0.22, crackTime: 0.4, fallTime: 0.45, gap: 0.03, push: 0.25, pop: 0.25, fall: 1.2,
+  tumble: 150, spin: 60, glow: 1.4, dust: 28, color: null };
+function cracksParams(def) {
+  const dis = def.dissolve || {}; if (!(dis.modes || []).includes("cracks")) return null;
+  const c = { ...CRACKS_DEFAULT, ...(dis.cracks || {}) };
+  c.count = Math.max(3, c.count | 0); c.rings = Math.max(0, Math.min(3, c.rings | 0));
+  return c;
+}
+const CR = {
+  KNOTS: 8,
+  sector: (c) => 360 / c.count,
+  edge(c, seed, k) { const kk = ((k % c.count) + c.count) % c.count, turns = Math.floor(k / c.count);
+    return (rnd(seed, 999) + kk + c.irregular * (rnd(seed, 1000 + kk) - 0.5)) * CR.sector(c) + 360 * turns; },
+  jag: (c) => Math.min(c.jag, (1 - c.irregular) * 0.9),
+  knot: (c, seed, k, i) => (i === 0 ? 0 : rnd(seed, 2000 + k * 16 + i) - 0.5),
+  angle(c, seed, k, r, reach) {
+    const kk = ((k % c.count) + c.count) % c.count, x = Math.max(0, Math.min(CR.KNOTS, r / reach * CR.KNOTS)), i = Math.min(CR.KNOTS - 1, Math.floor(x)), f = x - i;
+    return CR.edge(c, seed, k) + (CR.knot(c, seed, kk, i) * (1 - f) + CR.knot(c, seed, kk, i + 1) * f) * CR.jag(c) * CR.sector(c);
+  },
+  ring: (c, j, reach) => reach * j / (c.rings + 1),
+  ticks: (def, c) => c.crackTime * (def.dissolve.duration || 20),
+  start: (def, c, k) => 0.45 * CR.ticks(def, c) * pieceRank("scatter", k, c.count) / Math.max(1, c.count - 1),
+  reach(def, c, k, t, stopAt) { if (stopAt === null) return 0; const kk = ((k % c.count) + c.count) % c.count;
+    return ease("easeOutCubic", (t - stopAt - CR.start(def, c, kk)) / (0.55 * CR.ticks(def, c))); },
+  ringOpen(def, c, j, t, stopAt) { if (stopAt === null || j < 1 || j > c.rings) return 0; const ct = CR.ticks(def, c);
+    return ease("easeInOutSine", (t - stopAt - ct * (0.25 + 0.35 * j / (c.rings + 1))) / (0.4 * ct)); },
+  glow(def, c, t, stopAt) {
+    if (stopAt === null || t < stopAt) return 0;
+    const ct = CR.ticks(def, c), d = def.dissolve.duration || 20;
+    return c.glow * clamp01((t - stopAt) / Math.max(1, 0.25 * ct)) * (1 - clamp01((t - stopAt - ct) / Math.max(1, 0.5 * (d - ct)))) * (0.88 + 0.12 * Math.sin(1.7 * t));
+  },
+  fallStart(def, c, k, j) {
+    const d = def.dissolve.duration || 20, ct = CR.ticks(def, c), ft = c.fallTime * d, win = Math.max(0, d - ct - ft), n = c.count * (c.rings + 1);
+    const rank = (c.rings - j) * c.count + pieceRank("scatter", k, c.count);
+    return ct + (n > 1 ? win * rank / (n - 1) : 0);
+  },
+  shard(def, c, seed, k, j, t, stopAt) {
+    const reach = sigilReach(def), r0 = CR.ring(c, j, reach), r1 = CR.ring(c, j + 1, reach), rm = (r0 + r1) / 2;
+    const ca = (CR.angle(c, seed, k, rm, reach) + CR.angle(c, seed, k + 1, rm, reach)) / 2;
+    if (stopAt === null || t < stopAt) return { alpha: 1, centerAngle: ca, centerRadius: rm, radial: 0, drop: 0, tilt: 0, spin: 0, brightness: 1, fall: 0 };
+    const ct = CR.ticks(def, c), ft = c.fallTime * (def.dissolve.duration || 20), since = t - stopAt, start = CR.fallStart(def, c, k, j);
+    const s = clamp01((since - start) / ft), id = k * 4 + j;
+    const ra = rnd(seed, 3000 + id), rb = rnd(seed, 3100 + id), rc = rnd(seed, 3200 + id), rd = rnd(seed, 3300 + id);
+    const part = ease("easeOutCubic", (since - 0.6 * ct) / (0.4 * ct)), fade = clamp01((s - 0.3) / 0.7);
+    const g = c.glow > 0 ? CR.glow(def, c, t, stopAt) / c.glow : 0, snap = since >= start ? Math.max(0, 1 - (since - start) / 4) : 0;
+    return { alpha: 1 - fade * fade, centerAngle: ca, centerRadius: rm, radial: c.gap * part + c.push * s * (0.7 + 0.6 * ra),
+      drop: c.fall * s * s - c.pop * 4 * s * (1 - s) * (0.6 + 0.8 * rb), tilt: c.tumble * (0.55 + 0.45 * rd) * Math.pow(s, 1.3) * (rc < 0.5 ? -1 : 1),
+      spin: c.spin * (2 * rc - 1) * s, brightness: 1 + 0.4 * g + 0.6 * snap, fall: s };
+  },
+  dust(def, c, seed, i, t, stopAt) {
+    const none = { angle: 0, radius: 0, drop: 0, alpha: 0, size: 0 };
+    if (stopAt === null) return none;
+    const reach = sigilReach(def), ct = CR.ticks(def, c), ft = c.fallTime * (def.dissolve.duration || 20), k = i % c.count;
+    const u = 0.15 + 0.85 * rnd(seed, 5000 + i);
+    const born = CR.start(def, c, k) + 0.55 * ct * (1 - Math.cbrt(1 - u)) + 0.35 * ct * rnd(seed, 5100 + i);
+    const life = 10 + 10 * rnd(seed, 5200 + i), age = t - stopAt - born;
+    if (age < 0 || age > life) return none;
+    return { angle: CR.angle(c, seed, k, u * reach, reach), radius: u * reach + 0.06 * age / life, drop: c.fall * 0.6 * (age / ft) ** 2,
+      alpha: (1 - age / life) * Math.min(1, age / 2 + 0.3), size: 0.012 + 0.012 * rnd(seed, 5300 + i) };
+  },
+  shardAt(def, c, seed, x, y) {
+    const reach = sigilReach(def), r = Math.hypot(x, y), j = Math.min(c.rings, Math.floor(r / reach * (c.rings + 1)));
+    let a = Math.atan2(y, x) / D2R; const a0 = CR.angle(c, seed, 0, r, reach);
+    a = a0 + ((((a - a0) % 360) + 360) % 360);
+    let k = c.count - 1;
+    for (let q = 1; q < c.count; q++) if (a < CR.angle(c, seed, q, r, reach)) { k = q - 1; break; }
+    return k * (c.rings + 1) + j;
+  },
+};
+
 // ---------------------------------------------------------------- экземпляр печати
 let INST = [];
 class Sigil {
@@ -252,11 +479,14 @@ class Sigil {
     this.plane = new THREE.Group(); this.root.add(this.plane);          // плоскость печати: локальная XY, нормаль +Z
     this.layers = this.def.layers.map((l) => this.makeLayer(l));
     this.flash = null;
+    // T08 / T09: отклик на удар и разборка трещинами
+    this.hp = hitParams(this.def); this.cp = cracksParams(this.def); this.hits = []; this.hitFx = null; this.cr = null;
+    this.seed = opts.seed ?? 12345; this.noAuto = !!opts.noAuto; this.holdOverride = opts.hold; this.lt = 0;
   }
   makeLayer(l) {
     const g = new THREE.Group(); g.position.z = l.heightOffset || 0; this.plane.add(g);
     const color = l.color || this.def.color;
-    const L = { def: l, group: g, rot: 0, meshes: [], lastLen: -1 };
+    const L = { def: l, group: g, rot: 0, meshes: [], lastLen: -1, color: new THREE.Color(color), alpha: 0, ang: 0, k: 1 };
     if (l.type === "arcs") {
       for (let i = 0; i < (l.count || 4); i++) { const m = new THREE.Mesh(new THREE.BufferGeometry(), mat(l.texture || "arc_strip", color)); g.add(m); L.meshes.push(m); }
     } else if ((l.appear?.modes || []).includes("pieces")) {
@@ -279,6 +509,160 @@ class Sigil {
   done(t) { return this.stopAt !== null && t > this.stopAt + (this.def.dissolve?.duration || 20) + 2 && this.children.every((c) => c.done(t)); }
   dispose() { scene.remove(this.root); this.children.forEach((c) => c.dispose()); if (this.flash) scene.remove(this.flash.group); }
 
+  // ---------------- T08: удар в точке плоскости (x, y — в радиусах печати), сила 0..1
+  hit(x, y, power) {
+    if (!this.hp || this.stopAt !== null || this.lt < 0) return false;
+    return HIT.accept(this.hp, this.hits, { x, y, at: this.lt, power, seed: (Math.random() * 2147483647) | 0 });
+  }
+  /** Вниз по миру в координатах плоскости (для падения искр, осколков, пыли). */
+  downLocal() {
+    const q = new THREE.Quaternion(); this.plane.getWorldQuaternion(q);
+    return new THREE.Vector3(0, -1, 0).applyQuaternion(q.invert());
+  }
+  topZ() { return Math.max(0, ...this.def.layers.map((l) => l.heightOffset || 0)) + 0.012; }
+  updateHits(lt, S) {
+    const h = this.hp; if (!h) return;
+    this.hits = this.hits.filter((e) => lt - e.at <= HIT.life(h));
+    if (!this.hitFx) {
+      if (!this.hits.length) return;
+      const n = h.max * h.sparks, pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
+      const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+      const pts = new THREE.Points(geo, new THREE.PointsMaterial({ map: TEX.glow, size: 0.16, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+      this.root.add(pts);
+      const flashes = [];
+      for (let i = 0; i < h.max; i++) { const m = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("glow", "#FFFFFF")); this.plane.add(m); flashes.push(m); }
+      const hc = new THREE.Color(h.color || "#FFFFFF"); if (!h.color) hc.lerp(new THREE.Color(this.def.color), 0.5);
+      // световой «лист» по всему диску печати: то же кольцо, видно и на редком узоре (sheen)
+      // свет без текстуры: цвет складывается, альфа холста не трогается (иначе на прозрачном холсте — тёмный диск)
+      const sheet = new THREE.Mesh(polarGrid(false, 0, 1), new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false,
+        side: THREE.DoubleSide, blending: THREE.CustomBlending, blendEquation: THREE.AddEquation, blendSrc: THREE.OneFactor, blendDst: THREE.OneFactor,
+        blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor }));
+      sheet.scale.setScalar(sigilReach(this.def) * 1.02); sheet.position.z = this.topZ(); this.plane.add(sheet);
+      this.hitFx = { pts, flashes, color: hc, sheet };
+    }
+    const F = this.hitFx, reach = sigilReach(this.def), live = this.hits.length > 0;
+    // волна: поверх каждого слоя — та же текстура на плотной сетке, яркость в вершине = HIT.glow в её точке плоскости
+    for (const L of this.layers) {
+      const l = L.def;
+      if (l.type === "arcs" || lt < (l.appear?.delay || 0) + (l.appear?.duration || 0) || L.alpha < 0.003) { if (L.ov) L.ov.visible = false; continue; }
+      if (!live) { if (L.ov) L.ov.visible = false; continue; }
+      if (!L.ov) {
+        L.ov = new THREE.Mesh(polarGrid(l.type === "band", l.inner ?? 0.85, l.repeat || 6), new THREE.MeshBasicMaterial({ map: TEX[l.texture], vertexColors: true,
+          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+        L.ov.position.z = 0.004; L.group.add(L.ov);
+      }
+      L.ov.visible = true;
+      const P = L.ov.geometry.attributes.position, C = L.ov.geometry.attributes.color, a = L.ang * D2R, ca = Math.cos(a), sa = Math.sin(a);
+      const tint = L.color.clone().lerp(F.color, 0.45);
+      for (let i = 0; i < P.count; i++) {
+        const x = P.getX(i) * L.k, y = P.getY(i) * L.k, g = HIT.glow(h, this.hits, reach, x * ca - y * sa, x * sa + y * ca, lt) * L.alpha;
+        C.setXYZ(i, tint.r * g, tint.g * g, tint.b * g);
+      }
+      C.needsUpdate = true;
+    }
+    {
+      const P = F.sheet.geometry.attributes.position, C = F.sheet.geometry.attributes.color, R = reach * 1.02;
+      const tint = new THREE.Color(this.def.color).lerp(F.color, 0.5);
+      F.sheet.visible = live && h.sheen > 0;
+      if (F.sheet.visible) {
+        for (let i = 0; i < P.count; i++) {
+          const x = P.getX(i) * R, y = P.getY(i) * R;
+          const g = HIT.glow(h, this.hits, reach, x, y, lt) * h.sheen * clamp01((reach * 1.02 - Math.hypot(x, y)) / 0.08);
+          C.setXYZ(i, tint.r * g, tint.g * g, tint.b * g);
+        }
+        C.needsUpdate = true;
+      }
+    }
+    // вспышка в точке удара и искры (искры — в блоках, падают по миру)
+    const pos = F.pts.geometry.attributes.position, col = F.pts.geometry.attributes.color, down = this.downLocal(), z = this.topZ();
+    let n = 0;
+    F.flashes.forEach((m, i) => {
+      const e = this.hits[i];
+      if (!e) { m.material.opacity = 0; return; }
+      const age = lt - e.at;
+      m.position.set(e.x, e.y, z); m.scale.setScalar(Math.max(0.0001, 0.32 * (0.6 + 0.4 * e.power) * (1 + age / 6)));
+      m.material.color.copy(F.color); m.material.opacity = e.power * Math.exp(-age / 3);
+    });
+    for (const e of this.hits) for (let i = 0; i < HIT.sparkCount(h, e) && n < pos.count; i++) {
+      const sp = HIT.spark(h, e, i, lt), ps = this.plane.scale.x;
+      pos.setXYZ(n, e.x * ps + sp.u + down.x * sp.drop, e.y * ps + sp.v + down.y * sp.drop, z * ps + sp.n + down.z * sp.drop);
+      col.setXYZ(n, F.color.r * sp.alpha, F.color.g * sp.alpha, F.color.b * sp.alpha); n++;
+    }
+    for (; n < pos.count; n++) { pos.setXYZ(n, 0, 0, 0); col.setXYZ(n, 0, 0, 0); }
+    pos.needsUpdate = true; col.needsUpdate = true;
+  }
+
+  // ---------------- T09: разборка трещинами
+  buildCracks() {
+    const c = this.cp, def = this.def, reach = sigilReach(def), seed = this.seed, cr = { shards: [], group: new THREE.Group() };
+    this.plane.add(cr.group);
+    for (const L of this.layers) { L.group.visible = false; }
+    for (let k = 0; k < c.count; k++) for (let j = 0; j <= c.rings; j++) {
+      const s = CR.shard(def, c, seed, k, j, 0, null), ca = s.centerAngle * D2R, cx = Math.cos(ca) * s.centerRadius, cy = Math.sin(ca) * s.centerRadius;
+      const pivot = new THREE.Group(); cr.group.add(pivot);
+      const meshes = [];
+      for (const L of this.layers) {
+        if (L.alpha < 0.003) continue;
+        const geo = shardGeo(c, seed, reach, k, j, L, cx, cy); if (!geo) continue;
+        const m = new THREE.Mesh(geo, mat(L.def.type === "arcs" ? (L.def.texture || "arc_strip") : L.def.texture, "#FFFFFF"));
+        m.material.color.copy(L.color); m.position.z = L.def.heightOffset || 0; pivot.add(m); meshes.push({ m, a: L.alpha });
+      }
+      cr.shards.push({ k, j, pivot, meshes });
+    }
+    const cc = new THREE.Color(c.color || "#FFFFFF"); if (!c.color) cc.lerp(new THREE.Color(def.color), 0.4);
+    cr.halo = new THREE.Mesh(new THREE.BufferGeometry(), mat("glow", "#FFFFFF")); cr.halo.material.color.copy(cc);
+    cr.core = new THREE.Mesh(new THREE.BufferGeometry(), mat("glow", "#FFFFFF")); cr.core.material.color.set("#FFFFFF");
+    cr.halo.position.z = cr.core.position.z = this.topZ(); cr.group.add(cr.halo, cr.core);
+    const dn = c.dust + c.count, pos = new Float32Array(dn * 3), col = new Float32Array(dn * 3), geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3)); geo.setAttribute("color", new THREE.BufferAttribute(col, 3));
+    cr.dust = new THREE.Points(geo, new THREE.PointsMaterial({ map: TEX.glow, size: 0.14, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+    cr.group.add(cr.dust); cr.color = cc;
+    this.cr = cr;
+  }
+  updateCracks(lt) {
+    const c = this.cp, def = this.def, sa = this.stopAt - this.t0, reach = sigilReach(def), seed = this.seed;
+    if (!this.cr) this.buildCracks();
+    const cr = this.cr, down = this.downLocal(), Z = new THREE.Vector3(0, 0, 1);
+    for (const S of cr.shards) {
+      const s = CR.shard(def, c, seed, S.k, S.j, lt, sa), ca = s.centerAngle * D2R, dir = new THREE.Vector3(Math.cos(ca), Math.sin(ca), 0);
+      S.pivot.position.copy(dir).multiplyScalar(s.centerRadius + s.radial).addScaledVector(down, s.drop);
+      const tan = new THREE.Vector3(-Math.sin(ca), Math.cos(ca), 0);
+      S.pivot.quaternion.setFromAxisAngle(tan, s.tilt * D2R).multiply(new THREE.Quaternion().setFromAxisAngle(Z, s.spin * D2R));
+      for (const M of S.meshes) M.m.material.opacity = M.a * s.alpha * s.brightness;
+    }
+    // линии трещин: радиальные бегут от центра, кольцевые открываются от радиальных к середине дуги
+    const g = CR.glow(def, c, lt, sa), lines = [], tips = [];
+    for (let k = 0; k < c.count; k++) {
+      const rr = CR.reach(def, c, k, lt, sa) * reach; if (rr <= 0.001) continue;
+      const pts = []; for (let i = 0; i <= 24; i++) { const r = rr * i / 24, a = CR.angle(c, seed, k, r, reach) * D2R; pts.push([Math.cos(a) * r, Math.sin(a) * r]); }
+      lines.push(pts); if (rr < reach * 0.999) tips.push(pts[pts.length - 1]);
+    }
+    for (let j = 1; j <= c.rings; j++) {
+      const f = CR.ringOpen(def, c, j, lt, sa); if (f <= 0.001) continue;
+      const r = CR.ring(c, j, reach);
+      for (let k = 0; k < c.count; k++) {
+        const a0 = CR.angle(c, seed, k, r, reach), a1 = CR.angle(c, seed, k + 1, r, reach), w = (a1 - a0) / 2 * f;
+        for (const [from, to] of [[a0, a0 + w], [a1 - w, a1]]) {
+          const pts = []; for (let i = 0; i <= 8; i++) { const a = (from + (to - from) * i / 8) * D2R; pts.push([Math.cos(a) * r, Math.sin(a) * r]); }
+          lines.push(pts);
+        }
+      }
+    }
+    cr.halo.geometry.dispose(); cr.halo.geometry = ribbons(lines, 0.07); cr.halo.material.opacity = Math.min(1, 0.55 * g);
+    cr.core.geometry.dispose(); cr.core.geometry = ribbons(lines, 0.022); cr.core.material.opacity = Math.min(1, 0.9 * g);
+    // пыль из трещин и огоньки на кончиках бегущих трещин
+    const pos = cr.dust.geometry.attributes.position, col = cr.dust.geometry.attributes.color, z = this.topZ();
+    let n = 0;
+    for (let i = 0; i < c.dust; i++, n++) {
+      const m = CR.dust(def, c, seed, i, lt, sa), a = m.angle * D2R;
+      pos.setXYZ(n, Math.cos(a) * m.radius + down.x * m.drop, Math.sin(a) * m.radius + down.y * m.drop, z + down.z * m.drop);
+      col.setXYZ(n, cr.color.r * m.alpha, cr.color.g * m.alpha, cr.color.b * m.alpha);
+    }
+    for (const p of tips) { pos.setXYZ(n, p[0], p[1], z); col.setXYZ(n, 1.4 * g, 1.4 * g, 1.4 * g); n++; }
+    for (; n < pos.count; n++) { pos.setXYZ(n, 0, 0, 0); col.setXYZ(n, 0, 0, 0); }
+    pos.needsUpdate = true; col.needsUpdate = true;
+  }
+
   update(t, dt) {
     const lt = t - this.t0, def = this.def, T = this.T;
     // ориентация
@@ -298,7 +682,13 @@ class Sigil {
     const modes = dis.modes || [dis.mode || "fade"];
     if (modes.includes("collapse")) S *= 1 - ease("easeInCubic", dd);
     let globalA = modes.includes("fade") ? 1 - dd : 1;
-    this.plane.scale.setScalar(Math.max(0.0001, S));
+    this.lt = lt;
+    const flin = this.hp && this.hits.length ? HIT.scale(this.hp, this.hits, lt) : 1;
+    this.plane.scale.setScalar(Math.max(0.0001, S * flin));
+    const wob = this.hp && this.hits.length ? HIT.wobble(this.hp, this.hits, lt) : { ax: 1, ay: 0, angle: 0 };
+    this.plane.quaternion.setFromAxisAngle(new THREE.Vector3(wob.ax, wob.ay, 0), wob.angle * D2R);
+    const breaking = this.cp && this.stopAt !== null;
+    if (breaking && this.hits.length) this.hits = [];
     const n = this.layers.length, stagger = dis.stagger || 0;
     this.layers.forEach((L, i) => {
       const l = L.def, ap = l.appear || {}, p = clamp01((lt - (ap.delay || 0)) / Math.max(1, ap.duration || 1));
@@ -313,12 +703,13 @@ class Sigil {
       if (modes.includes("shatter") && this.stopAt !== null) { sc *= 1 + dd * 0.8; a *= 1 - dd; }
       // вращение: скорость (°/с), быстрее, пока слой появляется (boost)
       const rot = l.rotation || {};
-      L.rot += (rot.speed || 0) * (1 + (rot.boost || 0) * (1 - clamp01(e))) * dt / TPS;
+      if (!breaking) L.rot += (rot.speed || 0) * (1 + (rot.boost || 0) * (1 - clamp01(e))) * dt / TPS;   // трещины: расколотая печать не крутится
       let ang = L.rot + (m.includes("twist") ? (ap.twist || -120) * (1 - clamp01(e)) : 0);
       L.group.rotation.set(m.includes("unfold") ? (1 - clamp01(e)) * Math.PI / 2 : 0, 0, ang * D2R);
       L.group.scale.setScalar(sc * (l.radius || 1));
       const pul = l.pulse ? 1 + l.pulse.amp * Math.sin(2 * Math.PI * lt / l.pulse.period) : 1;
       const alpha = clamp01(a * globalA) * (l.brightness ?? 1) * pul;
+      if (!breaking) { L.alpha = alpha; L.ang = ang; L.k = sc * (l.radius || 1); }
       // геометрия: прорисовка (draw) и сборка дуг (assemble)
       const len = m.includes("draw") ? 2 * Math.PI * clamp01(e) : 2 * Math.PI;
       const start = (ap.startAngle || 0) * D2R, dir = ap.direction || 1;
@@ -353,13 +744,16 @@ class Sigil {
         L.meshes[0].material.opacity = alpha;
       }
     });
+    this.updateHits(lt, S);
+    if (breaking) this.updateCracks(lt);
     // вспышка формирования и дочерние печати
     if (!this.flashed && lt >= T.formedAt && this.stopAt === null) { this.flashed = true; this.spawnFlash(t, S); }
     if (this.flash) this.updateFlash(t, dt);
     if (!this.childrenDone && lt >= T.formedAt && this.stopAt === null) { this.childrenDone = true; this.spawnChildren(t); }
     this.children.forEach((c) => c.update(t, dt));
     // удержание
-    if (autoStop && this.stopAt === null && !this.parentHold && def.hold >= 0 && lt >= T.formedAt + def.hold) this.stop(t);
+    const hold = this.holdOverride ?? def.hold;
+    if (autoStop && !this.noAuto && this.stopAt === null && !this.parentHold && hold >= 0 && lt >= T.formedAt + hold) this.stop(t);
   }
 
   spawnFlash(t, S) {
@@ -420,6 +814,7 @@ class Portal {
       this.hg.position.set(pv[0], pv[1], pv[2]); this.hp.position.set(-pv[0], -pv[1], -pv[2]); this.root.add(this.hg); this.hg.add(this.hp);
     }
     this.parts = this.def.parts.map((p) => this.make(p));
+    this.hp = hitParams(this.def); this.hits = []; this.lt = 0; this.hitFx = null;   // T08: рябь по куполу
   }
   make(p) {
     const color = styleColor(this.def.style, p.color), g = new THREE.Group(), P = { def: p, g, rot: 0, mats: [] };
@@ -456,7 +851,7 @@ class Portal {
         const mesh = add(new THREE.BoxGeometry(Math.max(0.01, b[3] - b[0]), Math.max(0.01, b[4] - b[1]), Math.max(0.01, b[5] - b[2])), m);
         mesh.position.set((b[0] + b[3]) / 2, (b[1] + b[4]) / 2, (b[2] + b[5]) / 2);
         if (b[7]) mesh.rotation.set(b[7][0] * D2R, b[7][1] * D2R, b[7][2] * D2R, "YXZ");   // сначала roll, потом наклон (pitch), потом направление (yaw)
-        P.boxes.push({ m, y: (b[1] + b[4]) / 2, glow: glow.has(b[6]) });
+        P.boxes.push({ m, y: (b[1] + b[4]) / 2, glow: glow.has(b[6]), dir: mesh.position.clone().normalize(), base: m.color.clone() });
       }
       P.flash = add(new THREE.BoxGeometry(12, 0.25, 3), lit("#FFFFFF"));
     }
@@ -464,6 +859,43 @@ class Portal {
   }
   stop(t) { if (this.stopAt === null) this.stopAt = t; }
   done(t) { return this.stopAt !== null && t > this.stopAt + this.def.collapse.duration + 2; }
+  /** T08: удар по куполу; dir — направление от центра (локальные оси, единичный вектор). */
+  hit(dir, power) {
+    if (!this.hp || this.stopAt !== null) return false;
+    const h = this.hp; this.hits = this.hits.filter((e) => this.lt - e.at <= HIT.life(h));
+    while (this.hits.length >= h.max) this.hits.shift();
+    this.hits.push({ x: 0, y: 0, at: this.lt, power, seed: (Math.random() * 2147483647) | 0, dir: dir.clone().normalize() }); return true;
+  }
+  updateHits(lt) {
+    const h = this.hp;
+    if (!this.hitFx) {
+      if (!this.hits.length) return;
+      const n = h.max * h.sparks, geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(n * 3), 3)); geo.setAttribute("color", new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+      const pts = new THREE.Points(geo, new THREE.PointsMaterial({ map: TEX.glow, size: 0.18, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }));
+      this.root.add(pts);
+      const flashes = []; for (let i = 0; i < h.max; i++) { const m = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("glow", h.color || "#FFFFFF")); this.root.add(m); flashes.push(m); }
+      this.hitFx = { pts, flashes, color: new THREE.Color(h.color || "#FFFFFF") };
+    }
+    const F = this.hitFx, s = Math.abs(this.root.scale.x), pos = F.pts.geometry.attributes.position, col = F.pts.geometry.attributes.color;
+    const qi = new THREE.Quaternion(); this.root.getWorldQuaternion(qi); const down = new THREE.Vector3(0, -1, 0).applyQuaternion(qi.invert());
+    F.flashes.forEach((m, i) => {
+      const e = this.hits[i]; if (!e) { m.material.opacity = 0; return; }
+      const age = lt - e.at; m.position.copy(e.dir); m.quaternion.copy(cam.quaternion);
+      m.scale.setScalar(0.18 * (1 + age / 6)); m.material.opacity = e.power * Math.exp(-age / 3);
+    });
+    let n = 0;
+    for (const e of this.hits) {
+      const nrm = e.dir, u = new THREE.Vector3().crossVectors(nrm, Math.abs(nrm.y) > 0.9 ? new THREE.Vector3(1, 0, 0) : new THREE.Vector3(0, 1, 0)).normalize(), v = new THREE.Vector3().crossVectors(nrm, u);
+      for (let i = 0; i < HIT.sparkCount(h, e) && n < pos.count; i++, n++) {
+        const sp = HIT.spark(h, e, i, lt);
+        const p = e.dir.clone().addScaledVector(u, sp.u / s).addScaledVector(v, sp.v / s).addScaledVector(nrm, sp.n / s).addScaledVector(down, sp.drop / s);
+        pos.setXYZ(n, p.x, p.y, p.z); col.setXYZ(n, F.color.r * sp.alpha, F.color.g * sp.alpha, F.color.b * sp.alpha);
+      }
+    }
+    for (; n < pos.count; n++) { pos.setXYZ(n, 0, 0, 0); col.setXYZ(n, 0, 0, 0); }
+    pos.needsUpdate = true; col.needsUpdate = true;
+  }
   dispose() { scene.remove(this.root); }
   update(t, dt) {
     const lt = t - this.t0;
@@ -475,7 +907,11 @@ class Portal {
       ms = (mv.scaleFrom ?? 1) + (1 - (mv.scaleFrom ?? 1)) * e;
     }
     if (this.hinge) { const h = this.hinge; this.hg.rotation.y = (h.angle || 0) * D2R * ease(h.easing || "easeInOutCubic", clamp01((lt - (h.delay || 0)) / (h.duration || 1))); }
-    this.root.scale.setScalar(Math.max(0.0001, col * this.s * ms)); this.root.scale.x *= this.mirror; this.root.visible = lt >= 0;
+    this.lt = lt;
+    if (this.hp) this.hits = this.hits.filter((e) => lt - e.at <= HIT.life(this.hp));
+    const flin = this.hp && this.hits.length ? HIT.scale(this.hp, this.hits, lt) : 1;   // T08: купол вздрагивает от удара
+    this.root.scale.setScalar(Math.max(0.0001, col * this.s * ms * flin)); this.root.scale.x *= this.mirror; this.root.visible = lt >= 0;
+    if (this.hp) this.updateHits(lt);
     for (const P of this.parts) {
       const p = P.def, ap = p.appear || { delay: 0, duration: 1 }, k = clamp01((lt - ap.delay) / ap.duration), e = ease(ap.easing, k);
       let alpha = lt >= ap.delay ? clamp01(k * 3) : 0;
@@ -501,7 +937,11 @@ class Portal {
         const front = up ? lo - 1 + (hi - lo + 2) * clamp01(e) : hi - (hi - lo + 2) * clamp01(e);
         for (const B of P.boxes) {
           const k = up ? clamp01((front - B.y + band) / band) : clamp01((B.y - front + band) / band);   // 0 — ещё нет, 1 — готов
-          B.m.opacity = k * (B.glow ? 1 : (p.opacity ?? 1));
+          // T08: рябь — волна SigilHit по сфере (расстояние — угол между направлениями на ячейку и на удар)
+          let rip = 0;
+          if (this.hits.length) { for (const e of this.hits) rip += HIT.wave(this.hp, e, Math.PI, Math.acos(Math.max(-1, Math.min(1, B.dir.dot(e.dir)))), lt); rip = Math.min(rip, 2 * this.hp.strength); }
+          B.m.opacity = Math.min(1, k * (B.glow ? 1 : (p.opacity ?? 1)) * (1 + rip * (B.glow ? 1.5 : 5)));
+          if (rip > 0.01 || B.rip) { B.m.color.copy(B.base).lerp(new THREE.Color(1, 1, 1), Math.min(0.8, 0.5 * rip)); B.rip = rip > 0.01; }
           if (B.m.emissive) B.m.emissiveIntensity = 0.06 + 1.4 * (1 - k) * (k > 0 ? 1 : 0);   // у фронта — вспышка белым
         }
         P.flash.position.set(0, front, 0); P.flash.material.opacity = lt >= ap.delay && e < 1 ? 0.8 : 0;
@@ -748,20 +1188,37 @@ const SCENES = {
   "Ведьма: каст в одежде": () => [new FxRun("silent_witch_cast", { caster: new THREE.Vector3(0, 0, 0) })],
   "Ведьма: Тихий барьер": () => [new FxRun("silent_barrier", { caster: new THREE.Vector3(0, 0, 0) })],
   "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
+  "Отклик на урон": () => [new Sigil("higher_blades", new THREE.Vector3(0, 0.02, 0), { noAuto: true })],
+  "Отклик на урон: Тихий барьер": () => [new Sigil("silent_barrier", new THREE.Vector3(0, 1.0, 0.55), { noAuto: true })],
+  "Отклик на урон: Дезинтеграция": () => [new Sigil("disintegration_field", new THREE.Vector3(0, 0.02, 0), { noAuto: true, t0: -150 })],
+  "Отклик на урон: купол Барьера": () => [new Portal("silent_dome", new THREE.Vector3(0, 0.1, 0), { scale: 5, noAuto: true })],
+  "Распад трещинами": () => [new Sigil("higher_blades", new THREE.Vector3(0, 0.02, 0), { hold: 24 })],
+  "Распад трещинами: небесная печать": () => [new Sigil("__cracks_sky", new THREE.Vector3(0, 9, 0), { hold: 20 })],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
-const MAIN_ID = { "Меч-хлыст: Последний жар": "ember_last_heat", "Меч-хлыст: Огненный вихрь": "ember_vortex", "Алый разрез": "scarlet_cut", "Падение звезды": "star_fall", "Алое стекло (модель)": "star_glass", "Ведьма: каст в одежде": "silent_witch_cast", "Ведьма: Тихий барьер": "silent_barrier", "Копьё ветра (модель)": "silent_spear", "Купол Барьера (модель)": "silent_dome", "Тень дракона (модель)": "worgan_dragon", "Чёрное пламя Ворганы": "silent_worgan_flame", "Безмолвный залп": "silent_volley", "Врата (весь эффект)": "silent_gate", "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
+// небесная печать Silent Gate с разборкой «трещины» — только для превью (сам файл не меняется)
+DATA.sigils.__cracks_sky = { ...JSON.parse(JSON.stringify(DATA.sigils.silent_gate_sky)),
+  comment: "Превью T09: silent_gate_sky с разборкой cracks (12 трещин, 2 кольца) — как выглядит распад большой печати.",
+  dissolve: { modes: ["cracks"], duration: 60, cracks: { count: 12, rings: 2, irregular: 0.4, jag: 0.26, crackTime: 0.38, fallTime: 0.42, gap: 0.025,
+    push: 0.16, pop: 0.12, fall: 0.75, tumble: 170, spin: 50, glow: 1.7, dust: 70, color: "#E6FDFF" } } };
+const HIT_SCENES = new Set(["Отклик на урон", "Отклик на урон: Тихий барьер", "Отклик на урон: Дезинтеграция", "Отклик на урон: купол Барьера"]);
+const MAIN_ID = { "Отклик на урон: купол Барьера": "silent_dome", "Отклик на урон": "higher_blades", "Отклик на урон: Тихий барьер": "silent_barrier", "Отклик на урон: Дезинтеграция": "disintegration_field",
+  "Распад трещинами": "higher_blades", "Распад трещинами: небесная печать": "__cracks_sky", "Меч-хлыст: Последний жар": "ember_last_heat", "Меч-хлыст: Огненный вихрь": "ember_vortex", "Алый разрез": "scarlet_cut", "Падение звезды": "star_fall", "Алое стекло (модель)": "star_glass", "Ведьма: каст в одежде": "silent_witch_cast", "Ведьма: Тихий барьер": "silent_barrier", "Копьё ветра (модель)": "silent_spear", "Купол Барьера (модель)": "silent_dome", "Тень дракона (модель)": "worgan_dragon", "Чёрное пламя Ворганы": "silent_worgan_flame", "Безмолвный залп": "silent_volley", "Врата (весь эффект)": "silent_gate", "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
-const VIEW_FOR = { "Меч-хлыст: Последний жар": "ember", "Меч-хлыст: Огненный вихрь": "ember", "Алый разрез": "cut", "Падение звезды": "star", "Алое стекло (модель)": "close", "Ведьма: каст в одежде": "volley", "Ведьма: Тихий барьер": "volley", "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Чёрное пламя Ворганы": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
+const VIEW_FOR = { "Отклик на урон: купол Барьера": "side", "Отклик на урон": "hit", "Отклик на урон: Тихий барьер": "barrier", "Отклик на урон: Дезинтеграция": "hitBig", "Распад трещинами": "hit",
+  "Распад трещинами: небесная печать": "crackSky", "Меч-хлыст: Последний жар": "ember", "Меч-хлыст: Огненный вихрь": "ember", "Алый разрез": "cut", "Падение звезды": "star", "Алое стекло (модель)": "close", "Ведьма: каст в одежде": "volley", "Ведьма: Тихий барьер": "volley", "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Чёрное пламя Ворганы": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
+let hitQueue = [], nextAutoHit = 24;
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
 const sel = $("scene");
 for (const k of Object.keys(SCENES)) { const o = document.createElement("option"); o.value = k; o.textContent = k; sel.appendChild(o); }
 function start() {
   INST.forEach((s) => s.dispose()); INST = SCENES[cur](); t = 0;
   $("sceneName").textContent = cur;
+  $("hitBox").hidden = !HIT_SCENES.has(cur); hitQueue = []; nextAutoHit = 24;
+  $("hint").textContent = HIT_SCENES.has(cur) ? "Щёлкните по печати — удар в эту точку; тяните — камера" : "Тяните, чтобы повернуть камеру";
   const id = MAIN_ID[cur], src = DATA.sigils[id] || DATA.meshes[id] || DATA.fx[id];
   $("jsonTitle").textContent = id + ".json"; $("jsonView").textContent = JSON.stringify(src, null, 2);
   const L = $("layers"); L.innerHTML = "";
@@ -784,19 +1241,53 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+const VIEWS = { hit: [0.55, 0.78, 8.5, 0.2], hitBig: [0.55, 0.62, 13, 0.2], barrier: [0.45, 0.12, 6.2, 1.0], crackSky: [0.45, -0.12, 26, 7.5], ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];
 }
 document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => setView(b.dataset.view)));
 stage.addEventListener("pointerdown", (e) => { drag = [e.clientX, e.clientY, yaw, pitch]; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener("pointerup", (e) => {
+  if (!drag || !HIT_SCENES.has(cur) || Math.hypot(e.clientX - drag[0], e.clientY - drag[1]) > 5) return;
+  const S = mainSigil(); if (!S) return;
+  const r = cv.getBoundingClientRect(), ray = new THREE.Raycaster();
+  ray.setFromCamera(new THREE.Vector2((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1), cam);
+  if (S.isMesh) {   // купол: точка на сфере радиуса s вокруг центра модели
+    S.root.updateMatrixWorld(true);
+    const c = new THREE.Vector3().setFromMatrixPosition(S.root.matrixWorld), p = ray.ray.intersectSphere(new THREE.Sphere(c, Math.abs(S.root.scale.y)), new THREE.Vector3());
+    if (p && S.hit(S.root.worldToLocal(p.clone()), +$("hitPow").value)) ping(e.clientX - r.left, e.clientY - r.top);
+    return;
+  }
+  S.plane.updateMatrixWorld(true);
+  const n = new THREE.Vector3(0, 0, 1).transformDirection(S.plane.matrixWorld), o = new THREE.Vector3().setFromMatrixPosition(S.plane.matrixWorld);
+  const p = ray.ray.intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(n, o), new THREE.Vector3()); if (!p) return;
+  const q = S.plane.worldToLocal(p.clone());
+  if (Math.hypot(q.x, q.y) > sigilReach(S.def) * 1.15) return;
+  if (S.hit(q.x, q.y, +$("hitPow").value)) ping(e.clientX - r.left, e.clientY - r.top);
+});
 stage.addEventListener("pointermove", (e) => { if (!drag) return; yaw = drag[2] - (e.clientX - drag[0]) * 0.008; pitch = Math.max(-0.35, Math.min(1.45, drag[3] + (e.clientY - drag[1]) * 0.005)); setView(null); });
 stage.addEventListener("pointerup", () => (drag = null)); stage.addEventListener("pointercancel", () => (drag = null));
 stage.addEventListener("wheel", (e) => { e.preventDefault(); dist = Math.max(4, Math.min(40, dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive: false });
 
+function mainSigil() { return INST.find((s) => s.id === MAIN_ID[cur] && s.hit) || null; }
+// случайная точка удара: по печати — в круге; по куполу — на верхней полусфере (снаряды бьют в бок и сверху)
+function domeDir() { const a = Math.random() * 2 * Math.PI, y = 0.15 + 0.8 * Math.random(), k = Math.sqrt(1 - y * y); return new THREE.Vector3(Math.cos(a) * k, y, Math.sin(a) * k); }
+function ping(x, y) { const d = document.createElement("div"); d.className = "hit-ping"; d.style.left = x + "px"; d.style.top = y + "px"; stage.appendChild(d); setTimeout(() => d.remove(), 500); }
+function randomHit(S, power, near = 0.8) { if (S.isMesh) return S.hit(domeDir(), power); const a = Math.random() * 2 * Math.PI, r = Math.sqrt(Math.random()) * sigilReach(S.def) * near; return S.hit(Math.cos(a) * r, Math.sin(a) * r, power); }
+$("hitBtn").addEventListener("click", () => { const S = mainSigil(); if (S) randomHit(S, +$("hitPow").value); });
+$("hitCenter").addEventListener("click", () => { const S = mainSigil(); if (S) S.isMesh ? S.hit(new THREE.Vector3(0, 1, 0), +$("hitPow").value) : S.hit(0, 0, +$("hitPow").value); });
+$("hitBurst").addEventListener("click", () => { for (let i = 0; i < 3; i++) hitQueue.push(t + i * 5); });
+$("hitPow").addEventListener("input", () => { $("hitPowV").textContent = (+$("hitPow").value).toFixed(2); });
 function frame(now) {
   const dt = Math.min(0.1, (now - last) / 1000) * TPS * speed; last = now; t += dt;
+  if (HIT_SCENES.has(cur)) {   // серия и авто-удары — по времени сцены (замедление их тоже замедляет)
+    const S = mainSigil();
+    if (S && S.lt > S.T.formedAt) {
+      hitQueue = hitQueue.filter((at) => { if (t < at) return true; randomHit(S, +$("hitPow").value, 0.9); return false; });
+      if ($("hitAuto").checked && t >= nextAutoHit) { randomHit(S, +$("hitPow").value * (0.7 + 0.3 * Math.random())); nextAutoHit = t + 30; }
+    } else nextAutoHit = Math.max(nextAutoHit, t + 6);
+  }
   INST.forEach((s) => s.update(t, dt));
   if (INST.length && INST.every((s) => s.done(t))) start();
   const main = INST.find((s) => s.id === MAIN_ID[cur]) || INST[0];
@@ -868,8 +1359,9 @@ function edRender() {
     choice("Ориентация", ED.ORIENT, () => d.orientation || "ground", (v) => (d.orientation = v)),
     slider("Рост ×", () => (d.expand ? d.expand.scale : 1), (v) => { if (v <= 1.001) delete d.expand; else d.expand = { ...(d.expand || { delay: 4, duration: 20, easing: "easeOutCubic" }), scale: v }; }, 1, 6, 0.1, (v) => (v <= 1.001 ? "нет" : v.toFixed(1))),
     slider("Удержание, тиков", () => d.hold ?? 120, (v) => (d.hold = v), 20, 400, 10),
-    choice("Разборка", ["reverse+collapse", "collapse", "fade", "reverse", "shatter"], () => (d.dissolve?.modes || ["fade"]).join("+"),
-      (v) => (d.dissolve = { modes: v.split("+"), duration: 20, stagger: v.includes("reverse") ? 3 : 0 })));
+    choice("Разборка", ["reverse+collapse", "collapse", "fade", "reverse", "shatter", "cracks"], () => (d.dissolve?.modes || ["fade"]).join("+"),
+      (v) => (d.dissolve = { modes: v.split("+"), duration: v === "cracks" ? 40 : 20, stagger: v.includes("reverse") ? 3 : 0 })),
+    choice("Отклик на удар", ["нет", "есть"], () => (hitParams(d) ? "есть" : "нет"), (v) => { if (v === "есть") d.hit = d.hit && typeof d.hit === "object" ? d.hit : {}; else { delete d.hit; delete d.reactsToHits; } }));
   const L = $("edLayers"); L.innerHTML = "";
   d.layers.forEach((l, i) => {
     const ap = (l.appear = l.appear || { delay: 0, duration: 10, modes: ["fade"] }), card = document.createElement("div"); card.className = "ed-layer";

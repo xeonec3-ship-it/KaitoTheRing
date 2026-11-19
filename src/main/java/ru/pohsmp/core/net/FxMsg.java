@@ -14,7 +14,8 @@ import net.minecraftforge.network.NetworkEvent;
  * entities to follow, named points, scale, colour override, seed.
  */
 public final class FxMsg {
-    public static final int START = 0, STOP = 1, MOVE = 2, RELOAD = 3;
+    /** HIT (T08): something was struck at x, y, z inside the instance; power 0..1 in {@link #scale}, seed for sparks in {@link #seed}. */
+    public static final int START = 0, STOP = 1, MOVE = 2, RELOAD = 3, HIT = 4;
     public static final int FX = 0, SIGIL = 1, MESH = 2;
 
     public int op, inst, kind;
@@ -76,6 +77,12 @@ public final class FxMsg {
             z = b.readDouble();
             yaw = b.readFloat();
             pitch = b.readFloat();
+        } else if (op == HIT) {
+            x = b.readDouble();
+            y = b.readDouble();
+            z = b.readDouble();
+            scale = b.readFloat();
+            seed = b.readInt();
         }
     }
 
@@ -127,6 +134,12 @@ public final class FxMsg {
             b.writeDouble(z);
             b.writeFloat(yaw);
             b.writeFloat(pitch);
+        } else if (op == HIT) {
+            b.writeDouble(x);
+            b.writeDouble(y);
+            b.writeDouble(z);
+            b.writeFloat(scale);
+            b.writeInt((int) seed);
         }
     }
 

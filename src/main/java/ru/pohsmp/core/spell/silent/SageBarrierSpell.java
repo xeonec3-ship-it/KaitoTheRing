@@ -150,9 +150,17 @@ public class SageBarrierSpell extends SilentSpell {
         return a.add(d.scale(t));
     }
 
-    /** Ripple where something struck the dome (stand-in for the T08 sigil response). */
+    /**
+     * Ripple where something struck the dome. With the data effect (silent_barrier_dome) it is T08: Fx.hit — a ring of light runs over
+     * the dome's cells from the point (the "hit" of fx/meshes/silent_dome.json), the dome flinches, sparks fly; otherwise particles.
+     */
     public static void ripple(Dome d, Vec3 at) {
         ServerLevel sl = d.level;
+        if (d.fxInst >= 0 && Fx.running(d.fxInst)) {
+            Fx.hit(sl, d.fxInst, at, 0.85);
+            sl.playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_BLOCK_HIT, SoundSource.PLAYERS, 0.8f, 1.4f);
+            return;
+        }
         Vec3 n = at.subtract(d.center()).normalize();
         Vec3 u = Math.abs(n.y) > 0.9 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
         Vec3 a = n.cross(u).normalize(), b = n.cross(a).normalize();

@@ -4333,6 +4333,1063 @@
   ]
  },
  {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "ark",
+  "spell_ru": "Ковчег",
+  "event": "pohsmp_core:spell.ark.cast_bell",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/ark_cast_bell_1.ogg",
+   "spell/divine/ark_cast_bell_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ark_cast_bell_1.mp3",
+   "docs/sounds/mp3/ark_cast_bell_2.mp3"
+  ],
+  "what": "колокол — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "ArkSpell.java onCast()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "ark",
+  "spell_ru": "Ковчег",
+  "event": "pohsmp_core:spell.ark.cast_powerup",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/ark_cast_powerup_1.ogg",
+   "spell/divine/ark_cast_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ark_cast_powerup_1.mp3",
+   "docs/sounds/mp3/ark_cast_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "ArkSpell.java getCastStartSound(); ArkSpell.java onCast()",
+  "replaces": [
+   "BEACON_ACTIVATE",
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "ark",
+  "spell_ru": "Ковчег",
+  "event": "pohsmp_core:spell.ark.end_bell",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/divine/ark_end_bell_1.ogg",
+   "spell/divine/ark_end_bell_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ark_end_bell_1.mp3",
+   "docs/sounds/mp3/ark_end_bell_2.mp3"
+  ],
+  "what": "колокол — конец / снятие / смерть (подпись школы: золотой хор и большой колокол)",
+  "where": "ArkSpell.java onDeath()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "ark",
+  "spell_ru": "Ковчег",
+  "event": "pohsmp_core:spell.ark.end_powerdown",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/divine/ark_end_powerdown_1.ogg",
+   "spell/divine/ark_end_powerdown_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ark_end_powerdown_1.mp3",
+   "docs/sounds/mp3/ark_end_powerdown_2.mp3"
+  ],
+  "what": "спад, «выключение» — конец / снятие / смерть (подпись школы: золотой хор и большой колокол)",
+  "where": "ArkSpell.java tick()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "ark",
+  "spell_ru": "Ковчег",
+  "event": "pohsmp_core:spell.ark.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/divine/ark_release_1.ogg",
+   "spell/divine/ark_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ark_release_1.mp3",
+   "docs/sounds/mp3/ark_release_2.mp3"
+  ],
+  "what": "долгий резонанс — выпуск заклинания (подпись школы: золотой хор и большой колокол)",
+  "where": "ArkSpell.java getCastFinishSound()",
+  "replaces": [
+   "BELL_RESONATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "blessing",
+  "spell_ru": "Благословение",
+  "event": "pohsmp_core:spell.blessing.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/blessing_cast_1.ogg",
+   "spell/divine/blessing_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blessing_cast_1.mp3",
+   "docs/sounds/mp3/blessing_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "BlessingSpell.java getCastStartSound()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "blessing",
+  "spell_ru": "Благословение",
+  "event": "pohsmp_core:spell.blessing.charge_chime",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/blessing_charge_chime_1.ogg",
+   "spell/divine/blessing_charge_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blessing_charge_chime_1.mp3",
+   "docs/sounds/mp3/blessing_charge_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "BlessingSpell.java castTick()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "blessing",
+  "spell_ru": "Благословение",
+  "event": "pohsmp_core:spell.blessing.charge_magic",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/blessing_charge_magic_1.ogg",
+   "spell/divine/blessing_charge_magic_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blessing_charge_magic_1.mp3",
+   "docs/sounds/mp3/blessing_charge_magic_2.mp3"
+  ],
+  "what": "заклятие плетётся — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "BlessingSpell.java castTick()",
+  "replaces": [
+   "ENCHANTMENT_TABLE_USE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "blessing",
+  "spell_ru": "Благословение",
+  "event": "pohsmp_core:spell.blessing.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/blessing_charge_powerup_1.ogg",
+   "spell/divine/blessing_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blessing_charge_powerup_1.mp3",
+   "docs/sounds/mp3/blessing_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "BlessingSpell.java castTick()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "blessing",
+  "spell_ru": "Благословение",
+  "event": "pohsmp_core:spell.blessing.hit_bell",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/blessing_hit_bell_1.ogg",
+   "spell/divine/blessing_hit_bell_2.ogg",
+   "spell/divine/blessing_hit_bell_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blessing_hit_bell_1.mp3",
+   "docs/sounds/mp3/blessing_hit_bell_2.mp3",
+   "docs/sounds/mp3/blessing_hit_bell_3.mp3"
+  ],
+  "what": "колокол — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "BlessingSpell.java apply()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "blessing",
+  "spell_ru": "Благословение",
+  "event": "pohsmp_core:spell.blessing.hit_fanfare",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/blessing_hit_fanfare_1.ogg",
+   "spell/divine/blessing_hit_fanfare_2.ogg",
+   "spell/divine/blessing_hit_fanfare_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/blessing_hit_fanfare_1.mp3",
+   "docs/sounds/mp3/blessing_hit_fanfare_2.mp3",
+   "docs/sounds/mp3/blessing_hit_fanfare_3.mp3"
+  ],
+  "what": "торжество, исцеление — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "BlessingSpell.java apply()",
+  "replaces": [
+   "PLAYER_LEVELUP"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/disintegration_cast_1.ogg",
+   "spell/divine/disintegration_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_cast_1.mp3",
+   "docs/sounds/mp3/disintegration_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java getCastStartSound(); DisintegrationSpell.java startHold()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.charge_chime",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/disintegration_charge_chime_1.ogg",
+   "spell/divine/disintegration_charge_chime_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_charge_chime_1.mp3",
+   "docs/sounds/mp3/disintegration_charge_chime_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java tickHold()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.charge_hum",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/disintegration_charge_hum_1.ogg",
+   "spell/divine/disintegration_charge_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_charge_hum_1.mp3",
+   "docs/sounds/mp3/disintegration_charge_hum_2.mp3"
+  ],
+  "what": "гул / фон — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java tickHold()",
+  "replaces": [
+   "BEACON_AMBIENT"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/disintegration_charge_powerup_1.ogg",
+   "spell/divine/disintegration_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_charge_powerup_1.mp3",
+   "docs/sounds/mp3/disintegration_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java tickHold()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.charge_resonate",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/disintegration_charge_resonate_1.ogg",
+   "spell/divine/disintegration_charge_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_charge_resonate_1.mp3",
+   "docs/sounds/mp3/disintegration_charge_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java tickHold()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.charge_thunder",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/disintegration_charge_thunder_1.ogg",
+   "spell/divine/disintegration_charge_thunder_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_charge_thunder_1.mp3",
+   "docs/sounds/mp3/disintegration_charge_thunder_2.mp3"
+  ],
+  "what": "раскат грома — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java tickHold()",
+  "replaces": [
+   "TRIDENT_THUNDER"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/disintegration_hit_boom_1.ogg",
+   "spell/divine/disintegration_hit_boom_2.ogg",
+   "spell/divine/disintegration_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_hit_boom_1.mp3",
+   "docs/sounds/mp3/disintegration_hit_boom_2.mp3",
+   "docs/sounds/mp3/disintegration_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java finish()",
+  "replaces": [
+   "GENERIC_EXPLODE",
+   "WARDEN_SONIC_BOOM"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "disintegration",
+  "spell_ru": "Дезинтеграция",
+  "event": "pohsmp_core:spell.disintegration.hit_powerdown",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/disintegration_hit_powerdown_1.ogg",
+   "spell/divine/disintegration_hit_powerdown_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/disintegration_hit_powerdown_1.mp3",
+   "docs/sounds/mp3/disintegration_hit_powerdown_2.mp3"
+  ],
+  "what": "спад, «выключение» — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "DisintegrationSpell.java finish()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_backlash",
+  "spell_ru": "Божественная отдача",
+  "event": "pohsmp_core:spell.divine_backlash.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/divine_backlash_cast_1.ogg",
+   "spell/divine/divine_backlash_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_backlash_cast_1.mp3",
+   "docs/sounds/mp3/divine_backlash_cast_2.mp3"
+  ],
+  "what": "колокол — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "DivineEvents.java onCast()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_backlash",
+  "spell_ru": "Божественная отдача",
+  "event": "pohsmp_core:spell.divine_backlash.loop_bell",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/divine/divine_backlash_loop_bell_1.ogg",
+   "spell/divine/divine_backlash_loop_bell_2.ogg",
+   "spell/divine/divine_backlash_loop_bell_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_backlash_loop_bell_1.mp3",
+   "docs/sounds/mp3/divine_backlash_loop_bell_2.mp3",
+   "docs/sounds/mp3/divine_backlash_loop_bell_3.mp3"
+  ],
+  "what": "колокол — пока действует (тики) (подпись школы: золотой хор и большой колокол)",
+  "where": "DivineEvents.java onPlayerTick()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_backlash",
+  "spell_ru": "Божественная отдача",
+  "event": "pohsmp_core:spell.divine_backlash.loop_chime",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/divine/divine_backlash_loop_chime_1.ogg",
+   "spell/divine/divine_backlash_loop_chime_2.ogg",
+   "spell/divine/divine_backlash_loop_chime_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_backlash_loop_chime_1.mp3",
+   "docs/sounds/mp3/divine_backlash_loop_chime_2.mp3",
+   "docs/sounds/mp3/divine_backlash_loop_chime_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — пока действует (тики) (подпись школы: золотой хор и большой колокол)",
+  "where": "DivineEvents.java aura()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_taboo",
+  "spell_ru": "Божественное табу",
+  "event": "pohsmp_core:spell.divine_taboo.cast_bell",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/divine_taboo_cast_bell_1.ogg",
+   "spell/divine/divine_taboo_cast_bell_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_taboo_cast_bell_1.mp3",
+   "docs/sounds/mp3/divine_taboo_cast_bell_2.mp3"
+  ],
+  "what": "колокол — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "TabooSpell.java onCast()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_taboo",
+  "spell_ru": "Божественное табу",
+  "event": "pohsmp_core:spell.divine_taboo.cast_powerup",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/divine_taboo_cast_powerup_1.ogg",
+   "spell/divine/divine_taboo_cast_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_taboo_cast_powerup_1.mp3",
+   "docs/sounds/mp3/divine_taboo_cast_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "TabooSpell.java getCastStartSound(); TabooSpell.java onCast()",
+  "replaces": [
+   "BEACON_ACTIVATE",
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_taboo",
+  "spell_ru": "Божественное табу",
+  "event": "pohsmp_core:spell.divine_taboo.charge",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/divine_taboo_charge_1.ogg",
+   "spell/divine/divine_taboo_charge_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_taboo_charge_1.mp3",
+   "docs/sounds/mp3/divine_taboo_charge_2.mp3"
+  ],
+  "what": "долгий резонанс — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "TabooSpell.java onServerCastTick()",
+  "replaces": [
+   "BELL_RESONATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_taboo",
+  "spell_ru": "Божественное табу",
+  "event": "pohsmp_core:spell.divine_taboo.end",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/divine/divine_taboo_end_1.ogg",
+   "spell/divine/divine_taboo_end_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_taboo_end_1.mp3",
+   "docs/sounds/mp3/divine_taboo_end_2.mp3"
+  ],
+  "what": "спад, «выключение» — конец / снятие / смерть (подпись школы: золотой хор и большой колокол)",
+  "where": "TabooSpell.java tick()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "divine_taboo",
+  "spell_ru": "Божественное табу",
+  "event": "pohsmp_core:spell.divine_taboo.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/divine/divine_taboo_release_1.ogg",
+   "spell/divine/divine_taboo_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_taboo_release_1.mp3",
+   "docs/sounds/mp3/divine_taboo_release_2.mp3"
+  ],
+  "what": "долгий резонанс — выпуск заклинания (подпись школы: золотой хор и большой колокол)",
+  "where": "TabooSpell.java getCastFinishSound()",
+  "replaces": [
+   "BELL_RESONATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "school_divine",
+  "spell_ru": "Школа: Божественная",
+  "event": "pohsmp_core:school.divine.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/divine_cast_1.ogg",
+   "spell/divine/divine_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/divine_cast_1.mp3",
+   "docs/sounds/mp3/divine_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "Reg.java Reg()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.cast_heart",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/soul_devour_cast_heart_1.ogg",
+   "spell/divine/soul_devour_cast_heart_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_cast_heart_1.mp3",
+   "docs/sounds/mp3/soul_devour_cast_heart_2.mp3"
+  ],
+  "what": "удар сердца — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java start()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.cast_roar",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/soul_devour_cast_roar_1.ogg",
+   "spell/divine/soul_devour_cast_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_cast_roar_1.mp3",
+   "docs/sounds/mp3/soul_devour_cast_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java getCastStartSound()",
+  "replaces": [
+   "SCULK_SHRIEKER_SHRIEK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.charge_heart",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_devour_charge_heart_1.ogg",
+   "spell/divine/soul_devour_charge_heart_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_charge_heart_1.mp3",
+   "docs/sounds/mp3/soul_devour_charge_heart_2.mp3"
+  ],
+  "what": "удар сердца — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java onServerCastTick()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_devour_charge_powerup_1.ogg",
+   "spell/divine/soul_devour_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_charge_powerup_1.mp3",
+   "docs/sounds/mp3/soul_devour_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java onServerCastTick()",
+  "replaces": [
+   "WARDEN_SONIC_CHARGE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.charge_roar",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_devour_charge_roar_1.ogg",
+   "spell/divine/soul_devour_charge_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_charge_roar_1.mp3",
+   "docs/sounds/mp3/soul_devour_charge_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java onServerCastTick()",
+  "replaces": [
+   "ELDER_GUARDIAN_CURSE",
+   "SCULK_SHRIEKER_SHRIEK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.charge_soul",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_devour_charge_soul_1.ogg",
+   "spell/divine/soul_devour_charge_soul_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_charge_soul_1.mp3",
+   "docs/sounds/mp3/soul_devour_charge_soul_2.mp3"
+  ],
+  "what": "душа / вздох духа — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java onServerCastTick()",
+  "replaces": [
+   "SOUL_ESCAPE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.hit_boom",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/soul_devour_hit_boom_1.ogg",
+   "spell/divine/soul_devour_hit_boom_2.ogg",
+   "spell/divine/soul_devour_hit_boom_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_hit_boom_1.mp3",
+   "docs/sounds/mp3/soul_devour_hit_boom_2.mp3",
+   "docs/sounds/mp3/soul_devour_hit_boom_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java devour()",
+  "replaces": [
+   "WARDEN_SONIC_BOOM"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_devour",
+  "spell_ru": "Поглощение души",
+  "event": "pohsmp_core:spell.soul_devour.hit_soul",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/soul_devour_hit_soul_1.ogg",
+   "spell/divine/soul_devour_hit_soul_2.ogg",
+   "spell/divine/soul_devour_hit_soul_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_devour_hit_soul_1.mp3",
+   "docs/sounds/mp3/soul_devour_hit_soul_2.mp3",
+   "docs/sounds/mp3/soul_devour_hit_soul_3.mp3"
+  ],
+  "what": "душа / вздох духа — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulDevourSpell.java devour()",
+  "replaces": [
+   "SOUL_ESCAPE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/divine/soul_seal_cast_1.ogg",
+   "spell/divine/soul_seal_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_cast_1.mp3",
+   "docs/sounds/mp3/soul_seal_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java getCastStartSound()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.charge_chain",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_seal_charge_chain_1.ogg",
+   "spell/divine/soul_seal_charge_chain_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_charge_chain_1.mp3",
+   "docs/sounds/mp3/soul_seal_charge_chain_2.mp3"
+  ],
+  "what": "цепи, оковы — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java castTick()",
+  "replaces": [
+   "CHAIN_PLACE",
+   "CHAIN_STEP"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.charge_magic",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_seal_charge_magic_1.ogg",
+   "spell/divine/soul_seal_charge_magic_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_charge_magic_1.mp3",
+   "docs/sounds/mp3/soul_seal_charge_magic_2.mp3"
+  ],
+  "what": "заклятие плетётся — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java castTick()",
+  "replaces": [
+   "ENCHANTMENT_TABLE_USE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_seal_charge_powerup_1.ogg",
+   "spell/divine/soul_seal_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_charge_powerup_1.mp3",
+   "docs/sounds/mp3/soul_seal_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java castTick()",
+  "replaces": [
+   "RESPAWN_ANCHOR_CHARGE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.charge_resonate",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_seal_charge_resonate_1.ogg",
+   "spell/divine/soul_seal_charge_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_charge_resonate_1.mp3",
+   "docs/sounds/mp3/soul_seal_charge_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java castTick()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.charge_roar",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/divine/soul_seal_charge_roar_1.ogg",
+   "spell/divine/soul_seal_charge_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_charge_roar_1.mp3",
+   "docs/sounds/mp3/soul_seal_charge_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — нарастание во время каста (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java castTick()",
+  "replaces": [
+   "ELDER_GUARDIAN_CURSE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.fail_chain",
+  "role": "fail",
+  "role_ru": "отказ / ошибка",
+  "files": [
+   "spell/divine/soul_seal_fail_chain_1.ogg",
+   "spell/divine/soul_seal_fail_chain_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_fail_chain_1.mp3",
+   "docs/sounds/mp3/soul_seal_fail_chain_2.mp3"
+  ],
+  "what": "цепи, оковы — отказ / ошибка (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSeal.java deny()",
+  "replaces": [
+   "CHAIN_PLACE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.fail_resonate",
+  "role": "fail",
+  "role_ru": "отказ / ошибка",
+  "files": [
+   "spell/divine/soul_seal_fail_resonate_1.ogg",
+   "spell/divine/soul_seal_fail_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_fail_resonate_1.mp3",
+   "docs/sounds/mp3/soul_seal_fail_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — отказ / ошибка (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSeal.java deny()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.hit_bell",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/soul_seal_hit_bell_1.ogg",
+   "spell/divine/soul_seal_hit_bell_2.ogg",
+   "spell/divine/soul_seal_hit_bell_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_hit_bell_1.mp3",
+   "docs/sounds/mp3/soul_seal_hit_bell_2.mp3",
+   "docs/sounds/mp3/soul_seal_hit_bell_3.mp3"
+  ],
+  "what": "колокол — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java apply()",
+  "replaces": [
+   "BELL_BLOCK"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.hit_powerdown",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/soul_seal_hit_powerdown_1.ogg",
+   "spell/divine/soul_seal_hit_powerdown_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_hit_powerdown_1.mp3",
+   "docs/sounds/mp3/soul_seal_hit_powerdown_2.mp3"
+  ],
+  "what": "спад, «выключение» — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java apply()",
+  "replaces": [
+   "BEACON_DEACTIVATE"
+  ]
+ },
+ {
+  "school": "divine",
+  "school_ru": "Божественная",
+  "spell": "soul_seal",
+  "spell_ru": "Печать души",
+  "event": "pohsmp_core:spell.soul_seal.hit_slam",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/divine/soul_seal_hit_slam_1.ogg",
+   "spell/divine/soul_seal_hit_slam_2.ogg",
+   "spell/divine/soul_seal_hit_slam_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/soul_seal_hit_slam_1.mp3",
+   "docs/sounds/mp3/soul_seal_hit_slam_2.mp3",
+   "docs/sounds/mp3/soul_seal_hit_slam_3.mp3"
+  ],
+  "what": "тяжёлый металлический удар — удар / взрыв / попадание (подпись школы: золотой хор и большой колокол)",
+  "where": "SoulSealSpell.java apply()",
+  "replaces": [
+   "ANVIL_LAND"
+  ]
+ },
+ {
   "school": "forbidden",
   "school_ru": "Запретная (Мироздание)",
   "spell": "downfall",

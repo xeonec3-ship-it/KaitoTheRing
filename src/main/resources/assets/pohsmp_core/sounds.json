@@ -3878,5 +3878,652 @@
         "volume": 0.5
       }
     ]
+  },
+  "school.divine.cast": {
+    "subtitle": "subtitles.pohsmp_core.school.divine.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ark.cast_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.ark.cast_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/ark_cast_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/ark_cast_bell_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ark.cast_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.ark.cast_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/ark_cast_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/ark_cast_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ark.end_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.ark.end_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/ark_end_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/ark_end_bell_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ark.end_powerdown": {
+    "subtitle": "subtitles.pohsmp_core.spell.ark.end_powerdown",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/ark_end_powerdown_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/ark_end_powerdown_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ark.release": {
+    "subtitle": "subtitles.pohsmp_core.spell.ark.release",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/ark_release_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/ark_release_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.blessing.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.blessing.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/blessing_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.blessing.charge_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.blessing.charge_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/blessing_charge_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_charge_chime_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.blessing.charge_magic": {
+    "subtitle": "subtitles.pohsmp_core.spell.blessing.charge_magic",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/blessing_charge_magic_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_charge_magic_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.blessing.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.blessing.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/blessing_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.blessing.hit_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.blessing.hit_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/blessing_hit_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_hit_bell_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_hit_bell_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.blessing.hit_fanfare": {
+    "subtitle": "subtitles.pohsmp_core.spell.blessing.hit_fanfare",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/blessing_hit_fanfare_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_hit_fanfare_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/blessing_hit_fanfare_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.charge_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.charge_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_chime_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.charge_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.charge_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.charge_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.charge_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.charge_thunder": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.charge_thunder",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_thunder_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_charge_thunder_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.hit_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.hit_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_hit_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_hit_boom_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_hit_boom_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.disintegration.hit_powerdown": {
+    "subtitle": "subtitles.pohsmp_core.spell.disintegration.hit_powerdown",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_hit_powerdown_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/disintegration_hit_powerdown_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_backlash.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_backlash.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_backlash.loop_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_backlash.loop_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_loop_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_loop_bell_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_loop_bell_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_backlash.loop_chime": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_backlash.loop_chime",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_loop_chime_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_loop_chime_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_backlash_loop_chime_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_taboo.cast_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_taboo.cast_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_cast_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_cast_bell_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_taboo.cast_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_taboo.cast_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_cast_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_cast_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_taboo.charge": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_taboo.charge",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_charge_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_charge_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_taboo.end": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_taboo.end",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_end_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_end_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.divine_taboo.release": {
+    "subtitle": "subtitles.pohsmp_core.spell.divine_taboo.release",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_release_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/divine_taboo_release_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.cast_heart": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.cast_heart",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_cast_heart_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_cast_heart_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.cast_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.cast_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_cast_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_cast_roar_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.charge_heart": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.charge_heart",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_heart_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_heart_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.charge_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.charge_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_roar_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.charge_soul": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.charge_soul",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_soul_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_charge_soul_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.hit_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.hit_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_hit_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_hit_boom_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_hit_boom_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_devour.hit_soul": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_devour.hit_soul",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_hit_soul_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_hit_soul_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_devour_hit_soul_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.charge_chain": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.charge_chain",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_chain_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_chain_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.charge_magic": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.charge_magic",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_magic_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_magic_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.charge_powerup": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.charge_powerup",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_powerup_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_powerup_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.charge_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.charge_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.charge_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.charge_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_charge_roar_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.fail_chain": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.fail_chain",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_fail_chain_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_fail_chain_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.fail_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.fail_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_fail_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_fail_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.hit_bell": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.hit_bell",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_bell_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_bell_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_bell_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.hit_powerdown": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.hit_powerdown",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_powerdown_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_powerdown_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.soul_seal.hit_slam": {
+    "subtitle": "subtitles.pohsmp_core.spell.soul_seal.hit_slam",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_slam_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_slam_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/divine/soul_seal_hit_slam_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

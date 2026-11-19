@@ -10,7 +10,11 @@ JARS = [
     ("wthit", "forge-8.21.2", "wthit-1.20.1-forge-8.21.2.jar"),
     ("the-one-probe", "1.20.1-10.0.5", "theoneprobe-1.20.1-10.0.5.jar"),
     ("journeymap", "1.20.1-6.0.7+forge", "journeymap-forge-1.20.1-6.0.7.jar"),
+    ("playeranimator", "1.0.2-rc1+1.20-forge", "player-animation-lib-forge-1.0.2-rc1+1.20.jar"),
+    ("epic-fight", "20.14.17-mc1.20.1-forge", "epic-fight-20.14.17-mc1.20.1-forge.jar"),
 ]
+# saved under another name: build.gradle reads libs/ as a flat repository, "blank:<name>:<version>" -> <name>-<version>.jar
+SAVE_AS = {"epic-fight-20.14.17-mc1.20.1-forge.jar": "epicfight-1.20.1-20.14.17.jar"}
 
 
 def url_of(project, version, name):
@@ -31,5 +35,6 @@ for project, version, name in JARS:
             open(os.path.join(LIBS, os.path.basename(inner)), "wb").write(z.read(inner))
             print("ok", os.path.basename(inner))
         continue
-    open(os.path.join(LIBS, name), "wb").write(data)
-    print("ok", name)
+    out = SAVE_AS.get(name, name)
+    open(os.path.join(LIBS, out), "wb").write(data)
+    print("ok", out)

@@ -159,7 +159,7 @@ public class EmberBlade extends SwordItem {
         return f.lengthSqr() < 1e-4 ? new Vec3(0, 0, 1) : f.normalize();
     }
 
-    /** Whip form: the lash sweeps right to left over 4 ticks and burns everyone in the arc but the one already struck. */
+    /** Whip form: the lash sweeps right to left (the 2nd combo lash: left to right) over 4 ticks and burns everyone in the arc but the one already struck. */
     private static void lash(ServerLevel sl, Player p, LivingEntity struck) {
         Vec3 o = p.position().add(0, p.getBbHeight() * 0.6, 0), f = flat(p.getLookAngle());
         double yaw = Math.atan2(f.z, f.x);
@@ -172,7 +172,8 @@ public class EmberBlade extends SwordItem {
             hurt(sl, p, e, dmg, 4);
         }
         sl.playSound(null, o.x, o.y, o.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 0.7f, 1.3f);
-        sweep(sl, o, yaw, -WHIP_HALF, WHIP_HALF, 4, false);
+        int dir = EmberEpicFight.lashDir(p);   // the 2nd lash of the Epic Fight combo goes left to right
+        sweep(sl, o, yaw, -WHIP_HALF * dir, WHIP_HALF * dir, 4, false);
     }
 
     /** Turns the fire_whip model from a0 to a1 (radians from the facing, + = left) over n ticks, flames along the arc. */
@@ -212,12 +213,37 @@ public class EmberBlade extends SwordItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
         ItemStack s = p.getItemInHand(hand);
         if (hand != InteractionHand.MAIN_HAND || heat(s) < MAX_HEAT) return InteractionResultHolder.pass(s);
-        if (level instanceof ServerLevel sl) {
-            if (hot(s)) fireVortex(sl, p, s);
-            else lastEmber(sl, p, s);
-            p.getCooldowns().addCooldown(this, 20);
+        if (level instanceof ServerLevel sl && p instanceof net.minecraft.server.level.ServerPlayer sp) {
+            boolean vortex = hot(s);
+            // Epic Fight: the swing animation first; the effect and the damage wait for its strike (0 ticks without Epic Fight)
+            int delay = EmberEpicFight.playSpecial(sp, vortex);
+            set(s, 0, vortex ? HOT_AFTER : 0, vortex, sl.getGameTime());   // the heat is spent at once: no double special
+            later(delay, () -> {
+                if (!p.isAlive() || p.level() != sl) return;
+                if (vortex) fireVortex(sl, p, s);
+                else lastEmber(sl, p, s);
+            });
+            p.getCooldowns().addCooldown(this, vortex ? 24 : 40);
         }
         return InteractionResultHolder.sidedSuccess(s, level.isClientSide);
+    }
+
+    /** Runs r after n server ticks (at once when n <= 0). */
+    private static void later(int n, Runnable r) {
+        if (n <= 0) {
+            r.run();
+            return;
+        }
+        Tasks.add(new Tasks.Task() {
+            int left = n;
+
+            @Override
+            public boolean tick() {
+                if (--left > 0) return true;
+                r.run();
+                return false;
+            }
+        });
     }
 
     /** Ticks of fx/ember_last_heat.json when its three waves of pillars rise (the damage goes with them). */
@@ -232,7 +258,6 @@ public class EmberBlade extends SwordItem {
     private static void lastEmber(ServerLevel sl, Player p, ItemStack s) {
         Vec3 c = p.position().add(flat(p.getLookAngle()).scale(0.9));
         float dmg = damage(p) * 1.2f;
-        set(s, 0, 0, false, sl.getGameTime());
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.6f, 0.6f);
         int fx = Fx.play(sl, Fx.fx("ember_last_heat").at(c).yaw(p.getYRot()));
         Set<LivingEntity> burnt = new HashSet<>();
@@ -278,7 +303,6 @@ public class EmberBlade extends SwordItem {
      */
     private static void fireVortex(ServerLevel sl, Player p, ItemStack s) {
         Vec3 c = p.position(), f = flat(p.getLookAngle());
-        set(s, 0, HOT_AFTER, true, sl.getGameTime());
         float dmg = damage(p) * 1.1f;
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.6f);
         int fx = Fx.play(sl, Fx.fx("ember_vortex").at(c).yaw(p.getYRot()));

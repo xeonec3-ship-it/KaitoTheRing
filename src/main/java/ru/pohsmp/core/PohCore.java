@@ -66,6 +66,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(Charges.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.JointCast.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.ember.EmberBlade.Events.class);
+        if (ru.pohsmp.core.ember.EmberEpicFight.ON) ru.pohsmp.core.ember.EmberEpicFight.init(modBus);   // T14 animations, weapon type
         if (FMLEnvironment.dist == Dist.CLIENT) ClientInit.init(modBus);
     }
 

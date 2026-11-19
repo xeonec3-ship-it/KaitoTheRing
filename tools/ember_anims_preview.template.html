@@ -1,0 +1,403 @@
+<title>Анимации Раскалённых углей</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: stage-first viewer — the 3D forge stage on top, transport + timeline beside it on wide screens, notes last. */
+:root {
+  --bg: #f6f1ec;
+  --panel: #fffdfb;
+  --line: #e4d6ca;
+  --fg: #22160f;
+  --muted: #76655a;
+  --ember: #c2410c;
+  --ember-soft: #fbe2d0;
+  --iron: #3b3431;
+  --stage-top: #efe4da;
+  --stage-bot: #d8c6b8;
+  --grid: #b9a493;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #120d0b; --panel: #1b1411; --line: #33261f; --fg: #f3e9e2; --muted: #ab978a;
+    --ember: #ff8a3d; --ember-soft: #3a1f10; --iron: #cfc4bd;
+    --stage-top: #23170f; --stage-bot: #080504; --grid: #4a3528; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #120d0b; --panel: #1b1411; --line: #33261f; --fg: #f3e9e2; --muted: #ab978a;
+  --ember: #ff8a3d; --ember-soft: #3a1f10; --iron: #cfc4bd;
+  --stage-top: #23170f; --stage-bot: #080504; --grid: #4a3528; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 16px 32px;
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ember); }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(22px, 5vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 68ch; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tabs button { display: grid; text-align: left; gap: 0; padding: 8px 14px; }
+.tabs button small { font-family: var(--f-mono); font-size: 11px; color: var(--muted); }
+.main { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 920px) { .main { grid-template-columns: minmax(0, 1fr) 330px; align-items: start; } }
+.stage {
+  position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+  background: linear-gradient(var(--stage-top), var(--stage-bot)); aspect-ratio: 4 / 5; max-width: 100%; max-height: 74vh; width: 100%;
+  touch-action: none;
+}
+@media (min-width: 920px) { .stage { aspect-ratio: 4 / 3; } }
+.stage canvas { display: block; width: 100%; height: 100%; }
+.hud {
+  position: absolute; left: 12px; top: 12px; right: 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; pointer-events: none;
+  font-family: var(--f-mono); font-size: 12px; color: var(--fg);
+}
+.chip { background: color-mix(in srgb, var(--panel) 84%, transparent); border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-variant-numeric: tabular-nums; }
+.chip.phase { color: var(--ember); border-color: color-mix(in srgb, var(--ember) 45%, var(--line)); }
+.hint { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 12px; color: var(--muted); pointer-events: none; }
+.controls { display: grid; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; min-width: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button {
+  font: inherit; font-size: 14px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px 12px; cursor: pointer; min-height: 40px;
+}
+button:focus-visible, input:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+button.primary { background: var(--ember); color: var(--bg); border-color: var(--ember); font-weight: 600; min-width: 96px; }
+button[aria-pressed="true"] { border-color: var(--ember); color: var(--ember); font-weight: 600; }
+.time { font-family: var(--f-mono); font-variant-numeric: tabular-nums; font-size: 13px; color: var(--muted); margin-left: auto; }
+input[type=range] { width: 100%; accent-color: var(--ember); margin: 0; }
+.ticks { position: relative; height: 14px; }
+.ticks i { position: absolute; top: 0; width: 1px; height: 6px; background: var(--grid); }
+.ticks i.ev { height: 12px; width: 2px; background: var(--ember); }
+.label { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.phases { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.phases li { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+.phases li.on { background: var(--ember-soft); }
+.phases .t { font-family: var(--f-mono); font-size: 12px; color: var(--ember); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.phases .d { min-width: 0; }
+.facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; font-size: 13px; margin: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-family: var(--f-mono); font-size: 12px; overflow-wrap: anywhere; }
+.notes { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 8px; }
+.notes p { margin: 0; max-width: 72ch; }
+code { font-family: var(--f-mono); font-size: 13px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; overflow-wrap: anywhere; }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">pohsmp_core · T14 · Epic Fight 20.14</span>
+    <h1>Раскалённые угли: анимации</h1>
+    <p class="sub">Спецатаки и серия хлёстов огненного меча-хлыста. Страница читает те же JSON, что лягут в мод, и собирает позу так же, как Epic Fight: локальные матрицы суставов скелета <code>biped</code>, поворот Blender → Minecraft у корня. Кольца на земле — моменты из эффектов и кода.</p>
+  </header>
+
+  <div class="tabs" id="tabs" role="group" aria-label="Анимация"></div>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Игрок с мечом-хлыстом, проигрывающий анимацию"></canvas>
+      <div class="hud"><span class="chip" id="tickChip">тик 0</span><span class="chip phase" id="phaseChip">—</span></div>
+      <div class="hint">Тяните — повернуть камеру, колесо — приблизить</div>
+    </div>
+
+    <div class="controls">
+      <div class="row">
+        <button class="primary" id="play" type="button">Пауза</button>
+        <button type="button" id="step" aria-label="Следующий тик">+1 тик</button>
+        <span class="time" id="time">0.00 / 0.00 с</span>
+      </div>
+      <div>
+        <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Время">
+        <div class="ticks" id="ticks"></div>
+      </div>
+      <div class="row" role="group" aria-label="Скорость">
+        <span class="label">Скорость</span>
+        <button type="button" data-speed="0.1">×0.1</button>
+        <button type="button" data-speed="0.25">×¼</button>
+        <button type="button" data-speed="0.5">×½</button>
+        <button type="button" data-speed="1" aria-pressed="true">×1</button>
+      </div>
+      <div class="row" role="group" aria-label="Камера">
+        <span class="label">Камера</span>
+        <button type="button" data-view="front" aria-pressed="true">Спереди</button>
+        <button type="button" data-view="side">Сбоку</button>
+        <button type="button" data-view="top">Сверху</button>
+        <button type="button" data-view="far">Общий план</button>
+      </div>
+      <span class="label">Фазы</span>
+      <ol class="phases" id="phases"></ol>
+      <dl class="facts" id="facts"></dl>
+    </div>
+  </div>
+
+  <section class="notes">
+    <span class="label">Как это устроено</span>
+    <p>Позы задаются в <code>tools/gen_epicfight_anims.py</code> точками хвата и направлением клинка: плечо, локоть, колени и вспомогательные суставы скрипт ставит сам. После правки запустите генератор, он пересоберёт JSON и эту страницу.</p>
+    <p>Файлы лежат в <code>assets/pohsmp_core/animmodels/animations/biped/ember/</code>, регистрирует их <code>ru.pohsmp.core.ember.EmberEpicFight</code> через <code>AnimationRegistryEvent</code>. Спецатаки код включает сам по правому клику при полной шкале, хлёсты — серия ударов Epic Fight в форме хлыста.</p>
+    <p>Клинок и хлыст здесь условные. В игре в руке спрайт предмета, а хлыст рисует эффект <code>ember_whip</code>. Длина клинка взята как у коллайдера меча Epic Fight, около блока.</p>
+  </section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const BIND = /*BIND*/null;
+const DATA = /*ANIMS*/null;
+const TPS = 20, NAMES = Object.keys(BIND);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// ---------- tracks: keyframes -> (pos, quat) per joint, exactly what Epic Fight interpolates
+function tracks(anim) {
+  const out = {};
+  for (const j of anim.json.animation) {
+    const keys = j.transform.map((m, i) => {
+      const M = new THREE.Matrix4().set(...m), p = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3();
+      M.decompose(p, q, s);
+      return { t: j.time[i], p, q };
+    });
+    out[j.name] = keys;
+  }
+  return out;
+}
+const B2M = new THREE.Matrix4().makeRotationX(-Math.PI / 2);   // Blender Z-up -> Minecraft Y-up (JsonAssetLoader.BLENDER_TO_MINECRAFT_COORD)
+function poseAt(TR, t) {
+  const W = {}, coord = !!TR.Coord;   // with a Coord joint the file's Root is already in Minecraft axes
+  for (const n of NAMES) {
+    const ks = TR[n];
+    let L;
+    if (!ks) L = new THREE.Matrix4().set(...BIND[n].local);
+    else {
+      let i = 0;
+      while (i < ks.length - 2 && ks[i + 1].t <= t) i++;
+      const a = ks[i], b = ks[Math.min(i + 1, ks.length - 1)];
+      const f = b.t > a.t ? Math.min(1, Math.max(0, (t - a.t) / (b.t - a.t))) : 0;
+      L = new THREE.Matrix4().compose(a.p.clone().lerp(b.p, f), a.q.clone().slerp(b.q, f), new THREE.Vector3(1, 1, 1));
+    }
+    const par = BIND[n].parent;
+    W[n] = par ? W[par].clone().multiply(L) : (coord ? L : B2M.clone().multiply(L));
+  }
+  return W;
+}
+
+// ---------- scene
+const cv = document.getElementById("cv"), stage = document.getElementById("stage");
+const renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(38, 1, 0.05, 100);
+scene.add(new THREE.HemisphereLight(0xfff1e6, 0x40302a, 0.85));
+const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(-3, 6, -4); scene.add(sun);
+const grid = new THREE.GridHelper(16, 16); grid.material.transparent = true; grid.material.opacity = 0.35; scene.add(grid);
+const fwdArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, -1), new THREE.Vector3(0, 0.01, -0.35), 0.6, 0xc2410c, 0.15, 0.1); scene.add(fwdArrow);
+
+const mat = c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.8 });
+const SKIN = mat(0xd9a27a), SHIRT = mat(0x4b2e22), PANTS = mat(0x2d2a33), BOOT = mat(0x1e1a18), HAIR = mat(0x2b1a10);
+const parts = [];
+function part(joint, x0, x1, y0, y1, z0, z1, m) {   // box in the joint's local (Blender) frame
+  const g = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m);
+  g.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+  const holder = new THREE.Group(); holder.matrixAutoUpdate = false; holder.add(g); scene.add(holder);
+  parts.push({ joint, holder });
+  return holder;
+}
+part("Head", -0.25, 0.25, 0, 0.5, -0.25, 0.25, SKIN);
+part("Head", -0.26, 0.26, 0.36, 0.51, -0.26, 0.26, HAIR);
+const eyes = part("Head", -0.17, 0.17, 0.2, 0.26, -0.255, -0.24, mat(0x241812));
+part("Torso", -0.25, 0.25, -0.05, 0.3, -0.125, 0.125, PANTS);
+part("Chest", -0.25, 0.25, 0, 0.4, -0.125, 0.125, SHIRT);
+for (const s of ["R", "L"]) {
+  part("Arm_" + s, -0.125, 0.125, -0.12, 0.3, -0.125, 0.125, SHIRT);
+  part("Hand_" + s, -0.12, 0.12, 0, 0.2, -0.12, 0.12, SHIRT);
+  part("Hand_" + s, -0.115, 0.115, 0.2, 0.34, -0.115, 0.115, SKIN);
+  part("Thigh_" + s, -0.125, 0.125, 0, 0.375, -0.125, 0.125, PANTS);
+  part("Leg_" + s, -0.125, 0.125, 0, 0.3, -0.125, 0.125, PANTS);
+  part("Leg_" + s, -0.13, 0.13, 0.3, 0.386, -0.13, 0.13, BOOT);
+}
+// the blade along −Z of Tool_R; the edge glows while hot
+const bladeMat = new THREE.MeshStandardMaterial({ color: 0x3a2a22, emissive: 0xff5a14, emissiveIntensity: 1, roughness: 0.4, metalness: 0.4 });
+part("Tool_R", -0.012, 0.012, -0.055, 0.055, -1.0, -0.1, bladeMat);
+part("Tool_R", -0.03, 0.03, -0.11, 0.11, -0.12, -0.08, mat(0x2a2320));
+part("Tool_R", -0.025, 0.025, -0.025, 0.025, -0.08, 0.14, mat(0x151110));
+const gripHolder = parts.filter(p => p.joint === "Tool_R");
+
+// whip (preview only): points launched from the handle earlier in time, so the lash trails the hand
+const whipMat = new THREE.MeshBasicMaterial({ color: 0xff7a1a, transparent: true, opacity: 0.9 });
+let whipMesh = null;
+// fx overlays on the ground
+const fxGroup = new THREE.Group(); scene.add(fxGroup);
+function ring(r, w, color) {
+  const m = new THREE.Mesh(new THREE.RingGeometry(Math.max(0.01, r - w), r, 96), new THREE.MeshBasicMaterial({ color, transparent: true, side: THREE.DoubleSide, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; fxGroup.add(m); return m;
+}
+const arcMat = new THREE.LineBasicMaterial({ color: 0xffb347, transparent: true });
+let arcLine = null;
+const steam = [];
+for (let i = 0; i < 24; i++) {
+  const s = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshBasicMaterial({ color: 0xd8d2cc, transparent: true, depthWrite: false }));
+  s.visible = false; scene.add(s); steam.push(s);
+}
+
+// ---------- state
+const names = Object.keys(DATA);
+let cur = names[0], TR = null, t = 0, playing = !window.matchMedia("(prefers-reduced-motion: reduce)").matches, speed = 1, last = performance.now();
+const len = () => Math.max(...DATA[cur].json.animation.map(a => a.time[a.time.length - 1]));
+const tabs = document.getElementById("tabs");
+for (const n of names) {
+  const b = document.createElement("button"); b.type = "button"; b.dataset.anim = n;
+  b.innerHTML = `<span>${DATA[n].title}</span><small>${DATA[n].file}</small>`;
+  b.addEventListener("click", () => select(n)); tabs.appendChild(b);
+}
+function select(n) {
+  cur = n; t = 0; TR = tracks(DATA[n]);
+  for (const b of tabs.children) b.setAttribute("aria-pressed", String(b.dataset.anim === n));
+  const ph = document.getElementById("phases"); ph.innerHTML = "";
+  for (const [tick, label] of DATA[n].beats) {
+    const li = document.createElement("li"); li.dataset.t = tick / TPS;
+    li.innerHTML = `<span class="t">т ${tick}</span><span class="d">${label}</span>`;
+    li.addEventListener("click", () => { t = tick / TPS; playing = false; syncBtn(); }); ph.appendChild(li);
+  }
+  const tk = document.getElementById("ticks"); tk.innerHTML = "";
+  const L = len(), ev = new Set(events().map(e => e[0]));
+  for (let i = 0; i <= Math.round(L * TPS); i++) { const m = document.createElement("i"); m.style.left = (i / (L * TPS) * 100) + "%"; if (ev.has(i)) m.className = "ev"; tk.appendChild(m); }
+  const T = DATA[n].timing, f = document.getElementById("facts");
+  const rows = [["Длина", T.length + " с · " + Math.round(T.length * TPS) + " тиков"]];
+  if (T.fx_at_tick !== undefined) rows.push(["Старт fx", "тик " + T.fx_at_tick + " анимации"]);
+  if (T.antic !== undefined) rows.push(["Окно удара", T.antic + "–" + T.contact + " с, дальше с " + T.recovery + " с"], ["Дуга кода", T.lash > 0 ? "справа налево" : "слева направо"]);
+  rows.push(["Файл", DATA[n].file]);
+  f.innerHTML = rows.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("");
+  document.getElementById("stage").setAttribute("aria-label", DATA[n].title + ": " + DATA[n].desc);
+}
+// [tick, kind] — moments from the fx / code
+function events() {
+  const T = DATA[cur].timing;
+  if (cur === "last_heat") return [[T.fx_at_tick, "plant"], [T.fx_at_tick + 4, "w3"], [T.fx_at_tick + 12, "w5"], [T.fx_at_tick + 20, "w7"]];
+  if (cur === "fire_vortex") return [[T.fx_at_tick, "spin"], [T.fx_at_tick + 4, "hit"]];
+  const hit = DATA[cur].beats.find(b => b[1].startsWith("хлёст") || b[1].startsWith("щелчок"));
+  return hit ? [[hit[0], "lash"]] : [];
+}
+
+// ---------- camera
+let az = 0.35, el = 0.18, dist = 4.6, target = new THREE.Vector3(0, 1.0, -0.3);
+const VIEWS = { front: [0.35, 0.18, 4.6, 1.0], side: [Math.PI / 2, 0.1, 4.6, 1.0], top: [0.0, 1.35, 9, 0.2], far: [0.6, 0.55, 13, 0.4] };
+function setView(v) { [az, el, dist] = VIEWS[v]; target.y = VIEWS[v][3]; for (const b of document.querySelectorAll("[data-view]")) b.setAttribute("aria-pressed", String(b.dataset.view === v)); }
+let drag = null;
+stage.addEventListener("pointerdown", e => { drag = [e.clientX, e.clientY, az, el]; stage.setPointerCapture(e.pointerId); });
+stage.addEventListener("pointermove", e => { if (!drag) return; az = drag[2] - (e.clientX - drag[0]) * 0.01; el = Math.max(-0.2, Math.min(1.5, drag[3] + (e.clientY - drag[1]) * 0.01)); });
+stage.addEventListener("pointerup", () => drag = null);
+stage.addEventListener("wheel", e => { e.preventDefault(); dist = Math.max(2, Math.min(20, dist * (1 + Math.sign(e.deltaY) * 0.1))); }, { passive: false });
+
+// ---------- controls
+const playBtn = document.getElementById("play"), scrub = document.getElementById("scrub");
+function syncBtn() { playBtn.textContent = playing ? "Пауза" : "Играть"; }
+playBtn.addEventListener("click", () => { playing = !playing; if (playing && t >= len()) t = 0; syncBtn(); });
+document.getElementById("step").addEventListener("click", () => { playing = false; t = Math.min(len(), Math.round(t * TPS + 1) / TPS); syncBtn(); });
+scrub.addEventListener("input", () => { t = scrub.value / 1000 * len(); playing = false; syncBtn(); });
+for (const b of document.querySelectorAll("[data-speed]")) b.addEventListener("click", () => {
+  speed = +b.dataset.speed; for (const o of document.querySelectorAll("[data-speed]")) o.setAttribute("aria-pressed", String(o === b));
+});
+for (const b of document.querySelectorAll("[data-view]")) b.addEventListener("click", () => setView(b.dataset.view));
+
+// ---------- per-frame drawing
+const tmp = new THREE.Vector3();
+function toolTipAt(time, along) {
+  const W = poseAt(TR, Math.max(0, time));
+  const M = W["Tool_R"];
+  return new THREE.Vector3(0, 0, -along).applyMatrix4(M);
+}
+function toolDirAt(time) {
+  const M = poseAt(TR, Math.max(0, time))["Tool_R"];
+  return new THREE.Vector3(0, 0, -1).transformDirection(M);
+}
+function drawWhip() {
+  if (whipMesh) { scene.remove(whipMesh); whipMesh.geometry.dispose(); whipMesh = null; }
+  if (!cur.startsWith("whip") && cur !== "fire_vortex") return;
+  const N = 18, pts = [];
+  for (let k = 0; k <= N; k++) {
+    const back = k * 0.012, base = toolTipAt(t - back, 0.12), d = toolDirAt(t - back);
+    const p = base.add(d.multiplyScalar(k * 0.26));
+    p.y -= 0.9 * Math.pow(k / N, 2) * 0.6;
+    p.y = Math.max(0.02, p.y);
+    pts.push(p);
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  whipMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 48, 0.035, 6, false), whipMat);
+  scene.add(whipMesh);
+}
+function easeOut(x) { return 1 - Math.pow(1 - x, 3); }
+function drawFx() {
+  fxGroup.clear(); if (arcLine) { scene.remove(arcLine); arcLine = null; }
+  const tick = t * TPS, T = DATA[cur].timing;
+  const fade = (age, life) => Math.max(0, 1 - age / life);
+  if (cur === "last_heat") {
+    const fx = tick - T.fx_at_tick;
+    if (fx >= 0) {
+      const a = fade(fx, 30); if (a > 0) { const r = ring(0.6 + fx * 0.06, 0.08, 0xffd27a); r.position.set(0, 0.02, -0.92); r.material.opacity = a; }
+      for (const [d, R] of [[4, 3], [12, 5], [20, 7]]) {
+        const age = fx - d; if (age < 0) continue;
+        const a2 = fade(age, 16); if (a2 <= 0) continue;
+        const r = ring(R * Math.min(1, 0.6 + age / 4 * 0.4), 0.35, 0xff6a1a); r.position.set(0, 0.02, -0.92); r.material.opacity = a2;
+      }
+    }
+    const cool = Math.min(1, Math.max(0, (tick - (T.fx_at_tick + 24)) / 8));
+    bladeMat.emissiveIntensity = 1 - 0.85 * cool;
+    steam.forEach((s, i) => {
+      const age = tick - (T.fx_at_tick + 24) - i * 0.4;
+      if (age < 0 || age > 14) { s.visible = false; return; }
+      const tip = toolTipAt(t, 0.25 + (i % 6) * 0.13);
+      s.visible = true; s.position.set(tip.x + Math.sin(i * 7.3) * 0.08, tip.y + age * 0.05, tip.z + Math.cos(i * 3.1) * 0.08);
+      s.scale.setScalar(0.6 + age * 0.12); s.material.opacity = 0.55 * (1 - age / 14);
+    });
+  } else {
+    bladeMat.emissiveIntensity = 1; steam.forEach(s => s.visible = false);
+  }
+  if (cur === "fire_vortex") {
+    const fx = tick - T.fx_at_tick;
+    if (fx >= 0 && fx <= 14) {   // the fx slash: head runs −180°..+180° with easeOut over 8 ticks, tail follows
+      const head = easeOut(Math.min(1, fx / 8)), lag = 4.8, tail = Math.min(head, Math.pow(Math.min(1, Math.max(0, (fx - lag) / (14 - lag))), 2));
+      const pts = [];
+      for (let i = 0; i <= 64; i++) { const s = tail + (head - tail) * i / 64, a = -Math.PI + 2 * Math.PI * s; pts.push(new THREE.Vector3(Math.sin(a) * 4.6, 1.0, -Math.cos(a) * 4.6)); }
+      arcLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), arcMat); arcMat.opacity = fade(Math.max(0, fx - 8), 6); scene.add(arcLine);
+    }
+    const age = fx - 4; if (age >= 0 && age < 18) { const r = ring(5 * Math.min(1, 0.5 + age / 6), 0.4, 0xff6a1a); r.position.y = 0.02; r.material.opacity = fade(age, 18); }
+  }
+  if (cur.startsWith("whip")) {
+    const hit = events()[0]; if (hit) {
+      const age = tick - hit[0];
+      if (age >= 0 && age <= 10) {   // code: EmberBlade.lash sweeps ±50° over 4 ticks, 6 blocks
+        const dir = T.lash, prog = Math.min(1, age / 4), pts = [];
+        for (let i = 0; i <= 40; i++) { const a = (-50 + 100 * prog * i / 40) * Math.PI / 180 * dir; pts.push(new THREE.Vector3(Math.sin(-a) * 6, 1.08 - Math.sin(i / 40 * Math.PI) * 0.6, -Math.cos(a) * 6)); }
+        arcLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), arcMat); arcMat.opacity = fade(Math.max(0, age - 4), 6); scene.add(arcLine);
+      }
+    }
+  }
+}
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (playing) { t += dt * speed; if (t > len() + 0.6) t = 0; }
+  const tc = Math.min(t, len());
+  const W = poseAt(TR, tc);
+  for (const p of parts) { p.holder.matrix.copy(W[p.joint]); p.holder.matrixWorldNeedsUpdate = true; }
+  const saved = t; t = tc; drawWhip(); drawFx(); t = saved;
+  const tick = tc * TPS;
+  document.getElementById("tickChip").textContent = "тик " + tick.toFixed(1);
+  const beats = DATA[cur].beats; let on = 0; beats.forEach((b, i) => { if (b[0] <= tick + 1e-6) on = i; });
+  document.getElementById("phaseChip").textContent = beats[on][1];
+  [...document.getElementById("phases").children].forEach((li, i) => li.classList.toggle("on", i === on));
+  document.getElementById("time").textContent = tc.toFixed(2) + " / " + len().toFixed(2) + " с";
+  if (!drag && document.activeElement !== scrub) scrub.value = Math.round(tc / len() * 1000);
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if (cv.width !== Math.round(w * renderer.getPixelRatio()) || cv.height !== Math.round(h * renderer.getPixelRatio())) { renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  camera.position.set(target.x + Math.sin(az) * Math.cos(el) * dist * -1, target.y + Math.sin(el) * dist, target.z - Math.cos(az) * Math.cos(el) * dist);
+  camera.lookAt(target);
+  grid.material.color.set(css("--grid"));
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+// test hook: render a given animation at a given tick (used by the Playwright check)
+window.showAt = (n, tick, view) => { select(n); playing = false; syncBtn(); t = tick / TPS; if (view) setView(view); };
+select(cur); syncBtn(); requestAnimationFrame(frame);
+</script>

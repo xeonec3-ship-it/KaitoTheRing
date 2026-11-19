@@ -78,6 +78,11 @@ public final class GateOrder {
         return t / 20.0;
     }
 
+    /** Game time of the command of scene k on this client, -1 before it (or another scene). */
+    public static long commandAt(int k) {
+        return k == key ? commandAt : -1;
+    }
+
     /** Seconds of the wait so far (for the slow push-in of the wait camera). */
     public static double waitSeconds(double now) {
         return waitAt < 0 ? 0 : Math.max(0, now - waitAt) / 20.0;

@@ -183,7 +183,9 @@ public class ButterflyDreamSpell extends IllusionBase {
      * «Death» in the dream (owner 19.11): the dark screen lasts DEATH_SCREEN, the victim is moved on DEATH_MOVE under it, and takes no dream
      * damage for DEATH_GRACE. The new place: random within the dream, on solid ground, not closer than MIN_FROM_CASTER to the caster.
      */
-    private static final int DEATH_SCREEN = 40, DEATH_MOVE = 8, DEATH_GRACE = 50, COPY_REFILL = 160;
+    private static final int DEATH_SCREEN = 30, DEATH_MOVE = 22, DEATH_GRACE = 50, COPY_REFILL = 160;
+    /** The waking scene starts this long before the glass breaks at wakeAll (130.3 s of the track, visual letter 19.11). */
+    private static final int WAKE_SCENE = 34;
     private static final double MIN_FROM_CASTER = 12, COPY_LEASH = 28;
 
     private static final class Dream {
@@ -205,6 +207,8 @@ public class ButterflyDreamSpell extends IllusionBase {
         final Map<UUID, List<Copies.Copy>> copies = new HashMap<>();
         final Map<UUID, Integer> copyCount = new HashMap<>();
         final Map<UUID, Long> nextCopy = new HashMap<>();
+        /** victim -> its dream wounds (the butterflies around it, up to 12) */
+        final Map<UUID, Integer> wounds = new HashMap<>();
         final int tag;
         long wakeAll;
         boolean woke;
@@ -241,6 +245,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             int f = fx(sl, Fx.fx("illusion_butterfly_world").at(v.position()).caster(v).attach(v).duration(t).only(v), "illusion_butterfly_world");
             if (f >= 0) d.worldFx.put(id, f);
             v.addEffect(new MobEffectInstance(Reg.BUTTERFLY_DREAM.get(), t, 0, false, false, true));
+            fx(sl, Fx.fx("illusion_dream_enter").at(v.position()).caster(v).attach(v).only(v), "illusion_dream_enter");
             d.lost.put(id, 0.0);
             d.copies.put(id, new ArrayList<>());
             int n = 3 + sl.random.nextInt(3);   // 3-5 copies, each victim its own
@@ -328,6 +333,23 @@ public class ButterflyDreamSpell extends IllusionBase {
         Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", lost, 0, 0, 0, 0));
     }
 
+    /** The wound butterflies of v (to v and the caster). */
+    private static void wounds(Dream d, ServerPlayer v, int n) {
+        if (n <= 0 && d.wounds.getOrDefault(v.getUUID(), 0) <= 0) return;
+        d.wounds.put(v.getUUID(), n);
+        IlluMsg m = new IlluMsg(IlluMsg.WOUNDS, v.getId(), 0, n, null, "", 0, 0, 0, 0, 0);
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), m);
+        if (d.caster instanceof ServerPlayer cp && cp != v) Net.CH.send(PacketDistributor.PLAYER.with(() -> cp), m);
+    }
+
+    /** A dream hit on v: the wound flash (to v and the caster) and one more butterfly. */
+    private static void wound(Dream d, ServerPlayer v) {
+        fx(d.sl, Fx.fx("illusion_dream_wound").at(v.position()).caster(v).attach(v).only(v), "illusion_dream_wound");
+        if (d.caster instanceof ServerPlayer cp && cp != v)
+            fx(d.sl, Fx.fx("illusion_dream_wound").at(v.position()).caster(v).attach(v).only(cp), "illusion_dream_wound");
+        wounds(d, v, Math.min(12, d.wounds.getOrDefault(v.getUUID(), 0) + 1));
+    }
+
     /** The ripple the others see where a dreamer vanishes and comes back. */
     private static void ripple(ServerLevel sl, Vec3 at) {
         if (fx(sl, Fx.fx("illusion_dream_ripple").at(at), "illusion_dream_ripple") < 0) fx(sl, Fx.fx("illusion_poof").at(at), "illusion_poof");
@@ -343,6 +365,9 @@ public class ButterflyDreamSpell extends IllusionBase {
         long now = Illusions.now();
         d.grace.put(id, now + DEATH_GRACE);
         d.lost.put(id, 0.0);
+        wounds(d, v, 0);
+        // it falls apart into butterflies where it stood (no follow), seen by it only; moved on DEATH_MOVE when that is over
+        fx(d.sl, Fx.fx("illusion_dream_death").at(v.position()).caster(v).only(v), "illusion_dream_death");
         Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.DREAM_DEATH, v.getId(), DEATH_SCREEN, 0, null, "", 0, 0, 0, 0, 0));
         v.playNotifySound(SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 1f, 0.5f);
         List<Copies.Copy> l = d.copies.get(id);
@@ -363,6 +388,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             Cutscene.refreeze(v, to);
             ripple(d.sl, old);
             ripple(d.sl, to);
+            fx(d.sl, Fx.fx("illusion_dream_respawn").at(to).caster(v).attach(v).only(v), "illusion_dream_respawn");
             fakeHp(v, 0);
             for (int k = d.copyCount.getOrDefault(id, 3); k > 0; k--) spawnCopy(d, v);
             return false;
@@ -376,6 +402,9 @@ public class ButterflyDreamSpell extends IllusionBase {
         d.lost.remove(id);
         d.grace.remove(id);
         d.nextCopy.remove(id);
+        ServerPlayer w = player(d, id);
+        if (w != null) wounds(d, w, 0);
+        d.wounds.remove(id);
         List<Copies.Copy> l = d.copies.remove(id);
         if (l != null) for (Copies.Copy c : new ArrayList<>(l)) Copies.gone(c);
         ServerPlayer v = player(d, id);
@@ -385,6 +414,24 @@ public class ButterflyDreamSpell extends IllusionBase {
         for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), 0));
         v.removeEffect(Reg.BUTTERFLY_DREAM.get());
         if (fade) music(d.sl, id, 1, 40);
+    }
+
+    /** Out of the dream without the waking scene (it resisted longer, Blessing): back through the mirror. */
+    private static void exitFx(Dream d, ServerPlayer v) {
+        fx(d.sl, Fx.fx("illusion_dream_exit").at(v.position()).caster(v).attach(v).only(v), "illusion_dream_exit");
+    }
+
+    /** The waking scene starts (WAKE_SCENE before the break): on every dreamer still in (they all wake at the break now) and the caster. */
+    private static void wakeScene(Dream d, long now) {
+        fx(d.sl, Fx.fx("illusion_butterfly_wake").at(d.caster.position()).caster(d.caster), "illusion_butterfly_wake");
+        fx(d.sl, Fx.fx("illusion_dream_wake").at(d.caster.position()).caster(d.caster).attach(d.caster), "illusion_dream_wake");
+        for (var en : d.victims.entrySet()) {
+            ServerPlayer v = player(d, en.getKey());
+            if (v == null) continue;
+            en.setValue(Math.max(en.getValue(), d.wakeAll));
+            fx(d.sl, Fx.fx("illusion_dream_wake").at(v.position()).caster(v).attach(v), "illusion_dream_wake");
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> v), IlluMsg.of(IlluMsg.DREAM_WAKE, v.getId(), WAKE_SCENE));
+        }
     }
 
     /** The waking (owner 19.11: «это был просто сон»): only the look of it - the shards fly into v and break; nothing is dealt. */
@@ -474,6 +521,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             boolean any = false;
             for (Dream d : DREAMS)
                 if (d.victims.remove(t.getUUID()) != null) {
+                    if (t instanceof ServerPlayer v) exitFx(d, v);
                     release(d, t.getUUID(), true);   // Blessing: awake early, the music fades for it
                     any = true;
                 }
@@ -495,9 +543,10 @@ public class ButterflyDreamSpell extends IllusionBase {
                     Net.CH.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> cp),
                             new IlluMsg(IlluMsg.ANIM, cp.getId(), 0, 0, null, "pohsmp_illusion_butterfly_wake", 0, 0, 0, 0, 0));
                 }
-                if (now == d.wakeAll) {
-                    fx(d.sl, Fx.fx("illusion_butterfly_wake").at(d.caster.position()).caster(d.caster), "illusion_butterfly_wake");
-                    d.sl.playSound(null, d.caster.getX(), d.caster.getY() + 1, d.caster.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 4f, 0.5f);
+                if (now == d.wakeAll - WAKE_SCENE) wakeScene(d, now);
+                if (now == d.wakeAll) {   // the glass breaks, loud over the zone
+                    d.sl.playSound(null, d.caster.getX(), d.caster.getY() + 1, d.caster.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 6f, 0.5f);
+                    d.sl.playSound(null, d.caster.getX(), d.caster.getY() + 1, d.caster.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 6f, 0.6f);
                 }
                 for (var vi = d.victims.entrySet().iterator(); vi.hasNext(); ) {
                     var en = vi.next();
@@ -507,7 +556,10 @@ public class ButterflyDreamSpell extends IllusionBase {
                         vi.remove();
                         boolean woke = v != null && v.isAlive() && now >= end;
                         release(d, en.getKey(), !woke || end < d.wakeAll - WAKE_ANIM_LEAD);   // woke with everyone: the track plays on to its end
-                        if (woke && v.level() == d.sl) wakeFx(d, v);
+                        if (woke && v.level() == d.sl) {
+                            if (end < d.wakeAll) exitFx(d, v);   // resisted: out before the others, no scene
+                            else wakeFx(d, v);
+                        }
                         continue;
                     }
                     tend(d, v, now);
@@ -558,6 +610,7 @@ public class ButterflyDreamSpell extends IllusionBase {
                         : CombatRules.getDamageAfterAbsorb(amount, v.getArmorValue(), (float) v.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
                 double sum = d.lost.merge(id, (double) dealt, Double::sum);
                 fakeHp(v, sum);
+                wound(d, v);
                 if (sum >= v.getHealth()) dreamDeath(d, v);
                 return;
             }

@@ -12,6 +12,7 @@
     "EntityRenderDispatcherMixin",
     "ItemRendererMixin",
     "GameRendererMixin",
+    "ClientLevelMixin",
     "MouseHandlerMixin",
     "JourneyMapPlayersMixin",
     "JourneyMapPlayersDataMixin",

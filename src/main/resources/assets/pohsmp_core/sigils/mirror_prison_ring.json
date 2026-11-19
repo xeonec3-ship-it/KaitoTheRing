@@ -1,0 +1,18 @@
+{
+  "comment": "Зеркальная темница: печать на полу клетки (квадрат клетки вписан в круг). Квадратная рама, кольцо рун и зеркальный ромб в центре вращаются навстречу.",
+  "size": 2.15, "color": "#CFE2FF", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.9, "color": "#203048", "brightness": 1.1,
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.2, "period": 36 } },
+    { "id": "rim", "type": "disc", "texture": "thin_ring", "radius": 1.0, "heightOffset": 0.01, "color": "#FFFFFF", "brightness": 0.8,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutCubic", "modes": ["draw"], "startAngle": 45 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 0.96, "inner": 0.82, "repeat": 12, "heightOffset": 0.02,
+      "appear": { "delay": 2, "duration": 10, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 45, "direction": 1 }, "rotation": { "speed": 8 } },
+    { "id": "square", "type": "disc", "texture": "dodeca_ring", "radius": 0.74, "heightOffset": 0.03,
+      "appear": { "delay": 3, "duration": 10, "easing": "easeOutBack", "modes": ["grow", "twist"] }, "rotation": { "speed": -10 } },
+    { "id": "core", "type": "disc", "texture": "star_ring", "radius": 0.36, "heightOffset": 0.04, "color": "#FFFFFF",
+      "appear": { "delay": 6, "duration": 8, "easing": "easeOutBack", "modes": ["grow"] }, "rotation": { "speed": 22 } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.2, "duration": 8, "sparks": 20 },
+  "dissolve": { "modes": ["shatter"], "duration": 12 }
+}

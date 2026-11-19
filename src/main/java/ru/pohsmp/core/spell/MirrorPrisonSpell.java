@@ -40,7 +40,7 @@ public class MirrorPrisonSpell extends HigherSpell {
         LivingEntity caster, t;
         Vec3 c;
         long until;
-        List<Entity> walls = new ArrayList<>();
+        int fx = -1;
     }
 
     private static final Map<UUID, Cell> CELLS = new HashMap<>();
@@ -76,25 +76,21 @@ public class MirrorPrisonSpell extends HigherSpell {
                 cell.c = t.position();
                 cell.until = sl.getGameTime() + LIFE;
                 Vec3 c = cell.c;
-                String glass = "minecraft:light_blue_stained_glass";
-                cell.walls.add(Disp.block(sl, glass, c.x, c.y, c.z - HALF, (float) (HALF * 2), (float) H, 0.06f, 0));
-                cell.walls.add(Disp.block(sl, glass, c.x, c.y, c.z + HALF, (float) (HALF * 2), (float) H, 0.06f, 0));
-                cell.walls.add(Disp.block(sl, glass, c.x - HALF, c.y, c.z, 0.06f, (float) H, (float) (HALF * 2), 0));
-                cell.walls.add(Disp.block(sl, glass, c.x + HALF, c.y, c.z, 0.06f, (float) H, (float) (HALF * 2), 0));
-                cell.walls.add(Disp.block(sl, glass, c.x, c.y + H, c.z, (float) (HALF * 2), 0.06f, (float) (HALF * 2), 0));
+                // the mirror cage (owner, 19.11.2026: new look instead of blue glass blocks): seal, mirror panes, glints — fx/mirror_prison.json
+                cell.fx = ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx("mirror_prison").at(c).yaw(0));
                 CELLS.put(t.getUUID(), cell);
                 sl.playSound(null, c.x, c.y, c.z, SoundEvents.GLASS_PLACE, SoundSource.PLAYERS, 2f, 0.6f);
                 sl.playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.8f);
-                DivineEvents.particle(sl, ParticleTypes.END_ROD, c.x, c.y + 1.5, c.z, 40, 1.2, 0.02);
+                sl.playSound(null, c.x, c.y, c.z, SoundEvents.ILLUSIONER_MIRROR_MOVE, SoundSource.PLAYERS, 1.5f, 0.7f);
             }
         }
         super.onCast(level, spellLevel, caster, source, md);
     }
 
     private static void release(Cell cell) {
-        for (Entity w : cell.walls) Disp.kill(w);
         if (cell.t.level() instanceof ServerLevel sl) {
             Vec3 c = cell.c;
+            if (cell.fx >= 0) ru.pohsmp.core.fx.Fx.stop(sl, cell.fx, "");
             sl.playSound(null, c.x, c.y, c.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 2f, 0.7f);
             DivineEvents.particle(sl, ParticleTypes.END_ROD, c.x, c.y + 1.5, c.z, 30, 1.2, 0.1);
         }
@@ -118,9 +114,6 @@ public class MirrorPrisonSpell extends HigherSpell {
                     t.setDeltaMovement(Vec3.ZERO);
                 }
                 if (t instanceof Mob m && m.getTarget() != null) m.getNavigation().stop();
-                if (t.tickCount % 5 == 0 && t.level() instanceof ServerLevel sl)
-                    DivineEvents.particle(sl, ParticleTypes.END_ROD, cell.c.x + (sl.random.nextDouble() - 0.5) * HALF * 2, cell.c.y + sl.random.nextDouble() * H,
-                            cell.c.z + (sl.random.nextDouble() - 0.5) * HALF * 2, 1, 0, 0);
                 return false;
             });
         }

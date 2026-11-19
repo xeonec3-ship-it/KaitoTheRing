@@ -1,0 +1,15 @@
+{
+  "comment": "Зеркальная темница (Высшая): at — центр клетки на полу. Печать на полу, зеркальная клетка встаёт снизу вверх (fx/meshes/mirror_prison.json), по граням бегут искры-отражения. MirrorPrisonSpell останавливает эффект, когда темница кончается (клетка сжимается, печать рассыпается).",
+  "style": "higher",
+  "duration": -1,
+  "elements": [
+    { "type": "sigil", "id": "mirror_prison_ring", "delay": 0, "at": "caster+0,0.04,0" },
+    { "type": "flash", "delay": 0, "duration": 10, "at": "caster+0,1.5,0", "size": 2.6, "rays": 4, "anamorphic": 10, "color": "#E6F2FF" },
+    { "type": "wave", "delay": 0, "duration": 12, "at": "caster", "radius": 3.2, "color": "#CFE2FF" },
+    { "type": "mesh", "model": "mirror_prison", "delay": 2, "at": "caster", "yaw": 0 },
+    { "type": "sprites", "delay": 6, "at": "caster+0,1.5,0", "texture": "spark_sharp", "count": 2000, "rate": 0.8, "spread": 1.6, "speed": 0.004, "gravity": 0,
+      "size": [0.16, 0.0], "life": 14, "color": "#FFFFFF", "comment": "блики на гранях" },
+    { "type": "sprites", "delay": 6, "at": "caster+0,0.1,0", "texture": "spark_soft", "count": 2000, "rate": 0.5, "area": 1.4, "speed": 0.01, "gravity": -0.003,
+      "size": [0.1, 0.02], "life": 30, "color": "#BFD8FF" }
+  ]
+}

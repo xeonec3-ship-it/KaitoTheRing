@@ -5,6 +5,7 @@ import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
+import io.redspace.ironsspellbooks.entity.spells.ice_spike.IceSpikeEntity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +37,15 @@ public class FrostSpikeWallSpell extends PohSpell {
     }
 
     @Override public CastType getCastType() { return CastType.INSTANT; }
+
+    /** Size of a wall spike: the last of four decimals is 7, which tells IceWallClient to hold it up (Iron's own spikes use round sizes). */
+    public static float wallSize(float size) {
+        return Math.round(size * 1000) / 1000f + 0.0007f;
+    }
+
+    public static boolean isWallSize(float size) {
+        return Math.floorMod(Math.round(size * 10000), 10) == 7;
+    }
 
     private int length(int l) { return (int) Math.round(lv(l, 5, 10)); }
     private int ticks(int l) { return (int) (lv(l, 8, 20) * 20); }
@@ -72,11 +82,22 @@ public class FrostSpikeWallSpell extends PohSpell {
                 pts.add(ground(sl, caster, c.add(side.scale(o)).add(0, 1, 0)));
             }
         }
-        List<Entity> spikes = new ArrayList<>();
+        // Iron's own ice spikes (owner, 19.11.2026), held up for the whole wall: the spike's clock is stopped once it has risen,
+        // here on the server and by IceWallClient on every client (the spike is marked by its size). Hits are ours, not Iron's.
+        List<IceSpikeEntity> spikes = new ArrayList<>();
+        int[] up = new int[pts.size()];
         for (int i = 0; i < pts.size(); i++) {
             Vec3 p = pts.get(i);
-            float h = (float) (HEIGHT * (0.75 + 0.25 * ((i * 7) % 4) / 3.0));
-            spikes.add(Disp.block(sl, i % 3 == 0 ? "minecraft:blue_ice" : "minecraft:packed_ice", p.x, p.y - h, p.z, 0.55f, h, 0.55f, i * 37 % 90));
+            IceSpikeEntity s = new IceSpikeEntity(sl, caster);
+            s.moveTo(p.x, p.y, p.z, (i * 37) % 360, 0);
+            s.setDamage(0);
+            s.setSpikeSize(wallSize(0.9f + 0.1f * ((i * 7) % 4)));
+            int wait = Math.min(i, 12) / 2;   // a ripple from one end
+            s.setWaitTime(wait);
+            up[i] = wait + IceSpikeEntity.RISE_TIME;
+            Disp.track(s);
+            sl.addFreshEntity(s);
+            spikes.add(s);
         }
         sl.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.GLASS_PLACE, SoundSource.PLAYERS, 2f, 0.5f);
         sl.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 2f, 0.6f);
@@ -87,17 +108,16 @@ public class FrostSpikeWallSpell extends PohSpell {
             @Override
             public boolean tick() {
                 age++;
-                if (age <= 6) {   // spikes grow out of the ground
-                    for (int i = 0; i < spikes.size(); i++) {
-                        Vec3 p = pts.get(i);
-                        Entity s = spikes.get(i);
-                        Disp.move(s, p.x, p.y - HEIGHT * (1 - age / 6.0) + 0.0, p.z, s == null ? 0 : s.getYRot());
-                    }
+                for (int i = 0; i < spikes.size(); i++) {   // stand risen
+                    IceSpikeEntity s = spikes.get(i);
+                    if (!s.isRemoved() && s.tickCount > up[i]) s.tickCount = up[i];
                 }
                 if (age > dur) {
                     for (int i = 0; i < spikes.size(); i++) {
                         Vec3 p = pts.get(i);
-                        DivineEvents.particle(sl, ParticleTypes.SNOWFLAKE, p.x, p.y + 1, p.z, 4, 0.2, 0.02);
+                        DivineEvents.particle(sl, ParticleTypes.SNOWFLAKE, p.x, p.y + 1, p.z, 6, 0.25, 0.02);
+                        DivineEvents.particle(sl, new net.minecraft.core.particles.BlockParticleOption(ParticleTypes.BLOCK, net.minecraft.world.level.block.Blocks.PACKED_ICE.defaultBlockState()),
+                                p.x, p.y + 0.8, p.z, 10, 0.25, 0.05);
                         Disp.kill(spikes.get(i));
                     }
                     sl.playSound(null, pts.get(0).x, pts.get(0).y, pts.get(0).z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.5f, 0.8f);

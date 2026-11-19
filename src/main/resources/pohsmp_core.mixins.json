@@ -13,6 +13,8 @@
     "ItemRendererMixin",
     "GameRendererMixin",
     "MouseHandlerMixin",
+    "JourneyMapPlayersMixin",
+    "JourneyMapPlayersDataMixin",
     "AbstractClientPlayerMixin",
     "XaeroRadarMixin",
     "XaeroMinimapTrackerMixin",

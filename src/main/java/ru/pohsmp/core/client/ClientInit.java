@@ -37,6 +37,8 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.DreamMusic.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.NightmareClient.class);   // T25
         modBus.addListener(ru.pohsmp.core.client.nightmare.NightmareRender::register);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.NightmareWorld.class);   // T25 stage 3: the world rots
+        modBus.addListener(ru.pohsmp.core.client.nightmare.NightmareWorld::colors);
         modBus.register(ScrollModels.class);
         modBus.addListener(TargetPoseClient::setup);
         MinecraftForge.EVENT_BUS.register(EmberHud.class);

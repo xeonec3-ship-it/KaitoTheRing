@@ -44,7 +44,7 @@ public final class Fx {
     /** What to start. Fluent; positions in world coordinates. */
     public static final class Spec {
         final FxMsg m = new FxMsg();
-        UUID only;
+        UUID only, not;
 
         private Spec(int kind, String id) {
             m.op = FxMsg.START;
@@ -149,6 +149,12 @@ public final class Fx {
             return this;
         }
 
+        /** Everyone but this player gets the instance (a mark on its own body it would see in its face). */
+        public Spec not(ServerPlayer p) {
+            not = p.getUUID();
+            return this;
+        }
+
         /**
          * Inscription for the sigil's text layers with this {@code slot} (docs/sigils.md «Надписи»), e.g.
          * {@code Fx.sigil("time_clock").text("count", "0")}. Up to {@link FxMsg#MAX_TEXT} characters.
@@ -189,7 +195,7 @@ public final class Fx {
         /** T08: game time of the last sigil.hit sound of this instance (at most once in 3 ticks) */
         long lastSound = Long.MIN_VALUE;
         Set<UUID> sent = new HashSet<>();
-        UUID owner, only;
+        UUID owner, only, not;
     }
 
     private static final Map<Integer, Active> ACTIVE = new HashMap<>();
@@ -203,6 +209,7 @@ public final class Fx {
         a.dim = sl.dimension();
         a.msg = m;
         a.only = s.only;
+        a.not = s.not;
         a.start = sl.getGameTime();
         long life = lifetime(m);
         if (life >= 0) a.end = a.start + life;
@@ -386,7 +393,7 @@ public final class Fx {
     }
 
     private static void offer(ServerLevel sl, ServerPlayer p, Active a) {
-        if (p.level() != sl || a.only != null && !a.only.equals(p.getUUID()) || a.sent.contains(p.getUUID()) || !near(p, a.msg)) return;
+        if (p.level() != sl || a.only != null && !a.only.equals(p.getUUID()) || p.getUUID().equals(a.not) || a.sent.contains(p.getUUID()) || !near(p, a.msg)) return;
         a.sent.add(p.getUUID());
         FxMsg m = a.msg.copyAged((int) (sl.getGameTime() - a.start));
         Net.CH.send(PacketDistributor.PLAYER.with(() -> p), m);

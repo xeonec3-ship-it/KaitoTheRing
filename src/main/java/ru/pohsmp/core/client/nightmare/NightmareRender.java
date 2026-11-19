@@ -95,6 +95,15 @@ public final class NightmareRender {
         }
 
         @Override
+        protected void applyRotations(NightmareMob m, PoseStack ps, float age, float yaw, float pt) {
+            super.applyRotations(m, ps, age, yaw, pt);
+            if (m.onCeiling()) {   // the Crawler upside down, its feet on the ceiling
+                ps.translate(0, m.getBbHeight(), 0);
+                ps.mulPose(com.mojang.math.Axis.ZP.rotationDegrees(180));
+            }
+        }
+
+        @Override
         public RenderType getRenderType(NightmareMob m, ResourceLocation tex, MultiBufferSource buf, float pt) {
             return RenderType.entityCutoutNoCull(tex);
         }

@@ -84,7 +84,7 @@ public final class SoulSeal {
         p.addEffect(new MobEffectInstance(Reg.SOUL_SEAL.get(), MobEffectInstance.INFINITE_DURATION, 0, false, false, true));
         Integer old = MARKS.remove(p.getUUID());
         if (old != null) Fx.stop(p.serverLevel(), old, "");
-        MARKS.put(p.getUUID(), Fx.play(p.serverLevel(), Fx.fx("soul_seal_mark").at(p.position()).caster(p).attach(p).duration(MARK_TICKS)));
+        MARKS.put(p.getUUID(), Fx.play(p.serverLevel(), Fx.fx("soul_seal_mark").at(p.position()).caster(p).attach(p).duration(MARK_TICKS).not(p)));   // owner 19.11: the mark in its own face got in the way
     }
 
     private static void deny(ServerPlayer p) {

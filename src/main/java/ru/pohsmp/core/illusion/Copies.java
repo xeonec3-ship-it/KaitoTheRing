@@ -227,7 +227,7 @@ public final class Copies {
         return f;
     }
 
-    @SubscribeEvent
+    /* driven by Illusions.onTick (TickHub) */
     public static void onTick(TickEvent.ServerTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         now++;

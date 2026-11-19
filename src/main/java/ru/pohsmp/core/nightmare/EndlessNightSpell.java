@@ -46,7 +46,7 @@ public class EndlessNightSpell extends NightmareSpells.Base {
     }
 
     @Override public CastType getCastType() { return CastType.LONG; }
-    @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.WARDEN_HEARTBEAT); }
+    @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(NmSounds.HEARTBEAT); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
 
     @Override
@@ -102,8 +102,7 @@ public class EndlessNightSpell extends NightmareSpells.Base {
             Vec3 c = caster.position();
             Zone z = new Zone(caster, sl, c, r, Immersion.now() + ticks);
             z.fx = fx(sl, Fx.fx("nightmare_endless_night").at(c).caster(caster).scale(r / 24.0).duration(ticks), "nightmare_endless_night");
-            sl.playSound(null, c.x, c.y + 1, c.z, SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 3f, 0.6f);
-            sl.playSound(null, c.x, c.y + 1, c.z, SoundEvents.AMBIENT_CAVE.get(), SoundSource.PLAYERS, 2f, 0.6f);
+            sl.playSound(null, c.x, c.y + 1, c.z, NmSounds.CAST_NIGHT, SoundSource.PLAYERS, 1f, 1f);   // approved T25 sound, volume <= 1
             ZONES.add(z);
             Illusions.logZone("endless_night", sl, caster, c, r);
         }
@@ -130,7 +129,7 @@ public class EndlessNightSpell extends NightmareSpells.Base {
     public static final class Events {
         private Events() {}
 
-        @SubscribeEvent
+        /* driven by Illusions.onTick (TickHub) */
         public static void onTick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END || ZONES.isEmpty()) return;
             long now = Immersion.now();
@@ -153,14 +152,7 @@ public class EndlessNightSpell extends NightmareSpells.Base {
                             z.inside.remove(id);
                             night(p, 0);
                         } else if (in) {
-                            Immersion.touch(p);   // held while inside
-                            if (now >= next) {
-                                z.inside.put(id, now + step);
-                                int light = z.sl.getBrightness(LightLayer.BLOCK, p.blockPosition());
-                                if (light < IllusionBaseCfg.light()) Immersion.deepen(p, 1);
-                                else p.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.endless_night.held")
-                                        .withStyle(s -> s.withColor(0xE8E0D8)), true);
-                            }
+                            Immersion.touch(p);   // held while inside; owner 19.11: the Night brings stage 1 only, it no longer goes deeper in the dark
                         }
                     }
                 }

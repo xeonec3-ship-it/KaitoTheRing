@@ -111,6 +111,11 @@ public class WakingNightmareSpell extends IllusionBase {
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
+        if (level instanceof ServerLevel sl)   // owner 19.11: «Кошмар наяву» did not work on a player - what the cast had
+            ru.pohsmp.core.PohCore.LOG.info("[pohsmp] waking_nightmare by {}: data={} target={}", caster.getName().getString(),
+                    md == null ? null : md.getAdditionalCastData(),
+                    md != null && md.getAdditionalCastData() instanceof TargetEntityCastData td0 && td0.getTarget(sl) != null
+                            ? td0.getTarget(sl).getName().getString() + " ally=" + Illusions.ally(caster, td0.getTarget(sl)) : "none");
         if (level instanceof ServerLevel sl && md.getAdditionalCastData() instanceof TargetEntityCastData td) {
             LivingEntity t = td.getTarget(sl);
             if (t != null && t.isAlive() && !Illusions.ally(caster, t)) start(sl, caster, t, Illusions.duration(t, ticks(ServerConfig.NM_SECONDS)));
@@ -171,7 +176,7 @@ public class WakingNightmareSpell extends IllusionBase {
     public static final class Events {
         private Events() {}
 
-        @SubscribeEvent
+        /* driven by Illusions.onTick (TickHub) */
         public static void onTick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END || DREAMS.isEmpty()) return;
             long now = Illusions.now();

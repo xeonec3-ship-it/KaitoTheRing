@@ -113,7 +113,7 @@ public final class Immersion {
         ru.pohsmp.core.illusion.Illusions.onDispel(t -> t instanceof Player && clear(t));   // Blessing takes it all
     }
 
-    @SubscribeEvent
+    /* driven by Illusions.onTick (TickHub) */
     public static void onTick(TickEvent.ServerTickEvent e) {
         if (e.phase != TickEvent.Phase.END) return;
         now++;
@@ -125,6 +125,11 @@ public final class Immersion {
             ServerPlayer v = server.getPlayerList().getPlayer(en.getKey());
             if (v == null) {
                 it.remove();
+                continue;
+            }
+            if (s.sent > 0 && !v.hasEffect(Reg.IMMERSION.get())) {   // owner 19.11: the effect taken off (/effect clear, milk) - all of it goes
+                it.remove();
+                send(v, 0, 0);
                 continue;
             }
             double r = Math.max(0.5, Math.min(2, resist(v)));

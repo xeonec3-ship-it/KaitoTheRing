@@ -24,7 +24,7 @@ public final class NightmareClient {
     private NightmareClient() {}
 
     private static final ResourceLocation VIGNETTE = new ResourceLocation("minecraft", "textures/misc/vignette.png");
-    private static int stage, age, flicker, nextFlicker = 100, nextBeat = 40, nightLeft;
+    private static int stage, age, flicker, nextFlicker = 100, nextBeat = 40, nextVoice = 200, nightLeft;
     /** smooth 0..3 following the stage; 0..1 for the night */
     private static float level, night;
     private static long realTime = Long.MIN_VALUE, lastSet = Long.MIN_VALUE;
@@ -50,6 +50,8 @@ public final class NightmareClient {
         level = 0;
         night = 0;
         nightLeft = 0;
+        moths = 0;
+        inkLeft = 0;
         realTime = Long.MIN_VALUE;
     }
 
@@ -74,6 +76,8 @@ public final class NightmareClient {
             return;
         }
         age++;
+        mothsTick(mc);
+        if (inkLeft > 0) inkLeft--;
         if (nightLeft > 0) nightLeft--;
         night = nightLeft > 0 ? Math.min(1, night + 0.05f) : Math.max(0, night - 0.05f);
         level += Math.signum(stage - level) * Math.min(Math.abs(stage - level), 0.04f);
@@ -84,9 +88,19 @@ public final class NightmareClient {
             nextFlicker = (int) (40 + mc.level.random.nextInt(160) / Math.max(1, level));
         }
         if (--nextBeat <= 0 && mc.player != null) {
-            float v = 0.25f + 0.2f * level;
-            mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.WARDEN_HEARTBEAT, 0.9f + 0.1f * level, v));
-            nextBeat = Math.max(12, 40 - Math.round(level * 8));
+            float v = Math.min(1f, 0.45f + 0.18f * level);   // the approved sound is ~2 s long: one beat at a time
+            mc.getSoundManager().play(SimpleSoundInstance.forUI(ru.pohsmp.core.nightmare.NmSounds.HEARTBEAT, 0.95f + 0.05f * level, v));
+            nextBeat = Math.max(44, 90 - Math.round(level * 15));
+        }
+        if (--nextVoice <= 0 && mc.player != null) {   // whispers around the victim; from stage 2 scrapes and a far child's laugh
+            var r = mc.level.random;
+            var s = level >= 1.5f && r.nextInt(3) == 0 ? (r.nextBoolean() ? ru.pohsmp.core.nightmare.NmSounds.SCRAPE
+                    : ru.pohsmp.core.nightmare.NmSounds.CHILD_LAUGH) : ru.pohsmp.core.nightmare.NmSounds.WHISPER;
+            double a = r.nextDouble() * Math.PI * 2, d = 3 + r.nextDouble() * 5;
+            var p = mc.player.position();
+            mc.getSoundManager().play(new SimpleSoundInstance(s, net.minecraft.sounds.SoundSource.AMBIENT, Math.min(1f, 0.4f + 0.2f * level), 1f,
+                    r, p.x + Math.cos(a) * d, p.y + 1, p.z + Math.sin(a) * d));
+            nextVoice = (int) (300 + r.nextInt(400) / Math.max(1, level));
         }
     }
 
@@ -127,7 +141,7 @@ public final class NightmareClient {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onGui(RenderGuiEvent.Post e) {
-        if (level <= 0.01f) return;
+        if (level <= 0.01f && moths <= 0.01f && inkLeft <= 0) return;
         GuiGraphics g = e.getGuiGraphics();
         int w = g.guiWidth(), h = g.guiHeight();
         double t = age + e.getPartialTick();
@@ -142,7 +156,49 @@ public final class NightmareClient {
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        for (int s = 1; s <= 3; s++) {   // the helper's stage overlays: each fades in as the stage comes, over the one before
+            float k = Math.max(0, Math.min(1, level - (s - 1)));
+            if (k <= 0.01f) break;
+            RenderSystem.setShaderColor(1, 1, 1, k * (s == 3 ? 0.85f + 0.15f * pulse : 1f));
+            g.blit(STAGE[s - 1], 0, 0, 0, 0, w, h, w, h);
+        }
+        if (moths > 0.01f) {
+            RenderSystem.setShaderColor(1, 1, 1, moths);
+            g.blit(MOTHS, 0, 0, 0, 0, w, h, w, h);
+        }
+        if (inkLeft > 0) {
+            float k = Math.min(1, Math.min(inkLeft, inkLen - inkLeft + 1) / 8f);
+            RenderSystem.setShaderColor(1, 1, 1, k);
+            g.blit(INK, 0, 0, 0, 0, w, h, w, h);
+        }
+        RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.disableBlend();
         if (flicker > 0) g.fill(0, 0, w, h, (int) (60 + 30 * level) << 24);
+    }
+
+    private static final ResourceLocation[] STAGE = {fx("nightmare_stage1"), fx("nightmare_stage2"), fx("nightmare_stage3")};
+    private static final ResourceLocation MOTHS = fx("nightmare_moths_screen"), INK = fx("nightmare_ink_screen");
+    /** 0..1: the swarm at the face (a moth of ours within reach of the eyes) */
+    private static float moths;
+    private static int inkLeft, inkLen;
+
+    private static ResourceLocation fx(String n) {
+        return new ResourceLocation(ru.pohsmp.core.PohCore.MODID, "textures/fx/" + n + ".png");
+    }
+
+    /** Ink running down the screen for a while (the Mythic's thickening, the cast). */
+    public static void ink(int ticks) {
+        inkLeft = inkLen = Math.max(1, ticks);
+    }
+
+    private static void mothsTick(Minecraft mc) {
+        boolean near = false;
+        if (mc.player != null)
+            for (var m : mc.level.getEntitiesOfClass(ru.pohsmp.core.nightmare.NightmareMob.class, mc.player.getBoundingBox().inflate(2.5)))
+                if (m.kind == ru.pohsmp.core.nightmare.NightmareMob.Kind.MOTH && !m.going()) near = true;
+        moths = near ? Math.min(1, moths + 0.1f) : Math.max(0, moths - 0.05f);
     }
 
     @SubscribeEvent

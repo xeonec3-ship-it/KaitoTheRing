@@ -16,6 +16,8 @@ import yesman.epicfight.api.animation.property.AnimationProperty.ActionAnimation
 import yesman.epicfight.api.animation.property.AnimationProperty.AttackAnimationProperty;
 import yesman.epicfight.api.animation.types.ActionAnimation;
 import yesman.epicfight.api.animation.types.BasicAttackAnimation;
+import yesman.epicfight.api.animation.types.MovementAnimation;
+import yesman.epicfight.api.animation.types.StaticAnimation;
 import yesman.epicfight.api.forgeevent.WeaponCapabilityPresetRegistryEvent;
 import yesman.epicfight.gameasset.Animations;
 import yesman.epicfight.gameasset.Armatures;
@@ -70,6 +72,8 @@ public final class EmberEpicFight {
     private static final class Impl {
         static AnimationAccessor<ActionAnimation> LAST_HEAT, FIRE_VORTEX;
         static AnimationAccessor<BasicAttackAnimation> WHIP1, WHIP2, WHIP3;
+        static AnimationAccessor<StaticAnimation> WHIP_IDLE;
+        static AnimationAccessor<MovementAnimation> WHIP_WALK, WHIP_RUN;
 
         static void registerAnimations(AnimationRegistryEvent e) {
             e.newBuilder(PohCore.MODID, Impl::build);
@@ -90,6 +94,10 @@ public final class EmberEpicFight {
                     .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
             WHIP3 = b.nextAccessor("biped/ember/whip3", a -> new BasicAttackAnimation(0.1F, 0.20F, 0.35F, 0.55F, null, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
                     .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
+            // whip form motion loops (manager 19.11): idle as the EF static idle, walk/run as EF movement (pace follows the speed)
+            WHIP_IDLE = b.nextAccessor("biped/ember/whip_idle", a -> new StaticAnimation(true, a, Armatures.BIPED));
+            WHIP_WALK = b.nextAccessor("biped/ember/whip_walk", a -> new MovementAnimation(true, a, Armatures.BIPED));
+            WHIP_RUN = b.nextAccessor("biped/ember/whip_run", a -> new MovementAnimation(true, a, Armatures.BIPED));
         }
 
         static void registerWeaponType(WeaponCapabilityPresetRegistryEvent e) {
@@ -104,7 +112,10 @@ public final class EmberEpicFight {
                     .innateSkill(CapabilityItem.Styles.ONE_HAND, s -> special)
                     .innateSkill(CapabilityItem.Styles.TWO_HAND, s -> special)
                     .livingMotionModifier(CapabilityItem.Styles.ONE_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
-                    .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD));
+                    .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.BLOCK, Animations.SWORD_GUARD)
+                    .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.IDLE, WHIP_IDLE)
+                    .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.WALK, WHIP_WALK)
+                    .livingMotionModifier(CapabilityItem.Styles.TWO_HAND, LivingMotions.RUN, WHIP_RUN));
         }
 
         static yesman.epicfight.skill.Skill special;

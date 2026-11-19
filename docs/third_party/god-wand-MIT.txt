@@ -1,19 +1,22 @@
-Третьесторонний код: God Wand (HyIsNoob)
-========================================
+God Wand (HyIsNoob) — уведомление MIT для перенесённого кода
+===========================================================
 
-Источник: https://github.com/HyIsNoob/god-wand — common/src/main/java/net/godwand/client/GateMana.java
-(автор — HyIsNoob, God Wand contributors). Java-код God Wand распространяется по лицензии MIT (текст ниже);
-ассеты God Wand (звуки, текстуры, модели, бренд) — All Rights Reserved и в этот мод НЕ переносились.
+Источник: https://github.com/HyIsNoob/god-wand (common/src/main/java/net/godwand/client/: GateMana.java, GateDraw.java,
+GateAtlas.java, GatePose.java, SilentGateCinematic.java). По файлу LICENSE этого репозитория Java-код (`**/src/main/java/`)
+распространяется по MIT; ассеты (`assets/`) — All Rights Reserved, их мы НЕ копируем: атлас частиц генерируется кодом.
+Название и брендинг God Wand не используются; мод pohsmp_core не является официальным релизом God Wand.
 
-Что перенесено и куда:
-  src/main/java/ru/pohsmp/core/ember/WhipSim.java — идея и приёмы пружинной цепочки GateMana: шаг Верле с затуханием,
-  ограничение растяжения «от корня к концу», дрейф curl-шумом (функция curl — дословно по формуле GateMana.curl),
-  выталкивание точек из цилиндра тела, сглаживание Катмулла–Рома. Переписано под хлыст T14 (своя физика удара, щелчок,
-  столкновения с блоками); уведомление MIT — в шапке файла.
+Перенесённые / изменённые файлы мода (каждый — с этим уведомлением в шапке):
+  src/main/java/ru/pohsmp/core/client/fx/gate/GateAtlasGen.java  (из GateAtlas: GLOW, STAR, SILK, CLOUD, WISP, SOLID)
+  src/main/java/ru/pohsmp/core/client/fx/gate/GateDraw.java      (из GateDraw: sprite, halo, streamer, gradient, tex)
+  src/main/java/ru/pohsmp/core/client/fx/gate/GateMana.java      (из GateMana: flow, bands, wandTrail; manaGain из GatePose)
+  src/main/java/ru/pohsmp/core/client/DownfallCut.java           (планы камеры по SilentGateCinematic: raiseShot, circleShot — только формулы)
+  src/main/java/ru/pohsmp/core/ember/WhipSim.java                 (T14, физика хлыста; из GateMana: шаг Верле с затуханием, ограничение
+                                                                  растяжения от корня к концу, curl-шум — формула GateMana.curl, выталкивание
+                                                                  из цилиндра тела, сглаживание Катмулла–Рома; удар, щелчок и блоки — свои)
 
-This mod is not affiliated with or endorsed by God Wand / HyIsNoob.
-
-MIT License (Applies to Java source and its Java compatibility adapters)
+-----------------------------------------------------------------------------
+MIT License
 
 Copyright (c) 2026 HyIsNoob (God Wand contributors)
 

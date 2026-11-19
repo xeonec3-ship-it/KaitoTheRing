@@ -163,3 +163,44 @@ if __name__ == '__main__':
     for hot, name in ((False, 'ember_blade.png'), (True, 'ember_blade_hot.png')):
         draw(hot).save(os.path.join(OUT, name))
         print('wrote', name)
+
+
+def skill_icon():
+    """Иконка навыка оружия Epic Fight (спецатака): изогнутый клинок наискось, вокруг — огненная петля хлыста, искры. 64×64."""
+    from PIL import ImageDraw, ImageFilter
+    S = 256
+    im = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    dr = ImageDraw.Draw(im)
+    # огненная петля (спираль хлыста), от толстой к тонкой, оранжевый → жёлтый
+    pts = []
+    for i in range(160):
+        t = i / 159
+        a = math.radians(200 + 520 * t)
+        r = 104 * (1 - 0.62 * t)
+        pts.append((128 + r * math.cos(a), 132 + r * math.sin(a) * 0.92))
+    for i in range(len(pts) - 1):
+        t = i / len(pts)
+        w = int(16 * (1 - 0.8 * t)) + 3
+        c = (255, int(110 + 120 * t), int(30 + 90 * t), 255)
+        dr.line([pts[i], pts[i + 1]], fill=c, width=w)
+    glow = im.filter(ImageFilter.GaussianBlur(9))
+    base = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    base.alpha_composite(glow); base.alpha_composite(glow); base.alpha_composite(im)
+    d2 = ImageDraw.Draw(base)
+    # клинок наискось: тёмная кромка обуха, раскалённое тело, белая кромка
+    blade = [(58, 206), (72, 196), (196, 66), (214, 40), (186, 58), (62, 188)]
+    d2.polygon(blade, fill=(255, 140, 50, 255))
+    d2.line([(72, 196), (196, 66), (214, 40)], fill=(255, 242, 192, 255), width=6)
+    d2.line([(62, 188), (186, 58), (214, 40)], fill=(110, 24, 6, 255), width=5)
+    d2.line([(40, 228), (64, 202)], fill=(40, 32, 30, 255), width=16)   # рукоять
+    d2.line([(52, 192), (76, 214)], fill=(70, 70, 80, 255), width=9)    # пята
+    for (x, y, r) in ((200, 28, 5), (226, 54, 4), (176, 36, 3), (222, 22, 3)):
+        d2.ellipse((x - r, y - r, x + r, y + r), fill=(255, 236, 170, 255))
+    out = base.resize((64, 64), Image.LANCZOS)
+    p = os.path.join(OUT, '..', 'gui', 'skills', 'weapon_innate', 'ember_special.png')
+    out.save(p)
+    print('wrote gui/skills/weapon_innate/ember_special.png')
+
+
+if __name__ == '__main__':
+    skill_icon()

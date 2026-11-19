@@ -37,7 +37,8 @@ public final class Cutscene {
             BUTTERFLY_DREAM = 10,          // T22: focus = 5 blocks ahead of the caster (the way it looked when it began)
             WORLD_TREE = 11,               // T23: focus = the tree's foot
             ABYSS_EYE = 12,                // T23: focus = the eye in the sky
-            LAST_DAWN = 13;                // T23: focus = the sunrise point on the horizon
+            LAST_DAWN = 13,                // T23: focus = the sunrise point on the horizon
+            ERASED_NAME = 14;              // T24: focus = the target, i = the target's entity id
 
     /**
      * Starts the scene for everyone within r of the caster (in the caster's level) or of `extra` in `extraLevel` (may be another dimension).

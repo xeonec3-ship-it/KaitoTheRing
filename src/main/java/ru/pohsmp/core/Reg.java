@@ -142,7 +142,9 @@ public final class Reg {
     public static final RegistryObject<MobEffect> PHANTOM_PAIN = EFFECTS.register("phantom_pain", () -> new PohEffect(MobEffectCategory.HARMFUL, 0xFFB8E6));
     public static final RegistryObject<MobEffect> WAKING_NIGHTMARE = EFFECTS.register("waking_nightmare", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x3A2A5A));
     public static final RegistryObject<MobEffect> BUTTERFLY_DREAM = EFFECTS.register("butterfly_dream", () -> new PohEffect(MobEffectCategory.HARMFUL, ILLUSION_COLOR));
-    public static final RegistryObject<MobEffect> BORROWED_FACE = EFFECTS.register("borrowed_face", () -> new PohEffect(MobEffectCategory.BENEFICIAL, ILLUSION_COLOR));
+    /** T24 «Стёртое имя»: the icon only (the state itself lives in erased/Erased, milk does not take it off). */
+    public static final RegistryObject<MobEffect> ERASED = EFFECTS.register("erased", () -> new PohEffect(MobEffectCategory.HARMFUL, 0xE9E4D8));
+    public static final RegistryObject<MobEffect> BORROWED_FACE =EFFECTS.register("borrowed_face", () -> new PohEffect(MobEffectCategory.BENEFICIAL, ILLUSION_COLOR));
 
     /** Silent Witch outfit (T19): the barrier's cooldown, shown as an effect icon; milk does not remove it. */
     public static final RegistryObject<MobEffect> SILENT_BARRIER_COOLDOWN = EFFECTS.register("silent_barrier_cooldown",
@@ -248,7 +250,10 @@ public final class Reg {
     }
 
     /** "Creation" tier: only through its staff. */
-    public static final List<String> CREATION_SPELLS = List.of(ru.pohsmp.core.spell.DownfallSpell.PATH);
+    public static final List<String> CREATION_SPELLS = List.of(ru.pohsmp.core.spell.DownfallSpell.PATH, ru.pohsmp.core.erased.ErasedNameSpell.PATH);
+    static {
+        SPELLS.register(ru.pohsmp.core.erased.ErasedNameSpell.PATH, ru.pohsmp.core.erased.ErasedNameSpell::new);
+    }
     public static final RegistryObject<AbstractSpell> DOWNFALL = SPELLS.register(ru.pohsmp.core.spell.DownfallSpell.PATH, ru.pohsmp.core.spell.DownfallSpell::new);
 
     /** "Unknown" tier: only through the Silent Witch staff, in its slot order (T18; spells - T03 Gate, T20 the other four). */
@@ -322,6 +327,7 @@ public final class Reg {
         public void appendHoverText(ItemStack st, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level lvl, List<Component> tip,
                                     net.minecraft.world.item.TooltipFlag flag) {
             tip.add(Component.translatable("item.pohsmp_core.illusion_prism.desc").withStyle(Style.EMPTY.withColor(ILLUSION_COLOR)));
+            tip.add(Component.translatable("item.pohsmp_core.illusion_prism.allies").withStyle(net.minecraft.ChatFormatting.GRAY));
         }
     });
 
@@ -338,6 +344,7 @@ public final class Reg {
                 out.accept(Scrolls.make(DisintegrationSpell.ID, 1, null));
                 for (String p : MYTHIC_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
                 for (String p : DIVINE_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
+                out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, ru.pohsmp.core.erased.ErasedNameSpell.PATH), 1, null));   // T24
                 for (RegistryObject<Item> s : STAFFS) out.accept(s.get());
                 out.accept(DOWNFALL_STAFF.get());
                 out.accept(SILENT_WITCH_HOOD.get());

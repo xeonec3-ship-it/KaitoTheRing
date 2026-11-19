@@ -65,6 +65,7 @@ public final class IllusionClient {
             case IlluMsg.COPY_SPAWN, IlluMsg.COPY_MOVE, IlluMsg.COPY_HURT, IlluMsg.COPY_GONE -> Copies.handle(m);
             case IlluMsg.ZONE, IlluMsg.ZONE_END -> Zones.handle(m);
             case IlluMsg.FAKE_HP -> ZoneDraw.fakeLoss = Math.max(0, m.x);
+            case IlluMsg.ERASED -> ErasedClient.set(m.ticks);
             case IlluMsg.ANIM -> {
                 var lvl = Minecraft.getInstance().level;
                 if (lvl != null && lvl.getEntity(m.entity) instanceof Player p)

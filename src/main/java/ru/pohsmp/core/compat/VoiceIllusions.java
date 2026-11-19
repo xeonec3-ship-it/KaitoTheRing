@@ -26,6 +26,13 @@ public class VoiceIllusions implements VoicechatPlugin {
     @Override
     public void registerEvents(EventRegistration r) {
         r.registerEvent(EntitySoundPacketEvent.class, VoiceIllusions::onEntitySound);
+        r.registerEvent(de.maxhenkel.voicechat.api.events.MicrophonePacketEvent.class, VoiceIllusions::onMic);
+    }
+
+    /** T24: the erased are not heard - their microphone goes nowhere. */
+    private static void onMic(de.maxhenkel.voicechat.api.events.MicrophonePacketEvent e) {
+        VoicechatConnection from = e.getSenderConnection();
+        if (from != null && from.getPlayer() != null && ru.pohsmp.core.erased.Erased.isErased(from.getPlayer().getUuid())) e.cancel();
     }
 
     private static void onEntitySound(EntitySoundPacketEvent e) {

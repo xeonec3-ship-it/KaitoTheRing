@@ -32,8 +32,8 @@ import ru.pohsmp.core.fx.Fx;
  * <li>Illusory damage: it takes health for real but is written down per target; if the target lives until its time runs out, the
  * health comes back smoothly ([illusion] returnTicks) with fx/illusion_return. Death meanwhile is real (the debt is dropped).
  * Blessing ({@link #cleanse}) ends every illusion on the target and gives the debt back at once.</li>
- * <li>Allies: the same entity, vanilla teams, the same FTB Teams party (by reflection, no build dependency), own pets.
- * Allies of the caster never see its illusions.</li>
+ * <li>Allies: the same entity, own pets, and only the players the caster chose with the Prism ({@link IllusionAllies}; owner 19.11:
+ * teams and FTB Teams do not count). Allies of the caster never see its illusions.</li>
  * <li>Illusion resistance shortens what lands on a victim: time x (2 - resistance), not below resistFloor.</li>
  * </ul>
  */
@@ -42,38 +42,19 @@ public final class Illusions {
 
     // ---------------------------------------------------------------- allies
 
-    private static Method ftbApi, ftbManager, ftbSame;
-    private static boolean ftbTried;
-
-    /** True if b is on a's side: never the victim of a's illusions, and sees through them. */
+    /**
+     * True if b is on a's side: never the victim of a's illusions, and sees through them.
+     * Owner 19.11: players are NOT allies by teams or FTB Teams any more - only those the caster chose with the Prism (Shift + right
+     * click on the player, {@link IllusionAllies}); one way: a's choice of b does not make a b's ally. Own pets stay allies; mobs - by
+     * vanilla teams as before.
+     */
     public static boolean ally(LivingEntity a, Entity b) {
         if (a == null || b == null) return false;
         if (a == b || a.getUUID().equals(b.getUUID())) return true;
-        if (a.isAlliedTo(b) || b.isAlliedTo(a)) return true;
         if (b instanceof OwnableEntity o && a.getUUID().equals(o.getOwnerUUID())) return true;
         if (a instanceof OwnableEntity o && b.getUUID().equals(o.getOwnerUUID())) return true;
-        return a instanceof Player && b instanceof Player && ftbSameTeam(a.getUUID(), b.getUUID());
-    }
-
-    /** FTB Teams: dev.ftb.mods.ftbteams.api.FTBTeamsAPI.api().getManager().arePlayersInSameTeam(a, b); false if the mod is missing. */
-    private static boolean ftbSameTeam(UUID a, UUID b) {
-        try {
-            if (!ftbTried) {
-                ftbTried = true;
-                Class<?> c = Class.forName("dev.ftb.mods.ftbteams.api.FTBTeamsAPI");
-                ftbApi = c.getMethod("api");
-            }
-            if (ftbApi == null) return false;
-            Object api = ftbApi.invoke(null);
-            if (ftbManager == null) ftbManager = api.getClass().getMethod("getManager");
-            Object mgr = ftbManager.invoke(api);
-            if (mgr == null) return false;
-            if (ftbSame == null) ftbSame = mgr.getClass().getMethod("arePlayersInSameTeam", UUID.class, UUID.class);
-            return Boolean.TRUE.equals(ftbSame.invoke(mgr, a, b));
-        } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
-            ftbApi = null;
-            return false;
-        }
+        if (b instanceof Player && a instanceof Player) return IllusionAllies.chose(a.getUUID(), b.getUUID());
+        return a.isAlliedTo(b) || b.isAlliedTo(a);
     }
 
     /** Players (not spectators, not creative) the caster's illusion works on within r of the caster. */

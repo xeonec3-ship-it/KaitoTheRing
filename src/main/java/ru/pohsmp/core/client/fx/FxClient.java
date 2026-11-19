@@ -125,6 +125,7 @@ public final class FxClient {
             if (m.hasTarget) r.targetPos = new Vec3(m.tx, m.ty, m.tz);
             if (m.hasLook) r.look = new Vec3(m.lx, m.ly, m.lz);
             m.points.forEach((k, v) -> r.points.put(k, new Vec3(v[0], v[1], v[2])));
+            r.texts.putAll(m.texts);
             r.scale = m.scale;
             r.seed = m.seed;
             r.color = m.color;

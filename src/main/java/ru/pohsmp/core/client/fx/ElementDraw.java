@@ -165,6 +165,7 @@ public final class ElementDraw {
             Vec3 at = FxRun.w(el.at().resolve(ctx));
             r.base = at;
             r.caster = run.caster;
+            r.texts.putAll(run.texts);
             if (el.follow() && el.at().kind().startsWith("caster") && run.caster != null) {
                 r.follow = run.caster;
                 r.offset = at.subtract(run.caster.position());

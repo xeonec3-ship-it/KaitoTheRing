@@ -20,7 +20,7 @@ public final class FxMsg {
     public int op, inst, kind;
     public String id = "", style = "", mode = "";
     public double x, y, z, tx, ty, tz, lx, ly, lz;
-    public float yaw, scale = 1;
+    public float yaw, pitch, scale = 1;
     /** Entity ids: caster (anchor "caster", follow), target, attach (whole instance follows it); -1 none. */
     public int caster = -1, target = -1, attach = -1;
     public boolean hasTarget, hasLook;
@@ -44,6 +44,7 @@ public final class FxMsg {
             y = b.readDouble();
             z = b.readDouble();
             yaw = b.readFloat();
+            pitch = b.readFloat();
             scale = b.readFloat();
             caster = b.readVarInt();
             target = b.readVarInt();
@@ -74,6 +75,7 @@ public final class FxMsg {
             y = b.readDouble();
             z = b.readDouble();
             yaw = b.readFloat();
+            pitch = b.readFloat();
         }
     }
 
@@ -88,6 +90,7 @@ public final class FxMsg {
             b.writeDouble(y);
             b.writeDouble(z);
             b.writeFloat(yaw);
+            b.writeFloat(pitch);
             b.writeFloat(scale);
             b.writeVarInt(caster);
             b.writeVarInt(target);
@@ -123,6 +126,7 @@ public final class FxMsg {
             b.writeDouble(y);
             b.writeDouble(z);
             b.writeFloat(yaw);
+            b.writeFloat(pitch);
         }
     }
 
@@ -145,6 +149,7 @@ public final class FxMsg {
         m.ly = ly;
         m.lz = lz;
         m.yaw = yaw;
+        m.pitch = pitch;
         m.scale = scale;
         m.caster = caster;
         m.target = target;

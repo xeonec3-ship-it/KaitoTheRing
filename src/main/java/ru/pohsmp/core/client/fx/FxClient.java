@@ -70,6 +70,7 @@ public final class FxClient {
             if (i.fx != null) {
                 i.fx.base = p;
                 i.fx.yaw = m.yaw;
+                i.fx.pitch = m.pitch;
             }
             if (i.sigil != null) {
                 i.sigil.base = p;
@@ -78,6 +79,7 @@ public final class FxClient {
             if (i.mesh != null) {
                 i.mesh.base = p;
                 i.mesh.yaw = m.yaw;
+                i.mesh.pitch = m.pitch;
             }
             return;
         }
@@ -102,6 +104,7 @@ public final class FxClient {
             r.duration = m.duration;
             r.base = base;
             r.yaw = m.yaw;
+            r.pitch = m.pitch;
             r.caster = caster;
             r.target = m.target >= 0 ? lvl.getEntity(m.target) : null;
             r.attach = attach;
@@ -145,6 +148,7 @@ public final class FxClient {
                 r.offset = base.subtract(attach.position());
             }
             r.yaw = m.yaw;
+            r.pitch = m.pitch;
             r.start = i.start;
             r.scale = m.scale;
             if (m.duration >= 0 && m.age >= m.duration) r.stop(m.duration);

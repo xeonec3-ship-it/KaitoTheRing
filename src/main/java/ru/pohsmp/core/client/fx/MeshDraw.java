@@ -26,7 +26,7 @@ public final class MeshDraw {
         public FxStyle style;
         public Vec3 base = Vec3.ZERO, offset = Vec3.ZERO;
         public Entity follow;
-        public float yaw;
+        public float yaw, pitch;
         public double start, scale = 1, alpha = 1, stopAt = Double.NaN;
 
         Vec3 pos(float pt) {
@@ -60,7 +60,10 @@ public final class MeshDraw {
         double center = r.def.has("center") ? r.def.get("center").getAsDouble() : 0;
         Vec3 o = r.pos(f.pt()).add(0, center * r.scale, 0);
         FxMath.Vec rt = FxMath.right(r.yaw), fw = FxMath.forward(r.yaw);
-        Axes ax = new Axes(o, new Vec3(rt.x(), rt.y(), rt.z()), new Vec3(0, 1, 0), new Vec3(fw.x(), fw.y(), fw.z()), s);
+        // pitch (Minecraft sense, positive looks down) tilts forward and up around the right axis: a spear points along its flight
+        double pr = Math.toRadians(r.pitch), cp = Math.cos(pr), sp = Math.sin(pr);
+        Vec3 fwd = new Vec3(fw.x() * cp, -sp, fw.z() * cp), up = new Vec3(fw.x() * sp, cp, fw.z() * sp);
+        Axes ax = new Axes(o, new Vec3(rt.x(), rt.y(), rt.z()), up, fwd, s);
         if (!r.def.has("parts")) return true;
         for (JsonElement pe : r.def.getAsJsonArray("parts")) {
             JsonObject p = pe.getAsJsonObject();
@@ -77,6 +80,7 @@ public final class MeshDraw {
                 case "ring" -> ring(f, ax, p, t, e, lin, col, a);
                 case "polygon" -> polygon(f, ax, p, t, e, lin, col, a);
                 case "disc" -> disc(f, ax, p, t, e, lin, col, a);
+                case "boxes" -> boxes(f, ax, p, t, e, r.style, r.alpha);
                 default -> {}
             }
         }
@@ -198,6 +202,81 @@ public final class MeshDraw {
         boolean dark = "translucent".equals(str(p, "blend", "additive"));
         VertexConsumer vc = dark ? f.trans(FxDraw.tex(str(p, "texture", "glow"))) : f.add(FxDraw.tex(str(p, "texture", "glow")));
         FxDraw.disc(vc, f, ax.o, ax.x, ax.y, R, rot, col, dark ? Math.min(0.85, al) : al);
+    }
+
+    /** Unit cube corners and faces (outward normals) for the "boxes" part. */
+    private static final float[][] CUBE = {{-1, -1, -1}, {1, -1, -1}, {1, 1, -1}, {-1, 1, -1}, {-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}};
+    private static final int[][] CUBE_F = {{0, 3, 2, 1}, {4, 5, 6, 7}, {0, 4, 7, 3}, {1, 2, 6, 5}, {3, 7, 6, 2}, {0, 1, 5, 4}};
+    private static final float[][] CUBE_N = {{0, 0, -1}, {0, 0, 1}, {-1, 0, 0}, {1, 0, 0}, {0, 1, 0}, {0, -1, 0}};
+
+    /**
+     * Volume model of boxes (docs/fx.md "boxes"): [x0,y0,z0,x1,y1,z1,tone(,[rx,ry,rz])], turned about the box centre as three.js
+     * Euler "YXZ" (R = Ry·Rx·Rz: roll first, then pitch, then yaw). Glow tones are additive at full brightness; the others use the
+     * part's blend and opacity with faces shaded by their normal (top 1.0, sides 0.82 / 0.7, bottom 0.55). Reveal: a front runs
+     * down (or up) through `bounds` over the appear time; a box shows once the front passes its centre, flashing white near it.
+     */
+    private static void boxes(Frame f, Axes ax, JsonObject p, double t, double e, FxStyle style, double alpha) {
+        JsonArray list = p.has("boxes") ? p.getAsJsonArray("boxes") : null;
+        if (list == null || list.isEmpty()) return;
+        JsonArray tonesJ = p.has("tones") ? p.getAsJsonArray("tones") : new JsonArray();
+        int[] tones = new int[tonesJ.size()];
+        for (int i = 0; i < tones.length; i++) tones[i] = style.color(tonesJ.get(i).getAsString());
+        java.util.Set<Integer> glow = new java.util.HashSet<>();
+        if (p.has("glowTones")) for (JsonElement g : p.getAsJsonArray("glowTones")) glow.add(g.getAsInt());
+        boolean additive = "additive".equals(str(p, "blend", "translucent")), shade = !p.has("shade") || p.get("shade").getAsBoolean();
+        double opacity = num(p, "opacity", 1);
+        JsonObject ap = p.has("appear") ? p.getAsJsonObject("appear") : new JsonObject();
+        boolean upward = "up".equals(str(ap, "reveal", "down"));
+        double band = Math.max(1e-3, num(ap, "front", 0.8));
+        JsonArray bounds = p.has("bounds") ? p.getAsJsonArray("bounds") : null;
+        double lo = bounds != null ? bounds.get(0).getAsDouble() : -1, hi = bounds != null ? bounds.get(1).getAsDouble() : 1;
+        double ce = FxDraw.clamp01(e);
+        double front = upward ? lo - 1 + (hi - lo + 2) * ce : hi - (hi - lo + 2) * ce;
+        VertexConsumer vGlow = f.add(FxDraw.WHITE), vBody = additive ? vGlow : f.trans(FxDraw.WHITE);
+        Vector3f c = new Vector3f(), v = new Vector3f(), n = new Vector3f();
+        Vec3[] w = new Vec3[8];
+        for (JsonElement be : list) {
+            JsonArray b = be.getAsJsonArray();
+            if (b.size() < 7) continue;
+            float x0 = b.get(0).getAsFloat(), y0 = b.get(1).getAsFloat(), z0 = b.get(2).getAsFloat();
+            float x1 = b.get(3).getAsFloat(), y1 = b.get(4).getAsFloat(), z1 = b.get(5).getAsFloat();
+            int tone = b.get(6).getAsInt();
+            double cy = (y0 + y1) / 2.0;
+            double k = upward ? FxDraw.clamp01((front - cy + band) / band) : FxDraw.clamp01((cy - front + band) / band);
+            if (k <= 0.002) continue;
+            boolean gl = glow.contains(tone);
+            int col = tone >= 0 && tone < tones.length ? tones[tone] : 0xFFFFFF;
+            double a = alpha * k * (gl ? 1 : opacity);
+            if (a <= 0.002) continue;
+            Quaternionf q = null;
+            if (b.size() > 7 && b.get(7).isJsonArray()) {
+                JsonArray r = b.get(7).getAsJsonArray();
+                q = new Quaternionf().rotateY((float) Math.toRadians(r.get(1).getAsDouble()))
+                        .rotateX((float) Math.toRadians(r.get(0).getAsDouble()))
+                        .rotateZ((float) Math.toRadians(r.size() > 2 ? r.get(2).getAsDouble() : 0));
+            }
+            c.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+            float hx = Math.max(0.005f, Math.abs(x1 - x0) / 2), hy = Math.max(0.005f, Math.abs(y1 - y0) / 2), hz = Math.max(0.005f, Math.abs(z1 - z0) / 2);
+            for (int i = 0; i < 8; i++) {
+                v.set(CUBE[i][0] * hx, CUBE[i][1] * hy, CUBE[i][2] * hz);
+                if (q != null) q.transform(v);
+                w[i] = ax.at(v.add(c));
+            }
+            double flashK = 1 - k;   // near the front the box glows white
+            for (int fi = 0; fi < 6; fi++) {
+                int fc = col;
+                if (!gl && shade) {
+                    n.set(CUBE_N[fi][0], CUBE_N[fi][1], CUBE_N[fi][2]);
+                    if (q != null) q.transform(n);
+                    double side = Math.abs(n.x) >= Math.abs(n.z) ? 0.82 : 0.7;
+                    double sh = n.y >= 0 ? side + (1 - side) * n.y : side + (0.55 - side) * -n.y;
+                    fc = FxDraw.mix(0, col, sh);
+                }
+                if (flashK > 0.02) fc = FxDraw.mix(fc, 0xFFFFFF, Math.min(1, flashK * 1.4));
+                int[] fq = CUBE_F[fi];
+                FxDraw.quad(gl ? vGlow : vBody, f, w[fq[0]], w[fq[1]], w[fq[2]], w[fq[3]], fc, a);
+            }
+        }
     }
 
     private static Vector3f vec(JsonArray a) {

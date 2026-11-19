@@ -15,7 +15,7 @@ public final class FxRun {
     public double start, stopAt = Double.NaN;
     public int duration = -1;
     public Vec3 base = Vec3.ZERO, attachOffset = Vec3.ZERO;
-    public float yaw;
+    public float yaw, pitch;
     public Entity caster, target, attach;
     public Vec3 targetPos, look;
     public final Map<String, Vec3> points = new HashMap<>();

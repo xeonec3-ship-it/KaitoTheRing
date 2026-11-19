@@ -63,6 +63,12 @@ public final class Fx {
             return this;
         }
 
+        /** Tilt of the instance (degrees, Minecraft sense: positive looks down); models turn by yaw and pitch. */
+        public Spec pitch(float pitch) {
+            m.pitch = pitch;
+            return this;
+        }
+
         public Spec style(String style) {
             m.style = style;
             return this;
@@ -205,12 +211,18 @@ public final class Fx {
     }
 
     public static void move(ServerLevel sl, int inst, Vec3 p, float yaw) {
+        move(sl, inst, p, yaw, 0);
+    }
+
+    /** Moves the instance and turns it (models in it face yaw/pitch). */
+    public static void move(ServerLevel sl, int inst, Vec3 p, float yaw, float pitch) {
         Active a = ACTIVE.get(inst);
         if (a == null) return;
         a.msg.x = p.x;
         a.msg.y = p.y;
         a.msg.z = p.z;
         a.msg.yaw = yaw;
+        a.msg.pitch = pitch;
         FxMsg m = new FxMsg();
         m.op = FxMsg.MOVE;
         m.inst = inst;
@@ -218,6 +230,7 @@ public final class Fx {
         m.y = p.y;
         m.z = p.z;
         m.yaw = yaw;
+        m.pitch = pitch;
         sendTo(sl, a, m);
     }
 

@@ -115,7 +115,7 @@ public class SageBarrierSpell extends SilentSpell {
             return true;
         });
         Dome d = new Dome(owner, sl, radius, ticks);
-        d.fxInst = fx(sl, "silent_barrier_dome", Fx.fx("silent_barrier_dome").caster(owner).attach(owner).scale(radius).color(COLOR).duration(ticks));
+        d.fxInst = fx(sl, "silent_barrier_dome", Fx.fx("silent_barrier_dome").caster(owner).attach(owner).scale(radius).duration(ticks));
         DOMES.add(d);
         return d;
     }

@@ -87,7 +87,7 @@ public class WorganFlameSpell extends SilentSpell {
         super.onServerPreCast(level, spellLevel, caster, md);
         if (!(level instanceof ServerLevel sl)) return;
         Cast c = new Cast();
-        c.fxInst = fx(sl, "silent_worgan_flame", Fx.fx("silent_worgan_flame").caster(caster).attach(caster).color(BLACK)
+        c.fxInst = fx(sl, "silent_worgan_flame", Fx.fx("silent_worgan_flame").caster(caster).attach(caster)
                 .duration(getCastTime(1) + breath() + 30));
         CASTS.put(caster.getUUID(), c);
     }

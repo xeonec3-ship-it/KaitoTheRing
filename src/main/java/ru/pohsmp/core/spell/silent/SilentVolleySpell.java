@@ -31,7 +31,8 @@ import ru.pohsmp.core.fx.Fx;
  * "Silent Volley": during a 3 s cast 24 small seals rise around the caster in a fan (200° behind and to the sides, radius 2.5).
  * At the end every seal shoots an arrow of light at its own target: every enemy within 24 blocks, round robin (fewer enemies -
  * several arrows each, at most 6 into one). An arrow deals 6 damage, flies a homing arc and stops on a Barrier dome.
- * Look: fx/silent_volley.json (seals assembled from pieces, thin homing beams, sparks; ideas chat) - stand-in particles until then.
+ * Look: fx/silent_volley.json (the seals), silent_volley_arrow.json (one instance per arrow, moved along its arc) and
+ * silent_wind_spears_hit.json at half size on the hit; stand-in particles if a file is missing.
  */
 public class SilentVolleySpell extends SilentSpell {
     public static final String PATH = "silent_volley";
@@ -96,7 +97,7 @@ public class SilentVolleySpell extends SilentSpell {
         super.onServerPreCast(level, spellLevel, caster, md);
         if (!(level instanceof ServerLevel sl)) return;
         Cast c = new Cast();
-        c.fxInst = fx(sl, "silent_volley", Fx.fx("silent_volley").caster(caster).attach(caster).color(COLOR).duration(getCastTime(1) + 40));
+        c.fxInst = fx(sl, "silent_volley", Fx.fx("silent_volley").caster(caster).attach(caster).duration(getCastTime(1) + 40));
         CASTS.put(caster.getUUID(), c);
     }
 
@@ -136,7 +137,11 @@ public class SilentVolleySpell extends SilentSpell {
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
-        if (level instanceof ServerLevel sl) fire(sl, caster);
+        if (level instanceof ServerLevel sl) {
+            Cast c = CASTS.get(caster.getUUID());
+            if (c != null && c.fxInst >= 0) Fx.stop(sl, c.fxInst, "");   // the seals go out as their arrows leave
+            fire(sl, caster);
+        }
         super.onCast(level, spellLevel, caster, source, md);
     }
 
@@ -144,7 +149,7 @@ public class SilentVolleySpell extends SilentSpell {
     private static final class Arrow {
         LivingEntity target;
         Vec3 from, bend, pos;
-        int delay, flight, t;
+        int delay, flight, t, fx = -2;   // fx: data effect instance; -2 = not started yet, -1 = stand-in particles
         boolean done;
     }
 
@@ -184,8 +189,13 @@ public class SilentVolleySpell extends SilentSpell {
                     if (age <= a.delay) continue;
                     if (!a.target.isAlive() || a.target.isRemoved() || a.target.level() != sl) {   // target fell: the arrow goes out
                         a.done = true;
+                        if (a.fx >= 0) Fx.stop(sl, a.fx, "");
                         particles(sl, ParticleTypes.END_ROD, a.pos, 2, 0.05, 0.01);
                         continue;
+                    }
+                    if (a.fx == -2) {   // its own instance (fx/silent_volley_arrow.json), moved along the arc
+                        Vec3 d0 = a.bend.subtract(a.from);
+                        a.fx = fx(sl, "silent_volley_arrow", Fx.fx("silent_volley_arrow").at(a.from).yaw(yawOf(d0)).pitch(pitchOf(d0)).seed(a.delay * 31L + arrows.indexOf(a)));
                     }
                     a.t++;
                     double k = Math.min(1.0, a.t / (double) a.flight);
@@ -197,15 +207,22 @@ public class SilentVolleySpell extends SilentSpell {
                         Vec3 at = SageBarrierSpell.hitSphere(a.pos, p, dome.center(), dome.radius);
                         SageBarrierSpell.ripple(dome, at != null ? at : p);
                         a.done = true;
+                        if (a.fx >= 0) Fx.stop(sl, a.fx, "");
                         continue;
                     }
-                    line(sl, a.t % 2 == 0 ? WHITE_SMALL : TURQUOISE_SMALL, a.pos, p, 0.45);
+                    if (a.fx >= 0) {
+                        Vec3 d = p.subtract(a.pos);
+                        if (d.lengthSqr() > 1e-6) Fx.move(sl, a.fx, p, yawOf(d), pitchOf(d));
+                    } else line(sl, a.t % 2 == 0 ? WHITE_SMALL : TURQUOISE_SMALL, a.pos, p, 0.45);
                     a.pos = p;
                     if (k >= 1) {
                         a.done = true;
                         hit(caster, a.target, damage);
-                        particles(sl, ParticleTypes.ELECTRIC_SPARK, end, 5, 0.15, 0.08);
-                        particles(sl, TURQUOISE, end, 3, 0.2, 0);
+                        if (a.fx >= 0) Fx.stop(sl, a.fx, "");
+                        if (!hitFx(sl, end, 0.5)) {
+                            particles(sl, ParticleTypes.ELECTRIC_SPARK, end, 5, 0.15, 0.08);
+                            particles(sl, TURQUOISE, end, 3, 0.2, 0);
+                        }
                     }
                 }
                 return any;

@@ -191,9 +191,15 @@ public final class ElementDraw {
             m.style = d.has("style") && el.color() == null ? FxLib.style(d.get("style").getAsString()) : run.style;
             m.base = FxRun.w(el.at().resolve(ctx));
             m.yaw = (float) (ctx.yaw() + el.num("yaw", 0));
+            m.pitch = run.caster == null ? run.pitch : 0;   // a moved instance (spear) tilts along its flight
             m.start = run.start + el.delay();
             m.scale = el.scale() * run.scale;
             st.mesh = m;
+        }
+        if (el.follow()) {   // rides with the anchor: the caster, or the instance the server moves (Fx.move)
+            st.mesh.base = FxRun.w(el.at().resolve(ctx));
+            st.mesh.yaw = (float) (ctx.yaw() + el.num("yaw", 0));
+            st.mesh.pitch = run.caster == null ? run.pitch : 0;
         }
         double L = until(el);
         if (L >= 0 && te >= L) st.mesh.stop(L);
@@ -408,10 +414,31 @@ public final class ElementDraw {
         double grav = el.num("gravity", 0) * s, spin = el.num("spin", 0), sway = el.num("sway", 0), tumble = el.num("tumble", 0);
         double s0 = range(p, "size", 0.2, 0) * s, s1 = range(p, "size", 0.2, 1) * s;
         double emitEnd = L >= 0 ? L : Double.MAX_VALUE;
-        VertexConsumer vc = f.add(FxDraw.tex(run.style.texture(el.str("texture", "@sparks"))));
+        // blend: "additive" (light) or "translucent" (smoke, black flame); unset - dark colours are drawn translucent, since
+        // adding a near-black colour shows nothing
+        double lum = (0.2126 * FxDraw.r(col) + 0.7152 * FxDraw.g(col) + 0.0722 * FxDraw.b(col));
+        boolean dark = "translucent".equals(el.str("blend", lum < 0.2 ? "translucent" : "additive"));
+        var tex = FxDraw.tex(run.style.texture(el.str("texture", "@sparks")));
+        VertexConsumer vc = dark ? f.trans(tex) : f.add(tex);
         double glowK = el.num("glow", 0);
         VertexConsumer gl = glowK > 0 ? f.add(FxDraw.tex("glow")) : null;
         int step = f.low() ? 2 : 1;
+        // cone (degrees, full angle): particles fly within it along the caster's look (or the instance's yaw/pitch) - breath, sprays
+        double cone = el.num("cone", 0);
+        Vec3 dir = null, da = null, db = null;
+        double cosHalf = 1;
+        if (cone > 0) {
+            if (run.caster != null && run.caster.isAlive()) dir = run.caster.getViewVector(f.pt());
+            else {
+                double yr = Math.toRadians(run.yaw), pr = Math.toRadians(run.pitch);
+                dir = new Vec3(-Math.sin(yr) * Math.cos(pr), -Math.sin(pr), Math.cos(yr) * Math.cos(pr));
+            }
+            dir = dir.normalize();
+            Vec3 helper = Math.abs(dir.y) > 0.95 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
+            da = dir.cross(helper).normalize();
+            db = dir.cross(da).normalize();
+            cosHalf = Math.cos(Math.toRadians(Math.min(180, cone) / 2));
+        }
         for (int i = 0; i < count; i += step) {
             double birth = rate > 0 ? i / rate : 0;
             if (birth > emitEnd) break;
@@ -427,7 +454,11 @@ public final class ElementDraw {
                 Vec3 u = unit(r);
                 p0 = at.add(u.scale(spread * Math.cbrt(r.nextDouble())));
             }
-            Vec3 v = unit(r).scale(speed * (0.5 + r.nextDouble()));
+            Vec3 v;
+            if (dir != null) {   // uniform over the cone's cap
+                double cz = 1 - r.nextDouble() * (1 - cosHalf), sz = Math.sqrt(Math.max(0, 1 - cz * cz)), ph = r.nextDouble() * Math.PI * 2;
+                v = dir.scale(cz).add(da.scale(sz * Math.cos(ph))).add(db.scale(sz * Math.sin(ph))).scale(speed * (0.5 + r.nextDouble()));
+            } else v = unit(r).scale(speed * (0.5 + r.nextDouble()));
             double phase = r.nextDouble() * Math.PI * 2;
             Vec3 pos = p0.add(v.scale(age)).add(0, -0.5 * grav * age * age, 0);
             if (sway > 0) pos = pos.add(Math.sin(age * 0.12 + phase) * sway * 0.5, 0, Math.cos(age * 0.09 + phase) * sway * 0.3);

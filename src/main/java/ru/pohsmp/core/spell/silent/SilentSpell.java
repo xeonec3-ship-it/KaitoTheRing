@@ -206,6 +206,20 @@ public abstract class SilentSpell extends SilentStaffSpell {
         return Fx.play(sl, spec);
     }
 
+    /** Minecraft yaw / pitch (degrees, pitch positive = down) of a direction: data effects turn their models by these. */
+    public static float yawOf(Vec3 d) {
+        return (float) Math.toDegrees(Math.atan2(-d.x, d.z));
+    }
+
+    public static float pitchOf(Vec3 d) {
+        return (float) Math.toDegrees(-Math.atan2(d.y, Math.sqrt(d.x * d.x + d.z * d.z)));
+    }
+
+    /** Hit flash of a spear or arrow (fx/silent_wind_spears_hit.json); false if the file is missing (stand-in particles then). */
+    public static boolean hitFx(ServerLevel sl, Vec3 at, double scale) {
+        return fx(sl, "silent_wind_spears_hit", Fx.fx("silent_wind_spears_hit").at(at).scale(scale)) >= 0;
+    }
+
     public static void particles(ServerLevel sl, ParticleOptions p, Vec3 at, int count, double spread, double speed) {
         for (ServerPlayer pl : sl.players())
             if (pl.distanceToSqr(at) < 96 * 96) sl.sendParticles(pl, p, true, at.x, at.y, at.z, count, spread, spread, spread, speed);

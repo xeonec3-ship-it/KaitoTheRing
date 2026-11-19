@@ -25,7 +25,8 @@ import ru.pohsmp.core.fx.Fx;
 /**
  * "Wind Spears": up to 5 targets in a 60° cone up to 32 blocks, nearest to the aim. Over the caster's shoulders a clear spear
  * of wind (turquoise outline) appears for each, hangs for 0.5 s, then all fly at once (3 blocks a tick) and strike the head:
- * 14 damage each, knockback 0.6. Spears follow the head, stop on a Barrier dome. Look: fx/silent_wind_spears.json (ideas chat);
+ * 14 damage each, knockback 0.6. Spears follow the head, stop on a Barrier dome. Look: fx/silent_wind_spears.json (one instance per spear, moved and turned along
+ * its flight) and silent_wind_spears_hit.json on the hit;
  * gesture: a snap of the right hand's fingers (pose library T12) - until then Iron's one-handed cast.
  */
 public class WindSpearsSpell extends SilentSpell {
@@ -97,8 +98,10 @@ public class WindSpearsSpell extends SilentSpell {
             double side = ts.size() == 1 ? 0.6 : -1 + 2.0 * i / (ts.size() - 1);
             Spear s = new Spear(ts.get(i), side);
             s.pos = s.prev = slot(caster, side);
-            s.fxInst = fx(sl, "silent_wind_spears", Fx.fx("silent_wind_spears").caster(caster).target(s.target).at(s.pos)
-                    .point("start", s.pos).color(COLOR).seed(i + 1L));
+            // its own instance, not tied to the caster: the server moves and turns it (Fx.move) along the flight
+            Vec3 aim0 = head(s.target).subtract(s.pos);
+            s.fxInst = fx(sl, "silent_wind_spears", Fx.fx("silent_wind_spears").at(s.pos).yaw(yawOf(aim0)).pitch(pitchOf(aim0))
+                    .target(s.target).point("start", s.pos).seed(i + 1L));
             spears.add(s);
         }
         Tasks.add(new Tasks.Task() {
@@ -114,7 +117,9 @@ public class WindSpearsSpell extends SilentSpell {
                     if (age <= hover) {   // hanging over the shoulders, pointing at the target
                         s.prev = s.pos;
                         s.pos = slot(caster, s.side);
-                        drawSpear(sl, s, s.pos, s.target.isAlive() ? head(s.target).subtract(s.pos).normalize() : caster.getLookAngle(), s.fxInst < 0);
+                        Vec3 dir = s.target.isAlive() ? head(s.target).subtract(s.pos).normalize() : caster.getLookAngle();
+                        drawSpear(sl, s, s.pos, dir, s.fxInst < 0);
+                        if (s.fxInst >= 0) Fx.move(sl, s.fxInst, s.pos, yawOf(dir), pitchOf(dir));
                         if (age == hover) sl.playSound(null, s.pos.x, s.pos.y, s.pos.z, SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 0.35f, 1.8f);
                         continue;
                     }
@@ -139,7 +144,7 @@ public class WindSpearsSpell extends SilentSpell {
                         line(sl, TURQUOISE_SMALL, s.prev, s.pos, 0.5);   // the cut left in the air
                         drawSpear(sl, s, s.pos, to.normalize(), true);
                     } else {
-                        Fx.move(sl, s.fxInst, s.pos, (float) Math.toDegrees(Math.atan2(-to.x, to.z)));
+                        Fx.move(sl, s.fxInst, s.pos, yawOf(to), pitchOf(to));
                     }
                     if (d <= speed) strike(sl, caster, s, damage, kb, to.normalize());
                 }
@@ -167,7 +172,8 @@ public class WindSpearsSpell extends SilentSpell {
         LivingEntity t = s.target;
         if (hit(caster, t, damage) && kb > 0) t.knockback(kb, -dir.x, -dir.z);
         Vec3 h = head(t);
-        for (int i = 0; i < 14; i++) {   // ring of wind on the hit
+        if (s.fxInst >= 0) Fx.stop(sl, s.fxInst, "");
+        if (!hitFx(sl, h, 1.0)) for (int i = 0; i < 14; i++) {   // stand-in ring of wind on the hit
             double a = i * Math.PI * 2 / 14;
             Vec3 u = Math.abs(dir.y) > 0.9 ? new Vec3(1, 0, 0) : new Vec3(0, 1, 0);
             Vec3 p = dir.cross(u).normalize(), q = dir.cross(p).normalize();
@@ -175,12 +181,13 @@ public class WindSpearsSpell extends SilentSpell {
         }
         particles(sl, ParticleTypes.CLOUD, h, 4, 0.15, 0.04);
         sl.playSound(null, h.x, h.y, h.z, SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 0.6f, 1.7f);
-        if (s.fxInst >= 0) Fx.stop(sl, s.fxInst, "");
     }
 
     private static void vanish(ServerLevel sl, Spear s) {
         s.done = true;
-        particles(sl, ParticleTypes.CLOUD, s.pos, 3, 0.1, 0.02);
-        if (s.fxInst >= 0) Fx.stop(sl, s.fxInst, "");
+        if (s.fxInst >= 0) {
+            Fx.stop(sl, s.fxInst, "");
+            hitFx(sl, s.pos, 0.5);
+        } else particles(sl, ParticleTypes.CLOUD, s.pos, 3, 0.1, 0.02);
     }
 }

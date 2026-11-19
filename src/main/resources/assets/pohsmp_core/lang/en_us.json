@@ -701,5 +701,13 @@
   "subtitles.pohsmp_core.spell.world_tree.hit_earth": "World Tree: earth rumbles",
   "subtitles.pohsmp_core.spell.world_tree.hit_leaves": "World Tree: rustle",
   "subtitles.pohsmp_core.spell.world_tree.hit_wood": "World Tree: wood creaks",
-  "subtitles.pohsmp_core.spell.world_tree.loop": "World Tree: rustle"
+  "subtitles.pohsmp_core.spell.world_tree.loop": "World Tree: rustle",
+  "subtitles.pohsmp_core.spell.abyss_eye.cast": "Eye of the Abyss: hum",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_boom": "Eye of the Abyss: blast",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_heart": "Eye of the Abyss: heartbeat",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_hum": "Eye of the Abyss: hum",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_thunder": "Eye of the Abyss: thunderclap",
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_heart": "Eye of the Abyss: heartbeat",
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_hum": "Eye of the Abyss: hum",
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_roar": "Eye of the Abyss: roar"
 }

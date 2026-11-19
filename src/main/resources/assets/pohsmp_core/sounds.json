@@ -1660,5 +1660,113 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.abyss_eye.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.abyss_eye.charge_boom": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.charge_boom",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_boom_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_boom_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.abyss_eye.charge_heart": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.charge_heart",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_heart_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_heart_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.abyss_eye.charge_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.charge_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.abyss_eye.charge_thunder": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.charge_thunder",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_thunder_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_charge_thunder_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.abyss_eye.loop_heart": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.loop_heart",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_loop_heart_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_loop_heart_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_loop_heart_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.abyss_eye.loop_hum": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.loop_hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_loop_hum_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_loop_hum_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.abyss_eye.loop_roar": {
+    "subtitle": "subtitles.pohsmp_core.spell.abyss_eye.loop_roar",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_loop_roar_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/eldritch/abyss_eye_loop_roar_2",
+        "volume": 0.5
+      }
+    ]
   }
 }

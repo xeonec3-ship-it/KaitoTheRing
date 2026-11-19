@@ -2063,5 +2063,183 @@
   "replaces": [
    "AZALEA_LEAVES_BREAK"
   ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/eldritch/abyss_eye_cast_1.ogg",
+   "spell/eldritch/abyss_eye_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_cast_1.mp3",
+   "docs/sounds/mp3/abyss_eye_cast_2.mp3"
+  ],
+  "what": "гул / фон — начало каста (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java getCastStartSound()",
+  "replaces": [
+   "AMBIENT_CAVE"
+  ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.charge_boom",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/eldritch/abyss_eye_charge_boom_1.ogg",
+   "spell/eldritch/abyss_eye_charge_boom_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_charge_boom_1.mp3",
+   "docs/sounds/mp3/abyss_eye_charge_boom_2.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — нарастание во время каста (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java castTick()",
+  "replaces": [
+   "WARDEN_SONIC_BOOM"
+  ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.charge_heart",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/eldritch/abyss_eye_charge_heart_1.ogg",
+   "spell/eldritch/abyss_eye_charge_heart_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_charge_heart_1.mp3",
+   "docs/sounds/mp3/abyss_eye_charge_heart_2.mp3"
+  ],
+  "what": "удар сердца — нарастание во время каста (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java castTick()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.charge_hum",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/eldritch/abyss_eye_charge_hum_1.ogg",
+   "spell/eldritch/abyss_eye_charge_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_charge_hum_1.mp3",
+   "docs/sounds/mp3/abyss_eye_charge_hum_2.mp3"
+  ],
+  "what": "гул / фон — нарастание во время каста (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java castTick()",
+  "replaces": [
+   "AMBIENT_SOUL_SAND_VALLEY_MOOD"
+  ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.charge_thunder",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/eldritch/abyss_eye_charge_thunder_1.ogg",
+   "spell/eldritch/abyss_eye_charge_thunder_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_charge_thunder_1.mp3",
+   "docs/sounds/mp3/abyss_eye_charge_thunder_2.mp3"
+  ],
+  "what": "раскат грома — нарастание во время каста (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java castTick()",
+  "replaces": [
+   "LIGHTNING_BOLT_THUNDER"
+  ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.loop_heart",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/eldritch/abyss_eye_loop_heart_1.ogg",
+   "spell/eldritch/abyss_eye_loop_heart_2.ogg",
+   "spell/eldritch/abyss_eye_loop_heart_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_loop_heart_1.mp3",
+   "docs/sounds/mp3/abyss_eye_loop_heart_2.mp3",
+   "docs/sounds/mp3/abyss_eye_loop_heart_3.mp3"
+  ],
+  "what": "удар сердца — пока действует (тики) (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java tick()",
+  "replaces": [
+   "WARDEN_HEARTBEAT"
+  ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.loop_hum",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/eldritch/abyss_eye_loop_hum_1.ogg",
+   "spell/eldritch/abyss_eye_loop_hum_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_loop_hum_1.mp3",
+   "docs/sounds/mp3/abyss_eye_loop_hum_2.mp3"
+  ],
+  "what": "гул / фон — пока действует (тики) (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java tick()",
+  "replaces": [
+   "AMBIENT_CAVE"
+  ]
+ },
+ {
+  "school": "eldritch",
+  "school_ru": "Мистическая",
+  "spell": "abyss_eye",
+  "spell_ru": "Око бездны",
+  "event": "pohsmp_core:spell.abyss_eye.loop_roar",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/eldritch/abyss_eye_loop_roar_1.ogg",
+   "spell/eldritch/abyss_eye_loop_roar_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/abyss_eye_loop_roar_1.mp3",
+   "docs/sounds/mp3/abyss_eye_loop_roar_2.mp3"
+  ],
+  "what": "рёв / грозный гул — пока действует (тики) (подпись школы: шёпот и низкий гул)",
+  "where": "AbyssEyeSpell.java tick()",
+  "replaces": [
+   "WARDEN_ROAR"
+  ]
  }
 ]

@@ -701,5 +701,13 @@
   "subtitles.pohsmp_core.spell.world_tree.hit_earth": "Древо мира: дрожит земля",
   "subtitles.pohsmp_core.spell.world_tree.hit_leaves": "Древо мира: шелест",
   "subtitles.pohsmp_core.spell.world_tree.hit_wood": "Древо мира: трещит дерево",
-  "subtitles.pohsmp_core.spell.world_tree.loop": "Древо мира: шелест"
+  "subtitles.pohsmp_core.spell.world_tree.loop": "Древо мира: шелест",
+  "subtitles.pohsmp_core.spell.abyss_eye.cast": "Око бездны: гул",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_boom": "Око бездны: грохот",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_heart": "Око бездны: бьётся сердце",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_hum": "Око бездны: гул",
+  "subtitles.pohsmp_core.spell.abyss_eye.charge_thunder": "Око бездны: раскат",
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_heart": "Око бездны: бьётся сердце",
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_hum": "Око бездны: гул",
+  "subtitles.pohsmp_core.spell.abyss_eye.loop_roar": "Око бездны: рёв"
 }

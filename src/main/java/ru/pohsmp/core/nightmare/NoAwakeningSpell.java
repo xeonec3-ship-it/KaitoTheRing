@@ -35,15 +35,17 @@ import ru.pohsmp.core.spell.Cutscene;
 import ru.pohsmp.core.spell.HigherSpell;
 
 /**
- * T25 «Пробуждение не наступит» (Mythic): a 12 s cast with the camera scene (Cutscene.NO_AWAKENING) for everyone within 64 blocks. At 9.0 s
- * the victims (enemy players within [no_awakening] radius) start seeing the caster as nm_dread; at 12 s they are all at stage 3 for
+ * T25 «Пробуждение не наступит» (Mythic): a 17 s cast with the camera scene (Cutscene.NO_AWAKENING) for everyone within 64 blocks. After
+ * the title (13.1 s) the caster turns into nm_dread in the scene and the victims (enemy players within [no_awakening] radius) see it so from
+ * then on; at 17 s they are all at stage 3 for
  * [no_awakening] seconds, in the world of the nightmare, and the real monsters round them look like nightmares on their clients (their
  * damage is real; the bestiary's is not). Every [no_awakening] thickenEverySeconds it thickens: 1 more nightmares, 2 the faces of friends
  * come to bite (mimics), 3 the names of real people are gone, 4 the deepest. Killing the caster ends it for all, Blessing for one.
  */
 public class NoAwakeningSpell extends NightmareSpells.Base {
     public static final String PATH = NightmareSpells.NO_AWAKENING;
-    private static final int CAST = 240, TAIL = 20, DREAD_AT = 180;
+    /** Owner 19.11: the cast is 17 s; after the title (12 s) the caster turns into the Dread at MORPH_AT in front of the watchers. */
+    public static final int CAST = 340, TAIL = 20, MORPH_AT = 262;
 
     public NoAwakeningSpell() {
         super(PATH, Rank.MYTHIC, CAST);
@@ -102,12 +104,21 @@ public class NoAwakeningSpell extends NightmareSpells.Base {
         if (c == null) c = startCast(sl, caster);
         c.age++;
         switch (c.age) {
-            case DREAD_AT -> {   // 9.0 s: the heartbeat, the caster's look breaks - its victims see the Dread from now on
-                Cutscene.flash(sl, c.watchers, 6, 0xB01030);
-                for (ServerPlayer p : victims(sl, caster)) dread(p, caster, CAST - DREAD_AT + ticks(ServerConfig.NA_SECONDS), 0);
-            }
+            case 180 -> Cutscene.flash(sl, c.watchers, 6, 0xB01030);   // 9.0 s: the heartbeat, the face breaks
             case 220 -> Cutscene.flash(sl, c.watchers, 4, 0x3A0A16);
             case 236 -> Cutscene.flash(sl, c.watchers, 4, 0xE0285A);
+            case MORPH_AT -> {   // after the title: the caster turns into the Dread - for the watchers in the scene, for its victims from now on
+                Cutscene.flash(sl, c.watchers, 8, 0x7A1040);
+                Vec3 a = caster.position();
+                fx(sl, Fx.fx("nightmare_no_awakening_morph").at(a).caster(caster).attach(caster), "nightmare_no_awakening_morph");
+                sl.sendParticles(net.minecraft.core.particles.ParticleTypes.SQUID_INK, a.x, a.y + 1.2, a.z, 60, 0.5, 0.9, 0.5, 0.05);
+                sl.sendParticles(new net.minecraft.core.particles.DustParticleOptions(new org.joml.Vector3f(0.7f, 0.05f, 0.2f), 1.6f),
+                        a.x, a.y + 1.2, a.z, 40, 0.6, 1.0, 0.6, 0);
+                sl.playSound(null, a.x, a.y + 1, a.z, net.minecraft.sounds.SoundEvents.WARDEN_EMERGE, SoundSource.PLAYERS, 2f, 0.8f);
+                for (ServerPlayer p : victims(sl, caster)) dread(p, caster, CAST - MORPH_AT + ticks(ServerConfig.NA_SECONDS), 0);
+            }
+            case 300 -> sl.playSound(null, caster.getX(), caster.getY() + 1, caster.getZ(), net.minecraft.sounds.SoundEvents.WARDEN_ROAR,
+                    SoundSource.PLAYERS, 2f, 0.7f);
             default -> {}
         }
     }

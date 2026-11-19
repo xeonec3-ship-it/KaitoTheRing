@@ -577,7 +577,7 @@
   "spell.pohsmp_core.endless_night": "Endless Night",
   "spell.pohsmp_core.endless_night.guide": "For two minutes an endless night with a red moon rises around the caster - only for the enemies inside. Every 8 seconds their nightmare goes one stage deeper. Only real light holds the stage.",
   "spell.pohsmp_core.no_awakening": "No Awakening",
-  "spell.pohsmp_core.no_awakening.guide": "For twelve seconds the world drowns in ink. For five minutes every enemy within 64 blocks lives in the deepest nightmare, thicker every minute. The only way out is to kill the caster.",
+  "spell.pohsmp_core.no_awakening.guide": "For seventeen seconds the world drowns in ink, and the caster turns into a monster before everyone's eyes. For five minutes every enemy within 64 blocks lives in the deepest nightmare, thicker every minute. The only way out is to kill the caster.",
   "ui.pohsmp_core.endless_night.zone": "Zone: radius %s, %s s",
   "ui.pohsmp_core.endless_night.step": "Immersion one stage deeper every %s s",
   "ui.pohsmp_core.endless_night.light": "Light of %s or more holds the stage",

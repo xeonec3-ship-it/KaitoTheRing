@@ -72,7 +72,14 @@ public final class EmberEpicFight {
     private static final class Impl {
         static AnimationAccessor<ActionAnimation> LAST_HEAT, FIRE_VORTEX;
         static AnimationAccessor<BasicAttackAnimation> WHIP1, WHIP2, WHIP3;
+        static AnimationAccessor<BasicAttackAnimation> SWORD1, SWORD2, SWORD3, SWORD4, SWORD_DASH, SWORD_AIR;
         static AnimationAccessor<StaticAnimation> WHIP_IDLE;
+
+        /** A sword-form hit: the sword collider on the right hand, the same attack speed as the whip lashes. */
+        static BasicAttackAnimation sword(AnimationAccessor<BasicAttackAnimation> a, float antic, float contact, float recovery) {
+            return new BasicAttackAnimation(0.1F, antic, contact, recovery, null, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
+                    .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F);
+        }
         static AnimationAccessor<MovementAnimation> WHIP_WALK, WHIP_RUN;
 
         static void registerAnimations(AnimationRegistryEvent e) {
@@ -94,6 +101,15 @@ public final class EmberEpicFight {
                     .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
             WHIP3 = b.nextAccessor("biped/ember/whip3", a -> new BasicAttackAnimation(0.1F, 0.20F, 0.35F, 0.55F, null, Armatures.BIPED.get().toolR, a, Armatures.BIPED)
                     .addProperty(AttackAnimationProperty.BASIS_ATTACK_SPEED, 1.6F));
+            // sword form combo (owner 19.11: "ordinary hits, with variations"): 4 different hits, a dash hit and an air hit; fire trail in data/
+            SWORD1 = b.nextAccessor("biped/ember/sword1", a -> sword(a, 0.15F, 0.30F, 0.45F));   // horizontal cut right to left
+            SWORD2 = b.nextAccessor("biped/ember/sword2", a -> sword(a, 0.15F, 0.30F, 0.45F));   // rising backhand, low left to high right
+            SWORD3 = b.nextAccessor("biped/ember/sword3", a -> sword(a, 0.15F, 0.30F, 0.45F));   // thrust with a step
+            SWORD4 = b.nextAccessor("biped/ember/sword4", a -> sword(a, 0.25F, 0.40F, 0.60F)   // finisher from above with a hop: x1.2
+                    .addProperty(yesman.epicfight.api.animation.property.AnimationProperty.AttackPhaseProperty.DAMAGE_MODIFIER,
+                            yesman.epicfight.api.utils.math.ValueModifier.multiplier(1.2F)));
+            SWORD_DASH = b.nextAccessor("biped/ember/sword_dash", a -> sword(a, 0.15F, 0.30F, 0.45F));
+            SWORD_AIR = b.nextAccessor("biped/ember/sword_air", a -> sword(a, 0.15F, 0.30F, 0.45F));
             // whip form motion loops (manager 19.11): idle as the EF static idle, walk/run as EF movement (pace follows the speed)
             WHIP_IDLE = b.nextAccessor("biped/ember/whip_idle", a -> new StaticAnimation(true, a, Armatures.BIPED));
             WHIP_WALK = b.nextAccessor("biped/ember/whip_walk", a -> new MovementAnimation(true, a, Armatures.BIPED));
@@ -106,8 +122,7 @@ public final class EmberEpicFight {
                     .styleProvider(patch -> hot(patch.getOriginal()) ? CapabilityItem.Styles.TWO_HAND : CapabilityItem.Styles.ONE_HAND)
                     .collider(ColliderPreset.SWORD)
                     .hitSound(EpicFightSounds.BLADE_HIT.get())
-                    .newStyleCombo(CapabilityItem.Styles.ONE_HAND, Animations.SWORD_AUTO1, Animations.SWORD_AUTO2, Animations.SWORD_AUTO3,
-                            Animations.SWORD_DASH, Animations.SWORD_AIR_SLASH)
+                    .newStyleCombo(CapabilityItem.Styles.ONE_HAND, SWORD1, SWORD2, SWORD3, SWORD4, SWORD_DASH, SWORD_AIR)
                     .newStyleCombo(CapabilityItem.Styles.TWO_HAND, WHIP1, WHIP2, WHIP3, Animations.SWORD_DASH, Animations.SWORD_AIR_SLASH)
                     .innateSkill(CapabilityItem.Styles.ONE_HAND, s -> special)
                     .innateSkill(CapabilityItem.Styles.TWO_HAND, s -> special)

@@ -1,0 +1,115 @@
+{
+ "comment": "Ковчег: купол света на минуту — пузырь и кольцо, солнце-печать над куполом, столб к нему, завеса тонких лучей по границе, кольцо рун на земле, падают перья.",
+ "style": "divine",
+ "duration": 1200,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 32,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.5,0",
+   "duration": 40,
+   "shape": "sphere",
+   "radius": 32,
+   "rim": 1.2,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.5,0",
+   "duration": 14,
+   "size": 8,
+   "rays": 12,
+   "screen": 0.4,
+   "color": "#FFF4D6"
+  },
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "caster+0,32,0",
+   "id": "ark_sky",
+   "until": 1190
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "id": "ark_ground",
+   "until": 1190
+  },
+  {
+   "type": "column",
+   "delay": 10,
+   "at": "caster",
+   "duration": 1180,
+   "radius": 0.6,
+   "height": 32,
+   "rings": 3,
+   "ringSpeed": 4,
+   "fill": 1,
+   "color": "@primary",
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 10,
+   "at": "caster",
+   "duration": 1180,
+   "radius": 32,
+   "count": 72,
+   "height": 26,
+   "grow": 30,
+   "width": [
+    0.06,
+    0.16
+   ],
+   "brightness": [
+    0.15,
+    0.4
+   ],
+   "flicker": 0.3,
+   "texture": "beam_fade",
+   "color": "@primary",
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,22,0",
+   "duration": 1180,
+   "texture": "feather",
+   "count": 1180,
+   "rate": 1,
+   "area": 28,
+   "speed": 0.003,
+   "gravity": 0.0015,
+   "sway": 1.2,
+   "tumble": 0.6,
+   "size": [
+    0.45,
+    0.3
+   ],
+   "life": 180,
+   "color": "@secondary"
+  }
+ ]
+}

@@ -22,6 +22,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -30,7 +31,7 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * "Milky Way" (Higher): a 10 s cast with a cutscene for everyone around ("Birth of a galaxy": a great circle under the caster,
@@ -48,7 +49,7 @@ public class MilkyWaySpell extends HigherSpell {
 
     private static final class Cast {
         Vec3 at, dir;
-        int age, key, cutKey;
+        int age, fx, cutKey;
         List<UUID> watchers = new ArrayList<>();
     }
 
@@ -87,11 +88,10 @@ public class MilkyWaySpell extends HigherSpell {
         c.at = caster.position();
         Vec3 look = caster.getLookAngle().multiply(1, 0, 1);
         c.dir = look.lengthSqr() < 1e-4 ? new Vec3(0, 0, 1) : look.normalize();
-        c.key = key();
         c.cutKey = key();
         double ang = Math.atan2(c.dir.z, c.dir.x);
         c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.MILKY_WAY, CAST, c.at.add(c.dir.scale(14)).add(0, 3, 0), ang);
-        fx(sl, c.at.x, c.at.y, c.at.z, new Net.HFx(Net.HFx.MILKY, c.key, caster.getId(), -1, CAST, c.at.x, c.at.y, c.at.z, ang, COLOR));
+        c.fx = Fx.play(sl, Fx.fx("milky_way_cast").at(c.at).caster(caster));
         CASTS.put(caster.getUUID(), c);
         sl.playSound(null, c.at.x, c.at.y, c.at.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 4f, 0.6f);
         return c;
@@ -142,7 +142,7 @@ public class MilkyWaySpell extends HigherSpell {
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity caster, MagicData md, boolean cancelled) {
         Cast c = CASTS.remove(caster.getUUID());
         if (c != null && level instanceof ServerLevel sl) {
-            stop(sl, c.at.x, c.at.y, c.at.z, c.key);
+            Fx.stop(sl, c.fx, "");
             Cutscene.end(sl, caster, c.watchers, c.cutKey);
         }
         super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
@@ -154,9 +154,10 @@ public class MilkyWaySpell extends HigherSpell {
     }
 
     private static void launch(ServerLevel sl, LivingEntity caster, Vec3 at, Vec3 dir) {
-        int k = key();
-        double ang = Math.atan2(dir.z, dir.x);
-        fx(sl, at.x, at.y, at.z, new Net.HFx(Net.HFx.GALAXY, k, caster.getId(), -1, LIFE, at.x, at.y, at.z, ang, COLOR));
+        float yaw = (float) Math.toDegrees(Math.atan2(-dir.x, dir.z));
+        Vec3 c00 = center(at, dir, 0);
+        // the galaxy rides an invisible display entity moved every tick, so clients see it glide (the entity is interpolated)
+        Entity anchor = Disp.item(sl, "minecraft:air", c00.x, c00.y, c00.z, 1f, yaw);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 4f, 1.3f);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 2f, 1.4f);
         Vec3 c0 = center(at, dir, 0);
@@ -167,7 +168,26 @@ public class MilkyWaySpell extends HigherSpell {
             @Override
             public boolean tick() {
                 age++;
-                Vec3 c = center(at, dir, age);
+                Vec3 c = center(at, dir, Math.min(age, LIFE));
+                Disp.move(anchor, c.x, c.y, c.z, yaw);
+                if (age == 2) {   // a tick later than the anchor, so clients already know it
+                    Vec3 p = anchor != null ? anchor.position() : c;
+                    Fx.Spec g = Fx.sigil("milky_galaxy").at(p).yaw(yaw).duration(LIFE - 2), f = Fx.sigil("milky_galaxy_flat").at(p).yaw(yaw).duration(LIFE - 2),
+                            t = Fx.fx("milky_way_trail").at(p).yaw(yaw).duration(LIFE - 2);
+                    if (anchor != null) {
+                        g.attach(anchor);
+                        f.attach(anchor);
+                        t.attach(anchor);
+                    }
+                    Fx.play(sl, g);
+                    Fx.play(sl, f);
+                    Fx.play(sl, t);
+                }
+                if (age > LIFE) {   // keep the anchor while the galaxy dissolves
+                    if (age < LIFE + 40) return true;
+                    Disp.kill(anchor);
+                    return false;
+                }
                 boolean toss = age % TOSS_EVERY == TOSS_EVERY / 2;
                 for (LivingEntity e : around(sl, c, RAD + 1, e -> !friendly(caster, e) && Math.abs(e.getY() + e.getBbHeight() / 2 - c.y) < 4.5)) {
                     Vec3 ec = e.position().add(0, e.getBbHeight() / 2, 0);
@@ -199,10 +219,10 @@ public class MilkyWaySpell extends HigherSpell {
                 }
                 if (age % 20 == 0) sl.playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 3f, 0.6f);
                 if (age < LIFE) return true;
-                burst(sl, c.x, c.y, c.z, RAD, COLOR);
+                Fx.play(sl, Fx.fx("milky_way_end").at(c).yaw(yaw));
                 DivineEvents.particle(sl, ParticleTypes.END_ROD, c.x, c.y, c.z, 80, 1.5, 0.3);
                 sl.playSound(null, c.x, c.y, c.z, SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 4f, 0.5f);
-                return false;
+                return true;
             }
         });
     }

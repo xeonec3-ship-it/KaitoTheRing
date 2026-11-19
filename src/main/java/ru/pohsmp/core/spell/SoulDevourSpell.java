@@ -36,10 +36,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Soul Devour (divine, level 1): a 25 s cast that cannot be interrupted, with a cutscene for everyone around and drawn circles
- * (HFx SOUL). The target is held in place in darkness while its soul is drawn out toward the caster; at the end it dies.
+ * (fx soul_devour). The target is held in place in darkness while its soul is drawn out toward the caster; at the end it dies.
  * Nothing saves it: armor, effects, totem, creative mode.
  */
 public class SoulDevourSpell extends PohSpell {
@@ -50,7 +51,7 @@ public class SoulDevourSpell extends PohSpell {
     private static final class Hold {
         LivingEntity caster, target;
         Vec3 at;
-        int age, key, cutKey;
+        int age, fx, cutKey;
         List<UUID> watchers = new java.util.ArrayList<>();
     }
 
@@ -99,12 +100,11 @@ public class SoulDevourSpell extends PohSpell {
         h.target = t;
         h.at = t.position();
         HOLDS.put(caster.getUUID(), h);
-        h.key = HigherSpell.key();
         h.cutKey = HigherSpell.key();
         Vec3 d = h.at.subtract(caster.position());
         double ang = Math.atan2(d.z, d.x);
         h.watchers = Cutscene.start(sl, caster, h.cutKey, Cutscene.SOUL_DEVOUR, CAST, h.at, ang);
-        HigherSpell.fx(sl, h.at.x, h.at.y, h.at.z, new ru.pohsmp.core.net.Net.HFx(ru.pohsmp.core.net.Net.HFx.SOUL, h.key, caster.getId(), t.getId(), CAST, h.at.x, h.at.y, h.at.z, ang, COLOR));
+        h.fx = Fx.play(sl, Fx.fx("soul_devour").at(h.at).caster(caster).target(t));
         sl.playSound(null, h.at.x, h.at.y, h.at.z, SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 3f, 0.5f);
         return h;
     }
@@ -184,12 +184,13 @@ public class SoulDevourSpell extends PohSpell {
     /** Ends the cutscene and the circles (the camera comes back before the target dies). */
     private static void finish(ServerLevel sl, LivingEntity caster, Hold h) {
         if (h == null) return;
-        HigherSpell.stop(sl, h.at.x, h.at.y, h.at.z, h.key);
+        Fx.stop(sl, h.fx, "");
         Cutscene.end(sl, caster, h.watchers, h.cutKey);
     }
 
     private static void devour(ServerLevel sl, LivingEntity caster, LivingEntity t) {
         Vec3 c = t.position().add(0, t.getBbHeight() / 2, 0);
+        Fx.play(sl, Fx.fx("soul_devour_end").at(t.position()));
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 3f, 0.4f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 4f, 0.4f);
         DivineEvents.particle(sl, ParticleTypes.SCULK_SOUL, c.x, c.y, c.z, 60, 0.4, 0.15);

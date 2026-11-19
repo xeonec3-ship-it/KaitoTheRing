@@ -1,0 +1,123 @@
+{
+ "comment": "Застывший час, каст (2 с): циферблат под ногами раскручивается, шестерёнки, песочные часы в центре.",
+ "size": 2.6,
+ "color": "#F2C86B",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.9,
+   "heightOffset": -0.01,
+   "color": "#CFE6FF",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "gear",
+   "type": "disc",
+   "texture": "gear",
+   "radius": 0.6,
+   "heightOffset": 0.0,
+   "color": "#CFE6FF",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -30
+   }
+  },
+  {
+   "id": "face",
+   "type": "disc",
+   "texture": "clock_ornate",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 2,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   }
+  },
+  {
+   "id": "hourglass",
+   "type": "disc",
+   "texture": "hourglass",
+   "radius": 0.22,
+   "heightOffset": 0.02,
+   "appear": {
+    "delay": 8,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "hour",
+   "type": "disc",
+   "texture": "clock_hand_hour",
+   "radius": 1.0,
+   "heightOffset": 0.03,
+   "appear": {
+    "delay": 6,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -120
+   }
+  },
+  {
+   "id": "minute",
+   "type": "disc",
+   "texture": "clock_hand_minute",
+   "radius": 1.0,
+   "heightOffset": 0.04,
+   "appear": {
+    "delay": 6,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -720
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "collapse"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

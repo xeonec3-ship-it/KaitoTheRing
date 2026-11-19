@@ -1,0 +1,36 @@
+{
+ "comment": "Закрытие пространства: купол рассыпается — вспышка, осколки сыплются с оболочки.",
+ "style": "coven",
+ "duration": 80,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,20,0",
+   "duration": 16,
+   "size": 20,
+   "rays": 14,
+   "screen": 0.5,
+   "color": "#E4DAFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,50,0",
+   "duration": 10,
+   "texture": "shard",
+   "count": 360,
+   "rate": 36,
+   "area": 70,
+   "speed": 0.02,
+   "gravity": 0.02,
+   "tumble": 1,
+   "size": [
+    1.2,
+    0.4
+   ],
+   "life": 70,
+   "color": "@primary"
+  }
+ ]
+}

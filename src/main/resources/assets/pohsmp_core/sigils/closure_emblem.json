@@ -1,0 +1,54 @@
+{
+ "comment": "Закрытие пространства: печать Ковена, вписанная в оболочку купола (к зрителю).",
+ "size": 11.0,
+ "color": "#8A6CFF",
+ "orientation": "billboard",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.8,
+   "heightOffset": -0.01,
+   "brightness": 0.3,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "coven",
+   "type": "disc",
+   "texture": "circle_coven",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.9,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 3
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

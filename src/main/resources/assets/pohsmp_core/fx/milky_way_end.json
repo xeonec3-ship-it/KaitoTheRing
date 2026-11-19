@@ -1,0 +1,47 @@
+{
+ "comment": "Млечный путь: галактика рассыпается в конце пути.",
+ "style": "astral",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "duration": 12,
+   "size": 9,
+   "rays": 12,
+   "anamorphic": 16,
+   "screen": 0.3,
+   "color": "#E8DCFF"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "shape": "sphere",
+   "radius": 7,
+   "rim": 1.4,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 3,
+   "texture": "spark_sharp",
+   "count": 160,
+   "rate": 160,
+   "spread": 2,
+   "speed": 0.3,
+   "gravity": 0.004,
+   "size": [
+    0.4,
+    0.05
+   ],
+   "spin": 200,
+   "life": 30,
+   "color": "@secondary"
+  }
+ ]
+}

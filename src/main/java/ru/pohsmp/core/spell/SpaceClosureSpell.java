@@ -43,8 +43,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
-import ru.pohsmp.core.net.Net;
-import ru.pohsmp.core.net.Net.HFx;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Mythic "Closing of Space" (a Coven seal), levels 1-4. 20 s cast that cannot be interrupted, with a cutscene for everyone within 64.
@@ -68,7 +67,7 @@ public class SpaceClosureSpell extends PohSpell {
         Vec3 c;
         UUID caster;
         long until;
-        int key;
+        int fx = -1;
         /** Which side of the shell each entity was on (true = inside). Kept for players who leave the level. */
         final Map<UUID, Boolean> side = new HashMap<>();
         final Map<UUID, Long> lastFx = new HashMap<>();
@@ -78,7 +77,7 @@ public class SpaceClosureSpell extends PohSpell {
 
     private static final class Casting {
         Vec3 at;
-        int key, cutKey;
+        int fx, cutKey;
         List<UUID> watchers = new ArrayList<>();
     }
 
@@ -122,12 +121,11 @@ public class SpaceClosureSpell extends PohSpell {
     private static void begin(ServerLevel sl, LivingEntity caster) {
         Casting c = new Casting();
         c.at = caster.position();
-        c.key = HigherSpell.key();
         c.cutKey = HigherSpell.key();
         Vec3 look = caster.getLookAngle();
         double ang = Math.atan2(look.z, look.x);
         c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.SPACE_CLOSURE, CAST, c.at.add(0, 40, 0), ang);
-        HigherSpell.fx(sl, c.at.x, c.at.y + 20, c.at.z, new HFx(HFx.CLOSURE_CAST, c.key, caster.getId(), -1, CAST, c.at.x, c.at.y, c.at.z, R, COLOR));
+        c.fx = Fx.play(sl, Fx.fx("space_closure_cast").at(c.at).caster(caster));
         CASTING.put(caster.getUUID(), c);
     }
 
@@ -149,7 +147,7 @@ public class SpaceClosureSpell extends PohSpell {
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity caster, MagicData md, boolean cancelled) {
         Casting c = CASTING.remove(caster.getUUID());
         if (c != null && level instanceof ServerLevel sl) {
-            HigherSpell.stop(sl, c.at.x, c.at.y + 20, c.at.z, c.key);
+            Fx.stop(sl, c.fx, "");
             Cutscene.end(sl, caster, c.watchers, c.cutKey);
         }
         super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
@@ -167,9 +165,10 @@ public class SpaceClosureSpell extends PohSpell {
 
     // ---- the dome ----
 
-    private static void sendDome(ServerLevel sl, Zone z) {
+    /** The dome (fx space_closure_dome); players who come closer later get it from Fx with its current age. */
+    private static void sendDome(ServerLevel sl, Zone z, float yaw) {
         int left = (int) Math.max(1, z.until - sl.getGameTime());
-        Net.sendNear(sl, z.c.x, z.c.y, z.c.z, z.c.x, z.c.y + R, z.c.z, new HFx(HFx.CLOSURE, z.key, -1, -1, left, z.c.x, z.c.y, z.c.z, R, COLOR));
+        z.fx = Fx.play(sl, Fx.fx("space_closure_dome").at(z.c).yaw(yaw).duration(left));
     }
 
     public static void open(ServerLevel sl, LivingEntity caster, Vec3 at, int min) {
@@ -178,12 +177,11 @@ public class SpaceClosureSpell extends PohSpell {
         z.c = at;
         z.caster = caster.getUUID();
         z.until = sl.getGameTime() + min * 1200L;
-        z.key = z.caster.hashCode() ^ 0x5C105E;
         for (Zone o : new ArrayList<>(ZONES)) if (o.caster.equals(z.caster)) close(sl, o);
         for (Entity e : sl.getEntities((Entity) null, box(z, 2), e -> true)) if (e.getVehicle() == null) z.side.put(e.getUUID(), e.position().distanceTo(z.c) < R);
         for (ServerPlayer p : sl.getServer().getPlayerList().getPlayers()) z.side.putIfAbsent(p.getUUID(), p.level() == sl && p.position().distanceTo(z.c) < R);
         ZONES.add(z);
-        sendDome(sl, z);
+        sendDome(sl, z, caster.getYRot());
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 8f, 0.6f);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 6f, 0.4f);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 3f, 0.5f);
@@ -201,7 +199,6 @@ public class SpaceClosureSpell extends PohSpell {
                 }
                 if (age > 10) wall(sl, z);   // the shell closes after the dome has grown (client draws it in 40 ticks)
                 if (age % 100 == 1) silence(sl, z);
-                if (age % 100 == 50) sendDome(sl, z);
                 return true;
             }
         });
@@ -215,7 +212,8 @@ public class SpaceClosureSpell extends PohSpell {
             le.addEffect(new MobEffectInstance(ru.pohsmp.core.Reg.SPENT.get(), SPENT_TICKS, 0, false, true, true));
             if (le instanceof ServerPlayer sp) MagicData.getPlayerMagicData(sp).setMana(0);
         }
-        Net.sendNear(sl, z.c.x, z.c.y, z.c.z, z.c.x, z.c.y + R, z.c.z, new HFx(HFx.STOP, z.key, -1, -1, 0, 0, 0, 0, 0, 0));
+        if (z.fx >= 0) Fx.stop(sl, z.fx, "");
+        Fx.play(sl, Fx.fx("space_closure_break").at(z.c));
         sl.playSound(null, z.c.x, z.c.y, z.c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 8f, 0.5f);
         sl.playSound(null, z.c.x, z.c.y, z.c.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 8f, 0.4f);
     }
@@ -269,8 +267,8 @@ public class SpaceClosureSpell extends PohSpell {
         if (last != null && now - last < 8) return;
         z.lastFx.put(who, now);
         Vec3 n = p.subtract(z.c).normalize();
-        int yaw = (int) Math.round(Math.atan2(n.z, n.x) * 1000), pitch = (int) Math.round(Math.asin(Math.max(-1, Math.min(1, n.y))) * 1000);
-        Net.sendNear(sl, p.x, p.y, p.z, p.x, p.y, p.z, new HFx(HFx.CLOSURE_HIT, HigherSpell.key(), yaw, pitch, 24, p.x, p.y, p.z, 3.5, COLOR));
+        float yaw = (float) Math.toDegrees(Math.atan2(-n.x, n.z));   // the ripple stands on the shell, facing outward
+        Fx.play(sl, Fx.sigil("closure_ripple").at(p).yaw(yaw).orientation("facing"));
         sl.playSound(null, p.x, p.y, p.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.6f);
         sl.playSound(null, p.x, p.y, p.z, SoundEvents.RESPAWN_ANCHOR_SET_SPAWN, SoundSource.PLAYERS, 1.2f, 1.4f);
     }

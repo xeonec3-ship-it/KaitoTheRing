@@ -1,0 +1,62 @@
+{
+ "comment": "Низвержение: кольцо рун на уровне груди вокруг кастера.",
+ "size": 4.5,
+ "color": "#D4A017",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "runes",
+   "type": "band",
+   "texture": "rune_band",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#FFD36B",
+   "inner": 0.88,
+   "repeat": 8,
+   "appear": {
+    "delay": 0,
+    "duration": 24,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 14
+   }
+  },
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 0.86,
+   "heightOffset": 0.01,
+   "color": "#8A1420",
+   "brightness": 1.2,
+   "inner": 0.98,
+   "repeat": 1,
+   "appear": {
+    "delay": 8,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -10
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

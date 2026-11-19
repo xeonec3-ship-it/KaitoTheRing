@@ -1,0 +1,76 @@
+{
+ "comment": "Табу: «гироскоп» на столбе — кольца рун и пунктира, вращаются в разные стороны.",
+ "size": 9.0,
+ "color": "#FFD36B",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "runes",
+   "type": "disc",
+   "texture": "orbit_runes",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 6
+   }
+  },
+  {
+   "id": "dash",
+   "type": "disc",
+   "texture": "orbit_dash",
+   "radius": 0.78,
+   "heightOffset": 0.6,
+   "color": "#FFF4D6",
+   "appear": {
+    "delay": 6,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -9
+   }
+  },
+  {
+   "id": "stars",
+   "type": "disc",
+   "texture": "orbit_stars",
+   "radius": 0.55,
+   "heightOffset": 1.2,
+   "appear": {
+    "delay": 12,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 14
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

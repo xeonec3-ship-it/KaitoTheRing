@@ -1,0 +1,41 @@
+{
+ "comment": "Кровавая луна: нить крови от жертвы к кастеру.",
+ "style": "blood",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "beam",
+   "delay": 0,
+   "at": "target+0,1,0",
+   "to": "caster+0,1.2,0",
+   "follow": true,
+   "duration": 14,
+   "width": 0.14,
+   "core": 0.4,
+   "grow": 6,
+   "flicker": 0.3,
+   "color": "@primary",
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "target+0,1,0",
+   "duration": 8,
+   "texture": "spark_soft",
+   "count": 8,
+   "rate": 1,
+   "spread": 0.4,
+   "speed": 0.03,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 14,
+   "color": "@secondary"
+  }
+ ]
+}

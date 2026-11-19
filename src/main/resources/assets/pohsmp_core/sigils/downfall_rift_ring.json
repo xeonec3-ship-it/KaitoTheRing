@@ -1,0 +1,79 @@
+{
+ "comment": "Низвержение: кольца-орбиты вокруг разлома (вертикальные, смотрят на кастера).",
+ "size": 2.6,
+ "color": "#D4A017",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "orbit_dash",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 40
+   }
+  },
+  {
+   "id": "ring2",
+   "type": "disc",
+   "texture": "orbit_saw",
+   "radius": 0.8,
+   "heightOffset": 0.05,
+   "color": "#FFF0C0",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -55
+   }
+  },
+  {
+   "id": "runes",
+   "type": "disc",
+   "texture": "orbit_runes",
+   "radius": 1.3,
+   "heightOffset": -0.05,
+   "color": "#8A1420",
+   "brightness": 1.2,
+   "appear": {
+    "delay": 20,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 18
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 16,
+  "stagger": 2
+ }
+}

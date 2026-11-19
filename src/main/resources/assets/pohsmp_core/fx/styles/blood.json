@@ -1,0 +1,25 @@
+{
+ "comment": "Кровь: алый и розово-красный; луна, пульс, нити.",
+ "palette": {
+  "primary": "#D0101E",
+  "secondary": "#FF5A5A",
+  "core": "#FFD0D0",
+  "shadow": "#2A0006"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "shard",
+  "sigil": "sigil_blood"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.8,
+  "jitter": 0.0,
+  "easing": "easeOutSine",
+  "pulse": {
+   "amp": 0.25,
+   "period": 20
+  }
+ }
+}

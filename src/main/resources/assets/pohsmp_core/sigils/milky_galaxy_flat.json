@@ -1,0 +1,58 @@
+{
+ "comment": "Млечный путь: плоская галактика поперёк катящейся — вместе дают объём.",
+ "size": 6.0,
+ "color": "#A07CFF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "arms",
+   "type": "disc",
+   "texture": "galaxy_arms",
+   "radius": 0.9,
+   "heightOffset": 0.0,
+   "brightness": 0.6,
+   "appear": {
+    "delay": 4,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 110
+   }
+  },
+  {
+   "id": "orbit",
+   "type": "disc",
+   "texture": "orbit_runes",
+   "radius": 1.15,
+   "heightOffset": 0.01,
+   "color": "#D8DCFF",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 8,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -30
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "shatter"
+  ],
+  "duration": 24,
+  "stagger": 2
+ }
+}

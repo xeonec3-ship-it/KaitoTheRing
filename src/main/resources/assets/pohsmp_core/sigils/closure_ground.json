@@ -1,0 +1,129 @@
+{
+ "comment": "Закрытие пространства, каст: печать Ковена под кастером, мандала, обод; потом подрастает.",
+ "size": 9.0,
+ "color": "#8A6CFF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "mandala",
+   "type": "disc",
+   "texture": "pat_mandala",
+   "radius": 1.44,
+   "heightOffset": -0.01,
+   "brightness": 0.45,
+   "appear": {
+    "delay": 0,
+    "duration": 50,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   }
+  },
+  {
+   "id": "coven",
+   "type": "disc",
+   "texture": "circle_coven",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 3
+   }
+  },
+  {
+   "id": "circle_b",
+   "type": "disc",
+   "texture": "circle_b",
+   "radius": 0.36,
+   "heightOffset": 0.01,
+   "color": "#E4DAFF",
+   "appear": {
+    "delay": 20,
+    "duration": 20,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "twist"
+    ]
+   },
+   "rotation": {
+    "speed": -16
+   }
+  },
+  {
+   "id": "geo",
+   "type": "disc",
+   "texture": "coven_geo",
+   "radius": 0.6,
+   "heightOffset": 0.02,
+   "color": "#E4DAFF",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 30,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": -90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": 6
+   }
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.5,
+   "heightOffset": 0.03,
+   "brightness": 0.8,
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 40,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  }
+ ],
+ "expand": {
+  "scale": 1.2,
+  "delay": 20,
+  "duration": 40,
+  "easing": "easeInOutSine"
+ },
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.2,
+  "duration": 12,
+  "sparks": 30
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

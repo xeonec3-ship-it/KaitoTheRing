@@ -1,0 +1,55 @@
+{
+ "comment": "Закрытие пространства: печать в центре купола на земле.",
+ "size": 14.0,
+ "color": "#8A6CFF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "mandala",
+   "type": "disc",
+   "texture": "pat_mandala",
+   "radius": 1.43,
+   "heightOffset": -0.01,
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 1
+   }
+  },
+  {
+   "id": "coven",
+   "type": "disc",
+   "texture": "circle_coven",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -2.5
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

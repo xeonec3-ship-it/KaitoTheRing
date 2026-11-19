@@ -1,0 +1,21 @@
+{
+ "comment": "Время: золото на холодном сером, бледно-ледяные отблески; циферблаты, шестерёнки, застывшие пылинки.",
+ "palette": {
+  "primary": "#F2C86B",
+  "secondary": "#CFE6FF",
+  "core": "#FFFFFF",
+  "shadow": "#3A4458"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "shard",
+  "sigil": "clock_face"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.5,
+  "jitter": 0.0,
+  "easing": "easeOutSine"
+ }
+}

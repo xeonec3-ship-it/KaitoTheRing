@@ -1,0 +1,60 @@
+{
+ "comment": "Кровавая луна, 20 с: мир алеет, над кастером встаёт красная луна, печать крови под ногами, капли поднимаются.",
+ "style": "blood",
+ "duration": 400,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 400,
+   "radius": 24,
+   "color": "#6A0008",
+   "strength": 0.4,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,14,0",
+   "follow": true,
+   "id": "blood_moon",
+   "until": 396
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "follow": true,
+   "id": "blood_ground",
+   "until": 396
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 396,
+   "texture": "spark_soft",
+   "count": 800,
+   "rate": 2,
+   "area": 15,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 50,
+   "color": "@primary"
+  }
+ ]
+}

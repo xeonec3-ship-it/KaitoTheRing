@@ -29,8 +29,7 @@ import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
-import ru.pohsmp.core.net.Net.HFx;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Evocation: eight Iron's magic shields stand around the caster as a slowly turning octagonal wall and share one pool.
@@ -90,9 +89,7 @@ public class EightShieldsSpell extends PohSpell {
                 OWNERS.put(s.getId(), caster.getUUID());
                 shields.add(s);
             }
-            int key = HigherSpell.key();
-            Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), caster.getX(), caster.getY(), caster.getZ(),
-                    new HFx(HFx.WARD, key, caster.getId(), -1, dur, caster.getX(), caster.getY(), caster.getZ(), RAD, COLOR));
+            int ward = Fx.play(sl, Fx.sigil("eight_shields").at(caster.position().add(0, 0.05, 0)).caster(caster).attach(caster).duration(dur));   // octagram under the wall
             sl.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.ARMOR_EQUIP_NETHERITE, SoundSource.PLAYERS, 1.5f, 0.8f);
             sl.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.2f, 1.6f);
             Tasks.add(new Tasks.Task() {
@@ -129,8 +126,7 @@ public class EightShieldsSpell extends PohSpell {
                         resetAge(s);
                     }
                     if (over) {
-                        Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), caster.getX(), caster.getY(), caster.getZ(),
-                                new HFx(HFx.STOP, key, -1, -1, 0, 0, 0, 0, 0, 0));
+                        Fx.stop(sl, ward, "");
                         PohEvents.removePool(caster, pool);
                         caster.removeEffect(Reg.EIGHT_SHIELDS.get());
                     }

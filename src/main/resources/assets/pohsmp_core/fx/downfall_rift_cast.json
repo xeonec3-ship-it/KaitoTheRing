@@ -1,0 +1,72 @@
+{
+ "comment": "Низвержение, каст: разлом рождается в точке взгляда (с 10 с), кольца вокруг, затягивание искр, вспышка к открытию.",
+ "style": "forbidden",
+ "duration": 500,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 200,
+   "at": "caster+0,0.05,0",
+   "id": "downfall_ground",
+   "scale": 1.0,
+   "until": 500
+  },
+  {
+   "type": "mesh",
+   "delay": 220,
+   "at": "caster",
+   "model": "downfall_rift",
+   "until": 500
+  },
+  {
+   "type": "sigil",
+   "delay": 200,
+   "at": "caster+0,2.6,0",
+   "id": "downfall_rift_glow",
+   "until": 500
+  },
+  {
+   "type": "sigil",
+   "delay": 240,
+   "at": "caster+0,2.6,0",
+   "id": "downfall_rift_ring",
+   "until": 500
+  },
+  {
+   "type": "vortex",
+   "delay": 380,
+   "at": "caster+0,2.6,0",
+   "duration": 120,
+   "radius": 12,
+   "height": 6,
+   "arms": 5,
+   "speed": 1.5,
+   "pull": 1,
+   "texture": "spark_sharp",
+   "color": "@primary",
+   "comment": "искры затягивает в разлом (движок элементов)"
+  },
+  {
+   "type": "lightning",
+   "delay": 440,
+   "at": "caster+0,30,0",
+   "to": "caster+0,2.6,0",
+   "duration": 60,
+   "branches": 3,
+   "jaggedness": 0.5,
+   "regen": 3,
+   "width": 0.15,
+   "color": "#FFF0C0",
+   "comment": "молния в разлом (движок элементов)"
+  },
+  {
+   "type": "flash",
+   "delay": 460,
+   "at": "caster+0,2.6,0",
+   "duration": 40,
+   "size": 12,
+   "rays": 12,
+   "color": "#FFE6A0"
+  }
+ ]
+}

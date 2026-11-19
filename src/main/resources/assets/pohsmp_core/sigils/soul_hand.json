@@ -1,0 +1,73 @@
+{
+ "comment": "Пожирание душ: круг у ладони кастера — сюда тянется душа.",
+ "size": 0.9,
+ "color": "#46E0D8",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.01,
+   "brightness": 0.5,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.3,
+    "period": 16
+   }
+  },
+  {
+   "id": "spiral",
+   "type": "disc",
+   "texture": "spiral_ring",
+   "radius": 0.9,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 90
+   }
+  },
+  {
+   "id": "rim",
+   "type": "disc",
+   "texture": "thin_ring",
+   "radius": 1.1,
+   "heightOffset": 0.01,
+   "brightness": 0.8,
+   "appear": {
+    "delay": 4,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow"
+    ]
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

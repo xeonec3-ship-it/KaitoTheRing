@@ -1,0 +1,124 @@
+{
+ "comment": "Млечный путь, каст: туманность-галактика над полем, рукава медленно вращаются.",
+ "size": 16.0,
+ "color": "#A07CFF",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.9,
+   "heightOffset": -0.02,
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 60
+   }
+  },
+  {
+   "id": "arms",
+   "type": "disc",
+   "texture": "galaxy_arms",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "twist": -240,
+   "appear": {
+    "delay": 0,
+    "duration": 60,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "twist",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 6
+   }
+  },
+  {
+   "id": "stars",
+   "type": "disc",
+   "texture": "galaxy_stars",
+   "radius": 0.95,
+   "heightOffset": 0.01,
+   "color": "#D8DCFF",
+   "appear": {
+    "delay": 10,
+    "duration": 50,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 8
+   }
+  },
+  {
+   "id": "orbit",
+   "type": "disc",
+   "texture": "orbit_runes",
+   "radius": 1.25,
+   "heightOffset": 0.02,
+   "appear": {
+    "delay": 40,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -3
+   }
+  },
+  {
+   "id": "orbit2",
+   "type": "disc",
+   "texture": "orbit_dash",
+   "radius": 1.45,
+   "heightOffset": 0.03,
+   "color": "#D8DCFF",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 60,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFFFFF",
+  "size": 1.1,
+  "duration": 14,
+  "sparks": 40
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

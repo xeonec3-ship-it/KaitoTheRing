@@ -1,0 +1,71 @@
+{
+ "comment": "Метеорит Падения небес: метка на земле (1 с), огненный след с неба, удар — вспышка, волна, трещины, угли.",
+ "style": "pyre",
+ "duration": 90,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "meteor_mark",
+   "until": 30
+  },
+  {
+   "type": "beam",
+   "delay": 20,
+   "at": "caster+0,28,0",
+   "to": "caster",
+   "duration": 12,
+   "width": 1.4,
+   "core": 0.35,
+   "grow": 10,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0,0.8,0",
+   "duration": 10,
+   "size": 5,
+   "rays": 6,
+   "color": "#FFF2C0"
+  },
+  {
+   "type": "wave",
+   "delay": 30,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 4.2,
+   "color": "@primary"
+  },
+  {
+   "type": "decal",
+   "delay": 30,
+   "at": "caster",
+   "duration": 60,
+   "texture": "higher_cracks",
+   "radius": 3,
+   "fadeOut": 40,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,0.3,0",
+   "duration": 3,
+   "texture": "spark_sharp",
+   "count": 40,
+   "rate": 40,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.02,
+   "size": [
+    0.3,
+    0.05
+   ],
+   "life": 24,
+   "color": "@secondary"
+  }
+ ]
+}

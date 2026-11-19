@@ -285,15 +285,14 @@ public final class DownfallCut {
             double k = smooth(s / 14), a = yaw + Math.PI + Math.toRadians(-40 + 80 * k);
             pos = c.add(Math.cos(a) * (22 - 6 * k), 9 - 3 * k, Math.sin(a) * (22 - 6 * k));
             look = c.add(0, 1.2, 0);
-        } else if (s < 22) {                            // the finger points forward and up: the hand close, the sparks wind round it
-            double k = smooth((s - 14) / 8);
-            // in front and to the side of the caster, looking back at the raised hand and the sparks around it
-            pos = c.add(dir.scale(2.2 - 0.4 * k)).add(side.scale(1.6 - 0.3 * k)).add(0, 1.3 + 0.2 * k, 0);
-            look = c.add(side.scale(0.3)).add(dir.scale(0.3)).add(0, 1.6 + 0.2 * k, 0);
-        } else if (s < 26) {                            // the gate appears out of light: from below
-            double k = smooth((s - 22) / 4);
-            pos = f.subtract(dir.scale(10 - 3 * k)).add(side.scale(3)).add(0, 1.2, 0);
-            look = g.add(0, 4 * (1 - k), 0);
+        } else if (s < 26) {
+            // the finger points forward and up, the stream of sparks goes from the hand toward the sky, the gate comes out of the
+            // circle: over the right shoulder, a little to the side, so the hand and the whole stream are in frame (owner 19.11, as
+            // in the mod's video); a slow push-in, the look follows the stream up and at the end settles on the gate
+            double k = smooth((s - 14) / 12), kg = smooth(Math.max(0, (s - 21) / 5));
+            pos = c.subtract(dir.scale(2.6 - 0.6 * k)).add(side.scale(1.35 - 0.2 * k)).add(0, 1.9 + 0.3 * k, 0);
+            Vec3 stream = c.add(dir.scale(5 + 3 * k)).add(0, 2.5 + 4 * k, 0);
+            look = stream.lerp(g, kg);
         } else if (s < 36) {                            // the gate hangs, the halo behind it: slow orbit, gentle sway
             double k = smooth((s - 26) / 10), a = yaw + Math.PI + Math.toRadians(-35 + 70 * k);
             pos = g.add(Math.cos(a) * 40, -14 + 3 * k, Math.sin(a) * 40);

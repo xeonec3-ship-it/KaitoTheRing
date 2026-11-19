@@ -152,14 +152,7 @@ public class EndlessNightSpell extends NightmareSpells.Base {
                             z.inside.remove(id);
                             night(p, 0);
                         } else if (in) {
-                            Immersion.touch(p);   // held while inside
-                            if (now >= next) {
-                                z.inside.put(id, now + step);
-                                int light = z.sl.getBrightness(LightLayer.BLOCK, p.blockPosition());
-                                if (light < IllusionBaseCfg.light()) Immersion.deepen(p, 1);
-                                else p.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.endless_night.held")
-                                        .withStyle(s -> s.withColor(0xE8E0D8)), true);
-                            }
+                            Immersion.touch(p);   // held while inside; owner 19.11: the Night brings stage 1 only, it no longer goes deeper in the dark
                         }
                     }
                 }

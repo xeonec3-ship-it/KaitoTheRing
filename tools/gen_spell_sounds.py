@@ -250,7 +250,7 @@ def take(rng, name, dur=None, from_start=True):
 
 # ================================================================== обработка
 def env(x, a=0.01, r=0.1):
-    return fade(x, a, min(r, len(x) / SR / 2))
+    return fade(x, min(a, len(x) / SR / 2), min(r, len(x) / SR / 2))
 
 
 def cut(x, dur):

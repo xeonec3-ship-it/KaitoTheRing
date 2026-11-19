@@ -818,5 +818,16 @@
   "subtitles.pohsmp_core.spell.erased_name.charge_paper": "Стёртое имя: шелестят страницы",
   "subtitles.pohsmp_core.spell.erased_name.charge_wet": "Стёртое имя: хлюпает",
   "subtitles.pohsmp_core.spell.erased_name.charge_whoosh": "Стёртое имя: свист",
-  "subtitles.pohsmp_core.spell.erased_name.loop": "Стёртое имя: гул"
+  "subtitles.pohsmp_core.spell.erased_name.loop": "Стёртое имя: гул",
+  "subtitles.pohsmp_core.school.silent.cast": "Школа: Безмолвная: звон",
+  "subtitles.pohsmp_core.spell.barrier_guard.hit_resonate": "Барьер (страж оболочки): резонанс",
+  "subtitles.pohsmp_core.spell.barrier_guard.hit_shatter": "Барьер (страж оболочки): раскалывается",
+  "subtitles.pohsmp_core.spell.barrier_guard.hit_soul": "Барьер (страж оболочки): вздох духа",
+  "subtitles.pohsmp_core.spell.barrier_guard.loop": "Барьер (страж оболочки): звон",
+  "subtitles.pohsmp_core.spell.silent_staff.release": "Посох Безмолвной: звон",
+  "subtitles.pohsmp_core.spell.silent_witch.end": "Безмолвная ведьма: резонанс",
+  "subtitles.pohsmp_core.spell.wind_spears.hit": "Ветряные копья: раскалывается",
+  "subtitles.pohsmp_core.spell.wind_spears.loop": "Ветряные копья: свист",
+  "subtitles.pohsmp_core.spell.worgan_flame.cast": "Чёрное пламя Ворганы: пламя",
+  "subtitles.pohsmp_core.spell.worgan_flame.loop": "Чёрное пламя Ворганы: пламя"
 }

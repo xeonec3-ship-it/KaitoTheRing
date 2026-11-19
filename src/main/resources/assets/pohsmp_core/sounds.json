@@ -3349,5 +3349,172 @@
         "volume": 0.5
       }
     ]
+  },
+  "school.silent.cast": {
+    "subtitle": "subtitles.pohsmp_core.school.silent.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/silent_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/silent_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.barrier_guard.hit_resonate": {
+    "subtitle": "subtitles.pohsmp_core.spell.barrier_guard.hit_resonate",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_resonate_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_resonate_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.barrier_guard.hit_shatter": {
+    "subtitle": "subtitles.pohsmp_core.spell.barrier_guard.hit_shatter",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_shatter_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_shatter_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_shatter_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.barrier_guard.hit_soul": {
+    "subtitle": "subtitles.pohsmp_core.spell.barrier_guard.hit_soul",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_soul_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_soul_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_hit_soul_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.barrier_guard.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.barrier_guard.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/barrier_guard_loop_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.silent_staff.release": {
+    "subtitle": "subtitles.pohsmp_core.spell.silent_staff.release",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/silent_staff_release_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/silent_staff_release_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.silent_witch.end": {
+    "subtitle": "subtitles.pohsmp_core.spell.silent_witch.end",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/silent_witch_end_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/silent_witch_end_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.wind_spears.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.wind_spears.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/wind_spears_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/wind_spears_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/wind_spears_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.wind_spears.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.wind_spears.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/wind_spears_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/wind_spears_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/wind_spears_loop_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.worgan_flame.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.worgan_flame.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/worgan_flame_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/worgan_flame_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.worgan_flame.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.worgan_flame.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/silent/worgan_flame_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/worgan_flame_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/silent/worgan_flame_loop_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

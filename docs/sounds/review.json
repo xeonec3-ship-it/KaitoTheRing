@@ -4733,5 +4733,260 @@
   "replaces": [
    "END_PORTAL_SPAWN"
   ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "barrier_guard",
+  "spell_ru": "Барьер (страж оболочки)",
+  "event": "pohsmp_core:spell.barrier_guard.hit_resonate",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/silent/barrier_guard_hit_resonate_1.ogg",
+   "spell/silent/barrier_guard_hit_resonate_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/barrier_guard_hit_resonate_1.mp3",
+   "docs/sounds/mp3/barrier_guard_hit_resonate_2.mp3"
+  ],
+  "what": "долгий резонанс — удар / взрыв / попадание (подпись школы: чистый хрустальный звон)",
+  "where": "BarrierGuard.java repel()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "barrier_guard",
+  "spell_ru": "Барьер (страж оболочки)",
+  "event": "pohsmp_core:spell.barrier_guard.hit_shatter",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/silent/barrier_guard_hit_shatter_1.ogg",
+   "spell/silent/barrier_guard_hit_shatter_2.ogg",
+   "spell/silent/barrier_guard_hit_shatter_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/barrier_guard_hit_shatter_1.mp3",
+   "docs/sounds/mp3/barrier_guard_hit_shatter_2.mp3",
+   "docs/sounds/mp3/barrier_guard_hit_shatter_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: чистый хрустальный звон)",
+  "where": "BarrierGuard.java crack(); BarrierGuard.java kill()",
+  "replaces": [
+   "AMETHYST_CLUSTER_BREAK",
+   "GLASS_BREAK"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "barrier_guard",
+  "spell_ru": "Барьер (страж оболочки)",
+  "event": "pohsmp_core:spell.barrier_guard.hit_soul",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/silent/barrier_guard_hit_soul_1.ogg",
+   "spell/silent/barrier_guard_hit_soul_2.ogg",
+   "spell/silent/barrier_guard_hit_soul_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/barrier_guard_hit_soul_1.mp3",
+   "docs/sounds/mp3/barrier_guard_hit_soul_2.mp3",
+   "docs/sounds/mp3/barrier_guard_hit_soul_3.mp3"
+  ],
+  "what": "душа / вздох духа — удар / взрыв / попадание (подпись школы: чистый хрустальный звон)",
+  "where": "BarrierGuard.java kill()",
+  "replaces": [
+   "SOUL_ESCAPE"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "barrier_guard",
+  "spell_ru": "Барьер (страж оболочки)",
+  "event": "pohsmp_core:spell.barrier_guard.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/silent/barrier_guard_loop_1.ogg",
+   "spell/silent/barrier_guard_loop_2.ogg",
+   "spell/silent/barrier_guard_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/barrier_guard_loop_1.mp3",
+   "docs/sounds/mp3/barrier_guard_loop_2.mp3",
+   "docs/sounds/mp3/barrier_guard_loop_3.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — пока действует (тики) (подпись школы: чистый хрустальный звон)",
+  "where": "BarrierGuard.java tick()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "school_silent",
+  "spell_ru": "Школа: Безмолвная",
+  "event": "pohsmp_core:school.silent.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/silent/silent_cast_1.ogg",
+   "spell/silent/silent_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/silent_cast_1.mp3",
+   "docs/sounds/mp3/silent_cast_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — начало каста (подпись школы: чистый хрустальный звон)",
+  "where": "Reg.java Reg()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "silent_staff",
+  "spell_ru": "Посох Безмолвной",
+  "event": "pohsmp_core:spell.silent_staff.release",
+  "role": "release",
+  "role_ru": "выпуск заклинания",
+  "files": [
+   "spell/silent/silent_staff_release_1.ogg",
+   "spell/silent/silent_staff_release_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/silent_staff_release_1.mp3",
+   "docs/sounds/mp3/silent_staff_release_2.mp3"
+  ],
+  "what": "звон, отсчёт, отметка — выпуск заклинания (подпись школы: чистый хрустальный звон)",
+  "where": "SilentStaffSpell.java getCastFinishSound()",
+  "replaces": [
+   "AMETHYST_BLOCK_CHIME"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "silent_witch",
+  "spell_ru": "Безмолвная ведьма",
+  "event": "pohsmp_core:spell.silent_witch.end",
+  "role": "end",
+  "role_ru": "конец / снятие / смерть",
+  "files": [
+   "spell/silent/silent_witch_end_1.ogg",
+   "spell/silent/silent_witch_end_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/silent_witch_end_1.mp3",
+   "docs/sounds/mp3/silent_witch_end_2.mp3"
+  ],
+  "what": "долгий резонанс — конец / снятие / смерть (подпись школы: чистый хрустальный звон)",
+  "where": "SilentWitchEvents.java onDeath()",
+  "replaces": [
+   "AMETHYST_BLOCK_RESONATE"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "wind_spears",
+  "spell_ru": "Ветряные копья",
+  "event": "pohsmp_core:spell.wind_spears.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/silent/wind_spears_hit_1.ogg",
+   "spell/silent/wind_spears_hit_2.ogg",
+   "spell/silent/wind_spears_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_spears_hit_1.mp3",
+   "docs/sounds/mp3/wind_spears_hit_2.mp3",
+   "docs/sounds/mp3/wind_spears_hit_3.mp3"
+  ],
+  "what": "раскол, осколки — удар / взрыв / попадание (подпись школы: чистый хрустальный звон)",
+  "where": "WindSpearsSpell.java strike()",
+  "replaces": [
+   "AMETHYST_BLOCK_BREAK"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "wind_spears",
+  "spell_ru": "Ветряные копья",
+  "event": "pohsmp_core:spell.wind_spears.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/silent/wind_spears_loop_1.ogg",
+   "spell/silent/wind_spears_loop_2.ogg",
+   "spell/silent/wind_spears_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_spears_loop_1.mp3",
+   "docs/sounds/mp3/wind_spears_loop_2.mp3",
+   "docs/sounds/mp3/wind_spears_loop_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — пока действует (тики) (подпись школы: чистый хрустальный звон)",
+  "where": "WindSpearsSpell.java tick()",
+  "replaces": [
+   "PLAYER_ATTACK_SWEEP"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "worgan_flame",
+  "spell_ru": "Чёрное пламя Ворганы",
+  "event": "pohsmp_core:spell.worgan_flame.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/silent/worgan_flame_cast_1.ogg",
+   "spell/silent/worgan_flame_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/worgan_flame_cast_1.mp3",
+   "docs/sounds/mp3/worgan_flame_cast_2.mp3"
+  ],
+  "what": "вспышка пламени — начало каста (подпись школы: чистый хрустальный звон)",
+  "where": "WorganFlameSpell.java breathe()",
+  "replaces": [
+   "ENDER_DRAGON_SHOOT"
+  ]
+ },
+ {
+  "school": "silent",
+  "school_ru": "Безмолвная",
+  "spell": "worgan_flame",
+  "spell_ru": "Чёрное пламя Ворганы",
+  "event": "pohsmp_core:spell.worgan_flame.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/silent/worgan_flame_loop_1.ogg",
+   "spell/silent/worgan_flame_loop_2.ogg",
+   "spell/silent/worgan_flame_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/worgan_flame_loop_1.mp3",
+   "docs/sounds/mp3/worgan_flame_loop_2.mp3",
+   "docs/sounds/mp3/worgan_flame_loop_3.mp3"
+  ],
+  "what": "вспышка пламени — пока действует (тики) (подпись школы: чистый хрустальный звон)",
+  "where": "WorganFlameSpell.java tick()",
+  "replaces": [
+   "FIRE_AMBIENT"
+  ]
  }
 ]

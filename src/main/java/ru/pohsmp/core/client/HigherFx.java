@@ -936,20 +936,7 @@ public final class HigherFx {
             }
         }
         if (t > 80) gyro(c, tc, 3, (1.9f - 0.6f * (float) p) * grow(t, 80, 30), x.b, cr, cg, cb, fd * 0.7f);
-        if (t > 120) {   // the soul chain
-            float k = grow(t, 120, 30);
-            float w = 0.04f + 0.02f * (float) Math.sin(tm * 0.6);
-            beamLine(c.vc(BEAM), c.pose, tc, cc, c.cam, w, cr, cg, cb, fd * k);
-            beamLine(c.vc(BEAM), c.pose, tc, cc, c.cam, w * 4, cr * 0.5f, cg * 0.5f, cb * 0.5f, fd * k * 0.5f);
-            VertexConsumer fl = c.vc(FLARE);
-            int n = 4 + (int) (p * 8);
-            for (int i = 0; i < n; i++) {
-                double kk = (tm * 0.02 + i / (double) n) % 1.0;
-                Vec3 q = tc.lerp(cc, kk).add(0, Math.sin(kk * Math.PI) * 1.2, 0);
-                billboard(fl, c.pose, q, c.cam, 0.22f, cr, cg, cb, fd * k);
-                billboard(fl, c.pose, q, c.cam, 0.08f, 1f, 1f, 1f, fd * k);
-            }
-        }
+        // owner 19.11: no line from the caster to the target — the soul chain and the souls flowing along it are gone
         if (t > 200) {   // the seal in the sky pins the target with light
             float k = grow(t, 200, 60);
             Vec3 sky = tp.add(0, 9, 0), dn = new Vec3(0, -1, 0);

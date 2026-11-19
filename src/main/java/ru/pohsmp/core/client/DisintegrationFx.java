@@ -194,12 +194,7 @@ public final class DisintegrationFx {
             VertexConsumer vf = buf.getBuffer(RenderType.eyes(FLARE));
             billboard(vf, pose, c, cam, 0.3f + 1.6f * k * k, 1f, 0.95f, 0.8f, fade * k);
         }
-        if (caster != null && p > 0.15) {
-            float k = (float) Math.min(1.0, (p - 0.15) / 0.2) * fade;
-            Vec3 from = caster.getEyePosition(pt).add(caster.getViewVector(pt).scale(2.1)).add(0, -0.25, 0);
-            VertexConsumer vbeam = buf.getBuffer(RenderType.eyes(BEAM));
-            beamLine(vbeam, pose, from, c, cam, 0.06f + 0.1f * (float) p, 1f, 0.85f, 0.45f, k * 0.6f);
-        }
+        // owner 19.11: no beam from the caster's circles to the target
     }
 
     private static void drawBurst(MultiBufferSource.BufferSource buf, PoseStack.Pose pose, Burst b, double age, double time, Camera cam) {

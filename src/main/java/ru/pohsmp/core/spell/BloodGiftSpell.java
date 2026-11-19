@@ -52,12 +52,7 @@ public class BloodGiftSpell extends PohSpell {
                 if (give > 0) {
                     caster.setHealth(caster.getHealth() - give);
                     t.heal(give);
-                    Vec3 a = caster.position().add(0, caster.getBbHeight() * 0.6, 0), b = t.position().add(0, t.getBbHeight() * 0.6, 0);
-                    int steps = (int) (a.distanceTo(b) * 3) + 1;
-                    for (int i = 0; i <= steps; i++) {
-                        Vec3 p = a.lerp(b, i / (double) steps);
-                        DivineEvents.particle(sl, RED, p.x, p.y + Math.sin(i * 0.6) * 0.15, p.z, 1, 0.03, 0);
-                    }
+                    Vec3 b = t.position().add(0, t.getBbHeight() * 0.6, 0);   // owner 19.11: no line from the caster, only the burst on the target
                     DivineEvents.particle(sl, RED, b.x, b.y, b.z, 20, 0.4, 0);
                     sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.HONEY_DRINK, SoundSource.PLAYERS, 1f, 0.6f);
                     sl.playSound(null, caster.getX(), caster.getY(), caster.getZ(), SoundEvents.PLAYER_HURT_SWEET_BERRY_BUSH, SoundSource.PLAYERS, 0.8f, 0.7f);

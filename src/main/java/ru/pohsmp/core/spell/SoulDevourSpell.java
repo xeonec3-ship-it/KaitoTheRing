@@ -141,12 +141,7 @@ public class SoulDevourSpell extends PohSpell {
         if (h.age % 2 == 0) {
             DivineEvents.particle(sl, BLACK, tc.x, tc.y, tc.z, 3, t.getBbWidth() * 0.6, 0);
             DivineEvents.particle(sl, ParticleTypes.SQUID_INK, tc.x, tc.y - 0.3, tc.z, 1, 0.3, 0.01);
-            int n = 1 + (int) (p * 3);
-            for (int i = 0; i < n; i++) {   // souls drift from the target to the caster
-                double k = ((h.age * 0.02 + i / (double) n) % 1.0);
-                Vec3 q = tc.lerp(cc, k);
-                DivineEvents.particle(sl, ParticleTypes.SCULK_SOUL, q.x, q.y + Math.sin(k * Math.PI) * 0.8, q.z, 1, 0.05, 0);
-            }
+            // owner 19.11: no line from the target to the caster (the souls no longer drift along it)
         }
         if (h.age % Math.max(10, 40 - (int) (p * 30)) == 0) sl.playSound(null, tc.x, tc.y, tc.z, SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 2f + (float) p * 2, 0.5f + (float) p * 0.4f);
         if (h.age % 100 == 0) sl.playSound(null, tc.x, tc.y, tc.z, SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 2f, 0.5f);

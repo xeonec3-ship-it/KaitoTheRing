@@ -155,6 +155,8 @@
   "spell.pohsmp_core.mirror_prison.guide": "Цель заперта в зеркальном кубе. Её удары и заклинания отражаются в неё саму, снаружи её не достать, выйти нельзя.",
   "spell.pohsmp_core.countdown": "Обратный отсчёт",
   "spell.pohsmp_core.countdown.guide": "Над целью 10 с висит циферблат и считает каждую её рану. Когда время выходит, всё полученное бьёт ещё раз, разом и сквозь броню.",
+  "spell.pohsmp_core.scarlet_cut": "Алый разрез",
+  "spell.pohsmp_core.scarlet_cut.guide": "По взгляду заклинателя один за другим проходят от трёх до пяти алых разрезов. Под каждым в земле раскрывается трещина и через секунду взрывается осколками, подбрасывая всех рядом.",
   "spell.pohsmp_core.nightmare_cradle": "Колыбель кошмара",
   "spell.pohsmp_core.nightmare_cradle.guide": "Цель засыпает и видит кошмар. Удар по спящей будит её и бьёт сильнее; если её не разбудить, она проснётся в ужасе.",
   "spell.pohsmp_core.oblivion_blades": "Клинки забвения",
@@ -303,6 +305,8 @@
   "ui.pohsmp_core.mirror_prison.time": "Длительность: %s с",
   "ui.pohsmp_core.countdown.time": "Считает урон %s с",
   "ui.pohsmp_core.countdown.cap": "Повтор: до %s%% макс. здоровья",
+  "ui.pohsmp_core.scarlet_cut.cuts": "Разрезов: %s–%s, урон %s каждый",
+  "ui.pohsmp_core.scarlet_cut.burst": "Взрыв трещины: урон %s",
   "ui.pohsmp_core.nightmare_cradle.bonus": "Удар по спящему: +%s урона",
   "ui.pohsmp_core.nightmare_cradle.dread": "Не разбудили: Ужас на %s с и отброс",
   "ui.pohsmp_core.nightmare_cradle.sleep": "Сон: %s с",
@@ -341,5 +345,8 @@
   "ui.pohsmp_core.wind_mark.time": "Метка: %s с",
   "ui.pohsmp_core.world_rift.length": "Длина: %s блоков",
   "ui.pohsmp_core.world_rift.pillars": "Столбы тьмы: %s урона",
-  "ui.pohsmp_core.world_rift.toss": "Подброс: %s урона"
+  "ui.pohsmp_core.world_rift.toss": "Подброс: %s урона",
+  "tooltip.pohsmp_core.charges": "Заряды: %s/%s",
+  "ui.pohsmp_core.joint_cast": "Совместный каст: %s",
+  "ui.pohsmp_core.joint_cast.done": "Совместный каст завершён"
 }

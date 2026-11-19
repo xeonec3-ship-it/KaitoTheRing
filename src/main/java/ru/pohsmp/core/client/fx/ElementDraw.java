@@ -21,7 +21,7 @@ import ru.pohsmp.core.fx.sigil.SigilDef;
 
 /**
  * Element types of docs/fx.md drawn on the client: sigil, mesh, flash, wave, beam, beam_rain, sprites, curtain, column,
- * tint, decal. Random choices come from the effect seed, so every player sees the same. Unknown types are skipped.
+ * tint, decal (disc or crack), trail (slash). Random choices come from the effect seed, so every player sees the same. Unknown types are skipped.
  */
 public final class ElementDraw {
     private ElementDraw() {}
@@ -62,7 +62,8 @@ public final class ElementDraw {
             case "curtain" -> curtain(f, el, te, at, s, col, a, seed);
             case "column" -> column(f, el, te, at, s, col, a);
             case "tint" -> tint(el, at, col, a);
-            case "decal" -> decal(f, el, te, L, at, s, col, a);
+            case "decal" -> decal(f, run, el, te, L, at, s, col, a, seed, ctx);
+            case "trail", "ribbon" -> trail(f, run, el, te, L, at, s, col, a, seed, ctx);
             default -> {}
         }
         return true;
@@ -409,11 +410,158 @@ public final class ElementDraw {
         FxClient.tint(col, el.num("strength", 0.4) * a);
     }
 
-    private static void decal(Frame f, Element el, double te, double L, Vec3 at, double s, int col, double a) {
+    private static void decal(Frame f, FxRun run, Element el, double te, double L, Vec3 at, double s, int col, double a, long seed, FxDef.Context ctx) {
         double fade = el.num("fadeOut", 0);
         double k = L > 0 && fade > 0 ? FxDraw.clamp01((L - te) / fade) : 1;
+        if ("crack".equals(el.str("shape", "disc"))) {
+            crack(f, run, el, te, at, s, col, a * k, seed, ctx);
+            return;
+        }
         var tex = FxDraw.tex(el.str("texture", "core"));
         FxDraw.disc("translucent".equals(el.str("blend", "")) ? f.trans(tex) : f.add(tex), f, at.add(0, 0.04 + el.num("lift", 0), 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1),
                 el.num("radius", 2) * s, 0, col, a * k);
+    }
+
+    /**
+     * Ground crack across the view (along the caster's right axis): a jagged line of `length` blocks with short branches,
+     * opening over `grow` ticks; `pulse` (0..1) makes the glow throb faster towards the element's end (for "about to burst").
+     */
+    private static void crack(Frame f, FxRun run, Element el, double te, Vec3 at, double s, int col, double a, long seed, FxDef.Context ctx) {
+        double len = el.num("length", 4) * s, w = el.num("width", 0.12) * s, grow = el.num("grow", 4);
+        double L = until(el), pulse = el.num("pulse", 0);
+        double open = grow > 0 ? Easing.EASE_OUT_CUBIC.apply(FxDraw.clamp01(te / grow)) : 1;
+        if (pulse > 0 && L > 0) {
+            double p = FxDraw.clamp01(te / L);
+            a *= 1 - pulse * 0.4 + pulse * 0.4 * Math.sin(te * (0.4 + 1.6 * p * p));
+        }
+        double yaw = ctx.yaw() + el.num("yaw", 0);
+        FxMath.Vec rv = FxMath.right(yaw), fv = FxMath.forward(yaw);
+        Vec3 right = new Vec3(rv.x(), 0, rv.z()).normalize(), fwd = new Vec3(fv.x(), 0, fv.z()).normalize();
+        Vec3 base = at.add(0, 0.03, 0);
+        SplittableRandom r = new SplittableRandom(seed);
+        int n = Math.max(4, (int) Math.round(len / 0.35));
+        Vec3[] pts = new Vec3[n + 1];
+        for (int i = 0; i <= n; i++) {
+            double x = (i / (double) n - 0.5) * len;
+            double side = i == 0 || i == n ? 0 : (r.nextDouble() - 0.5) * 0.45 * s;
+            pts[i] = base.add(right.scale(x)).add(fwd.scale(side));
+        }
+        VertexConsumer glow = f.add(FxDraw.tex("beam")), core = f.add(FxDraw.WHITE);
+        int mid = n / 2;
+        for (int i = 0; i < n; i++) {
+            // opens from the middle outwards
+            double reach = open * (mid + 1);
+            if (Math.abs(i + 0.5 - mid) > reach) continue;
+            double taper = 1 - Math.abs(i + 0.5 - mid) / (mid + 1.0);
+            double ww = w * (0.4 + 0.6 * taper);
+            ground(glow, f, pts[i], pts[i + 1], ww * 5, col, a * 0.55);
+            ground(core, f, pts[i], pts[i + 1], ww, col, a);
+            ground(core, f, pts[i], pts[i + 1], ww * 0.35, 0xFFFFFF, a * 0.8);
+        }
+        int branches = (int) el.num("branches", 5);
+        for (int b = 0; b < branches; b++) {
+            int i = 1 + r.nextInt(Math.max(1, n - 1));
+            double side = r.nextBoolean() ? 1 : -1, bl = (0.3 + r.nextDouble() * 0.5) * s;
+            if (Math.abs(i - mid) > open * (mid + 1)) continue;
+            Vec3 end = pts[i].add(fwd.scale(side * bl)).add(right.scale((r.nextDouble() - 0.5) * bl));
+            ground(core, f, pts[i], end, w * 0.4, col, a * 0.8);
+            ground(glow, f, pts[i], end, w * 2, col, a * 0.35);
+        }
+    }
+
+    /** Flat strip on the ground from a to b. */
+    static void ground(VertexConsumer vc, Frame f, Vec3 a, Vec3 b, double w, int col, double al) {
+        Vec3 d = b.subtract(a);
+        Vec3 side = new Vec3(-d.z, 0, d.x);
+        if (side.lengthSqr() < 1e-9) return;
+        side = side.normalize().scale(w / 2);
+        FxDraw.vert(vc, f, a.subtract(side), 0, 0, col, al);
+        FxDraw.vert(vc, f, a.add(side), 1, 0, col, al);
+        FxDraw.vert(vc, f, b.add(side), 1, 1, col, al);
+        FxDraw.vert(vc, f, b.subtract(side), 0, 1, col, al);
+    }
+
+    // ---------------------------------------------------------------- trail / slash
+
+    /**
+     * Slash: an arc of `radius` and `arc` degrees whose middle is at the anchor, in the caster's view (yaw from ctx, plus `yaw`),
+     * tilted by `roll` degrees around the forward axis (`rollAlt`: true flips the tilt by seed, so a series alternates).
+     * The head sweeps over `sweep` ticks leaving a crescent `thickness` wide (thickest in the middle), then fades
+     * over the rest of the duration. `bend` pushes the arc ends back (deeper crescent), `secondary` (0..1) adds a thin second arc inside.
+     * Other trail shapes are not drawn yet.
+     */
+    private static void trail(Frame f, FxRun run, Element el, double te, double L, Vec3 at, double s, int col, double a, long seed, FxDef.Context ctx) {
+        if (!"slash".equals(el.str("shape", "slash"))) return;
+        double R = el.num("radius", 2.6) * s, arc = Math.toRadians(el.num("arc", 110)), th = el.num("thickness", 0.35) * s;
+        double sweep = Math.max(1, el.num("sweep", 3)), bend = el.num("bend", 0), sec = el.num("secondary", 0);
+        double dur = L > 0 ? L : 12;
+        double roll = el.num("roll", 0);
+        JsonObject p = el.params();
+        if (p.has("rollAlt") && p.get("rollAlt").getAsBoolean() && (run.seed & 1) == 1) roll = -roll;
+        double pitch = el.num("pitch", 0);
+        double yaw = ctx.yaw() + el.num("yaw", 0);
+        FxMath.Vec fv = FxMath.forward(yaw), rv = FxMath.right(yaw);
+        Vec3 fwd = new Vec3(fv.x(), 0, fv.z()).normalize(), right = new Vec3(rv.x(), 0, rv.z()).normalize(), up = new Vec3(0, 1, 0);
+        double pr = Math.toRadians(pitch);
+        fwd = fwd.scale(Math.cos(pr)).add(up.scale(-Math.sin(pr)));
+        double rr = Math.toRadians(roll);
+        Vec3 side = right.scale(Math.cos(rr)).add(fwd.cross(right).normalize().scale(-Math.sin(rr)));
+        Vec3 centre = at.subtract(fwd.scale(R));
+        boolean reverse = p.has("reverse") && p.get("reverse").getAsBoolean() || (p.has("rollAlt") && p.get("rollAlt").getAsBoolean() && (run.seed & 2) == 2);
+        double head = FxDraw.clamp01(te / sweep);
+        double fade = te <= sweep ? 1 : FxDraw.clamp01(1 - (te - sweep) / Math.max(1, dur - sweep));
+        fade *= fade;
+        double tail = Math.max(0, head - el.num("tail", 1.0));        // visible part of the arc, 0..1
+        int seg = f.low() ? 14 : 28;
+        VertexConsumer glow = f.add(FxDraw.tex("beam")), core = f.add(FxDraw.WHITE);
+        arcStrip(glow, f, centre, fwd, side, R, arc, bend, tail, head, th * 2.6, reverse, seg, col, a * fade * 0.6);
+        arcStrip(core, f, centre, fwd, side, R, arc, bend, tail, head, th, reverse, seg, col, a * fade);
+        arcStrip(core, f, centre, fwd, side, R, arc, bend, tail, head, th * 0.35, reverse, seg, 0xFFFFFF, a * fade * 1.2);
+        if (sec > 0) {
+            double h2 = FxDraw.clamp01((te - 1) / sweep), t2 = Math.max(0, h2 - 1);
+            if (h2 > 0) arcStrip(core, f, centre.add(fwd.scale(-0.25 * s)), fwd, side, R * 0.88, arc * 0.85, bend, t2, h2,
+                    th * 0.3, reverse, seg, col, a * fade * sec);
+        }
+        if (head < 1) {
+            double ang = (reverse ? 1 : -1) * (arc / 2 - arc * head);
+            Vec3 tip = arcPoint(centre, fwd, side, R, ang, bend, arc);
+            FxDraw.billboard(f.add(FxDraw.tex("glow")), f, tip, th * 2.5, 0, col, a);
+        }
+    }
+
+    private static Vec3 arcPoint(Vec3 c, Vec3 fwd, Vec3 side, double R, double ang, double bend, double arc) {
+        double e = arc > 0 ? Math.abs(ang) / (arc / 2) : 0;
+        double rr = R * (1 - bend * 0.25 * e * e);
+        return c.add(fwd.scale(Math.cos(ang) * rr)).add(side.scale(Math.sin(ang) * rr));
+    }
+
+    /** Crescent from t0 to t1 (0..1 along the arc), flat in the arc plane; width w at the middle of the arc, thin at its ends. */
+    private static void arcStrip(VertexConsumer vc, Frame f, Vec3 c, Vec3 fwd, Vec3 side, double R, double arc, double bend,
+                                 double t0, double t1, double w, boolean reverse, int seg, int col, double a) {
+        if (t1 - t0 < 1e-3 || a <= 0.002) return;
+        int n = Math.max(2, (int) Math.ceil(seg * (t1 - t0)));
+        Vec3 pi = null, po = null;
+        double ai = 0;
+        for (int i = 0; i <= n; i++) {
+            double t = t0 + (t1 - t0) * i / n;
+            double ang = (reverse ? 1 : -1) * (arc / 2 - arc * t);
+            Vec3 pt = arcPoint(c, fwd, side, R, ang, bend, arc);
+            Vec3 radial = pt.subtract(c).normalize();
+            double shape = Math.sin(Math.PI * t);                               // thick in the middle of the arc
+            double local = (t - t0) / Math.max(1e-3, t1 - t0);                  // fades toward the tail
+            double ww = w * (0.15 + 0.85 * shape) / 2;
+            double al = a * (0.25 + 0.75 * local);
+            Vec3 in = pt.subtract(radial.scale(ww)), out = pt.add(radial.scale(ww));
+            if (pi != null) {
+                float v0 = (float) ((i - 1) / (double) n), v1 = (float) (i / (double) n);
+                FxDraw.vert(vc, f, pi, 0, v0, col, ai);
+                FxDraw.vert(vc, f, po, 1, v0, col, ai);
+                FxDraw.vert(vc, f, out, 1, v1, col, al);
+                FxDraw.vert(vc, f, in, 0, v1, col, al);
+            }
+            pi = in;
+            po = out;
+            ai = al;
+        }
     }
 }

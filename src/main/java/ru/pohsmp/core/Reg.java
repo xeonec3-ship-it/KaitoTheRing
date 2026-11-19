@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -109,26 +110,37 @@ public final class Reg {
     public static final RegistryObject<SchoolType> FORBIDDEN = SCHOOLS.register("forbidden", () -> new SchoolType(FORBIDDEN_ID, FORBIDDEN_FOCUS,
             Component.translatable("school.pohsmp_core.forbidden").withStyle(Style.EMPTY.withColor(FORBIDDEN_COLOR)),
             FORBIDDEN_POWER, FORBIDDEN_RESIST, () -> SoundEvents.END_PORTAL_SPAWN, FORBIDDEN_DAMAGE, false, false));
-    /** Price of "Downfall": max health -50%, slow, weak; mana does not grow and no spells while it lasts (HigherEvents, DivineEvents). */
-    public static final RegistryObject<MobEffect> CREATION_BACKLASH = EFFECTS.register("creation_backlash", () -> new PohEffect(MobEffectCategory.HARMFUL, FORBIDDEN_COLOR)
-            .addAttributeModifier(Attributes.MAX_HEALTH, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a09", -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL)
-            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0a", -0.35, AttributeModifier.Operation.MULTIPLY_TOTAL)
-            .addAttributeModifier(Attributes.ATTACK_DAMAGE, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0b", -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL));
-
     /** "Silent" school (T18): the Silent Witch's magic, cast without words. Damage goes through armor. */
     public static final int SILENT_COLOR = 0x7FFFD0;
     public static final RegistryObject<Attribute> SILENT_POWER = ATTRS.register("silent_spell_power",
             () -> new RangedAttribute("attribute.pohsmp_core.silent_spell_power", 1.0, 0.0, 10.0).setSyncable(true));
     public static final RegistryObject<Attribute> SILENT_RESIST = ATTRS.register("silent_magic_resist",
             () -> new RangedAttribute("attribute.pohsmp_core.silent_magic_resist", 1.0, -100.0, 100.0).setSyncable(true));
+    /** Extra cast time reduction for Silent spells only, on top of Iron's cast_time_reduction (base 1 = none; see SilentWitch.castTime). */
+    public static final RegistryObject<Attribute> SILENT_CAST = ATTRS.register("silent_cast_time_reduction",
+            () -> new RangedAttribute("attribute.pohsmp_core.silent_cast_time_reduction", 1.0, -100.0, 100.0).setSyncable(true));
     public static final ResourceKey<DamageType> SILENT_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, "silent_magic"));
     public static final TagKey<Item> SILENT_FOCUS = ItemTags.create(new ResourceLocation(PohCore.MODID, "silent_focus"));
     public static final ResourceLocation SILENT_ID = new ResourceLocation(PohCore.MODID, "silent");
     public static final RegistryObject<SchoolType> SILENT = SCHOOLS.register("silent", () -> new SchoolType(SILENT_ID, SILENT_FOCUS,
             Component.translatable("school.pohsmp_core.silent").withStyle(Style.EMPTY.withColor(SILENT_COLOR)),
             SILENT_POWER, SILENT_RESIST, () -> SoundEvents.AMETHYST_BLOCK_CHIME, SILENT_DAMAGE, false, false));
+    /** Silent Witch outfit (T19): the barrier's cooldown, shown as an effect icon; milk does not remove it. */
+    public static final RegistryObject<MobEffect> SILENT_BARRIER_COOLDOWN = EFFECTS.register("silent_barrier_cooldown",
+            () -> new PohEffect(MobEffectCategory.NEUTRAL, SILENT_COLOR));
+
+    /** Price of "Downfall": max health -50%, slow, weak; mana does not grow and no spells while it lasts (HigherEvents, DivineEvents). */
+    public static final RegistryObject<MobEffect> CREATION_BACKLASH = EFFECTS.register("creation_backlash", () -> new PohEffect(MobEffectCategory.HARMFUL, FORBIDDEN_COLOR)
+            .addAttributeModifier(Attributes.MAX_HEALTH, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a09", -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL)
+            .addAttributeModifier(Attributes.MOVEMENT_SPEED, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0a", -0.35, AttributeModifier.Operation.MULTIPLY_TOTAL)
+            .addAttributeModifier(Attributes.ATTACK_DAMAGE, "6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a0b", -0.5, AttributeModifier.Operation.MULTIPLY_TOTAL));
     /** Black flame of Worgan: 1.5 damage a second, water does not put it out, milk does not cure it. */
     public static final RegistryObject<MobEffect> BLACK_FLAME = EFFECTS.register("black_flame", ru.pohsmp.core.spell.silent.WorganFlameSpell.BlackFlame::new);
+
+    /** Sounds of sounds.json that the code plays. */
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, PohCore.MODID);
+    public static final RegistryObject<SoundEvent> MUSIC_SILENT_GATE = SOUNDS.register("music.silent_gate",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate")));
 
     public static final DeferredRegister<AbstractSpell> SPELLS = DeferredRegister.create(SpellRegistry.SPELL_REGISTRY_KEY, PohCore.MODID);
     public static final RegistryObject<AbstractSpell> DISINTEGRATION = SPELLS.register("disintegration", DisintegrationSpell::new);
@@ -251,6 +263,12 @@ public final class Reg {
             staff("divine", DIVINE_POWER),
             ITEMS.register("mythic_staff", () -> new AnimatedStaff("mythic_staff", null, 0, STAFF_SCHOOL + STAFF_POWER, STAFF_REGEN)));
     public static final RegistryObject<Item> DOWNFALL_STAFF = ITEMS.register("downfall_staff", DownfallStaff::new);
+    public static final RegistryObject<Item> SILENT_WITCH_HOOD = ITEMS.register("silent_witch_hood",
+            () -> new ru.pohsmp.core.silent.SilentWitchArmor(net.minecraft.world.item.ArmorItem.Type.HELMET));
+    public static final RegistryObject<Item> SILENT_WITCH_ROBE = ITEMS.register("silent_witch_robe",
+            () -> new ru.pohsmp.core.silent.SilentWitchArmor(net.minecraft.world.item.ArmorItem.Type.CHESTPLATE));
+    public static final RegistryObject<Item> SILENT_WITCH_SKIRT = ITEMS.register("silent_witch_skirt",
+            () -> new ru.pohsmp.core.silent.SilentWitchArmor(net.minecraft.world.item.ArmorItem.Type.LEGGINGS));
     public static final RegistryObject<Item> SILENT_WITCH_STAFF = ITEMS.register(SilentWitchStaff.NAME, SilentWitchStaff::new);
 
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, PohCore.MODID);
@@ -268,6 +286,9 @@ public final class Reg {
                 for (String p : DIVINE_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
                 for (RegistryObject<Item> s : STAFFS) out.accept(s.get());
                 out.accept(DOWNFALL_STAFF.get());
+                out.accept(SILENT_WITCH_HOOD.get());
+                out.accept(SILENT_WITCH_ROBE.get());
+                out.accept(SILENT_WITCH_SKIRT.get());
                 out.accept(SILENT_WITCH_STAFF.get());
             })
             .build());
@@ -277,6 +298,7 @@ public final class Reg {
         EFFECTS.register(modBus);
         SCHOOLS.register(modBus);
         SPELLS.register(modBus);
+        SOUNDS.register(modBus);
         ITEMS.register(modBus);
         TABS.register(modBus);
     }

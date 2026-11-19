@@ -69,6 +69,13 @@ public abstract class PohSpell extends AbstractSpell {
     }
 
     @Override public ResourceLocation getSpellResource() { return id; }
+
+    /** Silent-school spells also take the Silent cast time reduction (the Silent Witch robe). */
+    @Override
+    public int getEffectiveCastTime(int spellLevel, @org.jetbrains.annotations.Nullable LivingEntity entity) {
+        if (getSchoolType() == ru.pohsmp.core.Reg.SILENT.get()) return ru.pohsmp.core.silent.SilentWitch.castTime(this, spellLevel, entity);
+        return super.getEffectiveCastTime(spellLevel, entity);
+    }
     @Override public DefaultConfig getDefaultConfig() { return config; }
     /** Black = invisible: Iron's target box is drawn additively. */
     @Override public org.joml.Vector3f getTargetingColor() { return new org.joml.Vector3f(0, 0, 0); }

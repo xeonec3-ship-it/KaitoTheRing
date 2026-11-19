@@ -76,3 +76,32 @@
 
 Все три вещи надеваются, видны другим игрокам с анимациями; эффекты 1–11 работают и проверены на тестовом сервере;
 числа в конфиге; подсказки на русском и английском.
+
+## Реализация (основной чат, 1.14.0)
+
+Код: `silent/SilentWitchArmor` (вещи, бонусы-атрибуты, подсказки, контроллеры GeckoLib `cloak` и `nero`), `silent/SilentWitch`
+(кто что носит, флаги скрытия имени, `castTime` для Безмолвной школы, `neroDragon`), `silent/SilentWitchEvents` (барьер, тишина,
+незаметность, команда-«невидимка», искры, «Врата»), `silent/compat/*` (Jade, WTHIT, The One Probe, JourneyMap), миксины Xaero's
+(`mixin/Xaero*`), клиент — `client/SilentWitchRenderer`, `OutfitAnim`, `GlowType`, `SilentWitchClient`. Все числа — `[silent_witch]` в `pohsmp_core-server.toml`.
+
+- **Скрытие имени.** Сервер считает флаги игрока (капюшон → ник над головой; полный комплект → ещё карты и подсказки) и рассылает
+  всем пакетом `SilentSync`, так что клиент знает и про игроков вне прорисовки. Сервер на этом сервере определить отсюда нельзя
+  (доступа нет), поэтому подключены все распространённые моды, каждый мягко: Jade (`addRayTraceCallback` → нет подсказки),
+  WTHIT (`waila_plugins.json`, override → `EMPTY_ENTITY`), The One Probe (IMC, `registerEntityBlacklist` — проверяется на сервере),
+  JourneyMap (API v2, отмена `EntityRadarUpdateEvent`), Xaero's Minimap / World Map (API нет — миксины: радар считает носителя
+  невидимым, метки отслеживаемых игроков выкидываются). Для клиентов без мода — команда `pohsmp_silent` с `nameTagVisibility never`
+  (только если игрок не в другой команде; чужую команду не трогаем).
+- **Тишина.** Звуки шагов/падения/плавания/всплеска, начинающиеся ровно в точке носителя полов, отменяются на сервере и на клиенте
+  (`PlayLevelSoundEvent.AtPosition`); вибрации — отмена `VanillaGameEvent` с причиной-носителем.
+- **Юбка.** Кости ног брони поворачиваются на 25 % (`SilentWitchRenderer.applyBaseTransformations`); ноги самого игрока в полах —
+  вдвое мельче (`OutfitAnim.legs` из `HumanoidModelMixin`; миксин по SRG-имени, в dev-запуске не применяется).
+- **Свечение каймы.** Второй проход по той же позе с glowmask: cutout, полная яркость, сдвиг глубины к камере, без отсечения граней
+  (`GlowType`). Аддитивные типы (`eyes`, `AutoGlowingGeoLayer`) у брони GeckoLib не работают: броня рисуется зеркально (scale −1),
+  а их батч сбрасывается раньше брони и затирается.
+- **Неро.** Состояние кота на клиенте: нет комплекта / бег (и 2 с после) → `nero_hidden`; каст → `nero_jump_up` → `nero_head`;
+  конец каста → `nero_jump_down`; после бега / дракона → `nero_return`. «Чёрное пламя Ворганы» в полном комплекте шлёт
+  `SilentWitch.neroDragon(caster, ticks)` (пакет `NeroMsg`) → `nero_dragon` на время каста и выдоха.
+- **«Врата».** Проверку полного комплекта и +20 % к лучам делает само заклинание (`SilentGateSpell`, `[silent_gate] setBonus`;
+  его `ru.pohsmp.core.SilentWitch.hasFullSet` теперь видит настоящие вещи). Из одежды — только иммунитет к магии, пока носитель
+  кастует заклинание с id `[silent_witch] gateSpell` (`gateMagicImmune`).
+- Эффекты `fx/silent_witch_cast.json`, `fx/silent_barrier.json` и печать `silent_barrier` — от чата идей. Временные: иконки `textures/item/silent_witch_{hood,robe,skirt}.png`, `textures/mob_effect/silent_barrier_cooldown.png`.

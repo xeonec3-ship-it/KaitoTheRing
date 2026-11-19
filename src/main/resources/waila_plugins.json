@@ -1,0 +1,7 @@
+{
+  "pohsmp_core:silent_witch": {
+    "entrypoints": { "client": "ru.pohsmp.core.silent.compat.WthitCompat" },
+    "side": "client",
+    "required": ["pohsmp_core"]
+  }
+}

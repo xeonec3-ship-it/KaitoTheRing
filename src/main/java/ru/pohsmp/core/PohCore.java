@@ -49,6 +49,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DownfallSpell.DownfallEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.EightShieldsSpell.EightShieldsEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.Cutscene.CutsceneEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.silent.SilentGateSpell.SilentGateEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MilkyWaySpell.MilkyWayEvents.class);
         MinecraftForge.EVENT_BUS.register(AnimatedStaff.StaffAnimEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.silent.SageBarrierSpell.BarrierEvents.class);
@@ -57,6 +58,8 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.CovenArrivalSpell.CovenArrivalEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.Fx.FxServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.FxCommands.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.silent.SilentWitchEvents.class);
+        ru.pohsmp.core.silent.compat.Compat.common(modBus);
         MinecraftForge.EVENT_BUS.register(Hidden.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.NpcCast.Events.class);
         MinecraftForge.EVENT_BUS.register(Charges.class);
@@ -79,6 +82,7 @@ public class PohCore {
             if (!e.has(type, Reg.FORBIDDEN_RESIST.get())) e.add(type, Reg.FORBIDDEN_RESIST.get());
             if (!e.has(type, Reg.SILENT_POWER.get())) e.add(type, Reg.SILENT_POWER.get());
             if (!e.has(type, Reg.SILENT_RESIST.get())) e.add(type, Reg.SILENT_RESIST.get());
+            if (!e.has(type, Reg.SILENT_CAST.get())) e.add(type, Reg.SILENT_CAST.get());
         }
     }
 }

@@ -13,6 +13,13 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.BooleanValue DIS_KILL;
     public static final ForgeConfigSpec.DoubleValue REPLICA_PERCENT;
     public static final ForgeConfigSpec.DoubleValue HIGHER_MULT;
+    // Silent Witch outfit (T19)
+    public static final ForgeConfigSpec.DoubleValue SW_CAST, SW_CAST_SILENT, SW_MANA_ROBE, SW_MANA_HOOD, SW_REGEN, SW_RESIST, SW_RESIST_SILENT;
+    public static final ForgeConfigSpec.BooleanValue SW_MUTE_CHANT, SW_SILENT_STEPS, SW_NO_VIBRATIONS, SW_TEAM, SW_GATE_MAGIC_IMMUNE;
+    public static final ForgeConfigSpec.IntValue SW_BARRIER_COOLDOWN, SW_BARRIER_INVUL, SW_STEALTH_RANGE, SW_EXPOSE_SECONDS;
+    public static final ForgeConfigSpec.ConfigValue<String> SW_GATE_SPELL;
+    public static final ForgeConfigSpec.DoubleValue GATE_RAY_DAMAGE, GATE_RAY_RADIUS, GATE_AREA, GATE_SET_BONUS;
+    public static final ForgeConfigSpec.IntValue GATE_HIT_COOLDOWN, GATE_AIM_INTERVAL, GATE_BEAMS_MIN, GATE_BEAMS_MAX, GATE_SILENCE_SECONDS;
     public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> JOINT_SPELLS;
     public static final ForgeConfigSpec.DoubleValue JOINT_RADIUS, JOINT_WINDOW, JOINT_MULT;
     public static final ForgeConfigSpec.DoubleValue COUNTDOWN_MAX;
@@ -53,6 +60,37 @@ public final class ServerConfig {
         b.pop();
         b.push("higher");
         HIGHER_MULT = b.comment("Damage and healing multiplier for all Higher-school spells").defineInRange("damageMult", 1.0, 0.0, 100.0);
+        b.pop();
+        b.comment("Silent Witch outfit: hood, robe, robe skirt (T19)").push("silent_witch");
+        SW_CAST = b.comment("1. Robe: cast time reduction for every spell (Iron's cast_time_reduction)").defineInRange("castTimeReduction", 0.15, 0.0, 0.9);
+        SW_CAST_SILENT = b.comment("1. Robe: total cast time reduction for spells of the Silent school (includes castTimeReduction)").defineInRange("silentCastTimeReduction", 0.25, 0.0, 0.9);
+        SW_MUTE_CHANT = b.comment("1. Robe: spells with spoken lines (Replica, Explosion) do not write them to chat").define("muteChants", true);
+        SW_MANA_ROBE = b.comment("2. Robe: max mana").defineInRange("maxManaRobe", 100.0, 0.0, 10000.0);
+        SW_MANA_HOOD = b.comment("2. Hood: max mana").defineInRange("maxManaHood", 100.0, 0.0, 10000.0);
+        SW_REGEN = b.comment("2. Robe + hood: mana regeneration bonus, split equally between the two").defineInRange("manaRegen", 0.25, 0.0, 10.0);
+        SW_RESIST = b.comment("3. Skirt + hood: magic resistance (Iron's spell_resist), split equally").defineInRange("spellResist", 0.15, 0.0, 10.0);
+        SW_RESIST_SILENT = b.comment("3. Skirt + hood: Silent magic resistance, split equally").defineInRange("silentResist", 0.30, 0.0, 10.0);
+        SW_BARRIER_COOLDOWN = b.comment("4. Full set: lethal damage leaves 1 health once per this many seconds").defineInRange("barrierCooldownSeconds", 600, 1, 86400);
+        SW_BARRIER_INVUL = b.comment("4. Invulnerability after the barrier saves the wearer (seconds)").defineInRange("barrierInvulnerableSeconds", 3, 0, 60);
+        SW_SILENT_STEPS = b.comment("5. Skirt: no step, jump, landing or swim sounds from the wearer").define("silentSteps", true);
+        SW_NO_VIBRATIONS = b.comment("5. Skirt: the wearer makes no vibrations (sculk sensors, shriekers, the Warden)").define("noVibrations", true);
+        SW_STEALTH_RANGE = b.comment("6. Hood: mobs farther than this do not notice the wearer").defineInRange("stealthRange", 12, 0, 256);
+        SW_EXPOSE_SECONDS = b.comment("6. After the wearer attacks or casts, mobs see them normally for this long (seconds)").defineInRange("exposeSeconds", 10, 0, 600);
+        SW_TEAM = b.comment("6/11. Also put the wearer in a scoreboard team with nameTagVisibility=never so clients without the mod do not draw the name",
+                "(only when the player is in no other team)").define("nameTagTeam", true);
+        SW_GATE_SPELL = b.comment("10. The Gate spell id (cast only in the full outfit)").define("gateSpell", "pohsmp_core:silent_gate");
+        SW_GATE_MAGIC_IMMUNE = b.comment("10. Full set: no magic damage while casting the Gate").define("gateMagicImmune", true);
+        b.pop();
+        b.push("silent_gate");
+        GATE_AREA = b.comment("Gate: radius of the area the beams hit, under the gate (26 blocks ahead of the caster)").defineInRange("area", 20.0, 2.0, 64.0);
+        GATE_RAY_DAMAGE = b.comment("Damage of one volley to a foe (Silent magic: through armor, scaled by Silent spell power, cut by Silent resistance)").defineInRange("rayDamage", 10.0, 0.0, 10000.0);
+        GATE_RAY_RADIUS = b.comment("Radius of one ray's hit").defineInRange("rayRadius", 1.5, 0.1, 16.0);
+        GATE_AIM_INTERVAL = b.comment("A volley every this many ticks: beams into every foe in the area").defineInRange("volleyInterval", 10, 1, 200);
+        GATE_BEAMS_MIN = b.comment("Beams per foe in one volley: from...").defineInRange("beamsMin", 3, 1, 20);
+        GATE_BEAMS_MAX = b.comment("...to (the damage counts once per volley)").defineInRange("beamsMax", 5, 1, 20);
+        GATE_HIT_COOLDOWN = b.comment("One creature is hit by rays at most once per this many ticks").defineInRange("hitCooldownTicks", 8, 0, 200);
+        GATE_SET_BONUS = b.comment("Silent Witch full set (always worn when Gate is cast): ray damage multiplier").defineInRange("setBonus", 1.2, 0.0, 100.0);
+        GATE_SILENCE_SECONDS = b.comment("'Silence' after the cast: Gate cannot be cast again for this long (other magic is fine)").defineInRange("silenceSeconds", 180, 0, 86400);
         b.pop();
         b.comment("Silent Witch staff spells: Wind Spears, Silent Volley, Barrier, Black Flame of Worgan.",
                 "Damage is multiplied by the caster's Silent spell power (the staff itself gives +25%).").push("silent_staff");
@@ -135,4 +173,13 @@ public final class ServerConfig {
     }
 
     private ServerConfig() {}
+
+    /** Value of a server config option, or its default while the config is not loaded (main menu, early tooltips). */
+    public static <T> T get(ForgeConfigSpec.ConfigValue<T> v) {
+        try {
+            return v.get();
+        } catch (IllegalStateException e) {
+            return v.getDefault();
+        }
+    }
 }

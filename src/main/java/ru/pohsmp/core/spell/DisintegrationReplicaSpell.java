@@ -54,6 +54,7 @@ public class DisintegrationReplicaSpell extends DisintegrationSpell {
     }
 
     private static void say(ServerLevel sl, LivingEntity caster, String text, boolean last) {
+        if (ru.pohsmp.core.silent.SilentWitch.muted(caster)) return;   // Silent Witch robe: silent chanting
         MutableComponent line = Component.literal("«" + text + "»").withStyle(ChatFormatting.RED, ChatFormatting.ITALIC);
         if (last) line.withStyle(ChatFormatting.BOLD);
         Component msg = Component.literal("").append(caster.getDisplayName()).append(Component.literal(": ").withStyle(ChatFormatting.GRAY)).append(line);

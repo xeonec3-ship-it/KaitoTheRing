@@ -90,6 +90,10 @@ public final class HigherFx {
         }
         if (m.kind == HFx.CUT) {
             DownfallCut.start(m, now);
+            if (m.b == ru.pohsmp.core.spell.Cutscene.SILENT_GATE) {
+                SilentMusic.start(m.key, m.dur);
+                GateStaff.start(m.key, m.a, now);
+            }
             return;
         }
         if (m.kind == HFx.ANIM) {   // a = player id, b = animation (0: pohsmp_coven_ritual)
@@ -99,6 +103,8 @@ public final class HigherFx {
         }
         if (m.kind == HFx.STOP) {
             DownfallCut.stop(m.key);
+            SilentMusic.stop(m.key);
+            GateStaff.stop(m.key);
             Inst x = LIVE.get(m.key);
             if (x != null && x.fadeAt < 0) x.fadeAt = now;
             if (x != null && x.kind == HFx.JOINT) JointFx.mark(x.a, now + 10);   // the final flash of the cast still gets both outlines

@@ -67,5 +67,6 @@ public class SilentWitchStaff extends AnimatedStaff implements IPresetSpellConta
         super.appendHoverText(stack, level, tip, flag);
         int rgb = Tier.UNKNOWN.colorAt(System.currentTimeMillis());
         tip.add(Component.translatable("tooltip.irons_spellbooks.rarity", Component.translatable(Tier.UNKNOWN.langKey())).withStyle(s -> s.withColor(rgb)));
+        tip.add(Component.translatable("item.pohsmp_core.silent_witch_staff.gate").withStyle(net.minecraft.ChatFormatting.GOLD));   // T19
     }
 }

@@ -132,7 +132,7 @@
    "id": "silent_nimbus",
    "delay": 400,
    "until": 1260,
-   "at": "caster+0,20.5,27",
+   "at": "caster+0,26,28",
    "orientation": "facing",
    "color": "@primary"
   },
@@ -251,7 +251,7 @@
    "type": "flash",
    "delay": 520,
    "duration": 200,
-   "at": "caster+0,20.5,27",
+   "at": "caster+0,26,28",
    "size": 10,
    "anamorphic": 0,
    "rays": 14,

@@ -5,7 +5,8 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Where the witch's staff is in the «Безмолвные врата» scene, as a pure function of the scene clock (ticks from the scene start):
  * until 37.4 s it floats upright front-left of her, swaying and bobbing; over 37.4–38.4 s it glides into her left fist at the belt
- * (pose STAFF_L of tools/gen_player_anims.py, the hand closes on it at 37.6–38.8 s) and stands there upright to the end.
+ * (pose STAFF_L of tools/gen_player_anims.py, the hand closes on it at 37.6–38.8 s), spinning a full turn, and is held across
+ * the body to the end (head low to her right, foot up behind the left shoulder).
  * Used by {@code client/GateStaff} (draws the staff) and by {@link GateMana} (the trail of mana from its head and foot), so both agree.
  * Local axes as in GateStaff: x to the caster's left, y up, z forward, from the feet, turned with the body yaw.
  */
@@ -16,6 +17,12 @@ public final class GateStaffPose {
     public static final int TAKE_FROM = 744, TAKE_TO = 772;
     /** Owner 19.11 (as in the anime): on its way into the left hand the staff spins a full turn (360° in its own plane) and rises in a short arc. */
     static final double SPIN = 360, ARC = .35;
+    /**
+     * Owner 19.11 (anime frame): after the spin the staff is held across the body, not upright — the head (ring and eye) low,
+     * forward and to her right, the foot up behind her left shoulder; the left fist at the belt, almost in the middle.
+     * Axis toward the head ≈ (right .72, down .5, forward .48): roll 124.8° and tilt 28.7° in GateStaff's ZP·XP order.
+     */
+    static final double HOLD_ROLL = 124.8, HOLD_TILT = 28.7;
     /** Head (ring and eye) and foot of the staff from the item origin along its axis, in blocks (geo silent_witch_staff: y -16..31 px). */
     static final double HEAD = 1.55, FOOT = .98;
 
@@ -23,9 +30,9 @@ public final class GateStaffPose {
     public static double[] local(double t) {
         double k = smoother((t - TAKE_FROM) / (TAKE_TO - TAKE_FROM));
         double fx = .75, fy = 1.15 + .08 * Math.sin(t * .06), fz = .65, rz = 4 * Math.sin(t * .045), rx = 3 * Math.sin(t * .037 + 1);
-        double hx = .36, hy = .98, hz = .3;
+        double hx = .14, hy = .99, hz = .35;   // = STAFF_L of tools/gen_player_anims.py (2.2, 15.8, 5.6 px)
         double arc = ARC * Math.sin(Math.PI * k);
-        return new double[]{fx + (hx - fx) * k, fy + (hy - fy) * k + arc, fz + (hz - fz) * k, rz * (1 - k) + SPIN * k, rx * (1 - k)};
+        return new double[]{fx + (hx - fx) * k, fy + (hy - fy) * k + arc, fz + (hz - fz) * k, rz * (1 - k) + (SPIN + HOLD_ROLL) * k, rx * (1 - k) + HOLD_TILT * k};
     }
 
     static double smoother(double x) { x = Math.max(0, Math.min(1, x)); return x * x * x * (x * (6 * x - 15) + 10); }

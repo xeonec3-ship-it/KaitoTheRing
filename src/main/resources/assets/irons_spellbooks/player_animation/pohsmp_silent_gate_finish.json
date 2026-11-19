@@ -23,10 +23,10 @@
     "tick": 0,
     "easing": "easeInOutSine",
     "leftArm": {
-     "pitch": -16.0,
-     "yaw": -6.0,
-     "roll": -10.0,
-     "bend": -58.0
+     "pitch": -57.7,
+     "yaw": 47.72,
+     "roll": -40.56,
+     "bend": -23.65
     }
    },
    {
@@ -169,10 +169,10 @@
     "tick": 232,
     "easing": "easeInOutSine",
     "leftArm": {
-     "pitch": -16.0,
-     "yaw": -6.0,
-     "roll": -10.0,
-     "bend": -58.0
+     "pitch": -57.7,
+     "yaw": 47.72,
+     "roll": -40.56,
+     "bend": -23.65
     }
    },
    {

@@ -98,6 +98,12 @@ public final class SigilDraw {
                 n = n.lengthSqr() < 1e-6 ? new Vec3(0, 0, 1) : n.normalize();
                 yield new Basis(n, f.left().scale(-1), f.up());
             }
+            case OUTWARD -> {
+                Vec3 n = r.normal == null || r.normal.lengthSqr() < 1e-6 ? new Vec3(0, 1, 0) : r.normal.normalize();
+                Vec3 u = n.cross(new Vec3(0, 1, 0));
+                u = u.lengthSqr() < 1e-6 ? new Vec3(1, 0, 0) : u.normalize();
+                yield new Basis(n, u, u.cross(n));
+            }
         };
     }
 

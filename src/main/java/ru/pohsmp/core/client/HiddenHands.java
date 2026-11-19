@@ -25,23 +25,52 @@ public final class HiddenHands {
     private static final Map<Integer, ItemStack[]> STASH = new HashMap<>();
 
     /** Called on the client when a staff-less cast starts; ticks covers the cast and its finish animation. */
-    public static void hide(LivingEntity e, int ticks) {
+    public static void hide(LivingEntity e, int ticks, int finish) {
         if (e.level() == null) return;
+        clear(e.getId());
         UNTIL.put(e.getId(), e.level().getGameTime() + ticks);
+        FINISH.put(e.getId(), finish);
     }
 
     public static void show(LivingEntity e) {
-        UNTIL.remove(e.getId());
+        clear(e.getId());
     }
 
+    /** entity id -> the spell whose cast hid the hands (seen in the synced cast data), and when the player was last seen casting it. */
+    private static final Map<Integer, String> SPELL = new HashMap<>();
+    private static final Map<Integer, Long> LAST_CAST = new HashMap<>();
+    /** entity id -> how long the hands stay empty after the cast ends (its finish animation / scene tail). */
+    private static final Map<Integer, Integer> FINISH = new HashMap<>();
+
+    /**
+     * Hidden only for the cast that asked for it and its finish animation: another spell cast meanwhile (e.g. the Worgan breath
+     * right after a cancelled Gate) shows the staff again at once (owner, 19.11.2026: a spell without a camera scene keeps the item).
+     */
     private static boolean hidden(Player p) {
-        Long until = UNTIL.get(p.getId());
+        int id = p.getId();
+        Long until = UNTIL.get(id);
         if (until == null) return false;
-        if (!p.isAlive() || p.level().getGameTime() > until) {
-            UNTIL.remove(p.getId());
-            return false;
+        long now = p.level().getGameTime();
+        if (!p.isAlive() || now > until) return clear(id);
+        io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData sd = io.redspace.ironsspellbooks.player.ClientMagicData.getSyncedSpellData(p);
+        if (sd != null && sd.isCasting()) {
+            String spell = sd.getCastingSpellId();
+            String own = SPELL.putIfAbsent(id, spell);
+            if (own != null && !own.equals(spell)) return clear(id);
+            LAST_CAST.put(id, now);
+        } else {
+            Long last = LAST_CAST.get(id);
+            if (last != null && now - last > FINISH.getOrDefault(id, ru.pohsmp.core.spell.CastAnims.FINISH_TICKS)) return clear(id);
         }
         return true;
+    }
+
+    private static boolean clear(int id) {
+        UNTIL.remove(id);
+        SPELL.remove(id);
+        LAST_CAST.remove(id);
+        FINISH.remove(id);
+        return false;
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -79,5 +108,8 @@ public final class HiddenHands {
         }
         STASH.clear();
         UNTIL.clear();
+        SPELL.clear();
+        LAST_CAST.clear();
+        FINISH.clear();
     }
 }

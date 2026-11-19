@@ -509,7 +509,8 @@ public final class DownfallCut {
             }
             return;
         }
-        double tt = dur * 0.88;
+        // Star Fall: the title appears while the star is in flight (owner, 19.11.2026), not after the impact
+        double tt = scene == 6 ? ru.pohsmp.core.spell.StarFallSpell.FALL_AT : dur * 0.88;
         if (t > tt) {
             float a = (float) Math.min(1, (t - tt) / 15.0);
             Font font = Minecraft.getInstance().font;

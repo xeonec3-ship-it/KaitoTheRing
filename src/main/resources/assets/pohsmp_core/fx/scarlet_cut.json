@@ -14,8 +14,8 @@
    "type": "trail",
    "shape": "slash",
    "delay": 0,
-   "duration": 9,
-   "at": "caster",
+   "duration": 14,
+   "at": "caster+0,0,-2",
    "radius": 2.7,
    "arc": 120,
    "thickness": 0.46,
@@ -26,14 +26,15 @@
    "secondary": 0.75,
    "color": "@primary",
    "brightness": 1.5,
-   "comment": "главный серп: алый, белое ядро"
+   "comment": "главный серп: алый, белое ядро",
+   "travel": 7.0
   },
   {
    "type": "trail",
    "shape": "slash",
    "delay": 1,
-   "duration": 12,
-   "at": "caster",
+   "duration": 17,
+   "at": "caster+0,0,-2",
    "radius": 2.95,
    "arc": 100,
    "thickness": 0.22,
@@ -44,14 +45,15 @@
    "secondary": 0.0,
    "color": "@secondary",
    "brightness": 0.8,
-   "comment": "послеобраз: тёмно-багровый, шире и позже"
+   "comment": "послеобраз: тёмно-багровый, шире и позже",
+   "travel": 8.5
   },
   {
    "type": "trail",
    "shape": "slash",
    "delay": 0,
-   "duration": 6,
-   "at": "caster",
+   "duration": 11,
+   "at": "caster+0,0,-2",
    "radius": 2.6,
    "arc": 130,
    "thickness": 0.08,
@@ -62,23 +64,25 @@
    "secondary": 0.0,
    "color": "@core",
    "brightness": 1.8,
-   "comment": "тонкая белая кромка лезвия"
+   "comment": "тонкая белая кромка лезвия",
+   "travel": 5.5
   },
   {
    "type": "flash",
    "delay": 2,
    "duration": 5,
-   "at": "caster",
+   "at": "caster+0,0,-2",
    "size": 1.6,
    "anamorphic": 6,
    "rays": 4,
-   "color": "@core"
+   "color": "@core",
+   "travel": 2.5
   },
   {
    "type": "sprites",
    "delay": 2,
    "duration": 4,
-   "at": "caster",
+   "at": "caster+0,0,-2",
    "texture": "@sparks",
    "count": 30,
    "rate": 8,
@@ -91,13 +95,14 @@
    ],
    "life": 12,
    "color": "@primary",
-   "comment": "искры с лезвия"
+   "comment": "искры с лезвия",
+   "travel": 2.0
   },
   {
    "type": "sprites",
    "delay": 3,
    "duration": 3,
-   "at": "caster",
+   "at": "caster+0,0,-2",
    "texture": "@shards",
    "count": 10,
    "rate": 4,
@@ -111,7 +116,8 @@
    ],
    "life": 14,
    "color": "@primary",
-   "comment": "сколы воздуха"
+   "comment": "сколы воздуха",
+   "travel": 1.5
   },
   {
    "type": "decal",

@@ -864,6 +864,107 @@ def silent_gate_finish():
     return a
 
 
+
+# ---------------------------------------------------------------- Библиотека поз (T12)
+# Именованные позы всего тела. Новое заклинание собирается списком шагов «поза → время → плавность»:
+#   a = compose('pohsmp_x', 2.0, [('stand', 0), ('arms_sky', 0.6, 'easeOutBack'), ('palm_push', 1.4, 'easeInQuad')])
+# Поза — словарь частей (rightArm, leftArm, torso, head, rightLeg, leftLeg, body); недостающие части берутся из 'stand'.
+# Шаг может быть и словарём: {'pose': 'stance', 't': 1.0, 'ease': 'easeOutBack', 'sway': ('torso', 'pitch', 1.5, 2.0)} —
+# sway: часть, канал, амплитуда, период — лёгкое покачивание до следующего шага.
+_PR = Rig()
+_HL = lambda **k: {'pitch': 0, 'yaw': 0, 'roll': 0, **k}
+_TO = lambda **k: {'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0, **k}
+_STANCE_LEGS = dict(rightLeg=_TO(pitch=-10, roll=5, bend=12), leftLeg=_TO(pitch=12, roll=-5, bend=6))
+SLASH_UP_R = _fk(pitch=-165, yaw=40, roll=-45, bend=-25)      # замах: кисть высоко справа над головой                      # замах: кисть над левым плечом
+SLASH_DOWN_R = _fk(pitch=-50, yaw=30, roll=-60, bend=-8)      # конец взмаха: рука ушла наискось вниз-влево, через корпус
+SNAP_UP_R = _fk(pitch=-78, yaw=6, roll=10, bend=-62)          # кисть у плеча, пальцы сложены для щелчка
+SNAP_R = _fk(pitch=-96, yaw=4, roll=6, bend=-14)              # щелчок: рука выброшена вперёд
+POSES = {
+    'stand': dict(rightArm=ARM_DOWN_R, leftArm=ARM_DOWN_L, torso=ZERO_T, head=ZERO_H, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG, body={'y': 0}),
+    'prayer': dict(rightArm=_PR.R(-0.55, 23.4, 4.6), leftArm=_PR.L(0.55, 23.4, 4.6), head=_HL(pitch=14), torso=_TO(pitch=3, bend=4)),
+    'staff_slam': dict(rightArm=_fk(pitch=-58, yaw=-8, roll=4, bend=-38), leftArm=_fk(pitch=-44, yaw=10, roll=-6, bend=-30),
+                       torso=_TO(pitch=14, bend=8), head=_HL(pitch=8), body={'y': -0.12}, **_STANCE_LEGS),
+    'arms_wide': dict(rightArm=T_R, leftArm=mirror(T_R), torso=_TO(pitch=-3), head=_HL(pitch=-6)),
+    'arms_sky': dict(rightArm=V_R, leftArm=mirror(V_R), torso=_TO(pitch=-7, bend=-2), head=_HL(pitch=-32)),
+    'slash_ready': dict(rightArm=SLASH_UP_R, leftArm=_fk(pitch=-20, roll=-14, bend=-30), torso=_TO(yaw=22, pitch=-2),
+                        head=_HL(yaw=-10), **_STANCE_LEGS),
+    'slash': dict(rightArm=SLASH_DOWN_R, leftArm=_fk(pitch=-6, roll=-22, bend=-20), torso=_TO(yaw=-24, pitch=8, bend=4),
+                  head=_HL(yaw=12, pitch=4), **_STANCE_LEGS),
+    'palm_push': dict(rightArm=_PR.R(-1.6, 21.6, 9.0), leftArm=_PR.L(1.6, 21.6, 9.0), torso=_TO(pitch=9, bend=6), head=_HL(),
+                      rightLeg=_TO(pitch=6, roll=3, bend=6), leftLeg=_TO(pitch=-8, roll=-3, bend=4)),
+    'bow': dict(rightArm=_PR.R(-0.9, 20.6, 3.8), leftArm=_fk(pitch=8, roll=-6, bend=-6), torso=_TO(pitch=32, bend=8), head=_HL(pitch=18)),
+    'stance': dict(rightArm=_fk(pitch=-48, yaw=-6, roll=8, bend=-46), leftArm=_fk(pitch=-30, yaw=8, roll=-12, bend=-56),
+                   torso=_TO(pitch=6, yaw=-14, bend=3), head=_HL(yaw=10), body={'y': -0.1}, **_STANCE_LEGS),
+    'point': dict(rightArm=POINT_R, leftArm=_fk(pitch=4, roll=-12, bend=-8), torso=_TO(pitch=2, yaw=-10, bend=2), head=_HL(pitch=-6, yaw=-8)),
+    'point_sky': dict(rightArm=SKY_R, torso=_TO(pitch=-4), head=_HL(pitch=-24)),
+    'hush': dict(rightArm=_PR.R(-0.4, 25.6, 4.4), head=_HL(pitch=6), torso=_TO(pitch=3, bend=3)),
+    'snap_ready': dict(rightArm=SNAP_UP_R, torso=_TO(yaw=-6), head=_HL(pitch=-2)),
+    'snap': dict(rightArm=SNAP_R, torso=_TO(yaw=4, pitch=3), head=_HL()),
+    'held': dict(rightArm=_fk(pitch=-12, roll=118, bend=-4), leftArm=mirror(_fk(pitch=-12, roll=118, bend=-4)),
+                 torso=_TO(pitch=-12, bend=-6), head=_HL(pitch=-38), body={'y': 0.45},
+                 rightLeg=_TO(pitch=8, roll=4, bend=14), leftLeg=_TO(pitch=-4, roll=-4, bend=8)),
+}
+POSE_NAMES = {'stand': 'стойка (спокойно)', 'prayer': 'молитва', 'staff_slam': 'удар посохом о землю', 'arms_wide': 'руки в стороны',
+              'arms_sky': 'руки к небу', 'slash_ready': 'замах разреза', 'slash': 'взмах-разрез', 'palm_push': 'толчок ладонями',
+              'bow': 'поклон', 'stance': 'боевая стойка', 'point': 'указ рукой', 'point_sky': 'палец к небу', 'hush': 'палец к губам',
+              'snap_ready': 'щелчок: замах', 'snap': 'щелчок пальцами', 'held': 'скован (цель)'}
+
+
+def pose(name, **over):
+    """Поза из библиотеки (с частями 'stand' по умолчанию); over — заменить части."""
+    return {**POSES['stand'], **POSES[name], **over}
+
+
+def compose(anim_name, seconds, steps, hold=False):
+    a = Anim(anim_name, seconds, hold=hold)
+    steps = [s if isinstance(s, dict) else dict(zip(('pose', 't', 'ease'), s)) for s in steps]
+    for i, st in enumerate(steps):
+        p = st['pose'] if isinstance(st['pose'], dict) else pose(st['pose'])
+        a.pose(st['t'], st.get('ease') or 'easeInOutSine', **p)
+        if st.get('sway'):
+            part, ch, amp, period = st['sway']
+            t1 = steps[i + 1]['t'] if i + 1 < len(steps) else seconds
+            a.sway(st['t'], t1, period, part, p[part], ch, amp)
+    return a
+
+
+def scarlet_cut_cast():
+    """«Алый разрез» (T02): замах и 5 взмахов по одному в 4 тика (0.2 с), прямой и обратный по очереди; потом рука опускается."""
+    st = [('stand', 0), ('slash_ready', 0.15, 'easeOutCubic')]
+    t = 0.2
+    for i in range(5):
+        st.append(('slash' if i % 2 == 0 else 'slash_ready', t + 0.1, 'easeOutQuart'))
+        t += 0.2
+    st += [('stance', t + 0.3), ('stand', t + 0.9)]
+    return compose('pohsmp_scarlet_cut_cast', t + 0.9, st)
+
+
+def finger_snap():
+    """Щелчок пальцами правой руки (T20, «Копья ветра» и др.): кисть к плечу — резкий выброс вперёд — опускается."""
+    return compose('pohsmp_finger_snap', 1.1, [('stand', 0), ('snap_ready', 0.25, 'easeOutCubic'), ('snap', 0.38, 'easeOutBack'),
+                                               ('snap', 0.7), ('stand', 1.1)])
+
+
+def held_target():
+    """Цель, которую держит Дезинтеграция/Реплика (T13): руки разведены и скованы, голова запрокинута, тело чуть парит;
+    петля (hold) — играет, пока держат; дрожь и покачивание."""
+    a = compose('pohsmp_held_target', 4.0, [('stand', 0), ('held', 0.8, 'easeOutCubic')], hold=True)
+    h = pose('held')
+    a.sway(0.8, 4.0, 0.8, 'rightArm', h['rightArm'], 'roll', 3)
+    a.sway(0.8, 4.0, 0.9, 'leftArm', h['leftArm'], 'roll', -3)
+    a.sway(0.8, 4.0, 2.0, 'head', h['head'], 'yaw', 6)
+    a.sway(0.8, 4.0, 1.6, 'body', h['body'], 'y', 0.06)
+    return a
+
+
+def pose_gallery():
+    """Только для превью: по 1.4 с на каждую позу библиотеки."""
+    out = []
+    for k in POSES:
+        a = compose(f'поза: {k} — {POSE_NAMES[k]}', 1.6, [('stand', 0), (k, 0.6, 'easeOutCubic'), (k, 1.6)])
+        out.append(a)
+    return out
+
 def _pair(fn, finish_name):
     """Анимация каста и финал из её последней позы."""
     def cast():
@@ -883,7 +984,8 @@ _CA = _pair(coven_arrival_cast, 'pohsmp_coven_arrival_finish')
 _DI = _pair(disintegration_cast, 'pohsmp_disintegration_finish')
 
 
-ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_finish]
+ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_finish,
+         scarlet_cut_cast, finger_snap, held_target]
 
 
 def main():
@@ -899,6 +1001,8 @@ def main():
             json.dump(js, fh, ensure_ascii=False, indent=1)
         data[a.name] = js
         print('wrote', a.name, '-', len(js['emote']['moves']), 'keys')
+    for a in pose_gallery():   # библиотека поз — только в превью, в мод не пишется
+        data[a.name] = a.emotecraft()
     with open(os.path.join(HERE, 'anim_preview.template.html'), encoding='utf-8') as fh:
         page = fh.read().replace('/*ANIMS*/null', json.dumps(data, ensure_ascii=False))
     with open(os.path.join(HERE, 'anim_preview.html'), 'w', encoding='utf-8') as fh:

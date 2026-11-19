@@ -19,7 +19,8 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
                        List<Layer> layers, Expand expand, Flash formedFlash, List<Child> onFormed, Dissolve dissolve,
                        GroundLight groundLight, BlockGlow blockGlow) {
 
-    public enum Orientation { GROUND, SKY, FACING, BILLBOARD }
+    /** OUTWARD: fixed, laid on a sphere around the element's anchor (normal from the anchor to the sigil), e.g. seals on a dome. */
+    public enum Orientation { GROUND, SKY, FACING, BILLBOARD, OUTWARD }
 
     public enum LayerType { DISC, BAND, ARCS, SPOKES }
 

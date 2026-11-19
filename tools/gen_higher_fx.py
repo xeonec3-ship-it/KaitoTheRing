@@ -149,6 +149,13 @@ def scarlet_cut():
         {'type': 'decal', 'delay': 22, 'duration': 22, 'at': 'point:ground', 'texture': 'higher_cracks', 'radius': 1.5, 'fadeOut': 18, 'color': '@secondary',
          'comment': 'выжженный след после взрыва'},
     ]
+    # the cut flies forward (owner, 19.11.2026): blade, its flash and sparks start 2 blocks back and travel 0.5 block/tick
+    for e in E:
+        if e['at'] == 'caster' and e['type'] in ('trail', 'flash', 'sprites'):
+            if e['type'] == 'trail':
+                e['duration'] += 5
+            e['at'] = 'caster+0,0,-2'
+            e['travel'] = round(0.5 * e['duration'], 2)
     dump('fx/scarlet_cut.json', {
         'comment': '«Алый разрез» (T02). Один экземпляр = один разрез: at = середина дуги (на высоте груди), point:ground = место трещины под ней, '
                    'yaw — взгляд заклинателя. Сервер (ScarletCutSpell) взрывает трещину на тике 20 — взрыв держать на 20. Сгенерировано tools/gen_higher_fx.py.',
@@ -163,8 +170,7 @@ def star_fall():
          'life': 50, 'size': [0.14, 0.02], 'texture': '@sparks', 'color': '#FF6A70', 'comment': 'искры поднимаются над прицелом'},
         {'type': 'wave', 'at': 'point:impact', 'delay': 60, 'duration': 40, 'radius': 8, 'color': '@primary', 'brightness': 0.6},
         {'type': 'wave', 'at': 'point:impact', 'delay': 110, 'duration': 40, 'radius': 8, 'color': '#FF6A70', 'brightness': 0.9},
-        {'type': 'beam', 'at': 'point:impact', 'fromSky': 60, 'delay': 40, 'duration': 124, 'width': 0.12, 'core': 0.5, 'flicker': 0.4,
-         'color': '@primary', 'in': {'duration': 20}, 'comment': 'тонкий луч-наводка с неба'},
+        # луч-наводка с земли убран (владелец, 19.11.2026)
         # звёздная печать в небе раскрывается, звезда вспыхивает
         {'type': 'sigil', 'id': 'star_fall_sky', 'delay': 64, 'until': 150, 'at': 'point:sky', 'orientation': 'sky'},
         {'type': 'flash', 'at': 'point:sky', 'delay': 96, 'duration': 16, 'size': 10, 'rays': 10, 'anamorphic': 16, 'color': '#FFFFFF'},

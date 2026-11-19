@@ -33,8 +33,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -43,12 +41,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import ru.pohsmp.core.Hidden;
 import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.net.Net;
 import ru.pohsmp.core.net.Net.HFx;
@@ -262,7 +259,7 @@ public class CovenArrivalSpell extends PohSpell {
     private record Walk(Vec3 from, Vec3 to, int start, int len) {}
 
     private static final Map<UUID, Arrival> CAST_BY = new HashMap<>();
-    /** Entity -> caster: hidden in the portal, no damage. */
+    /** Entity -> caster: inside the portal (ru.pohsmp.core.Hidden: not drawn, no damage, no collisions). */
     private static final Map<UUID, UUID> HIDDEN = new HashMap<>();
 
     @Override
@@ -374,7 +371,6 @@ public class CovenArrivalSpell extends PohSpell {
         for (var e : where.entrySet()) {
             LivingEntity le = find(ar.getServer(), e.getKey());
             if (le == null || !le.isAlive() || le.level() != ar) continue;
-            if (HIDDEN.containsKey(le.getUUID())) hide(le);   // renew: something (a cast, milk) may have removed it
             float yaw = baseYaw;
             Walk w = a.walks.get(le.getUUID());
             if (w != null) {   // walking: the server leads it in small steps, the client animates the legs
@@ -397,12 +393,6 @@ public class CovenArrivalSpell extends PohSpell {
             le.setYHeadRot(yaw);
             le.setYBodyRot(yaw);
         }
-    }
-
-    /** CNPC NPCs ignore invisibility when drawn, so while "inside the portal" they wait high above the arena, out of sight. */
-    private static Vec3 stash(ServerLevel ar, Vec3 p) {
-        double up = p.y + 150, top = ar.getMaxBuildHeight() - 4;
-        return new Vec3(p.x, up <= top ? up : Math.max(ar.getMinBuildHeight() + 2, p.y - 150), p.z);
     }
 
     /** The caster's own portal in front of him, on the cast level: he opens it with his arms and walks into it. */
@@ -429,7 +419,8 @@ public class CovenArrivalSpell extends PohSpell {
         if (a.cSeal >= 0) Fx.stop(cl, a.cSeal, "");
         HigherSpell.burst(cl, cp.x, cp.y + 2.9, cp.z, 2.5, COLOR);
         cl.playSound(null, cp.x, cp.y, cp.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 3f, 0.5f);
-        // everyone steps into the portal: moved to the arena (other dimension too), invisible, unhurt until their exit
+        // everyone steps into the portal: moved to the arena (other dimension too) right behind the portal, hidden from every viewer
+        // (CNPC NPCs ignore invisibility when drawn, so Hidden cancels their rendering), unhurt and not pushed until their exit
         a.pre.clear();
         a.walks.clear();
         Vec3 inside = a.inside;
@@ -437,10 +428,11 @@ public class CovenArrivalSpell extends PohSpell {
         all.add(caster);
         for (LivingEntity e : all) {
             HIDDEN.put(e.getUUID(), caster.getUUID());
-            hide(e);
+            Hidden.hide(e, CAST, true, true);   // gone on the cast level at once; the time limit is a safety net, exit/finish show them
             if (!(e instanceof Player)) HigherSpell.burst(e.level() instanceof ServerLevel el ? el : cl, e.getX(), e.getY() + 1, e.getZ(), 1.4, COLOR);
-            Vec3 p = e instanceof Player ? inside : stash(ar, inside);
+            Vec3 p = inside;
             LivingEntity moved = move(e, ar, p, a.yaw);
+            Hidden.hide(moved, CAST, true, true);   // again: held at the new spot (and the new entity if it changed dimension)
             a.hold.put(moved.getUUID(), p);
             if (moved != caster) LOG.info("[pohsmp] coven arrival: {} into the portal -> {}", where(moved), p);
             if (moved != e) {
@@ -459,27 +451,6 @@ public class CovenArrivalSpell extends PohSpell {
             Cutscene.release(ar, gone, a.cutKey);
             a.watchers.removeAll(gone);
         }
-    }
-
-    /** Iron's true invisibility hides the armour and held items too (vanilla invisibility does not). */
-    private static final ResourceLocation TRUE_INVIS = new ResourceLocation("irons_spellbooks", "true_invisibility");
-
-    private static net.minecraft.world.effect.MobEffect trueInvis() {
-        return net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.containsKey(TRUE_INVIS)
-                ? net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getValue(TRUE_INVIS) : null;
-    }
-
-    /** Invisible inside the portal: vanilla invisibility plus Iron's true invisibility (renewed every tick while hidden). */
-    private static void hide(LivingEntity e) {
-        if (!e.hasEffect(MobEffects.INVISIBILITY)) e.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 60, 0, false, false, false));
-        var ti = trueInvis();
-        if (ti != null && !e.hasEffect(ti)) e.addEffect(new MobEffectInstance(ti, 60, 0, false, false, false));
-    }
-
-    private static void unhide(LivingEntity e) {
-        e.removeEffect(MobEffects.INVISIBILITY);
-        var ti = trueInvis();
-        if (ti != null) e.removeEffect(ti);
     }
 
     /** Moves an entity to p in level `to`, facing yaw; returns the entity (a new one if a non-player changed dimension). */
@@ -529,7 +500,7 @@ public class CovenArrivalSpell extends PohSpell {
         if (!le.isAlive()) return true;
         keep(ar, to);
         HIDDEN.remove(le.getUUID());
-        unhide(le);
+        Hidden.show(le);
         LivingEntity m;
         if (le == caster) {   // the caster's animation walks him out by itself: he is set at the end point at once
             m = move(le, ar, to, a.yaw);
@@ -580,12 +551,7 @@ public class CovenArrivalSpell extends PohSpell {
             Walk w = a.walks.get(u);
             if (le != null && w != null && !(le instanceof Player) && le.level() == ar) le.teleportTo(w.to().x, w.to().y, w.to().z);
             if (HIDDEN.remove(u) == null || le == null) continue;
-            unhide(le);
-            // cut short while still inside the portal: NPCs come down from where they waited
-            if (!(le instanceof Player) && le.level() == ar) {
-                le.fallDistance = 0;
-                le.teleportTo(a.inside.x, a.inside.y, a.inside.z);
-            }
+            Hidden.show(le);   // cut short while still inside the portal: they appear where they waited, behind the portal
         }
         for (var p : a.poses.entrySet()) {
             LivingEntity le = find(ar.getServer(), p.getKey());
@@ -640,11 +606,6 @@ public class CovenArrivalSpell extends PohSpell {
             e.setCanceled(true);
             e.setCancellationResult(InteractionResult.SUCCESS);
             if (p instanceof ServerPlayer sp && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND) spell.toggle(sp, t);
-        }
-
-        @SubscribeEvent(priority = EventPriority.HIGHEST)
-        public static void onAttack(LivingAttackEvent e) {
-            if (!HIDDEN.isEmpty() && HIDDEN.containsKey(e.getEntity().getUUID())) e.setCanceled(true);
         }
 
         @SubscribeEvent

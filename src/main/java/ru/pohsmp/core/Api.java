@@ -67,4 +67,41 @@ public final class Api {
         MinecraftServer s = sl.getServer();
         return s.getCommands().performPrefixedCommand(s.createCommandSourceStack().withLevel(sl).withSuppressedOutput(), command);
     }
+    /**
+     * Hides an entity from every player (model, armour, held items, name tag, shadow) for ticks (&lt;= 0: until {@link #show}),
+     * with no damage and no collisions; a hidden NPC stays where it is. Takes a CNPC script entity (npc, player, e.target)
+     * or a Minecraft entity. Example: <code>Core.hide(npc, 100)</code>.
+     */
+    public static void hide(Object entity, int ticks) {
+        net.minecraft.world.entity.Entity e = unwrap(entity);
+        if (e != null) Hidden.hide(e, ticks);
+    }
+
+    /** Like {@link #hide(Object, int)} with the options: noDamage cancels damage, noCollide stops pushing, projectiles and clicks. */
+    public static void hide(Object entity, int ticks, boolean noDamage, boolean noCollide) {
+        net.minecraft.world.entity.Entity e = unwrap(entity);
+        if (e != null) Hidden.hide(e, ticks, noDamage, noCollide);
+    }
+
+    /** Shows an entity hidden by {@link #hide}. */
+    public static void show(Object entity) {
+        net.minecraft.world.entity.Entity e = unwrap(entity);
+        if (e != null) Hidden.show(e);
+    }
+
+    public static boolean isHidden(Object entity) {
+        return Hidden.isHidden(unwrap(entity));
+    }
+
+    /** A Minecraft entity, or a CNPC script wrapper (IEntity.getMCEntity()), or null. */
+    private static net.minecraft.world.entity.Entity unwrap(Object o) {
+        if (o instanceof net.minecraft.world.entity.Entity e) return e;
+        if (o == null) return null;
+        try {
+            Object mc = o.getClass().getMethod("getMCEntity").invoke(o);
+            return mc instanceof net.minecraft.world.entity.Entity e ? e : null;
+        } catch (ReflectiveOperationException ex) {
+            return null;
+        }
+    }
 }

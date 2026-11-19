@@ -44,6 +44,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.IllusionSpell.IllusionEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MirrorPrisonSpell.MirrorPrisonEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.FrozenHourSpell.FrozenHourEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.CountdownSpell.CountdownEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.ArkSpell.ArkEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DownfallSpell.DownfallEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.EightShieldsSpell.EightShieldsEvents.class);

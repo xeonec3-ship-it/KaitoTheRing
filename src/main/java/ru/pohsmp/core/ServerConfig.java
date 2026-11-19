@@ -13,6 +13,7 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.BooleanValue DIS_KILL;
     public static final ForgeConfigSpec.DoubleValue REPLICA_PERCENT;
     public static final ForgeConfigSpec.DoubleValue HIGHER_MULT;
+    public static final ForgeConfigSpec.DoubleValue COUNTDOWN_MAX;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -35,6 +36,9 @@ public final class ServerConfig {
         b.pop();
         b.push("higher");
         HIGHER_MULT = b.comment("Damage and healing multiplier for all Higher-school spells").defineInRange("damageMult", 1.0, 0.0, 100.0);
+        b.pop();
+        b.push("countdown");
+        COUNTDOWN_MAX = b.comment("Countdown: the repeated hit is capped at this share of the target's max health").defineInRange("maxRepeat", 0.4, 0.0, 100.0);
         b.pop();
         SPEC = b.build();
     }

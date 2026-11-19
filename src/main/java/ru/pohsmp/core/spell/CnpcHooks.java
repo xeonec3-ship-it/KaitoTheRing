@@ -94,16 +94,44 @@ public final class CnpcHooks {
             set.setAccessible(true);
             int old = ((Number) get.invoke(ai)).intValue();
             set.invoke(ai, type);
-            // DataAI.setAnimation only changes the server value: ask CNPC to resend the NPC data to the clients
+            // DataAI.setAnimation only changes the server value: CNPC must resend the NPC data to the clients. Manager 19.11
+            // («the NPC animations are gone again»): send it now (EntityNPCInterface.updateClient()), the flag only as a fallback
+            boolean sent = false;
             try {
+                npc.getClass().getMethod("updateClient").invoke(npc);
+                sent = true;
+            } catch (NoSuchMethodException ignored) {
+            }
+            if (!sent) try {
                 field(npc.getClass(), "updateClient").setBoolean(npc, true);
+                sent = true;
             } catch (NoSuchFieldException ignored) {
             }
+            int now = ((Number) get.invoke(ai)).intValue();
+            if (now != type || !sent) LOG.warn("[pohsmp] CNPC animation {} on {} did not take: now {}, sent to clients {}", type, npc.getUUID(), now, sent);
+            else LOG.info("[pohsmp] CNPC animation {} -> {} on {}", old, type, npc.getUUID());
             return old;
         } catch (Throwable t) {
             LOG.warn("[pohsmp] CNPC animation {} failed: {}", type, t.toString());
             return -1;
         }
+    }
+
+    /** For the log: whether e is a CNPC NPC, its model animation and whether its script is on (-1 / false when unknown). */
+    public static String describe(Entity e) {
+        if (!isNpc(e)) return "not a CNPC NPC";
+        int anim = -1;
+        boolean script = false;
+        try {
+            Object w = field(e.getClass(), "wrappedNPC").get(e);
+            Object ai = w.getClass().getMethod("getAi").invoke(w);
+            anim = ((Number) ai.getClass().getMethod("getAnimation").invoke(ai)).intValue();
+            Object data = field(e.getClass(), "script").get(e);
+            script = data != null && (Boolean) data.getClass().getMethod("isEnabled").invoke(data);
+        } catch (Throwable t) {
+            return "CNPC NPC, lookup failed: " + t;
+        }
+        return "CNPC NPC, animation " + anim + ", script " + (script ? "on" : "off");
     }
 
     /**

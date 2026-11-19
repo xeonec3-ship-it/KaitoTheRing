@@ -60,7 +60,7 @@ public final class DownfallCut {
         active = true;
     }
 
-    /** Coven Arrival: how many of the retinue step out in 30-38 s (each gets an equal share of it, skipped ones are cut). */
+    /** Coven Arrival: how many of the retinue step out (all but the last in 30-38 s, each an equal share; the last after the caster). */
     private static int retinue = 2;
 
     public static void covenRetinue(int forKey, int n) {
@@ -193,6 +193,7 @@ public final class DownfallCut {
         Vec3 g = a.add(fw.scale(2.2));
         boolean hasC = ce != null && ce.isAlive();
         Vec3 c = hasC ? ce.getPosition(pt) : a.add(fw.scale(3));
+        int before = Math.max(0, retinue - 1);   // who steps out before the caster: all but the last (CovenArrivalSpell.exitTick)
         double base = Math.atan2(fw.z, fw.x);
         Vec3 pos, look;
         double shake = 0;
@@ -208,28 +209,23 @@ public final class DownfallCut {
             double k = smooth((s - 16) / 3), an = Math.toRadians(30 + 20 * k);
             pos = c.add(Math.cos(an) * (3.2 + 2.5 * k), 1.7 + 0.6 * k, Math.sin(an) * (3.2 + 2.5 * k));
             look = c.add(0, 1.4, 0);
-        } else if (s < (retinue == 0 ? 38 : 30)) {          // the portal unfolds: orbit (without a retinue on to the caster's exit)
-            double k = smooth((s - 19) / (retinue == 0 ? 19 : 11)), an = base + Math.toRadians(-70 + 140 * k);
+        } else if (s < (before == 0 ? 38 : 30)) {           // the portal unfolds: orbit (nobody before the caster: on to his exit)
+            double k = smooth((s - 19) / (before == 0 ? 19 : 11)), an = base + Math.toRadians(-70 + 140 * k);
             pos = a.add(Math.cos(an) * (11 - 3 * k), 3 + 2 * k, Math.sin(an) * (11 - 3 * k));
             look = pc;
             shake = 0.02;
-        } else if (s < 38) {                                // the retinue steps out one by one, 8 s shared equally (owner 19.11: up to 3)
-            double span = 8.0 / retinue;
-            int i = Math.min(retinue - 1, (int) ((s - 30) / span));
+        } else if (s < 38) {                                // the retinue but the last steps out one by one, 8 s shared equally
+            double span = 8.0 / before;
+            int i = Math.min(before - 1, (int) ((s - 30) / span));
             double k = smooth((s - 30 - i * span) / span);
-            Vec3 cs = a.add(fw.scale(3.2));                 // where the caster will stand; the slots as in CovenArrivalSpell.slot
             if (i == 0) {                                   // №1 to the left: low angle from the right
                 pos = a.add(fw.scale(6)).add(rt.scale(4)).add(0, 0.4, 0);
                 look = a.add(fw.scale(1.2 + k)).subtract(rt.scale(1.3 + 1.3 * k)).add(0, 1.3, 0);
-            } else if (i == 1) {                            // №2 to the right: the other side
+            } else {                                        // №2 to the right: the other side
                 pos = a.add(fw.scale(6)).subtract(rt.scale(4)).add(0, 0.4, 0);
                 look = a.add(fw.scale(1.2 + k)).add(rt.scale(1.3 + 1.3 * k)).add(0, 1.3, 0);
-            } else {                                        // №3 back in the middle: low from the front, a little above
-                Vec3 slot = cs.subtract(fw.scale(2.4));
-                pos = cs.add(fw.scale(5.5 - k)).add(rt.scale(0.6)).add(0, 1.2 + 0.4 * k, 0);
-                look = a.add(fw.scale(0.3)).lerp(slot, k).add(0, 1.3, 0);
             }
-        } else if (s < 48) {                                // the caster walks out: slow dolly from below
+        } else if (s < 48) {                                // the caster walks out (the last of the retinue behind him at 42 s): slow dolly from below
             double k = smooth((s - 38) / 10);
             pos = a.add(fw.scale(7.5 - 2 * k)).add(rt.scale(1.4)).add(0, 0.3 + 0.4 * k, 0);
             look = c.add(0, 1.5, 0);

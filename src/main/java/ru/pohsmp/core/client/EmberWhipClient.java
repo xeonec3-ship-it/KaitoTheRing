@@ -64,10 +64,11 @@ public final class EmberWhipClient {
     // ---------------------------------------------------------------- where the whip leaves the hilt (item model space, 0..1)
 
     /**
-     * The icon (tools/gen_ember_blade.py): weapon axis from the pommel (2.6, 29.4) to the point (29.6, 2.2) of 32 px. The whip
-     * grows out of the point of the glowing blade (manager 19.11: the root is the blade tip in the hand), along the blade axis.
+     * The icon (tools/gen_ember_blade.py): weapon axis from the pommel (2.6, 29.4) to the point (29.6, 2.2) of 32 px. In the whip
+     * form the hand holds only the hilt (models/item/ember_whip_handle, manager 19.11: the blade turns into the whip): the whip grows
+     * out of the glowing stub at the end of the hilt, ~(13, 19) px of the same axis, along it.
      */
-    static final float AX0 = 2.6f / 32, AY0 = 1 - 29.4f / 32, AX1 = 29.6f / 32, AY1 = 1 - 2.2f / 32, ROOT_U = 0.97f;
+    static final float AX0 = 2.6f / 32, AY0 = 1 - 29.4f / 32, AX1 = 29.6f / 32, AY1 = 1 - 2.2f / 32, ROOT_U = 0.39f;
     static final float ROOT_X = AX0 + (AX1 - AX0) * ROOT_U, ROOT_Y = AY0 + (AY1 - AY0) * ROOT_U, DIR_X = AX1 - AX0, DIR_Y = AY1 - AY0;
 
     /** Sides of the tube and spline samples per rope span (near / far). */

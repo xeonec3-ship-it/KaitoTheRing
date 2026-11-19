@@ -63,6 +63,11 @@ public final class EmberEpicFight {
         return Impl.playSpecial(p, vortex);
     }
 
+    /** The blade changed form (sword/whip): Epic Fight re-reads the living motions of the style and sends them to the watchers. */
+    public static void formChanged(ServerPlayer p) {
+        if (ON) Impl.formChanged(p);
+    }
+
     /** Direction of the code lash for the swing in progress: +1 right to left (default), −1 left to right (the 2nd lash). */
     public static int lashDir(Player p) {
         if (!ON || !(p instanceof ServerPlayer sp)) return 1;
@@ -223,6 +228,15 @@ public final class EmberEpicFight {
             if (patch == null || anim == null) return 0;
             patch.playAnimationSynchronized(anim, 0.0F);
             return vortex ? VORTEX_FX_TICK : LAST_HEAT_FX_TICK;
+        }
+
+        static void formChanged(ServerPlayer p) {
+            try {
+                ServerPlayerPatch patch = EpicFightCapabilities.getEntityPatch(p, ServerPlayerPatch.class);
+                if (patch != null) patch.modifyLivingMotionByCurrentItem();
+            } catch (RuntimeException ex) {   // an API change in Epic Fight must not break the heat
+                PohCore.LOG.warn("Ember: Epic Fight motion refresh failed", ex);
+            }
         }
 
         static int lashDir(ServerPlayer p) {

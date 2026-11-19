@@ -96,12 +96,15 @@ public class EmberBlade extends SwordItem {
     private static void set(Player p, float heat, int streak, boolean hot, long last) {
         St s = SERVER.computeIfAbsent(p.getUUID(), k -> new St());
         heat = Math.max(0, Math.min(MAX_HEAT, heat));
-        boolean changed = s.heat != heat || s.hot != hot;
+        boolean changed = s.heat != heat || s.hot != hot, form = s.hot != hot;
         s.heat = heat;
         s.streak = streak;
         s.hot = hot;
         s.last = last;
         if (changed) sync(p, null);
+        // owner 19.11 «the same animations in both forms»: the stack no longer changes with the form, so Epic Fight does not
+        // re-read the style's idle/walk/run by itself — ask it to (the attack combo follows the style on each hit)
+        if (form && p instanceof net.minecraft.server.level.ServerPlayer sp) EmberEpicFight.formChanged(sp);
     }
 
     /** To the holder and his watchers, or only to {@code to}. */

@@ -70,9 +70,17 @@ public class CovenArrivalSpell extends PohSpell {
     /** HFx.ANIM b: tells the cutscene clients how many of the retinue step out (dur = the count), for the camera of 30-38 s. */
     public static final int ANIM_RETINUE = 3;
 
-    /** Tick of the i-th retinue exit of n: the 30-38 s window is shared equally (skipped exits are cut, owner 19.11). */
+    /** Pause between two exits; the last of the retinue steps out this long after the caster (4 s, as between three). */
+    private static final int EXIT_GAP = 80;
+
+    /**
+     * Tick of the i-th retinue exit of n. Owner 19.11 («the caster walks through the last chosen one»): all but the last step out
+     * in 30-38 s (the window shared equally), then the caster at 38 s, then the last one EXIT_GAP later, when the caster has
+     * walked on past his spot (the slot behind the caster for three).
+     */
     public static int exitTick(int i, int n) {
-        return T_EXITS + i * (T_CASTER - T_EXITS) / Math.max(1, n);
+        if (i >= n - 1) return T_CASTER + EXIT_GAP;
+        return T_EXITS + i * (T_CASTER - T_EXITS) / (n - 1);
     }
 
     /** Where the caster ends up in front of the portal. */
@@ -353,6 +361,8 @@ public class CovenArrivalSpell extends PohSpell {
         keep(sl, a.cAt);
         LOG.info("[pohsmp] coven arrival: caster {}, arena {} {}, retinue {}", where(caster), a.arena.dimension().location(), a.at,
                 a.retinue.stream().map(CovenArrivalSpell::where).toList());
+        // manager 19.11 («the NPC animations are gone again»): what each NPC of the retinue is at the start, for the server log
+        for (LivingEntity e : a.retinue) if (!(e instanceof Player)) LOG.info("[pohsmp] coven arrival: retinue {} — {}", e.getUUID(), CnpcHooks.describe(e));
         Tasks.add(() -> step(caster, a));
     }
 
@@ -554,7 +564,8 @@ public class CovenArrivalSpell extends PohSpell {
         ar.playSound(null, to.x, to.y, to.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 2f, pitch);
         ar.playSound(null, to.x, to.y, to.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 2f, 0.8f);
         if (m != caster) {
-            CnpcHooks.call(m, "coven_exit", caster.getName().getString());
+            if (!(m instanceof Player) && !CnpcHooks.call(m, "coven_exit", caster.getName().getString()))
+                LOG.info("[pohsmp] coven arrival: no coven_exit script call for {} ({})", m.getUUID(), CnpcHooks.describe(m));
             LOG.info("[pohsmp] coven arrival: {} steps out to {}", where(m), to);
         }
         return true;
@@ -651,6 +662,30 @@ public class CovenArrivalSpell extends PohSpell {
             e.setCanceled(true);
             e.setCancellationResult(InteractionResult.SUCCESS);
             if (p instanceof ServerPlayer sp && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND) spell.toggle(sp, t);
+        }
+
+        /**
+         * Manager 19.11: Shift + right click into the air (no block, no creature in reach) with this spell clears the arena choice —
+         * the mark and the chosen retinue. A plain right click works as before. Cancelled on both sides, so the scroll is not used.
+         */
+        @SubscribeEvent
+        public static void onUseItem(PlayerInteractEvent.RightClickItem e) {
+            Player p = e.getEntity();
+            if (!p.isShiftKeyDown() || e.getHand() != net.minecraft.world.InteractionHand.MAIN_HAND) return;
+            if (!(ru.pohsmp.core.Reg.COVEN_ARRIVAL.get() instanceof CovenArrivalSpell spell) || !spell.holdsThis(p)) return;
+            double reach = p.getBlockReach();
+            Vec3 eye = p.getEyePosition(), end = eye.add(p.getViewVector(1).scale(reach));
+            if (p.pick(reach, 1, false).getType() != net.minecraft.world.phys.HitResult.Type.MISS) return;
+            if (net.minecraft.world.entity.projectile.ProjectileUtil.getEntityHitResult(p, eye, end,
+                    p.getBoundingBox().expandTowards(end.subtract(eye)).inflate(1), x -> !x.isSpectator() && x.isPickable(), reach * reach) != null) return;
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.SUCCESS);
+            if (!(p instanceof ServerPlayer sp) || CAST_BY.containsKey(sp.getUUID())) return;
+            setMark(sp, null);
+            showMark(sp);   // no mark: only stops the seal over the old one
+            dropRetinue(sp);
+            say(sp, "cleared");
+            sp.playNotifySound(SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.PLAYERS, 0.35f, 1.3f);
         }
 
         @SubscribeEvent

@@ -351,7 +351,7 @@
   "ui.pohsmp_core.soul_devour.death": "Цель умирает: броня и тотем не спасают",
   "ui.pohsmp_core.soul_devour.time": "Каст: %s с, не сбивается",
   "ui.pohsmp_core.space_closure.cast": "Каст: %s с, не сбивается, ролик для всех в 64 блоках",
-  "ui.pohsmp_core.space_closure.magic": "Внутри магия и зелья только у заклинателя",
+  "ui.pohsmp_core.space_closure.magic": "Внутри зелья и обычная магия только у заклинателя; Высшие, Мифические, Божественные заклинания и «Мироздание» доступны всем",
   "ui.pohsmp_core.space_closure.recast": "Повторный каст снимает купол",
   "ui.pohsmp_core.space_closure.spent": "Когда купол спадает, заклинатель истощён %s с, мана на нуле",
   "ui.pohsmp_core.space_closure.time": "Длительность: %s мин",

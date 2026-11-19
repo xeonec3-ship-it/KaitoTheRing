@@ -59,15 +59,11 @@ def build():
     # Дважды: в самом начале каста (1–9 с) и во время указа рукой (14.6–26 с). Камера в эти моменты — сбоку (код).
     STAFF = (-0.8, 1.3, 0.25)
     for t0, t1 in ((1.0, 9.0), (14.6, 26.0)):
-        el(type='flash', delay=T(t0), duration=T(t1 - t0), at='caster+%.2f,%.2f,%.2f' % STAFF, size=1.6, rays=6, color='@core', brightness=0.8,
-           **{'in': {'duration': T(0.8)}, 'out': {'duration': T(1.5)}}, comment='яркое пятно у посоха')
-        for k in range(6):                                  # полоса: облака-billboard вдоль линии от посоха вправо
-            u = k / 5
-            x = STAFF[0] + 0.6 + 8.4 * u
-            y = STAFF[1] + 0.4 + 0.9 * u
-            z = STAFF[2] + 0.4 * math.sin(u * 3)
-            el(type='sigil', id='silent_hand_nebula', delay=T(t0) + int(k * 6), until=T(t1), at=f'caster+{x:.2f},{y:.2f},{z:.2f}',
-               orientation='billboard', scale=round(0.55 + 0.2 * math.sin(u * 3.1), 2))
+        el(type='flash', delay=T(t0), duration=T(1.2), at='caster+%.2f,%.2f,%.2f' % STAFF, size=1.2, rays=6, color='@core', brightness=0.7,
+           comment='вспышка у посоха в начале')
+        # полоса — одна широкая туманность (горизонтальный рукав), центр в 4 блоках правее посоха, начало у посоха
+        el(type='sigil', id='silent_staff_nebula', delay=T(t0), until=T(t1), at='caster+%.2f,%.2f,%.2f' % (STAFF[0] + 4.2, STAFF[1] + 0.7, STAFF[2] + 0.2),
+           orientation='billboard')
         el(type='sprites', delay=T(t0), duration=T(t1 - t0), at='caster+%.2f,%.2f,%.2f' % STAFF, texture='spark_soft', count=900, rate=3,
            cone=26, speed=0.09, gravity=-0.0008, size=[0.08, 0.02], life=70, color='#F4E0F4', comment='искры текут от посоха вдоль полосы')
         el(type='sprites', delay=T(t0), duration=T(t1 - t0), at='caster+3.5,2.2,0.3', texture='glint4', count=160, rate=0.6, spread=4.5,

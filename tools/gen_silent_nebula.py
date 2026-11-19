@@ -21,7 +21,16 @@ A = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core'
 N = 512
 
 
+AXIS = [None]
+
+
 def arm(t):
+    if AXIS[0]:
+        return AXIS[0](t)
+    return _plume(t)
+
+
+def _plume(t):
     """Ось облака (как в видео мода): пышный столб снизу от центра вверх и вправо, слегка изогнутый (не дуга-радуга)."""
     return 220 + 120 * t + 30 * math.sin(t * 3.0), 430 - 360 * t
 
@@ -62,7 +71,14 @@ def save(rgb, name):
 
 
 def main():
-    rnd = random.Random(1514)
+    build('silent_nebula', 'silent_hand_nebula', None, 4.0)
+    # полоса от посоха: горизонтальный рукав через весь квадрат, слегка волной и чуть вверх к концу
+    build('silent_band', 'silent_staff_nebula', lambda t: (30 + 452 * t, 300 - 70 * t + 22 * math.sin(t * 5.5)), 6.0, quiet=True)
+
+
+def build(tex, sig_id, axis, size, quiet=False):
+    AXIS[0] = axis
+    rnd = random.Random(1514 + (7 if quiet else 0))
     core, mid, edge = (255, 255, 255), (246, 196, 238), (110, 214, 236)
     cloud = blobs(rnd, 320, 18, 56, 38) + 0.7 * blobs(rnd, 140, 40, 90, 55)
     def smooth_noise(res, seed, blur):
@@ -72,10 +88,10 @@ def main():
     noise = 0.5 * smooth_noise(12, 3, 18) + 0.3 * smooth_noise(28, 4, 9) + 0.2 * smooth_noise(64, 5, 4)
     cloud *= 0.35 + 1.3 * noise
     cloud = np.array(Image.fromarray(np.clip(cloud / cloud.max() * 255, 0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(3)), np.float32)
-    save(colorize(cloud, core, mid, edge) * 255, 'silent_nebula_cloud')
+    save(colorize(cloud, core, mid, edge) * 255, tex + '_cloud')
     haze = blobs(rnd, 60, 70, 140, 70)
     hz = colorize(haze, (255, 236, 250), (226, 160, 214), (150, 110, 170)) * 255 * 0.8
-    save(hz, 'silent_nebula_haze')
+    save(hz, tex + '_haze')
     # струи-завитки: тонкие светлые нити вдоль рукава
     w = np.zeros((N, N), np.float32)
     im = Image.new('L', (N, N), 0)
@@ -92,7 +108,7 @@ def main():
         dr.line(pts, fill=int(rnd.uniform(90, 200)), width=rnd.choice((2, 3, 4)))
     im = im.filter(ImageFilter.GaussianBlur(2.2))
     w = np.array(im, np.float32)
-    save(colorize(w, core, (210, 245, 255), edge) * 255, 'silent_nebula_wisp')
+    save(colorize(w, core, (210, 245, 255), edge) * 255, tex + '_wisp')
     # звёзды
     st = Image.new('RGB', (N, N), (0, 0, 0))
     dr = ImageDraw.Draw(st)
@@ -113,27 +129,35 @@ def main():
         db.ellipse((x - 2.5, y - 2.5, x + 2.5, y + 2.5), fill=(255, 255, 255))
     halo = big.filter(ImageFilter.GaussianBlur(4))
     arr = np.array(st, np.float32) + np.array(big, np.float32) * 0.9 + np.array(halo, np.float32) * 1.6
-    save(arr, 'silent_nebula_stars')
+    save(arr, tex + '_stars')
     sig = {
         'comment': '«Безмолвные врата», указ рукой (14.6–26 с): туманность как в видео мода — облачный рукав галактики перед ведьмой и над ней, '
                    'звёзды и светлые струи; billboard, слои медленно вращаются. Сгенерировано tools/gen_silent_nebula.py.',
-        'size': 4.0, 'color': '#FFFFFF', 'orientation': 'billboard', 'lifetime': -1, 'hold': -1,
+        'size': size, 'color': '#FFFFFF', 'orientation': 'billboard', 'lifetime': -1, 'hold': -1,
         'layers': [
-            {'id': 'haze', 'type': 'disc', 'texture': 'silent_nebula_haze', 'radius': 1.7, 'heightOffset': -0.1, 'brightness': 0.65,
+            {'id': 'haze', 'type': 'disc', 'texture': tex + '_haze', 'radius': 1.7, 'heightOffset': -0.1, 'brightness': 0.65,
              'appear': {'delay': 0, 'duration': 36, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade']}, 'rotation': {'speed': 0.4}},
-            {'id': 'cloud_back', 'type': 'disc', 'texture': 'silent_nebula_cloud', 'radius': 1.25, 'heightOffset': -0.06, 'brightness': 0.24,
+            {'id': 'cloud_back', 'type': 'disc', 'texture': tex + '_cloud', 'radius': 1.25, 'heightOffset': -0.06, 'brightness': 0.24,
              'appear': {'delay': 0, 'duration': 30, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade', 'twist'], 'twist': -40}, 'rotation': {'speed': 0.8}},
-            {'id': 'cloud', 'type': 'disc', 'texture': 'silent_nebula_cloud', 'radius': 1.05, 'heightOffset': 0.0, 'brightness': 0.33,
+            {'id': 'cloud', 'type': 'disc', 'texture': tex + '_cloud', 'radius': 1.05, 'heightOffset': 0.0, 'brightness': 0.33,
              'appear': {'delay': 6, 'duration': 30, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade', 'twist'], 'twist': 50}, 'rotation': {'speed': -1.2}},
-            {'id': 'wisp', 'type': 'disc', 'texture': 'silent_nebula_wisp', 'radius': 1.05, 'heightOffset': 0.03, 'brightness': 0.8,
+            {'id': 'wisp', 'type': 'disc', 'texture': tex + '_wisp', 'radius': 1.05, 'heightOffset': 0.03, 'brightness': 0.8,
              'appear': {'delay': 10, 'duration': 30, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade']}, 'rotation': {'speed': 2.0}},
-            {'id': 'stars', 'type': 'disc', 'texture': 'silent_nebula_stars', 'radius': 1.1, 'heightOffset': 0.06,
+            {'id': 'stars', 'type': 'disc', 'texture': tex + '_stars', 'radius': 1.1, 'heightOffset': 0.06,
              'appear': {'delay': 4, 'duration': 24, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade']}, 'rotation': {'speed': -0.6},
              'pulse': {'amp': 0.18, 'period': 26}}],
         'dissolve': {'modes': ['fade', 'collapse'], 'duration': 24}}
-    with open(os.path.join(A, 'sigils', 'silent_hand_nebula.json'), 'w', encoding='utf-8') as f:
+    if quiet:
+        mul = {'haze': 1.3, 'cloud_back': 1.5, 'cloud': 1.6, 'wisp': 0.9, 'stars': 1.0}
+        for L in sig['layers']:
+            L['brightness'] = round(L.get('brightness', 1.0) * mul[L['id']], 3)
+            L.pop('rotation', None)                     # полоса не вращается — иначе перевернётся
+        sig['comment'] = ('«Безмолвные врата»: полоса туманности от посоха — горизонтальный рукав (облака, струи, звёзды, дымка). '
+                          'Сгенерировано tools/gen_silent_nebula.py.')
+    with open(os.path.join(A, 'sigils', sig_id + '.json'), 'w', encoding='utf-8') as f:
         json.dump(sig, f, ensure_ascii=False, indent=1)
-    print('wrote sigils/silent_hand_nebula.json')
+    print('wrote sigils/' + sig_id + '.json')
+
 
 
 if __name__ == '__main__':

@@ -13,7 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
-import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.ViewportEvent;
@@ -61,6 +60,7 @@ public final class DownfallCut {
         if (rite && d.lengthSqr() < 1e-4) dir = new Vec3(Math.cos(m.f), 0, Math.sin(m.f));   // Blessing on oneself: the way the caster looks
         portalYaw = m.f;
         retinue = 2;   // until the server says (older servers: two exits)
+        CamGuard.reset();
         active = true;
     }
 
@@ -307,7 +307,7 @@ public final class DownfallCut {
             shake = 0.08 + 0.2 * k;
         }
         if (shake > 0) pos = pos.add(Math.sin(t * 1.7) * shake, Math.sin(t * 2.3 + 1) * shake, Math.cos(t * 1.9) * shake);
-        pos = free(mc.level, pos);
+        pos = CamGuard.guard(mc.level, pos, look);
         Vec3 d = look.subtract(pos);
         double h = Math.sqrt(d.x * d.x + d.z * d.z);
         float yaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
@@ -638,16 +638,6 @@ public final class DownfallCut {
             "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title"};
     private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A};
 
-    /** Lift the camera out of solid blocks (up to 6). */
-    private static Vec3 free(ClientLevel lvl, Vec3 p) {
-        for (int i = 0; i < 6; i++) {
-            BlockPos bp = BlockPos.containing(p);
-            if (lvl.getBlockState(bp).getCollisionShape(lvl, bp).isEmpty()) return p;
-            p = p.add(0, 1, 0);
-        }
-        return p;
-    }
-
     private static boolean apply(Camera cam, Vec3 pos) {
         try {
             if (setPos == null) {
@@ -692,15 +682,40 @@ public final class DownfallCut {
         if (active) e.setCanceled(true);
     }
 
+    private static boolean hidHud, hudWas;
+
+    /**
+     * Owner 19.11: during every cutscene the HUD is off for all who watch, as with F1 (other mods' HUDs too). Called each frame from
+     * GameRendererMixin before anything is drawn; F1 pressed during a scene does nothing, after it the player's own choice comes back.
+     */
+    public static void syncHud() {
+        Minecraft mc = Minecraft.getInstance();
+        if (active) {
+            if (!hidHud) {
+                hudWas = mc.options.hideGui;
+                hidHud = true;
+            }
+            mc.options.hideGui = true;
+        } else if (hidHud) {
+            hidHud = false;
+            mc.options.hideGui = hudWas;
+        }
+    }
+
+    /** Fallback if the mixin did not apply: the HUD then stays on and RenderGuiEvent still runs, so the bars are drawn here. */
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onGui(RenderGuiEvent.Post e) {
+    public static void onGui(net.minecraftforge.client.event.RenderGuiEvent.Post e) {
+        if (!hidHud) drawBars(e.getGuiGraphics(), e.getPartialTick());
+    }
+
+    /** The bars and titles: drawn by GameRendererMixin after the (hidden) HUD, so they show with hideGui on. */
+    public static void drawBars(GuiGraphics g, float pt) {
         if (!active) return;
-        GuiGraphics g = e.getGuiGraphics();
         int w = g.guiWidth(), h = g.guiHeight();
-        double t = now(e.getPartialTick());
+        double t = now(pt);
         float in = (float) Math.min(1, t / 12.0);
         if (releaseAt >= 0 && Minecraft.getInstance().level != null)   // T21: the bars go with the camera
-            in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + e.getPartialTick() - releaseAt) / RELEASE));
+            in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + pt - releaseAt) / RELEASE));
         int bar = (int) (h * 0.11 * in);
         g.fill(0, 0, w, bar, 0xFF000000);
         g.fill(0, h - bar, w, h, 0xFF000000);

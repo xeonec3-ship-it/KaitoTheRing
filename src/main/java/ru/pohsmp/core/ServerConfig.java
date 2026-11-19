@@ -14,11 +14,12 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue REPLICA_PERCENT;
     public static final ForgeConfigSpec.DoubleValue HIGHER_MULT;
     // Silent Witch outfit (T19)
-    public static final ForgeConfigSpec.DoubleValue SW_CAST, SW_CAST_SILENT, SW_MANA_ROBE, SW_MANA_HOOD, SW_REGEN, SW_RESIST, SW_RESIST_SILENT,
-            SW_GATE_BONUS;
+    public static final ForgeConfigSpec.DoubleValue SW_CAST, SW_CAST_SILENT, SW_MANA_ROBE, SW_MANA_HOOD, SW_REGEN, SW_RESIST, SW_RESIST_SILENT;
     public static final ForgeConfigSpec.BooleanValue SW_MUTE_CHANT, SW_SILENT_STEPS, SW_NO_VIBRATIONS, SW_TEAM, SW_GATE_MAGIC_IMMUNE;
     public static final ForgeConfigSpec.IntValue SW_BARRIER_COOLDOWN, SW_BARRIER_INVUL, SW_STEALTH_RANGE, SW_EXPOSE_SECONDS;
     public static final ForgeConfigSpec.ConfigValue<String> SW_GATE_SPELL;
+    public static final ForgeConfigSpec.DoubleValue GATE_RAY_DAMAGE, GATE_RAY_RADIUS, GATE_AREA, GATE_SET_BONUS;
+    public static final ForgeConfigSpec.IntValue GATE_HIT_COOLDOWN, GATE_AIM_INTERVAL, GATE_BEAMS_MIN, GATE_BEAMS_MAX, GATE_SILENCE_SECONDS;
     public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> JOINT_SPELLS;
     public static final ForgeConfigSpec.DoubleValue JOINT_RADIUS, JOINT_WINDOW, JOINT_MULT;
     public static final ForgeConfigSpec.DoubleValue COUNTDOWN_MAX;
@@ -34,6 +35,7 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue VOLLEY_COOLDOWN, VOLLEY_RADIUS, VOLLEY_ARC, VOLLEY_SEAL_RADIUS, VOLLEY_DAMAGE;
     public static final ForgeConfigSpec.IntValue BARRIER_CAST, BARRIER_MANA, BARRIER_SECONDS;
     public static final ForgeConfigSpec.DoubleValue BARRIER_COOLDOWN, BARRIER_RADIUS;
+    public static final ForgeConfigSpec.IntValue SILENT_PLAYER_AGGRO;
     public static final ForgeConfigSpec.IntValue FLAME_CAST, FLAME_MANA, FLAME_BREATH, FLAME_INTERVAL, FLAME_BURN;
     public static final ForgeConfigSpec.DoubleValue FLAME_COOLDOWN, FLAME_CONE, FLAME_RANGE, FLAME_DAMAGE, FLAME_BURN_DPS;
 
@@ -77,11 +79,23 @@ public final class ServerConfig {
         SW_TEAM = b.comment("6/11. Also put the wearer in a scoreboard team with nameTagVisibility=never so clients without the mod do not draw the name",
                 "(only when the player is in no other team)").define("nameTagTeam", true);
         SW_GATE_SPELL = b.comment("10. The Gate spell id (cast only in the full outfit)").define("gateSpell", "pohsmp_core:silent_gate");
-        SW_GATE_BONUS = b.comment("10. Full set: Gate beams deal this much more damage").defineInRange("gateDamageBonus", 0.20, 0.0, 10.0);
         SW_GATE_MAGIC_IMMUNE = b.comment("10. Full set: no magic damage while casting the Gate").define("gateMagicImmune", true);
+        b.pop();
+        b.push("silent_gate");
+        GATE_AREA = b.comment("Gate: radius of the area the beams hit, under the gate (26 blocks ahead of the caster)").defineInRange("area", 20.0, 2.0, 64.0);
+        GATE_RAY_DAMAGE = b.comment("Damage of one volley to a foe (Silent magic: through armor, scaled by Silent spell power, cut by Silent resistance)").defineInRange("rayDamage", 10.0, 0.0, 10000.0);
+        GATE_RAY_RADIUS = b.comment("Radius of one ray's hit").defineInRange("rayRadius", 1.5, 0.1, 16.0);
+        GATE_AIM_INTERVAL = b.comment("A volley every this many ticks: beams into every foe in the area").defineInRange("volleyInterval", 10, 1, 200);
+        GATE_BEAMS_MIN = b.comment("Beams per foe in one volley: from...").defineInRange("beamsMin", 3, 1, 20);
+        GATE_BEAMS_MAX = b.comment("...to (the damage counts once per volley)").defineInRange("beamsMax", 5, 1, 20);
+        GATE_HIT_COOLDOWN = b.comment("One creature is hit by rays at most once per this many ticks").defineInRange("hitCooldownTicks", 8, 0, 200);
+        GATE_SET_BONUS = b.comment("Silent Witch full set (always worn when Gate is cast): ray damage multiplier").defineInRange("setBonus", 1.2, 0.0, 100.0);
+        GATE_SILENCE_SECONDS = b.comment("'Silence' after the cast: Gate cannot be cast again for this long (other magic is fine)").defineInRange("silenceSeconds", 180, 0, 86400);
         b.pop();
         b.comment("Silent Witch staff spells: Wind Spears, Silent Volley, Barrier, Black Flame of Worgan.",
                 "Damage is multiplied by the caster's Silent spell power (the staff itself gives +25%).").push("silent_staff");
+        SILENT_PLAYER_AGGRO = b.comment("Silent Witch magic hurts only hostile creatures; a player counts as hostile to the caster",
+                "for this many seconds after hitting the caster (every hit starts it again)").defineInRange("playerAggroSeconds", 60, 0, 3600);
         b.push("wind_spears");
         SPEARS_CAST = b.comment("Cast time (ticks)").defineInRange("castTicks", 20, 0, 1200);
         SPEARS_COOLDOWN = b.comment("Cooldown (seconds)").defineInRange("cooldown", 6.0, 0.0, 3600.0);

@@ -1,13 +1,94 @@
 {
-  "comment": "ВРЕМЕННО (чат идей заменит): одежда безмолвной ведьмы, эффект 4 — тихий барьер спас от смерти: бирюзовая печать вокруг, пузырь, вспышка.",
-  "style": "silent",
-  "duration": 70,
-  "elements": [
-    { "type": "sigil", "id": "silent_barrier", "delay": 0, "at": "caster+0,1,0" },
-    { "type": "wave", "shape": "sphere", "delay": 0, "duration": 40, "at": "caster+0,1,0", "follow": true, "radius": 1.6, "rim": 0.9, "color": "@primary",
-      "in": { "duration": 4, "easing": "easeOutCubic" }, "out": { "duration": 14, "easing": "easeInSine" } },
-    { "type": "flash", "delay": 0, "duration": 8, "at": "caster+0,1,0", "size": 2.5, "rays": 6, "color": "@secondary" },
-    { "type": "sprites", "delay": 2, "duration": 40, "at": "caster+0,1,0", "follow": true, "texture": "@sparks", "count": 24, "rate": 3,
-      "spread": 1.4, "speed": 0.05, "gravity": 0.0, "spin": 60, "size": [0.2, 0.05], "life": 30, "color": "@primary" }
-  ]
+ "comment": "«Тихий барьер» сработал (T19, пункт 4): печать вокруг носителя и на земле, сфера-пузырь с ярким краем держится 3 с (неуязвимость), белая вспышка, искры осыпаются. Следует за носителем. Сгенерировано tools/gen_silent_outfit_fx.py.",
+ "style": "silent",
+ "duration": 80,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 8,
+   "at": "caster+0,1,0",
+   "follow": true,
+   "size": 4,
+   "anamorphic": 8,
+   "rays": 10,
+   "screen": 0.35,
+   "color": "@core"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_barrier",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "follow": true,
+   "orientation": "facing"
+  },
+  {
+   "type": "sigil",
+   "id": "silent_witch_feet",
+   "delay": 0,
+   "until": 64,
+   "at": "caster",
+   "follow": true,
+   "sigilScale": 1.6
+  },
+  {
+   "type": "wave",
+   "shape": "sphere",
+   "delay": 2,
+   "duration": 62,
+   "at": "caster+0,1,0",
+   "follow": true,
+   "radius": 1.6,
+   "speed": 0,
+   "rim": 1.0,
+   "color": "@primary",
+   "in": {
+    "duration": 6,
+    "easing": "easeOutBack"
+   },
+   "out": {
+    "duration": 12,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "duration": 60,
+   "at": "caster+0,1.2,0",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 240,
+   "rate": 4,
+   "spread": 1.5,
+   "speed": 0.006,
+   "gravity": 0.003,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 30,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 4,
+   "at": "caster+0,1,0",
+   "follow": true,
+   "texture": "@sparks",
+   "count": 60,
+   "rate": 15,
+   "spread": 0.3,
+   "speed": 0.22,
+   "gravity": 0.01,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 18,
+   "color": "@core"
+  }
+ ]
 }

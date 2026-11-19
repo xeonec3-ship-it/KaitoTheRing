@@ -15,7 +15,7 @@ import ru.pohsmp.core.fx.sigil.Easing;
 
 /**
  * Generated structures described by parts (docs/fx.md, "mesh"): seed polyhedron, rings that tumble into the plane,
- * polygon frames, flying facets, textured discs. The structure plane is local XY (X to the right of `yaw`, Y up),
+ * polygon frames, flying facets, textured discs, volumes of boxes (the Gate). The structure plane is local XY (X to the right of `yaw`, Y up),
  * its centre `center` blocks above the anchor; stopping collapses it to a point.
  */
 public final class MeshDraw {
@@ -77,6 +77,7 @@ public final class MeshDraw {
                 case "ring" -> ring(f, ax, p, t, e, lin, col, a);
                 case "polygon" -> polygon(f, ax, p, t, e, lin, col, a);
                 case "disc" -> disc(f, ax, p, t, e, lin, col, a);
+                case "boxes" -> boxes(f, ax, p, r.style, t >= delay ? e : 0, a);
                 default -> {}
             }
         }
@@ -198,6 +199,102 @@ public final class MeshDraw {
         boolean dark = "translucent".equals(str(p, "blend", "additive"));
         VertexConsumer vc = dark ? f.trans(FxDraw.tex(str(p, "texture", "glow"))) : f.add(FxDraw.tex(str(p, "texture", "glow")));
         FxDraw.disc(vc, f, ax.o, ax.x, ax.y, R, rot, col, dark ? Math.min(0.85, al) : al);
+    }
+
+    // ---------------------------------------------------------------- boxes (volumes: the Gate of T03)
+
+    /** One box, prepared once per part: 8 corners in local space (rotation applied), tone, centre height. */
+    private record Box(Vector3f[] c, int tone, double y, float[] shade) {}
+
+    private static final java.util.Map<JsonObject, Box[]> BOXES = java.util.Collections.synchronizedMap(new java.util.WeakHashMap<>());
+    /** Faces as corner indices (bit 0 = x1, bit 1 = y1, bit 2 = z1) and their local normals. */
+    private static final int[][] FACES = {{1, 3, 7, 5}, {0, 4, 6, 2}, {2, 6, 7, 3}, {0, 1, 5, 4}, {4, 5, 7, 6}, {0, 2, 3, 1}};
+    private static final float[][] NORMALS = {{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}};
+
+    private static Box[] prepare(JsonObject p) {
+        return BOXES.computeIfAbsent(p, k -> {
+            JsonArray arr = p.getAsJsonArray("boxes");
+            boolean shadeOn = !p.has("shade") || p.get("shade").getAsBoolean();
+            Box[] out = new Box[arr == null ? 0 : arr.size()];
+            for (int i = 0; i < out.length; i++) {
+                JsonArray b = arr.get(i).getAsJsonArray();
+                float x0 = b.get(0).getAsFloat(), y0 = b.get(1).getAsFloat(), z0 = b.get(2).getAsFloat();
+                float x1 = b.get(3).getAsFloat(), y1 = b.get(4).getAsFloat(), z1 = b.get(5).getAsFloat();
+                Vector3f cen = new Vector3f((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+                Quaternionf q = null;
+                if (b.size() > 7 && b.get(7).isJsonArray()) {
+                    JsonArray r = b.get(7).getAsJsonArray();
+                    q = new Quaternionf().rotateXYZ((float) Math.toRadians(r.get(0).getAsDouble()), (float) Math.toRadians(r.get(1).getAsDouble()),
+                            (float) Math.toRadians(r.get(2).getAsDouble()));
+                }
+                Vector3f[] c = new Vector3f[8];
+                for (int j = 0; j < 8; j++) {
+                    Vector3f v = new Vector3f((j & 1) != 0 ? x1 : x0, (j & 2) != 0 ? y1 : y0, (j & 4) != 0 ? z1 : z0).sub(cen);
+                    if (q != null) q.transform(v);
+                    c[j] = v.add(cen);
+                }
+                float[] shade = new float[6];
+                for (int fi = 0; fi < 6; fi++) {
+                    Vector3f n = new Vector3f(NORMALS[fi][0], NORMALS[fi][1], NORMALS[fi][2]);
+                    if (q != null) q.transform(n);
+                    float ax = Math.abs(n.x), ay = Math.abs(n.y), az = Math.abs(n.z);
+                    // top x1.0, sides x0.82 / x0.7, bottom x0.55 (docs/fx.md), so the volume reads in full-bright light
+                    shade[fi] = !shadeOn ? 1f : ay >= ax && ay >= az ? (n.y > 0 ? 1f : 0.55f) : ax >= az ? 0.82f : 0.7f;
+                }
+                out[i] = new Box(c, b.size() > 6 ? b.get(6).getAsInt() : 0, cen.y, shade);
+            }
+            return out;
+        });
+    }
+
+    private static int mul(int rgb, float k) {
+        return (Math.min(255, (int) (((rgb >> 16) & 255) * k)) << 16) | (Math.min(255, (int) (((rgb >> 8) & 255) * k)) << 8) | Math.min(255, (int) ((rgb & 255) * k));
+    }
+
+    private static int toWhite(int rgb, double k) {
+        int r = (rgb >> 16) & 255, g = (rgb >> 8) & 255, b = rgb & 255;
+        return ((int) (r + (255 - r) * k) << 16) | ((int) (g + (255 - g) * k) << 8) | (int) (b + (255 - b) * k);
+    }
+
+    /**
+     * Volume of boxes [x0, y0, z0, x1, y1, z1, tone, [rx, ry, rz]?] (docs/fx.md, "boxes"). Glowing tones are additive at full brightness,
+     * the others translucent with `opacity` and shaded by face. Appear "reveal: down": a front runs from bounds[1] to bounds[0], a box shows
+     * once the front passes its centre ("up": from bounds[0] upwards, the crystal growing) (a band `front` blocks wide fades it in with a white flash), and a bright bar marks the front.
+     */
+    private static void boxes(Frame f, Axes ax, JsonObject p, FxStyle style, double e, double a) {
+        if (a <= 1e-3) return;
+        Box[] bs = prepare(p);
+        if (bs.length == 0) return;
+        JsonArray tonesJ = p.getAsJsonArray("tones");
+        int[] tones = new int[tonesJ == null ? 1 : tonesJ.size()];
+        for (int i = 0; i < tones.length; i++) tones[i] = tonesJ == null ? 0xFFFFFF : style.color(tonesJ.get(i).getAsString());
+        java.util.Set<Integer> glow = new java.util.HashSet<>();
+        if (p.has("glowTones")) for (JsonElement g : p.getAsJsonArray("glowTones")) glow.add(g.getAsInt());
+        JsonObject ap = p.has("appear") ? p.getAsJsonObject("appear") : new JsonObject();
+        String reveal = str(ap, "reveal", "");
+        boolean down = "down".equals(reveal), up = "up".equals(reveal), sweep = down || up;
+        JsonArray bounds = p.has("bounds") ? p.getAsJsonArray("bounds") : null;
+        double lo = bounds != null ? bounds.get(0).getAsDouble() : 0, hi = bounds != null ? bounds.get(1).getAsDouble() : 0;
+        double band = Math.max(0.05, num(ap, "front", 0.8));
+        double front = down ? hi - (hi - lo + 2) * FxDraw.clamp01(e) : lo + (hi - lo + 2) * FxDraw.clamp01(e);
+        double opacity = num(p, "opacity", 1);
+        VertexConsumer solid = f.solid(FxDraw.WHITE), add = f.add(FxDraw.WHITE);
+        Vec3[] w = new Vec3[8];
+        for (Box b : bs) {
+            double k = down ? FxDraw.clamp01((b.y() - front + band) / band) : up ? FxDraw.clamp01((front - b.y() + band) / band) : FxDraw.clamp01(e * 3);
+            if (k <= 1e-3) continue;
+            for (int j = 0; j < 8; j++) w[j] = ax.at(b.c()[j]);
+            int base = tones[Math.max(0, Math.min(tones.length - 1, b.tone()))];
+            boolean gl = glow.contains(b.tone());
+            if (sweep && k < 1) base = toWhite(base, 0.85 * (1 - k));   // the white flash at the front
+            for (int fi = 0; fi < 6; fi++) {
+                int[] q = FACES[fi];
+                if (gl) FxDraw.quad(add, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], base, a * k);
+                else FxDraw.quad(solid, f, w[q[0]], w[q[1]], w[q[2]], w[q[3]], mul(base, b.shade()[fi]), Math.min(1, a * k * opacity));
+            }
+        }
+        if (sweep && e > 0 && e < 1)   // the light front sweeping down (or up: the crystal grows from the ground)
+            FxDraw.line(add, f, ax.at(-6, front, 0), ax.at(6, front, 0), 0.25 * ax.s, 0xFFFFFF, 0.8 * a);
     }
 
     private static Vector3f vec(JsonArray a) {

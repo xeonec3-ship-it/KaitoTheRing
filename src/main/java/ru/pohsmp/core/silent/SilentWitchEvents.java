@@ -45,7 +45,8 @@ import ru.pohsmp.core.net.Net;
 /**
  * Silent Witch outfit (T19), everything that happens on the server (plus the sound filter, which runs on both sides):
  * 1 mute chants (in the spells), 4 quiet barrier, 5 silent steps and no vibrations, 6 mobs do not notice the wearer from afar,
- * 6/11 name hiding (synced flags, scoreboard team), 8 cast sparks, 10 the Gate bonus.
+ * 6/11 name hiding (synced flags, scoreboard team), 8 cast sparks, 10 no magic damage while casting the Gate
+ * (its +20% beam damage is [silent_gate] setBonus in SilentGateSpell).
  */
 public final class SilentWitchEvents {
     private SilentWitchEvents() {}
@@ -193,9 +194,6 @@ public final class SilentWitchEvents {
         Entity atk = e.getSource().getEntity();
         LivingEntity wearer = wearerBehind(atk);
         if (wearer != null) expose(wearer);
-        if (atk instanceof LivingEntity le && e.getSource() instanceof SpellDamageSource sds && sds.spell() != null
-                && sds.spell().getSpellResource().equals(gateId()) && SilentWitch.fullSet(le))
-            e.setAmount(e.getAmount() * (float) (1.0 + ServerConfig.get(ServerConfig.SW_GATE_BONUS)));
     }
 
     // ------------------------------------------------------------------ 6. mobs do not notice the hooded wearer from afar

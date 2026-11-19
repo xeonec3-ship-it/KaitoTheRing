@@ -60,6 +60,17 @@ public class AnimatedStaff extends PohStaff implements GeoItem {
         return id;
     }
 
+    /**
+     * Server: give the stack its animation id as soon as it is carried. The id is NBT; assigned only when the first "cast" animation
+     * plays, it changes the held stack at the start of a cast, and Iron's cancels a cast whenever the held casting item changes -
+     * so the very first cast with a new staff stopped at once (found with the Gate showcase).
+     */
+    @Override
+    public void inventoryTick(ItemStack stack, net.minecraft.world.level.Level level, net.minecraft.world.entity.Entity holder, int slot, boolean selected) {
+        super.inventoryTick(stack, level, holder, slot, selected);
+        if (level instanceof ServerLevel sl && !(holder instanceof LivingEntity le && MagicData.getPlayerMagicData(le).isCasting())) GeoItem.getOrAssignId(stack, sl);
+    }
+
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "main", 6, s -> s.setAndContinue(IDLE))

@@ -1,0 +1,13 @@
+{
+  "comment": "Один наведённый луч «Врат» (по видео мода): из печати поля в небе (point:from) в цель (target); на месте удара — вспышка и кольцо на земле. Код пускает залпами: раз в 0.5 с в каждого врага площади 3–5 лучей из разных точек неба.",
+  "style": "silent",
+  "duration": 30,
+  "elements": [
+    { "type": "beam", "delay": 0, "duration": 9, "at": "point:from", "to": "target", "width": 0.22, "core": 0.5, "grow": 3,
+      "easing": "easeInCubic", "color": "@secondary", "out": { "duration": 5, "easing": "easeInSine" } },
+    { "type": "beam", "delay": 0, "duration": 7, "at": "point:from", "to": "target", "width": 0.5, "core": 0.0, "grow": 3,
+      "easing": "easeInCubic", "color": "@primary", "brightness": 0.45 },
+    { "type": "flash", "delay": 3, "duration": 6, "at": "target", "size": 1.6, "rays": 6, "color": "@core" },
+    { "type": "sigil", "id": "silent_impact", "delay": 3, "at": "target", "until": 24 }
+  ]
+}

@@ -110,6 +110,10 @@ minecraft {
                 property 'pohsmp.showcase', 'true'
                 args '--quickPlaySingleplayer', 'showcase'
             }
+            if (project.hasProperty('gateShowcase')) {   // gradlew runClient -PdevRun -PgateShowcase: the Gate (T03) scene + screenshots
+                property 'pohsmp.gateshow', 'true'
+                args '--quickPlaySingleplayer', 'showcase'
+            }
         }
 
         server {

@@ -802,6 +802,68 @@ def disintegration_cast():
                ({'pitch': 6, 'yaw': 0, 'roll': 3, 'bend': 6}, {'pitch': -8, 'yaw': 0, 'roll': -3, 'bend': 4}), 0.0)
 
 
+# ---------------------------------------------------------------- Врата (50 с, «Безмолвная ведьма»)
+# По отрывку аниме: посох НЕ в руках — парит перед ведьмой (рисует код), руки свободны, жесты — правой рукой:
+#   0–14   стоит спокойно, руки опущены, лёгкое дыхание, взгляд вперёд
+#   14     указывает рукой вперёд-вверх (из руки к вратам тянутся потоки света — эффект), корпус чуть разворачивается
+#   22     поднимает взгляд на врата, рука выше
+#   26–38  рука опускается, смотрит вверх
+#   38–42  палец к губам — «тсс», голова чуть опущена; ЛЕВОЙ рукой берёт посох (дальше он в левой руке, низко по диагонали) —
+#          за спиной в это время складываются золотые круги и сферы (эффект)
+#   49     палец вверх — команда; в момент удара (49.8–50) рука резко опускается и встаёт прямо вперёд; так она и держит её,
+#          пока бьют лучи (финал 14 с: держит 12 с и опускает), посох всё ещё в левой
+POINT_R = _fk(pitch=-100, yaw=8, roll=-6, bend=-4)
+POINT_HI_R = _fk(pitch=-128, yaw=6, roll=-4, bend=-2)
+SKY_R = _fk(pitch=-172, yaw=0, roll=-8, bend=-2)
+FWD_R = _fk(pitch=-90, yaw=4, roll=-4, bend=0)          # рука прямо вперёд — момент удара
+STAFF_L = _fk(pitch=-34, yaw=-14, roll=10, bend=-22)      # левая рука держит посох низко впереди, по диагонали
+
+
+def silent_gate_cast():
+    T = 50.0
+    a, r = Anim('pohsmp_silent_gate_cast', T), Rig()
+    _start(a)
+    calm_t = {'pitch': 0, 'yaw': 0, 'roll': 0, 'bend': 0}
+    a.sway(0.5, 13.4, 3.2, 'torso', calm_t, 'pitch', 1.0)
+    a.pose(13.4, rightArm=ARM_DOWN_R, leftArm=ARM_DOWN_L, head={'pitch': 0, 'yaw': 0, 'roll': 0})
+    # 14 — указ
+    a.pose(14.6, 'easeOutBack', rightArm=POINT_R, leftArm=_fk(pitch=4, roll=-12, bend=-8),
+           torso={'pitch': 2, 'yaw': -10, 'roll': 0, 'bend': 2}, head={'pitch': -6, 'yaw': -8, 'roll': 0})
+    a.sway(14.6, 21.6, 1.8, 'rightArm', POINT_R, 'pitch', 2.5)
+    # 22 — взгляд на врата
+    a.pose(22.6, rightArm=POINT_HI_R, head={'pitch': -28, 'yaw': -4, 'roll': 0}, torso={'pitch': -3, 'yaw': -6, 'roll': 0, 'bend': 0})
+    a.pose(25.8, rightArm=POINT_HI_R)
+    # 26–38 — рука опускается, смотрит вверх
+    a.pose(27.6, rightArm=ARM_DOWN_R, leftArm=ARM_DOWN_L, torso={'pitch': -2, 'yaw': 0, 'roll': 0, 'bend': 0},
+           head={'pitch': -22, 'yaw': 0, 'roll': 0})
+    a.sway(27.6, 37.6, 3.4, 'head', {'pitch': -22, 'yaw': 0, 'roll': 0}, 'yaw', 5)
+    a.pose(37.6, rightArm=ARM_DOWN_R, leftArm=ARM_DOWN_L)
+    # 38 — палец к губам
+    lips = r.R(-0.4, 25.6, 4.4)
+    a.pose(38.8, rightArm=lips, leftArm=STAFF_L, head={'pitch': 6, 'yaw': 0, 'roll': 0}, torso={'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 3})
+    a.sway(38.8, 47.2, 2.2, 'leftArm', STAFF_L, 'pitch', 2)
+    a.pose(47.2, rightArm=lips, head={'pitch': 2, 'yaw': 0, 'roll': 0})
+    # 49 — палец вверх
+    a.pose(48.4, rightArm=r.R(-1.0, 25.0, 3.0), head={'pitch': -14, 'yaw': 0, 'roll': 0})
+    a.pose(49.1, 'easeOutBack', rightArm=SKY_R, head={'pitch': -24, 'yaw': 0, 'roll': 0}, torso={'pitch': -4, 'yaw': 0, 'roll': 0, 'bend': 0})
+    a.pose(49.55, rightArm=SKY_R)
+    a.pose(49.9, 'easeInQuad', rightArm=FWD_R, head={'pitch': -4, 'yaw': 0, 'roll': 0}, torso={'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 2})
+    a.pose(T, rightArm=FWD_R, leftArm=STAFF_L)
+    return a, (FWD_R, STAFF_L, {'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 2}, None, 0.0)
+
+
+def silent_gate_finish():
+    """После каста сцена идёт ещё 14 с (удар лучами): рука прямо вперёд, лёгкое покачивание, в конце опускается."""
+    a = Anim('pohsmp_silent_gate_finish', 14.0, hold=False)
+    a.pose(0, rightArm=FWD_R, leftArm=STAFF_L, torso={'pitch': 3, 'yaw': 0, 'roll': 0, 'bend': 2},
+           head={'pitch': -4, 'yaw': 0, 'roll': 0}, body={'y': 0}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
+    a.sway(0, 11.6, 2.6, 'rightArm', FWD_R, 'yaw', 3)
+    a.pose(11.6, leftArm=STAFF_L)
+    a.pose(13.0, rightArm=ARM_DOWN_R, leftArm=ARM_DOWN_L, head={'pitch': -8, 'yaw': 0, 'roll': 0}, torso=ZERO_T)
+    a.pose(14.0, rightArm=ZERO_LEG, leftArm=ZERO_LEG, head=ZERO_H)
+    return a
+
+
 def _pair(fn, finish_name):
     """Анимация каста и финал из её последней позы."""
     def cast():
@@ -821,7 +883,7 @@ _CA = _pair(coven_arrival_cast, 'pohsmp_coven_arrival_finish')
 _DI = _pair(disintegration_cast, 'pohsmp_disintegration_finish')
 
 
-ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI]
+ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_finish]
 
 
 def main():

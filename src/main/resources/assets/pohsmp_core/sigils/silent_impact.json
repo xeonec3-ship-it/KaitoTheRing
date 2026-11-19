@@ -1,0 +1,18 @@
+{
+  "comment": "Кольцо на земле в месте удара луча «Врат» (по видео мода): быстро разворачивается и гаснет.",
+  "size": 0.4,
+  "color": "#BFFFEA",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": 6,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.4, "brightness": 0.7,
+      "appear": { "delay": 0, "duration": 3, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "ring", "type": "disc", "texture": "spiral_ring", "radius": 1.0,
+      "appear": { "delay": 0, "duration": 5, "easing": "easeOutCubic", "modes": ["grow", "twist", "fade"], "twist": -90 }, "rotation": { "speed": 60 } },
+    { "id": "rim", "type": "disc", "texture": "thin_ring", "radius": 1.15,
+      "appear": { "delay": 2, "duration": 4, "easing": "easeOutCubic", "modes": ["grow", "fade"] } }
+  ],
+  "expand": { "scale": 4.0, "delay": 0, "duration": 6, "easing": "easeOutCubic" },
+  "dissolve": { "modes": ["fade"], "duration": 14 }
+}

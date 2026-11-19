@@ -31,6 +31,8 @@ public class GraspingGardenSpell extends PohSpell {
     public static final String PATH = "grasping_garden";
     public static final String CREEPER_TAG = "poh_creeper";
     private static final int CREEPER_LIFE = 400;
+    /** Burst radius of a garden creeper (owner, 19.11.2026: twice the old 3.5). */
+    private static final double BOOM_R = 7;
 
     public GraspingGardenSpell() {
         super(PATH, SchoolRegistry.NATURE_RESOURCE, SpellRarity.UNCOMMON, 6, 30, 0, 50, 10);
@@ -120,15 +122,23 @@ public class GraspingGardenSpell extends PohSpell {
                     if (best == null && c.distanceToSqr(caster) > 16) c.getNavigation().moveTo(caster, 1.1);
                 }
                 if (c.getTarget() == caster || (c.getTarget() != null && HigherSpell.friendly(caster, c.getTarget()))) c.setTarget(null);
+                // Vanilla melee/swell AI did not fire on mobs (owner, 19.11.2026: no burst next to a hostile mob): walk to the target
+                // and light the fuse ourselves when close.
+                LivingEntity tg = c.getTarget();
+                if (tg != null && tg.isAlive()) {
+                    if (age % 10 == 1) c.getNavigation().moveTo(tg, 1.2);
+                    if (c.distanceToSqr(tg) < 3.2 * 3.2 && c.hasLineOfSight(tg) && !c.isIgnited()) c.ignite();
+                }
                 if (c.getSwelling(1f) > 0.85f) {
                     Vec3 at = c.position();
                     Disp.kill(c);
                     DivineEvents.particle(sl, ParticleTypes.EXPLOSION_EMITTER, at.x, at.y + 0.5, at.z, 1, 0, 0);
-                    DivineEvents.particle(sl, ParticleTypes.COMPOSTER, at.x, at.y + 0.5, at.z, 40, 1.2, 0.1);
+                    DivineEvents.particle(sl, ParticleTypes.EXPLOSION, at.x, at.y + 0.8, at.z, 10, BOOM_R * 0.4, 0);
+                    DivineEvents.particle(sl, ParticleTypes.COMPOSTER, at.x, at.y + 0.5, at.z, 80, BOOM_R * 0.35, 0.1);
                     sl.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 2f, 1.1f);
-                    for (LivingEntity e : HigherSpell.around(sl, at, 3.5, e -> !HigherSpell.friendly(caster, e) && !e.getTags().contains(CREEPER_TAG))) {
+                    for (LivingEntity e : HigherSpell.around(sl, at, BOOM_R, e -> !HigherSpell.friendly(caster, e) && !e.getTags().contains(CREEPER_TAG))) {
                         double d = e.position().distanceTo(at);
-                        hit(caster, e, (float) (dmg * (1 - 0.5 * Math.min(1, d / 3.5))));
+                        hit(caster, e, (float) (dmg * (1 - 0.5 * Math.min(1, d / BOOM_R))));
                         Vec3 away = e.position().subtract(at).multiply(1, 0, 1);
                         if (away.lengthSqr() > 1e-4) HigherSpell.push(e, away.normalize().scale(0.8).add(0, 0.45, 0));
                     }

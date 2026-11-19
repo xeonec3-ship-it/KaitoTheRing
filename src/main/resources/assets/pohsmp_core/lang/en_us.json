@@ -688,5 +688,18 @@
   "subtitles.pohsmp_core.spell.space_closure.open_powerup": "Closing of Space: power rises",
   "subtitles.pohsmp_core.spell.space_closure.open_roar": "Closing of Space: roar",
   "subtitles.pohsmp_core.spell.space_closure.release": "Closing of Space: space tears",
-  "subtitles.pohsmp_core.spell.swap.cast": "Swap: space tears"
+  "subtitles.pohsmp_core.spell.swap.cast": "Swap: space tears",
+  "subtitles.pohsmp_core.spell.grasping_garden.cast": "Grasping Garden: earth rumbles",
+  "subtitles.pohsmp_core.spell.grasping_garden.hit": "Grasping Garden: blast",
+  "subtitles.pohsmp_core.spell.spore_cloud.cast": "Spore Cloud: rustle",
+  "subtitles.pohsmp_core.spell.spore_cloud.loop": "Spore Cloud: rustle",
+  "subtitles.pohsmp_core.spell.world_tree.cast": "World Tree: earth rumbles",
+  "subtitles.pohsmp_core.spell.world_tree.charge_earth": "World Tree: earth rumbles",
+  "subtitles.pohsmp_core.spell.world_tree.charge_leaves": "World Tree: rustle",
+  "subtitles.pohsmp_core.spell.world_tree.charge_powerup": "World Tree: power rises",
+  "subtitles.pohsmp_core.spell.world_tree.charge_wood": "World Tree: wood creaks",
+  "subtitles.pohsmp_core.spell.world_tree.hit_earth": "World Tree: earth rumbles",
+  "subtitles.pohsmp_core.spell.world_tree.hit_leaves": "World Tree: rustle",
+  "subtitles.pohsmp_core.spell.world_tree.hit_wood": "World Tree: wood creaks",
+  "subtitles.pohsmp_core.spell.world_tree.loop": "World Tree: rustle"
 }

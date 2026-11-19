@@ -688,5 +688,18 @@
   "subtitles.pohsmp_core.spell.space_closure.open_powerup": "Закрытие Пространства: сила нарастает",
   "subtitles.pohsmp_core.spell.space_closure.open_roar": "Закрытие Пространства: рёв",
   "subtitles.pohsmp_core.spell.space_closure.release": "Закрытие Пространства: разрыв пространства",
-  "subtitles.pohsmp_core.spell.swap.cast": "Подмена: разрыв пространства"
+  "subtitles.pohsmp_core.spell.swap.cast": "Подмена: разрыв пространства",
+  "subtitles.pohsmp_core.spell.grasping_garden.cast": "Хваткий сад: дрожит земля",
+  "subtitles.pohsmp_core.spell.grasping_garden.hit": "Хваткий сад: грохот",
+  "subtitles.pohsmp_core.spell.spore_cloud.cast": "Облако спор: шелест",
+  "subtitles.pohsmp_core.spell.spore_cloud.loop": "Облако спор: шелест",
+  "subtitles.pohsmp_core.spell.world_tree.cast": "Древо мира: дрожит земля",
+  "subtitles.pohsmp_core.spell.world_tree.charge_earth": "Древо мира: дрожит земля",
+  "subtitles.pohsmp_core.spell.world_tree.charge_leaves": "Древо мира: шелест",
+  "subtitles.pohsmp_core.spell.world_tree.charge_powerup": "Древо мира: сила нарастает",
+  "subtitles.pohsmp_core.spell.world_tree.charge_wood": "Древо мира: трещит дерево",
+  "subtitles.pohsmp_core.spell.world_tree.hit_earth": "Древо мира: дрожит земля",
+  "subtitles.pohsmp_core.spell.world_tree.hit_leaves": "Древо мира: шелест",
+  "subtitles.pohsmp_core.spell.world_tree.hit_wood": "Древо мира: трещит дерево",
+  "subtitles.pohsmp_core.spell.world_tree.loop": "Древо мира: шелест"
 }

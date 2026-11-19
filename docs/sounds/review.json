@@ -1761,5 +1761,307 @@
   "replaces": [
    "ENDERMAN_TELEPORT"
   ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "grasping_garden",
+  "spell_ru": "Хваткий сад",
+  "event": "pohsmp_core:spell.grasping_garden.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/nature/grasping_garden_cast_1.ogg",
+   "spell/nature/grasping_garden_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/grasping_garden_cast_1.mp3",
+   "docs/sounds/mp3/grasping_garden_cast_2.mp3"
+  ],
+  "what": "земля, камень, корни — начало каста (подпись школы: дерево, корни, листва)",
+  "where": "GraspingGardenSpell.java onCast()",
+  "replaces": [
+   "ROOTED_DIRT_BREAK"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "grasping_garden",
+  "spell_ru": "Хваткий сад",
+  "event": "pohsmp_core:spell.grasping_garden.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/nature/grasping_garden_hit_1.ogg",
+   "spell/nature/grasping_garden_hit_2.ogg",
+   "spell/nature/grasping_garden_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/grasping_garden_hit_1.mp3",
+   "docs/sounds/mp3/grasping_garden_hit_2.mp3",
+   "docs/sounds/mp3/grasping_garden_hit_3.mp3"
+  ],
+  "what": "взрыв / тяжёлый удар — удар / взрыв / попадание (подпись школы: дерево, корни, листва)",
+  "where": "GraspingGardenSpell.java tick()",
+  "replaces": [
+   "GENERIC_EXPLODE"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "spore_cloud",
+  "spell_ru": "Облако спор",
+  "event": "pohsmp_core:spell.spore_cloud.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/nature/spore_cloud_cast_1.ogg",
+   "spell/nature/spore_cloud_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/spore_cloud_cast_1.mp3",
+   "docs/sounds/mp3/spore_cloud_cast_2.mp3"
+  ],
+  "what": "листва — начало каста (подпись школы: дерево, корни, листва)",
+  "where": "SporeCloudSpell.java onCast()",
+  "replaces": [
+   "AZALEA_LEAVES_BREAK",
+   "PUFFER_FISH_BLOW_OUT"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "spore_cloud",
+  "spell_ru": "Облако спор",
+  "event": "pohsmp_core:spell.spore_cloud.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/nature/spore_cloud_loop_1.ogg",
+   "spell/nature/spore_cloud_loop_2.ogg",
+   "spell/nature/spore_cloud_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/spore_cloud_loop_1.mp3",
+   "docs/sounds/mp3/spore_cloud_loop_2.mp3",
+   "docs/sounds/mp3/spore_cloud_loop_3.mp3"
+  ],
+  "what": "листва — пока действует (тики) (подпись школы: дерево, корни, листва)",
+  "where": "SporeCloudSpell.java tick()",
+  "replaces": [
+   "MOSS_STEP"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/nature/world_tree_cast_1.ogg",
+   "spell/nature/world_tree_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_cast_1.mp3",
+   "docs/sounds/mp3/world_tree_cast_2.mp3"
+  ],
+  "what": "земля, камень, корни — начало каста (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java getCastStartSound()",
+  "replaces": [
+   "ROOTED_DIRT_PLACE"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.charge_earth",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/nature/world_tree_charge_earth_1.ogg",
+   "spell/nature/world_tree_charge_earth_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_charge_earth_1.mp3",
+   "docs/sounds/mp3/world_tree_charge_earth_2.mp3"
+  ],
+  "what": "земля, камень, корни — нарастание во время каста (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java castTick()",
+  "replaces": [
+   "ROOTED_DIRT_BREAK"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.charge_leaves",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/nature/world_tree_charge_leaves_1.ogg",
+   "spell/nature/world_tree_charge_leaves_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_charge_leaves_1.mp3",
+   "docs/sounds/mp3/world_tree_charge_leaves_2.mp3"
+  ],
+  "what": "листва — нарастание во время каста (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java castTick()",
+  "replaces": [
+   "AZALEA_LEAVES_PLACE",
+   "AZALEA_PLACE"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.charge_powerup",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/nature/world_tree_charge_powerup_1.ogg",
+   "spell/nature/world_tree_charge_powerup_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_charge_powerup_1.mp3",
+   "docs/sounds/mp3/world_tree_charge_powerup_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — нарастание во время каста (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java castTick()",
+  "replaces": [
+   "BEACON_ACTIVATE"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.charge_wood",
+  "role": "charge",
+  "role_ru": "нарастание во время каста",
+  "files": [
+   "spell/nature/world_tree_charge_wood_1.ogg",
+   "spell/nature/world_tree_charge_wood_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_charge_wood_1.mp3",
+   "docs/sounds/mp3/world_tree_charge_wood_2.mp3"
+  ],
+  "what": "дерево — нарастание во время каста (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java castTick()",
+  "replaces": [
+   "WOOD_PLACE"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.hit_earth",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/nature/world_tree_hit_earth_1.ogg",
+   "spell/nature/world_tree_hit_earth_2.ogg",
+   "spell/nature/world_tree_hit_earth_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_hit_earth_1.mp3",
+   "docs/sounds/mp3/world_tree_hit_earth_2.mp3",
+   "docs/sounds/mp3/world_tree_hit_earth_3.mp3"
+  ],
+  "what": "земля, камень, корни — удар / взрыв / попадание (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java tick()",
+  "replaces": [
+   "ROOTED_DIRT_BREAK"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.hit_leaves",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/nature/world_tree_hit_leaves_1.ogg",
+   "spell/nature/world_tree_hit_leaves_2.ogg",
+   "spell/nature/world_tree_hit_leaves_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_hit_leaves_1.mp3",
+   "docs/sounds/mp3/world_tree_hit_leaves_2.mp3",
+   "docs/sounds/mp3/world_tree_hit_leaves_3.mp3"
+  ],
+  "what": "листва — удар / взрыв / попадание (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java bloom()",
+  "replaces": [
+   "CHERRY_LEAVES_BREAK",
+   "SPORE_BLOSSOM_BREAK"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.hit_wood",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/nature/world_tree_hit_wood_1.ogg",
+   "spell/nature/world_tree_hit_wood_2.ogg",
+   "spell/nature/world_tree_hit_wood_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_hit_wood_1.mp3",
+   "docs/sounds/mp3/world_tree_hit_wood_2.mp3",
+   "docs/sounds/mp3/world_tree_hit_wood_3.mp3"
+  ],
+  "what": "дерево — удар / взрыв / попадание (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java hit()",
+  "replaces": [
+   "WOOD_BREAK",
+   "WOOD_HIT"
+  ]
+ },
+ {
+  "school": "nature",
+  "school_ru": "Природа",
+  "spell": "world_tree",
+  "spell_ru": "Древо мира",
+  "event": "pohsmp_core:spell.world_tree.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/nature/world_tree_loop_1.ogg",
+   "spell/nature/world_tree_loop_2.ogg",
+   "spell/nature/world_tree_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/world_tree_loop_1.mp3",
+   "docs/sounds/mp3/world_tree_loop_2.mp3",
+   "docs/sounds/mp3/world_tree_loop_3.mp3"
+  ],
+  "what": "листва — пока действует (тики) (подпись школы: дерево, корни, листва)",
+  "where": "WorldTreeSpell.java tick()",
+  "replaces": [
+   "AZALEA_LEAVES_BREAK"
+  ]
  }
 ]

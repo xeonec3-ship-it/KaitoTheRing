@@ -1,0 +1,77 @@
+{
+ "comment": "PLACEHOLDER (T03): the ice crystal mountain at the strike point (64 s, only a look, 30 s) until the crystal mesh exists.",
+ "style": "divine",
+ "duration": 600,
+ "elements": [
+  {
+   "type": "column",
+   "delay": 0,
+   "duration": 600,
+   "at": "point:p",
+   "radius": 2.6,
+   "height": 14,
+   "color": "#CFE8FF",
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 60,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "column",
+   "delay": 6,
+   "duration": 590,
+   "at": "point:p+3,0,1",
+   "radius": 1.2,
+   "height": 8,
+   "color": "#FFFFFF",
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 60,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "column",
+   "delay": 10,
+   "duration": 585,
+   "at": "point:p+-2.5,0,-2",
+   "radius": 1.0,
+   "height": 6,
+   "color": "#FFFFFF",
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 60,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 560,
+   "at": "point:p+0,6,0",
+   "texture": "shard",
+   "count": 50,
+   "rate": 0.5,
+   "spread": 4,
+   "speed": 0.01,
+   "gravity": 0.002,
+   "spin": 30,
+   "size": [
+    0.3,
+    0.1
+   ],
+   "life": 120,
+   "color": "#CFE8FF"
+  }
+ ]
+}

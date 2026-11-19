@@ -26,8 +26,10 @@ E = []
 # Точка каста не нужна (решение владельца): врата встают в небе впереди заклинателя — по взгляду в начале каста.
 # Площадь ударов — под вратами (центр в 26 блоках впереди); ледяная гора в финале — в центре площади. Главного луча нет.
 FWD = 26
-GATE = f'caster+0,16,{FWD}'          # врата
-NIMBUS = f'caster+0,26,{FWD + 2}'    # нимб за верхом врат, крупнее их (как в аниме)
+# высота врат над площадью: «намного повыше» (решение владельца 19.11; было 16) — то же число в SilentGateSpell.GATE_H
+GATE_UP = 48
+GATE = f'caster+0,{GATE_UP},{FWD}'    # врата
+NIMBUS = f'caster+0,{GATE_UP + 10},{FWD + 2}'    # нимб за верхом врат, крупнее их (как в аниме)
 AREA = f'caster+0,0,{FWD}'           # центр площади ударов
 
 
@@ -62,7 +64,7 @@ def build():
     el(type='mesh', model='silent_gate', delay=T(22), until=T(63), at=GATE, yaw=180, scale=1.5)
     for i in range(7):
         x = -5 + i * 10 / 6
-        el(type='beam', delay=T(22.3 + 0.35 * i), duration=T(3.2), at=f'caster+{x:.1f},28,{FWD}', to=f'caster+{x * 0.7:.1f},11,{FWD}',
+        el(type='beam', delay=T(22.3 + 0.35 * i), duration=T(3.2), at=f'caster+{x:.1f},{GATE_UP + 12},{FWD}', to=f'caster+{x * 0.7:.1f},{GATE_UP - 5},{FWD}',
            width=0.18 + 0.12 * (i % 2), core=0.4, taper=0.6, grow=10, color='@secondary', brightness=0.7)
     # 26–36 с: врата висят — блики и мерцание
     el(type='flash', delay=T(26), duration=T(10), at=NIMBUS, size=10, anamorphic=0, rays=14, screen=0.0, color='@primary', brightness=0.35)
@@ -96,7 +98,7 @@ def build():
         d = T(50) + rnd.randint(0, 16)
         green = i % 3 != 0
         el(type='sigil', id='silent_field_green' if green else 'silent_field_white', delay=d, until=T(62.8),
-           at=f'caster+{x:.1f},{h:.1f},{FWD + z:.1f}', orientation='sky', scale=rnd.uniform(0.7, 1.5))
+           at=f'caster+{x:.1f},{h:.1f},{FWD + z:.1f}', orientation='sky', scale=rnd.uniform(0.28, 0.6))   # мельче (решение владельца 19.11; было 0.7–1.5)
     el(type='beam_rain', delay=T(50.5), duration=T(12), at=AREA, area=22, count=200, interval=1.2, width=0.22, height=26,
        color='@secondary', impact='silent_impact')
     # 62.5–65 с: всё гаснет, ледяная гора на месте удара

@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -129,6 +130,11 @@ public final class Reg {
             SILENT_POWER, SILENT_RESIST, () -> SoundEvents.AMETHYST_BLOCK_CHIME, SILENT_DAMAGE, false, false));
     /** Black flame of Worgan: 1.5 damage a second, water does not put it out, milk does not cure it. */
     public static final RegistryObject<MobEffect> BLACK_FLAME = EFFECTS.register("black_flame", ru.pohsmp.core.spell.silent.WorganFlameSpell.BlackFlame::new);
+
+    /** Sounds of sounds.json that the code plays. */
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, PohCore.MODID);
+    public static final RegistryObject<SoundEvent> MUSIC_SILENT_GATE = SOUNDS.register("music.silent_gate",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(PohCore.MODID, "music.silent_gate")));
 
     public static final DeferredRegister<AbstractSpell> SPELLS = DeferredRegister.create(SpellRegistry.SPELL_REGISTRY_KEY, PohCore.MODID);
     public static final RegistryObject<AbstractSpell> DISINTEGRATION = SPELLS.register("disintegration", DisintegrationSpell::new);
@@ -277,6 +283,7 @@ public final class Reg {
         EFFECTS.register(modBus);
         SCHOOLS.register(modBus);
         SPELLS.register(modBus);
+        SOUNDS.register(modBus);
         ITEMS.register(modBus);
         TABS.register(modBus);
     }

@@ -35,7 +35,7 @@
 /give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:countdown",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
 Закрытие Пространства (Мифическая, печать Ковена; уровни 1-4 = 5/10/20/30 мин, купол r86):
 /give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:space_closure",index:0,level:4,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
-Падение звезды (пока Мифическая, школа Святая — временно; каст 8 с с роликом, удар r8 в точку взгляда до 48 блоков):
+Падение звезды (Высшая; каст 8 с с роликом, удар r8 в точку взгляда до 48 блоков):
 /give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:star_fall",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
 Все свитки также лежат во вкладке творческого режима PohSMP.
 Урон Высшей школы учитывает броню; общий множитель урона и лечения: [higher] damageMult в pohsmp_core-server.toml.

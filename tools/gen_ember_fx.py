@@ -8,6 +8,10 @@
   fx/ember_heat.json        — раскалённый клинок (пока жар > 0): угли и искры с клинка; follow, гасится кодом (stop).
   textures/gui/ember_heat_bar.png — HUD шкалы жара над хотбаром: 128×32, верх 16 — рамка-«угли», низ 16 — заливка (градиент),
                               код рисует рамку и заливку по доле жара; при полной шкале — пульсация (код, альфа заливки).
+  fx/meshes/ember_whip.json — хлыст «Раскалённых углей» (по референсам Ruination и Whip Sword): рукоять в обмотке и кольцо-навершие
+                              сзади (−z), из пяты 16 раскалённых звеньев-клинков вдоль +z на 6 блоков с провисом и S-изгибом, конец
+                              закручивается огненной спиралью; вокруг звеньев вьётся огненная лента, над ними — языки пламени.
+                              Та же система, что у fire_whip: начало — в руке, длина вдоль +z, код поворачивает его по дуге взмаха.
 Запуск: python3 tools/gen_ember_fx.py
 """
 import json
@@ -138,8 +142,105 @@ def hud():
     print('wrote textures/gui/ember_heat_bar.png')
 
 
+def whip():
+    """Хлыст из звеньев (как Whip Sword) в огне (как Ruination). Тоны: 0 кожа, 1 тёмное железо, 2 раскалённое железо,
+    3 добела, 4 пламя (2–4 светятся)."""
+    B, F = [], []
+    R3 = lambda v: round(v, 3)
+
+    def box(c, size, t, rot=(0, 0, 0), out=B):
+        x, y, z = c; sx, sy, sz = size
+        b = [R3(x - sx / 2), R3(y - sy / 2), R3(z - sz / 2), R3(x + sx / 2), R3(y + sy / 2), R3(z + sz / 2), t]
+        if any(abs(a) > 1e-6 for a in rot):
+            b.append([R3(a) for a in rot])
+        out.append(b)
+
+    LEN = 6.0
+    def curve(s):                         # s 0..1 → точка оси хлыста (вперёд z, провис вниз, S-изгиб вбок, конец вверх)
+        z = s * LEN
+        y = -0.7 * math.sin(s * math.pi) + 0.35 * max(0, s - 0.8) / 0.2
+        x = 0.45 * math.sin(s * 2 * math.pi) * (1 - 0.3 * s)
+        return x, y, z
+
+    def rot_of(a, b):
+        dx, dy, dz = b[0] - a[0], b[1] - a[1], b[2] - a[2]
+        ln = math.sqrt(dx * dx + dy * dy + dz * dz)
+        return math.degrees(-math.asin(dy / ln)), math.degrees(math.atan2(dx, dz)), ln
+
+    # рукоять (−z): обмотка кольцами, кольцо-навершие (D-ring), пята с крюком
+    for i in range(9):
+        z = -0.06 - i * 0.05
+        box((0, 0, z), (0.11, 0.11, 0.04), 0 if i % 2 else 1)
+    for i in range(10):                    # кольцо-навершие в вертикальной плоскости
+        a = 2 * math.pi * i / 10
+        box((0, 0.13 * math.sin(a), -0.6 + 0.13 * math.cos(a)), (0.04, 0.05, 0.05), 1, (math.degrees(a), 0, 0))
+    box((0, 0.02, 0.03), (0.2, 0.16, 0.08), 1)                          # пята
+    box((0, 0.14, 0.05), (0.06, 0.12, 0.06), 1, (25, 0, 0))             # крюк к обуху
+    # звенья-клинки: 16 шт, каждое — плоский клинок шире у основания, острый кончик заходит на следующее
+    n = 16
+    for i in range(n):
+        s0, s1 = i / n, (i + 1) / n
+        a, b = curve(s0), curve(s1)
+        rx, ry, ln = rot_of(a, b)
+        c = tuple((a[k] + b[k]) / 2 for k in range(3))
+        w = 0.24 * (1 - 0.4 * s0)
+        hot = 2 if i % 2 == 0 else 1
+        box(c, (0.07, w * 1.3, ln * 0.92), hot, (rx, ry, 0))                         # пластина звена
+        box((c[0], c[1] + w * 0.55, c[2]), (0.09, w * 0.25, ln * 0.85), 1, (rx, ry, 0))   # тёмный обух звена
+        box((c[0], c[1] - w * 0.6, c[2]), (0.08, w * 0.3, ln * 0.8), 3, (rx, ry, 0))   # раскалённая кромка снизу
+        box(b, (0.06, w * 0.6, 0.06), 2, (rx, ry, 45))                               # шарнир
+    # остриё
+    tip = curve(1.0); pre = curve(0.97)
+    rx, ry, _ = rot_of(pre, tip)
+    box((tip[0], tip[1] + 0.02, tip[2] + 0.12), (0.03, 0.09, 0.3), 3, (rx - 12, ry, 0))
+    def strip(pts, w, tone_fn):
+        for j in range(len(pts) - 1):
+            p0, p1 = pts[j], pts[j + 1]
+            rx, ry, ln = rot_of(p0, p1)
+            box(tuple((p0[k] + p1[k]) / 2 for k in range(3)), (w, w * 0.7, ln * 1.35), tone_fn(j), (rx, ry, 0), F)
+    # огненная лента: сплошная спираль вокруг звеньев (1.6 витка на блок), к концу шире и ярче
+    rib = []
+    for j in range(241):
+        s_ = j / 240
+        x, y, z = curve(s_)
+        ang = s_ * LEN * 1.6 * 2 * math.pi
+        r = 0.2 + 0.1 * s_
+        rib.append((x + r * math.cos(ang), y + r * math.sin(ang), z))
+    strip(rib, 0.07, lambda j: 3 if j % 9 == 0 else 4)
+    # конец закручивается огненной спиралью (как в Ruination): сплошная лента в вертикальной плоскости над кончиком
+    cx, cy, cz = curve(1.0)
+    sp = []
+    for j in range(91):
+        t = j / 90
+        ang = t * 1.8 * 2 * math.pi
+        r = 0.62 * (1 - t) + 0.07
+        sp.append((cx, cy + 0.62 + r * math.sin(ang), cz - 0.25 + r * math.cos(ang)))
+    strip(sp, 0.09, lambda j: 3 if j > 70 or j % 7 == 0 else 4)
+    # языки пламени над обухом звеньев
+    rnd = random.Random(61)
+    for i in range(40):
+        s = 0.08 + 0.9 * i / 40
+        x, y, z = curve(s)
+        h = 0.2 + 0.4 * s * rnd.uniform(0.6, 1.0)
+        box((x + rnd.uniform(-0.05, 0.05), y + 0.18 + h / 2, z), (0.09, h, 0.09), 4 if i % 3 else 3, (rnd.uniform(-20, 20), 0, rnd.uniform(-15, 15)), F)
+    ys = [b[1] for b in B + F] + [b[4] for b in B + F]
+    tones = ['#1C1716', '#5A1A08', '#E04A0C', '#FFE7A0', '#FFB040']
+    doc = {'comment': 'Хлыст «Раскалённых углей» (T14): рукоять и кольцо-навершие сзади, 16 раскалённых звеньев-клинков вдоль +z на 6 блоков '
+                      '(провис, S-изгиб), конец — огненная спираль; огненная лента и языки пламени. Как fire_whip: начало в руке, код поворачивает '
+                      'по дуге взмаха. Сгенерировано tools/gen_ember_fx.py.',
+           'style': 'pyre', 'center': 0, 'formedAt': 3, 'collapse': {'duration': 6, 'easing': 'easeInSine'},
+           'parts': [{'type': 'boxes', 'tones': tones, 'glowTones': [2, 3, 4], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': B,
+                      'appear': {'delay': 0, 'duration': 2, 'easing': 'easeOutCubic'}, 'bounds': [min(ys), max(ys)]},
+                     {'type': 'boxes', 'tones': tones, 'glowTones': [3, 4], 'blend': 'additive', 'opacity': 0.85, 'shade': False, 'boxes': F,
+                      'appear': {'delay': 0, 'duration': 3, 'easing': 'easeOutCubic'}, 'bounds': [min(ys), max(ys)]}]}
+    with open(os.path.join(A, 'fx', 'meshes', 'ember_whip.json'), 'w', encoding='utf-8') as f:
+        json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
+    print('wrote fx/meshes/ember_whip.json:', len(B), '+', len(F), 'boxes')
+
+
 if __name__ == '__main__':
     last_heat()
     vortex()
     heat()
     hud()
+    whip()

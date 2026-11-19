@@ -45,8 +45,8 @@ import ru.pohsmp.core.spell.CastAnims;
 public class WakingNightmareSpell extends IllusionBase {
     public static final String PATH = "waking_nightmare";
     private static final int CAST = 70, MONSTERS_R = 40, MONSTERS_MAX = 32, REFRESH = 54;
-    /** Owner 19.11: off - no faceless monsters on everyone for the victim (the code kept for if it comes back). */
-    private static final boolean MONSTERS = false;
+    /** Owner 19.11 (again): on - the victim sees everyone round it (people and mobs) as the faceless monster illusion_nightmare. */
+    private static final boolean MONSTERS = true;
 
     public WakingNightmareSpell() {
         super(PATH, Rank.HIGHER, CAST);

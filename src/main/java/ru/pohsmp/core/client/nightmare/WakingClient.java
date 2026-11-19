@@ -20,27 +20,27 @@ public final class WakingClient {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onLiving(RenderLivingEvent.Pre<?, ?> e) {
         if (e.isCanceled()) return;
-        if (e.getEntity() instanceof net.minecraft.world.entity.Mob mob && mobMasked(mob)) {
-            NmStandIn.draw(e, mob, NightmareMob.Kind.DREAD);
+        if (mobMasked(e.getEntity())) {   // the server puts the faceless monster (fx) on it: the real model is not drawn
+            e.setCanceled(true);
             return;
         }
         if (!(e.getEntity() instanceof Player p) || p == Minecraft.getInstance().player || Zones.active(Zones.WAKING) == null) return;
         NmStandIn.draw(e, p, NightmareMob.Kind.DREAD);
     }
 
-    /** Owner 19.11: under any nightmare spell (the immersion at any stage, «Кошмар наяву», «Пробуждение не наступит») mobs are the Dread too. */
-    private static boolean inNightmare() {
-        return NightmareClient.stage() > 0 || Zones.active(Zones.WAKING) != null || Zones.active(Zones.NO_AWAKENING) != null;
-    }
-
-    /** A real mob (not a nightmare of ours, not a CustomNPCs NPC - those are people) while this client is in a nightmare. */
-    private static boolean mobMasked(net.minecraft.world.entity.Mob mob) {
-        return !(mob instanceof NightmareMob) && !mob.getClass().getName().startsWith("noppes.npcs") && inNightmare();
+    /**
+     * Owner 19.11: at stages 2 and 3 of the immersion the real mobs within 40 blocks are the faceless monster illusion_nightmare
+     * (as in «Кошмар наяву»); the server sends the monster fx on each (Immersion.masks), this client hides the mob itself.
+     */
+    private static boolean mobMasked(net.minecraft.world.entity.Entity e) {
+        var me = Minecraft.getInstance().player;
+        return me != null && NightmareClient.stage() >= 2 && !HouseClient.on() && ru.pohsmp.core.nightmare.Immersion.maskable(e)
+                && e.distanceToSqr(me) < 40 * 40;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void onName(RenderNameTagEvent e) {
-        if (e.getEntity() instanceof net.minecraft.world.entity.Mob mob && mobMasked(mob)) {
+        if (mobMasked(e.getEntity())) {
             e.setResult(Event.Result.DENY);
             return;
         }

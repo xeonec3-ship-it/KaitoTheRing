@@ -231,7 +231,7 @@
   "ui.pohsmp_core.coven_arrival.moved": "Метка арены перенесена",
   "ui.pohsmp_core.coven_arrival.not_marked": "Арена не отмечена",
   "ui.pohsmp_core.coven_arrival.retinue": "Шифт+ПКМ со свитком по существу — свита (до %s)",
-  "ui.pohsmp_core.coven_arrival.retinue_full": "В свите уже двое",
+  "ui.pohsmp_core.coven_arrival.retinue_full": "В свите уже трое",
   "ui.pohsmp_core.coven_arrival.retinue_in": "%s в свите (%s/%s)",
   "ui.pohsmp_core.coven_arrival.retinue_out": "%s больше не в свите",
   "ui.pohsmp_core.disintegration.armor": "Сквозь броню, цель обездвижена",

@@ -31,6 +31,7 @@ public class PohCore {
         modBus.addListener(PohCore::attributes);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         MinecraftForge.EVENT_BUS.register(DivineEvents.class);
+        MinecraftForge.EVENT_BUS.register(SchoolSeals.class);
         MinecraftForge.EVENT_BUS.register(DisintegrationSpell.DisintegrationEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.TargetPose.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DisintegrationReplicaSpell.ReplicaEvents.class);

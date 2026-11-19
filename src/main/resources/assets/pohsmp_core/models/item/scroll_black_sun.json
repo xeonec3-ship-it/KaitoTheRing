@@ -1,6 +1,0 @@
-{
-  "parent": "item/generated",
-  "textures": {
-    "layer0": "pohsmp_core:item/scroll_black_sun"
-  }
-}

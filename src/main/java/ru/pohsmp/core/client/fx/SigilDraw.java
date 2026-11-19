@@ -109,6 +109,7 @@ public final class SigilDraw {
         double gs = SigilTimeline.globalScale(d, t, r.stopAt, r.scale);
         double ga = SigilTimeline.globalAlpha(d, t, r.stopAt) * r.alpha;
         if (gs <= 1e-4 || ga <= 0.002) return;
+        SigilLight.draw(f, r, d, t, c, gs);
         layers(f, r, d, t, c, bs, gs, ga, false);
         // joint cast (T15): a second outline, raised, wider, turned and spinning the other way
         if (ru.pohsmp.core.client.JointFx.isJoint(r.caster != null ? r.caster : r.follow)) layers(f, r, d, t, c, bs, gs, ga, true);

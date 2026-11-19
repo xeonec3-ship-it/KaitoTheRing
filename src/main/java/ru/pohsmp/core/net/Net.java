@@ -17,14 +17,16 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "4";
+    private static final String V = "5";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
         CH.messageBuilder(Fx.class, 0, NetworkDirection.PLAY_TO_CLIENT).encoder(Fx::encode).decoder(Fx::new).consumerMainThread(Fx::handle).add();
         CH.messageBuilder(HFx.class, 1, NetworkDirection.PLAY_TO_CLIENT).encoder(HFx::encode).decoder(HFx::new).consumerMainThread(HFx::handle).add();
         CH.messageBuilder(FxMsg.class, 2, NetworkDirection.PLAY_TO_CLIENT).encoder(FxMsg::encode).decoder(FxMsg::new).consumerMainThread(FxMsg::handle).add();
-        CH.messageBuilder(CastTime.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(CastTime::encode).decoder(CastTime::new).consumerMainThread(CastTime::handle).add();
+        CH.messageBuilder(HideMsg.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(HideMsg::encode).decoder(HideMsg::new).consumerMainThread(HideMsg::handle).add();
+        CH.messageBuilder(NpcCastMsg.class, 4, NetworkDirection.PLAY_TO_CLIENT).encoder(NpcCastMsg::encode).decoder(NpcCastMsg::new).consumerMainThread(NpcCastMsg::handle).add();
+        CH.messageBuilder(CastTime.class, 5, NetworkDirection.PLAY_TO_CLIENT).encoder(CastTime::encode).decoder(CastTime::new).consumerMainThread(CastTime::handle).add();
     }
 
     /**
@@ -129,6 +131,42 @@ public final class Net {
 
         public void handle(Supplier<NetworkEvent.Context> ctx) {
             DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.DisintegrationFx.handle(this));
+        }
+    }
+
+    /** A non-player caster (spell/NpcCast) started, finished or cancelled a cast: sound and animation on clients. */
+    public static final class NpcCastMsg {
+        public static final int START = 0, FINISH = 1, CANCEL = 2;
+        public final byte phase;
+        public final int entity, level, ticks;
+        public final String spell;
+
+        public NpcCastMsg(int phase, int entity, String spell, int level, int ticks) {
+            this.phase = (byte) phase;
+            this.entity = entity;
+            this.spell = spell;
+            this.level = level;
+            this.ticks = ticks;
+        }
+
+        public NpcCastMsg(FriendlyByteBuf b) {
+            phase = b.readByte();
+            entity = b.readVarInt();
+            spell = b.readUtf(256);
+            level = b.readVarInt();
+            ticks = b.readVarInt();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeByte(phase);
+            b.writeVarInt(entity);
+            b.writeUtf(spell, 256);
+            b.writeVarInt(level);
+            b.writeVarInt(ticks);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.NpcCastClient.handle(this));
         }
     }
 

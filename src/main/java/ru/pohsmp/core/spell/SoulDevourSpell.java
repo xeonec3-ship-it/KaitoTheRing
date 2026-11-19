@@ -119,7 +119,7 @@ public class SoulDevourSpell extends PohSpell {
         LivingEntity t = h.target;
         if (!t.isAlive() || t.isRemoved() || t.level() != sl) {
             finish(sl, caster, HOLDS.remove(caster.getUUID()));
-            if (caster instanceof ServerPlayer sp) Utils.serverSideCancelCast(sp);
+            NpcCast.cancelAny(caster);
             return;
         }
         h.age++;

@@ -4,7 +4,7 @@
  "color": "#D9A441",
  "orientation": "facing",
  "lifetime": -1,
- "hold": 4,
+ "hold": 12,
  "layers": [
   {
    "id": "glow",

@@ -1,0 +1,76 @@
+{
+ "comment": "Благословение, 1.7–6 с: малый тёплый круг у сложенных ладоней (деталь крупного плана), смотрит вперёд.",
+ "size": 0.22,
+ "color": "#FFC94D",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.6,
+   "heightOffset": -0.01,
+   "color": "#FFE7A0",
+   "brightness": 0.55,
+   "appear": {
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 30
+   }
+  },
+  {
+   "id": "holy",
+   "type": "disc",
+   "texture": "holy_seal",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 12
+   }
+  },
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.25,
+   "heightOffset": 0.01,
+   "color": "#A8DCFF",
+   "inner": 0.9,
+   "repeat": 1,
+   "appear": {
+    "delay": 6,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ]
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 12,
+  "stagger": 2
+ }
+}

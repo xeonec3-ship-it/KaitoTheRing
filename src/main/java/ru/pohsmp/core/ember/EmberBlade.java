@@ -81,7 +81,7 @@ public class EmberBlade extends SwordItem {
         try {
             return ru.pohsmp.core.ServerConfig.EMBER_HITS_TO_BURN.get();
         } catch (RuntimeException e) {   // config not loaded yet
-            return 15;
+            return 5;
         }
     }
 

@@ -48,8 +48,10 @@ public class SilentVolleySpell extends SilentSpell {
     }
 
     @Override public CastType getCastType() { return CastType.LONG; }
-    @Override public AnimationHolder getCastStartAnimation() { return SpellAnimations.CHARGE_RAISED_HAND; }
-    @Override public AnimationHolder getCastFinishAnimation() { return SpellAnimations.ANIMATION_INSTANT_CAST; }
+    private static final AnimationHolder ANIM_CAST = ru.pohsmp.core.spell.CastAnims.of("silent_volley_cast"),
+            ANIM_FINISH = ru.pohsmp.core.spell.CastAnims.of("silent_volley_finish");
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
+    @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
 
     private static int seals() { return cfg(ServerConfig.VOLLEY_SEALS::get, 24); }
     private static double radius() { return cfg(ServerConfig.VOLLEY_RADIUS::get, 24.0); }

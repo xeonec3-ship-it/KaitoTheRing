@@ -12,6 +12,8 @@ import ru.pohsmp.core.fx.sigil.SigilDef;
 import ru.pohsmp.core.fx.sigil.SigilDef.AppearMode;
 import ru.pohsmp.core.fx.sigil.SigilDef.Layer;
 import ru.pohsmp.core.fx.sigil.SigilDef.LayerType;
+import ru.pohsmp.core.fx.sigil.SigilCracks;
+import ru.pohsmp.core.fx.sigil.SigilHit;
 import ru.pohsmp.core.fx.sigil.SigilText;
 import ru.pohsmp.core.fx.sigil.SigilTimeline;
 import ru.pohsmp.core.fx.sigil.SigilTimeline.LayerState;
@@ -20,8 +22,10 @@ import ru.pohsmp.core.fx.sigil.SigilTimeline.PieceState;
 /**
  * Draws a sigil exactly as {@link SigilTimeline} describes it (docs/sigils.md): no shaders, the "draw" reveal is a triangle fan
  * up to the current angle, bands are rings with the texture repeated around, arcs are short ring strips, pieces are sectors
- * flying into place, inscriptions are one textured square per letter from a glyph atlas ({@link SigilText}). The plane is (u, v)
- * with normal n; layer tilt (unfold) turns v towards n.
+ * flying into place, inscriptions are one textured square per letter from a glyph atlas ({@link SigilText}). The plane is (u, v) with normal n; layer tilt (unfold) turns v towards n.
+ * T08: hits ({@link SigilHit}) — a wave of light over every layer and a light sheet, the flinch and wobble of the plane, a flash and
+ * sparks at the point. T09: the {@code cracks} dissolve ({@link SigilCracks}) — layers are drawn shard by shard, plus glowing cracks
+ * and dust.
  */
 public final class SigilDraw {
     private SigilDraw() {}
@@ -119,10 +123,339 @@ public final class SigilDraw {
         double ga = SigilTimeline.globalAlpha(d, t, r.stopAt) * r.alpha;
         if (gs <= 1e-4 || ga <= 0.002) return;
         SigilLight.draw(f, r, d, t, c, gs);
+        if (SigilCracks.breaking(d, t, r.stopAt)) {      // T09: the sigil breaks into shards
+            r.hits.clear();
+            r.pending.clear();
+            cracks(f, r, d, t, c, bs, gs, ga);
+            return;
+        }
+        // T08: place new hits on the plane, then flinch (scale) and wobble (turn the plane) while they last
+        placeHits(r, d, t, bs, gs);
+        if (!r.hits.isEmpty()) {
+            gs *= SigilHit.scale(d, r.hits, t);
+            bs = wobble(bs, SigilHit.wobble(d, r.hits, t));
+        }
         layers(f, r, d, t, c, bs, gs, ga, false);
         // joint cast (T15): a second outline, raised, wider, turned and spinning the other way
         if (ru.pohsmp.core.client.JointFx.isJoint(r.caster != null ? r.caster : r.follow)) layers(f, r, d, t, c, bs, gs, ga, true);
+        if (!r.hits.isEmpty()) hits(f, r, d, t, c, bs, gs, ga);
         flash(f, r, d, t, c, bs, gs, ga);
+    }
+
+    // ---------------------------------------------------------------- T08: hits
+
+    /** Pending world hits -> plane coordinates (unit = current radius); drops dead hits and hits that missed the sigil. */
+    private static void placeHits(SigilRun r, SigilDef d, double t, Basis bs, double gs) {
+        SigilDef.Hit h = d.hit();
+        if (h == null) {
+            r.pending.clear();
+            return;
+        }
+        for (SigilRun.Pending p : r.pending) {
+            double x = p.offset().dot(bs.u) / gs, y = p.offset().dot(bs.v) / gs;
+            if (Math.hypot(x, y) > d.reach() * 1.3) continue;                       // not on this sigil (e.g. another sigil of the effect)
+            SigilHit.accept(h, r.hits, new SigilHit.Event(x, y, p.at(), p.power(), p.seed()));
+        }
+        r.pending.clear();
+        r.hits.removeIf(e -> !SigilHit.alive(h, e, t));
+    }
+
+    /** The plane turned by the wobble around the in-plane axis (ax·u + ay·v). */
+    private static Basis wobble(Basis b, SigilHit.Wobble w) {
+        if (Math.abs(w.angle()) < 1e-4) return b;
+        Vec3 axis = b.u.scale(w.ax()).add(b.v.scale(w.ay())).normalize();
+        double a = Math.toRadians(w.angle());
+        return new Basis(rotate(b.n, axis, a), rotate(b.u, axis, a), rotate(b.v, axis, a));
+    }
+
+    /** Rodrigues: p turned by angle a (radians) around the unit axis k. */
+    private static Vec3 rotate(Vec3 p, Vec3 k, double a) {
+        double cs = Math.cos(a), sn = Math.sin(a);
+        return p.scale(cs).add(k.cross(p).scale(sn)).add(k.scale(k.dot(p) * (1 - cs)));
+    }
+
+    /**
+     * Wave over each formed disc/spokes/band layer (its own texture on a dense polar grid, vertex alpha = layer alpha ·
+     * SigilHit.glow there, colour towards the hit colour), the light sheet (white, sheen), the flash at the point and the sparks.
+     */
+    private static void hits(Frame f, SigilRun r, SigilDef d, double t, Vec3 c, Basis bs, double gs, double ga) {
+        SigilDef.Hit h = d.hit();
+        int hitCol = h.color() >= 0 ? h.color() : FxDraw.mix(r.color >= 0 ? r.color : d.color(), 0xFFFFFF, 0.5);
+        int rings = f.low() ? 8 : 16, sectors = f.low() ? 40 : 72;
+        double top = 0;
+        for (int i = 0; i < d.layers().size(); i++) {
+            Layer l = d.layers().get(i);
+            top = Math.max(top, l.heightOffset());
+            if (l.type() == LayerType.ARCS || l.type() == LayerType.TEXT || t < l.appear().end()) continue;   // надписи (T07) волной не светятся
+            LayerState st = SigilTimeline.layer(d, i, t, r.stopAt);
+            if (!st.visible()) continue;
+            double rho = st.scale(), R = gs * rho, a = st.alpha() * ga;
+            boolean band = l.type() == LayerType.BAND;
+            double inner = band ? (l.inner() >= 0.9999 ? 0.86 : l.inner()) : 0;
+            int col = FxDraw.mix(r.color >= 0 ? r.color : l.color(), hitCol, 0.45);
+            Plane p = new Plane(c.add(bs.n.scale(l.heightOffset() * r.scale + 0.004)), bs.u, bs.v, bs.n);
+            VertexConsumer vc = f.add(FxDraw.tex(l.texture()));
+            int nr = band ? 3 : rings;
+            double[][] g = new double[nr + 1][sectors + 1];                       // glow at the grid nodes, once per frame
+            for (int ri = 0; ri <= nr; ri++)
+                for (int si = 0; si <= sectors; si++) g[ri][si] = glowAt(d, r, (inner + (1 - inner) * ri / nr) * rho, 360.0 * si / sectors, t);
+            for (int ri = 0; ri < nr; ri++) {
+                double q0 = inner + (1 - inner) * ri / nr, q1 = inner + (1 - inner) * (ri + 1) / nr;   // shares of the layer radius
+                for (int si = 0; si < sectors; si++) {
+                    double a0 = 360.0 * si / sectors, a1 = 360.0 * (si + 1) / sectors;
+                    double g00 = g[ri][si], g01 = g[ri][si + 1], g11 = g[ri + 1][si + 1], g10 = g[ri + 1][si];
+                    if (g00 + g01 + g11 + g10 < 0.004) continue;
+                    if (band) {
+                        float u0 = (float) ((a0 - st.angle()) / 360 * l.repeat()), u1 = (float) ((a1 - st.angle()) / 360 * l.repeat());
+                        float v0 = (float) ((1 - q0) / (1 - inner)), v1 = (float) ((1 - q1) / (1 - inner));
+                        FxDraw.vert(vc, f, p.polar(R * q1, a0), u0, v1, col, a * g10);
+                        FxDraw.vert(vc, f, p.polar(R * q0, a0), u0, v0, col, a * g00);
+                        FxDraw.vert(vc, f, p.polar(R * q0, a1), u1, v0, col, a * g01);
+                        FxDraw.vert(vc, f, p.polar(R * q1, a1), u1, v1, col, a * g11);
+                    } else {
+                        FxDraw.vert(vc, f, p.polar(R * q1, a0), du(R * q1, a0, R, st.angle()), dv(R * q1, a0, R, st.angle()), col, a * g10);
+                        FxDraw.vert(vc, f, p.polar(R * q0, a0), du(R * q0, a0, R, st.angle()), dv(R * q0, a0, R, st.angle()), col, a * g00);
+                        FxDraw.vert(vc, f, p.polar(R * q0, a1), du(R * q0, a1, R, st.angle()), dv(R * q0, a1, R, st.angle()), col, a * g01);
+                        FxDraw.vert(vc, f, p.polar(R * q1, a1), du(R * q1, a1, R, st.angle()), dv(R * q1, a1, R, st.angle()), col, a * g11);
+                    }
+                }
+            }
+        }
+        // light sheet over the whole disc (so the ring reads on sparse patterns too)
+        double reach = d.reach();
+        Plane sp = new Plane(c.add(bs.n.scale(top * r.scale + 0.012)), bs.u, bs.v, bs.n);
+        if (h.sheen() > 0) {
+            VertexConsumer vc = f.add(FxDraw.WHITE);
+            int sheetCol = FxDraw.mix(r.color >= 0 ? r.color : d.color(), hitCol, 0.5);
+            double[][] g = new double[rings + 1][sectors + 1];
+            for (int ri = 0; ri <= rings; ri++)
+                for (int si = 0; si <= sectors; si++) g[ri][si] = sheenAt(d, r, reach * 1.02 * ri / rings, 360.0 * si / sectors, t);
+            for (int ri = 0; ri < rings; ri++) {
+                double q0 = reach * 1.02 * ri / rings, q1 = reach * 1.02 * (ri + 1) / rings;
+                for (int si = 0; si < sectors; si++) {
+                    double a0 = 360.0 * si / sectors, a1 = 360.0 * (si + 1) / sectors;
+                    double g10 = g[ri + 1][si], g00 = g[ri][si], g01 = g[ri][si + 1], g11 = g[ri + 1][si + 1];
+                    if (g00 + g01 + g11 + g10 < 0.004) continue;
+                    FxDraw.vert(vc, f, sp.polar(gs * q1, a0), 0.5f, 0.5f, sheetCol, ga * g10);
+                    FxDraw.vert(vc, f, sp.polar(gs * q0, a0), 0.5f, 0.5f, sheetCol, ga * g00);
+                    FxDraw.vert(vc, f, sp.polar(gs * q0, a1), 0.5f, 0.5f, sheetCol, ga * g01);
+                    FxDraw.vert(vc, f, sp.polar(gs * q1, a1), 0.5f, 0.5f, sheetCol, ga * g11);
+                }
+            }
+        }
+        // flash at the point, then sparks (in blocks, they fall in the world); one buffer at a time — taking another ends the first
+        VertexConsumer glow = f.add(GLOW);
+        for (SigilHit.Event e : r.hits) {
+            double age = t - e.at();
+            Vec3 at = sp.at(e.x() * gs, e.y() * gs, 0.02);
+            FxDraw.billboard(glow, f, at, gs * 0.32 * (0.6 + 0.4 * e.power()) * (1 + age / 6), 0, hitCol, e.power() * Math.exp(-age / 3) * ga);
+        }
+        if (f.low()) return;
+        VertexConsumer spark = f.add(SPARK);
+        for (SigilHit.Event e : r.hits) {
+            Vec3 at = sp.at(e.x() * gs, e.y() * gs, 0.02);
+            for (int i = 0, n = SigilHit.sparkCount(h, e); i < n; i++) {
+                SigilHit.Spark s = SigilHit.spark(h, e, i, t);
+                if (s.alpha() <= 0.002) continue;
+                Vec3 q = at.add(bs.u.scale(s.u())).add(bs.v.scale(s.v())).add(bs.n.scale(s.n())).add(0, -s.drop(), 0);
+                FxDraw.billboard(spark, f, q, s.size(), 0, hitCol, s.alpha() * ga);
+            }
+        }
+    }
+
+    private static double glowAt(SigilDef d, SigilRun r, double rho, double deg, double t) {
+        double k = Math.toRadians(deg);
+        return SigilHit.glow(d, r.hits, Math.cos(k) * rho, Math.sin(k) * rho, t);
+    }
+
+    private static double sheenAt(SigilDef d, SigilRun r, double rho, double deg, double t) {
+        double k = Math.toRadians(deg);
+        return SigilHit.sheen(d, r.hits, Math.cos(k) * rho, Math.sin(k) * rho, t);
+    }
+
+    // ---------------------------------------------------------------- T09: cracks
+
+    /**
+     * The sigil broken into shards (SigilCracks): every layer is cut along the same cracks (shard (k, j) = between radial cracks
+     * k and k+1, from ring j to j+1; the outer ring takes everything beyond reach), each shard moves as one piece; then the glowing
+     * cracks (radial run from the centre, ring cracks open from the radial ones), bright tips of running cracks, and dust.
+     */
+    private static void cracks(Frame f, SigilRun r, SigilDef d, double t, Vec3 c, Basis bs, double gs, double ga) {
+        SigilDef.Cracks cr = d.dissolve().cracksOrNull();
+        int seed = (int) r.seed, nk = cr.count(), nj = cr.rings() + 1;
+        double reach = d.reach();
+        SigilCracks.Shard[] sh = new SigilCracks.Shard[nk * nj];
+        for (int k = 0; k < nk; k++) for (int j = 0; j < nj; j++) sh[k * nj + j] = SigilCracks.shard(d, seed, k, j, t, r.stopAt);
+        Vec3 down = new Vec3(0, -1, 0);
+        double top = 0;
+        for (int i = 0; i < d.layers().size(); i++) {
+            Layer l = d.layers().get(i);
+            top = Math.max(top, l.heightOffset());
+            if (l.type() == LayerType.TEXT) continue;                  // надписи (T07) на осколки не режутся — гаснут с трещинами
+            LayerState st = SigilTimeline.layer(d, i, t, r.stopAt);   // the angle stays as it was at the stop
+            if (!st.visible()) continue;
+            double rho = st.scale(), a = st.alpha() * ga, ang = st.angle();
+            int col = r.color >= 0 ? r.color : l.color();
+            VertexConsumer vc = f.add(FxDraw.tex(l.texture()));
+            double lift = l.heightOffset() * r.scale;
+            double inner = switch (l.type()) {
+                case BAND -> l.inner() >= 0.9999 ? 0.86 : l.inner();
+                case ARCS -> 1 - l.width() / 2;
+                default -> 0;
+            };
+            double outer = l.type() == LayerType.ARCS ? 1 + l.width() / 2 : 1;
+            for (int k = 0; k < nk; k++)
+                for (int j = 0; j < nj; j++) {
+                    SigilCracks.Shard s = sh[k * nj + j];
+                    double sa = a * s.alpha() * s.brightness();
+                    if (sa <= 0.002) continue;
+                    double ra = Math.max(SigilCracks.ringRadius(cr, j, reach), inner * rho);
+                    double rb = Math.min(j == nj - 1 ? Double.MAX_VALUE : SigilCracks.ringRadius(cr, j + 1, reach), outer * rho);
+                    if (rb - ra < 1e-4) continue;
+                    shard(f, vc, l, cr, seed, k, s, ra, rb, rho, inner, outer, ang, reach, c.add(bs.n.scale(lift)), bs, gs, down, col, sa);
+                }
+        }
+        // glowing cracks
+        double g = SigilCracks.crackGlow(d, t, r.stopAt) * ga;
+        if (g <= 0.004) {
+            dust(f, r, d, cr, seed, t, c, bs, gs, top, down, ga);
+            return;
+        }
+        int lineCol = cr.color() >= 0 ? cr.color() : FxDraw.mix(r.color >= 0 ? r.color : d.color(), 0xFFFFFF, 0.6);
+        Plane p = new Plane(c.add(bs.n.scale(top * r.scale + 0.014)), bs.u, bs.v, bs.n);
+        java.util.List<Vec3> tips = new java.util.ArrayList<>();
+        for (int k = 0; k < nk; k++) {
+            double rr = SigilCracks.crackReach(d, k, t, r.stopAt) * reach;
+            if (rr <= 1e-3) continue;
+            java.util.List<Vec3> pts = new java.util.ArrayList<>();
+            int n = 16;
+            for (int i = 0; i <= n; i++) {
+                double rad = rr * i / n;
+                pts.add(p.polar(gs * rad, SigilCracks.crackAngle(cr, seed, k, rad, reach)));
+            }
+            crackLine(f, pts, bs, gs, lineCol, g);
+            if (rr < reach * 0.999) tips.add(pts.get(n));
+        }
+        for (int j = 1; j <= cr.rings(); j++) {
+            double open = SigilCracks.ringCrack(d, j, t, r.stopAt);
+            if (open <= 1e-3) continue;
+            double rad = SigilCracks.ringRadius(cr, j, reach);
+            for (int k = 0; k < nk; k++) {
+                double a0 = SigilCracks.crackAngle(cr, seed, k, rad, reach), a1 = SigilCracks.crackAngle(cr, seed, k + 1, rad, reach);
+                double w = (a1 - a0) / 2 * open;
+                for (double[] arc : new double[][] {{a0, a0 + w}, {a1 - w, a1}}) {
+                    java.util.List<Vec3> pts = new java.util.ArrayList<>();
+                    for (int i = 0; i <= 6; i++) pts.add(p.polar(gs * rad, arc[0] + (arc[1] - arc[0]) * i / 6));
+                    crackLine(f, pts, bs, gs, lineCol, g);
+                }
+            }
+        }
+        if (!tips.isEmpty()) {                                      // bright heads of the cracks still running
+            VertexConsumer vc = f.add(GLOW);
+            for (Vec3 q : tips) FxDraw.billboard(vc, f, q, gs * 0.07, 0, 0xFFFFFF, g * 1.2);
+        }
+        dust(f, r, d, cr, seed, t, c, bs, gs, top, down, ga);
+    }
+
+    /** One crack: a flat glowing strip in the plane (halo + white core), width relative to the sigil. */
+    private static void crackLine(Frame f, java.util.List<Vec3> pts, Basis bs, double gs, int col, double g) {
+        int n = pts.size();
+        Vec3[] sides = new Vec3[n];
+        double[] w = new double[n], a = new double[n];
+        for (int i = 0; i < n; i++) {
+            Vec3 tan = pts.get(Math.min(n - 1, i + 1)).subtract(pts.get(Math.max(0, i - 1)));
+            Vec3 side = bs.n.cross(tan);
+            sides[i] = side.lengthSqr() < 1e-12 ? bs.u : side.normalize();
+            w[i] = Math.max(0.03, gs * 0.022);
+            a[i] = g * 0.9;
+        }
+        FxDraw.glowStrip(f, pts, w, a, col, sides, 3.2);
+    }
+
+    /**
+     * One shard of one layer: the region between radial cracks k and k+1, radius ra..rb (plane units), as a grid of quads
+     * (radial steps at the crack knots, angular steps of ≤ 4°), moved and turned as SigilCracks.Shard says.
+     */
+    private static void shard(Frame f, VertexConsumer vc, Layer l, SigilDef.Cracks cr, int seed, int k, SigilCracks.Shard s,
+                              double ra, double rb, double rho, double inner, double outer, double ang, double reach, Vec3 c, Basis bs,
+                              double gs, Vec3 down, int col, double alpha) {
+        java.util.List<Double> radii = new java.util.ArrayList<>();
+        radii.add(ra);
+        for (int i = 1; i < SigilCracks.KNOTS; i++) {
+            double q = reach * i / SigilCracks.KNOTS;
+            if (q > ra + 1e-6 && q < rb - 1e-6) radii.add(q);
+        }
+        radii.add(rb);
+        java.util.List<Double> fine = new java.util.ArrayList<>();
+        fine.add(radii.get(0));
+        for (int i = 1; i < radii.size(); i++) {
+            double r0 = radii.get(i - 1), r1 = radii.get(i);
+            int steps = Math.max(1, (int) Math.ceil((r1 - r0) / (reach / 14)));
+            for (int q = 1; q <= steps; q++) fine.add(r0 + (r1 - r0) * q / steps);
+        }
+        double mid = (ra + rb) / 2;
+        int m = Math.max(3, (int) Math.ceil((SigilCracks.crackAngle(cr, seed, k + 1, mid, reach) - SigilCracks.crackAngle(cr, seed, k, mid, reach)) / 4));
+        double ca = Math.toRadians(s.centerAngle()), cx = Math.cos(ca) * s.centerRadius(), cy = Math.sin(ca) * s.centerRadius();
+        double tx = -Math.sin(ca), ty = Math.cos(ca);
+        double spin = Math.toRadians(s.spin()), tilt = Math.toRadians(s.tilt()), cs = Math.cos(tilt), sn = Math.sin(tilt);
+        double ox = cx + Math.cos(ca) * s.radial(), oy = cy + Math.sin(ca) * s.radial();
+        Vec3 drop = down.scale(s.drop() * gs);
+        int nr = fine.size();
+        Vec3[] pos = new Vec3[nr * (m + 1)];
+        float[] uu = new float[pos.length], vv = new float[pos.length];
+        double closed = 360.0 / Math.max(1, l.count());
+        for (int ri = 0; ri < nr; ri++) {
+            double r = fine.get(ri);
+            double a0 = SigilCracks.crackAngle(cr, seed, k, r, reach), a1 = SigilCracks.crackAngle(cr, seed, k + 1, r, reach);
+            for (int q = 0; q <= m; q++) {
+                double th = a0 + (a1 - a0) * q / m, kk = Math.toRadians(th);
+                double x = Math.cos(kk) * r - cx, y = Math.sin(kk) * r - cy;
+                double xs = x * Math.cos(spin) - y * Math.sin(spin), ys = x * Math.sin(spin) + y * Math.cos(spin);
+                double dot = xs * tx + ys * ty;                                     // tilt around the tangent (tx, ty, 0)
+                double rx = xs * cs + tx * dot * (1 - cs), ry = ys * cs + ty * dot * (1 - cs), rz = (tx * ys - ty * xs) * sn;
+                int idx = ri * (m + 1) + q;
+                pos[idx] = c.add(bs.u.scale((ox + rx) * gs)).add(bs.v.scale((oy + ry) * gs)).add(bs.n.scale(rz * gs)).add(drop);
+                double ph = th - ang, lr = r / rho;
+                switch (l.type()) {
+                    case BAND -> {
+                        uu[idx] = (float) (ph / 360 * l.repeat());
+                        vv[idx] = (float) ((1 - lr) / (1 - inner));
+                    }
+                    case ARCS -> {
+                        double nArc = Math.round(ph / closed);
+                        uu[idx] = (float) ((ph - (nArc * closed - closed / 2)) / closed);
+                        vv[idx] = (float) ((outer - lr) / (outer - inner));
+                    }
+                    default -> {
+                        uu[idx] = du(lr, th, 1, ang);
+                        vv[idx] = dv(lr, th, 1, ang);
+                    }
+                }
+            }
+        }
+        for (int ri = 0; ri + 1 < nr; ri++)
+            for (int q = 0; q < m; q++) {
+                int a = ri * (m + 1) + q, b = (ri + 1) * (m + 1) + q;
+                FxDraw.vert(vc, f, pos[b], uu[b], vv[b], col, alpha);
+                FxDraw.vert(vc, f, pos[a], uu[a], vv[a], col, alpha);
+                FxDraw.vert(vc, f, pos[a + 1], uu[a + 1], vv[a + 1], col, alpha);
+                FxDraw.vert(vc, f, pos[b + 1], uu[b + 1], vv[b + 1], col, alpha);
+            }
+    }
+
+    /** Dust trickling from the cracks (SigilCracks.dust): small sparks that fall in the world. */
+    private static void dust(Frame f, SigilRun r, SigilDef d, SigilDef.Cracks cr, int seed, double t, Vec3 c, Basis bs, double gs, double top,
+                             Vec3 down, double ga) {
+        if (f.low() || cr.dust() <= 0) return;
+        int col = cr.color() >= 0 ? cr.color() : FxDraw.mix(r.color >= 0 ? r.color : d.color(), 0xFFFFFF, 0.6);
+        Plane p = new Plane(c.add(bs.n.scale(top * r.scale + 0.016)), bs.u, bs.v, bs.n);
+        VertexConsumer vc = f.add(SPARK);
+        for (int i = 0; i < cr.dust(); i++) {
+            SigilCracks.Mote m = SigilCracks.dust(d, seed, i, t, r.stopAt);
+            if (m.alpha() <= 0.002) continue;
+            Vec3 q = p.polar(gs * m.radius(), m.angle()).add(down.scale(m.drop() * gs));
+            FxDraw.billboard(vc, f, q, Math.max(0.025, m.size() * gs), 0, col, m.alpha() * ga);
+        }
     }
 
     private static void layers(Frame f, SigilRun r, SigilDef d, double t, Vec3 c, Basis bs, double gs, double ga, boolean echo) {

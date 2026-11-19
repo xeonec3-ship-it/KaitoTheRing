@@ -51,7 +51,7 @@ def L(id, type, tex, radius, h=0.0, appear=None, rot=None, boost=None, color=Non
 
 
 def sigil(id, comment, size, color, orientation, layers, hold=-1, lifetime=-1, expand=None, flash=None, children=None,
-          dissolve=('reverse', 'collapse'), ddur=20, stagger=2):
+          dissolve=('reverse', 'collapse'), ddur=20, stagger=2, hit=None):
     o = {'comment': comment, 'size': size, 'color': color, 'orientation': orientation, 'lifetime': lifetime, 'hold': hold,
          'layers': layers}
     if expand:
@@ -60,6 +60,8 @@ def sigil(id, comment, size, color, orientation, layers, hold=-1, lifetime=-1, e
         o['formedFlash'] = flash
     if children:
         o['onFormed'] = children
+    if hit is not None:
+        o['hit'] = hit   # T08: отклик на удар (docs/sigils.md)
     o['dissolve'] = {'modes': list(dissolve), 'duration': ddur, 'stagger': stagger}
     write('sigils/%s.json' % id, o)
 
@@ -234,7 +236,8 @@ def taboo():
         L('runes', 'band', 'rune_band', 1.0, 0.02, ap(40, 30, 'draw', startAngle=90), inner=0.93, repeat=10, rot=-3),
         L('rim', 'band', 'thin_ring', 1.04, 0.03, ap(60, 20, 'draw'), inner=0.985, repeat=1, br=0.8),
     ], flash={'color': '#FFFFFF', 'size': 1.1, 'duration': 12, 'sparks': 40},
-          children=[{'id': 'golden_halo', 'anchor': 'caster', 'arc': {'count': 6, 'radius': 1.6, 'angle': 160, 'height': 1.6, 'behind': True, 'stagger': 3}}])
+          children=[{'id': 'golden_halo', 'anchor': 'caster', 'arc': {'count': 6, 'radius': 1.6, 'angle': 160, 'height': 1.6, 'behind': True, 'stagger': 3}}],
+          hit={'duration': 10, 'width': 0.09, 'rings': 3, 'spacing': 0.14, 'tilt': 1, 'sparks': 14, 'color': DPALE})
 
     tiers = [('pat_stars', 4), ('pat_metatron', 6), ('pat_zodiac', 8), ('circle_taboo', 10)]
     for i, (tex, r) in enumerate(tiers):

@@ -1,5 +1,5 @@
 {
- "comment": "Школа Iron's «nature» для знаков при касте (fx/school_nature.json): природа: лоза с листьями, кружатся листья.",
+ "comment": "Стиль школы Iron's «Природа» (T06): венок из двух переплетённых лоз с листьями, побеги с усиками, цветок с семенами по золотому углу. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#7EE04A",
   "secondary": "#D8FF9A",
@@ -9,13 +9,17 @@
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_nature_band",
-  "shards": "leaf",
-  "sigil": "sigil_nature"
+  "shards": "mote_leaf",
+  "sigil": "nature_seal"
  },
  "blend": "additive",
  "motion": {
-  "rotationScale": 1.0,
+  "rotationScale": 0.5,
   "jitter": 0.0,
-  "easing": "easeOutCubic"
+  "easing": "easeOutSine",
+  "pulse": {
+   "amp": 0.1,
+   "period": 40
+  }
  }
 }

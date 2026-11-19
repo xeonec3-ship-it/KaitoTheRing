@@ -1,0 +1,87 @@
+{
+ "comment": "T06, школа «Ветер», ступень Мифическая/Божественная: печать + венец над головой + частицы школы. duration -1: код останавливает эффект в конце каста (Fx.stop). Сгенерировано tools/gen_school_themes.py.",
+ "style": "wind",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "wind_seal",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "follow": true
+  },
+  {
+   "type": "sigil",
+   "id": "wind_crown",
+   "delay": 10,
+   "at": "caster+0,2.55,0",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "duration": 10,
+   "at": "caster+0,0.4,0",
+   "size": 2.2,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 0,
+   "duration": 16,
+   "at": "caster",
+   "radius": 4.0,
+   "color": "@primary"
+  },
+  {
+   "type": "vortex",
+   "delay": 4,
+   "duration": 9999,
+   "at": "caster",
+   "radius": 2.2,
+   "height": 3.2,
+   "arms": 3,
+   "speed": 9,
+   "pull": 0.2,
+   "funnel": 0.45,
+   "turns": 1.4,
+   "width": 0.08,
+   "texture": "mote_wisp",
+   "particles": 36,
+   "life": 24,
+   "size": 0.28,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "mote_wisp",
+   "count": 2000,
+   "color": "@secondary",
+   "rate": 1.2,
+   "area": 2.6,
+   "speed": 0.05,
+   "gravity": -0.001,
+   "spin": 120,
+   "size": [
+    0.36,
+    0.1
+   ],
+   "life": 22
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "duration": 10,
+   "at": "caster+0,2.55,0",
+   "size": 1.4,
+   "color": "@core",
+   "brightness": 0.6,
+   "rays": 6
+  }
+ ]
+}

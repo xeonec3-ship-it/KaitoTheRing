@@ -390,5 +390,6 @@
   "item.pohsmp_core.silent_witch_skirt": "Полы мантии безмолвной ведьмы",
   "item.pohsmp_core.silent_witch_skirt.desc1": "Шаги, прыжки, приземления и плавание не звучат",
   "item.pohsmp_core.silent_witch_skirt.desc2": "Не вызывает вибраций: скалк и Хранитель вас не слышат",
-  "item.pohsmp_core.silent_witch_staff.gate": "Полный комплект: открывает «Врата» посоха безмолвной ведьмы"
+  "item.pohsmp_core.silent_witch_staff.gate": "Полный комплект: открывает «Врата» посоха безмолвной ведьмы",
+  "subtitles.pohsmp_core.sigil.hit": "Звон печати от удара"
 }

@@ -1,21 +1,25 @@
 {
- "comment": "Школа Iron's «blood» для знаков при касте (fx/school_blood.json): кровь: капли с обода и шипы, падают капли.",
+ "comment": "Стиль школы Iron's «Кровь» (T06): вены от внутреннего круга, капли на нитях, терновое кольцо, полумесяц с каплей. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#E0242C",
   "secondary": "#FF8A8A",
-  "core": "#FFFFFF",
+  "core": "#FFD6D6",
   "shadow": "#4A0006"
  },
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_blood_band",
-  "shards": "drop",
-  "sigil": "sigil_blood"
+  "shards": "mote_drop",
+  "sigil": "blood_seal"
  },
  "blend": "additive",
  "motion": {
-  "rotationScale": 1.0,
+  "rotationScale": 0.8,
   "jitter": 0.0,
-  "easing": "easeOutCubic"
+  "easing": "easeOutSine",
+  "pulse": {
+   "amp": 0.22,
+   "period": 16
+  }
  }
 }

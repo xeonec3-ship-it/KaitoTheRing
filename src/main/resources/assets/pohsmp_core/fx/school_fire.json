@@ -1,5 +1,5 @@
 {
- "comment": "Каст обычной магии школы «fire» (PohSpell.onCast): знак под магом, волна, частицы школы.",
+ "comment": "Каст обычной магии школы «Огонь» (PohSpell.onCast): знак под магом, волна, частицы школы. Сгенерировано tools/gen_school_themes.py.",
  "style": "fire",
  "duration": 36,
  "elements": [

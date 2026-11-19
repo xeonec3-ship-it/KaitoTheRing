@@ -12,5 +12,6 @@
       "appear": { "delay": 26, "duration": 12, "easing": "easeOutCubic", "modes": ["fade"] }, "rotation": { "speed": -2 } }
   ],
   "formedFlash": { "color": "#FFF0C0", "size": 1.15, "duration": 16, "sparks": 16 },
+  "hit": { "duration": 9, "rings": 2, "tilt": 1.5, "color": "#FFE9A8" },
   "dissolve": { "modes": ["reverse", "collapse"], "duration": 26, "stagger": 4 }
 }

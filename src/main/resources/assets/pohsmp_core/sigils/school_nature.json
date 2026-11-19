@@ -1,5 +1,5 @@
 {
- "comment": "Знак школы «nature» под магом при каждом касте обычной магии: природа: лоза с листьями, кружатся листья. Прорисовка пером, лента школы навстречу, дуги смыкаются.",
+ "comment": "Знак школы «Природа» под магом при каждом касте обычной магии (PohSpell.onCast): короткий, на текстурах T06 (nature_seal, nature_core). Сгенерировано tools/gen_school_themes.py.",
  "size": 1.9,
  "color": "#7EE04A",
  "orientation": "ground",
@@ -13,7 +13,7 @@
    "radius": 0.8,
    "heightOffset": 0.0,
    "color": "#2A5A10",
-   "brightness": 1.2,
+   "brightness": 1.1,
    "appear": {
     "delay": 0,
     "duration": 5,
@@ -27,8 +27,8 @@
   {
    "id": "sign",
    "type": "disc",
-   "texture": "sigil_nature",
-   "radius": 0.86,
+   "texture": "nature_seal",
+   "radius": 0.9,
    "heightOffset": 0.01,
    "appear": {
     "delay": 0,
@@ -41,20 +41,42 @@
     "direction": 1
    },
    "rotation": {
-    "speed": 10,
+    "speed": 30,
     "boost": 3
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "nature_core",
+   "radius": 0.36,
+   "heightOffset": 0.02,
+   "color": "#D8FF9A",
+   "appear": {
+    "delay": 3,
+    "duration": 8,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "twist"
+    ],
+    "twist": -180
+   },
+   "rotation": {
+    "speed": -50,
+    "boost": 2
    }
   },
   {
    "id": "band",
    "type": "band",
    "texture": "school_nature_band",
-   "radius": 1.12,
-   "inner": 0.9,
-   "repeat": 4,
-   "heightOffset": 0.02,
-   "color": "#D8FF9A",
-   "brightness": 0.9,
+   "radius": 1.08,
+   "inner": 0.94,
+   "repeat": 8,
+   "heightOffset": 0.03,
+   "color": "#A8F070",
+   "brightness": 0.85,
    "appear": {
     "delay": 2,
     "duration": 9,
@@ -66,31 +88,8 @@
     "direction": -1
    },
    "rotation": {
-    "speed": -6.0,
+    "speed": -24,
     "boost": 2
-   }
-  },
-  {
-   "id": "arcs",
-   "type": "arcs",
-   "texture": "arc_strip",
-   "radius": 1.22,
-   "width": 0.035,
-   "heightOffset": 0.03,
-   "count": 3,
-   "arcLength": 80,
-   "appear": {
-    "delay": 3,
-    "duration": 10,
-    "easing": "easeInOutCubic",
-    "modes": [
-     "assemble",
-     "fade"
-    ]
-   },
-   "rotation": {
-    "speed": 4.0,
-    "boost": 4
    }
   }
  ],

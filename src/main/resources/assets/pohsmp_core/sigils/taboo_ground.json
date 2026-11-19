@@ -127,6 +127,15 @@
    }
   }
  ],
+ "hit": {
+  "duration": 10,
+  "width": 0.09,
+  "rings": 3,
+  "spacing": 0.14,
+  "tilt": 1,
+  "sparks": 14,
+  "color": "#FFF4D6"
+ },
  "dissolve": {
   "modes": [
    "reverse",

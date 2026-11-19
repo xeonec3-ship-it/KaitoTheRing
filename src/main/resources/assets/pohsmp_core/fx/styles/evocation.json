@@ -1,5 +1,5 @@
 {
- "comment": "Школа Iron's «evocation» для знаков при касте (fx/school_evocation.json): воплощение: шевроны и ромбы, белые искры.",
+ "comment": "Стиль школы Iron's «Призывание» (T06): вихрь рун тремя рукавами, клыки заклинателя, круг призыва с крыльями векса. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#DDE6F0",
   "secondary": "#FFFFFF",
@@ -9,8 +9,8 @@
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_evocation_band",
-  "shards": "spark_soft",
-  "sigil": "sigil_evocation"
+  "shards": "mote_rune",
+  "sigil": "evocation_seal"
  },
  "blend": "additive",
  "motion": {

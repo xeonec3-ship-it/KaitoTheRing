@@ -107,7 +107,9 @@ public final class SigilTimeline {
         if (l.pulse() != null && l.pulse().amp() != 0) alpha *= 1 + l.pulse().amp() * Math.sin(2 * Math.PI * t / l.pulse().period());
         alpha = Math.max(0, alpha * l.brightness());
 
-        double angle = rotation(l, t);
+        // cracks: a broken slab stops turning — the layer keeps the angle it had when the dissolve began (shards carry it)
+        double turnT = dis.modes().contains(DissolveMode.CRACKS) && !Double.isNaN(stopAt) ? Math.min(t, stopAt) : t;
+        double angle = rotation(l, turnT);
         if (ap.modes().contains(AppearMode.TWIST)) angle += ap.twist() * (1 - clamp01(e));
         double tilt = ap.modes().contains(AppearMode.UNFOLD) ? 90 * (1 - clamp01(e)) : 0;
         double draw = ap.modes().contains(AppearMode.DRAW) ? clamp01(e) : 1;

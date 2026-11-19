@@ -17,7 +17,7 @@ import java.util.Set;
  */
 public record SigilDef(String id, double size, int color, Orientation orientation, int lifetime, int hold,
                        List<Layer> layers, Expand expand, Flash formedFlash, List<Child> onFormed, Dissolve dissolve,
-                       GroundLight groundLight, BlockGlow blockGlow) {
+                       GroundLight groundLight, BlockGlow blockGlow, Hit hit) {
 
     /** OUTWARD: fixed, laid on a sphere around the element's anchor (normal from the anchor to the sigil), e.g. seals on a dome. */
     public enum Orientation { GROUND, SKY, FACING, BILLBOARD, OUTWARD }
@@ -27,7 +27,7 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
 
     public enum AppearMode { GROW, FADE, DRAW, TWIST, UNFOLD, ASSEMBLE, PIECES }
 
-    public enum DissolveMode { REVERSE, COLLAPSE, FADE, SHATTER }
+    public enum DissolveMode { REVERSE, COLLAPSE, FADE, SHATTER, CRACKS }
 
     public record Appear(int delay, int duration, Easing easing, Set<AppearMode> modes, double startAngle, int direction, double twist,
                          Pieces pieces) {
@@ -69,8 +69,36 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
 
     public record Arc(int count, double radius, double angle, double height, boolean behind, int stagger) {}
 
-    public record Dissolve(Set<DissolveMode> modes, int duration, int stagger) {
-        public static final Dissolve DEFAULT = new Dissolve(EnumSet.of(DissolveMode.FADE), 20, 0);
+    public record Dissolve(Set<DissolveMode> modes, int duration, int stagger, Cracks cracks) {
+        public static final Dissolve DEFAULT = new Dissolve(EnumSet.of(DissolveMode.FADE), 20, 0, null);
+
+        /** Parameters of the {@code cracks} mode (defaults when the mode is on without its own block), or null if it is off. */
+        public Cracks cracksOrNull() {
+            return modes.contains(DissolveMode.CRACKS) ? cracks != null ? cracks : Cracks.DEFAULT : null;
+        }
+    }
+
+    /**
+     * Dissolve mode {@code cracks} (T09, docs/sigils.md "Распад трещинами"): cracks run from the centre to the rim along {@code count}
+     * uneven radial lines (plus {@code rings} circular ones), the sigil breaks into count·(rings+1) shards that tumble down and go out.
+     * Shares of the dissolve duration: crackTime — cracks spread; fallTime — one shard falls. Distances in sigil radii.
+     */
+    public record Cracks(int count, int rings, double irregular, double jag, double crackTime, double fallTime, double gap, double push,
+                         double pop, double fall, double tumble, double spin, double glow, int dust, int color) {
+        public static final Cracks DEFAULT = new Cracks(9, 1, 0.35, 0.22, 0.4, 0.45, 0.03, 0.25, 0.25, 1.2, 150, 60, 1.4, 28, -1);
+    }
+
+    /**
+     * Response to hits (T08, docs/sigils.md "Отклик на удар"): a ring of light runs from the hit point to the rim in
+     * {@code duration} ticks (and {@code rings - 1} weaker ripples behind it, {@code spacing} radii apart), the sigil flinches
+     * (scale ±{@code shake}, wobble by {@code tilt}°), {@code sparks} sparks fly from the point, the point flashes.
+     * color: sparks and flash (-1 = mix of the sigil colour and white). max — hits drawn at once; cooldown — ticks a new hit
+     * near an old one is merged into it. sheen — the same wave as plain light over the whole disc of the sigil (so the ring reads
+     * on sparse patterns too), share of the brightness on the layers.
+     */
+    public record Hit(int duration, double width, double strength, int rings, double spacing, double shake, double shakePeriod,
+                      double tilt, double flash, int sparks, double sparkSpeed, int color, int max, int cooldown, double sheen) {
+        public static final Hit DEFAULT = new Hit(8, 0.1, 1.0, 3, 0.26, 0.02, 4, 2.5, 0.9, 10, 0.16, -1, 4, 2, 0.35);
     }
 
     /**
@@ -135,7 +163,18 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
             for (JsonElement m : arr(d, "modes")) modes.add(DissolveMode.valueOf(m.getAsString().toUpperCase(Locale.ROOT)));
             if (d.has("mode")) modes.add(DissolveMode.valueOf(str(d, "mode", "fade").toUpperCase(Locale.ROOT)));
             if (modes.isEmpty()) modes.add(DissolveMode.FADE);
-            dissolve = new Dissolve(modes, (int) num(d, "duration", 20), (int) num(d, "stagger", 0));
+            Cracks cracks = null;
+            if (d.has("cracks") && d.get("cracks").isJsonObject()) {
+                JsonObject c = d.getAsJsonObject("cracks");
+                Cracks k = Cracks.DEFAULT;
+                cracks = new Cracks(Math.max(3, (int) num(c, "count", k.count())), Math.max(0, Math.min(3, (int) num(c, "rings", k.rings()))),
+                        clamp(num(c, "irregular", k.irregular()), 0, 0.8), clamp(num(c, "jag", k.jag()), 0, 0.45),
+                        clamp(num(c, "crackTime", k.crackTime()), 0.05, 0.9), clamp(num(c, "fallTime", k.fallTime()), 0.05, 0.95),
+                        num(c, "gap", k.gap()), num(c, "push", k.push()), num(c, "pop", k.pop()), num(c, "fall", k.fall()),
+                        num(c, "tumble", k.tumble()), num(c, "spin", k.spin()), Math.max(0, num(c, "glow", k.glow())),
+                        Math.max(0, (int) num(c, "dust", k.dust())), c.has("color") ? color(str(c, "color", "#FFFFFF")) : k.color());
+            }
+            dissolve = new Dissolve(modes, (int) num(d, "duration", 20), (int) num(d, "stagger", 0), cracks);
         }
         GroundLight gl = null;
         if (o.has("groundLight") && !o.get("groundLight").isJsonNull() && !isFalse(o.get("groundLight"))) {
@@ -153,7 +192,39 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
         }
         return new SigilDef(id, num(o, "size", 1), color, Orientation.valueOf(str(o, "orientation", "ground").toUpperCase(Locale.ROOT)),
                 (int) num(o, "lifetime", -1), (int) num(o, "hold", -1), List.copyOf(layers), expand, flash, List.copyOf(children), dissolve,
-                gl, bg);
+                gl, bg, parseHit(o));
+    }
+
+    /**
+     * {@code "hit": {...}} / {@code true} / {@code {}} or {@code "reactsToHits": true} of a sigil (or of a mesh, MeshDraw) -> Hit with
+     * defaults for missing fields; null when absent or {@code "hit": false}.
+     */
+    public static Hit parseHit(JsonObject o) {
+        Hit hit = null;
+        boolean hitOn = o.has("hit") && !o.get("hit").isJsonNull() && !isFalse(o.get("hit"));
+        if (hitOn || o.has("reactsToHits") && o.get("reactsToHits").isJsonPrimitive() && o.get("reactsToHits").getAsBoolean()) {
+            JsonObject h = hitOn && o.get("hit").isJsonObject() ? o.getAsJsonObject("hit") : new JsonObject();
+            Hit d = Hit.DEFAULT;
+            hit = new Hit(Math.max(1, (int) num(h, "duration", d.duration())), Math.max(0.02, num(h, "width", d.width())),
+                    Math.max(0, num(h, "strength", d.strength())), Math.max(1, Math.min(6, (int) num(h, "rings", d.rings()))),
+                    Math.max(0.02, num(h, "spacing", d.spacing())), Math.max(0, num(h, "shake", d.shake())),
+                    Math.max(1, num(h, "shakePeriod", d.shakePeriod())), num(h, "tilt", d.tilt()), Math.max(0, num(h, "flash", d.flash())),
+                    Math.max(0, Math.min(64, (int) num(h, "sparks", d.sparks()))), Math.max(0, num(h, "sparkSpeed", d.sparkSpeed())),
+                    h.has("color") ? color(str(h, "color", "#FFFFFF")) : d.color(), Math.max(1, Math.min(16, (int) num(h, "max", d.max()))),
+                    Math.max(0, (int) num(h, "cooldown", d.cooldown())), Math.max(0, num(h, "sheen", d.sheen())));
+        }
+        return hit;
+    }
+
+    /** Largest layer radius (share of size, at least 1): how far the sigil really reaches. */
+    public double reach() {
+        double r = 1;
+        for (Layer l : layers) r = Math.max(r, l.radius());
+        return r;
+    }
+
+    private static double clamp(double x, double lo, double hi) {
+        return Math.max(lo, Math.min(hi, x));
     }
 
     /** {@code "groundLight": false} switches the flag off explicitly; {@code true} means "on with defaults". */

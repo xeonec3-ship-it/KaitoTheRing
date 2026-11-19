@@ -1,5 +1,5 @@
 {
- "comment": "Каст обычной магии школы «ender» (PohSpell.onCast): знак под магом, волна, частицы школы.",
+ "comment": "Каст обычной магии школы «Край» (PohSpell.onCast): знак под магом, волна, частицы школы. Сгенерировано tools/gen_school_themes.py.",
  "style": "ender",
  "duration": 36,
  "elements": [
@@ -40,7 +40,7 @@
    "area": 1.6,
    "speed": 0.02,
    "gravity": -0.003,
-   "spin": -60,
+   "spin": 80,
    "size": [
     0.22,
     0.1

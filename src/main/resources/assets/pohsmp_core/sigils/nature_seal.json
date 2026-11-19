@@ -1,0 +1,120 @@
+{
+ "comment": "T06, школа «Природа», ступени Высшая/Мифическая/Божественная: печать под магом на время каста (hold -1 — гасит код в конце каста). Рисунок: венок из двух переплетённых лоз с листьями, побеги с усиками, цветок с семенами по золотому углу. Сгенерировано tools/gen_school_themes.py.",
+ "size": 2.4,
+ "color": "#7EE04A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "fade",
+   "collapse"
+  ],
+  "duration": 24,
+  "stagger": 4
+ },
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": 0.0,
+   "color": "#2A5A10",
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "nature_seal",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutSine",
+    "modes": [
+     "grow",
+     "twist",
+     "fade"
+    ],
+    "twist": -90
+   },
+   "rotation": {
+    "speed": 5,
+    "boost": 1
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_nature_band",
+   "radius": 1.22,
+   "inner": 0.87,
+   "repeat": 10,
+   "heightOffset": 0.02,
+   "color": "#A8F070",
+   "brightness": 0.85,
+   "appear": {
+    "delay": 12,
+    "duration": 26,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": 1
+   },
+   "rotation": {
+    "speed": -4,
+    "boost": 1
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "nature_core",
+   "radius": 0.4,
+   "heightOffset": 0.03,
+   "color": "#D8FF9A",
+   "appear": {
+    "delay": 24,
+    "duration": 16,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "twist"
+    ],
+    "twist": 120
+   },
+   "rotation": {
+    "speed": -10,
+    "boost": 0
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 40
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#D8FF9A",
+  "size": 1.2,
+  "duration": 10,
+  "sparks": 16
+ },
+ "groundLight": {
+  "radius": 0.7,
+  "strength": 0.45
+ }
+}

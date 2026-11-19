@@ -1,5 +1,5 @@
 {
- "comment": "Школа Iron's «ice» для знаков при касте (fx/school_ice.json): лёд: снежинки и кристаллы, снежинки медленно падают.",
+ "comment": "Стиль школы Iron's «Лёд» (T06): снежинка с ветвящимися лучами, сосульки по ободу, кристаллы с гранями. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#9FE0FF",
   "secondary": "#E8FAFF",
@@ -9,12 +9,12 @@
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_ice_band",
-  "shards": "snowflake",
-  "sigil": "sigil_ice"
+  "shards": "mote_ice",
+  "sigil": "ice_seal"
  },
  "blend": "additive",
  "motion": {
-  "rotationScale": 1.0,
+  "rotationScale": 0.6,
   "jitter": 0.0,
   "easing": "easeOutCubic"
  }

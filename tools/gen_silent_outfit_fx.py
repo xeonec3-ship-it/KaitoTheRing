@@ -63,6 +63,8 @@ def main():
             {'id': 'rim', 'type': 'disc', 'texture': 'rim', 'radius': 1.2, 'heightOffset': 0.02,
              'appear': {'delay': 6, 'duration': 4, 'easing': 'easeOutCubic', 'modes': ['grow', 'fade']}}],
         'formedFlash': {'color': '#FFFFFF', 'size': 1.4, 'duration': 10, 'sparks': 40},
+        # T08: удар по носителю — волна по печати, вздрагивание, искры
+        'hit': {'duration': 8, 'rings': 3, 'shake': 0.025, 'tilt': 4, 'sparks': 12, 'color': '#E8FFF6'},
         'dissolve': {'modes': ['reverse', 'collapse'], 'duration': 14, 'stagger': 2}})
     dump('fx/silent_barrier.json', {
         'comment': '«Тихий барьер» сработал (T19, пункт 4): печать вокруг носителя и на земле, сфера-пузырь с ярким краем держится 3 с '

@@ -68,6 +68,19 @@ public final class FxClient {
             if (i != null && i.sigil != null) i.sigil.setText(m.slot, m.text, now - i.start);
             return;
         }
+        if (m.op == FxMsg.HIT) {   // T08: a hit inside the instance — its sigils (and sigils of an effect) answer it
+            Inst i = LIVE.get(m.inst);
+            if (i == null) return;
+            Vec3 p = new Vec3(m.x, m.y, m.z);
+            double t = now - i.start;
+            if (i.sigil != null) i.sigil.hit(p, t, m.scale, (int) m.seed);
+            if (i.mesh != null) i.mesh.hit(p, t, m.scale, (int) m.seed);
+            if (i.fx != null) for (ElementDraw.State st : i.fx.state.values()) {
+                if (st.sigil != null) st.sigil.hit(p, now - st.sigil.start, m.scale, (int) m.seed);
+                if (st.mesh != null) st.mesh.hit(p, now - st.mesh.start, m.scale, (int) m.seed);
+            }
+            return;
+        }
         if (m.op == FxMsg.MOVE) {
             Inst i = LIVE.get(m.inst);
             if (i == null) return;

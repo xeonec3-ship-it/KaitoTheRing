@@ -1,0 +1,155 @@
+{
+ "comment": "T06, школа «Мистическая», ступени Высшая/Мифическая/Божественная: печать под магом на время каста (hold -1 — гасит код в конце каста). Рисунок: щупальца с присосками, глаза между ними, кривые «живые» кольца, око с ресницами-шипами. Сгенерировано tools/gen_school_themes.py.",
+ "size": 2.4,
+ "color": "#3FD6B8",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "shatter"
+  ],
+  "duration": 18,
+  "stagger": 3
+ },
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": 0.0,
+   "color": "#0A3A30",
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "eldritch_seal",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 2,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "pieces"
+    ],
+    "pieces": {
+     "count": 7,
+     "order": "scatter",
+     "pieceTime": 0.5,
+     "fly": 0.6,
+     "lift": 0.2,
+     "orbit": 70,
+     "tilt": 110,
+     "spin": 90,
+     "lockFlash": 0.6
+    }
+   },
+   "rotation": {
+    "speed": -6,
+    "boost": 0
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 26
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_eldritch_band",
+   "radius": 1.22,
+   "inner": 0.87,
+   "repeat": 10,
+   "heightOffset": 0.02,
+   "color": "#2AA890",
+   "brightness": 0.85,
+   "appear": {
+    "delay": 14,
+    "duration": 18,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": 9,
+    "boost": 2
+   }
+  },
+  {
+   "id": "core",
+   "type": "disc",
+   "texture": "eldritch_core",
+   "radius": 0.4,
+   "heightOffset": 0.03,
+   "color": "#B8FFF0",
+   "appear": {
+    "delay": 26,
+    "duration": 14,
+    "easing": "easeInOutSine",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 4,
+    "boost": 0
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 26
+   }
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.3,
+   "width": 0.03,
+   "heightOffset": 0.04,
+   "count": 5,
+   "arcLength": 40,
+   "color": "#2AA890",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 28,
+    "duration": 12,
+    "easing": "easeInOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -18,
+    "boost": 3
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#B8FFF0",
+  "size": 1.3,
+  "duration": 10,
+  "sparks": 20
+ },
+ "groundLight": {
+  "radius": 0.7,
+  "strength": 0.45
+ }
+}

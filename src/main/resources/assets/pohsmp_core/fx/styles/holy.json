@@ -1,5 +1,5 @@
 {
- "comment": "Школа Iron's «holy» для знаков при касте (fx/school_holy.json): свет: солнца и кресты, падают перья.",
+ "comment": "Стиль школы Iron's «Святая» (T06): лучи-клинья, два крыла из трёх рядов перьев, восьмиконечная звезда. Сгенерировано tools/gen_school_themes.py.",
  "palette": {
   "primary": "#FFE38A",
   "secondary": "#FFFBE6",
@@ -9,13 +9,13 @@
  "textures": {
   "sparks": "spark_soft",
   "runes": "school_holy_band",
-  "shards": "feather",
-  "sigil": "sigil_holy"
+  "shards": "mote_feather",
+  "sigil": "holy_seal"
  },
  "blend": "additive",
  "motion": {
-  "rotationScale": 1.0,
+  "rotationScale": 0.5,
   "jitter": 0.0,
-  "easing": "easeOutCubic"
+  "easing": "easeOutSine"
  }
 }

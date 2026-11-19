@@ -1,0 +1,10 @@
+{
+  "comment": "Клинки забвения: один клинок (fx/meshes/oblivion_blade.json) и тёмный след за ним. OblivionBladesSpell двигает и поворачивает его каждый тик (Fx.move) и останавливает в конце.",
+  "style": "higher",
+  "duration": -1,
+  "elements": [
+    { "type": "mesh", "model": "oblivion_blade", "delay": 0, "at": "caster", "yaw": 0, "follow": true },
+    { "type": "sprites", "delay": 0, "at": "caster", "follow": true, "texture": "spark_soft", "count": 5000, "rate": 1, "spread": 0.12, "speed": 0.005, "gravity": 0,
+      "size": [0.14, 0.0], "life": 10, "color": "#7A3AB8" }
+  ]
+}

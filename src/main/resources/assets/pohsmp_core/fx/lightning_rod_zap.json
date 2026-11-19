@@ -1,0 +1,11 @@
+{
+  "comment": "Громоотвод бьёт: молния от кристалла (at) к цели (target), вспышка на цели.",
+  "style": "lightning",
+  "duration": 8,
+  "elements": [
+    { "type": "lightning", "delay": 0, "duration": 6, "at": "caster", "to": "target", "branches": 2, "jaggedness": 0.18, "regen": 2, "width": 0.07, "color": "#BFF6FF",
+      "out": { "duration": 3, "easing": "easeInSine" } },
+    { "type": "flash", "delay": 0, "duration": 6, "at": "target", "size": 1.2, "rays": 6, "color": "#FFFFFF" },
+    { "type": "flash", "delay": 0, "duration": 5, "at": "caster", "size": 0.9, "rays": 4, "color": "#6BE6FF" }
+  ]
+}

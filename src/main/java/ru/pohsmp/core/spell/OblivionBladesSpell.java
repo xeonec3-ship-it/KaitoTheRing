@@ -18,6 +18,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import ru.pohsmp.core.DivineEvents;
+import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.spell.silent.SilentSpell;
 
 /** Higher: six dark blades circle the caster for 12 s; every half second one flies at the nearest enemy and comes back. */
 public class OblivionBladesSpell extends HigherSpell {
@@ -40,7 +42,7 @@ public class OblivionBladesSpell extends HigherSpell {
     }
 
     private static final class Blade {
-        Entity e;
+        int fx = -1;       // own model: fx/oblivion_blade.json (mesh oblivion_blade + dark trail)
         int mode;          // 0 orbit, 1 out, 2 back
         LivingEntity t;
         Vec3 pos;
@@ -53,7 +55,8 @@ public class OblivionBladesSpell extends HigherSpell {
             for (int i = 0; i < N; i++) {
                 bl[i] = new Blade();
                 bl[i].pos = orbit(caster, i, 0);
-                bl[i].e = Disp.item(sl, "minecraft:netherite_sword", bl[i].pos.x, bl[i].pos.y, bl[i].pos.z, 0.9f, 0);
+                Vec3 tan = orbit(caster, i, 1).subtract(bl[i].pos);
+                bl[i].fx = Fx.play(sl, Fx.fx("oblivion_blade").at(bl[i].pos).yaw(SilentSpell.yawOf(tan)).pitch(SilentSpell.pitchOf(tan)));
             }
             Tasks.add(new Tasks.Task() {
                 int age, next;
@@ -64,7 +67,7 @@ public class OblivionBladesSpell extends HigherSpell {
                     if (!caster.isAlive() || caster.isRemoved() || age > LIFE) {
                         for (Blade b : bl) {
                             DivineEvents.particle(sl, ParticleTypes.REVERSE_PORTAL, b.pos.x, b.pos.y, b.pos.z, 10, 0.2, 0.05);
-                            Disp.kill(b.e);
+                            Fx.stop(sl, b.fx, "");
                         }
                         return false;
                     }
@@ -85,10 +88,11 @@ public class OblivionBladesSpell extends HigherSpell {
                     for (int i = 0; i < N; i++) {
                         Blade b = bl[i];
                         Vec3 home = orbit(caster, i, age);
+                        Vec3 was = b.pos;
                         if (b.mode == 0) {
                             b.pos = home;
                         } else if (b.mode == 1) {
-                            if (b.t == null || !b.t.isAlive()) { b.mode = 2; continue; }
+                            if (b.t == null || !b.t.isAlive()) { b.mode = 2; continue; }   // turns back next tick
                             Vec3 aim = b.t.position().add(0, b.t.getBbHeight() * 0.55, 0);
                             Vec3 d = aim.subtract(b.pos);
                             if (d.length() < SPEED + 0.4) {
@@ -105,9 +109,9 @@ public class OblivionBladesSpell extends HigherSpell {
                             if (d.length() < SPEED + 0.2) { b.mode = 0; b.pos = home; }
                             else b.pos = b.pos.add(d.normalize().scale(SPEED));
                         }
-                        float yaw = (float) Math.toDegrees(Math.atan2(b.pos.z - caster.getZ(), b.pos.x - caster.getX()));
-                        Disp.move(b.e, b.pos.x, b.pos.y, b.pos.z, b.mode == 0 ? yaw : age * 40f);
-                        if (age % 2 == 0) DivineEvents.particle(sl, DARK, b.pos.x, b.pos.y, b.pos.z, 1, 0.05, 0);
+                        Vec3 d = b.pos.subtract(was);   // point the blade along its motion
+                        if (d.lengthSqr() < 1e-6) d = orbit(caster, i, age + 1).subtract(b.pos);
+                        Fx.move(sl, b.fx, b.pos, SilentSpell.yawOf(d), SilentSpell.pitchOf(d));
                     }
                     return true;
                 }

@@ -1,0 +1,12 @@
+{
+  "comment": "Громоотвод: at — основание на земле. Модель мачты (fx/meshes/lightning_rod.json) вырастает из земли, круг зоны, искры у кристалла. LightningRodSpell останавливает эффект в конце.",
+  "style": "lightning",
+  "duration": -1,
+  "elements": [
+    { "type": "sigil", "id": "lightning_rod_zone", "delay": 0, "at": "caster+0,0.04,0" },
+    { "type": "mesh", "model": "lightning_rod", "delay": 0, "at": "caster", "yaw": 0 },
+    { "type": "flash", "delay": 6, "duration": 8, "at": "caster+0,2.95,0", "size": 1.4, "rays": 6, "color": "#BFF6FF" },
+    { "type": "sprites", "delay": 8, "at": "caster+0,2.95,0", "texture": "spark_sharp", "count": 3000, "rate": 0.8, "spread": 0.35, "speed": 0.05, "gravity": 0.01,
+      "size": [0.12, 0.02], "life": 8, "color": "#BFF6FF" }
+  ]
+}

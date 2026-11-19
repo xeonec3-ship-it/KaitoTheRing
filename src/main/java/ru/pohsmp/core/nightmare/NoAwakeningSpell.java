@@ -188,6 +188,7 @@ public class NoAwakeningSpell extends NightmareSpells.Base {
     private static void take(Night n, ServerPlayer p) {
         int left = (int) Math.max(1, n.until - Immersion.now());
         Immersion.hold(p, 3, left);
+        Immersion.by(p, n.caster);
         Bestiary.allow(p, limit(n.step), left);
         dread(p, n.caster, left, n.step);
         n.worldFx.put(p.getUUID(), fx(n.sl, Fx.fx("nightmare_no_awakening_world").at(p.position()).caster(p).attach(p).duration(left).only(p),

@@ -148,6 +148,7 @@ public class HouseThatIsntSpell extends NightmareSpells.Base {
         sl.playSound(null, t.getX(), t.getY() + 1, t.getZ(), SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 1f, 0.6f);
         if (!(t instanceof ServerPlayer p)) return;
         Immersion.hold(p, 2, ticks);   // straight to stage 2, and it stays there after
+        Immersion.by(p, caster);
         fx(sl, Fx.fx("nightmare_house_that_isnt_enter").at(p.position()).caster(p).attach(p).only(p), "nightmare_house_that_isnt_enter");
         h.atmosphere = fx(sl, Fx.fx("nightmare_house_that_isnt_corridor").at(p.position()).caster(p).attach(p).duration(ticks).only(p),
                 "nightmare_house_that_isnt_corridor");

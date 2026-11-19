@@ -148,6 +148,7 @@ public class EndlessNightSpell extends NightmareSpells.Base {
                             night(p, (int) (z.until - now));
                             if (Immersion.stage(p) < 1) Immersion.deepen(p, 1);
                             else Immersion.touch(p);
+                            Immersion.by(p, z.caster);
                         } else if (!in && next != null) {   // walked out
                             z.inside.remove(id);
                             night(p, 0);

@@ -35,6 +35,16 @@ public final class Immersion {
         double progress;
         long lastHit, floorUntil;
         int floor, sent = -1;
+        /** who put it there last (its client always sees that one as the Dread from stage 2) */
+        UUID caster;
+    }
+
+    /** The caster behind v's immersion now (the spells call it after deepen/hold); the client is told at once. */
+    public static void by(ServerPlayer v, LivingEntity caster) {
+        State s = STATES.get(v.getUUID());
+        if (s == null || caster == null || caster.getUUID().equals(s.caster)) return;
+        s.caster = caster.getUUID();
+        send(v, stage(s), (int) Math.max(0, s.floorUntil - now));
     }
 
     private static final Map<UUID, State> STATES = new HashMap<>();
@@ -91,7 +101,7 @@ public final class Immersion {
     public static boolean clear(LivingEntity v) {
         State s = STATES.remove(v.getUUID());
         if (s == null) return false;
-        if (v instanceof ServerPlayer sp) send(sp, 0, 0);
+        if (v instanceof ServerPlayer sp) send(sp, 0, 0, null);
         v.removeEffect(Reg.IMMERSION.get());
         return true;
     }
@@ -100,13 +110,19 @@ public final class Immersion {
         int st = stage(s);
         if (st == s.sent) return;
         s.sent = st;
-        send(v, st, (int) Math.max(0, s.floorUntil - now));
+        send(v, st, (int) Math.max(0, s.floorUntil - now), s.caster);
         if (st <= 0) v.removeEffect(Reg.IMMERSION.get());
         else v.addEffect(new MobEffectInstance(Reg.IMMERSION.get(), -1, st - 1, false, false, true));
     }
 
     private static void send(ServerPlayer v, int stage, int ticks) {
-        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.IMMERSION, v.getId(), ticks, stage, null, "", 0, 0, 0, 0, 0));
+        State s = STATES.get(v.getUUID());
+        send(v, stage, ticks, s == null ? null : s.caster);
+    }
+
+    /** other = the caster (people in the nightmare: that one is always the Dread from stage 2). */
+    private static void send(ServerPlayer v, int stage, int ticks, UUID caster) {
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.IMMERSION, v.getId(), ticks, stage, caster, "", 0, 0, 0, 0, 0));
     }
 
     static {
@@ -129,7 +145,7 @@ public final class Immersion {
             }
             if (s.sent > 0 && !v.hasEffect(Reg.IMMERSION.get())) {   // owner 19.11: the effect taken off (/effect clear, milk) - all of it goes
                 it.remove();
-                send(v, 0, 0);
+                send(v, 0, 0, null);
                 continue;
             }
             double r = Math.max(0.5, Math.min(2, resist(v)));
@@ -140,7 +156,7 @@ public final class Immersion {
             }
             if (s.progress < 1 && now >= s.floorUntil) {
                 it.remove();
-                send(v, 0, 0);
+                send(v, 0, 0, null);
                 v.removeEffect(Reg.IMMERSION.get());
                 continue;
             }
@@ -160,7 +176,7 @@ public final class Immersion {
 
     @SubscribeEvent
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent e) {
-        if (e.getEntity() instanceof ServerPlayer sp) send(sp, 0, 0);
+        if (e.getEntity() instanceof ServerPlayer sp) send(sp, 0, 0, null);
     }
 
     @SubscribeEvent

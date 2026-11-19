@@ -69,7 +69,10 @@ public final class IllusionClient {
             case IlluMsg.GHOST -> Ghosts.set(m.entity, m.ticks);
             case IlluMsg.DREAM_DEATH -> ZoneDraw.dreamDeath(m.ticks);
             case IlluMsg.DREAM_MUSIC -> DreamMusic.handle(m.i, m.ticks);
-            case IlluMsg.IMMERSION -> ru.pohsmp.core.client.nightmare.NightmareClient.set(m.i, m.ticks);
+            case IlluMsg.IMMERSION -> {
+                ru.pohsmp.core.client.nightmare.NightmareClient.set(m.i, m.ticks);
+                ru.pohsmp.core.client.nightmare.NightmarePeople.caster(m.other);
+            }
             case IlluMsg.NIGHT -> ru.pohsmp.core.client.nightmare.NightmareClient.night(m.ticks);
             case IlluMsg.SKY ->ru.pohsmp.core.client.mythic.SkyClient.set(m.i, m.ticks);
             case IlluMsg.WOUNDS -> DreamScreen.wounds(m.entity, m.i);
@@ -93,6 +96,7 @@ public final class IllusionClient {
     /** The tab entry whose skin this player is drawn with now, or null for its own (AbstractClientPlayerMixin). */
     public static PlayerInfo faceOf(AbstractClientPlayer p) {
         UUID face = Copies.faceOf(p);
+        if (face == null) face = ru.pohsmp.core.client.nightmare.NightmarePeople.faceOf(p);   // T25 stage 1-2: the looks shuffled
         if (face == null) {
             Disguise d = disguise(p);
             if (d == null || d.player() == null) return null;

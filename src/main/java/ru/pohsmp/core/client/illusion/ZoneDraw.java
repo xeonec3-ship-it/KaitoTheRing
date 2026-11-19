@@ -55,7 +55,7 @@ public final class ZoneDraw {
 
     @SubscribeEvent
     public static void onInput(MovementInputUpdateEvent e) {
-        if (Zones.active(Zones.LABYRINTH) == null) return;
+        if (Zones.active(Zones.LABYRINTH) == null && Zones.active(Zones.DREAM) == null) return;   // «Сон бабочки»: the mirror world too
         Input in = e.getInput();
         in.leftImpulse = -in.leftImpulse;
         boolean l = in.left;
@@ -153,7 +153,37 @@ public final class ZoneDraw {
         realHealth = -1;
     }
 
+    /** «Сон бабочки»: the «death» in the dream - the screen goes dark, a line, and back (the server moves the player meanwhile). */
+    private static long deathFrom = -1, deathTo = -1;
+
+    static void dreamDeath(int ticks) {
+        deathFrom = IllusionClient.now();
+        deathTo = deathFrom + Math.max(10, ticks);
+    }
+
+    @SubscribeEvent
+    public static void onGui(net.minecraftforge.client.event.RenderGuiEvent.Post e) {
+        if (deathTo < 0) return;
+        long now = IllusionClient.now();
+        if (now >= deathTo) {
+            deathFrom = deathTo = -1;
+            return;
+        }
+        double t = now - deathFrom + e.getPartialTick(), len = deathTo - deathFrom;
+        float a = (float) Math.min(1, Math.min(t / 6.0, (len - t) / 14.0));
+        if (a <= 0) return;
+        var g = e.getGuiGraphics();
+        int w = g.guiWidth(), h = g.guiHeight();
+        g.fill(0, 0, w, h, ((int) (a * 235) << 24) | 0x0A0614);
+        var font = Minecraft.getInstance().font;
+        var line = net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.butterfly_dream.died");
+        int tw = font.width(line);
+        int alpha = Math.max(4, (int) (a * 255));
+        g.drawString(font, line, (w - tw) / 2, h / 2 - 4, (alpha << 24) | 0xD9C8FF, false);
+    }
+
     static void clear() {
+        deathFrom = deathTo = -1;
         maze = null;
         mazeKey = "";
         fakeLoss = 0;

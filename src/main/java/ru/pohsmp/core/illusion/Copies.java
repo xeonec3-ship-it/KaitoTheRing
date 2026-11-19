@@ -39,7 +39,8 @@ import ru.pohsmp.core.net.Net;
 public final class Copies {
     private Copies() {}
 
-    public enum Mode { MIRROR, RUNNER }
+    /** HUNTER («Сон бабочки»): walks up to its (only) victim on its own and strikes it now and then. */
+    public enum Mode { MIRROR, RUNNER, HUNTER }
 
     /** One tick of the caster's moves. */
     private record Frame(Vec3 pos, float yaw, float pitch, int flags, String spell) {}
@@ -54,7 +55,7 @@ public final class Copies {
         long until;
         int hits;
         final int maxHits, delay;
-        int swingAt = -1, age;
+        int swingAt = -1, age, nextSwing = 20;
         /** illusory damage of its strike, how long until it comes back, the debt tag */
         public float damage;
         public int damageReturn, tag;
@@ -274,6 +275,8 @@ public final class Copies {
             c.pitch = f.pitch();
             fl = f.flags();
             spell = f.spell();   // the client sends a harmless bolt of this school's colour when the copy's cast ends
+        } else if (c.mode == Mode.HUNTER) {
+            fl = hunt(sl, c);
         } else {
             Vec3 next = c.pos.add(c.vel.x, 0, c.vel.z);
             double fy = floor(sl, next, c.pos.y);
@@ -285,6 +288,39 @@ public final class Copies {
             Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.COPY_MOVE, c.owner.getId(), fl, c.id, null, spell, c.pos.x, c.pos.y, c.pos.z, c.yaw, c.pitch));
         if ((fl & SWING) != 0 && c.damage > 0) strike(sl, c);
         if (!c.ghost) arrows(sl, c);
+    }
+
+    /** HUNTER: a step towards its victim (stops 2 blocks off), a swing every ~1-1.6 s in reach. */
+    private static int hunt(ServerLevel sl, Copy c) {
+        List<ServerPlayer> ps = players(sl, c);
+        if (ps.isEmpty()) return 0;
+        ServerPlayer t = ps.get(0);
+        Vec3 to = t.position().subtract(c.pos);
+        double dist = Math.sqrt(to.x * to.x + to.z * to.z);
+        int fl = 0;
+        if (dist > 1e-3) c.yaw = (float) Math.toDegrees(Math.atan2(-to.x, to.z));
+        c.pitch = (float) -Math.toDegrees(Math.atan2(t.getEyeY() - (c.pos.y + 1.62), Math.max(0.5, dist))) * 0.5f;
+        if (dist > 2.0) {
+            double step = Math.min(dist - 2.0, 0.26);
+            Vec3 next = c.pos.add(to.x / dist * step, 0, to.z / dist * step);
+            next = new Vec3(next.x, floor(sl, next, c.pos.y), next.z);
+            if (!free(sl, next)) {   // a block in the way: one hop up it
+                Vec3 up = new Vec3(next.x, floor(sl, next, c.pos.y + 1.1), next.z);
+                if (up.y - c.pos.y <= 1.25 && free(sl, up)) {
+                    next = up;
+                    fl |= JUMP;
+                } else next = null;
+            }
+            if (next != null) {
+                c.pos = next;
+                fl |= SPRINT;
+            }
+        }
+        if (dist <= 3.0 && Math.abs(to.y) < 2.5 && c.age >= c.nextSwing) {
+            fl |= SWING;
+            c.nextSwing = c.age + 20 + sl.random.nextInt(13);
+        }
+        return fl;
     }
 
     /** A copy's swing: illusory damage to a victim in reach in front of it. */

@@ -339,7 +339,11 @@ public class CovenArrivalSpell extends PohSpell {
             if (e != null && e.isAlive() && e != caster) a.retinue.add(e);
         }
         a.cutKey = HigherSpell.key();
-        a.watchers = Cutscene.start(sl, caster, a.cutKey, Cutscene.COVEN_ARRIVAL, CAST, a.at, a.yaw, Cutscene.R_COVEN, a.arena, a.at);
+        // owner 19.11 («a player in the retinue does not move»): the retinue players watch and are held wherever they stand,
+        // the walks below move them through the cutscene freeze
+        java.util.Set<UUID> retPlayers = new java.util.HashSet<>();
+        for (LivingEntity e : a.retinue) if (e instanceof ServerPlayer) retPlayers.add(e.getUUID());
+        a.watchers = Cutscene.start(sl, caster, a.cutKey, Cutscene.COVEN_ARRIVAL, CAST, a.at, a.yaw, Cutscene.R_COVEN, a.arena, a.at, retPlayers);
         HFx count = new HFx(HFx.ANIM, a.cutKey, caster.getId(), ANIM_RETINUE, a.retinue.size(), 0, 0, 0, 0, 0);
         for (UUID u : a.watchers) {
             ServerPlayer w = sl.getServer().getPlayerList().getPlayer(u);
@@ -435,7 +439,7 @@ public class CovenArrivalSpell extends PohSpell {
             }
             Vec3 p = e.getValue();
             if (le instanceof ServerPlayer sp) {   // players are held by the cutscene freeze
-                if (w != null) Cutscene.refreeze(sp, p);
+                Cutscene.refreeze(sp, p, yaw);   // walking: step and face the way; standing: face the line's way
                 continue;
             }
             if (le.position().distanceToSqr(p) > 0.0004) le.teleportTo(p.x, p.y, p.z);

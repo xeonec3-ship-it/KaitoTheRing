@@ -1715,7 +1715,7 @@ def dream_fx():
         E('flash', 12, 'caster+0,1.1,0', duration=8, size=2.0, rays=6, color=WHITE),
         E('wave', 12, 'caster', duration=12, shape='ring', radius=4, color='@primary'),
     ])
-    fx('illusion_dream_shift', 'Сон бабочки: что видят ОСТАЛЬНЫЕ, когда жертва «умерла во сне» и перенеслась (caster = старая точка, затем '
+    fx('illusion_dream_ripple', 'Сон бабочки: что видят ОСТАЛЬНЫЕ, когда жертва «умерла во сне» и перенеслась (caster = старая точка, затем '
                                'та же — в новой): короткая рябь воздуха в рост человека и кольцо, без бабочек и цвета смерти. 16 тиков.',
        'illusion', 16, [
            E('wave', 0, 'caster+0,1,0', duration=12, shape='sphere', radius=1.4, rim=1.3, color=PEARL, brightness=0.45),
@@ -1766,13 +1766,13 @@ def dream_fx():
         E('sigil', B, 'caster+0,12,0', id='illusion_mirror_crack', scale=20, until=B + 8, orientation='sky', comment='небо-зеркало трескается'),
     ])
     fx('illusion_butterfly_wake_hit', 'Сон бабочки (после пересмотра — БЕЗ урона): на 34 тике ролика пробуждения бабочки-метки ранений '
-                                      'жертвы (caster = жертва; видят жертва и заклинатель) вспыхивают и разлетаются стеклом — «раны были '
+                                      'жертвы (target = жертва, как зовёт ButterflyDreamSpell.wakeFx; видят жертва и заклинатель) вспыхивают и разлетаются стеклом — «раны были '
                                       'сном». Код в этот тик убирает свои бабочки-метки. 22 тика.', 'illusion', 22, [
-        E('sprites', 0, 'caster+0,1.1,0', duration=3, texture='mote_glass', count=36, rate=12, spread=0.9, speed=0.12, gravity=0.008,
+        E('sprites', 0, 'target+0,1.1,0', duration=3, texture='mote_glass', count=36, rate=12, spread=0.9, speed=0.12, gravity=0.008,
           spin=260, tumble=1, size=[0.24, 0.06], life=16, color=PEARL, glow=0.3, comment='осколки разлетаются ОТ жертвы'),
-        E('sprites', 0, 'caster+0,1.1,0', duration=3, texture='mote_butterfly', count=12, rate=4, spread=0.9, speed=0.08, gravity=-0.004,
+        E('sprites', 0, 'target+0,1.1,0', duration=3, texture='mote_butterfly', count=12, rate=4, spread=0.9, speed=0.08, gravity=-0.004,
           sway=1.6, size=[0.24, 0.0], life=20, color=PINK, glow=0.5, comment='бабочки-метки улетают и тают'),
-        E('flash', 0, 'caster+0,1.2,0', follow=True, duration=8, size=1.6, rays=8, color=PINK),
+        E('flash', 0, 'target+0,1.2,0', follow=True, duration=8, size=1.6, rays=8, color=PINK),
     ])
 
 

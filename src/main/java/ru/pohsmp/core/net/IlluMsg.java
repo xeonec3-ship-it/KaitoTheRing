@@ -42,6 +42,10 @@ public final class IlluMsg {
     public static final int SKY_DREAD = 1, SKY_DAWN = 2;
     /** «Сон бабочки»: entity is drawn see-through for ticks (it showed itself by a strike or a cast). */
     public static final int GHOST = 14;
+    /** «Сон бабочки»: the victim «died» in the dream - the short dark screen for ticks (it is moved meanwhile). */
+    public static final int DREAM_DEATH = 15;
+    /** «Сон бабочки» music: i = 0 start (ticks = how long it may play at most), i = 1 fade out over ticks. */
+    public static final int DREAM_MUSIC = 16;
     /** zone kinds (i of ZONE / ZONE_END) */
     public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4;
 

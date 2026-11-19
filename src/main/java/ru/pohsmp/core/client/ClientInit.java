@@ -32,6 +32,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.ErasedClient.class);   // T24
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.mythic.SkyClient.class);   // T23
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.Ghosts.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.DreamMusic.class);
         modBus.register(ScrollModels.class);
         modBus.addListener(TargetPoseClient::setup);
         MinecraftForge.EVENT_BUS.register(EmberHud.class);

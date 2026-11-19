@@ -46,13 +46,20 @@ public final class Cutscene {
      */
     public static List<UUID> start(ServerLevel sl, LivingEntity caster, int key, int scene, int dur, Vec3 focus, double ang, double r,
                                    ServerLevel extraLevel, Vec3 extra) {
+        return start(sl, caster, key, scene, dur, focus, ang, r, extraLevel, extra, java.util.Set.of());
+    }
+
+    /** The same, and the players in `also` watch (and are held) wherever they are (Coven Arrival: the retinue, owner 19.11). */
+    public static List<UUID> start(ServerLevel sl, LivingEntity caster, int key, int scene, int dur, Vec3 focus, double ang, double r,
+                                   ServerLevel extraLevel, Vec3 extra, java.util.Set<UUID> also) {
         List<UUID> watchers = new ArrayList<>();
         long until = sl.getGameTime() + dur + 60;
         Net.HFx cut = new Net.HFx(Net.HFx.CUT, key, caster.getId(), scene, dur, focus.x, focus.y, focus.z, ang, 0);
         for (ServerPlayer sp : sl.getServer().getPlayerList().getPlayers()) {
             if (sp.isSpectator()) continue;
             boolean near = sp.level() == sl && sp.distanceToSqr(caster) <= r * r
-                    || extraLevel != null && sp.level() == extraLevel && sp.position().distanceToSqr(extra) <= r * r;
+                    || extraLevel != null && sp.level() == extraLevel && sp.position().distanceToSqr(extra) <= r * r
+                    || also.contains(sp.getUUID());
             if (!near) continue;
             Frozen f = new Frozen();
             f.pos = sp.position();
@@ -69,6 +76,14 @@ public final class Cutscene {
     public static void refreeze(ServerPlayer sp, Vec3 pos) {
         Frozen f = FROZEN.get(sp.getUUID());
         if (f != null) f.pos = pos;
+    }
+
+    /** The same, and the body faces yaw (a walk led by the spell: the player's own mouse is locked in the scene). */
+    public static void refreeze(ServerPlayer sp, Vec3 pos, float yaw) {
+        Frozen f = FROZEN.get(sp.getUUID());
+        if (f == null) return;
+        f.pos = pos;
+        f.yaw = yaw;
     }
 
     /** Lets the watchers move, be hurt and be thrown again while their camera keeps playing (Star Fall: the impact inside the scene). */
@@ -90,6 +105,7 @@ public final class Cutscene {
         Vec3 pos;
         long until;
         UUID caster;
+        float yaw = Float.NaN;
     }
 
     private static final Map<UUID, Frozen> FROZEN = new HashMap<>();
@@ -154,7 +170,13 @@ public final class Cutscene {
                 FROZEN.remove(sp.getUUID());
                 return;
             }
-            if (sp.position().distanceToSqr(f.pos) > 0.0025) sp.connection.teleport(f.pos.x, f.pos.y, f.pos.z, sp.getYRot(), sp.getXRot());
+            boolean turn = !Float.isNaN(f.yaw) && Math.abs(net.minecraft.util.Mth.wrapDegrees(f.yaw - sp.getYRot())) > 1;
+            if (turn || sp.position().distanceToSqr(f.pos) > 0.0025) {
+                float yaw = Float.isNaN(f.yaw) ? sp.getYRot() : f.yaw;
+                sp.connection.teleport(f.pos.x, f.pos.y, f.pos.z, yaw, sp.getXRot());
+                sp.setYHeadRot(yaw);
+                sp.setYBodyRot(yaw);
+            }
             sp.setDeltaMovement(Vec3.ZERO);
             sp.fallDistance = 0;
         }

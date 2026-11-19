@@ -9,12 +9,12 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 /**
- * Data-driven effects (ru.pohsmp.core.fx): start, stop, move or reload. One instance = one sigil, mesh or whole effect.
+ * Data-driven effects (ru.pohsmp.core.fx): start, stop, move, reload or replace a sigil inscription (TEXT, T07). One instance = one sigil, mesh or whole effect.
  * Everything the client needs to draw the same thing as every other client: definition id, style, anchor, view yaw,
  * entities to follow, named points, scale, colour override, seed.
  */
 public final class FxMsg {
-    public static final int START = 0, STOP = 1, MOVE = 2, RELOAD = 3;
+    public static final int START = 0, STOP = 1, MOVE = 2, RELOAD = 3, TEXT = 4;
     public static final int FX = 0, SIGIL = 1, MESH = 2;
 
     public int op, inst, kind;
@@ -30,6 +30,11 @@ public final class FxMsg {
     /** Ticks already elapsed when sent (late joiners see the effect at its current moment). */
     public int age;
     public final Map<String, double[]> points = new LinkedHashMap<>();
+    /** Sigil inscriptions by slot (layers of type text with "slot", docs/sigils.md «Надписи»); START carries the current ones. */
+    public final Map<String, String> texts = new LinkedHashMap<>();
+    /** TEXT: which slot gets which text. */
+    public String slot = "", text = "";
+    public static final int MAX_TEXT = 256;
 
     public FxMsg() {}
 
@@ -68,6 +73,11 @@ public final class FxMsg {
             age = b.readVarInt();
             int n = b.readVarInt();
             for (int i = 0; i < n; i++) points.put(b.readUtf(64), new double[] {b.readDouble(), b.readDouble(), b.readDouble()});
+            int nt = b.readVarInt();
+            for (int i = 0; i < nt; i++) texts.put(b.readUtf(64), b.readUtf(MAX_TEXT));
+        } else if (op == TEXT) {
+            slot = b.readUtf(64);
+            text = b.readUtf(MAX_TEXT);
         } else if (op == STOP) {
             mode = b.readUtf(64);
         } else if (op == MOVE) {
@@ -119,6 +129,14 @@ public final class FxMsg {
                 b.writeDouble(e.getValue()[1]);
                 b.writeDouble(e.getValue()[2]);
             }
+            b.writeVarInt(texts.size());
+            for (var e : texts.entrySet()) {
+                b.writeUtf(e.getKey(), 64);
+                b.writeUtf(e.getValue(), MAX_TEXT);
+            }
+        } else if (op == TEXT) {
+            b.writeUtf(slot == null ? "" : slot, 64);
+            b.writeUtf(text == null ? "" : text, MAX_TEXT);
         } else if (op == STOP) {
             b.writeUtf(mode == null ? "" : mode, 64);
         } else if (op == MOVE) {
@@ -162,6 +180,9 @@ public final class FxMsg {
         m.seed = seed;
         m.age = age;
         m.points.putAll(points);
+        m.texts.putAll(texts);
+        m.slot = slot;
+        m.text = text;
         return m;
     }
 

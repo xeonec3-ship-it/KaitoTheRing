@@ -1,7 +1,9 @@
 package ru.pohsmp.core.client.fx;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.fx.sigil.SigilDef;
@@ -32,6 +34,19 @@ public final class SigilRun {
     /** Surface heights cached by {@link SigilLight} (groundLight / blockGlow). */
     Object light;
     public final List<SigilRun> children = new ArrayList<>();
+    /** Inscriptions by slot (text layers, T07) and when each was last replaced (ticks since start; absent = from the start). */
+    public final Map<String, String> texts = new HashMap<>();
+    final Map<String, Double> textChanged = new HashMap<>();
+    /** Letter layouts by layer index, rebuilt when the layer's text changes ({@link SigilDraw}). */
+    final Map<Integer, Object> textCache = new HashMap<>();
+
+    /** Replaces the inscription of a slot at tick t (since start); children get it too. */
+    public void setText(String slot, String text, double t) {
+        if (text.equals(texts.get(slot))) return;
+        texts.put(slot, text);
+        textChanged.put(slot, t);
+        for (SigilRun c : children) c.setText(slot, text, t - (c.start - start));
+    }
 
     public Vec3 pos(float pt) {
         if (follow != null && follow.isAlive()) return follow.getPosition(pt).add(offset);

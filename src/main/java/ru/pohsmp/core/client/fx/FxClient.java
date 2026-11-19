@@ -63,6 +63,11 @@ public final class FxClient {
             if (i != null) i.stop(now);
             return;
         }
+        if (m.op == FxMsg.TEXT) {
+            Inst i = LIVE.get(m.inst);
+            if (i != null && i.sigil != null) i.sigil.setText(m.slot, m.text, now - i.start);
+            return;
+        }
         if (m.op == FxMsg.MOVE) {
             Inst i = LIVE.get(m.inst);
             if (i == null) return;
@@ -134,6 +139,7 @@ public final class FxClient {
             r.start = i.start;
             if (m.duration >= 0) r.stopAfter = m.duration;
             r.seed = m.seed;
+            r.texts.putAll(m.texts);
             i.sigil = r;
         } else {
             var d = FxLib.mesh(m.id);

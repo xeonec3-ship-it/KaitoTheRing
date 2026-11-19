@@ -1,5 +1,5 @@
 {
-  "comment": "Печать Ковена (геометрия): для Появления Ковена и Закрытия Пространства.",
+  "comment": "Печать Ковена (геометрия): для Появления Ковена и Закрытия Пространства. Снаружи — надпись рунами (T07): «Ковен видит ✦ Ковен помнит».",
   "size": 3.0,
   "color": "#B49BFF",
   "orientation": "sky",
@@ -19,7 +19,10 @@
       "appear": { "delay": 16, "duration": 14, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": -90, "direction": -1 },
       "rotation": { "speed": -10 } },
     { "id": "rim", "type": "disc", "texture": "thin_ring", "radius": 1.0, "heightOffset": 0.04,
-      "appear": { "delay": 24, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "fade"] } }
+      "appear": { "delay": 24, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "inscription", "type": "text", "text": "КОВЕН ВИДИТ ✦ КОВЕН ПОМНИТ ✦", "font": "runic", "radius": 1.1, "size": 0.12,
+      "spacing": 0.1, "repeat": 2, "heightOffset": 0.05, "brightness": 0.85,
+      "appear": { "delay": 18, "duration": 14, "easing": "easeInOutSine", "modes": ["draw"] }, "rotation": { "speed": 6 } }
   ],
   "expand": { "scale": 2.5, "delay": 6, "duration": 24, "easing": "easeOutCubic" },
   "formedFlash": { "color": "#E6DCFF", "size": 1.2, "duration": 12, "sparks": 30 },

@@ -12,6 +12,7 @@ import ru.pohsmp.core.fx.sigil.SigilDef;
 import ru.pohsmp.core.fx.sigil.SigilDef.AppearMode;
 import ru.pohsmp.core.fx.sigil.SigilDef.Layer;
 import ru.pohsmp.core.fx.sigil.SigilDef.LayerType;
+import ru.pohsmp.core.fx.sigil.SigilText;
 import ru.pohsmp.core.fx.sigil.SigilTimeline;
 import ru.pohsmp.core.fx.sigil.SigilTimeline.LayerState;
 import ru.pohsmp.core.fx.sigil.SigilTimeline.PieceState;
@@ -19,7 +20,8 @@ import ru.pohsmp.core.fx.sigil.SigilTimeline.PieceState;
 /**
  * Draws a sigil exactly as {@link SigilTimeline} describes it (docs/sigils.md): no shaders, the "draw" reveal is a triangle fan
  * up to the current angle, bands are rings with the texture repeated around, arcs are short ring strips, pieces are sectors
- * flying into place. The plane is (u, v) with normal n; layer tilt (unfold) turns v towards n.
+ * flying into place, inscriptions are one textured square per letter from a glyph atlas ({@link SigilText}). The plane is (u, v)
+ * with normal n; layer tilt (unfold) turns v towards n.
  */
 public final class SigilDraw {
     private SigilDraw() {}
@@ -73,6 +75,7 @@ public final class SigilDraw {
         c.scale = parent.scale;
         c.caster = parent.caster;
         c.seed = parent.seed * 31 + parent.children.size();
+        c.texts.putAll(parent.texts);
         if (onCaster) {
             c.follow = parent.caster;
             c.offset = at.subtract(parent.caster.position());
@@ -136,8 +139,12 @@ public final class SigilDraw {
             int col = r.color >= 0 ? r.color : l.color();
             double a = st.alpha() * ga * am;
             double ang = echo ? -st.angle() * 1.3 + turn : st.angle();
-            VertexConsumer vc = f.add(FxDraw.tex(l.texture()));
             Plane pl = new Plane(lc, u, v, n);
+            if (l.type() == LayerType.TEXT) {
+                text(f, r, d, l, i, t, pl, gs * st.scale() * sc, ang, col, a);
+                continue;
+            }
+            VertexConsumer vc = f.add(FxDraw.tex(l.texture()));
             if (l.appear().modes().contains(AppearMode.PIECES)) pieces(f, vc, pl, d, l, i, t, r.stopAt, R, ang, col, a);
             else switch (l.type()) {
                 case DISC, SPOKES -> {
@@ -147,6 +154,7 @@ public final class SigilDraw {
                 case BAND -> band(f, vc, pl, R, l.inner(), l.repeat(), ang, st.drawStart(),
                         st.drawDirection() * st.drawFraction() * 360, col, a);
                 case ARCS -> arcs(f, vc, pl, l, st, SigilTimeline.assemble(d, i, t), R, col, a);
+                default -> {}
             }
         }
     }
@@ -215,6 +223,49 @@ public final class SigilDraw {
                 FxDraw.vert(vc, f, p.polar(ra - w / 2, a0), u0, 1, col, a);
                 FxDraw.vert(vc, f, p.polar(ra - w / 2, a1), u1, 1, col, a);
                 FxDraw.vert(vc, f, p.polar(ra + w / 2, a1), u1, 0, col, a);
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------- inscriptions (T07)
+
+    private record TextCache(String text, SigilText.Layout layout) {}
+
+    /**
+     * Text layer: letters laid out by {@link SigilText#layout} (sigil units, so × G = gs · grow), turned with the layer by rot,
+     * each a square with its atlas cell, written in letter by letter ({@link SigilTimeline#letter}). Letters of one atlas go in one batch.
+     */
+    private static void text(Frame f, SigilRun r, SigilDef d, Layer l, int index, double t, Plane p, double G, double rot, int col, double a) {
+        SigilText.Spec sp = l.text();
+        if (sp == null || G <= 1e-5) return;
+        String txt = SigilText.textFor(sp, r.texts);
+        TextCache tc = r.textCache.get(index) instanceof TextCache c && c.text.equals(txt) ? c : null;
+        if (tc == null) {
+            tc = new TextCache(txt, SigilText.layout(sp, txt, l.radius(), FxLib.font(sp.font()), FxLib::font));
+            r.textCache.put(index, tc);
+        }
+        SigilText.Layout lay = tc.layout;
+        if (lay.letters().isEmpty()) return;
+        Double changed = sp.slot() == null ? null : r.textChanged.get(sp.slot());
+        double since = changed == null ? Double.NaN : t - changed;
+        double k = Math.toRadians(rot), cs = Math.cos(k), sn = Math.sin(k);
+        // one batch per atlas (usually one; a fallback font adds a second): switching buffers per letter would flush every time
+        java.util.LinkedHashSet<String> atlases = new java.util.LinkedHashSet<>();
+        for (SigilText.Letter le : lay.letters()) atlases.add(le.texture());
+        for (String want : atlases) {
+            VertexConsumer vc = f.add(FxDraw.tex(want));
+            for (SigilText.Letter le : lay.letters()) {
+                if (!le.texture().equals(want)) continue;
+                SigilText.LetterState ls = SigilTimeline.letter(d, index, le.order(), lay.perCopy(), t, since);
+                double la = a * ls.alpha() * ls.brightness();
+                if (la <= 0.002) continue;
+                double x = (le.x() * cs - le.y() * sn) * G, y = (le.x() * sn + le.y() * cs) * G, h = le.size() * G * ls.scale() / 2;
+                double up = Math.toRadians(le.up() + rot), ux = Math.cos(up), uy = Math.sin(up), rx = uy, ry = -ux;   // right = up − 90°
+                float[] uv = le.uv();
+                FxDraw.vert(vc, f, p.at(x + (-rx + ux) * h, y + (-ry + uy) * h, 0), uv[0], uv[1], col, la);        // top left
+                FxDraw.vert(vc, f, p.at(x + (-rx - ux) * h, y + (-ry - uy) * h, 0), uv[0], uv[3], col, la);        // bottom left
+                FxDraw.vert(vc, f, p.at(x + (rx - ux) * h, y + (ry - uy) * h, 0), uv[2], uv[3], col, la);          // bottom right
+                FxDraw.vert(vc, f, p.at(x + (rx + ux) * h, y + (ry + uy) * h, 0), uv[2], uv[1], col, la);          // top right
             }
         }
     }

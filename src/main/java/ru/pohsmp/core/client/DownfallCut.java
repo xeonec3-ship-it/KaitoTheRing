@@ -705,6 +705,34 @@ public final class DownfallCut {
                 case 4 -> { pos = c.add(0, 150 - 40 * k, 0).add(side.scale(0.05)); look = c; roll = -70 * k; }
                 default -> { double a = yaw + Math.PI + k * 0.5; pos = c.add(Math.cos(a) * (14 - 9 * k), 2.5 + 1.5 * k, Math.sin(a) * (14 - 9 * k)); look = c.add(0, 1.6 + 4 * k, 0); shake = 0.03 + 0.12 * k; }
             }
+        } else if (sc == ru.pohsmp.core.spell.Cutscene.WORLD_TREE) {   // T23 «Древо мира» (draft until the visual plan): f = the tree's foot
+            Vec3 ft = f.add(0, 2, 0);
+            switch (i) {
+                case 0 -> { double a = yaw + Math.PI + Math.toRadians(-60 + 120 * k); pos = c.add(Math.cos(a) * 3, 1.5, Math.sin(a) * 3); look = c.add(0, 1.3, 0); }
+                case 1 -> { pos = f.add(side.scale(3)).add(0, 0.4, 0); look = ft; }
+                case 2 -> { double a = yaw + k * Math.PI * 0.7; pos = f.add(Math.cos(a) * 10, 2 + 14 * k, Math.sin(a) * 10); look = f.add(0, 2 + 16 * k, 0); }
+                case 3 -> { double a = yaw + Math.PI * 0.7 + k * Math.PI * 0.5; pos = f.add(Math.cos(a) * 34, 20 + 8 * k, Math.sin(a) * 34); look = f.add(0, 18, 0); }
+                case 4 -> { pos = c.add(dir.scale(-4)).add(side.scale(1.5)).add(0, 2, 0); look = f.add(0, 10 + 20 * k, 0); }
+                default -> { pos = f.add(dir.scale(-(30 - 8 * k))).add(0, 6, 0); look = f.add(0, 20, 0); shake = 0.03 + 0.06 * k; }
+            }
+        } else if (sc == ru.pohsmp.core.spell.Cutscene.ABYSS_EYE) {   // T23 «Око бездны» (draft): f = the eye in the sky over the caster
+            switch (i) {
+                case 0 -> { double a = yaw + Math.toRadians(-70 + 140 * k); pos = c.add(Math.cos(a) * 3.2, 1.5, Math.sin(a) * 3.2); look = c.add(0, 1.4, 0); }
+                case 1 -> { pos = c.add(side.scale(1.8)).add(0, 0.2, 0); look = c.add(0, 6 + 30 * k, 0); roll = 6 * k; }
+                case 2 -> { double a = yaw + k * Math.PI; pos = c.add(Math.cos(a) * (8 + 20 * k), 3 + 12 * k, Math.sin(a) * (8 + 20 * k)); look = f; }
+                case 3 -> { pos = f.add(0, -14 + 4 * k, 0).add(side.scale(0.05)); look = f; roll = 40 * k; shake = 0.02; }
+                case 4 -> { double a = yaw + Math.PI + k * 0.8; pos = c.add(Math.cos(a) * 14, 2, Math.sin(a) * 14); look = f.lerp(c.add(0, 1.5, 0), 0.4 * (1 - k)); }
+                default -> { pos = c.add(dir.scale(3 - k)).add(0, 1.2, 0); look = f; shake = 0.04 + 0.12 * k; }
+            }
+        } else if (sc == ru.pohsmp.core.spell.Cutscene.LAST_DAWN) {   // T23 «Последний рассвет» (draft): f = the sunrise point on the horizon
+            switch (i) {
+                case 0 -> { double a = yaw + Math.PI + Math.toRadians(-50 + 100 * k); pos = c.add(Math.cos(a) * 3, 1.5, Math.sin(a) * 3); look = c.add(0, 1.4, 0); }
+                case 1 -> { pos = c.add(dir.scale(-3)).add(0, 1.8, 0); look = f; }
+                case 2 -> { double a = yaw + Math.PI + k * Math.PI * 0.4; pos = c.add(Math.cos(a) * 10, 4 + 4 * k, Math.sin(a) * 10); look = c.add(0, 1.5, 0); }
+                case 3 -> { pos = c.add(dir.scale(-1.2)).add(side.scale(0.8)).add(0, 1.7, 0); look = f.add(0, 8 * k, 0); }
+                case 4 -> { pos = c.add(dir.scale(4)).add(0, 1.4, 0); look = c.add(0, 1.5, 0); }
+                default -> { pos = c.add(dir.scale(-(6 + 8 * k))).add(0, 2 + 3 * k, 0); look = f.add(0, 10, 0); shake = 0.02; }
+            }
         } else {   // Divine Taboo: f = the seal 56 blocks over the caster
             switch (i) {
                 case 0 -> { double a = yaw + Math.toRadians(-70 + 140 * k); pos = c.add(Math.cos(a) * 3.4, 1.4 + 0.4 * k, Math.sin(a) * 3.4); look = c.add(0, 1.4, 0); }
@@ -723,8 +751,10 @@ public final class DownfallCut {
 
     private static final String[] TITLES = {"fx.pohsmp_core.downfall.title", "fx.pohsmp_core.milky_way.title", "fx.pohsmp_core.soul_devour.title", "fx.pohsmp_core.divine_taboo.title",
             "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title", "fx.pohsmp_core.silent_gate.title",
-            "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title", "fx.pohsmp_core.butterfly_dream.title"};
-    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A, 0xC9A8FF};
+            "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title", "fx.pohsmp_core.butterfly_dream.title",
+            "fx.pohsmp_core.world_tree.title", "fx.pohsmp_core.abyss_eye.title", "fx.pohsmp_core.last_dawn.title"};
+    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A, 0xC9A8FF,
+            0x7FD46A, 0x8E5BD9, 0xFFC860};
 
     private static boolean apply(Camera cam, Vec3 pos) {
         try {

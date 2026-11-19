@@ -34,7 +34,10 @@ public final class Cutscene {
     public static final double R_GATE = 128;
     public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, STAR_FALL = 6, SILENT_GATE = 7,
             SOUL_SEAL = 8, BLESSING = 9,   // T21: i of the packet = the target's entity id
-            BUTTERFLY_DREAM = 10;          // T22: focus = 5 blocks ahead of the caster (the way it looked when it began)
+            BUTTERFLY_DREAM = 10,          // T22: focus = 5 blocks ahead of the caster (the way it looked when it began)
+            WORLD_TREE = 11,               // T23: focus = the tree's foot
+            ABYSS_EYE = 12,                // T23: focus = the eye in the sky
+            LAST_DAWN = 13;                // T23: focus = the sunrise point on the horizon
 
     /**
      * Starts the scene for everyone within r of the caster (in the caster's level) or of `extra` in `extraLevel` (may be another dimension).

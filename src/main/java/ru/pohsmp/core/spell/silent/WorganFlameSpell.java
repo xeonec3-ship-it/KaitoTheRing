@@ -171,7 +171,8 @@ public class WorganFlameSpell extends SilentSpell {
                     drawBreath(sl, from, look, range, cone, age);
                 }
                 if (age % 8 == 1) sl.playSound(null, from.x, from.y, from.z, SoundEvents.FIRE_AMBIENT, SoundSource.PLAYERS, 0.9f, 0.5f);
-                for (LivingEntity t : cone(sl, caster, from, look, range, cone, false)) {
+                // hits are aimed from the caster's eyes (where the player looks), the flame is drawn from the dragon's jaws
+                for (LivingEntity t : cone(sl, caster, caster.getEyePosition(), look, range, cone, false)) {
                     if (!caster.hasLineOfSight(t)) continue;
                     SageBarrierSpell.Dome d = SageBarrierSpell.shielding(t);
                     if (d != null && !d.inside(caster)) continue;   // a Barrier shields it

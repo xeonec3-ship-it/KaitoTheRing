@@ -27,7 +27,50 @@ public final class Cutscene {
     private Cutscene() {}
 
     public static final double R = 64;
-    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4;
+    /** Coven Arrival: watchers within this of the arena and of the caster (the other scenes use R). */
+    public static final double R_COVEN = 98;
+    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5;
+
+    /**
+     * Starts the scene for everyone within r of the caster (in the caster's level) or of `extra` in `extraLevel` (may be another dimension).
+     * The packet carries the caster's entity id: on clients in the other level that entity is unknown, the client copes with it.
+     */
+    public static List<UUID> start(ServerLevel sl, LivingEntity caster, int key, int scene, int dur, Vec3 focus, double ang, double r,
+                                   ServerLevel extraLevel, Vec3 extra) {
+        List<UUID> watchers = new ArrayList<>();
+        long until = sl.getGameTime() + dur + 60;
+        Net.HFx cut = new Net.HFx(Net.HFx.CUT, key, caster.getId(), scene, dur, focus.x, focus.y, focus.z, ang, 0);
+        for (ServerPlayer sp : sl.getServer().getPlayerList().getPlayers()) {
+            if (sp.isSpectator()) continue;
+            boolean near = sp.level() == sl && sp.distanceToSqr(caster) <= r * r
+                    || extraLevel != null && sp.level() == extraLevel && sp.position().distanceToSqr(extra) <= r * r;
+            if (!near) continue;
+            Frozen f = new Frozen();
+            f.pos = sp.position();
+            f.until = until;
+            f.caster = caster.getUUID();
+            FROZEN.put(sp.getUUID(), f);
+            watchers.add(sp.getUUID());
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> sp), cut);
+        }
+        return watchers;
+    }
+
+    /** A frozen player was moved by the spell: hold them at the new place instead of pulling them back. */
+    public static void refreeze(ServerPlayer sp, Vec3 pos) {
+        Frozen f = FROZEN.get(sp.getUUID());
+        if (f != null) f.pos = pos;
+    }
+
+    /** Ends the scene for some watchers only (they left for another dimension). */
+    public static void release(ServerLevel sl, List<UUID> who, int key) {
+        Net.HFx stop = new Net.HFx(Net.HFx.STOP, key, -1, -1, 0, 0, 0, 0, 0, 0);
+        for (UUID u : who) {
+            FROZEN.remove(u);
+            ServerPlayer sp = sl.getServer().getPlayerList().getPlayer(u);
+            if (sp != null) Net.CH.send(PacketDistributor.PLAYER.with(() -> sp), stop);
+        }
+    }
 
     private static final class Frozen {
         Vec3 pos;

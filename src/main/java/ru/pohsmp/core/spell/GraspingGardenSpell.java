@@ -106,7 +106,7 @@ public class GraspingGardenSpell extends PohSpell {
                 if (!c.isAlive() || c.isRemoved()) return false;
                 if (age > CREEPER_LIFE || !caster.isAlive()) {
                     DivineEvents.particle(sl, ParticleTypes.COMPOSTER, c.getX(), c.getY() + 0.8, c.getZ(), 20, 0.4, 0.05);
-                    c.discard();
+                    Disp.kill(c);
                     return false;
                 }
                 if (age % 10 == 1) {
@@ -122,7 +122,7 @@ public class GraspingGardenSpell extends PohSpell {
                 if (c.getTarget() == caster || (c.getTarget() != null && HigherSpell.friendly(caster, c.getTarget()))) c.setTarget(null);
                 if (c.getSwelling(1f) > 0.85f) {
                     Vec3 at = c.position();
-                    c.discard();
+                    Disp.kill(c);
                     DivineEvents.particle(sl, ParticleTypes.EXPLOSION_EMITTER, at.x, at.y + 0.5, at.z, 1, 0, 0);
                     DivineEvents.particle(sl, ParticleTypes.COMPOSTER, at.x, at.y + 0.5, at.z, 40, 1.2, 0.1);
                     sl.playSound(null, at.x, at.y, at.z, SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 2f, 1.1f);

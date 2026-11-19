@@ -179,8 +179,8 @@ public class FrozenHourSpell extends PohSpell {
         }
     }
 
-    public static final class Events {
-        private Events() {}
+    public static final class FrozenHourEvents {
+        private FrozenHourEvents() {}
 
         @SubscribeEvent
         public static void onServerTick(TickEvent.ServerTickEvent e) {

@@ -70,8 +70,8 @@ public class DisintegrationReplicaSpell extends DisintegrationSpell {
     }
 
     /** Never lethal: runs last, after armor, resistances, absorption and other mods' changes. */
-    public static final class Events {
-        private Events() {}
+    public static final class ReplicaEvents {
+        private ReplicaEvents() {}
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onDamage(LivingDamageEvent e) {

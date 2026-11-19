@@ -3,14 +3,36 @@
 Дезинтеграция (Божественная, встроенная ступень):
 /give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:disintegration",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
 
-Дезинтеграция: Реплика (Высшая, встроенная ступень; 90% макс. здоровья, не убивает):
-/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:disintegration_replica",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
-
 Любое заклинание со ступенью по метке (pohsmp_tier: "higher" Высшая, "mythic" Мифическая, "divine" Божественная, "none" — без ступени):
 /give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"irons_spellbooks:fireball",index:0,level:12,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b},pohsmp_tier:"mythic"} 1
 
 Без метки ступень считается по уровню выше максимума заклинания: +1..2 Высшая, +3..4 Мифическая, +5 и больше Божественная
 (у Огненного шара максимум 5, значит уровень 15 = Божественная, с аурой и отдачей).
 
-Божественная ступень: золотая аура при касте, после удачного каста отдача (по умолчанию Слабость II 15 с, Замедление II 10 с, Тошнота 5 с).
-Настройки: world/serverconfig/pohsmp_core-server.toml ([divine] aura, backlash; [disintegration] damagePercent 1.0, damageFlat 0, alwaysKill true, range 48; [disintegration_replica] damagePercent 0.9).
+Божественная ступень: золотая аура при касте, после удачного каста один эффект «Отдача божественной магии» на 60 с:
+мана не восстанавливается весь эффект (ни регенерация, ни зелья), первые 10 с Замедление II, первые 15 с Слабость II, 5 с скрытая тошнота; молоко не снимает.
+Снять вручную: /effect clear <ник> pohsmp_core:divine_backlash
+Настройки: world/serverconfig/pohsmp_core-server.toml ([divine] aura, backlashSeconds, slowSeconds, weakSeconds, nauseaSeconds, blockMana; [disintegration] damagePercent 0.5, damageFlat 40, range 48).
+
+Высшая школа (1.3.0), встроенная ступень Высшая, уровень 1, без маны и перезарядки:
+Колыбель кошмара (Сновидица):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:nightmare_cradle",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Звезда судьбы (Астролог):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:fate_star",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Сингулярность (Гравитационный):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:singularity",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Печать запрета (Рунный):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:forbidding_seal",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Вознесение ветра (Святой):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:wind_ascension",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Без пепла (Эшли):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:ashless_flame",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Млечный путь (Высшая, каст 10 с с роликом):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:milky_way",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Вечная метель (Высшая, мгновенно, круг r12 на 15 с):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:eternal_blizzard",index:0,level:1,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Закрытие Пространства (Мифическая, печать Ковена; уровни 1-4 = 5/10/20/30 мин, купол r86):
+/give @s irons_spellbooks:scroll{"irons_spellbooks:spell_container":{data:[{id:"pohsmp_core:space_closure",index:0,level:4,locked:1b}],maxSpells:1,mustEquip:0b,spellWheel:0b}} 1
+Все свитки также лежат во вкладке творческого режима PohSMP.
+Урон Высшей школы учитывает броню; общий множитель урона и лечения: [higher] damageMult в pohsmp_core-server.toml.
+Свои эффекты: pohsmp_core:nightmare_sleep, dread, forbidding_seal, gravity_crush, ascension (молоко не снимает).

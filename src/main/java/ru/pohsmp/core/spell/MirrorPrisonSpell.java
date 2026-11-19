@@ -100,8 +100,8 @@ public class MirrorPrisonSpell extends HigherSpell {
         }
     }
 
-    public static final class Events {
-        private Events() {}
+    public static final class MirrorPrisonEvents {
+        private MirrorPrisonEvents() {}
 
         @SubscribeEvent
         public static void onServerTick(net.minecraftforge.event.TickEvent.ServerTickEvent e) {

@@ -29,8 +29,8 @@ import ru.pohsmp.core.net.Net;
  * Eternal Blizzard (Higher, instant): a ring of snowstorm r12 around the cast point for 15 s, walls 6 high.
  * Inside, enemies are slowed harder the closer they are to the wall (Slowness II at the center up to V at the edge),
  * freeze like in powder snow (the frost builds up; fully frozen = vanilla freeze damage), and the last 1.5 blocks
- * before the wall gently pull back inside: leaving is possible, but slow. Snowflakes of Iron's blizzard swirl along
- * the whole wall in both directions (server-sent SwirlingParticleOptions orbiting the center).
+ * before the wall gently pull back inside: leaving is possible, but slow. The storm itself (snow wall at the edge, frost on the
+ * ground by the wall, snowfall and haze inside) is drawn by each client from one HFx BLIZZARD packet (client/HigherFx).
  */
 public class EternalBlizzardSpell extends HigherSpell {
     public static final String PATH = "eternal_blizzard";
@@ -75,7 +75,6 @@ public class EternalBlizzardSpell extends HigherSpell {
             @Override
             public boolean tick() {
                 age++;
-                wall(sl, c, rnd, age);
                 AABB box = new AABB(c, c).inflate(R + 1, 0, R + 1).expandTowards(0, WALL_H + 2, 0).expandTowards(0, -3, 0);
                 for (LivingEntity e : sl.getEntitiesOfClass(LivingEntity.class, box, e -> e.isAlive() && !immune(caster, e))) {
                     double dx = e.getX() - c.x, dz = e.getZ() - c.z, d = Math.sqrt(dx * dx + dz * dz);
@@ -102,26 +101,4 @@ public class EternalBlizzardSpell extends HigherSpell {
         });
     }
 
-    /**
-     * Swirling snowflakes on the wall: each one orbits the center at radius ~R (Iron's SwirlingParticle: normal = axis,
-     * width/height = orbit radii, speed = degrees per tick), at a random height, half clockwise, half counter-clockwise.
-     */
-    private static void wall(ServerLevel sl, Vec3 c, RandomSource rnd, int age) {
-        int n = age < 10 ? 24 : 10;
-        for (int i = 0; i < n; i++) {
-            boolean dust = i % 3 == 2;
-            ParticleOptions inner = dust ? ParticleHelper.SNOW_DUST : ParticleHelper.SNOWFLAKE;
-            double rr = R + (rnd.nextDouble() - 0.5) * 0.9;
-            double sp = (1.6 + rnd.nextDouble() * 1.6) * (i % 2 == 0 ? 1 : -1);
-            Vec3 axis = new Vec3((rnd.nextDouble() - 0.5) * 0.06, 1, (rnd.nextDouble() - 0.5) * 0.06).normalize();
-            SwirlingParticleOptions o = new SwirlingParticleOptions(inner, axis, new Vec3(0, 0, 1), new Vec3(rr, rr, sp), Vec3.ZERO);
-            double y = c.y + 0.1 + rnd.nextDouble() * WALL_H;
-            DivineEvents.particle(sl, o, c.x, y, c.z, 0, 0, 0);
-        }
-        if (age % 2 == 0)   // snowfall inside the ring
-            for (int i = 0; i < 6; i++) {
-                double a = rnd.nextDouble() * Math.PI * 2, r = Math.sqrt(rnd.nextDouble()) * (R - 1);
-                DivineEvents.particle(sl, ParticleTypes.SNOWFLAKE, c.x + Math.cos(a) * r, c.y + WALL_H - rnd.nextDouble() * 2, c.z + Math.sin(a) * r, 0, 0, 0);
-            }
-    }
 }

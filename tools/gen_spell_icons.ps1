@@ -1,4 +1,4 @@
-# Icons of the ordinary/legendary/mythic/divine spells of pohsmp_core (16x16) and their effects (18x18).
+﻿# Icons of the ordinary/legendary/mythic/divine spells of pohsmp_core (16x16) and their effects (18x18).
 # Usage: tools\gen_spell_icons.ps1
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
@@ -25,7 +25,7 @@ function Br($h) { New-Object Drawing.SolidBrush (Hex $h) }
 function Pn($h, $w) { $p = New-Object Drawing.Pen (Hex $h), $w; $p.StartCap = 'Round'; $p.EndCap = 'Round'; $p.LineJoin = 'Round'; $p }
 function Pts($arr) { $r = @(); for ($i = 0; $i -lt $arr.Count; $i += 2) { $r += New-Object Drawing.PointF ([float]$arr[$i]), ([float]$arr[$i + 1]) }; [Drawing.PointF[]]$r }
 function Frame($g, $S, $rim, $bg) { $g.FillRectangle((Br $bg), 2, 2, $S - 4, $S - 4); $g.DrawRectangle((Pn $rim ($S * 0.07)), $S * 0.05, $S * 0.05, $S * 0.9, $S * 0.9) }
-function I($name, [scriptblock]$draw, $rim, $bg) { Small 16 { param($g, $S) Frame $g $S $rim $bg; & $draw $g $S } (Join-Path $icons "$name.png") }
+function I($name, [scriptblock]$art, $rim, $bg) { Small 16 { param($g, $S) Frame $g $S $rim $bg; & $art $g $S } (Join-Path $icons "$name.png") }
 
 # blood: heart with a drop going out
 I 'blood_gift' { param($g, $S)
@@ -197,3 +197,14 @@ Small 18 { param($g, $S)
   $g.DrawLine((Pn '#C0C0C0' ($S*0.05)), $S*0.66, $S*0.16, $S*0.82, $S*0.06); $g.DrawLine((Pn '#C0C0C0' ($S*0.05)), $S*0.72, $S*0.28, $S*0.9, $S*0.24) } (Join-Path $eff 'spent.png')
 Small 18 { param($g, $S)
   $g.FillEllipse((Br '#3A0008'), $S*0.06, $S*0.26, $S*0.88, $S*0.48); $g.FillEllipse((Br '#FF2030'), $S*0.34, $S*0.28, $S*0.32, $S*0.44); $g.FillEllipse((Br '#000000'), $S*0.45, $S*0.32, $S*0.1, $S*0.36) } (Join-Path $eff 'magic_madness.png')
+Small 18 { param($g, $S)
+  $g.DrawEllipse((Pn '#C0102A' ($S*0.08)), $S*0.14, $S*0.14, $S*0.72, $S*0.72); $g.FillEllipse((Br '#FF5060'), $S*0.36, $S*0.36, $S*0.28, $S*0.28) } (Join-Path $eff 'blood_mark.png')
+Small 18 { param($g, $S)
+  $g.FillPolygon((Br '#C0102A'), (Pts @(($S*0.5),($S*0.08), ($S*0.82),($S*0.56), ($S*0.18),($S*0.56)))); $g.FillEllipse((Br '#C0102A'), $S*0.18, $S*0.4, $S*0.64, $S*0.52) } (Join-Path $eff 'hemorrhage.png')
+Small 18 { param($g, $S)
+  $g.FillPolygon((Br '#8FD8FF'), (Pts @(($S*0.6),($S*0.04), ($S*0.22),($S*0.54), ($S*0.48),($S*0.54), ($S*0.36),($S*0.96), ($S*0.8),($S*0.42), ($S*0.54),($S*0.42)))) } (Join-Path $eff 'overload.png')
+Small 18 { param($g, $S)
+  foreach ($c in @(@(0.08,0.3,0.44), @(0.4,0.16,0.5), @(0.28,0.46,0.46))) { $g.FillEllipse((Br '#8CB43A'), $S*$c[0], $S*$c[1], $S*$c[2], $S*$c[2]*0.8) } } (Join-Path $eff 'spores.png')
+Small 18 { param($g, $S)
+  $g.FillEllipse((Br '#D4A017'), $S*0.1, $S*0.1, $S*0.8, $S*0.8); $g.FillEllipse((Br '#050304'), $S*0.22, $S*0.22, $S*0.56, $S*0.56)
+  $g.DrawLine((Pn '#FFE08A' ($S*0.08)), $S*0.3, $S*0.3, $S*0.7, $S*0.7) } (Join-Path $eff 'creation_backlash.png')

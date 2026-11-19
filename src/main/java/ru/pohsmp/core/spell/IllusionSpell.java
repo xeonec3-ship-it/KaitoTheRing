@@ -91,8 +91,8 @@ public class IllusionSpell extends PohSpell {
     }
 
     /** A player striking the double pops it. */
-    public static final class Events {
-        private Events() {}
+    public static final class IllusionEvents {
+        private IllusionEvents() {}
 
         @SubscribeEvent
         public static void onPlayerAttack(AttackEntityEvent e) {

@@ -1,0 +1,9 @@
+{
+  "comment": "Появление Ковена: мир лиловеет у всех в 98 блоках от арены на всё время ролика.",
+  "style": "coven",
+  "duration": 1800,
+  "elements": [
+    { "type": "tint", "at": "caster", "duration": 1800, "color": "@secondary", "radius": 98, "strength": 0.16,
+      "in": { "duration": 100, "easing": "easeInOutSine" }, "out": { "duration": 60, "easing": "easeInOutSine" } }
+  ]
+}

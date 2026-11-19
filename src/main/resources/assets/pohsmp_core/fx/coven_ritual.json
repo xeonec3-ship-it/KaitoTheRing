@@ -1,0 +1,23 @@
+{
+  "comment": "Появление Ковена, ритуал (69–83 с ролика): между тремя (точки a, b, c) протягиваются линии, от каждого — луч к точке sky, там складывается печать Ковена. Без свиты точки b и c совпадают с a.",
+  "style": "coven",
+  "duration": 340,
+  "elements": [
+    { "type": "beam", "at": "point:a+0,1.2,0", "to": "point:b+0,1.2,0", "duration": 300, "grow": 30, "width": 0.22, "core": 0.4, "flicker": 0.2,
+      "color": "@primary", "out": { "duration": 30 } },
+    { "type": "beam", "at": "point:b+0,1.2,0", "to": "point:c+0,1.2,0", "delay": 15, "duration": 285, "grow": 30, "width": 0.22, "core": 0.4, "flicker": 0.2,
+      "color": "@primary", "out": { "duration": 30 } },
+    { "type": "beam", "at": "point:c+0,1.2,0", "to": "point:a+0,1.2,0", "delay": 30, "duration": 270, "grow": 30, "width": 0.22, "core": 0.4, "flicker": 0.2,
+      "color": "@primary", "out": { "duration": 30 } },
+    { "type": "beam", "at": "point:a+0,2,0", "to": "point:sky", "delay": 70, "duration": 230, "grow": 60, "width": 0.3, "core": 0.35, "taper": 0.6,
+      "color": "@core", "out": { "duration": 30 } },
+    { "type": "beam", "at": "point:b+0,2,0", "to": "point:sky", "delay": 80, "duration": 220, "grow": 60, "width": 0.3, "core": 0.35, "taper": 0.6,
+      "color": "@core", "out": { "duration": 30 } },
+    { "type": "beam", "at": "point:c+0,2,0", "to": "point:sky", "delay": 90, "duration": 210, "grow": 60, "width": 0.3, "core": 0.35, "taper": 0.6,
+      "color": "@core", "out": { "duration": 30 } },
+    { "type": "sprites", "at": "point:a", "duration": 260, "count": 160, "rate": 0.7, "area": 4, "speed": 0.01, "gravity": -0.004,
+      "life": 70, "size": [0.12, 0.03], "texture": "@sparks", "color": "@primary" },
+    { "type": "sigil", "id": "coven_seal", "at": "point:sky", "delay": 130, "until": 330, "orientation": "sky", "sigilScale": 1.6 },
+    { "type": "flash", "at": "point:sky", "delay": 300, "duration": 16, "size": 9, "anamorphic": 16, "rays": 12, "color": "@core", "screen": 0.5 }
+  ]
+}

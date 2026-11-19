@@ -1,0 +1,16 @@
+{
+ "comment": "Пролог Появления Ковена: крошечный вращающийся многогранник над центром арены (зародыш портала coven_portal).",
+ "style": "coven",
+ "center": 2.9,
+ "formedAt": 10,
+ "collapse": { "duration": 8, "easing": "easeInCubic" },
+ "parts": [
+  {
+   "type": "seed",
+   "shape": "octahedron",
+   "radius": 0.35,
+   "spin": [40, 70, 0],
+   "appear": { "delay": 0, "duration": 40, "easing": "easeOutBack" }
+  }
+ ]
+}

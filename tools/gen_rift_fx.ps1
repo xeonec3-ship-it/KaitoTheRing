@@ -1,4 +1,4 @@
-# Рисует разлом Низвержения (512x768): силуэт прорехи (rift_tear, RGBA, чёрный), ядро Нижнего мира (rift_core, RGBA, цветное)
+﻿# Рисует разлом Низвержения (512x768): силуэт прорехи (rift_tear, RGBA, чёрный), ядро Нижнего мира (rift_core, RGBA, цветное)
 # и светящуюся кромку с трещинами (rift_edge, белое на чёрном, аддитивно). Использование: tools\gen_rift_fx.ps1 [папка_превью]
 param([string]$Preview)
 $ErrorActionPreference = 'Stop'
@@ -11,12 +11,12 @@ $rng = New-Object Random 777
 # Контур прорехи: сверху вниз по левому краю, обратно по правому; ширина ~ sin(pi t)^0.75, зубцы
 function Outline([double]$scale, [int]$seed) {
   $r = New-Object Random $seed
-  $n = 46; $left = @(); $right = @()
+  $n = 38; $left = @(); $right = @()
   for ($i = 0; $i -le $n; $i++) {
     $t = $i / [double]$n; $y = 40 + ($H - 80) * $t
     $w = 150 * [Math]::Pow([Math]::Sin($PI * $t), 0.75) * $scale
-    $jl = if ($i % 2 -eq 0) { 1 + 0.28 * $r.NextDouble() } else { 0.72 + 0.12 * $r.NextDouble() }
-    $jr = if ($i % 2 -eq 1) { 1 + 0.28 * $r.NextDouble() } else { 0.72 + 0.12 * $r.NextDouble() }
+    $jl = 0.78 + 0.32 * $r.NextDouble(); if ($r.NextDouble() -lt 0.14) { $jl = 1.3 + 0.2 * $r.NextDouble() } elseif ($r.NextDouble() -lt 0.1) { $jl = 0.6 }
+    $jr = 0.78 + 0.32 * $r.NextDouble(); if ($r.NextDouble() -lt 0.14) { $jr = 1.3 + 0.2 * $r.NextDouble() } elseif ($r.NextDouble() -lt 0.1) { $jr = 0.6 }
     $bend = 18 * [Math]::Sin($t * 5.1) * $scale
     $left += New-Object Drawing.PointF ([float]($cx + $bend - $w * $jl)), ([float]$y)
     $right += New-Object Drawing.PointF ([float]($cx + $bend + $w * $jr)), ([float]$y)
@@ -57,13 +57,13 @@ for ($s = 0; $s -lt 9; $s++) {
   $g.DrawCurve((New-Object Drawing.Pen ([Drawing.Color]::FromArgb($al, 255, 120 + $rng.Next(80), 20)), (2 + 3 * $rng.NextDouble())), [Drawing.PointF[]]$pts) }
 for ($i = 0; $i -lt 120; $i++) { $x = $cx + ($rng.NextDouble() * 2 - 1) * 150; $y = 60 + $rng.NextDouble() * ($H - 120); $r = 1 + 3 * $rng.NextDouble()
   $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(120 + $rng.Next(130), 255, 180 + $rng.Next(70), 60))), [float]($x - $r), [float]($y - $r), [float](2 * $r), [float](2 * $r)) }
-$g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(110, 255, 200, 90))), [float]($cx - 36), [float]($H * 0.52 - 60), 72, 120)
+$g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(40, 255, 200, 90))), [float]($cx - 30), [float]($H * 0.52 - 50), 60, 100)
 $g.ResetClip()
 Save $b $g 'rift_core'
 
 # ---- кромка: толстый контур, внутренняя линия, ветвящиеся трещины наружу, искры ----
 $b, $g = Canvas $false
-$pen = New-Object Drawing.Pen ([Drawing.Color]::White), 9; $pen.LineJoin = 'Miter'
+$pen = New-Object Drawing.Pen ([Drawing.Color]::White), 6; $pen.LineJoin = 'Round'
 $g.DrawPolygon($pen, $main)
 $g.DrawPolygon((New-Object Drawing.Pen ([Drawing.Color]::FromArgb(255, 150, 150, 150)), 3), (Outline 0.9 31))
 function Crack($g, [double]$x, [double]$y, [double]$a, [double]$len, [double]$w, [int]$depth) {

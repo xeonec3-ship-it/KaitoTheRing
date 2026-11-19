@@ -1,12 +1,11 @@
 package ru.pohsmp.core.spell;
 
-import org.jetbrains.annotations.Nullable;
-import net.minecraft.world.InteractionHand;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.Utils;
@@ -46,9 +45,10 @@ import ru.pohsmp.core.ServerConfig;
 import ru.pohsmp.core.net.Net;
 
 /**
- * Divine school, level 1 (subclass {@link DisintegrationReplicaSpell} — the Higher copy with other damage, colors and a chant). 10 s long cast on a locked target: the target is frozen and lifted, magic circles close around it,
- * then it takes damagePercent (1.0) * max HP + damageFlat ignoring armor and, with alwaysKill (default), dies no matter what
- * is left (absorption, resistances, totems). The cast cannot be interrupted by damage.
+ * Divine school, level 1 (subclass {@link DisintegrationReplicaSpell} - the Higher copy with other damage, colors and a chant).
+ * 10 s long cast on a locked target: the target is frozen and lifted, magic circles close around it, then it takes
+ * damagePercent (1.0) * max HP + damageFlat ignoring armor and, with alwaysKill (default), dies no matter what is left
+ * (absorption, resistances, totems). The cast cannot be interrupted by damage.
  */
 public class DisintegrationSpell extends AbstractSpell {
     public static final ResourceLocation ID = new ResourceLocation(PohCore.MODID, "disintegration");
@@ -91,14 +91,14 @@ public class DisintegrationSpell extends AbstractSpell {
     @Override public boolean canBeInterrupted(Player player) { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.BEACON_ACTIVATE); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
-    /** Молитва, как у Хинаты и Шуны в «Слизи» (tools/gen_player_anims.py); ладони сложены — предмет в руках на время каста не рисуется. */
+    /** Prayer pose (tools/gen_player_anims.py); hands folded, so the held item is not drawn for the cast. */
     private static final AnimationHolder ANIM_CAST = CastAnims.of("disintegration_cast"), ANIM_FINISH = CastAnims.of("disintegration_finish");
 
     @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
     @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
 
     @Override
-    public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, InteractionHand hand, @Nullable MagicData md) {
+    public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, net.minecraft.world.InteractionHand hand, @javax.annotation.Nullable MagicData md) {
         super.onClientPreCast(level, spellLevel, entity, hand, md);
         CastAnims.hideHands(level, entity, getEffectiveCastTime(spellLevel, entity));
     }
@@ -169,7 +169,7 @@ public class DisintegrationSpell extends AbstractSpell {
         t.hurt(src, dmg);
         boolean exempt = t instanceof Player p && (p.isCreative() || p.isSpectator());
         if (ServerConfig.DIS_KILL.get() && t.isAlive() && !exempt) {
-            // absorption, resistance, totem or another mod kept it alive: finish it, bypassing the totem
+            // absorption, resistance, a totem or another mod kept it alive: finish it, bypassing the totem
             t.setAbsorptionAmount(0);
             t.setHealth(0);
             t.die(src);
@@ -270,8 +270,8 @@ public class DisintegrationSpell extends AbstractSpell {
     }
 
     /** Safety: if the caster disappears mid-cast, free the target. */
-    public static final class Events {
-        private Events() {}
+    public static final class DisintegrationEvents {
+        private DisintegrationEvents() {}
 
         @SubscribeEvent
         public static void onServerTick(TickEvent.ServerTickEvent e) {

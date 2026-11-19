@@ -20,7 +20,8 @@ public final class HigherEvents {
     @SubscribeEvent
     public static void onPreCast(SpellPreCastEvent e) {
         Player p = e.getEntity();
-        if (p.hasEffect(Reg.SEAL.get()) || p.hasEffect(Reg.NIGHTMARE.get())) e.setCanceled(true);
+        if (p.hasEffect(Reg.SEAL.get()) || p.hasEffect(Reg.NIGHTMARE.get()) || p.hasEffect(Reg.SPENT.get())
+                || p.hasEffect(Reg.CREATION_BACKLASH.get())) e.setCanceled(true);
     }
 
     /** Seal: no drinking (potions, milk, mana potions). */

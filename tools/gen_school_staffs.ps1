@@ -1,4 +1,4 @@
-# School staffs for pohsmp_core: one 32x32 texture + 3D item model (Iron's staff proportions) per school.
+﻿# School staffs for pohsmp_core: one 32x32 texture + 3D item model (Iron's staff proportions) per school.
 # Every staff has its own silhouette (head AND shaft), not a recolor.
 # Output: assets/pohsmp_core/textures/item/<school>_staff.png, models/item/<school>_staff.json
 # Usage: tools\gen_school_staffs.ps1 [-Only fire,blood]
@@ -134,12 +134,12 @@ function Paint-Plane($kind, $c) {
 
 # ======================= model building =======================
 $UVMAP = @{ wood = @(0, 0, 1, 16); m1 = @(1, 0, 3, 4); m2 = @(3, 0, 5, 4); core = @(5, 0, 7, 4); hot = @(7, 0, 8, 4); gem = @(8, 0, 12, 4); frame = @(12, 0, 16, 4)
-  m3 = @(1, 4, 3, 8); m4 = @(3, 4, 5, 8); core2 = @(5, 4, 7, 8); wide = @(8, 4, 16, 8); plane2 = @(1, 8, 8, 16); plane = @(8, 8, 16, 16) }
+  m3 = @(1, 4, 3, 8); m4 = @(3, 4, 5, 8); core2 = @(5, 4, 7, 8); wide = @(8, 4, 16, 8); plane2 = @(1, 8, 8, 16); plane = @(8, 8, 16, 16); hole = @(9, 1, 11, 3) }
 $LIGHTDATA = [ordered]@{ block_light = 15; sky_light = 15; ambient_occlusion = $false }
 $ALLF = @('north', 'east', 'south', 'west', 'up', 'down')
 $NS = @('north', 'south'); $EW = @('east', 'west')
 function R3($v) { [Math]::Round([double]$v, 3) }
-function Rot($angle, $axis, $origin) { [ordered]@{ angle = $angle; axis = $axis; origin = @((R3 $origin[0]), (R3 $origin[1]), (R3 $origin[2])) } }
+function Rot([double]$angle, $axis, $origin) { [ordered]@{ angle = $angle; axis = $axis; origin = @((R3 $origin[0]), (R3 $origin[1]), (R3 $origin[2])) } }
 function Box($from, $to, $mat, $rotation = $null, [switch]$lit, $faces = $ALLF) {
   $fd = [ordered]@{}
   foreach ($fn in $faces) { $face = [ordered]@{ uv = $UVMAP[$mat]; texture = '#0' }; if ($lit) { $face.forge_data = $LIGHTDATA }; $fd[$fn] = $face }
@@ -416,14 +416,15 @@ function Staff-Holy($e) {   # celestial bident: gold shaft, ankh foot, spiked ov
   Add $e (Box @(7.8, 11.9, 9.1) @(8.2, 12.3, 10.9) 'm1' (Rot -22.5 'x' @(8, 12.1, 9.1)))
   Add $e (Box @(7.8, 11.9, 5.1) @(8.2, 12.3, 6.9) 'm1' (Rot 22.5 'x' @(8, 12.1, 6.9)))
   # feather blades, V
-  foreach ($sd in @(1, -1)) {
-    $ox = 8 + $sd * 1.1; $ang = -22.5 * $sd
-    $x0 = if ($sd -gt 0) { $ox } else { $ox - 1.8 }; $x1 = $x0 + 1.8
+  foreach ($side in @(1, -1)) {
+    $ox = 8 + $side * 1.1; $ang = -22.5 * $side
+    Bn $(if ($side -gt 0) { 'wing_r' } else { 'wing_l' }) $null $ox 12.4 8
+    $x0 = if ($side -gt 0) { $ox } else { $ox - 1.8 }; $x1 = $x0 + 1.8
     Add $e (Box @($x0, 12.4, 7.75) @($x1, 22.4, 8.25) 'wide' (Rot $ang 'z' @($ox, 12.4, 8)))
-    $t0 = if ($sd -gt 0) { $ox + 0.2 } else { $ox - 1.2 }
+    $t0 = if ($side -gt 0) { $ox + 0.2 } else { $ox - 1.2 }
     Add $e (Box @($t0, 22.4, 7.8) @(($t0 + 1), 25.4, 8.2) 'wide' (Rot $ang 'z' @($ox, 12.4, 8)))
-    $o2 = 8 + $sd * 1.6; $u0 = if ($sd -gt 0) { $o2 } else { $o2 - 1.3 }
-    Add $e (Box @($u0, 12.6, 7.95) @(($u0 + 1.3), 19.6, 8.45) 'wide' (Rot (-45 * $sd) 'z' @($o2, 12.6, 8)))
+    $o2 = 8 + $side * 1.6; $u0 = if ($side -gt 0) { $o2 } else { $o2 - 1.3 }
+    Add $e (Box @($u0, 12.6, 7.95) @(($u0 + 1.3), 19.6, 8.45) 'wide' (Rot (-45 * $side) 'z' @($o2, 12.6, 8)))
   }
   $script:BN = $null
   # oval frame with the blue stone
@@ -439,71 +440,94 @@ function Staff-Holy($e) {   # celestial bident: gold shaft, ankh foot, spiked ov
   Add $e (C 8 22.6 8 1.6 1.6 1.6 'core' -lit); Add $e (C 8 22.6 8 1.4 1.4 1.4 'core' 45 -lit); Add $e (C 8 22.6 8 1.4 1.4 1.4 'core' 45 'x' -lit)
   $script:BN = $null
 }
-function Staff-Lightning($e) {   # spatiochronic: copper horseshoe gears, figure-eight rings of teal glass, hourglass half-gear
+function Staff-Lightning($e) {   # spatiochronic: copper horseshoe gears, hourglass half-gear, ring and needle
   Add $e (C 8 -1.5 8 0.8 25 0.8 'wood')
   Add $e (C 8 -14.3 8 1.2 0.9 1.2 'm1' 45); Add $e (C 8 -15 8 0.8 0.8 0.8 'm1')
   foreach ($yy in @(-9, -2, 5)) { Add $e (C 8 $yy 8 1.2 0.5 1.2 'm2') }
   Add $e (C 8 11.4 8 1.4 0.9 1.4 'm2')
   # lower horseshoe gear with a teal orb
   Oct $e 'm1' 8 14.6 2.6 2.6 0.3 0.45 @('T')
+  Bn 'teeth_low' $null 8 14.6 8
   Teeth $e 'm2' 8 14.6 3.05 200 340 6 0.55 0.35
+  Bn 'orb_low' $null 8 14.6 8
   Add $e (C 8 14.6 8 1.9 1.9 1.9 'gem' -lit); Add $e (C 8 14.6 8 1.7 1.7 1.7 'gem' 45 -lit)
+  $script:BN = $null
   foreach ($k in @(@(5.4, 14.6), @(10.6, 14.6), @(8, 12))) { Add $e (C $k[0] $k[1] 8.5 0.3 0.3 0.2 'm2') }
-  # figure eight
-  foreach ($cy in @(18.7, 22.3)) {
-    Oct $e 'm1' 8 $cy 1.9 1.8 0.25 0.35
-  }
-  # half gear with an hourglass
-  Oct $e 'm1' 8 25.8 2.5 2.5 0.28 0.4 @('B', 'BL', 'BR')
-  Add $e (Box @(5.3, 24.55, 7.6) @(10.7, 25.05, 8.4) 'm1')
-  Teeth $e 'm2' 8 25.8 2.95 20 160 7 0.5 0.3
-  Add $e (C 8 27.2 8 1.4 0.25 0.5 'm2'); Add $e (C 8 25.25 8 1.4 0.25 0.5 'm2')
-  Add $e (C 8 26.7 8 0.9 0.9 0.3 'core2' 45 'z' -lit); Add $e (C 8 25.75 8 0.65 0.65 0.3 'core2' 45 'z' -lit)
+  # half gear with an hourglass, right on top of the horseshoe
+  Add $e (C 8 17.3 8 0.5 1.2 0.5 'm2')
+  Oct $e 'm1' 8 19 2.5 2.5 0.28 0.4 @('B', 'BL', 'BR')
+  Add $e (Box @(5.3, 17.75, 7.6) @(10.7, 18.25, 8.4) 'm1')
+  Bn 'teeth_up' $null 8 19 8
+  Teeth $e 'm2' 8 19 2.95 20 160 7 0.5 0.3
+  Bn 'hourglass' $null 8 19.425 8
+  Add $e (C 8 20.4 8 1.4 0.25 0.5 'm2'); Add $e (C 8 18.45 8 1.4 0.25 0.5 'm2')
+  Add $e (C 8 19.9 8 0.9 0.9 0.3 'core2' 45 'z' -lit); Add $e (C 8 18.95 8 0.65 0.65 0.3 'core2' 45 'z' -lit)
+  $script:BN = $null
   # ring on the left, needle on the right
-  Add $e (Box @(5.6, 20.3, 7.8) @(6.2, 20.7, 8.2) 'm2')
-  Oct $e 'm1' 4.4 20.5 1.2 1.2 0.2 0.3
-  Add $e (C 4.4 20.5 8 0.6 0.6 0.6 'hot' 45 -lit)
-  Add $e (Box @(9.8, 21.1, 7.8) @(11.2, 21.5, 8.2) 'm2')
-  Add $e (C 11.6 22.5 8 0.3 6 0.3 'm2' -22.5 'z'); Add $e (C 12.75 25.3 8 0.3 0.3 0.3 'hot' 45 -lit)
+  Add $e (Box @(5.1, 18.4, 7.8) @(5.7, 18.8, 8.2) 'm2')
+  Bn 'ring' $null 3.9 18.6 8
+  Oct $e 'm1' 3.9 18.6 1.2 1.2 0.2 0.3
+  Add $e (C 3.9 18.6 8 0.6 0.6 0.6 'hot' 45 -lit)
+  $script:BN = $null
+  Add $e (Box @(10.3, 19.4, 7.8) @(11.5, 19.8, 8.2) 'm2')
+  Bn 'needle' $null 10.9 19.6 8
+  Add $e (C 11.9 21.2 8 0.3 6 0.3 'm2' -22.5 'z'); Add $e (C 13.05 24 8 0.3 0.3 0.3 'hot' 45 -lit)
+  $script:BN = $null
   # discharges and teal sparks
-  [void](Chain $e 4.4 21.7 8 'z' @(@(-22.5, 1.2), @(45, 1.2), @(-45, 1), @(22.5, 1)) 'hot' 0.14 0.1 -lit)
-  [void](Chain $e 10.6 15.6 8.2 'z' @(@(-45, 1.2), @(22.5, 1), @(-45, 1.2), @(0, 0.8)) 'hot' 0.14 0.1 -lit)
-  [void](Chain $e 8 28.3 8 'x' @(@(22.5, 1), @(-45, 1), @(45, 0.8)) 'hot' 0.14 0.1 -lit)
-  [void](Chain $e 5.6 13.6 8 'z' @(@(45, 1.2, $true), @(-22.5, 1, $true), @(45, 0.8, $true)) 'hot' 0.14 0.1 -lit)
-  foreach ($s in @(@(3.6, 16.5, 9), @(12.4, 18, 7), @(5, 25, 9.5), @(11.5, 28.5, 8), @(3, 23, 7.5), @(13, 14, 8.5))) { Add $e (C $s[0] $s[1] $s[2] 0.4 0.4 0.4 'hot' 45 -lit) }
+  [void](Chain $e 3.9 19.8 8 'z' @(@(-22.5, 1.2), @(45, 1.2), @(-45, 1), @(22.5, 1)) 'hot' 0.14 0.1 -lit -ChainBone 'arc0')
+  [void](Chain $e 10.6 15.6 8.2 'z' @(@(-45, 1.2), @(22.5, 1), @(-45, 1.2), @(0, 0.8)) 'hot' 0.14 0.1 -lit -ChainBone 'arc1')
+  [void](Chain $e 8 22.2 8 'x' @(@(22.5, 1), @(-45, 1), @(45, 0.8)) 'hot' 0.14 0.1 -lit -ChainBone 'arc2')
+  [void](Chain $e 5.6 13.6 8 'z' @(@(45, 1.2, $true), @(-22.5, 1, $true), @(45, 0.8, $true)) 'hot' 0.14 0.1 -lit -ChainBone 'arc3')
+  Bn 'sparks' $null 8 19 8
+  foreach ($s in @(@(3.6, 16, 9), @(12.4, 17, 7), @(4.5, 22, 9.5), @(10.5, 24, 8), @(2.4, 21, 7.5), @(13, 14, 8.5))) { Add $e (C $s[0] $s[1] $s[2] 0.4 0.4 0.4 'hot' 45 -lit) }
+  $script:BN = $null
 }
-function Staff-Nature($e) {   # crooked living branch, roots, vines, leafy crown, glowing flower
-  [void](Chain $e 8 -14 8 'z' @(@(0, 6), @(22.5, 5), @(-22.5, 5), @(0, 4), @(-22.5, 4), @(22.5, 3.5)) 'wood' 1.3 1.0)
-  foreach ($k in @(@(8, -8), @(6.09, -3.38), @(8, 1.24), @(9.53, 8.94))) { Add $e (C $k[0] $k[1] 8 1.5 1.2 1.5 'm2') }
-  foreach ($v in @(@(8.7, -11, 8.4), @(7, -5.7, 8.75), @(6.4, -1.1, 8.2), @(8.2, 3.2, 7.25), @(9.5, 7.1, 8.3), @(8.6, 10.5, 8.8))) { Add $e (C $v[0] $v[1] $v[2] 0.7 0.7 0.7 'm1' 45) }
-  [void](Chain $e 8 -14 8 'z' @(, @(22.5, 1.8, $true)) 'wood' 0.6 0.6)
-  [void](Chain $e 8 -14 8 'z' @(, @(-22.5, 1.8, $true)) 'wood' 0.6 0.6)
-  [void](Chain $e 8 -14 8 'x' @(, @(22.5, 1.8, $true)) 'wood' 0.6 0.6)
-  $tw = Chain $e 6.3 -3 8 'z' @(@(45, 2), @(22.5, 1)) 'wood' 0.5 0.4; Add $e (C $tw[0] $tw[1] $tw[2] 1.3 1.1 1.3 'wide' 45)
-  $tw = Chain $e 8 5.5 8.5 'x' @(@(22.5, 2), @(45, 1)) 'wood' 0.5 0.4; Add $e (C $tw[0] $tw[1] $tw[2] 1.3 1.1 1.3 'wide' 45)
-  $B = @(
-    @('z', @(@(-45, 3), @(-22.5, 2.5), @(0, 1.5))),
-    @('z', @(@(45, 3), @(22.5, 3))),
-    @('x', @(@(-45, 2.5), @(-22.5, 2.5))),
-    @('x', @(@(45, 2.5), @(0, 2))))
-  $ends = @()
-  foreach ($b in $B) { $p = Chain $e 8.2 12.2 8 $b[0] $b[1] 'wood' 0.8 0.5; $ends += , $p }
-  $i = 0
-  foreach ($p in $ends) {
-    Add $e (C $p[0] ($p[1] + 0.6) $p[2] 2.8 2.2 2.8 'wide' $(if ($i % 2) { 45 } else { 0 }))
-    Add $e (C $p[0] ($p[1] + 2) $p[2] 1.8 1.4 1.8 'wide' $(if ($i % 2) { 0 } else { 45 }))
-    $i++
+function Staff-Nature($e) {   # grove skull: crooked dark branch, two claw branches cradle a skull with green eyes, leaves and sprouts
+  [void](Chain $e 8 11 8 'z' @(@(0, 3, $true), @(22.5, 4, $true), @(0, 4, $true), @(-22.5, 4, $true), @(22.5, 4, $true), @(22.5, 3, $true), @(0, 2, $true)) 'wood' 1.3 0.3)
+  foreach ($k in @(@(8, 5.5), @(9.5, 0.2), @(8.4, -6.5))) { Add $e (C $k[0] $k[1] 8 1.6 0.8 1.6 'wood' 45) }
+  # claw branches
+  [void](Chain $e 7.6 11 8 'z' @(@(22.5, 3), @(22.5, 3), @(0, 3), @(-22.5, 2), @(-45, 2), @(-45, 1.2)) 'wood' 1.2 0.3)
+  [void](Chain $e 8.6 12.5 8 'z' @(@(-22.5, 2.5), @(-22.5, 2), @(0, 2), @(22.5, 2), @(45, 1.5), @(45, 1)) 'wood' 1.0 0.3)
+  [void](Chain $e 8 12 8 'x' @(@(22.5, 2.5), @(0, 2), @(-22.5, 1.5)) 'wood' 0.7 0.3)
+  # skull
+  $sr = (Rot 22.5 'y' @(8, 17, 8))
+  foreach ($b in @(
+      @(6.2, 17.9, 6.6, 9.8, 19.4, 9.3, 'm4'),     # cranium
+      @(6.6, 19.4, 6.9, 9.4, 19.9, 9.0, 'm4'),     # dome
+      @(6.3, 16.4, 6.9, 9.7, 17.9, 9.2, 'm4'),     # mid skull
+      @(6.6, 16.3, 9.2, 9.4, 17.9, 9.3, 'm2'),     # dark socket backing
+      @(6.3, 17.9, 9.3, 9.7, 18.4, 9.95, 'm4'),    # brow ridge
+      @(7.8, 16.9, 9.3, 8.2, 17.9, 9.85, 'm4'),    # nose bridge
+      @(6.3, 16.6, 9.3, 6.9, 17.9, 9.85, 'm4'),    # outer socket rims
+      @(9.1, 16.6, 9.3, 9.7, 17.9, 9.85, 'm4'),
+      @(6.6, 16.3, 9.3, 7.75, 16.9, 9.8, 'm4'),    # cheeks under the eyes, nose hole between
+      @(8.25, 16.3, 9.3, 9.4, 16.9, 9.8, 'm4'),
+      @(6.8, 15.8, 8.0, 9.2, 16.3, 9.6, 'm4'),     # upper jaw
+      @(7.0, 15.55, 8.2, 9.0, 15.8, 9.5, 'm2')     # mouth gap
+    )) { Add $e (Box @($b[0], $b[1], $b[2]) @($b[3], $b[4], $b[5]) $b[6] $sr) }
+  foreach ($tx in @(7.05, 7.55, 8.05, 8.55)) {   # teeth
+    Add $e (Box @($tx, 15.5, 9.55) @(($tx + 0.4), 16.0, 9.75) 'm4' $sr)
   }
-  Add $e (C $ends[0][0] ($ends[0][1] - 1) ($ends[0][2] + 0.6) 0.6 0.6 0.6 'core' 45 -lit)
-  Add $e (C $ends[2][0] ($ends[2][1] - 1) $ends[2][2] 0.6 0.6 0.6 'core' 45 -lit)
-  [void](Chain $e $ends[1][0] ($ends[1][1] - 0.4) $ends[1][2] 'z' @(@(0, 2.5, $true), @(22.5, 1.5, $true)) 'm1' 0.3 0.3 -tipMat 'core' -tipSize 0.4)
-  [void](Chain $e $ends[3][0] ($ends[3][1] - 0.4) $ends[3][2] 'x' @(, @(0, 3, $true)) 'm1' 0.3 0.3)
-  $fl = Chain $e 8.2 12.2 8 'z' @(@(0, 4.5), @(22.5, 2.2), @(-22.5, 2.6)) 'wood' 0.7 0.5
-  $fx = $fl[0]; $fy = $fl[1] + 0.3; $fz = $fl[2]
-  Add $e (C $fx $fy $fz 1 1 1 'hot' -lit)
-  foreach ($o in @(@(0.9, 0), @(-0.9, 0), @(0, 0.9), @(0, -0.9))) { Add $e (C ($fx + $o[0]) ($fy - 0.1) ($fz + $o[1]) 1 0.4 1 'core2' 45 -lit) }
-}
-function Staff-Higher($e) {   # singularity: black sphere with a crimson rim, tilted debris disk, jets, cracked black shaft
+  foreach ($ex in @(7.1, 8.4)) { Add $e (Box @($ex, 17.05, 9.3) @(($ex + 0.5), 17.55, 9.5) 'core' $sr -lit) }   # eye glow
+  # mandible and hinges: the bone 'jaw_yaw' carries the skull's 22.5 turn, 'jaw' opens about the hinge line
+  Bn 'jaw_yaw' $null 8 17 8 @(0, -22.5, 0)
+  Bn 'jaw' 'jaw_yaw' 8 15.8 7.6 $null -drop
+  foreach ($b in @(
+      @(6.9, 15.0, 7.6, 9.1, 15.55, 9.55, 'm4'),   # mandible
+      @(6.5, 15.2, 7.3, 6.9, 16.3, 7.9, 'm4'),     # jaw hinges
+      @(9.1, 15.2, 7.3, 9.5, 16.3, 7.9, 'm4')
+    )) { Add $e (Box @($b[0], $b[1], $b[2]) @($b[3], $b[4], $b[5]) $b[6] $sr) }
+  # green glow circling the skull
+  Bn 'wisps' $null 8 17 8.6
+  foreach ($g in @(@(5.6, 19.5, 8.6), @(10.6, 18.5, 7.6), @(7.4, 21.4, 8.2), @(9.6, 15, 9.4))) { Add $e (C $g[0] $g[1] $g[2] 0.7 0.7 0.7 'core' 45 -lit) }
+  $script:BN = $null
+  $k = 0
+  foreach ($l in @(@(4.7, 17.6, 8.3, 0), @(11.2, 17.2, 7.7, 45), @(5.9, 14, 8.6, 45), @(10.3, 20.4, 8.2, 0), @(9.7, 4.6, 8.6, 45), @(10.5, -1.5, 7.6, 0), @(7.1, -8.5, 8.4, 45))) {
+    AddOwn $e (C $l[0] $l[1] $l[2] 1.3 1 1.3 'wide' $l[3]) "leaf$k"; $k++
+  }
+  $k = 0
+  foreach ($s in @(@(9.5, 5.6, 7.5), @(6.8, 1, 8.5), @(10.9, -2.6, 8.2))) { [void](Chain $e $s[0] $s[1] $s[2] 'z' @(@(-45, 1), @(-22.5, 0.8)) 'm1' 0.3 0.2 -ChainBone "sprout$k"); $k++ }
+}function Staff-Higher($e) {   # singularity: black sphere with a crimson rim, tilted debris disk, jets, cracked black shaft
   Add $e (C 8 -1.5 8 1 25 1 'wood')
   Add $e (C 8 -14.5 8 1.6 1 1.6 'm2'); Add $e (Box @(7.4, -16, 7.4) @(8.6, -15, 8.6) 'core' (Rot 45 'y' @(8, -15.5, 8)) -lit)
   foreach ($v in @(@(8.56, 3, 8, 0.12, 5, 0.3), @(7.44, 6.5, 8, 0.12, 6, 0.3), @(8, 5, 8.56, 0.3, 3.5, 0.12), @(8, 8.5, 7.44, 0.3, 4.5, 0.12))) {
@@ -540,28 +564,45 @@ function Staff-Higher($e) {   # singularity: black sphere with a crimson rim, ti
   Add $e (C 8 15.6 8 0.35 2.4 0.35 'hot' -lit)
   $script:BN = $null
 }
-function Staff-Divine($e) {   # sun disk with rays inside a halo, floating crown
+function Staff-Divine($e) {   # volumetric sun: glowing core, 3D star of rays, gyroscope of two halos, floating crown
   Add $e (C 8 -1.5 8 1.1 25 1.1 'wood')
   foreach ($yy in @(-12, -6, 0, 6)) { Add $e (C 8 $yy 8 1.5 0.6 1.5 'm1') }
   Add $e (C 8 -3 8 1.4 4.4 1.4 'm2')
   Add $e (C 8 -14.75 8 1.8 1.5 1.8 'm1'); Add $e (C 8 -15.6 8 0.8 0.8 0.8 'hot' 45 -lit)
   Add $e (C 8 11.6 8 1.8 1.2 1.8 'm1'); Add $e (C 8 12.6 8 2.6 0.8 2.6 'm1'); Add $e (C 8 13.6 8 0.8 1.4 0.8 'm1')
-  Add $e (Box @(3.5, 14.5, 7.85) @(12.5, 23.5, 8.15) 'plane2' -lit -faces $NS)
-  HaloV $e 'm1' 19 4.9 0.35 -lit
-  foreach ($a in @(0, 45, -45)) { Add $e (Box @(7.55, 24, 7.7) @(8.45, 28.2, 8.3) 'hot' (Rot $a 'z' @(8, 19, 8)) -lit) }
-  foreach ($a in @(45, -45)) { Add $e (Box @(7.55, 9.8, 7.7) @(8.45, 14, 8.3) 'hot' (Rot $a 'z' @(8, 19, 8)) -lit) }
-  Add $e (Box @(12.9, 18.55, 7.7) @(17.2, 19.45, 8.3) 'hot' -lit); Add $e (Box @(-1.2, 18.55, 7.7) @(3.1, 19.45, 8.3) 'hot' -lit)
-  foreach ($a in @(22.5, -22.5)) { Add $e (Box @(7.65, 24, 7.75) @(8.35, 26.4, 8.25) 'core' (Rot $a 'z' @(8, 19, 8)) -lit) }
+  # sun core
+  Bn 'sun' $null 8 19 8
+  Add $e (C 8 19 8 3.4 3.4 3.4 'hot' -lit)
+  Add $e (C 8 19 8 3.0 3.0 3.0 'hot' 45 -lit)
+  Add $e (C 8 19 8 3.0 3.0 3.0 'hot' 45 'x' -lit)
+  Add $e (C 8 19 8 4.0 1.6 1.6 'core' -lit); Add $e (C 8 19 8 1.6 4.0 1.6 'core' -lit); Add $e (C 8 19 8 1.6 1.6 4.0 'core' -lit)
+  # gyroscope
+  Bn 'halo_v' $null 8 19 8
+  HaloV $e 'm1' 19 4.9 0.4 -lit
+  Bn 'halo_z' $null 8 19 8
+  HaloZ $e 'm1' 19 4.4 0.4 -lit
+  # long rays: up, sides, front/back (square section)
+  Bn 'rays' $null 8 19 8
+  foreach ($a in @(0, 45, -45)) { Add $e (Box @(7.5, 24, 7.5) @(8.5, 28.2, 8.5) 'hot' (Rot $a 'z' @(8, 19, 8)) -lit) }
+  foreach ($a in @(45, -45)) { Add $e (Box @(7.5, 9.8, 7.5) @(8.5, 14, 8.5) 'hot' (Rot $a 'z' @(8, 19, 8)) -lit) }
+  Add $e (Box @(12.9, 18.5, 7.5) @(17.2, 19.5, 8.5) 'hot' -lit); Add $e (Box @(-1.2, 18.5, 7.5) @(3.1, 19.5, 8.5) 'hot' -lit)
+  Add $e (Box @(7.5, 18.5, 12.9) @(8.5, 19.5, 17.2) 'hot' -lit); Add $e (Box @(7.5, 18.5, -1.2) @(8.5, 19.5, 3.1) 'hot' -lit)
+  foreach ($a in @(45, -45)) { Add $e (Box @(7.5, 24, 7.5) @(8.5, 27.4, 8.5) 'hot' (Rot $a 'x' @(8, 19, 8)) -lit) }
+  # short rays between
+  Bn 'rays_short' 'rays' 8 19 8
   foreach ($a in @(22.5, -22.5)) {
-    Add $e (Box @(12.9, 18.65, 7.75) @(15.3, 19.35, 8.25) 'core' (Rot $a 'z' @(8, 19, 8)) -lit)
-    Add $e (Box @(0.7, 18.65, 7.75) @(3.1, 19.35, 8.25) 'core' (Rot $a 'z' @(8, 19, 8)) -lit)
+    Add $e (Box @(7.6, 24, 7.6) @(8.4, 26.4, 8.4) 'core' (Rot $a 'z' @(8, 19, 8)) -lit)
+    Add $e (Box @(7.6, 24, 7.6) @(8.4, 26.4, 8.4) 'core' (Rot $a 'x' @(8, 19, 8)) -lit)
+    Add $e (Box @(12.9, 18.6, 7.6) @(15.3, 19.4, 8.4) 'core' (Rot $a 'z' @(8, 19, 8)) -lit)
+    Add $e (Box @(0.7, 18.6, 7.6) @(3.1, 19.4, 8.4) 'core' (Rot $a 'z' @(8, 19, 8)) -lit)
+    Add $e (Box @(7.6, 18.6, 12.9) @(8.4, 19.4, 15.3) 'core' (Rot $a 'x' @(8, 19, 8)) -lit)
+    Add $e (Box @(7.6, 18.6, 0.7) @(8.4, 19.4, 3.1) 'core' (Rot $a 'x' @(8, 19, 8)) -lit)
   }
   Bn 'crown' $null 8 29.6 8
   RingFlat $e 'm1' 29.6 1.6 0.3 -lit
   foreach ($o in @(@(1.6, 0), @(-1.6, 0), @(0, 1.6), @(0, -1.6))) { Add $e (C (8 + $o[0]) 30.6 (8 + $o[1]) 0.45 1.2 0.45 'm1' 45 -lit) }
   $script:BN = $null
 }
-
 function Staff-Mythic($e) {   # Mythic tier: starry armillary sphere, star core, crescent, silver helix
   Add $e (C 8 -1.5 8 1 25 1 'wood')
   Bn 'helix' $null 8 0 8
@@ -608,23 +649,20 @@ function Staff-Downfall($e) {   # Forbidden school (GeckoLib): black spear-staff
   Teeth $e 'm1' 8 20.5 6.3 -45 225 9 0.75 0.4
   [void](Chain $e 5.7 25.2 8 'z' @(@(-22.5, 1.3), @(-45, 1.1)) 'm2' 0.9 0.5 -tipMat 'm1' -tipSize 0.5)
   [void](Chain $e 10.3 25.2 8 'z' @(@(22.5, 1.3), @(45, 1.1)) 'm2' 0.9 0.5 -tipMat 'm1' -tipSize 0.5)
-  # upper spear through the opening
-  Add $e (C 8 25.4 8 1.2 0.6 1.2 'm1'); Add $e (C 8 28 8 1.3 3.8 0.35 'm1'); Add $e (C 8 28 8 0.4 3.2 0.42 'm2')
-  Add $e (C 8 30.1 8 0.95 0.95 0.35 'm1' 45 'z')
   # quasar: black hole with gold edge, photon ring, tilted accretion disk, jets, orbiting gold debris
   $script:BN = 'quasar'
-  Add $e (C 8 20.5 8 2.2 2.2 2.2 'gem' -lit); Add $e (C 8 20.5 8 2.0 2.0 2.0 'gem' 45 -lit); Add $e (C 8 20.5 8 2.0 2.0 2.0 'gem' 45 'x' -lit)
-  HaloV $e 'hot' 20.5 1.75 0.12 -lit
+  Add $e (C 8 20.5 8 2.2 2.2 2.2 'hole'); Add $e (C 8 20.5 8 2.0 2.0 2.0 'hole' 45); Add $e (C 8 20.5 8 2.0 2.0 2.0 'hole' 45 'x')
+  HaloV $e 'core2' 20.5 1.55 0.14 -lit
   $script:BN = 'disk'
   $rot = Rot 22.5 'x' @(8, 20.5, 8)
-  foreach ($ring in @(@(2.0, 10, 0.7, 'core'), @(2.8, 14, 0.6, 'core'), @(3.6, 18, 0.45, 'core2'))) {
+  foreach ($ring in @(@(1.7, 10, 0.95, 'core2'), @(2.4, 14, 0.9, 'core'), @(3.1, 18, 0.8, 'core'), @(3.8, 22, 0.6, 'hot'))) {
     for ($i = 0; $i -lt $ring[1]; $i++) {
       $a = $i * 2 * [Math]::PI / $ring[1] + $ring[0]; $s = $ring[2]; $px = 8 + $ring[0] * [Math]::Cos($a); $pz = 8 + $ring[0] * [Math]::Sin($a)
       Add $e (Box @(($px - $s / 2), (20.42), ($pz - $s / 2)) @(($px + $s / 2), (20.58), ($pz + $s / 2)) $ring[3] $rot -lit)
     }
   }
   $script:BN = 'jets'
-  Add $e (C 8 23.3 8 0.3 3.4 0.3 'core2' -lit); Add $e (C 8 17.7 8 0.3 3.4 0.3 'core2' -lit)
+  Add $e (C 8 22.9 8 0.3 2.6 0.3 'core2' -lit); Add $e (C 8 18.1 8 0.3 2.6 0.3 'core2' -lit)
   Add $e (C 8 22.6 8 0.6 1.6 0.6 'hot' -lit); Add $e (C 8 18.4 8 0.6 1.6 0.6 'hot' -lit)
   $script:BN = 'orbit'
   foreach ($o in @(@(4.4, 0), @(-4.4, 0), @(0, 4.4), @(0, -4.4))) { Add $e (C (8 + $o[0]) 20.5 (8 + $o[1]) 0.45 0.45 0.45 'm1' 45 -lit) }
@@ -995,8 +1033,8 @@ $SCHOOLS = [ordered]@{
     core = @('#FFFFFF', '#FFFFFF', '#FFFBEA', '#FFF0B8'); hot = @('#FFE9A0', '#FFFFFF'); gem = 'orb'; gc = @('#E8F4FF', '#6AB4FF', '#2A6AD8', '#12306A'); wide = 'feather'; wc = @('#FFFFFF', '#F2F0EA', '#D8D4CA', '#E8B848') }
   lightning = @{ fn = 'Staff-Lightning'; shaft = @('#C87A44', '#B06A38', '#D88A50', '#9A5A2E'); m1 = @('#F6B07A', '#D9824A', '#E89A62', '#7A3E1C'); m2 = @('#A8723E', '#7A4E26', '#8E5E30', '#3A220E')
     core = @('#FFFFFF', '#B8FFF4', '#5AE8D8', '#1A8A80'); hot = @('#5AE8D8', '#FFFFFF'); core2 = @('#E8FFFA', '#8AF4E6', '#3ACCBC', '#1A7A70'); gem = 'orb'; gc = @('#FFFFFF', '#A8FFF0', '#3ADCC8', '#167A70'); plane = 'arcs'; pc = @('#FFFFFF', '#B8FFF4', '#5AE8D8', '#1A8A80') }
-  nature = @{ fn = 'Staff-Nature'; shaft = @('#5A3A1E', '#6A4626', '#4A3018', '#7A5430'); cracks = @('#5A9A2A', '#3E7A1E'); m1 = @('#9ADC5A', '#6FA83A', '#82C048', '#2E5A14'); m2 = @('#4A3018', '#3A2412', '#42291A', '#1E120A')
-    core = @('#FFF6B0', '#E8E83A', '#B0C81E', '#5A6A0A'); hot = @('#FFE07A', '#FFFFE0'); core2 = @('#FFE0F0', '#FF9AD0', '#F06AB0', '#B03A80'); wide = 'leaf'; wc = @('#B8F07A', '#6AB82E', '#4A9620', '#2A6010') }
+  nature = @{ fn = 'Staff-Nature'; shaft = @('#3A2418', '#4A2E1E', '#2E1C12', '#56362A'); m1 = @('#B8F07A', '#7AC83A', '#94DC52', '#3A6A16'); m2 = @('#1A1612', '#120E0B', '#161210', '#0A0806'); m4 = @('#F2EEE0', '#DCD6C2', '#E8E2D0', '#8E8670')
+    core = @('#F0FFD0', '#B8F070', '#88D040', '#4A8A1E'); hot = @('#B8F070', '#F0FFD0'); gem = 'skull'; gc = @('#F2EEE0', '#C8C0A8', '#1A1612', '#9CFF5A'); wide = 'leaf'; wc = @('#B8F07A', '#6AB82E', '#4A9620', '#2A6010') }
   higher = @{ fn = 'Staff-Higher'; shaft = @('#160A0C', '#1E0E10', '#120809', '#261214'); cracks = @('#FF3B3B', '#A01818'); m1 = @('#6A3036', '#3A1A1E', '#4E2228', '#160809'); m2 = @('#3A3034', '#2A2226', '#201A1C', '#0C0A0A')
     core = @('#FFD0D0', '#FF5A5A', '#E01E28', '#7A0A10'); hot = @('#FF3B3B', '#FFE0E0'); core2 = @('#FFC0C0', '#FF6060', '#FF3B3B', '#C01818'); gem = 'void'; gc = @('#FF5050', '#A01018', '#3A0408') }
   divine = @{ fn = 'Staff-Divine'; shaft = @('#F6F3EA', '#EAE4D4', '#FFFDF6', '#DCD4C0'); cracks = @('#FFD34D', '#E8B030'); m1 = @('#FFF0B0', '#FFD34D', '#FFE07A', '#B08418'); m2 = @('#FFFFFF', '#F0F0F6', '#E0E2EA', '#9A9EAE')

@@ -1,0 +1,12 @@
+{
+  "comment": "Появление Ковена: портал раскрылся — вспышка и волна по арене.",
+  "style": "coven",
+  "duration": 60,
+  "elements": [
+    { "type": "flash", "at": "caster+0,2.9,0", "duration": 14, "size": 4, "anamorphic": 7, "rays": 10, "color": "@core", "screen": 0.35 },
+    { "type": "wave", "at": "caster", "duration": 40, "radius": 32, "color": "@primary", "brightness": 1.2 },
+    { "type": "wave", "at": "caster", "delay": 6, "duration": 46, "radius": 24, "color": "@secondary" },
+    { "type": "sprites", "at": "caster+0,2.9,0", "duration": 50, "count": 70, "spread": 1.2, "speed": 0.12, "life": 40,
+      "size": [0.18, 0.02], "texture": "@sparks", "color": "@primary" }
+  ]
+}

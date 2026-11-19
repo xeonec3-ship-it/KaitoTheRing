@@ -31,7 +31,7 @@ public final class ServerConfig {
         DIS_RANGE = b.comment("Targeting range in blocks").defineInRange("range", 48, 4, 128);
         b.pop();
         b.push("disintegration_replica");
-        REPLICA_PERCENT = b.comment("Disintegration: Replica — damage as a share of the target's max health, through armor; never kills (leaves 1 HP)").defineInRange("damagePercent", 0.9, 0.0, 10.0);
+        REPLICA_PERCENT = b.comment("Disintegration: Replica - damage as a share of the target's max health, through armor; never kills (leaves 1 HP)").defineInRange("damagePercent", 0.9, 0.0, 10.0);
         b.pop();
         b.push("higher");
         HIGHER_MULT = b.comment("Damage and healing multiplier for all Higher-school spells").defineInRange("damageMult", 1.0, 0.0, 100.0);

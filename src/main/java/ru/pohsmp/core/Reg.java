@@ -162,7 +162,10 @@ public final class Reg {
     public static final List<String> DIVINE_SPELLS = List.of(ru.pohsmp.core.spell.TabooSpell.PATH, ru.pohsmp.core.spell.SoulDevourSpell.PATH,
             ru.pohsmp.core.spell.ArkSpell.PATH);
     public static final List<String> MYTHIC_SPELLS = List.of(ru.pohsmp.core.spell.ExplosionSpell.PATH,
-            ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.FrozenHourSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell.PATH);
+            ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.FrozenHourSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell.PATH,
+            ru.pohsmp.core.spell.CovenArrivalSpell.PATH);
+    public static final RegistryObject<AbstractSpell> COVEN_ARRIVAL = SPELLS.register(ru.pohsmp.core.spell.CovenArrivalSpell.PATH,
+            ru.pohsmp.core.spell.CovenArrivalSpell::new);
     static {
         SPELLS.register(ru.pohsmp.core.spell.SpaceClosureSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.HeavenFallSpell::new);

@@ -1,4 +1,4 @@
-# Рисует узоры и лучи для pohsmp_core (белое на чёрном со свечением, цвет даёт мод):
+﻿# Рисует узоры и лучи для pohsmp_core (белое на чёрном со свечением, цвет даёт мод):
 # pat_alchemy — алхимический круг (зодиак в поясе, 7 планет на гептаграмме, гексаграмма, солнце в центре);
 # pat_metatron — куб Метатрона поверх цветка жизни, пояс рун Футарка;
 # pat_zodiac — колесо зодиака с домами и звездой {12/5}; pat_mandala — лепестки в три яруса;
@@ -94,17 +94,17 @@ Finish $b $g 'pat_alchemy'
 $b, $g = Layer 1024
 Circ $g 502 7; Circ $g 490 2.5; Circ $g 420 2.5; Circ $g 408 6
 Belt $g @(0..23 | ForEach-Object { "$_" }) 455 62 $true
-$r0 = 64.0
-$centers = @(@($C, $C))
+$r0 = 100.0
+$centers = @(,@($C, $C))
 for ($ring = 1; $ring -le 2; $ring++) { for ($i = 0; $i -lt 6; $i++) { $a = $i * $PI / 3 - $PI / 2
   for ($j = 0; $j -lt $ring; $j++) { $a2 = $a + 2 * $PI / 3
     $x = $C + [Math]::Cos($a) * $r0 * $ring + [Math]::Cos($a2) * $r0 * $j; $y = $C + [Math]::Sin($a) * $r0 * $ring + [Math]::Sin($a2) * $r0 * $j
     $centers += ,@($x, $y) } } }
-foreach ($c in $centers) { CircAt $g $c[0] $c[1] $r0 2 170 }    # цветок жизни (19 кругов)
+foreach ($cc in $centers) { CircAt $g $cc[0] $cc[1] $r0 2 170 }    # цветок жизни (19 кругов)
 Circ $g (3 * $r0) 3
 $mc = @(,@($C, $C)); foreach ($k in @(1, 2)) { for ($i = 0; $i -lt 6; $i++) { $a = $i * $PI / 3 - $PI / 2; $mc += ,@(($C + [Math]::Cos($a) * 2 * $r0 * $k * 0.92), ($C + [Math]::Sin($a) * 2 * $r0 * $k * 0.92)) } }
 for ($i = 0; $i -lt $mc.Count; $i++) { for ($j = $i + 1; $j -lt $mc.Count; $j++) { Line $g (New-Object Drawing.PointF ([float]$mc[$i][0]), ([float]$mc[$i][1])) (New-Object Drawing.PointF ([float]$mc[$j][0]), ([float]$mc[$j][1])) 2.5 } }
-foreach ($c in $mc) { CircAt $g $c[0] $c[1] ($r0 * 0.55) 4; Dot $g $c[0] $c[1] 6 }
+foreach ($cc in $mc) { CircAt $g $cc[0] $cc[1] ($r0 * 0.55) 4; Dot $g $cc[0] $cc[1] 6 }
 Ticks $g 400 120 22 10 2.5
 Finish $b $g 'pat_metatron'
 
@@ -179,31 +179,31 @@ for ($i = 0; $i -lt 64; $i++) {
   $path.AddPolygon([Drawing.PointF[]]@((P 6 ($a - $wd * 4)), (P $len $a), (P 6 ($a + $wd * 4))))
   $p1 = P 0 $a; $p2 = P $len $a
   $lg = New-Object Drawing.Drawing2D.LinearGradientBrush $p1, $p2, ([Drawing.Color]::FromArgb(255, 255, 255, 255)), ([Drawing.Color]::FromArgb(0, 255, 255, 255))
-  $g.FillPath($lg, $path) }
-$pg = New-Object Drawing.Drawing2D.GraphicsPath; $pg.AddEllipse(156, 156, 200, 200)
+  $g.FillPath($lg, $path); $g.FillPath($lg, $path) }
+$pg = New-Object Drawing.Drawing2D.GraphicsPath; $pg.AddEllipse(206, 206, 100, 100)
 $br = New-Object Drawing.Drawing2D.PathGradientBrush $pg; $br.CenterColor = [Drawing.Color]::FromArgb(255, 255, 255, 255); $br.SurroundColors = [Drawing.Color[]]@([Drawing.Color]::FromArgb(0, 255, 255, 255))
 $g.FillPath($br, $pg)
 Finish $b $g 'rays' $false
 # ---- галактика «Млечного пути»: туманные спиральные рукава (galaxy_arms) и звёзды вдоль них (galaxy_stars) ----
 function Gauss { $u = 1 - $rng.NextDouble(); $v = $rng.NextDouble(); [Math]::Sqrt(-2 * [Math]::Log($u)) * [Math]::Cos(2 * $PI * $v) }
-function ArmPt([int]$arm, [double]$t, [double]$jit) { $an = $arm * $PI + $t * 4.4; $rr = 26 + 450 * $t
+function ArmPt([int]$arm, [double]$t, [double]$jit) { $an = $arm * $PI + $t * 4.4; $rr = 26 + 400 * $t
   $x = $C + [Math]::Cos($an) * $rr + (Gauss) * $jit; $y = $C + [Math]::Sin($an) * $rr + (Gauss) * $jit; return @($x, $y) }
 $b, $g = Layer 1024
-for ($arm = 0; $arm -lt 2; $arm++) { for ($i = 0; $i -lt 900; $i++) { $t = $rng.NextDouble(); $q = ArmPt $arm $t (14 + 40 * $t); $s = 50 * (1 - 0.6 * $t) + 10 * $rng.NextDouble()
-    $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(9, 255, 255, 255))), [float]($q[0] - $s / 2), [float]($q[1] - $s / 2), [float]$s, [float]$s) }
-  for ($i = 0; $i -lt 260; $i++) { $t = $rng.NextDouble() * 0.9 + 0.05; $q = ArmPt ($arm + 0.5) $t (30 + 50 * $t); $s = 30 + 30 * $rng.NextDouble()   # тонкие межрукавные струи
-    $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(5, 255, 255, 255))), [float]($q[0] - $s / 2), [float]($q[1] - $s / 2), [float]$s, [float]$s) } }
-$pg = New-Object Drawing.Drawing2D.GraphicsPath; $pg.AddEllipse([float]($C - 150), [float]($C - 150), 300, 300)
+for ($arm = 0; $arm -lt 2; $arm++) { for ($i = 0; $i -lt 2200; $i++) { $t = $rng.NextDouble(); $q = ArmPt $arm $t (16 + 36 * $t); $sz = 64 * (1 - 0.6 * $t) + 10 * $rng.NextDouble()
+    $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(4, 255, 255, 255))), [float]($q[0] - $sz / 2), [float]($q[1] - $sz / 2), [float]$sz, [float]$sz) }
+  for ($i = 0; $i -lt 260; $i++) { $t = $rng.NextDouble() * 0.9 + 0.05; $q = ArmPt ($arm + 0.5) $t (30 + 50 * $t); $sz = 30 + 30 * $rng.NextDouble()   # тонкие межрукавные струи
+    $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb(5, 255, 255, 255))), [float]($q[0] - $sz / 2), [float]($q[1] - $sz / 2), [float]$sz, [float]$sz) } }
+$pg = New-Object Drawing.Drawing2D.GraphicsPath; $pg.AddEllipse([float]($C - 110), [float]($C - 110), 220, 220)
 $br = New-Object Drawing.Drawing2D.PathGradientBrush $pg; $br.CenterColor = [Drawing.Color]::FromArgb(255, 255, 255, 255); $br.SurroundColors = [Drawing.Color[]]@([Drawing.Color]::FromArgb(0, 255, 255, 255))
 $g.FillPath($br, $pg)
 Finish $b $g 'galaxy_arms'
 $b, $g = Layer 1024
 for ($i = 0; $i -lt 1400; $i++) { $t = [Math]::Pow($rng.NextDouble(), 0.8)
   if ($rng.NextDouble() -lt 0.75) { $q = ArmPt ($rng.Next(2)) $t (10 + 36 * $t) } else { $an = $rng.NextDouble() * 2 * $PI; $rr = 470 * [Math]::Sqrt($rng.NextDouble()); $q = @(($C + [Math]::Cos($an) * $rr), ($C + [Math]::Sin($an) * $rr)) }
-  $s = 0.8 + 2.4 * [Math]::Pow($rng.NextDouble(), 3); $a = 120 + $rng.Next(136)
-  $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb($a, 255, 255, 255))), [float]($q[0] - $s), [float]($q[1] - $s), [float](2 * $s), [float](2 * $s)) }
-for ($i = 0; $i -lt 22; $i++) { $q = ArmPt ($rng.Next(2)) ($rng.NextDouble()) 20; $s = 9 + 9 * $rng.NextDouble()   # яркие звёзды-крестики
-  $g.DrawLine((WPen 1.6), [float]($q[0] - $s), [float]$q[1], [float]($q[0] + $s), [float]$q[1]); $g.DrawLine((WPen 1.6), [float]$q[0], [float]($q[1] - $s), [float]$q[0], [float]($q[1] + $s)); Dot $g $q[0] $q[1] 2.6 }
+  $sz = 0.8 + 2.4 * [Math]::Pow($rng.NextDouble(), 3); $a = 120 + $rng.Next(136)
+  $g.FillEllipse((New-Object Drawing.SolidBrush ([Drawing.Color]::FromArgb($a, 255, 255, 255))), [float]($q[0] - $sz), [float]($q[1] - $sz), [float](2 * $sz), [float](2 * $sz)) }
+for ($i = 0; $i -lt 22; $i++) { $q = ArmPt ($rng.Next(2)) ($rng.NextDouble()) 20; $sz = 9 + 9 * $rng.NextDouble()   # яркие звёзды-крестики
+  $g.DrawLine((WPen 1.6), [float]($q[0] - $sz), [float]$q[1], [float]($q[0] + $sz), [float]$q[1]); $g.DrawLine((WPen 1.6), [float]$q[0], [float]($q[1] - $sz), [float]$q[0], [float]($q[1] + $sz)); Dot $g $q[0] $q[1] 2.6 }
 Dot $g $C $C 10
 Finish $b $g 'galaxy_stars'
 $futhark.Dispose()

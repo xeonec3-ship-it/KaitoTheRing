@@ -154,8 +154,8 @@ public class ArkSpell extends PohSpell {
         return false;
     }
 
-    public static final class Events {
-        private Events() {}
+    public static final class ArkEvents {
+        private ArkEvents() {}
 
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         public static void onDeath(LivingDeathEvent e) {

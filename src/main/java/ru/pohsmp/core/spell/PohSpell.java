@@ -38,6 +38,27 @@ public abstract class PohSpell extends AbstractSpell {
         this.spellPowerPerLevel = 0;
     }
 
+    /** Iron's schools that have a drawn sigil (index = HFx.SIGIL b) and their colors. */
+    private static final String[] SIGIL_SCHOOLS = {"fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind"};
+    private static final int[] SIGIL_COLORS = {0xFF7A2A, 0x9FE0FF, 0x6BE6FF, 0x7EE04A, 0xFFE38A, 0xE0242C, 0xC060FF, 0xDDE6F0, 0x3FD6B8, 0xBFF2E8};
+
+    /** Every cast of an ordinary-school spell flashes the drawn sigil of its school under the caster. */
+    @Override
+    public void onCast(net.minecraft.world.level.Level level, int spellLevel, LivingEntity caster, io.redspace.ironsspellbooks.api.spells.CastSource source,
+                       io.redspace.ironsspellbooks.api.magic.MagicData md) {
+        if (level instanceof ServerLevel sl && caster != null) {
+            String school = getSchoolType() == null ? "" : getSchoolType().getId().getPath();
+            for (int i = 0; i < SIGIL_SCHOOLS.length; i++) {
+                if (!SIGIL_SCHOOLS[i].equals(school)) continue;
+                ru.pohsmp.core.net.Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), caster.getX(), caster.getY(), caster.getZ(),
+                        new ru.pohsmp.core.net.Net.HFx(ru.pohsmp.core.net.Net.HFx.SIGIL, HigherSpell.key(), caster.getId(), i, 34,
+                                caster.getX(), caster.getY(), caster.getZ(), 1.9, SIGIL_COLORS[i]));
+                break;
+            }
+        }
+        super.onCast(level, spellLevel, caster, source, md);
+    }
+
     @Override public ResourceLocation getSpellResource() { return id; }
     @Override public DefaultConfig getDefaultConfig() { return config; }
     /** Black = invisible: Iron's target box is drawn additively. */

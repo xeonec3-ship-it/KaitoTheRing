@@ -48,12 +48,13 @@ public final class DownfallCut {
         casterId = m.a;
         scene = Math.max(0, m.b);
         dur = m.dur;
-        start = now;
+        start = now - Math.max(0, m.i);
         rift = new Vec3(m.x, m.y, m.z);
         Entity c = mc.level.getEntity(casterId);
         casterPos = c != null ? c.position() : mc.player.position();
         Vec3 d = rift.subtract(casterPos).multiply(1, 0, 1);
         dir = d.lengthSqr() < 1e-4 ? new Vec3(-Math.cos(m.f), 0, -Math.sin(m.f)) : d.normalize();
+        portalYaw = m.f;
         active = true;
     }
 
@@ -97,7 +98,12 @@ public final class DownfallCut {
         double baseYaw = Math.atan2(dir.z, dir.x);
         Vec3 pos, look;
         double roll = 0, shake = 0;
-        if (scene != 0) {
+        if (scene == 5) {
+            Vec3[] pl = coven(t / 20.0, ce, pt);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+        } else if (scene != 0) {
             Vec3[] pl = new Vec3[2];
             double[] rs = new double[2];
             shot(scene, t / dur, c, rift, dir, side, baseYaw, pl, rs);
@@ -149,6 +155,83 @@ public final class DownfallCut {
         e.setYaw(yaw);
         e.setPitch(pitch);
         e.setRoll((float) roll);
+    }
+
+    private static double portalYaw;
+
+    /**
+     * Scene 5, Coven Arrival (90 s, by seconds s). rift = the arena mark, portalYaw = the portal's facing (degrees, MC yaw):
+     * people step out along forward(yaw). The caster is followed while the client knows him; otherwise the arena is shown.
+     * Returns camera position, look point and (shake, 0, 0).
+     */
+    private static Vec3[] coven(double s, Entity ce, float pt) {
+        Vec3 a = rift, pc = a.add(0, 2.9, 0);
+        Vec3 fw = new Vec3(-Math.sin(Math.toRadians(portalYaw)), 0, Math.cos(Math.toRadians(portalYaw)));
+        Vec3 rt = new Vec3(-fw.z, 0, fw.x);
+        Vec3 g = a.add(fw.scale(2.2));
+        boolean hasC = ce != null && ce.isAlive();
+        Vec3 c = hasC ? ce.getPosition(pt) : a.add(fw.scale(3));
+        double base = Math.atan2(fw.z, fw.x);
+        Vec3 pos, look;
+        double shake = 0;
+        if (s < 8 || (s < 19 && !hasC)) {                    // prologue: wide orbit of the arena, the seed over its centre
+            double k = smooth(s / 19), an = base + Math.toRadians(-50 + 100 * k);
+            pos = a.add(Math.cos(an) * 16, 6 - 2 * k, Math.sin(an) * 16);
+            look = pc;
+        } else if (s < 16) {                                // at the caster: he turns, nods, draws the circle
+            double k = smooth((s - 8) / 8), an = Math.toRadians(-60 + 90 * k);
+            pos = c.add(Math.cos(an) * 3.2, 1.6, Math.sin(an) * 3.2);
+            look = c.add(0, 1.4, 0);
+        } else if (s < 19) {                                // he steps back into the portal: pull back
+            double k = smooth((s - 16) / 3), an = Math.toRadians(30 + 20 * k);
+            pos = c.add(Math.cos(an) * (3.2 + 2.5 * k), 1.7 + 0.6 * k, Math.sin(an) * (3.2 + 2.5 * k));
+            look = c.add(0, 1.4, 0);
+        } else if (s < 30) {                                // the portal unfolds: orbit
+            double k = smooth((s - 19) / 11), an = base + Math.toRadians(-70 + 140 * k);
+            pos = a.add(Math.cos(an) * (11 - 3 * k), 3 + 2 * k, Math.sin(an) * (11 - 3 * k));
+            look = pc;
+            shake = 0.02;
+        } else if (s < 34) {                                // retinue 1 steps out to the left: low angle
+            double k = smooth((s - 30) / 4);
+            pos = a.add(fw.scale(6)).add(rt.scale(4)).add(0, 0.4, 0);
+            look = a.add(fw.scale(1.2 + k)).subtract(rt.scale(1.5 + 1.5 * k)).add(0, 1.3, 0);
+        } else if (s < 38) {                                // retinue 2 to the right: the other side
+            double k = smooth((s - 34) / 4);
+            pos = a.add(fw.scale(6)).subtract(rt.scale(4)).add(0, 0.4, 0);
+            look = a.add(fw.scale(1.2 + k)).add(rt.scale(1.5 + 1.5 * k)).add(0, 1.3, 0);
+        } else if (s < 48) {                                // the caster walks out: slow dolly from below
+            double k = smooth((s - 38) / 10);
+            pos = a.add(fw.scale(7.5 - 2 * k)).add(rt.scale(1.4)).add(0, 0.3 + 0.4 * k, 0);
+            look = c.add(0, 1.5, 0);
+        } else if (s < 56) {                                // the three: orbit
+            double k = smooth((s - 48) / 8), an = base + Math.toRadians(-70 + 140 * k);
+            pos = g.add(Math.cos(an) * 6.5, 2.2, Math.sin(an) * 6.5);
+            look = g.add(0, 1.2, 0);
+        } else if (s < 64) {                                // close-up, slow push-in: the line
+            double k = smooth((s - 56) / 8);
+            pos = c.add(fw.scale(3.2 - 1.3 * k)).add(rt.scale(0.4)).add(0, 1.6, 0);
+            look = c.add(0, 1.55, 0);
+        } else if (s < 69) {                                // the three, wide: the title
+            double k = smooth((s - 64) / 5);
+            pos = g.add(fw.scale(9 - k)).add(0, 2.5, 0);
+            look = g.add(0, 1.4, 0);
+        } else if (s < 80) {                                // the ritual: the camera rises with the triangle
+            double k = smooth((s - 69) / 11);
+            pos = g.add(fw.scale(9 + 6 * k)).add(0, 2.5 + 14 * k, 0);
+            look = g.add(0, 2 + 16 * k, 0);
+            shake = 0.02 * k;
+        } else if (s < 86) {                                // very far outside: the dome unfolds
+            double k = smooth((s - 80) / 6);
+            pos = a.add(fw.scale(150 - 10 * k)).add(rt.scale(60)).add(0, 40, 0);
+            look = a.add(0, 20, 0);
+            shake = s > 83 && s < 84.5 ? 0.15 : 0;
+        } else {                                            // the portal collapses
+            double k = smooth((s - 86) / 4);
+            pos = g.add(fw.scale(6 + k)).add(0, 2, 0);
+            look = pc;
+            shake = 0.05 * (1 - k);
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, 0, 0)};
     }
 
     /** Shot boundaries (fractions of the cast) shared by the scenes 1-3. */
@@ -278,6 +361,35 @@ public final class DownfallCut {
         int bar = (int) (h * 0.11 * in);
         g.fill(0, 0, w, bar, 0xFF000000);
         g.fill(0, h - bar, w, h, 0xFF000000);
+        if (scene == 5) {
+            Font font = Minecraft.getInstance().font;
+            if (t >= 1120 && t < 1290) {   // the line: first part at 56 s, the rest at 61.8 s
+                Component line = Component.translatable("fx.pohsmp_core.coven_arrival.line1");
+                if (t >= 1236) line = line.copy().append(" ").append(Component.translatable("fx.pohsmp_core.coven_arrival.line2"));
+                float a = (float) Math.min(1, Math.min((t - 1120) / 8.0, (1290 - t) / 8.0));
+                int alpha = Math.max(8, (int) (a * 255));
+                g.pose().pushPose();
+                g.pose().translate(w / 2f, h - bar - 26, 0);
+                g.pose().scale(1.5f, 1.5f, 1f);
+                g.drawString(font, line, -font.width(line) / 2, 0, (alpha << 24) | 0xEDE6FF, true);
+                g.pose().popPose();
+            }
+            if (t >= 1280 && t < 1390) {   // the title, with lines at the sides
+                float a = (float) Math.min(1, Math.min((t - 1280) / 15.0, (1390 - t) / 10.0));
+                int alpha = Math.max(8, (int) (a * 255));
+                Component title = Component.translatable("fx.pohsmp_core.coven_arrival.title");
+                g.pose().pushPose();
+                g.pose().translate(w / 2f, h * 0.66f, 0);
+                g.pose().scale(2.6f, 2.6f, 1f);
+                int tw = font.width(title);
+                g.drawString(font, title, -tw / 2, 0, (alpha << 24) | 0xB49BFF, true);
+                int lw = (int) (40 * a);
+                g.fill(-tw / 2 - 6 - lw, 4, -tw / 2 - 6, 5, (alpha << 24) | 0xB49BFF);
+                g.fill(tw / 2 + 6, 4, tw / 2 + 6 + lw, 5, (alpha << 24) | 0xB49BFF);
+                g.pose().popPose();
+            }
+            return;
+        }
         double tt = dur * 0.88;
         if (t > tt) {
             float a = (float) Math.min(1, (t - tt) / 15.0);

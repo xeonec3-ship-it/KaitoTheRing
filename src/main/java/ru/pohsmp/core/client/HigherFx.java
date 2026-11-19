@@ -37,7 +37,16 @@ public final class HigherFx {
 
     private static final ResourceLocation CIRCLE_A = tex("circle_a"), CIRCLE_B = tex("circle_b"), FLARE = tex("flare"),
             BEAM = tex("beam"), RING = tex("ring"), RUNE = tex("rune"), VOID = tex("void"),
-            CIRCLE_TABOO = tex("circle_taboo"), RUNE_TABOO = tex("rune_taboo"), CIRCLE_WARD = tex("circle_ward");
+            CIRCLE_TABOO = tex("circle_taboo"), RUNE_TABOO = tex("rune_taboo"), CIRCLE_WARD = tex("circle_ward"),
+            RIFT_TEAR = tex("rift_tear"), RIFT_CORE = tex("rift_core"), RIFT_EDGE = tex("rift_edge"), FUTHARK = tex("futhark"),
+            ORBIT_RUNES = tex("orbit_runes"), ORBIT_DASH = tex("orbit_dash"), ORBIT_SAW = tex("orbit_saw"), ORBIT_STARS = tex("orbit_stars");
+    private static final ResourceLocation[] ORBITS = {ORBIT_RUNES, ORBIT_DASH, ORBIT_SAW, ORBIT_STARS};
+    private static final ResourceLocation CIRCLE_COVEN = tex("circle_coven"), DOME_CELL = tex("dome_cell");
+    private static final ResourceLocation PAT_ALCHEMY = tex("pat_alchemy"), PAT_METATRON = tex("pat_metatron"), PAT_ZODIAC = tex("pat_zodiac"),
+            PAT_MANDALA = tex("pat_mandala"), PAT_STARS = tex("pat_stars"), RAYS = tex("rays"), GALAXY_ARMS = tex("galaxy_arms"), GALAXY_STARS = tex("galaxy_stars");
+    private static final ResourceLocation[] PATTERNS = {PAT_ALCHEMY, PAT_METATRON, PAT_ZODIAC, PAT_MANDALA, PAT_STARS, RAYS, GALAXY_ARMS, GALAXY_STARS};
+    private static final int SILVER = 0xD8DCFF, VIOLET = 0x6A2AD8, GOLD = 0xFFE38A;
+    private static final int ALGIZ = 14;
     private static final ResourceLocation[] SIGILS = {tex("sigil_fire"), tex("sigil_ice"), tex("sigil_lightning"), tex("sigil_nature"), tex("sigil_holy"),
             tex("sigil_blood"), tex("sigil_ender"), tex("sigil_evocation"), tex("sigil_eldritch"), tex("sigil_wind")};
     private static final int[] CARD_COLOR = {0xFFC94D, 0xA8C8FF, 0xFF4D4D, 0x7DFFB0};
@@ -57,6 +66,9 @@ public final class HigherFx {
         if (SRC == null) {
             Map<RenderType, BufferBuilder> m = new LinkedHashMap<>();
             m.put(RenderType.entityTranslucent(VOID), new BufferBuilder(4096));
+            m.put(RenderType.entityTranslucent(RIFT_TEAR), new BufferBuilder(1024));
+            m.put(RenderType.entityTranslucent(RIFT_CORE), new BufferBuilder(1024));
+            m.put(RenderType.eyes(RIFT_EDGE), new BufferBuilder(1024));
             for (ResourceLocation t : new ResourceLocation[] {CIRCLE_A, CIRCLE_B, RING, RUNE, BEAM, FLARE, CIRCLE_TABOO, RUNE_TABOO, CIRCLE_WARD, FUTHARK}) m.put(RenderType.eyes(t), new BufferBuilder(16384));
             for (ResourceLocation t : ORBITS) m.put(RenderType.eyes(t), new BufferBuilder(8192));
             m.put(RenderType.eyes(CIRCLE_COVEN), new BufferBuilder(8192));
@@ -78,6 +90,11 @@ public final class HigherFx {
         }
         if (m.kind == HFx.CUT) {
             DownfallCut.start(m, now);
+            return;
+        }
+        if (m.kind == HFx.ANIM) {   // a = player id, b = animation (0: pohsmp_coven_ritual)
+            if (lvl.getEntity(m.a) instanceof net.minecraft.world.entity.player.Player p && m.b == 0)
+                io.redspace.ironsspellbooks.player.ClientSpellCastHelper.animatePlayerStart(p, new ResourceLocation("irons_spellbooks", "pohsmp_coven_ritual"));
             return;
         }
         if (m.kind == HFx.STOP) {
@@ -174,7 +191,7 @@ public final class HigherFx {
 
     private record Ctx(ClientLevel lvl, MultiBufferSource.BufferSource buf, PoseStack.Pose pose, Camera cam, float pt, double time, double age, float fade) {
         VertexConsumer vc(ResourceLocation t) {
-            return buf.getBuffer(t == VOID ? RenderType.entityTranslucent(VOID) : RenderType.eyes(t));
+            return buf.getBuffer(t == VOID || t == RIFT_TEAR || t == RIFT_CORE ? RenderType.entityTranslucent(t) : RenderType.eyes(t));
         }
     }
 
@@ -285,33 +302,107 @@ public final class HigherFx {
      * a belt of runes on top, and Hagalaz / Isa (hail and ice) runes circling the wall in both directions. The snow itself is
      * Iron's swirling snowflakes sent by the server.
      */
+    // ---- Eternal Blizzard: a snowstorm wall at the edge (client particles, see onClientTick), frost on the ground by the wall, wind streaks ----
+
+    private static final ResourceLocation FROST_BAND = tex("frost_band");
+    /** Wall band: from R - BLIZ_IN to R + BLIZ_OUT, BLIZ_H high; wind speed along the wall, blocks per tick. */
+    private static final double BLIZ_IN = 2.6, BLIZ_OUT = 0.5, BLIZ_H = 7, BLIZ_WIND = 0.32;
+
     private static void blizzard(Ctx c, Inst x) {
         Vec3 p = x.pos;
-        float R = x.f;
-        int col = x.i;
-        float cr = r(col), cg = g(col), cb = b(col);
-        double k = Math.min(1.0, c.age / 12.0);
-        float rr = R * (float) (0.25 + 0.75 * k);
-        Vec3 g0 = p.add(0, 0.06, 0);
-        flat(c.vc(CIRCLE_A), c.pose, g0, UP, rr, (float) (c.time * 0.012), cr, cg, cb, c.fade * 0.75f);
-        flat(c.vc(PAT_MANDALA), c.pose, g0.add(0, 0.01, 0), UP, rr * 0.62f, (float) (-c.time * 0.02), 0.85f, 0.95f, 1f, c.fade * 0.7f);
-        flat(c.vc(CIRCLE_B), c.pose, g0.add(0, 0.02, 0), UP, rr * 0.3f, (float) (c.time * 0.05), 1f, 1f, 1f, c.fade * 0.8f);
-        flat(c.vc(PAT_STARS), c.pose, g0.add(0, 0.015, 0), UP, rr * 0.9f, (float) (-c.time * 0.008), cr, cg, cb, c.fade * 0.35f);
-        float h = 6f * (float) k;
-        for (int j = 0; j <= 6; j++) {   // frost bands: brightest at the foot, fading up the wall, alternate spin
-            float y = h * j / 6f;
-            float a = c.fade * (0.75f - 0.09f * j) * (0.8f + 0.2f * (float) Math.sin(c.time * 0.15 + j));
-            flat(c.vc(RING), c.pose, p.add(0, y + 0.08, 0), UP, R, (float) ((j % 2 == 0 ? 1 : -1) * c.time * 0.01), cr, cg, cb, a);
+        double R = x.f;
+        double k = Math.min(1.0, c.age / 20.0);
+        // frost creeping from the wall inwards: textured annulus, transparent inside, densest at the wall
+        double r0 = R - 2.4 * k, r1 = R + 0.5;
+        VertexConsumer fv = c.buf.getBuffer(RenderType.entityTranslucent(FROST_BAND));
+        Matrix4f m = c.pose.pose();
+        Matrix3f n = c.pose.normal();
+        int seg = 96;
+        float a = c.fade * 0.9f;
+        for (int i = 0; i < seg; i++) {
+            double a0 = Math.PI * 2 * i / seg, a1 = Math.PI * 2 * (i + 1) / seg;
+            float u0 = i * 8f / seg, u1 = (i + 1) * 8f / seg;   // the band repeats 8 times around
+            Vector3f[] v = {
+                    new Vector3f((float) (p.x + Math.cos(a0) * r0), (float) p.y + 0.04f, (float) (p.z + Math.sin(a0) * r0)),
+                    new Vector3f((float) (p.x + Math.cos(a0) * r1), (float) p.y + 0.04f, (float) (p.z + Math.sin(a0) * r1)),
+                    new Vector3f((float) (p.x + Math.cos(a1) * r1), (float) p.y + 0.04f, (float) (p.z + Math.sin(a1) * r1)),
+                    new Vector3f((float) (p.x + Math.cos(a1) * r0), (float) p.y + 0.04f, (float) (p.z + Math.sin(a1) * r0))};
+            float[][] uv = {{u0, 0}, {u0, 1}, {u1, 1}, {u1, 0}};
+            quadUV(fv, c.pose, v, uv, 1f, 1f, 1f, a);
         }
-        flat(c.vc(ORBIT_RUNES), c.pose, p.add(0, h + 0.1, 0), UP, R * 1.02f, (float) (c.time * 0.006), cr, cg, cb, c.fade * 0.8f);
-        flat(c.vc(ORBIT_SAW), c.pose, p.add(0, 0.12, 0), UP, R * 1.04f, (float) (-c.time * 0.01), 0.9f, 0.97f, 1f, c.fade * 0.6f);
-        for (int i = 0; i < 16; i++) {   // hail and ice runes riding the wall, two tiers turning opposite ways
-            boolean up = i % 2 == 0;
-            double an = i * Math.PI / 8 + (up ? 1 : -1) * c.time * 0.02;
-            Vec3 q = p.add(Math.cos(an) * (R - 0.2), (up ? 1.6 : 3.8) * k + Math.sin(c.time * 0.1 + i) * 0.15, Math.sin(an) * (R - 0.2));
-            rune(c, q, up ? 8 : 10, 0.45f, 0.85f, 0.95f, 1f, c.fade * 0.9f);
+        // gusts: faint smeared streaks running along the wall with the wind
+        VertexConsumer bm = c.vc(BEAM);
+        java.util.Random rnd = new java.util.Random(x.start * 31L);
+        for (int i = 0; i < 48; i++) {
+            double rr = R - BLIZ_IN * rnd.nextDouble() + BLIZ_OUT * 0.5, y = 0.3 + rnd.nextDouble() * (BLIZ_H - 0.6) * k;
+            double dir = i % 3 == 0 ? -1 : 1, speed = BLIZ_WIND * (0.8 + 0.6 * rnd.nextDouble()) / rr;
+            double an = rnd.nextDouble() * Math.PI * 2 + dir * speed * c.time, len = 0.12 + 0.1 * rnd.nextDouble();
+            Vec3 q0 = p.add(Math.cos(an) * rr, y, Math.sin(an) * rr), q1 = p.add(Math.cos(an + dir * len) * rr, y + 0.15, Math.sin(an + dir * len) * rr);
+            beamLine(bm, c.pose, q0, q1, c.cam, 0.05f, 0.75f, 0.85f, 0.95f, c.fade * 0.22f * (float) k);
         }
-        gyro(c, p.add(0, 1.2, 0), 2, 1.1f, (int) x.start, cr, cg, cb, c.fade * 0.6f);
+    }
+
+    /** Snowflakes of the storm wall and the snowfall inside, spawned on this client every tick for each live blizzard. */
+    @SubscribeEvent
+    public static void onClientTick(net.minecraftforge.event.TickEvent.ClientTickEvent e) {
+        if (e.phase != net.minecraftforge.event.TickEvent.Phase.END || LIVE.isEmpty()) return;
+        Minecraft mc = Minecraft.getInstance();
+        ClientLevel lvl = mc.level;
+        if (lvl == null || mc.isPaused()) return;
+        long now = lvl.getGameTime();
+        Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
+        net.minecraft.util.RandomSource rnd = lvl.random;
+        for (Inst x : LIVE.values()) {
+            if (x.kind != HFx.BLIZZARD) continue;
+            double age = now - x.start;
+            if (age > x.dur || x.fadeAt >= 0) continue;
+            double R = x.f, dist = Math.sqrt((cam.x - x.pos.x) * (cam.x - x.pos.x) + (cam.z - x.pos.z) * (cam.z - x.pos.z));
+            if (Math.abs(dist - R) > 96) continue;
+            double k = Math.min(1.0, age / 20.0) * Math.min(1.0, (x.dur - age) / 20.0);
+            int n = (int) (110 * k);
+            for (int i = 0; i < n; i++) {   // the wall: denser toward the outer edge, carried along the wall by the wind
+                double t = rnd.nextDouble();
+                double rr = R + BLIZ_OUT - (BLIZ_IN + BLIZ_OUT) * t * t;
+                double an = rnd.nextDouble() * Math.PI * 2, y = x.pos.y + rnd.nextDouble() * BLIZ_H;
+                double dir = rnd.nextInt(4) == 0 ? -1 : 1, w = BLIZ_WIND * (0.6 + 0.8 * rnd.nextDouble()) * dir;
+                double tx = -Math.sin(an) * w, tz = Math.cos(an) * w;   // tangent, plus a little pull inward so flakes stay on the band
+                double vx = tx - Math.cos(an) * 0.03, vz = tz - Math.sin(an) * 0.03, vy = (rnd.nextDouble() - 0.6) * 0.06;
+                net.minecraft.core.particles.ParticleOptions o = rnd.nextInt(3) == 0 ? io.redspace.ironsspellbooks.util.ParticleHelper.SNOWFLAKE
+                        : net.minecraft.core.particles.ParticleTypes.SNOWFLAKE;
+                lvl.addAlwaysVisibleParticle(o, x.pos.x + Math.cos(an) * rr, y, x.pos.z + Math.sin(an) * rr, vx, vy, vz);
+            }
+            int fall = (int) (14 * k);
+            for (int i = 0; i < fall; i++) {   // light snow inside, drifting with the wind
+                double an = rnd.nextDouble() * Math.PI * 2, rr = Math.sqrt(rnd.nextDouble()) * (R - BLIZ_IN);
+                lvl.addParticle(net.minecraft.core.particles.ParticleTypes.SNOWFLAKE, x.pos.x + Math.cos(an) * rr, x.pos.y + BLIZ_H - rnd.nextDouble() * 2,
+                        x.pos.z + Math.sin(an) * rr, -Math.sin(an) * 0.05, -0.05, Math.cos(an) * 0.05);
+            }
+        }
+    }
+
+    /** White haze on the screen of a player standing inside a blizzard (thicker near the wall). */
+    @SubscribeEvent
+    public static void onGuiHaze(net.minecraftforge.client.event.RenderGuiEvent.Pre e) {
+        if (LIVE.isEmpty()) return;
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.level == null) return;
+        Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
+        double now = mc.level.getGameTime() + e.getPartialTick(), best = 0;
+        for (Inst x : LIVE.values()) {
+            if (x.kind != HFx.BLIZZARD) continue;
+            double age = now - x.start;
+            if (age > x.dur) continue;
+            double dx = cam.x - x.pos.x, dz = cam.z - x.pos.z, d = Math.sqrt(dx * dx + dz * dz);
+            if (d > x.f + BLIZ_OUT || cam.y < x.pos.y - 2 || cam.y > x.pos.y + BLIZ_H + 2) continue;
+            double k = Math.min(1.0, age / 20.0) * Math.min(1.0, (x.dur - age) / 20.0);
+            if (x.fadeAt >= 0) k *= Math.max(0, 1 - (now - x.fadeAt) / 10.0);
+            double edge = Math.max(0, 1 - (x.f - d) / BLIZ_IN);   // 0 inside .. 1 in the wall
+            best = Math.max(best, k * (0.10 + 0.30 * edge));
+        }
+        if (best > 0.004) {
+            int w = e.getWindow().getGuiScaledWidth(), h = e.getWindow().getGuiScaledHeight();
+            e.getGuiGraphics().fill(0, 0, w, h, (int) (best * 255) << 24 | 0xE6F0FA);
+        }
     }
 
     private static void seal(Ctx c, Inst x) {
@@ -492,10 +583,13 @@ public final class HigherFx {
         }
     }
 
-    /** The open rift: a black oval facing n (angle f), nether glow inside, golden edge and cracks, a circle on the ground. */
+    /**
+     * The open rift (drawn): a torn black silhouette with a dark halo facing n (angle f), the nether depth with burning veins inside,
+     * a golden edge with branching cracks, embers drawn into it, rings around it and a circle on the ground.
+     */
     private static void rift(Ctx c, Inst x) {
         double t = c.age, tm = c.time;
-        float open = (float) Math.min(1, t / 15.0);
+        float open = (float) smooth(Math.min(1, t / 18.0));
         if (t > x.dur - 20) open *= (float) Math.max(0, (x.dur - t) / 20.0);
         if (open <= 0.01f) return;
         int col = x.i;
@@ -503,29 +597,33 @@ public final class HigherFx {
         Vec3 n = new Vec3(Math.cos(x.f), 0, Math.sin(x.f));
         Vec3 side = new Vec3(-n.z, 0, n.x), up = new Vec3(0, 1, 0);
         Vec3 cc = x.pos.add(0, 2.6, 0);
-        float ry = 2.6f * Math.min(1, open * 1.5f), rx = 1.8f * open;
-        float pulse = 0.55f + 0.15f * (float) Math.sin(tm * 0.2);
-        oval(c.vc(VOID), c.pose, cc, side, up, rx * 1.15f, ry * 1.1f, 0, 1f, 1f, 1f, fd, true);
-        oval(c.vc(FLARE), c.pose, cc, side, up, rx * 0.85f, ry * 0.9f, 0, 0.9f, 0.25f, 0.05f, fd * pulse, false);
-        oval(c.vc(CIRCLE_B), c.pose, cc, side, up, rx * 0.75f, ry * 0.75f, (float) (tm * 0.03), 0.8f, 0.2f, 0.05f, fd * 0.5f, false);
-        oval(c.vc(RING), c.pose, cc, side, up, rx * 1.2f, ry * 1.15f, 0, cr, cg, cb, fd, false);
-        oval(c.vc(RING), c.pose, cc, side, up, rx * 1.32f, ry * 1.25f, 0, cr * 0.6f, cg * 0.5f, cb * 0.2f, fd * 0.6f, false);
-        VertexConsumer bm = c.vc(BEAM);
-        for (int i = 0; i < 8; i++) {
-            double a = i * Math.PI / 4 + 0.3 * Math.sin(i * 3.1);
-            Vec3 dir = side.scale(Math.cos(a)).add(up.scale(Math.sin(a)));
-            Vec3 p0 = cc.add(side.scale(Math.cos(a) * rx * 1.2)).add(up.scale(Math.sin(a) * ry * 1.15));
-            double len = (0.8 + 0.5 * ((i * 7) % 3)) * open;
-            Vec3 mid = p0.add(dir.scale(len * 0.5)).add(side.scale(0.25 * Math.sin(i * 2.3))).add(up.scale(0.25 * Math.cos(i * 1.7)));
-            Vec3 p1 = p0.add(dir.scale(len));
-            float al = fd * (0.6f + 0.4f * (float) Math.sin(tm * 0.3 + i));
-            beamLine(bm, c.pose, p0, mid, c.cam, 0.04f, cr, cg, cb, al);
-            beamLine(bm, c.pose, mid, p1, c.cam, 0.03f, cr, cg, cb, al);
+        float ry = 2.9f * Math.min(1, open * 1.4f), rx = 1.95f * open;
+        float pulse = 0.8f + 0.2f * (float) Math.sin(tm * 0.18);
+        float breathe = 1f + 0.02f * (float) Math.sin(tm * 0.11);
+        oval(c.vc(RIFT_TEAR), c.pose, cc, side, up, rx * breathe, ry * breathe, 0, 1f, 1f, 1f, fd, true);
+        oval(c.vc(RIFT_CORE), c.pose, cc.add(n.scale(0.01)), side, up, rx * breathe, ry * breathe, 0, 1f, 1f, 1f, fd * (0.85f + 0.15f * pulse), true);
+        oval(c.vc(CIRCLE_B), c.pose, cc.add(n.scale(0.02)), side, up, rx * 0.5f, ry * 0.55f, (float) (tm * 0.05), 0.9f, 0.3f, 0.05f, fd * 0.35f, false);
+        oval(c.vc(FLARE), c.pose, cc.add(n.scale(0.03)), side, up, rx * 0.7f, ry * 0.75f, 0, 0.9f, 0.25f, 0.05f, fd * 0.35f * pulse, false);
+        float flick = 0.75f + 0.25f * (float) Math.sin(tm * 0.9) * (float) Math.sin(tm * 0.37);
+        oval(c.vc(RIFT_EDGE), c.pose, cc.add(n.scale(0.04)), side, up, rx * breathe, ry * breathe, 0, cr, cg, cb, fd * flick, false);
+        oval(c.vc(RIFT_EDGE), c.pose, cc.subtract(n.scale(0.04)), side, up, rx * breathe, ry * breathe, 0, cr, cg, cb, fd * flick, false);
+        // embers drawn into the rift from all around
+        VertexConsumer fl = c.vc(FLARE);
+        for (int i = 0; i < 18; i++) {
+            double ph = tm * 0.03 + i * 0.618;
+            double fr = ph - Math.floor(ph);
+            double a = i * 2.399 + Math.floor(ph) * 1.7;
+            double rr = 7 * (1 - fr);
+            Vec3 q = cc.add(side.scale(Math.cos(a) * rr)).add(up.scale(Math.sin(a) * rr * 0.8)).add(n.scale(Math.sin(a * 1.3) * rr * 0.5));
+            billboard(fl, c.pose, q, c.cam, 0.12f + 0.1f * (float) fr, 1f, 0.55f, 0.15f, fd * (float) fr);
         }
+        // tilted gold rings and the ground circle
+        flat(c.vc(RING), c.pose, cc, n, 3.4f * open, 0, cr, cg, cb, fd * 0.5f);
+        flat(c.vc(RING), c.pose, cc, new Vec3(n.x, 0.35, n.z).normalize(), 3.9f * open, (float) (tm * 0.02), cr * 0.6f, cg * 0.5f, cb * 0.2f, fd * 0.35f);
         gyro(c, cc, 3, 3.7f * open, (int) x.start, cr, cg, cb, fd * 0.55f);
         flat(c.vc(CIRCLE_A), c.pose, x.pos.add(0, 0.05, 0), UP, 4.5f * open, (float) (tm * 0.02), cr, cg, cb, fd * 0.7f);
+        flat(c.vc(CIRCLE_B), c.pose, x.pos.add(0, 0.07, 0), UP, 2.6f * open, (float) (-tm * 0.04), 1f, 0.45f, 0.1f, fd * 0.6f);
     }
-
     /**
      * Divine Taboo: a great seal over the whole field (radius f) high in the sky, a second counter-turning seal under it,
      * sixteen seal-runes circling under the rim, light curtains on the border, a golden column and a circle at the center.

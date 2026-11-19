@@ -1,4 +1,4 @@
-# Кольца родства для школ pohsmp_core (Iron's сам регистрирует <ns>:item/affinity_ring_<школа>).
+﻿# Кольца родства для школ pohsmp_core (Iron's сам регистрирует <ns>:item/affinity_ring_<школа>).
 # Берёт кольцо Святой школы из jar Iron's в клиенте Prism и перекрашивает камень. Использование: tools\gen_affinity_rings.ps1
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.IO.Compression.FileSystem

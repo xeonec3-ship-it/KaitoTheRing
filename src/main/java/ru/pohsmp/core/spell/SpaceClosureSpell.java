@@ -1,12 +1,11 @@
 package ru.pohsmp.core.spell;
 
-import org.jetbrains.annotations.Nullable;
-import net.minecraft.world.InteractionHand;
 import io.redspace.ironsspellbooks.api.events.SpellPreCastEvent;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import java.util.ArrayList;
@@ -94,14 +93,11 @@ public class SpaceClosureSpell extends PohSpell {
     @Override public boolean allowCrafting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.END_PORTAL_FRAME_FILL); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.of(SoundEvents.END_PORTAL_SPAWN); }
-    /** Своя анимация игрока без посоха (tools/gen_player_anims.py); предмет в руках на это время не рисуется. */
     private static final AnimationHolder ANIM_CAST = CastAnims.of("space_closure_cast"), ANIM_FINISH = CastAnims.of("space_closure_finish");
-
     @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
     @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
-
     @Override
-    public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, InteractionHand hand, @Nullable MagicData md) {
+    public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, net.minecraft.world.InteractionHand hand, @javax.annotation.Nullable MagicData md) {
         super.onClientPreCast(level, spellLevel, entity, hand, md);
         CastAnims.hideHands(level, entity, getEffectiveCastTime(spellLevel, entity));
     }
@@ -176,7 +172,7 @@ public class SpaceClosureSpell extends PohSpell {
         Net.sendNear(sl, z.c.x, z.c.y, z.c.z, z.c.x, z.c.y + R, z.c.z, new HFx(HFx.CLOSURE, z.key, -1, -1, left, z.c.x, z.c.y, z.c.z, R, COLOR));
     }
 
-    private static void open(ServerLevel sl, LivingEntity caster, Vec3 at, int min) {
+    public static void open(ServerLevel sl, LivingEntity caster, Vec3 at, int min) {
         Zone z = new Zone();
         z.dim = sl.dimension();
         z.c = at;

@@ -1,4 +1,4 @@
-# Рисует круг Божественного Табу (1024) и руну-печать запрета (128) для pohsmp_core.
+﻿# Рисует круг Божественного Табу (1024) и руну-печать запрета (128) для pohsmp_core.
 # Белые линии на чёрном непрозрачном фоне (рисуются аддитивно, цвет даёт мод).
 # Использование: tools\gen_taboo_fx.ps1
 $ErrorActionPreference = 'Stop'
@@ -49,7 +49,8 @@ Circle $g (Pen 10) $c $c 502; Circle $g (Pen 4) $c $c 486
 for ($i = 0; $i -lt 96; $i++) { $a = $i * $PI / 48; $l = if ($i % 8 -eq 0) { 26 } else { 12 }; $g.DrawLine((Pen 4), (Pt $c 486 $a), (Pt $c (486 - $l) $a)) }
 Runes $g (Pen 5) $c 420 456 64 101
 Circle $g (Pen 6) $c $c 418
-Poly $g (Pen 6) $c 416 8 (-$PI / 2) 3
+Poly $g (Pen 6) $c 416 4 (-$PI / 2) 1
+Poly $g (Pen 6) $c 416 4 (-$PI / 4) 1
 Poly $g (Pen 4) $c 416 8 (-$PI / 2) 1
 for ($i = 0; $i -lt 8; $i++) { $q = Pt $c 360 (-$PI / 2 + $PI / 8 + $i * $PI / 4); Forbid $g (Pen 5) $q.X $q.Y 30 }
 Circle $g (Pen 6) $c $c 300
@@ -69,16 +70,16 @@ Circle $g (Pen 4) $c $c 128
 Save $bmp $g 'circle_taboo.png'
 
 # ---- Руна-печать запрета 128: кольцо, ромб, замочная скважина, две перекладины ----
-$M = 128; $m = $M / 2
-$bmp, $g = New-Canvas $M
-Circle $g (Pen 5) $m $m 58
-Circle $g (Pen 2.5) $m $m 50
-Poly $g (Pen 3.5) $m 46 4 (-$PI / 2) 1
-Circle $g (Pen 4) $m ($m - 8) 9
-$g.DrawLine((Pen 4), [float]($m - 4), [float]($m), [float]($m - 8), [float]($m + 22))
-$g.DrawLine((Pen 4), [float]($m + 4), [float]($m), [float]($m + 8), [float]($m + 22))
-$g.DrawLine((Pen 4), [float]($m - 8), [float]($m + 22), [float]($m + 8), [float]($m + 22))
-$g.DrawLine((Pen 3.5), [float]($m - 34), [float]($m - 26), [float]($m + 34), [float]($m - 26))
-$g.DrawLine((Pen 3.5), [float]($m - 34), [float]($m + 32), [float]($m + 34), [float]($m + 32))
-for ($i = 0; $i -lt 4; $i++) { $q = Pt $m 50 ($i * $PI / 2 + $PI / 4); Circle $g (Pen 3) $q.X $q.Y 5 }
+$RS = 128; $rc = $RS / 2
+$bmp, $g = New-Canvas $RS
+Circle $g (Pen 5) $rc $rc 58
+Circle $g (Pen 2.5) $rc $rc 50
+Poly $g (Pen 3.5) $rc 46 4 (-$PI / 2) 1
+Circle $g (Pen 4) $rc ($rc - 8) 9
+$g.DrawLine((Pen 4), [float]($rc - 4), [float]($rc), [float]($rc - 8), [float]($rc + 22))
+$g.DrawLine((Pen 4), [float]($rc + 4), [float]($rc), [float]($rc + 8), [float]($rc + 22))
+$g.DrawLine((Pen 4), [float]($rc - 8), [float]($rc + 22), [float]($rc + 8), [float]($rc + 22))
+$g.DrawLine((Pen 3.5), [float]($rc - 34), [float]($rc - 26), [float]($rc + 34), [float]($rc - 26))
+$g.DrawLine((Pen 3.5), [float]($rc - 34), [float]($rc + 32), [float]($rc + 34), [float]($rc + 32))
+for ($i = 0; $i -lt 4; $i++) { $q = Pt $rc 50 ($i * $PI / 2 + $PI / 4); Circle $g (Pen 3) $q.X $q.Y 5 }
 Save $bmp $g 'rune_taboo.png'

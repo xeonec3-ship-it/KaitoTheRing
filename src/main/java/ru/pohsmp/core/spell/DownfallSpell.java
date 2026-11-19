@@ -3,6 +3,7 @@ package ru.pohsmp.core.spell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
+import io.redspace.ironsspellbooks.api.spells.SpellAnimations;
 import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.api.util.CameraShakeData;
@@ -86,10 +87,8 @@ public class DownfallSpell extends PohSpell {
     @Override public boolean allowLooting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.BEACON_ACTIVATE); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
-    /** Своя анимация игрока с посохом: assets/irons_spellbooks/player_animation/pohsmp_downfall_*.json (tools/gen_player_anims.py). */
     public static final AnimationHolder ANIM_CAST = new AnimationHolder("pohsmp_downfall_cast", true);
     public static final AnimationHolder ANIM_FINISH = new AnimationHolder("pohsmp_downfall_finish", true);
-
     @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
     @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
 

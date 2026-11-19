@@ -17,12 +17,13 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "2";
+    private static final String V = "3";
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
         CH.messageBuilder(Fx.class, 0, NetworkDirection.PLAY_TO_CLIENT).encoder(Fx::encode).decoder(Fx::new).consumerMainThread(Fx::handle).add();
         CH.messageBuilder(HFx.class, 1, NetworkDirection.PLAY_TO_CLIENT).encoder(HFx::encode).decoder(HFx::new).consumerMainThread(HFx::handle).add();
+        CH.messageBuilder(FxMsg.class, 2, NetworkDirection.PLAY_TO_CLIENT).encoder(FxMsg::encode).decoder(FxMsg::new).consumerMainThread(FxMsg::handle).add();
     }
 
     /**
@@ -32,7 +33,7 @@ public final class Net {
     public static final class HFx {
         public static final int STOP = 0, TELE = 1, SLEEP = 2, STAR = 3, SING = 4, SEAL = 5, ASC = 6, RING = 7, BURST = 8, PILLAR = 9, SKY = 10, FLASH = 11, MOON = 12,
                 CUT = 13, DOWN = 14, RIFT = 15, TABOO = 16, SIGIL = 17, WARD = 18, MILKY = 19, GALAXY = 20, SOUL = 21, TABOO_CAST = 22, BLIZZARD = 23,
-                CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26;
+                CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27;
         public final byte kind;
         public final int key, a, b, dur, i;
         public final float x, y, z, f;
@@ -88,7 +89,7 @@ public final class Net {
                 CH.send(PacketDistributor.PLAYER.with(() -> p), msg);
     }
 
-    /** Disintegration visuals. type low 4 bits: 0 start, 1 finished (x y z = target center), 2 cancelled; high bits: look (0 golden, 1 scarlet Replica). */
+    /** Disintegration visuals. type: 0 start, 1 finished (x y z = target center), 2 cancelled. */
     public static final class Fx {
         public final byte type;
         public final int caster, target, duration;

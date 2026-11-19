@@ -109,7 +109,7 @@ public class MadnessSpell extends PohSpell {
         List<SpellSlot> ok = new ArrayList<>();
         for (SpellSlot s : ISpellContainer.get(book).getActiveSpells()) {
             AbstractSpell sp2 = s.getSpell();
-            if (sp2 == null || sp2.getSpellId().equals(Reg.MODID_SPELL(PATH))) continue;
+            if (sp2 == null || sp2.getSpellId().equals("pohsmp_core:" + PATH)) continue;
             if (md.getPlayerCooldowns().isOnCooldown(sp2)) continue;
             if (md.getMana() < sp2.getManaCost(s.getLevel())) continue;
             ok.add(s);
@@ -123,13 +123,25 @@ public class MadnessSpell extends PohSpell {
         }
     }
 
-    public static final class Events {
-        private Events() {}
+    public static final class MadnessEvents {
+        private MadnessEvents() {}
+
+        private static final java.util.UUID POWER_ID = java.util.UUID.fromString("6f1c6f5e-2b1a-4c51-9a41-0b8f3c5e7a10");
 
         @SubscribeEvent
         public static void onPlayerTick(TickEvent.PlayerTickEvent e) {
-            if (e.phase != TickEvent.Phase.END || !(e.player instanceof ServerPlayer sp) || !sp.hasEffect(Reg.MADNESS.get())) return;
-            madTick(sp);
+            if (e.phase != TickEvent.Phase.END || !(e.player instanceof ServerPlayer sp)) return;
+            MobEffectInstance mad = sp.getEffect(Reg.MADNESS.get());
+            var attr = sp.getAttribute(io.redspace.ironsspellbooks.api.registry.AttributeRegistry.SPELL_POWER.get());
+            if (attr != null) {
+                var cur = attr.getModifier(POWER_ID);
+                double want = mad == null ? 0 : POWER[Math.max(0, Math.min(2, mad.getAmplifier()))];
+                if (cur != null && (want == 0 || cur.getAmount() != want)) attr.removeModifier(POWER_ID);
+                if (want > 0 && (cur == null || cur.getAmount() != want))
+                    attr.addTransientModifier(new net.minecraft.world.entity.ai.attributes.AttributeModifier(POWER_ID, "pohsmp madness", want,
+                            net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADDITION));
+            }
+            if (mad != null) madTick(sp);
         }
 
         @SubscribeEvent

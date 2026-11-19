@@ -1,0 +1,628 @@
+package ru.pohsmp.core.spell;
+
+import io.redspace.ironsspellbooks.api.magic.MagicData;
+import io.redspace.ironsspellbooks.api.magic.SpellSelectionManager;
+import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
+import io.redspace.ironsspellbooks.api.spells.CastSource;
+import io.redspace.ironsspellbooks.api.spells.CastType;
+import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
+import io.redspace.ironsspellbooks.api.spells.SpellData;
+import io.redspace.ironsspellbooks.api.spells.SpellRarity;
+import io.redspace.ironsspellbooks.api.util.AnimationHolder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.ITeleporter;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.net.Net.HFx;
+
+/**
+ * Mythic "Coven Arrival" (a Coven seal), level 1. First use marks the arena where the caster stands (no cast, the scroll stays);
+ * using it within 8 blocks of the mark moves the mark. Shift+right click on a creature with the scroll (or the spell selected
+ * in a spellbook) adds it to the retinue or removes it (up to 2). Using it farther away starts a 90 s cast that cannot be
+ * interrupted, with a cutscene for everyone within 98 blocks of the arena and of the caster: a portal opens on the arena,
+ * the retinue and the caster step out of it (from another dimension too), a line, a ritual, and at 83 s Closing of Space
+ * (15 min) unfolds over the arena. CNPC NPCs of the retinue get script events coven_exit and coven_ritual.
+ */
+public class CovenArrivalSpell extends PohSpell {
+    public static final String PATH = "coven_arrival";
+    public static final String ID = "pohsmp_core:" + PATH;
+    public static final int CAST = 1800, COLOR = 0xB49BFF, MAX_RETINUE = 2, DOME_MIN = 15;
+    public static final double REMARK = 8;
+    private static final String TAG = "pohsmp_core:coven_arena";
+    /** Timeline, ticks from the start of the cast. */
+    private static final int T_PORTAL = 380, T_EXIT1 = 600, T_EXIT2 = 680, T_CASTER = 760, T_RITUAL = 1380, T_DOME = 1660, T_CLOSE = 1720;
+    /** The caster's own portal: opens in front of him (the arms open at 14 s), he and the retinue walk into it at 16.2-18.6 s. Retinue NPCs bow at the nod. */
+    private static final int T_BOW = 188, T_BOW_END = 222, T_CPORTAL = 220, T_STEP = 324, STEP = 48, WALK = 32;
+    /** How far in front of the caster his portal stands (the animation steps him 1.4 forward). */
+    private static final double C_FRONT = 1.9;
+    /** Where the retinue stands at the start: to the sides of the caster, a little behind. */
+    private static final double R_SIDE = 1.8, R_BACK = 0.5;
+    /** CNPC model animations: bow, arms forward. */
+    private static final int NPC_BOW = 11, NPC_RITUAL = 3;
+
+    public CovenArrivalSpell() {
+        super(PATH, SchoolRegistry.ENDER_RESOURCE, SpellRarity.LEGENDARY, 1, 0, CAST, 0, 0);
+    }
+
+    @Override public CastType getCastType() { return CastType.LONG; }
+    @Override public boolean canBeInterrupted(Player player) { return false; }
+    @Override public boolean allowCrafting() { return false; }
+    @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.BEACON_ACTIVATE); }
+    @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.of(SoundEvents.END_PORTAL_SPAWN); }
+    private static final AnimationHolder ANIM_CAST = CastAnims.of("coven_arrival_cast"), ANIM_FINISH = CastAnims.of("coven_arrival_finish");
+    @Override public AnimationHolder getCastStartAnimation() { return ANIM_CAST; }
+    @Override public AnimationHolder getCastFinishAnimation() { return ANIM_FINISH; }
+
+    @Override
+    public void onClientPreCast(Level level, int spellLevel, LivingEntity entity, net.minecraft.world.InteractionHand hand, @javax.annotation.Nullable MagicData md) {
+        super.onClientPreCast(level, spellLevel, entity, hand, md);
+        CastAnims.hideHands(level, entity, getEffectiveCastTime(spellLevel, entity));
+    }
+
+    @Override
+    public List<MutableComponent> getUniqueInfo(int level, LivingEntity caster) {
+        return List.of(ui("mark", (int) REMARK), ui("retinue", MAX_RETINUE), ui("cast", CAST / 20, (int) Cutscene.R_COVEN), ui("dome", DOME_MIN));
+    }
+
+    // ---------------------------------------------------------------- arena mark
+
+    private record Mark(ResourceKey<Level> dim, Vec3 pos, float yaw) {}
+
+    private static CompoundTag persisted(Player p) {
+        CompoundTag root = p.getPersistentData();
+        if (!root.contains(Player.PERSISTED_NBT_TAG)) root.put(Player.PERSISTED_NBT_TAG, new CompoundTag());
+        return root.getCompound(Player.PERSISTED_NBT_TAG);
+    }
+
+    private static Mark mark(Player p) {
+        CompoundTag t = persisted(p);
+        if (!t.contains(TAG)) return null;
+        CompoundTag m = t.getCompound(TAG);
+        ResourceKey<Level> dim = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(m.getString("dim")));
+        return new Mark(dim, new Vec3(m.getDouble("x"), m.getDouble("y"), m.getDouble("z")), m.getFloat("yaw"));
+    }
+
+    private static void setMark(Player p, Mark k) {
+        CompoundTag t = persisted(p);
+        if (k == null) {
+            t.remove(TAG);
+            return;
+        }
+        CompoundTag m = new CompoundTag();
+        m.putString("dim", k.dim().location().toString());
+        m.putDouble("x", k.pos().x);
+        m.putDouble("y", k.pos().y);
+        m.putDouble("z", k.pos().z);
+        m.putFloat("yaw", k.yaw());
+        t.put(TAG, m);
+    }
+
+    private static void say(Player p, String key) {
+        p.displayClientMessage(Component.translatable("ui.pohsmp_core.coven_arrival." + key).withStyle(s -> s.withColor(COLOR)), true);
+    }
+
+    /** Fx instance of the small seal over the mark, seen by its owner only. */
+    private static final Map<UUID, Integer> MARK_FX = new HashMap<>();
+
+    private static void showMark(ServerPlayer sp) {
+        Integer old = MARK_FX.remove(sp.getUUID());
+        if (old != null && sp.level() instanceof ServerLevel sl0) Fx.stop(sl0, old, "");
+        Mark k = mark(sp);
+        if (k == null) return;
+        ServerLevel sl = sp.server.getLevel(k.dim());
+        if (sl == null) return;
+        int id = Fx.play(sl, Fx.sigil("coven_seal").at(k.pos().add(0, 2.2, 0)).yaw(k.yaw()).scale(0.09).orientation("billboard").duration(72000).only(sp));
+        MARK_FX.put(sp.getUUID(), id);
+    }
+
+    @Override
+    public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData md) {
+        if (!(level instanceof ServerLevel sl) || !(entity instanceof ServerPlayer sp)) return super.checkPreCastConditions(level, spellLevel, entity, md);
+        if (CAST_BY.containsKey(sp.getUUID())) return false;
+        Mark k = mark(sp);
+        boolean near = k != null && k.dim() == sl.dimension() && k.pos().distanceTo(sp.position()) < REMARK;
+        if (k == null || near || sp.server.getLevel(k.dim()) == null) {
+            Mark nk = new Mark(sl.dimension(), sp.position(), sp.getYRot());
+            setMark(sp, nk);
+            say(sp, k == null ? "marked" : "moved");
+            Fx.play(sl, Fx.sigil("coven_seal").at(nk.pos().add(0, 0.05, 0)).yaw(nk.yaw()).scale(0.35).orientation("ground").duration(30));
+            sl.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 1.2f, 0.7f);
+            showMark(sp);
+            return false;
+        }
+        return super.checkPreCastConditions(level, spellLevel, entity, md);
+    }
+
+    // ---------------------------------------------------------------- retinue (Shift + right click)
+
+    /** Caster -> chosen creatures (in order), and the marker over each (seen by the caster). */
+    private static final Map<UUID, LinkedHashMap<UUID, Integer>> RETINUE = new HashMap<>();
+
+    private boolean holdsThis(Player p) {
+        for (ItemStack st : new ItemStack[] {p.getMainHandItem(), p.getOffhandItem()}) {
+            if (st.isEmpty() || !(st.getItem() instanceof io.redspace.ironsspellbooks.item.Scroll) || !ISpellContainer.isSpellContainer(st)) continue;
+            if (ISpellContainer.get(st).getSpellAtIndex(0).getSpell() == this) return true;
+        }
+        SpellData sel = new SpellSelectionManager(p).getSelectedSpellData();
+        return sel != null && sel.getSpell() == this;
+    }
+
+    private static void dropRetinue(ServerPlayer caster) {
+        LinkedHashMap<UUID, Integer> r = RETINUE.remove(caster.getUUID());
+        if (r != null && caster.level() instanceof ServerLevel sl) for (int id : r.values()) Fx.stop(sl, id, "");
+    }
+
+    void toggle(ServerPlayer sp, LivingEntity t) {
+        LinkedHashMap<UUID, Integer> r = RETINUE.computeIfAbsent(sp.getUUID(), u -> new LinkedHashMap<>());
+        ServerLevel sl = sp.serverLevel();
+        Integer had = r.remove(t.getUUID());
+        if (had != null) {
+            Fx.stop(sl, had, "");
+            sp.displayClientMessage(Component.translatable("ui.pohsmp_core.coven_arrival.retinue_out", t.getDisplayName()).withStyle(s -> s.withColor(COLOR)), true);
+            return;
+        }
+        if (r.size() >= MAX_RETINUE) {
+            say(sp, "retinue_full");
+            return;
+        }
+        int id = Fx.play(sl, Fx.sigil("coven_seal").at(t.position().add(0, t.getBbHeight() + 0.6, 0)).attach(t).scale(0.06)
+                .orientation("billboard").duration(72000).only(sp));
+        r.put(t.getUUID(), id);
+        sp.displayClientMessage(Component.translatable("ui.pohsmp_core.coven_arrival.retinue_in", t.getDisplayName(), r.size(), MAX_RETINUE)
+                .withStyle(s -> s.withColor(COLOR)), true);
+        sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1f, 1.2f);
+    }
+
+    private static LivingEntity find(net.minecraft.server.MinecraftServer srv, UUID u) {
+        ServerPlayer p = srv.getPlayerList().getPlayer(u);
+        if (p != null) return p;
+        for (ServerLevel l : srv.getAllLevels()) if (l.getEntity(u) instanceof LivingEntity le) return le;
+        return null;
+    }
+
+    // ---------------------------------------------------------------- the arrival
+
+    private static final class Arrival {
+        ServerLevel castLevel, arena;
+        Vec3 at, fw, rt;
+        float yaw;
+        int cutKey, age;
+        List<UUID> watchers = new ArrayList<>();
+        final List<LivingEntity> retinue = new ArrayList<>();
+        /** Who is hidden inside the portal (damage to them is cancelled), and where each one stands. */
+        final Map<UUID, Vec3> hold = new HashMap<>();
+        final List<Integer> fx = new ArrayList<>();
+        int seed = -1, portal = -1, seal = -1, cPortal = -1, cSeal = -1;
+        boolean domeOpened;
+        /** Where the caster stood at the start (cast level) and his facing; the ground spot inside the arena portal. */
+        Vec3 cAt, cFw, inside;
+        float cYaw;
+        /** Who walks now (out of the arena portal, or into the caster's): from, to, start tick, length. */
+        final Map<UUID, Walk> walks = new HashMap<>();
+        /** The retinue beside the caster on the cast level until they enter his portal. */
+        final Map<UUID, Vec3> pre = new HashMap<>();
+        /** CNPC NPCs: the model animation they had before the arrival changed it. */
+        final Map<UUID, Integer> poses = new HashMap<>();
+    }
+
+    private record Walk(Vec3 from, Vec3 to, int start, int len) {}
+
+    private static final Map<UUID, Arrival> CAST_BY = new HashMap<>();
+    /** Entity -> caster: hidden in the portal, no damage. */
+    private static final Map<UUID, UUID> HIDDEN = new HashMap<>();
+
+    @Override
+    public void onServerPreCast(Level level, int spellLevel, LivingEntity caster, MagicData md) {
+        super.onServerPreCast(level, spellLevel, caster, md);
+        if (level instanceof ServerLevel sl && !CAST_BY.containsKey(caster.getUUID())) begin(sl, caster);
+    }
+
+    private static void begin(ServerLevel sl, LivingEntity caster) {
+        Arrival a = new Arrival();
+        a.castLevel = sl;
+        Mark k = caster instanceof Player p ? mark(p) : null;
+        a.arena = k != null ? sl.getServer().getLevel(k.dim()) : null;
+        if (a.arena == null) {
+            a.arena = sl;
+            a.at = caster.position();
+            a.yaw = caster.getYRot();
+        } else {
+            a.at = k.pos();
+            a.yaw = k.yaw();
+        }
+        double r = Math.toRadians(a.yaw);
+        a.fw = new Vec3(-Math.sin(r), 0, Math.cos(r));
+        a.rt = new Vec3(-a.fw.z, 0, a.fw.x);
+        a.inside = a.at.subtract(a.fw.scale(0.3));
+        a.cAt = caster.position();
+        a.cYaw = caster.getYRot();
+        double cr = Math.toRadians(a.cYaw);
+        a.cFw = new Vec3(-Math.sin(cr), 0, Math.cos(cr));
+        LinkedHashMap<UUID, Integer> ret = RETINUE.get(caster.getUUID());
+        if (ret != null) for (UUID u : ret.keySet()) {
+            LivingEntity e = find(sl.getServer(), u);
+            if (e != null && e.isAlive() && e != caster) a.retinue.add(e);
+        }
+        a.cutKey = HigherSpell.key();
+        a.watchers = Cutscene.start(sl, caster, a.cutKey, Cutscene.COVEN_ARRIVAL, CAST, a.at, a.yaw, Cutscene.R_COVEN, a.arena, a.at);
+        // the retinue comes to the caster's sides, facing the way he faces, ready for the nod and the walk into his portal
+        Vec3 cRt = new Vec3(-a.cFw.z, 0, a.cFw.x);
+        for (int i = 0; i < a.retinue.size(); i++) {
+            LivingEntity e = a.retinue.get(i);
+            Vec3 spot = a.cAt.add(cRt.scale(i == 0 ? -R_SIDE : R_SIDE)).subtract(a.cFw.scale(R_BACK));
+            LivingEntity moved = move(e, sl, spot, a.cYaw);
+            a.retinue.set(i, moved);
+            a.pre.put(moved.getUUID(), spot);
+        }
+        a.fx.add(Fx.play(a.arena, Fx.fx("coven_tint").at(a.at).yaw(a.yaw)));
+        a.seed = Fx.play(a.arena, Fx.mesh("coven_seed").at(a.at).yaw(a.yaw));
+        a.arena.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 6f, 0.5f);
+        CAST_BY.put(caster.getUUID(), a);
+        Tasks.add(() -> step(caster, a));
+    }
+
+    /** One server tick of the arrival; false ends the task. */
+    private static boolean step(LivingEntity caster, Arrival a) {
+        if (CAST_BY.get(caster.getUUID()) != a) return false;
+        int t = ++a.age;
+        ServerLevel ar = a.arena;
+        if (t % 100 == 0 && t < T_PORTAL) ar.playSound(null, a.at.x, a.at.y + 3, a.at.z, SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 5f, 0.45f);
+        if (t == 200) ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 4f, 0.5f);
+        if (t == T_BOW || t == T_BOW_END) for (LivingEntity e : a.retinue) {
+            if (e instanceof Player || !e.isAlive()) continue;
+            if (t == T_BOW) {
+                int old = CnpcHooks.anim(e, NPC_BOW);
+                if (old >= 0) a.poses.putIfAbsent(e.getUUID(), old);
+            } else if (a.poses.containsKey(e.getUUID())) CnpcHooks.anim(e, a.poses.get(e.getUUID()));
+        }
+        if (t == T_CPORTAL) openCasterPortal(a);
+        if (t == T_PORTAL) openPortal(caster, a);
+        if (t == T_EXIT1 && a.retinue.size() > 0) exit(caster, a, a.retinue.get(0), a.at.add(a.fw.scale(2.2)).subtract(a.rt.scale(3)), 0.6f);
+        if (t == T_EXIT2 && a.retinue.size() > 1) exit(caster, a, a.retinue.get(1), a.at.add(a.fw.scale(2.2)).add(a.rt.scale(3)), 0.6f);
+        if (t == T_CASTER) exit(caster, a, caster, a.at.add(a.fw.scale(3.2)), 0.45f);
+        if (t == T_RITUAL) ritual(caster, a);
+        if (t == T_DOME) {
+            a.domeOpened = true;
+            Cutscene.flash(ar, a.watchers, 20, 0xD8C8FF);
+            SpaceClosureSpell.open(ar, caster, a.at, DOME_MIN);
+        }
+        if (t == T_CLOSE) {
+            if (a.portal >= 0) Fx.stop(ar, a.portal, "");
+            if (a.seal >= 0) Fx.stop(ar, a.seal, "");
+            HigherSpell.burst(ar, a.at.x, a.at.y + 2.9, a.at.z, 4, COLOR);
+            ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.ENDER_EYE_DEATH, SoundSource.PLAYERS, 4f, 0.5f);
+        }
+        // before the portal: the retinue stands beside the caster, then walks with him into his portal
+        if (t == T_STEP) {
+            Vec3 shift = a.cFw.scale(C_FRONT + 0.2);
+            for (var e : a.pre.entrySet()) a.walks.put(e.getKey(), new Walk(e.getValue(), e.getValue().add(shift), T_STEP, STEP));
+        }
+        if (t < T_PORTAL) holdAll(a, a.pre, a.castLevel, a.cYaw, t);
+        // hold everyone hidden or already out in place: the retinue NPCs stand still, the hidden are not seen
+        holdAll(a, a.hold, ar, a.yaw, t);
+        return t < CAST + 40;
+    }
+
+    private static void holdAll(Arrival a, Map<UUID, Vec3> where, ServerLevel ar, float baseYaw, int t) {
+        for (var e : where.entrySet()) {
+            LivingEntity le = find(ar.getServer(), e.getKey());
+            if (le == null || !le.isAlive() || le.level() != ar) continue;
+            if (HIDDEN.containsKey(le.getUUID())) hide(le);   // renew: something (a cast, milk) may have removed it
+            float yaw = baseYaw;
+            Walk w = a.walks.get(le.getUUID());
+            if (w != null) {   // walking: the server leads it in small steps, the client animates the legs
+                double k = Math.min(1, (t - w.start()) / (double) w.len());
+                double s = k * k * (3 - 2 * k);
+                Vec3 d = w.to().subtract(w.from());
+                e.setValue(w.from().add(d.scale(s)));
+                if (k < 1 && d.horizontalDistanceSqr() > 1e-4) yaw = (float) Math.toDegrees(Math.atan2(-d.x, d.z));
+                if (k >= 1) a.walks.remove(le.getUUID());
+            }
+            Vec3 p = e.getValue();
+            if (le instanceof ServerPlayer sp) {   // players are held by the cutscene freeze
+                if (w != null) Cutscene.refreeze(sp, p);
+                continue;
+            }
+            if (le.position().distanceToSqr(p) > 0.0004) le.teleportTo(p.x, p.y, p.z);
+            le.fallDistance = 0;
+            le.setDeltaMovement(Vec3.ZERO);
+            le.setYRot(yaw);
+            le.setYHeadRot(yaw);
+            le.setYBodyRot(yaw);
+        }
+    }
+
+    /** CNPC NPCs ignore invisibility when drawn, so while "inside the portal" they wait high above the arena, out of sight. */
+    private static Vec3 stash(ServerLevel ar, Vec3 p) {
+        double up = p.y + 150, top = ar.getMaxBuildHeight() - 4;
+        return new Vec3(p.x, up <= top ? up : Math.max(ar.getMinBuildHeight() + 2, p.y - 150), p.z);
+    }
+
+    /** The caster's own portal in front of him, on the cast level: he opens it with his arms and walks into it. */
+    private static void openCasterPortal(Arrival a) {
+        ServerLevel cl = a.castLevel;
+        Vec3 p = a.cAt.add(a.cFw.scale(C_FRONT));
+        a.cPortal = Fx.play(cl, Fx.mesh("coven_portal").at(p).yaw(a.cYaw).duration(T_PORTAL + 8 - T_CPORTAL));
+        a.cSeal = Fx.play(cl, Fx.sigil("coven_seal").at(p.add(0, 0.05, 0)).yaw(a.cYaw).scale(0.5).orientation("ground")
+                .duration(T_PORTAL + 8 - T_CPORTAL));
+        cl.playSound(null, p.x, p.y, p.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 3f, 0.8f);
+    }
+
+    private static void openPortal(LivingEntity caster, Arrival a) {
+        ServerLevel ar = a.arena;
+        if (a.seed >= 0) Fx.stop(ar, a.seed, "");
+        a.portal = Fx.play(ar, Fx.mesh("coven_portal").at(a.at).yaw(a.yaw).duration(T_CLOSE - T_PORTAL));
+        a.seal = Fx.play(ar, Fx.sigil("coven_seal").at(a.at.add(0, 0.05, 0)).yaw(a.yaw).scale(0.8).orientation("ground").duration(T_CLOSE - T_PORTAL));
+        a.fx.add(Fx.play(ar, Fx.fx("coven_wave").at(a.at).yaw(a.yaw)));
+        ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 6f, 0.6f);
+        // the caster's own portal closes behind those who stepped into it
+        ServerLevel cl = a.castLevel;
+        Vec3 cp = a.cAt.add(a.cFw.scale(C_FRONT));
+        if (a.cPortal >= 0) Fx.stop(cl, a.cPortal, "");
+        if (a.cSeal >= 0) Fx.stop(cl, a.cSeal, "");
+        HigherSpell.burst(cl, cp.x, cp.y + 2.9, cp.z, 2.5, COLOR);
+        cl.playSound(null, cp.x, cp.y, cp.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 3f, 0.5f);
+        // everyone steps into the portal: moved to the arena (other dimension too), invisible, unhurt until their exit
+        a.pre.clear();
+        a.walks.clear();
+        Vec3 inside = a.inside;
+        List<LivingEntity> all = new ArrayList<>(a.retinue);
+        all.add(caster);
+        for (LivingEntity e : all) {
+            HIDDEN.put(e.getUUID(), caster.getUUID());
+            hide(e);
+            if (!(e instanceof Player)) HigherSpell.burst(e.level() instanceof ServerLevel el ? el : cl, e.getX(), e.getY() + 1, e.getZ(), 1.4, COLOR);
+            Vec3 p = e instanceof Player ? inside : stash(ar, inside);
+            LivingEntity moved = move(e, ar, p, a.yaw);
+            a.hold.put(moved.getUUID(), p);
+            if (moved != e) {
+                a.retinue.replaceAll(x -> x == e ? moved : x);
+                Integer pose = a.poses.remove(e.getUUID());
+                if (pose != null) a.poses.put(moved.getUUID(), pose);
+            }
+        }
+        // watchers left in another dimension (around the caster) have nothing to watch any more
+        List<UUID> gone = new ArrayList<>();
+        for (UUID u : a.watchers) {
+            ServerPlayer sp = ar.getServer().getPlayerList().getPlayer(u);
+            if (sp != null && sp.level() != ar) gone.add(u);
+        }
+        if (!gone.isEmpty()) {
+            Cutscene.release(ar, gone, a.cutKey);
+            a.watchers.removeAll(gone);
+        }
+    }
+
+    /** Iron's true invisibility hides the armour and held items too (vanilla invisibility does not). */
+    private static final ResourceLocation TRUE_INVIS = new ResourceLocation("irons_spellbooks", "true_invisibility");
+
+    private static net.minecraft.world.effect.MobEffect trueInvis() {
+        return net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.containsKey(TRUE_INVIS)
+                ? net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getValue(TRUE_INVIS) : null;
+    }
+
+    /** Invisible inside the portal: vanilla invisibility plus Iron's true invisibility (renewed every tick while hidden). */
+    private static void hide(LivingEntity e) {
+        if (!e.hasEffect(MobEffects.INVISIBILITY)) e.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, 60, 0, false, false, false));
+        var ti = trueInvis();
+        if (ti != null && !e.hasEffect(ti)) e.addEffect(new MobEffectInstance(ti, 60, 0, false, false, false));
+    }
+
+    private static void unhide(LivingEntity e) {
+        e.removeEffect(MobEffects.INVISIBILITY);
+        var ti = trueInvis();
+        if (ti != null) e.removeEffect(ti);
+    }
+
+    /** Moves an entity to p in level `to`, facing yaw; returns the entity (a new one if a non-player changed dimension). */
+    private static LivingEntity move(LivingEntity e, ServerLevel to, Vec3 p, float yaw) {
+        e.fallDistance = 0;
+        e.stopRiding();
+        if (e instanceof ServerPlayer sp) {
+            if (sp.level() == to) sp.connection.teleport(p.x, p.y, p.z, yaw, 0);
+            else sp.teleportTo(to, p.x, p.y, p.z, yaw, 0);
+            sp.setDeltaMovement(Vec3.ZERO);
+            Cutscene.refreeze(sp, p);
+            return sp;
+        }
+        if (e.level() == to) {
+            e.teleportTo(p.x, p.y, p.z);
+            e.setYRot(yaw);
+            return e;
+        }
+        Entity moved = e.changeDimension(to, new ITeleporter() {
+            @Override
+            public net.minecraft.world.level.portal.PortalInfo getPortalInfo(Entity entity, ServerLevel dest,
+                    java.util.function.Function<ServerLevel, net.minecraft.world.level.portal.PortalInfo> def) {
+                return new net.minecraft.world.level.portal.PortalInfo(p, Vec3.ZERO, yaw, 0);
+            }
+
+            @Override
+            public boolean playTeleportSound(ServerPlayer player, ServerLevel src, ServerLevel dest) {
+                return false;
+            }
+        });
+        return moved instanceof LivingEntity le ? le : e;
+    }
+
+    private static void exit(LivingEntity caster, Arrival a, LivingEntity e, Vec3 to, float pitch) {
+        ServerLevel ar = a.arena;
+        LivingEntity le = find(ar.getServer(), e.getUUID());
+        if (le == null || !le.isAlive()) return;
+        HIDDEN.remove(le.getUUID());
+        unhide(le);
+        LivingEntity m;
+        if (le == caster) {   // the caster's animation walks him out by itself: he is set at the end point at once
+            m = move(le, ar, to, a.yaw);
+            a.hold.put(m.getUUID(), to);
+        } else {   // the retinue really walks out: from inside the portal to its place
+            m = move(le, ar, a.inside, a.yaw);
+            a.hold.put(m.getUUID(), a.inside);
+            a.walks.put(m.getUUID(), new Walk(a.inside, to, a.age, WALK));
+        }
+        a.fx.add(Fx.play(ar, Fx.sigil("coven_seal").at(to.add(0, 0.04, 0)).yaw(a.yaw).scale(0.16).orientation("ground").duration(50)));
+        HigherSpell.burst(ar, to.x, to.y + 1, to.z, 1.6, COLOR);
+        ar.playSound(null, to.x, to.y, to.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 2f, pitch);
+        ar.playSound(null, to.x, to.y, to.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 2f, 0.8f);
+        if (m != caster) CnpcHooks.call(m, "coven_exit", caster.getName().getString());
+    }
+
+    private static void ritual(LivingEntity caster, Arrival a) {
+        ServerLevel ar = a.arena;
+        Vec3 pa = a.at.add(a.fw.scale(3.2));
+        Vec3 pb = a.retinue.size() > 0 ? a.at.add(a.fw.scale(2.2)).subtract(a.rt.scale(3)) : pa;
+        Vec3 pc = a.retinue.size() > 1 ? a.at.add(a.fw.scale(2.2)).add(a.rt.scale(3)) : pb;
+        Vec3 sky = pa.add(pb).add(pc).scale(1 / 3.0).add(0, 22, 0);
+        a.fx.add(Fx.play(ar, Fx.fx("coven_ritual").at(a.at).yaw(a.yaw).point("a", pa).point("b", pb).point("c", pc).point("sky", sky)));
+        ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 5f, 0.5f);
+        for (LivingEntity e : a.retinue) {
+            LivingEntity le = find(ar.getServer(), e.getUUID());
+            if (le == null || !le.isAlive()) continue;
+            if (le instanceof ServerPlayer) Net.sendNear(ar, le.getX(), le.getY(), le.getZ(), a.at.x, a.at.y, a.at.z,
+                    new HFx(HFx.ANIM, 0, le.getId(), 0, 0, 0, 0, 0, 0, 0));
+            else {
+                int old = CnpcHooks.anim(le, NPC_RITUAL);   // arms forward; the NPC script may change it in coven_ritual
+                if (old >= 0) a.poses.putIfAbsent(le.getUUID(), old);
+                CnpcHooks.call(le, "coven_ritual", caster.getName().getString());
+            }
+        }
+    }
+
+    private static void finish(LivingEntity caster, Arrival a, boolean cancelled) {
+        CAST_BY.remove(caster.getUUID());
+        ServerLevel ar = a.arena;
+        Cutscene.end(ar, caster, a.watchers, a.cutKey);
+        for (UUID u : new ArrayList<>(a.hold.keySet())) {
+            LivingEntity le = find(ar.getServer(), u);
+            Walk w = a.walks.get(u);
+            if (le != null && w != null && !(le instanceof Player) && le.level() == ar) le.teleportTo(w.to().x, w.to().y, w.to().z);
+            if (HIDDEN.remove(u) == null || le == null) continue;
+            unhide(le);
+            // cut short while still inside the portal: NPCs come down from where they waited
+            if (!(le instanceof Player) && le.level() == ar) {
+                le.fallDistance = 0;
+                le.teleportTo(a.inside.x, a.inside.y, a.inside.z);
+            }
+        }
+        for (var p : a.poses.entrySet()) {
+            LivingEntity le = find(ar.getServer(), p.getKey());
+            if (le != null) CnpcHooks.anim(le, p.getValue());
+        }
+        HIDDEN.values().removeIf(c -> c.equals(caster.getUUID()));
+        if (cancelled) {
+            for (int id : a.fx) Fx.stop(ar, id, "");
+            for (int id : new int[] {a.seed, a.portal, a.seal}) if (id >= 0) Fx.stop(ar, id, "");
+            if (a.cPortal >= 0) Fx.stop(a.castLevel, a.cPortal, "");
+            if (a.cSeal >= 0) Fx.stop(a.castLevel, a.cSeal, "");
+        }
+        if (caster instanceof ServerPlayer sp) {
+            dropRetinue(sp);
+            if (!cancelled || a.domeOpened) {
+                setMark(sp, null);
+                showMark(sp);
+            }
+        }
+    }
+
+    @Override
+    public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
+        Arrival a = CAST_BY.get(caster.getUUID());
+        if (a != null) {
+            if (!a.domeOpened) {   // the cast ended early on the clock: still raise the dome
+                a.domeOpened = true;
+                SpaceClosureSpell.open(a.arena, caster, a.at, DOME_MIN);
+            }
+            finish(caster, a, false);
+        }
+        super.onCast(level, spellLevel, caster, source, md);
+    }
+
+    @Override
+    public void onServerCastComplete(Level level, int spellLevel, LivingEntity caster, MagicData md, boolean cancelled) {
+        Arrival a = CAST_BY.get(caster.getUUID());
+        if (a != null) finish(caster, a, cancelled);
+        super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
+    }
+
+    // ---------------------------------------------------------------- events
+
+    public static final class CovenArrivalEvents {
+        private CovenArrivalEvents() {}
+
+        @SubscribeEvent
+        public static void onInteract(PlayerInteractEvent.EntityInteract e) {
+            Player p = e.getEntity();
+            if (!p.isShiftKeyDown() || !(e.getTarget() instanceof LivingEntity t)) return;
+            if (!(ru.pohsmp.core.Reg.COVEN_ARRIVAL.get() instanceof CovenArrivalSpell spell) || !spell.holdsThis(p)) return;
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.SUCCESS);
+            if (p instanceof ServerPlayer sp && e.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND) spell.toggle(sp, t);
+        }
+
+        @SubscribeEvent(priority = EventPriority.HIGHEST)
+        public static void onAttack(LivingAttackEvent e) {
+            if (!HIDDEN.isEmpty() && HIDDEN.containsKey(e.getEntity().getUUID())) e.setCanceled(true);
+        }
+
+        @SubscribeEvent
+        public static void onPlayerTick(TickEvent.PlayerTickEvent e) {
+            if (e.phase != TickEvent.Phase.END || !(e.player instanceof ServerPlayer sp) || sp.tickCount % 200 != 37) return;
+            Integer id = MARK_FX.get(sp.getUUID());
+            if ((id == null || !Fx.running(id)) && mark(sp) != null) showMark(sp);
+        }
+
+        @SubscribeEvent
+        public static void onLogin(PlayerEvent.PlayerLoggedInEvent e) {
+            if (e.getEntity() instanceof ServerPlayer sp && mark(sp) != null) showMark(sp);
+        }
+
+        @SubscribeEvent
+        public static void onLogout(PlayerEvent.PlayerLoggedOutEvent e) {
+            if (!(e.getEntity() instanceof ServerPlayer sp)) return;
+            dropRetinue(sp);
+            Integer id = MARK_FX.remove(sp.getUUID());
+            if (id != null) Fx.stop(sp.serverLevel(), id, "");
+        }
+
+        @SubscribeEvent
+        public static void onStopping(ServerStoppingEvent e) {
+            RETINUE.clear();
+            MARK_FX.clear();
+            CAST_BY.clear();
+            HIDDEN.clear();
+        }
+    }
+}

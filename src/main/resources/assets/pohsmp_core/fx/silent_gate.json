@@ -39,200 +39,51 @@
    "color": "@primary"
   },
   {
-   "type": "mesh",
-   "model": "silent_hand_stream",
+   "type": "sigil",
+   "id": "silent_hand_nebula",
    "delay": 292,
    "until": 520,
-   "at": "caster.hand"
+   "at": "caster+0,2.5,2.0",
+   "orientation": "billboard"
   },
   {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 300,
-   "until": 308,
-   "at": "caster.hand"
+   "type": "sprites",
+   "delay": 296,
+   "duration": 220,
+   "at": "caster+0,2.5,2.0",
+   "texture": "glint4",
+   "count": 90,
+   "rate": 0.4,
+   "spread": 3.2,
+   "speed": 0.006,
+   "gravity": -0.001,
+   "spin": 40,
+   "size": [
+    0.0,
+    0.35
+   ],
+   "life": 44,
+   "color": "#FFFFFF",
+   "comment": "мерцающие звёздочки в облаке"
   },
   {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 308,
-   "until": 316,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 316,
-   "until": 324,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 324,
-   "until": 332,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 332,
-   "until": 340,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 340,
-   "until": 348,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 348,
-   "until": 356,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 356,
-   "until": 364,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 364,
-   "until": 372,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 372,
-   "until": 380,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 380,
-   "until": 388,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 388,
-   "until": 396,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 396,
-   "until": 404,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 404,
-   "until": 412,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 412,
-   "until": 420,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 420,
-   "until": 428,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 428,
-   "until": 436,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 436,
-   "until": 444,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 444,
-   "until": 452,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 452,
-   "until": 460,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 460,
-   "until": 468,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 468,
-   "until": 476,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 476,
-   "until": 484,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 484,
-   "until": 492,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 492,
-   "until": 500,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_b",
-   "delay": 500,
-   "until": 508,
-   "at": "caster.hand"
-  },
-  {
-   "type": "mesh",
-   "model": "silent_hand_glints_a",
-   "delay": 508,
-   "until": 516,
-   "at": "caster.hand"
+   "type": "sprites",
+   "delay": 296,
+   "duration": 220,
+   "at": "caster+0,2.5,2.0",
+   "texture": "spark_soft",
+   "count": 160,
+   "rate": 0.7,
+   "spread": 3.6,
+   "speed": 0.008,
+   "gravity": -0.0015,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 50,
+   "color": "#F2D8F2",
+   "comment": "редкие пылинки света"
   },
   {
    "type": "flash",

@@ -1,0 +1,104 @@
+{
+ "comment": "«Безмолвные врата», указ рукой (14.6–26 с): туманность как в видео мода — облачный рукав галактики перед ведьмой и над ней, звёзды и светлые струи; billboard, слои медленно вращаются. Сгенерировано tools/gen_silent_nebula.py.",
+ "size": 4.0,
+ "color": "#FFFFFF",
+ "orientation": "billboard",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "cloud_back",
+   "type": "disc",
+   "texture": "silent_nebula_cloud",
+   "radius": 1.2,
+   "heightOffset": -0.06,
+   "brightness": 0.38,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade",
+     "twist"
+    ],
+    "twist": -40
+   },
+   "rotation": {
+    "speed": 0.8
+   }
+  },
+  {
+   "id": "cloud",
+   "type": "disc",
+   "texture": "silent_nebula_cloud",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 0.55,
+   "appear": {
+    "delay": 6,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade",
+     "twist"
+    ],
+    "twist": 50
+   },
+   "rotation": {
+    "speed": -1.2
+   }
+  },
+  {
+   "id": "wisp",
+   "type": "disc",
+   "texture": "silent_nebula_wisp",
+   "radius": 1.05,
+   "heightOffset": 0.03,
+   "brightness": 0.8,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2.0
+   }
+  },
+  {
+   "id": "stars",
+   "type": "disc",
+   "texture": "silent_nebula_stars",
+   "radius": 1.1,
+   "heightOffset": 0.06,
+   "appear": {
+    "delay": 4,
+    "duration": 24,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -0.6
+   },
+   "pulse": {
+    "amp": 0.18,
+    "period": 26
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 24
+ }
+}

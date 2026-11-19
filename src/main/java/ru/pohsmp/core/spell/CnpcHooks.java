@@ -40,6 +40,21 @@ public final class CnpcHooks {
 
     /** Runs `function name(e)` in the NPC's scripts; false if it is not a CNPC NPC or something failed. */
     public static boolean call(Entity npc, String name, String caster) {
+        return run(npc, name, wrapped -> new Event(wrapped, name, caster, npc.getX(), npc.getY(), npc.getZ()));
+    }
+
+    /** Same with an event object of the caller's (its public field `npc`, if any, gets the NPC's script wrapper). */
+    public static boolean callWith(Entity npc, String name, Object event) {
+        return run(npc, name, wrapped -> {
+            try {
+                event.getClass().getField("npc").set(event, wrapped);
+            } catch (ReflectiveOperationException ignored) {
+            }
+            return event;
+        });
+    }
+
+    private static boolean run(Entity npc, String name, java.util.function.Function<Object, Object> make) {
         if (!isNpc(npc)) return false;
         try {
             Field f = field(npc.getClass(), "script");
@@ -48,11 +63,16 @@ public final class CnpcHooks {
             Method en = data.getClass().getMethod("isEnabled");
             if (!(Boolean) en.invoke(data)) return false;
             List<?> scripts = (List<?>) data.getClass().getMethod("getScripts").invoke(data);
+            Object own = field(npc.getClass(), "wrappedNPC").get(npc);
             for (Object sc : scripts) {
-                Object wrapped = sc.getClass().getField("wrappedNPC").get(sc);
-                if (wrapped == null) wrapped = field(npc.getClass(), "wrappedNPC").get(npc);
-                Event ev = new Event(wrapped, name, caster, npc.getX(), npc.getY(), npc.getZ());
-                sc.getClass().getMethod("run", String.class, Object.class).invoke(sc, name, ev);
+                // older CNPC builds keep the wrapper on the script container, newer ones (GBPort 1.20.1) only on the NPC
+                Object wrapped = null;
+                try {
+                    wrapped = sc.getClass().getField("wrappedNPC").get(sc);
+                } catch (NoSuchFieldException ignored) {
+                }
+                if (wrapped == null) wrapped = own;
+                sc.getClass().getMethod("run", String.class, Object.class).invoke(sc, name, make.apply(wrapped));
             }
             return true;
         } catch (Throwable t) {

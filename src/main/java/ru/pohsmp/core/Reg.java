@@ -403,6 +403,7 @@ public final class Reg {
         SOUNDS.register(modBus);
         ITEMS.register(modBus);
         TABS.register(modBus);
+        ru.pohsmp.core.nightmare.Bestiary.ENTITIES.register(modBus);   // T25
         LOOT_MODIFIERS.register(modBus);
     }
 

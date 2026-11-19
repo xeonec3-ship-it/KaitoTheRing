@@ -23,10 +23,19 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "m_109093_(FJZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;m_91265_()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0, remap = false), remap = false, require = 0)
     private void pohsmp$bars(float pt, long nanos, boolean level, CallbackInfo ci) {
-        if (!DownfallCut.active()) return;
         Minecraft mc = Minecraft.getInstance();
-        GuiGraphics g = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
-        DownfallCut.drawBars(g, pt);
-        g.flush();
+        if (mc.level != null) {   // T22 «Сон бабочки»: ripple, the dream death, the waking shards - over the HUD and the scene bars
+            GuiGraphics g = new GuiGraphics(mc, mc.renderBuffers().bufferSource());
+            if (DownfallCut.active()) DownfallCut.drawBars(g, pt);
+            ru.pohsmp.core.client.illusion.DreamScreen.overlay(g, pt);
+            g.flush();
+        }
+    }
+
+    /** T22: right after the level (and the hand) is drawn - the dream mirror folds the picture here. renderLevel = m_109089_. */
+    @Inject(method = "m_109093_(FJZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;m_109089_(FJLcom/mojang/blaze3d/vertex/PoseStack;)V",
+            shift = At.Shift.AFTER, remap = false), remap = false, require = 0)
+    private void pohsmp$afterLevel(float pt, long nanos, boolean level, CallbackInfo ci) {
+        ru.pohsmp.core.client.illusion.DreamScreen.afterLevel(pt);
     }
 }

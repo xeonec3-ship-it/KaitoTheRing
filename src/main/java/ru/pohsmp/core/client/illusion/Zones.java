@@ -24,6 +24,10 @@ public final class Zones {
 
     static void handle(IlluMsg m) {
         ru.pohsmp.core.PohCore.LOG.info("[pohsmp] illusion zone {} kind {} from entity {} for {} ticks", m.kind == IlluMsg.ZONE ? "on" : "off", m.i, m.entity, m.ticks);
+        if (m.i == DREAM) {   // the mirror of the dream folds in / out
+            if (m.kind == IlluMsg.ZONE) DreamScreen.enter();
+            else DreamScreen.exit();
+        }
         if (m.kind == IlluMsg.ZONE) ZONES.put(key(m.entity, m.i), new Zone(m.i, m.entity, m.x, m.y, m.z, m.yaw, IllusionClient.now() + m.ticks, m.text));
         else if (m.i != 0) ZONES.remove(key(m.entity, m.i));
         else ZONES.values().removeIf(z -> z.caster() == m.entity);   // no kind given: every zone of that caster

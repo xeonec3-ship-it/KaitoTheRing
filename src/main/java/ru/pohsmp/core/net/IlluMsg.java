@@ -52,6 +52,10 @@ public final class IlluMsg {
     public static final int NIGHT = 18;
     /** A walk led by a spell (Coven Arrival, the retinue players): this client's own player walks to x y z within ticks and faces yaw at the end. */
     public static final int WALK = 19;
+    /** «Сон бабочки»: i wound butterflies circle entity (its dream hits; 0 = none). To the dreamer and the caster. */
+    public static final int WOUNDS = 20;
+    /** «Сон бабочки»: the waking scene starts on this client (the glass breaks 34 ticks later). */
+    public static final int DREAM_WAKE = 21;
     /** zone kinds (i of ZONE / ZONE_END) */
     public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4;
 

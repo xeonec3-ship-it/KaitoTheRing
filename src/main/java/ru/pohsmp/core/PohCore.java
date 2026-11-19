@@ -29,6 +29,7 @@ public class PohCore {
         Reg.register(modBus);
         modBus.addListener(PohCore::commonSetup);
         modBus.addListener(PohCore::attributes);
+        modBus.addListener(ru.pohsmp.core.nightmare.Bestiary::attributes);   // T25
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
         MinecraftForge.EVENT_BUS.register(DivineEvents.class);
         MinecraftForge.EVENT_BUS.register(SchoolSeals.class);
@@ -69,6 +70,7 @@ public class PohCore {
         ru.pohsmp.core.spell.illusion.IllusionSpells.registerEvents();   // T22
         ru.pohsmp.core.nightmare.NightmareSpells.registerEvents();   // T25
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.nightmare.Immersion.class);   // T25
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.nightmare.Bestiary.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.Erased.class);   // T24
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.ErasedNameSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.mythic.MythicT23.Events.class);   // T23

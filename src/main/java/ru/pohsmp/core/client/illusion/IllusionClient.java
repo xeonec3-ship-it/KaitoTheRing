@@ -72,6 +72,8 @@ public final class IllusionClient {
             case IlluMsg.IMMERSION -> ru.pohsmp.core.client.nightmare.NightmareClient.set(m.i, m.ticks);
             case IlluMsg.NIGHT -> ru.pohsmp.core.client.nightmare.NightmareClient.night(m.ticks);
             case IlluMsg.SKY ->ru.pohsmp.core.client.mythic.SkyClient.set(m.i, m.ticks);
+            case IlluMsg.WOUNDS -> DreamScreen.wounds(m.entity, m.i);
+            case IlluMsg.DREAM_WAKE -> DreamScreen.wake();
             case IlluMsg.WALK -> ru.pohsmp.core.client.ScriptedWalk.start(m.entity, m.x, m.y, m.z, m.ticks, m.yaw);
             case IlluMsg.ANIM -> {
                 var lvl = Minecraft.getInstance().level;
@@ -211,5 +213,6 @@ public final class IllusionClient {
         Copies.clear();
         Zones.clear();
         ZoneDraw.clear();
+        DreamScreen.clear();
     }
 }

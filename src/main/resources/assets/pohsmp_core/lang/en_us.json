@@ -449,7 +449,7 @@
   "spell.pohsmp_core.mirror_labyrinth": "Mirror Labyrinth",
   "spell.pohsmp_core.mirror_labyrinth.guide": "The palms draw a square and strike the ground: a dome of 14 blocks stands for 20 seconds. Enemies inside see solid mirror walls; they can pass through, but the shards wound and push them back. The caster is reflected in the walls, left and right are swapped. The caster and allies do not see the walls.",
   "spell.pohsmp_core.waking_nightmare": "Waking Nightmare",
-  "spell.pohsmp_core.waking_nightmare.guide": "A seal of empty eyes opens over the target. For twelve seconds everyone around it, allies, enemies and mobs, looks like the same faceless monster, and names are hidden. Strike an ally and the wound is real.",
+  "spell.pohsmp_core.waking_nightmare.guide": "A seal of empty eyes opens over the target. For twelve seconds everyone around it, allies, enemies, mobs and the caster too, looks like the same faceless monster, and names are hidden. Strike an ally and the wound is real.",
   "spell.pohsmp_core.butterfly_dream": "Butterfly Dream",
   "spell.pohsmp_core.butterfly_dream.guide": "Twelve seconds of casting: a glass butterfly is born in the palms, the world cracks like a mirror and turns over. For 25 seconds every enemy within 32 blocks lives in the reflection: the caster and allies are invisible to them (a hit or a cast shows a flickering outline for a second), and half the damage they take is an illusion. At the end the butterflies shatter and all the illusory damage becomes real at once.",
   "effect.pohsmp_core.phantom_pain": "Phantom Pain",

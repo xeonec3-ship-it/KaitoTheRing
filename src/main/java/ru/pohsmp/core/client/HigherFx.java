@@ -103,6 +103,10 @@ public final class HigherFx {
                 TargetPoseClient.handle(m.a, m.b);
                 return;
             }
+            if (m.b == ru.pohsmp.core.spell.CovenArrivalSpell.ANIM_RETINUE) {   // Coven Arrival: how many of the retinue step out (dur)
+                DownfallCut.covenRetinue(m.key, m.dur);
+                return;
+            }
             if (lvl.getEntity(m.a) instanceof net.minecraft.world.entity.player.Player p && m.b == 0)
                 io.redspace.ironsspellbooks.player.ClientSpellCastHelper.animatePlayerStart(p, new ResourceLocation("irons_spellbooks", "pohsmp_coven_ritual"));
             return;

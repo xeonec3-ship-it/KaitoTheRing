@@ -54,7 +54,7 @@ import org.slf4j.Logger;
 /**
  * Mythic "Coven Arrival" (a Coven seal), level 1. First use marks the arena where the caster stands (no cast, the scroll stays);
  * using it within 8 blocks of the mark moves the mark. Shift+right click on a creature with the scroll (or the spell selected
- * in a spellbook) adds it to the retinue or removes it (up to 2). Using it farther away starts a 90 s cast that cannot be
+ * in a spellbook) adds it to the retinue or removes it (up to 3). Using it farther away starts a 90 s cast that cannot be
  * interrupted, with a cutscene for everyone within 98 blocks of the arena and of the caster: a portal opens on the arena,
  * the retinue and the caster step out of it (from another dimension too), a line, a ritual, and at 83 s Closing of Space
  * (15 min) unfolds over the arena. CNPC NPCs of the retinue get script events coven_exit and coven_ritual.
@@ -62,11 +62,36 @@ import org.slf4j.Logger;
 public class CovenArrivalSpell extends PohSpell {
     public static final String PATH = "coven_arrival";
     public static final String ID = "pohsmp_core:" + PATH;
-    public static final int CAST = 1800, COLOR = 0xB49BFF, MAX_RETINUE = 2, DOME_MIN = 15;
+    public static final int CAST = 1800, COLOR = 0xB49BFF, MAX_RETINUE = 3, DOME_MIN = 15;
     public static final double REMARK = 8;
     private static final String TAG = "pohsmp_core:coven_arena";
-    /** Timeline, ticks from the start of the cast. */
-    private static final int T_PORTAL = 380, T_EXIT1 = 600, T_EXIT2 = 680, T_CASTER = 760, T_RITUAL = 1380, T_DOME = 1660, T_CLOSE = 1720;
+    /** Timeline, ticks from the start of the cast. The retinue steps out one by one in T_EXITS..T_CASTER (owner 19.11: up to 3). */
+    private static final int T_PORTAL = 380, T_EXITS = 600, T_CASTER = 760, T_RITUAL = 1380, T_DOME = 1660, T_CLOSE = 1720;
+    /** HFx.ANIM b: tells the cutscene clients how many of the retinue step out (dur = the count), for the camera of 30-38 s. */
+    public static final int ANIM_RETINUE = 3;
+
+    /** Tick of the i-th retinue exit of n: the 30-38 s window is shared equally (skipped exits are cut, owner 19.11). */
+    public static int exitTick(int i, int n) {
+        return T_EXITS + i * (T_CASTER - T_EXITS) / Math.max(1, n);
+    }
+
+    /** Where the caster ends up in front of the portal. */
+    private static Vec3 casterSpot(Arrival a) {
+        return a.at.add(a.fw.scale(3.2));
+    }
+
+    /**
+     * Where retinue i stands after its exit: №1 left (-2.6 to the side, 1.0 behind the caster), №2 right (+2.6, 1.0), №3 in the
+     * middle 2.4 behind the caster — a diamond with the caster in front (docs/specs/coven_arrival_spec.md, end).
+     */
+    private static Vec3 slot(Arrival a, int i) {
+        Vec3 c = casterSpot(a);
+        return switch (i) {
+            case 0 -> c.subtract(a.fw.scale(1.0)).subtract(a.rt.scale(2.6));
+            case 1 -> c.subtract(a.fw.scale(1.0)).add(a.rt.scale(2.6));
+            default -> c.subtract(a.fw.scale(2.4));
+        };
+    }
     /** The caster's own portal: opens in front of him (the arms open at 14 s), he and the retinue walk into it at 16.2-18.6 s. Retinue NPCs bow at the nod. */
     private static final int T_BOW = 188, T_BOW_END = 222, T_CPORTAL = 220, T_STEP = 324, STEP = 48, WALK = 32;
     /** How far in front of the caster his portal stands (the animation steps him 1.4 forward). */
@@ -74,7 +99,7 @@ public class CovenArrivalSpell extends PohSpell {
     /** Height of the portal's centre over the ground (fx/meshes/coven_portal.json "center"): the cosmos disc stands on the ground. */
     public static final double PORTAL_Y = 1.86;
     /** Where the retinue stands at the start: to the sides of the caster, a little behind. */
-    private static final double R_SIDE = 1.8, R_BACK = 0.5;
+    private static final double R_SIDE = 1.8, R_BACK = 0.5, R_BEHIND = 2.0;
     /** CNPC model animations: bow, arms forward. */
     private static final int NPC_BOW = 11, NPC_RITUAL = 3;
 
@@ -300,11 +325,17 @@ public class CovenArrivalSpell extends PohSpell {
         }
         a.cutKey = HigherSpell.key();
         a.watchers = Cutscene.start(sl, caster, a.cutKey, Cutscene.COVEN_ARRIVAL, CAST, a.at, a.yaw, Cutscene.R_COVEN, a.arena, a.at);
-        // the retinue comes to the caster's sides, facing the way he faces, ready for the nod and the walk into his portal
+        HFx count = new HFx(HFx.ANIM, a.cutKey, caster.getId(), ANIM_RETINUE, a.retinue.size(), 0, 0, 0, 0, 0);
+        for (UUID u : a.watchers) {
+            ServerPlayer w = sl.getServer().getPlayerList().getPlayer(u);
+            if (w != null) Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> w), count);
+        }
+        // the retinue comes to the caster's sides (№3 right behind him), facing the way he faces, ready for the nod and the walk into his portal
         Vec3 cRt = new Vec3(-a.cFw.z, 0, a.cFw.x);
         for (int i = 0; i < a.retinue.size(); i++) {
             LivingEntity e = a.retinue.get(i);
-            Vec3 spot = a.cAt.add(cRt.scale(i == 0 ? -R_SIDE : R_SIDE)).subtract(a.cFw.scale(R_BACK));
+            Vec3 spot = i == 2 ? a.cAt.subtract(a.cFw.scale(R_BEHIND))
+                    : a.cAt.add(cRt.scale(i == 0 ? -R_SIDE : R_SIDE)).subtract(a.cFw.scale(R_BACK));
             LivingEntity moved = move(e, sl, spot, a.cYaw);
             a.retinue.set(i, moved);
             a.pre.put(moved.getUUID(), spot);
@@ -345,9 +376,9 @@ public class CovenArrivalSpell extends PohSpell {
         }
         if (t == T_CPORTAL) openCasterPortal(a);
         if (t == T_PORTAL) openPortal(caster, a);
-        if (t == T_EXIT1 && a.retinue.size() > 0) exitOrWait(caster, a, a.retinue.get(0), a.at.add(a.fw.scale(2.2)).subtract(a.rt.scale(3)));
-        if (t == T_EXIT2 && a.retinue.size() > 1) exitOrWait(caster, a, a.retinue.get(1), a.at.add(a.fw.scale(2.2)).add(a.rt.scale(3)));
-        if (t == T_CASTER) exit(caster, a, caster, a.at.add(a.fw.scale(3.2)), 0.45f);
+        for (int i = 0; i < a.retinue.size(); i++)
+            if (t == exitTick(i, a.retinue.size())) exitOrWait(caster, a, a.retinue.get(i), slot(a, i));
+        if (t == T_CASTER) exit(caster, a, caster, casterSpot(a), 0.45f);
         if (t == T_RITUAL) ritual(caster, a);
         if (t == T_DOME) {
             a.domeOpened = true;
@@ -526,11 +557,17 @@ public class CovenArrivalSpell extends PohSpell {
 
     private static void ritual(LivingEntity caster, Arrival a) {
         ServerLevel ar = a.arena;
-        Vec3 pa = a.at.add(a.fw.scale(3.2));
-        Vec3 pb = a.retinue.size() > 0 ? a.at.add(a.fw.scale(2.2)).subtract(a.rt.scale(3)) : pa;
-        Vec3 pc = a.retinue.size() > 1 ? a.at.add(a.fw.scale(2.2)).add(a.rt.scale(3)) : pb;
-        Vec3 sky = pa.add(pb).add(pc).scale(1 / 3.0).add(0, 22, 0);
-        a.fx.add(Fx.play(ar, Fx.fx("coven_ritual").at(a.at).yaw(a.yaw).point("a", pa).point("b", pb).point("c", pc).point("sky", sky)));
+        // fx/coven_ritual.json: a ring of lines a-b-c-d-a. Around the diamond: caster, №1 (left), №3 (behind), №2 (right);
+        // missing ones repeat the last point, so two give the triangle and none a single point
+        List<Vec3> ring = new ArrayList<>();
+        ring.add(casterSpot(a));
+        for (int i : new int[] {0, 2, 1}) if (i < a.retinue.size()) ring.add(slot(a, i));
+        Vec3 sum = Vec3.ZERO;
+        for (Vec3 p : ring) sum = sum.add(p);
+        Vec3 sky = sum.scale(1.0 / ring.size()).add(0, 22, 0);
+        while (ring.size() < 4) ring.add(ring.get(ring.size() - 1));
+        a.fx.add(Fx.play(ar, Fx.fx("coven_ritual").at(a.at).yaw(a.yaw).point("a", ring.get(0)).point("b", ring.get(1))
+                .point("c", ring.get(2)).point("d", ring.get(3)).point("sky", sky)));
         ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 5f, 0.5f);
         for (LivingEntity e : a.retinue) {
             LivingEntity le = find(ar.getServer(), e.getUUID());

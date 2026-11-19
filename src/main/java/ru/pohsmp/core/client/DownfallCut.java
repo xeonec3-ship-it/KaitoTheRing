@@ -56,7 +56,15 @@ public final class DownfallCut {
         dir = d.lengthSqr() < 1e-4 ? new Vec3(-Math.cos(m.f), 0, -Math.sin(m.f)) : d.normalize();
         if (scene == STAR) dir = new Vec3(Math.cos(m.f), 0, Math.sin(m.f));   // the server's caster -> impact, so the star path matches the fx
         portalYaw = m.f;
+        retinue = 2;   // until the server says (older servers: two exits)
         active = true;
+    }
+
+    /** Coven Arrival: how many of the retinue step out in 30-38 s (each gets an equal share of it, skipped ones are cut). */
+    private static int retinue = 2;
+
+    public static void covenRetinue(int forKey, int n) {
+        if (forKey == key) retinue = Math.max(0, Math.min(ru.pohsmp.core.spell.CovenArrivalSpell.MAX_RETINUE, n));
     }
 
     public static void stop(int k) {
@@ -198,19 +206,27 @@ public final class DownfallCut {
             double k = smooth((s - 16) / 3), an = Math.toRadians(30 + 20 * k);
             pos = c.add(Math.cos(an) * (3.2 + 2.5 * k), 1.7 + 0.6 * k, Math.sin(an) * (3.2 + 2.5 * k));
             look = c.add(0, 1.4, 0);
-        } else if (s < 30) {                                // the portal unfolds: orbit
-            double k = smooth((s - 19) / 11), an = base + Math.toRadians(-70 + 140 * k);
+        } else if (s < (retinue == 0 ? 38 : 30)) {          // the portal unfolds: orbit (without a retinue on to the caster's exit)
+            double k = smooth((s - 19) / (retinue == 0 ? 19 : 11)), an = base + Math.toRadians(-70 + 140 * k);
             pos = a.add(Math.cos(an) * (11 - 3 * k), 3 + 2 * k, Math.sin(an) * (11 - 3 * k));
             look = pc;
             shake = 0.02;
-        } else if (s < 34) {                                // retinue 1 steps out to the left: low angle
-            double k = smooth((s - 30) / 4);
-            pos = a.add(fw.scale(6)).add(rt.scale(4)).add(0, 0.4, 0);
-            look = a.add(fw.scale(1.2 + k)).subtract(rt.scale(1.5 + 1.5 * k)).add(0, 1.3, 0);
-        } else if (s < 38) {                                // retinue 2 to the right: the other side
-            double k = smooth((s - 34) / 4);
-            pos = a.add(fw.scale(6)).subtract(rt.scale(4)).add(0, 0.4, 0);
-            look = a.add(fw.scale(1.2 + k)).add(rt.scale(1.5 + 1.5 * k)).add(0, 1.3, 0);
+        } else if (s < 38) {                                // the retinue steps out one by one, 8 s shared equally (owner 19.11: up to 3)
+            double span = 8.0 / retinue;
+            int i = Math.min(retinue - 1, (int) ((s - 30) / span));
+            double k = smooth((s - 30 - i * span) / span);
+            Vec3 cs = a.add(fw.scale(3.2));                 // where the caster will stand; the slots as in CovenArrivalSpell.slot
+            if (i == 0) {                                   // №1 to the left: low angle from the right
+                pos = a.add(fw.scale(6)).add(rt.scale(4)).add(0, 0.4, 0);
+                look = a.add(fw.scale(1.2 + k)).subtract(rt.scale(1.3 + 1.3 * k)).add(0, 1.3, 0);
+            } else if (i == 1) {                            // №2 to the right: the other side
+                pos = a.add(fw.scale(6)).subtract(rt.scale(4)).add(0, 0.4, 0);
+                look = a.add(fw.scale(1.2 + k)).add(rt.scale(1.3 + 1.3 * k)).add(0, 1.3, 0);
+            } else {                                        // №3 back in the middle: low from the front, a little above
+                Vec3 slot = cs.subtract(fw.scale(2.4));
+                pos = cs.add(fw.scale(5.5 - k)).add(rt.scale(0.6)).add(0, 1.2 + 0.4 * k, 0);
+                look = a.add(fw.scale(0.3)).lerp(slot, k).add(0, 1.3, 0);
+            }
         } else if (s < 48) {                                // the caster walks out: slow dolly from below
             double k = smooth((s - 38) / 10);
             pos = a.add(fw.scale(7.5 - 2 * k)).add(rt.scale(1.4)).add(0, 0.3 + 0.4 * k, 0);

@@ -1,0 +1,449 @@
+{
+ "comment": "Печать души, каст 10 с (200 тиков). Точки: caster — заклинатель, target — цель. 0–2 с печать под заклинателем, свет стягивается к рукам; 2–6 с из лучей над целью собирается печать-замок, малый замок у ладони; 6–9 с цепи тянутся от замка к груди и сжимаются, кольца цепи стягивают тело; 9.3–9.8 с замок сжимается в точку и луч вбивает его в грудь. Финал — fx/soul_seal_lock_in (код, на 200 тике).",
+ "style": "soul_seal",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "soul_seal_ground",
+   "until": 196
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.15,0",
+   "duration": 44,
+   "texture": "spark_soft",
+   "count": 110,
+   "rate": 2.5,
+   "area": 3.0,
+   "speed": 0.012,
+   "gravity": -0.005,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 34,
+   "color": "@secondary",
+   "glow": 0.4,
+   "comment": "свет поднимается от печати"
+  },
+  {
+   "type": "vortex",
+   "delay": 4,
+   "at": "caster+0,1.25,0.45",
+   "duration": 40,
+   "radius": 1.4,
+   "height": 0,
+   "arms": 3,
+   "speed": 4,
+   "pull": 1,
+   "texture": "spark_soft",
+   "particles": 60,
+   "life": 20,
+   "size": 0.12,
+   "color": "@primary",
+   "comment": "руки собирают свет"
+  },
+  {
+   "type": "flash",
+   "delay": 34,
+   "at": "caster+0,1.25,0.45",
+   "duration": 10,
+   "size": 1.1,
+   "rays": 6,
+   "color": "#E6F0FF"
+  },
+  {
+   "type": "sigil",
+   "delay": 40,
+   "at": "caster.hand",
+   "follow": true,
+   "id": "soul_seal_hand",
+   "until": 190
+  },
+  {
+   "type": "beam",
+   "delay": 44,
+   "at": "caster.hand",
+   "to": "target+0,3,0",
+   "follow": true,
+   "duration": 146,
+   "width": 0.035,
+   "core": 0.6,
+   "grow": 16,
+   "flicker": 0.2,
+   "scroll": 1.2,
+   "color": "#E6F0FF",
+   "brightness": 0.7,
+   "comment": "тонкий луч от ладони к замку"
+  },
+  {
+   "type": "aura",
+   "delay": 40,
+   "at": "target",
+   "target": "target",
+   "duration": 152,
+   "thickness": 0.08,
+   "pulse": [
+    0.25,
+    24
+   ],
+   "motes": 10,
+   "texture": "spark_soft",
+   "color": "#9A6CFF",
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 40,
+   "at": "target+2.48,6.2,0.77",
+   "to": "target+0,3,0",
+   "follow": true,
+   "duration": 34,
+   "width": 0.05,
+   "core": 0.5,
+   "grow": 14,
+   "head": 1.2,
+   "color": "@primary",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 45,
+   "at": "target+0.58,6.8,2.54",
+   "to": "target+0,3,0",
+   "follow": true,
+   "duration": 34,
+   "width": 0.05,
+   "core": 0.5,
+   "grow": 14,
+   "head": 1.2,
+   "color": "#E6F0FF",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 50,
+   "at": "target+-1.91,6.2,1.77",
+   "to": "target+0,3,0",
+   "follow": true,
+   "duration": 34,
+   "width": 0.05,
+   "core": 0.5,
+   "grow": 14,
+   "head": 1.2,
+   "color": "@primary",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 55,
+   "at": "target+-2.48,6.8,-0.77",
+   "to": "target+0,3,0",
+   "follow": true,
+   "duration": 34,
+   "width": 0.05,
+   "core": 0.5,
+   "grow": 14,
+   "head": 1.2,
+   "color": "#E6F0FF",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 60,
+   "at": "target+-0.58,6.2,-2.54",
+   "to": "target+0,3,0",
+   "follow": true,
+   "duration": 34,
+   "width": 0.05,
+   "core": 0.5,
+   "grow": 14,
+   "head": 1.2,
+   "color": "@primary",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 65,
+   "at": "target+1.91,6.8,-1.77",
+   "to": "target+0,3,0",
+   "follow": true,
+   "duration": 34,
+   "width": 0.05,
+   "core": 0.5,
+   "grow": 14,
+   "head": 1.2,
+   "color": "#E6F0FF",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "vortex",
+   "delay": 40,
+   "at": "target+0,3,0",
+   "duration": 60,
+   "radius": 2.4,
+   "height": 0,
+   "arms": 4,
+   "speed": 3,
+   "pull": 1,
+   "texture": "spark_sharp",
+   "particles": 80,
+   "life": 24,
+   "size": 0.14,
+   "color": "#E6F0FF",
+   "comment": "искры затягивает в печать"
+  },
+  {
+   "type": "sigil",
+   "delay": 44,
+   "at": "target+0,3,0",
+   "follow": true,
+   "id": "soul_seal_lock",
+   "until": 186
+  },
+  {
+   "type": "sigil",
+   "delay": 56,
+   "at": "target+0,3,0",
+   "follow": true,
+   "id": "soul_seal_gyro",
+   "until": 186
+  },
+  {
+   "type": "sprites",
+   "delay": 80,
+   "at": "target+0,3,0",
+   "follow": true,
+   "duration": 100,
+   "texture": "rune",
+   "count": 50,
+   "rate": 0.5,
+   "spread": 1.2,
+   "speed": 0.006,
+   "gravity": 0.0,
+   "spin": 60,
+   "size": [
+    0.18,
+    0.1
+   ],
+   "life": 30,
+   "color": "#E6F0FF",
+   "comment": "символы вокруг печати"
+  },
+  {
+   "type": "chains",
+   "delay": 120,
+   "at": "target+0.67,2.9,0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 46,
+   "link": 0.16,
+   "sag": 0.35,
+   "tension": 0.25,
+   "grow": 24,
+   "rattle": 0.02,
+   "color": "#9A6CFF"
+  },
+  {
+   "type": "chains",
+   "delay": 166,
+   "at": "target+0.67,2.9,0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 22,
+   "link": 0.16,
+   "sag": 0.0,
+   "tension": 1.0,
+   "rattle": 0.06,
+   "color": "#9A6CFF",
+   "brightness": 1.4,
+   "comment": "цепи натянуты: провис уходит, дрожь"
+  },
+  {
+   "type": "chains",
+   "delay": 123,
+   "at": "target+-0.67,2.9,0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 43,
+   "link": 0.16,
+   "sag": 0.35,
+   "tension": 0.25,
+   "grow": 24,
+   "rattle": 0.02,
+   "color": "#9A6CFF"
+  },
+  {
+   "type": "chains",
+   "delay": 166,
+   "at": "target+-0.67,2.9,0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 22,
+   "link": 0.16,
+   "sag": 0.0,
+   "tension": 1.0,
+   "rattle": 0.06,
+   "color": "#9A6CFF",
+   "brightness": 1.4,
+   "comment": "цепи натянуты: провис уходит, дрожь"
+  },
+  {
+   "type": "chains",
+   "delay": 126,
+   "at": "target+-0.67,2.9,-0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 40,
+   "link": 0.16,
+   "sag": 0.35,
+   "tension": 0.25,
+   "grow": 24,
+   "rattle": 0.02,
+   "color": "#9A6CFF"
+  },
+  {
+   "type": "chains",
+   "delay": 166,
+   "at": "target+-0.67,2.9,-0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 22,
+   "link": 0.16,
+   "sag": 0.0,
+   "tension": 1.0,
+   "rattle": 0.06,
+   "color": "#9A6CFF",
+   "brightness": 1.4,
+   "comment": "цепи натянуты: провис уходит, дрожь"
+  },
+  {
+   "type": "chains",
+   "delay": 129,
+   "at": "target+0.67,2.9,-0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 37,
+   "link": 0.16,
+   "sag": 0.35,
+   "tension": 0.25,
+   "grow": 24,
+   "rattle": 0.02,
+   "color": "#9A6CFF"
+  },
+  {
+   "type": "chains",
+   "delay": 166,
+   "at": "target+0.67,2.9,-0.67",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 22,
+   "link": 0.16,
+   "sag": 0.0,
+   "tension": 1.0,
+   "rattle": 0.06,
+   "color": "#9A6CFF",
+   "brightness": 1.4,
+   "comment": "цепи натянуты: провис уходит, дрожь"
+  },
+  {
+   "type": "sigil",
+   "delay": 128,
+   "at": "target+0,0.55,0",
+   "follow": true,
+   "id": "soul_seal_bind",
+   "until": 188
+  },
+  {
+   "type": "sigil",
+   "delay": 135,
+   "at": "target+0,1.05,0",
+   "follow": true,
+   "id": "soul_seal_bind",
+   "until": 188
+  },
+  {
+   "type": "sigil",
+   "delay": 142,
+   "at": "target+0,1.55,0",
+   "follow": true,
+   "id": "soul_seal_bind",
+   "until": 188
+  },
+  {
+   "type": "tint",
+   "delay": 120,
+   "at": "target",
+   "duration": 80,
+   "radius": 12,
+   "color": "#20103A",
+   "strength": 0.25,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 182,
+   "at": "target+0,3,0",
+   "to": "target+0,1.35,0",
+   "follow": true,
+   "duration": 14,
+   "width": 0.3,
+   "core": 0.35,
+   "grow": 6,
+   "easing": "easeInCubic",
+   "head": 3,
+   "color": "#E6F0FF",
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "comment": "замок вбивается в грудь"
+  },
+  {
+   "type": "flash",
+   "delay": 188,
+   "at": "caster.hand",
+   "duration": 8,
+   "size": 1.4,
+   "rays": 6,
+   "color": "#9A6CFF",
+   "comment": "рывок «запереть»"
+  }
+ ]
+}

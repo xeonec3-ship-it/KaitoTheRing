@@ -398,5 +398,14 @@
   "item.pohsmp_core.silent_witch_staff.gate": "Полный комплект: открывает «Врата» посоха безмолвной ведьмы",
   "subtitles.pohsmp_core.sigil.hit": "Звон печати от удара",
   "subtitles.pohsmp_core.music.silent_gate_wait": "Врата ждут приказа",
-  "ui.pohsmp_core.silent_gate.command": "ЛКМ — приказать вратам"
+  "ui.pohsmp_core.silent_gate.command": "ЛКМ — приказать вратам",
+  "spell.pohsmp_core.soul_seal": "Печать души",
+  "spell.pohsmp_core.soul_seal.guide": "Десять секунд над игроком, на которого вы смотрите, собирается печать-замок; цепи света тянутся к его груди и вдавливают печать. Запечатанный навсегда теряет магию — даже после смерти. Снять печать может только «Благословение».",
+  "spell.pohsmp_core.blessing": "Благословение",
+  "spell.pohsmp_core.blessing.guide": "Десять секунд молитвы: над целью раскрывается нимб, сверху опускается мягкий свет. Снимает все негативные эффекты, горение, заморозку, метки и проклятия — и «Печать души». Без цели благословляет заклинателя.",
+  "effect.pohsmp_core.soul_seal": "Печать души",
+  "effect.pohsmp_core.soul_seal.description": "Душа запечатана: колдовать нельзя — ни заклинаниями, ни свитками. Не снимается молоком, тотемами и смертью; снять может только «Благословение».",
+  "ui.pohsmp_core.soul_seal.sealed": "Душа запечатана",
+  "ui.pohsmp_core.soul_seal.already": "Душа уже запечатана",
+  "ui.pohsmp_core.soul_seal.no_target": "Нет цели"
 }

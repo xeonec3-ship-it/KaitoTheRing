@@ -1100,7 +1100,8 @@ class FxRun {
     this.root = new THREE.Group(); scene.add(this.root);
     this.sigils = []; this.items = [];
     if (!targetFig) { targetFig = player(); scene.add(targetFig); }
-    targetFig.visible = true; targetFig.position.copy(FIG.target); caster.position.copy(FIG.caster);
+    targetFig.visible = !opts.noTarget; targetFig.position.copy(FIG.target); caster.position.copy(FIG.caster);
+    targetFig.rotation.y = opts.faceCaster ? Math.PI : 0; this.noLift = !!opts.noLift;   // T21: цель стоит лицом к заклинателю
     for (const e of this.def.elements) this.items.push({ e, made: false });
   }
   col(c) { return styleColor(this.def.style, c); }
@@ -1157,6 +1158,20 @@ class FxRun {
       const m = new THREE.Mesh(new THREE.RingGeometry(R - th / 2, R + th / 2, 64, 1, Math.PI / 2 - arc / 2, arc), addMat(this.col(e.color)));
       const pv = new THREE.Group(); pv.position.copy(anchor(e.at)).add(new THREE.Vector3(0, -R * (e.bend || 0.3), 0)); pv.rotation.z = (e.roll || 0) * Math.PI / 180;
       pv.add(m); g.add(pv); it.m = m;
+    } else if (e.type === "chains") {   // T21: звенья по провисшей линии at → to (в превью — торы, чётные повёрнуты на 90°)
+      const a = anchor(e.at), b = anchor(e.to), L = a.distanceTo(b), lk = e.link || 0.3, n = Math.max(2, Math.round(L / (lk * 0.8)));
+      it.links = []; it.a = a; it.b = b;
+      for (let i = 0; i < n; i++) {
+        const m = new THREE.Mesh(new THREE.TorusGeometry(lk * 0.42, lk * 0.09, 6, 14), addMat(this.col(e.color)));
+        m.scale.set(1, 0.6, 1); g.add(m); it.links.push(m);
+      }
+    } else if (e.type === "halo") {
+      it.m = new THREE.Mesh(new THREE.TorusGeometry(e.size || 0.4, 0.035, 8, 48), addMat(this.col(e.color))); it.m.rotation.x = Math.PI / 2; g.add(it.m);
+      it.m.position.copy(anchor(e.at)).add(new THREE.Vector3(0, 2.15, 0));
+    } else if (e.type === "vortex") {   // точки по спирали к центру
+      const n = e.particles || 60, pos = new Float32Array(n * 3), geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      it.pts = new THREE.Points(geo, new THREE.PointsMaterial({ color: new THREE.Color(this.col(e.color)), size: e.size || 0.12, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
+      it.c = anchor(e.at); it.n = n; g.add(it.pts);
     } else if (e.type === "flash") {
       const m = new THREE.Mesh(discGeo(2 * Math.PI, 0), mat("glow", this.col(e.color))); m.position.copy(anchor(e.at)); g.add(m); it.m = m;
     } else if (e.type === "beam_rain") {
@@ -1193,7 +1208,7 @@ class FxRun {
   update(t, dt) {
     const lt = t - this.t0;
     // цель приподнята и висит; исчезает в момент удара
-    if (targetFig) { targetFig.position.y = FIG.target.y + 0.75 * clamp01(lt / 25) + 0.08 * Math.sin(lt * 0.15); targetFig.visible = lt < 204; }
+    if (targetFig && !this.noLift) { targetFig.position.y = FIG.target.y + 0.75 * clamp01(lt / 25) + 0.08 * Math.sin(lt * 0.15); targetFig.visible = lt < 204; }
     let screen = 0;
     for (const it of this.items) {
       const e = it.e, k = lt - e.delay;
@@ -1244,6 +1259,25 @@ class FxRun {
       } else if (e.type === "trail") {
         const sw = clamp01(k / (e.sweep || 3)), f = clamp01(k / dur);
         it.m.scale.setScalar(0.85 + 0.15 * ease("easeOutCubic", sw)); it.m.material.opacity = end ? 0 : ease("easeOutCubic", sw) * (1 - f * f) * Math.min(1, e.brightness ?? 1);
+      } else if (e.type === "chains") {
+        const gk = e.grow ? ease("easeOutCubic", clamp01(k / e.grow)) : 1, n = it.links.length, sag = (e.sag ?? 0.5) * (1 - (e.tension || 0));
+        const dir = it.b.clone().sub(it.a), q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(1, 0, 0), dir.clone().normalize());
+        it.links.forEach((m, i) => {
+          const f = (i + 0.5) / n, shake = (e.rattle || 0) * Math.sin(lt * 2.3 + i * 1.7);
+          m.position.copy(it.a).addScaledVector(dir, f).add(new THREE.Vector3(shake, -sag * 4 * f * (1 - f) + shake, 0));
+          m.quaternion.copy(q); if (i % 2) m.rotateX(Math.PI / 2);
+          const fresh = clamp01(1 - (gk * n - i) / 3);
+          m.material.opacity = (f <= gk ? 1 : 0) * life * Math.min(1.5, (e.brightness ?? 1) * (0.8 + 0.8 * fresh));
+        });
+      } else if (e.type === "halo") {
+        it.m.rotation.z = lt * (e.spin || 1) * Math.PI / 180; it.m.material.opacity = life * clamp01(k / 10);
+      } else if (e.type === "vortex") {
+        const pos = it.pts.geometry.attributes.position, R = e.radius || 1, lf = e.life || 20;
+        for (let i = 0; i < it.n; i++) {
+          const ph = ((k + i * lf / it.n) % lf) / lf, r = R * (1 - ph), an = i * 2.4 + ph * (e.speed || 3) * 0.6;
+          pos.setXYZ(i, it.c.x + Math.cos(an) * r, it.c.y + (e.height || 0) * ph, it.c.z + Math.sin(an) * r);
+        }
+        pos.needsUpdate = true; it.pts.material.opacity = life;
       } else if (e.type === "beam_rain") {
         it.rays.forEach((r) => { const a = k - r.at; r.m.material.opacity = end || a < 0 || a > 8 ? 0 : 1 - a / 8; });
       } else if (e.type === "wave") {
@@ -1321,6 +1355,15 @@ const SCENES = {
   "Отклик на урон: купол Барьера": () => [new Portal("silent_dome", new THREE.Vector3(0, 0.1, 0), { scale: 5, noAuto: true })],
   "Распад трещинами": () => [new Sigil("higher_blades", new THREE.Vector3(0, 0.02, 0), { hold: 24 })],
   "Распад трещинами: небесная печать": () => [new Sigil("__cracks_sky", new THREE.Vector3(0, 9, 0), { hold: 20 })],
+  // T21 — Божественная ступень: «Печать души» и «Благословение» (каст 10 с; цель лицом к заклинателю)
+  "Печать души: каст": () => [new FxRun("soul_seal_cast", { caster: new THREE.Vector3(0, 0, -7), noLift: true, faceCaster: true })],
+  "Печать души: замок (печать)": () => { caster.visible = false; return [new Sigil("soul_seal_lock", new THREE.Vector3(0, 3, 0)), new Sigil("soul_seal_gyro", new THREE.Vector3(0, 3, 0), { t0: 12 })]; },
+  "Печать души: под заклинателем": () => [new Sigil("soul_seal_ground", new THREE.Vector3(0, 0.02, 0))],
+  "Печать души: вдавливание и знак": () => [new FxRun("soul_seal_lock_in", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Печать души: попытка колдовать": () => [new FxRun("soul_seal_deny", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Благословение: каст": () => [new FxRun("blessing_cast", { caster: new THREE.Vector3(0, 0, -6), noLift: true, faceCaster: true })],
+  "Благословение: нимб-печать": () => { caster.visible = false; return [new Sigil("blessing_halo", new THREE.Vector3(0, 2.7, 0))]; },
+  "Благословение: круг на земле": () => [new Sigil("blessing_ground", new THREE.Vector3(0, 0.02, 0))],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
 // небесная печать Silent Gate с разборкой «трещины» — только для превью (сам файл не меняется)
@@ -1329,11 +1372,11 @@ DATA.sigils.__cracks_sky = { ...JSON.parse(JSON.stringify(DATA.sigils.silent_gat
   dissolve: { modes: ["cracks"], duration: 60, cracks: { count: 12, rings: 2, irregular: 0.4, jag: 0.26, crackTime: 0.38, fallTime: 0.42, gap: 0.025,
     push: 0.16, pop: 0.12, fall: 0.75, tumble: 170, spin: 50, glow: 1.7, dust: 70, color: "#E6FDFF" } } };
 const HIT_SCENES = new Set(["Отклик на урон", "Отклик на урон: Тихий барьер", "Отклик на урон: Дезинтеграция", "Отклик на урон: купол Барьера"]);
-const MAIN_ID = { "Врата: удар по приказу": "silent_gate_strike", "Врата: поток от руки (модель)": "silent_hand_stream", "Школа: огонь (Божественная)": "school_fire_cast_divine", "Меч-хлыст: хлыст (модель)": "ember_whip", "Отклик на урон: купол Барьера": "silent_dome", "Отклик на урон": "higher_blades", "Отклик на урон: Тихий барьер": "silent_barrier", "Отклик на урон: Дезинтеграция": "disintegration_field",
+const MAIN_ID = { "Печать души: каст": "soul_seal_cast", "Печать души: замок (печать)": "soul_seal_lock", "Печать души: под заклинателем": "soul_seal_ground", "Печать души: вдавливание и знак": "soul_seal_lock_in", "Печать души: попытка колдовать": "soul_seal_deny", "Благословение: каст": "blessing_cast", "Благословение: нимб-печать": "blessing_halo", "Благословение: круг на земле": "blessing_ground", "Врата: удар по приказу": "silent_gate_strike", "Врата: поток от руки (модель)": "silent_hand_stream", "Школа: огонь (Божественная)": "school_fire_cast_divine", "Меч-хлыст: хлыст (модель)": "ember_whip", "Отклик на урон: купол Барьера": "silent_dome", "Отклик на урон": "higher_blades", "Отклик на урон: Тихий барьер": "silent_barrier", "Отклик на урон: Дезинтеграция": "disintegration_field",
   "Распад трещинами": "higher_blades", "Распад трещинами: небесная печать": "__cracks_sky", "Меч-хлыст: Последний жар": "ember_last_heat", "Меч-хлыст: Огненный вихрь": "ember_vortex", "Алый разрез": "scarlet_cut", "Падение звезды": "star_fall", "Алое стекло (модель)": "star_glass", "Ведьма: каст в одежде": "silent_witch_cast", "Ведьма: Тихий барьер": "silent_barrier", "Копьё ветра (модель)": "silent_spear", "Купол Барьера (модель)": "silent_dome", "Тень дракона (модель)": "worgan_dragon", "Чёрное пламя Ворганы": "silent_worgan_flame", "Безмолвный залп": "silent_volley", "Врата (весь эффект)": "silent_gate", "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Надпись на печати": "text_demo", "Циферблат с числом": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
-const VIEW_FOR = { "Врата: удар по приказу": "gateFx", "Врата: поток от руки (модель)": "whip", "Школа: огонь (Божественная)": "volley", "Меч-хлыст: хлыст (модель)": "whip", "Отклик на урон: купол Барьера": "side", "Отклик на урон": "hit", "Отклик на урон: Тихий барьер": "barrier", "Отклик на урон: Дезинтеграция": "hitBig", "Распад трещинами": "hit",
+const VIEW_FOR = { "Печать души: каст": "t21", "Печать души: замок (печать)": "t21lock", "Печать души: под заклинателем": "above", "Печать души: вдавливание и знак": "t21chest", "Печать души: попытка колдовать": "t21chest", "Благословение: каст": "t21", "Благословение: нимб-печать": "t21lock", "Благословение: круг на земле": "above", "Врата: удар по приказу": "gateFx", "Врата: поток от руки (модель)": "whip", "Школа: огонь (Божественная)": "volley", "Меч-хлыст: хлыст (модель)": "whip", "Отклик на урон: купол Барьера": "side", "Отклик на урон": "hit", "Отклик на урон: Тихий барьер": "barrier", "Отклик на урон: Дезинтеграция": "hitBig", "Распад трещинами": "hit",
   "Распад трещинами: небесная печать": "crackSky", "Меч-хлыст: Последний жар": "ember", "Меч-хлыст: Огненный вихрь": "ember", "Алый разрез": "cut", "Падение звезды": "star", "Алое стекло (модель)": "close", "Ведьма: каст в одежде": "volley", "Ведьма: Тихий барьер": "volley", "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Чёрное пламя Ворганы": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Надпись на печати": "above", "Циферблат с числом": "dial", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
@@ -1383,6 +1426,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
 const VIEWS = { whip: [1.35, 0.18, 8, 1.0], hit: [0.55, 0.78, 8.5, 0.2], hitBig: [0.55, 0.62, 13, 0.2], barrier: [0.45, 0.12, 6.2, 1.0], crackSky: [0.45, -0.12, 26, 7.5], ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], dial: [3.14, 0.05, 6.5, 2.2], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+VIEWS.t21 = [1.15, 0.2, 13, 1.8]; VIEWS.t21lock = [0.4, -0.35, 6.5, 2.6]; VIEWS.t21chest = [0.25, 0.1, 3.4, 1.3];   // T21
 VIEWS.school = [0.55, 0.55, 9.5, 1.1]; VIEWS.gallery = [0.0, 1.32, 27, 0];   // сцены «Школа: …» (T06)
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));

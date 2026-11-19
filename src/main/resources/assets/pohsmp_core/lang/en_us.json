@@ -398,5 +398,14 @@
   "item.pohsmp_core.silent_witch_staff.gate": "Full set: unlocks the Gate of the Silent Witch's staff",
   "subtitles.pohsmp_core.sigil.hit": "Sigil rings from a hit",
   "subtitles.pohsmp_core.music.silent_gate_wait": "The gate awaits a command",
-  "ui.pohsmp_core.silent_gate.command": "Left click to command the gate"
+  "ui.pohsmp_core.silent_gate.command": "Left click to command the gate",
+  "spell.pohsmp_core.soul_seal": "Soul Seal",
+  "spell.pohsmp_core.soul_seal.guide": "For ten seconds a lock-seal gathers above the player you look at; chains of light reach for their chest and press the seal in. The sealed player loses magic forever, even after death. Only Blessing can lift it.",
+  "spell.pohsmp_core.blessing": "Blessing",
+  "spell.pohsmp_core.blessing.guide": "Ten seconds of prayer: a halo opens above the target and soft light descends. Removes all harmful effects, burning, freezing, marks and curses, and the Soul Seal. With no target it blesses the caster.",
+  "effect.pohsmp_core.soul_seal": "Soul Seal",
+  "effect.pohsmp_core.soul_seal.description": "The soul is sealed: no casting of any kind, spells or scrolls. Milk, totems and death do not remove it; only Blessing can.",
+  "ui.pohsmp_core.soul_seal.sealed": "Your soul is sealed",
+  "ui.pohsmp_core.soul_seal.already": "This soul is already sealed",
+  "ui.pohsmp_core.soul_seal.no_target": "No target"
 }

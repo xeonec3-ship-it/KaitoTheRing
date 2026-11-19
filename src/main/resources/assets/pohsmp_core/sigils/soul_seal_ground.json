@@ -1,0 +1,195 @@
+{
+ "comment": "Печать души, каст 0–2 с: божественная печать под заклинателем — мандала, решётка Метатрона прорисовывается, замок в центре с доворотом, кольцо цепи, руны «ПЕЧАТЬ ДУШИ», обод. Держится весь каст (hold −1).",
+ "size": 3.4,
+ "color": "#D9A441",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": -0.01,
+   "color": "#9A6CFF",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 40
+   }
+  },
+  {
+   "id": "mandala",
+   "type": "disc",
+   "texture": "pat_mandala",
+   "radius": 1.32,
+   "heightOffset": 0.0,
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 34,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1.5
+   }
+  },
+  {
+   "id": "metatron",
+   "type": "disc",
+   "texture": "pat_metatron",
+   "radius": 0.8,
+   "heightOffset": 0.005,
+   "color": "#E6F0FF",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 4,
+    "duration": 26,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -4
+   }
+  },
+  {
+   "id": "lock",
+   "type": "disc",
+   "texture": "soul_lock",
+   "radius": 0.46,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 8,
+    "duration": 22,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "twist",
+     "fade"
+    ],
+    "twist": -140
+   },
+   "rotation": {
+    "speed": 6,
+    "boost": 3
+   }
+  },
+  {
+   "id": "chains",
+   "type": "band",
+   "texture": "chain_band",
+   "radius": 1.0,
+   "heightOffset": 0.015,
+   "color": "#9A6CFF",
+   "brightness": 1.2,
+   "inner": 0.9,
+   "repeat": 14,
+   "appear": {
+    "delay": 14,
+    "duration": 22,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": -3
+   }
+  },
+  {
+   "id": "runes",
+   "type": "text",
+   "radius": 0.84,
+   "heightOffset": 0.02,
+   "color": "#E6F0FF",
+   "brightness": 0.85,
+   "appear": {
+    "delay": 18,
+    "duration": 22,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 2
+   },
+   "text": "ПЕЧАТЬ ДУШИ ✦ ",
+   "font": "runic",
+   "size": 0.085,
+   "repeat": 3,
+   "side": "outer"
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.08,
+   "heightOffset": 0.025,
+   "brightness": 0.9,
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 24,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  },
+  {
+   "id": "rim2",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 0.7,
+   "heightOffset": 0.03,
+   "color": "#9A6CFF",
+   "inner": 0.97,
+   "repeat": 1,
+   "appear": {
+    "delay": 28,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": -90,
+    "direction": -1
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#E6F0FF",
+  "size": 1.2,
+  "duration": 12,
+  "sparks": 30
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 18,
+  "stagger": 2
+ }
+}

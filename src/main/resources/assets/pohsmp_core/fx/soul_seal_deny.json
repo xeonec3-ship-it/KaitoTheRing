@@ -1,0 +1,44 @@
+{
+ "comment": "Печать души: попытка колдовать (caster = запечатанный игрок) — знак на груди вспыхивает, цепь дёргается, фиолетовые искры. Короткий (16 тиков), можно запускать хоть каждую попытку.",
+ "style": "soul_seal",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,1.35,0.2",
+   "follow": true,
+   "id": "soul_seal_deny",
+   "until": 8
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.35,0.2",
+   "follow": true,
+   "duration": 8,
+   "size": 0.9,
+   "rays": 4,
+   "color": "#9A6CFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.35,0.2",
+   "follow": true,
+   "duration": 2,
+   "texture": "spark_sharp",
+   "count": 14,
+   "rate": 14,
+   "spread": 0.15,
+   "speed": 0.08,
+   "gravity": 0.004,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 12,
+   "color": "#9A6CFF"
+  }
+ ]
+}

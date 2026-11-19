@@ -1247,6 +1247,74 @@ def worgan_flame_finish():
     return a
 
 
+# ---------------------------------------------------------------- T21: Печать души и Благословение (10 с = 200 тиков ровно)
+# Шкала — docs/specs/tasks/T21_soul_seal_blessing.md и эффекты fx/soul_seal_cast.json, fx/blessing_cast.json (tools/gen_divine_t21.py).
+# Без посоха: предмет в руках прячет клиент (как у других божественных с полной анимацией).
+T21_T = 10.0
+SEAL_PALM_R = _fk(pitch=-88, yaw=4, roll=-2, bend=-4)          # ладонь к цели: рука прямо вперёд на уровне плеча
+SEAL_FIST_R = _fk(pitch=-84, yaw=4, roll=-2, bend=-16)         # пальцы сжимаются в кулак
+SEAL_PULL_R = _fk(pitch=-70, yaw=8, roll=6, bend=-50)          # тянет цепи к себе: кулак идёт к груди
+SEAL_WIND_R = _fk(pitch=-62, yaw=10, roll=10, bend=-72)        # замах перед рывком
+SEAL_LOCK_R = _fk(pitch=-97, yaw=-6, roll=-12, bend=-4)        # рывок «запереть»: кулак вперёд с поворотом, как ключ в замке
+SEAL_BACK_L = _fk(pitch=22, yaw=-6, roll=-26, bend=-14)        # левая отброшена назад-в сторону для равновесия
+SEAL_LEGS = dict(rightLeg=_TO(pitch=-8, roll=4, bend=8), leftLeg=_TO(pitch=10, roll=-4, bend=4))
+
+
+def soul_seal_cast():
+    """«Печать души» (T21), 10 с: 0–2 руки собирают свет у груди; 2–6 ладонь к цели (над ней собирается замок), левая держит
+    свет у груди; 6–9 пальцы сжимаются, кулак медленно тянет цепи к себе; 9.5 — рывок «запереть» (замок вдавливается в грудь цели)."""
+    a, r = Anim('pohsmp_soul_seal_cast', T21_T), Rig()
+    _start(a)
+    orb_r, orb_l = r.R(-2.4, 17.6, 6.2), r.L(2.4, 17.6, 6.2)      # ладони друг к другу, между ними свет
+    a.pose(0.9, rightArm=orb_r, leftArm=orb_l, torso=_TO(pitch=4, bend=5), head=_HL(pitch=16), **SEAL_LEGS)
+    a.sway(0.9, 1.9, 0.5, 'rightArm', orb_r, 'roll', 2)
+    a.sway(0.9, 1.9, 0.55, 'leftArm', orb_l, 'roll', -2)
+    chest_l = r.L(1.6, 18.2, 5.4, elbow_out=1.5)
+    a.pose(1.95, 'easeInQuad', rightArm=_fk(pitch=-60, yaw=4, roll=2, bend=-36), head=_HL(pitch=2))
+    a.pose(2.4, 'easeOutBack', rightArm=SEAL_PALM_R, leftArm=chest_l, torso=_TO(pitch=2, yaw=-8, bend=2), head=_HL(pitch=-6, yaw=6))
+    a.sway(2.4, 6.0, 0.45, 'rightArm', SEAL_PALM_R, 'pitch', 1.2)          # ладонь дрожит от силы
+    a.sway(2.4, 6.0, 1.6, 'head', _HL(pitch=-6, yaw=6), 'pitch', -3)       # взгляд поднимается к замку над целью
+    a.sway(2.4, 6.0, 0.6, 'leftArm', chest_l, 'roll', -2)
+    a.pose(6.45, 'easeOutCubic', rightArm=SEAL_FIST_R, torso=_TO(pitch=3, yaw=-9, bend=3), head=_HL(pitch=-2, yaw=6))
+    a.pose(9.0, 'easeInOutSine', rightArm=SEAL_PULL_R, torso=_TO(pitch=-4, yaw=-12, bend=-2), head=_HL(pitch=0, yaw=8))
+    a.sway(6.45, 9.0, 0.22, 'rightArm', SEAL_PULL_R, 'yaw', 1.5)            # кулак дрожит, цепи сопротивляются
+    a.pose(9.42, 'easeInOutQuad', rightArm=SEAL_WIND_R, leftArm=r.L(2.4, 17.0, 4.6, elbow_out=1.5),
+           torso=_TO(pitch=-6, yaw=-16, bend=-3), head=_HL(pitch=2, yaw=10))
+    lock_t = _TO(pitch=8, yaw=6, bend=5)
+    a.pose(9.62, 'easeOutBack', rightArm=SEAL_LOCK_R, leftArm=SEAL_BACK_L, torso=lock_t, head=_HL(pitch=4, yaw=-2),
+           rightLeg=_TO(pitch=-14, roll=4, bend=14), leftLeg=_TO(pitch=14, roll=-4, bend=6), body={'y': -0.05})
+    a.pose(T21_T, rightArm=SEAL_LOCK_R, leftArm=SEAL_BACK_L, torso=lock_t)
+    return a, (SEAL_LOCK_R, SEAL_BACK_L, lock_t, (_TO(pitch=-14, roll=4, bend=14), _TO(pitch=14, roll=-4, bend=6)), -0.05)
+
+
+BLESS_SKY_R = _fk(pitch=-36, roll=132, bend=-10)               # ладони к небу широким V
+
+
+def blessing_cast():
+    """«Благословение» (T21), 10 с: 0–6 молитвенно сложенные руки у лица (голова склонена, к 5 с поднимается);
+    6–8.8 руки раскрываются ладонями к цели (свет опускается на неё); 8.8–9.5 ладони поднимаются к небу — вспышка в 9.5."""
+    a, r = Anim('pohsmp_blessing_cast', T21_T), Rig()
+    _start(a)
+    pray_r, pray_l = r.R(-0.55, 23.0, 6.0), r.L(0.55, 23.0, 6.0)   # ладони у подбородка, чуть впереди лица
+    pray_t = _TO(pitch=3, bend=4)
+    a.pose(1.4, rightArm=pray_r, leftArm=pray_l, head=_HL(pitch=10), torso=pray_t)
+    a.sway(1.4, 4.6, 2.0, 'torso', pray_t, 'pitch', 1.2)
+    hi_r, hi_l = r.R(-0.55, 24.4, 6.4), r.L(0.55, 24.4, 6.4)       # ладони чуть поднимаются, голова встаёт
+    a.pose(5.6, rightArm=hi_r, leftArm=hi_l, head=_HL(pitch=-4), torso=_TO(pitch=0, bend=1))
+    open_r, open_l = r.R(-5.0, 19.8, 8.6, elbow_out=1.3), r.L(5.0, 19.8, 8.6, elbow_out=1.3)
+    open_t = _TO(pitch=4, bend=3)
+    a.pose(6.0, rightArm=r.R(-1.8, 23.0, 7.4), leftArm=r.L(1.8, 23.0, 7.4))
+    a.pose(6.9, 'easeOutCubic', rightArm=open_r, leftArm=open_l, torso=open_t, head=_HL(pitch=-2),
+           rightLeg=_TO(pitch=-6, roll=3, bend=5), leftLeg=_TO(pitch=8, roll=-3, bend=3))
+    a.sway(6.9, 8.8, 1.0, 'rightArm', open_r, 'pitch', 2)
+    a.sway(6.9, 8.8, 1.1, 'leftArm', open_l, 'pitch', 2)
+    a.pose(9.45, 'easeInOutCubic', rightArm=BLESS_SKY_R, leftArm=mirror(BLESS_SKY_R), torso=_TO(pitch=-6, bend=-4),
+           head=_HL(pitch=-30), body={'y': 0.02})
+    a.pose(T21_T, rightArm=BLESS_SKY_R, leftArm=mirror(BLESS_SKY_R), torso=_TO(pitch=-7, bend=-5), head=_HL(pitch=-32))
+    return a, (BLESS_SKY_R, mirror(BLESS_SKY_R), _TO(pitch=-7, bend=-5), (_TO(pitch=-6, roll=3, bend=5), _TO(pitch=8, roll=-3, bend=3)), 0.02)
+
+
+
 def pose_gallery():
     """Только для превью: по 1.4 с на каждую позу библиотеки."""
     out = []
@@ -1272,11 +1340,18 @@ _TB = _pair(taboo_cast, 'pohsmp_taboo_finish')
 _SC = _pair(space_closure_cast, 'pohsmp_space_closure_finish')
 _CA = _pair(coven_arrival_cast, 'pohsmp_coven_arrival_finish')
 _DI = _pair(disintegration_cast, 'pohsmp_disintegration_finish')
+_SS = (lambda: soul_seal_cast()[0],
+       lambda: _finish('pohsmp_soul_seal_finish', *soul_seal_cast()[1][:3], head=_HL(pitch=4, yaw=-2), legs=soul_seal_cast()[1][3],
+                       body_y=-0.05, length=1.2))
+_BL = (lambda: blessing_cast()[0],
+       lambda: _finish('pohsmp_blessing_finish', *blessing_cast()[1][:3], head=_HL(pitch=-32), legs=blessing_cast()[1][3],
+                       body_y=0.02, length=1.5))
 
 
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
          scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
-         silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish]
+         silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish,
+         *_SS, *_BL]
 
 
 def main():

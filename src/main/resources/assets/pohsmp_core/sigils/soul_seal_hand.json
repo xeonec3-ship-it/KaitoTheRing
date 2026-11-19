@@ -1,0 +1,85 @@
+{
+ "comment": "Печать души: малый замок у ладони заклинателя (2–9.5 с), смотрит на цель.",
+ "size": 0.42,
+ "color": "#D9A441",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.4,
+   "heightOffset": -0.01,
+   "color": "#9A6CFF",
+   "brightness": 0.55,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.3,
+    "period": 14
+   }
+  },
+  {
+   "id": "lock",
+   "type": "disc",
+   "texture": "soul_lock",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutBack",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 40,
+    "boost": 3
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "orbit_dash",
+   "radius": 1.35,
+   "heightOffset": 0.01,
+   "color": "#E6F0FF",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 4,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -60
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#E6F0FF",
+  "size": 1.6,
+  "duration": 6,
+  "sparks": 6
+ },
+ "dissolve": {
+  "modes": [
+   "collapse"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

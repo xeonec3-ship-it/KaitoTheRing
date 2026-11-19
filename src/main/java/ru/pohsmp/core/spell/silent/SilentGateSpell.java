@@ -58,8 +58,12 @@ public class SilentGateSpell extends SilentStaffSpell {
     public static final String PATH = "silent_gate";
     /** Ticks: cast (= 50 s in the track), first rays, last rays, crystal, end of the scene, crystal life. */
     public static final int CAST = 1000, RAYS_FROM = 1000, RAYS_TO = 1260, END = 1300;   // no ice mountain any more (owner 19.11)
-    /** Ticks from an aimed beam's launch to its strike (fx/silent_gate_beam.json hits on the 6th tick). */
-    private static final int HIT_DELAY = 6;
+    /** Ticks from an aimed shot's launch to its strike (fx/silent_gate_beam.json: the new circle forms 0-10, the beam hits on the 14th tick). */
+    private static final int HIT_DELAY = 14;
+    /** Each foe gets one shot every SHOT_MIN..SHOT_MAX ticks, on its own random rhythm; at most SHOTS_PER_TICK new shots over the whole area. */
+    private static final int SHOT_MIN = 12, SHOT_MAX = 24, SHOTS_PER_TICK = 4;
+    /** The new circle of a shot: this far to the side of the foe (0..SHOT_SIDE). */
+    private static final double SHOT_SIDE = 3;
     /**
      * No cast point (owner): the gate stands in the sky FWD blocks ahead of the caster (by the view at the cast start), GATE_H over the area;
      * the area of the rays is under it. Same numbers as tools/gen_silent_gate_fx.py (FWD, GATE_UP); the camera uses them too.
@@ -80,6 +84,8 @@ public class SilentGateSpell extends SilentStaffSpell {
         boolean cast, done;
         List<UUID> watchers = new ArrayList<>();
         final Map<UUID, Integer> lastHit = new HashMap<>();
+        /** foe -> tick of its next aimed shot */
+        final Map<UUID, Integer> nextShot = new HashMap<>();
         boolean placeholder;
     }
 
@@ -225,18 +231,25 @@ public class SilentGateSpell extends SilentStaffSpell {
     }
 
     /**
-     * Aimed volleys (as in the mod video): every aimedInterval ticks each foe in the area gets 3-5 beams from different seals of the sky
-     * field; the hit (rayRadius around the foe) counts once per volley and at most once per hitCooldownTicks per creature. The random rain
-     * of the effect (beam_rain) is only a look.
+     * Aimed shots (owner 19.11: not all together): over each foe in the area a new circle appears at the height of the sky field,
+     * forms in 0.5 s and strikes it with a beam (fx/silent_gate_beam.json, hit on tick {@link #HIT_DELAY}). Each foe gets one shot every
+     * 12-24 ticks on its own random rhythm; at most {@link #SHOTS_PER_TICK} new shots per tick over the whole area (the rest wait a tick).
+     * The hit (rayRadius around the foe) counts at most once per hitCooldownTicks per creature. The rain of the effect is only a look.
      */
     private static void rays(Cast c, int t) {
-        if ((t - RAYS_FROM) % ServerConfig.GATE_AIM_INTERVAL.get() != 0) return;
         double area = ServerConfig.GATE_AREA.get();
-        int lo = ServerConfig.GATE_BEAMS_MIN.get(), hi = Math.max(lo, ServerConfig.GATE_BEAMS_MAX.get());
+        int budget = SHOTS_PER_TICK;
         for (LivingEntity e : HigherSpell.around(c.sl, c.hit, area + 0.5, e -> hdist(e, c.hit) <= area && target(c.caster, e))) {
-            int n = lo + c.sl.random.nextInt(hi - lo + 1);
-            for (int i = 0; i < n; i++) beam(c, e);
-            // the beam (fx/silent_gate_beam.json) locks on for 4 ticks and strikes on the 6th: the damage comes then, where the foe is then
+            Integer next = c.nextShot.get(e.getUUID());
+            if (next == null) {   // newly in the area: the first shot at a random moment of the first interval, so they do not all go at once
+                c.nextShot.put(e.getUUID(), t + c.sl.random.nextInt(SHOT_MAX - SHOT_MIN + 1));
+                continue;
+            }
+            if (t < next || budget <= 0) continue;
+            budget--;
+            c.nextShot.put(e.getUUID(), t + SHOT_MIN + c.sl.random.nextInt(SHOT_MAX - SHOT_MIN + 1));
+            beam(c, e);
+            // the damage comes on the beam's strike, where the foe is then
             ru.pohsmp.core.spell.Tasks.add(new ru.pohsmp.core.spell.Tasks.Task() {
                 int left = HIT_DELAY;
 
@@ -250,10 +263,10 @@ public class SilentGateSpell extends SilentStaffSpell {
         }
     }
 
-    /** One beam from a random seal of the sky field into the foe (look only). */
+    /** One shot: a new circle over the foe (17-32 over the ground at it, 0-3 to the side) and its beam into the foe (look only). */
     private static void beam(Cast c, LivingEntity e) {
-        double a = c.sl.random.nextDouble() * Math.PI * 2, r = Math.sqrt(c.sl.random.nextDouble()) * SKY_R;
-        Vec3 from = c.hit.add(Math.cos(a) * r, SKY_LO + c.sl.random.nextDouble() * (SKY_HI - SKY_LO), Math.sin(a) * r);
+        double a = c.sl.random.nextDouble() * Math.PI * 2, r = c.sl.random.nextDouble() * SHOT_SIDE;
+        Vec3 from = e.position().add(Math.cos(a) * r, SKY_LO + c.sl.random.nextDouble() * (SKY_HI - SKY_LO), Math.sin(a) * r);
         if (c.placeholder) {
             Fx.play(c.sl, Fx.fx(FX_BEAM + "_placeholder").at(e.position()).yaw(c.yaw).point("p", e.position()).point("from", from));
             return;

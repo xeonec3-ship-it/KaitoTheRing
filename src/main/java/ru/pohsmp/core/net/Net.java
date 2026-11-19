@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "10";   // 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S)
+    private static final String V = "11";   // 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -33,6 +33,37 @@ public final class Net {
                 .consumerMainThread(NeroMsg::handle).add();
         CH.messageBuilder(GateCommand.class, 8, NetworkDirection.PLAY_TO_SERVER).encoder(GateCommand::encode).decoder(GateCommand::new)
                 .consumerMainThread(GateCommand::handle).add();
+        CH.messageBuilder(EmberMsg.class, 9, NetworkDirection.PLAY_TO_CLIENT).encoder(EmberMsg::encode).decoder(EmberMsg::new)
+                .consumerMainThread(EmberMsg::handle).add();
+    }
+
+    /** T14: the Ember Blade holder's heat and form (the server keeps them, ember/EmberBlade). */
+    public static final class EmberMsg {
+        public final int entity;
+        public final float heat;
+        public final boolean hot;
+
+        public EmberMsg(int entity, float heat, boolean hot) {
+            this.entity = entity;
+            this.heat = heat;
+            this.hot = hot;
+        }
+
+        public EmberMsg(FriendlyByteBuf b) {
+            entity = b.readVarInt();
+            heat = b.readFloat();
+            hot = b.readBoolean();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeVarInt(entity);
+            b.writeFloat(heat);
+            b.writeBoolean(hot);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            ru.pohsmp.core.ember.EmberBlade.clientSet(entity, heat, hot);
+        }
     }
 
     /** «Безмолвные врата», «Приказ»: the waiting caster clicked the left button (client -> server, no data). */

@@ -22,7 +22,7 @@ public final class EmberHud {
 
     public static void setup(FMLClientSetupEvent e) {
         e.enqueueWork(() -> ItemProperties.register(Reg.EMBER_BLADE.get(), new ResourceLocation(PohCore.MODID, "hot"),
-                (s, level, holder, seed) -> EmberBlade.hot(s) ? 1f : 0f));
+                (s, level, holder, seed) -> EmberBlade.hot(holder != null ? holder : Minecraft.getInstance().player) ? 1f : 0f));
     }
 
     @SubscribeEvent
@@ -33,7 +33,7 @@ public final class EmberHud {
         if (!(s.getItem() instanceof EmberBlade)) return;
         GuiGraphics g = e.getGuiGraphics();
         int w = g.guiWidth(), h = g.guiHeight();
-        float heat = Math.min(1f, EmberBlade.heat(s) / EmberBlade.MAX_HEAT);
+        float heat = Math.min(1f, EmberBlade.heat(mc.player) / EmberBlade.MAX_HEAT);
         double t = (mc.player.tickCount + e.getPartialTick()) / 10.0;
         float alpha = heat >= 1f ? 0.65f + 0.35f * (float) Math.sin(t * Math.PI) : 1f;   // full: the fill pulses (special attack ready)
         int x0 = w / 2 - BAR_W / 2, y = mc.player.isCreative() ? h - 40 : h - 76;   // over the hotbar; in survival over hearts and armor
@@ -46,7 +46,7 @@ public final class EmberHud {
         }
         g.blit(BAR, x0, y, 0, 0, BAR_W, BAR_H, BAR_W, BAR_H * 2);   // top half: the frame
         com.mojang.blaze3d.systems.RenderSystem.disableBlend();
-        if (EmberBlade.hot(s))   // a small flame mark at the right end: whip form
+        if (EmberBlade.hot(mc.player))   // a small flame mark at the right end: whip form
             g.fill(x0 + BAR_W + 3, y + 6, x0 + BAR_W + 6, y + 10, 0xFFFF6A1A);
     }
 

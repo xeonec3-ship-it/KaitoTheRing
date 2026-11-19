@@ -46,35 +46,75 @@ import ru.pohsmp.core.spell.Tasks;
 public class EmberBlade extends SwordItem {
     public static final String NAME = "ember_blade";
     public static final float MAX_HEAT = 100, HEAT_PER_HIT = 14, COOL_PER_SEC = 6;
-    public static final int HOT_AFTER = 2, COOL_TICKS = 100, IDLE_TICKS = 40;
+    /** Owner 19.11: 10 s for each phase — the whip goes back to the sword, and the heat starts to cool, 10 s after the last hit. */
+    public static final int HOT_AFTER = 2, COOL_TICKS = 200, IDLE_TICKS = 200;
     static final double WHIP_LEN = 6, WHIP_HALF = Math.toRadians(50), VORTEX_R = 5;
     static final double[] WAVES = {3, 5, 7};
 
-    private static final String HEAT = "Heat", STREAK = "Streak", LAST = "LastHit", HOT = "Hot";
     private static boolean lashing;   // our own lash/special damage must not count as a new hit
 
     public EmberBlade() {
         super(Tiers.DIAMOND, 3, -2.4f, new Properties().stacksTo(1).fireResistant());
     }
 
-    // ---------------------------------------------------------------- state in the stack (synced to the client with the stack)
+    // ---------------------------------------------------------------- state of the holder: kept by the server, sent to the clients
 
-    public static float heat(ItemStack s) {
-        CompoundTag t = s.getTag();
-        return t == null ? 0 : t.getFloat(HEAT);
+    /**
+     * Owner 19.11: with the state in the stack tag the gauge stayed empty and the model stayed a blade — in creative the client sends its
+     * own copy of the slot back and the server's heat was lost. Now the server keeps heat and form per player and sends them
+     * (Net.EmberMsg) to the holder and everyone who sees him; the client keeps them per entity id.
+     */
+    private static final class St {
+        float heat;
+        int streak;
+        boolean hot;
+        long last;
     }
 
-    public static boolean hot(ItemStack s) {
-        CompoundTag t = s.getTag();
-        return t != null && t.getBoolean(HOT);
+    private static final St NONE = new St();
+    private static final java.util.Map<java.util.UUID, St> SERVER = new java.util.HashMap<>();
+    private static final java.util.Map<Integer, St> CLIENT = new java.util.HashMap<>();
+
+    private static St st(Entity e) {
+        if (e == null) return NONE;
+        St s = e.level().isClientSide ? CLIENT.get(e.getId()) : SERVER.get(e.getUUID());
+        return s == null ? NONE : s;
     }
 
-    private static void set(ItemStack s, float heat, int streak, boolean hot, long last) {
-        CompoundTag t = s.getOrCreateTag();
-        t.putFloat(HEAT, Math.max(0, Math.min(MAX_HEAT, heat)));
-        t.putInt(STREAK, streak);
-        t.putBoolean(HOT, hot);
-        t.putLong(LAST, last);
+    /** Heat of the holder (0..MAX_HEAT); on the client — the last value the server sent. */
+    public static float heat(Entity holder) {
+        return st(holder).heat;
+    }
+
+    /** True: the holder's blade is in the whip form. */
+    public static boolean hot(Entity holder) {
+        return st(holder).hot;
+    }
+
+    private static void set(Player p, float heat, int streak, boolean hot, long last) {
+        St s = SERVER.computeIfAbsent(p.getUUID(), k -> new St());
+        heat = Math.max(0, Math.min(MAX_HEAT, heat));
+        boolean changed = s.heat != heat || s.hot != hot;
+        s.heat = heat;
+        s.streak = streak;
+        s.hot = hot;
+        s.last = last;
+        if (changed) sync(p, null);
+    }
+
+    /** To the holder and his watchers, or only to {@code to}. */
+    private static void sync(Player p, net.minecraft.server.level.ServerPlayer to) {
+        St s = st(p);
+        Object msg = new ru.pohsmp.core.net.Net.EmberMsg(p.getId(), s.heat, s.hot);
+        if (to != null) ru.pohsmp.core.net.Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> to), msg);
+        else ru.pohsmp.core.net.Net.CH.send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> p), msg);
+    }
+
+    /** Client: the state the server sent (Net.EmberMsg). */
+    public static void clientSet(int entity, float heat, boolean hot) {
+        St s = CLIENT.computeIfAbsent(entity, k -> new St());
+        s.heat = heat;
+        s.hot = hot;
     }
 
     /** Heat changes every second: the stack must not replay the re-equip animation each time. */
@@ -85,21 +125,22 @@ public class EmberBlade extends SwordItem {
 
     @Override
     public void inventoryTick(ItemStack s, Level level, Entity holder, int slot, boolean selected) {
-        if (level.isClientSide || level.getGameTime() % 20 != 0 || s.getTag() == null) return;
-        CompoundTag t = s.getTag();
-        long idle = level.getGameTime() - t.getLong(LAST);
-        float heat = t.getFloat(HEAT);
-        boolean hot = t.getBoolean(HOT);
-        int streak = t.getInt(STREAK);
-        if (idle < IDLE_TICKS || (heat <= 0 && !hot && streak == 0)) return;
-        heat -= COOL_PER_SEC;
+        if (level.isClientSide || level.getGameTime() % 20 != 0 || !(holder instanceof Player p)) return;
+        St t = SERVER.get(p.getUUID());
+        if (t == null) return;
+        long idle = level.getGameTime() - t.last;
+        float heat = t.heat;
+        boolean hot = t.hot;
+        int streak = t.streak;
+        if (heat <= 0 && !hot && streak == 0) return;
+        if (idle >= IDLE_TICKS) heat -= COOL_PER_SEC;
         if (idle >= COOL_TICKS) {
             if (hot && level instanceof ServerLevel sl)
                 sl.playSound(null, holder.getX(), holder.getY(), holder.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5f, 1.4f);
             hot = false;
             streak = 0;
         }
-        set(s, heat, streak, hot, t.getLong(LAST));
+        if (heat != t.heat || hot != t.hot || streak != t.streak) set(p, heat, streak, hot, t.last);
     }
 
     @Override
@@ -113,46 +154,49 @@ public class EmberBlade extends SwordItem {
 
     /** Any melee hit of the holder with this blade in the main hand (vanilla or an Epic Fight swing). */
     public static final class Events {
-        /**
-         * Owner 19.11: the heat did not grow. The direct entity of an Epic Fight swing may not be the player himself, so any non-projectile
-         * damage by the holder counts. Temporary: each hit goes to the server log (to see in the next check whether the hits arrive).
-         */
-        @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST, receiveCanceled = true)
+        /** Any non-projectile damage by the holder counts (the direct entity of an Epic Fight swing may not be the player himself). */
+        @SubscribeEvent(priority = net.minecraftforge.eventbus.api.EventPriority.LOWEST)
         public static void onHurt(LivingHurtEvent e) {
             if (lashing || !(e.getSource().getEntity() instanceof Player p)) return;
             if (!(p.level() instanceof ServerLevel sl)) return;
             ItemStack s = p.getMainHandItem();
             if (!(s.getItem() instanceof EmberBlade)) return;
-            Entity direct = e.getSource().getDirectEntity();
-            ru.pohsmp.core.PohCore.LOG.info("[ember] hurt {} by {}: source {}, direct {}, amount {}, cancelled {}, heat {}",
-                    e.getEntity().getName().getString(), p.getName().getString(), e.getSource().getMsgId(),
-                    direct == null ? "null" : direct.getType().toShortString(), e.getAmount(), e.isCanceled(), heat(s));
-            if (e.isCanceled() || direct instanceof net.minecraft.world.entity.projectile.Projectile) return;
+            if (e.getSource().getDirectEntity() instanceof net.minecraft.world.entity.projectile.Projectile) return;
             onHit(sl, p, s, e.getEntity());
         }
 
-        /** Temporary: a swing that hits nothing still shows in the log, to tell "no hurt event" from "no swing". */
+        /** A player who starts seeing the holder gets his form (the whip model and animations). */
         @SubscribeEvent
-        public static void onAttack(net.minecraftforge.event.entity.player.AttackEntityEvent e) {
-            if (e.getEntity().getMainHandItem().getItem() instanceof EmberBlade && !e.getEntity().level().isClientSide)
-                ru.pohsmp.core.PohCore.LOG.info("[ember] attack by {} on {}", e.getEntity().getName().getString(), e.getTarget().getName().getString());
+        public static void onTrack(net.minecraftforge.event.entity.player.PlayerEvent.StartTracking e) {
+            if (e.getTarget() instanceof Player p && SERVER.containsKey(p.getUUID()) && e.getEntity() instanceof net.minecraft.server.level.ServerPlayer to)
+                sync(p, to);
+        }
+
+        @SubscribeEvent
+        public static void onLogout(net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent e) {
+            SERVER.remove(e.getEntity().getUUID());
+        }
+
+        @SubscribeEvent
+        public static void onUnload(net.minecraftforge.event.level.LevelEvent.Unload e) {
+            if (e.getLevel().isClientSide()) CLIENT.clear();
         }
     }
 
     private static void onHit(ServerLevel sl, Player p, ItemStack s, LivingEntity target) {
         long now = sl.getGameTime();
-        CompoundTag t = s.getOrCreateTag();
-        int streak = now - t.getLong(LAST) <= COOL_TICKS ? t.getInt(STREAK) + 1 : 1;
-        boolean wasHot = t.getBoolean(HOT), hot = wasHot || streak >= HOT_AFTER;
-        float heat = t.getFloat(HEAT) + HEAT_PER_HIT;
+        St t = st(p);
+        int streak = now - t.last <= COOL_TICKS ? t.streak + 1 : 1;
+        boolean wasHot = t.hot, hot = wasHot || streak >= HOT_AFTER;
+        float before = t.heat, heat = before + HEAT_PER_HIT;
         target.setSecondsOnFire(hot ? 5 : 3);
-        set(s, heat, streak, hot, now);
+        set(p, heat, streak, hot, now);
         glow(sl, p, s);
         if (hot && !wasHot) {   // the blade catches fire
             sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.8f);
             DivineEvents.particle(sl, ParticleTypes.FLAME, p.getX(), p.getY() + 1.2, p.getZ(), 20, 0.4, 0.05);
         }
-        if (heat >= MAX_HEAT && t.getFloat(HEAT) < MAX_HEAT)
+        if (heat >= MAX_HEAT && before < MAX_HEAT)
             sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.BLAZE_AMBIENT, SoundSource.PLAYERS, 0.8f, 1.6f);
         if (wasHot) lash(sl, p, target);
     }
@@ -209,7 +253,7 @@ public class EmberBlade extends SwordItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player p, InteractionHand hand) {
         ItemStack s = p.getItemInHand(hand);
-        if (EmberEpicFight.ON || hand != InteractionHand.MAIN_HAND || heat(s) < MAX_HEAT) return InteractionResultHolder.pass(s);
+        if (EmberEpicFight.ON || hand != InteractionHand.MAIN_HAND || heat(p) < MAX_HEAT) return InteractionResultHolder.pass(s);
         if (level instanceof ServerLevel && p instanceof net.minecraft.server.level.ServerPlayer sp) special(sp, s);
         return InteractionResultHolder.sidedSuccess(s, level.isClientSide);
     }
@@ -220,10 +264,10 @@ public class EmberBlade extends SwordItem {
      * (EmberEpicFight.Special), without Epic Fight by the right click. Returns false when the heat is not full.
      */
     public static boolean special(net.minecraft.server.level.ServerPlayer p, ItemStack s) {
-        if (!(s.getItem() instanceof EmberBlade item) || heat(s) < MAX_HEAT || !(p.level() instanceof ServerLevel sl)) return false;
-        boolean vortex = hot(s);
+        if (!(s.getItem() instanceof EmberBlade item) || heat(p) < MAX_HEAT || !(p.level() instanceof ServerLevel sl)) return false;
+        boolean vortex = hot(p);
         int delay = EmberEpicFight.playSpecial(p, vortex);
-        set(s, 0, vortex ? HOT_AFTER : 0, vortex, sl.getGameTime());   // the heat is spent at once: no double special
+        set(p, 0, vortex ? HOT_AFTER : 0, vortex, sl.getGameTime());   // the heat is spent at once: no double special
         later(delay, () -> {
             if (!p.isAlive() || p.level() != sl) return;
             if (vortex) fireVortex(sl, p, s);
@@ -290,12 +334,12 @@ public class EmberBlade extends SwordItem {
 
     /** Starts the glow on the holder's hand once; it watches itself and goes out when the heat is 0 or the blade leaves the hand. */
     static void glow(ServerLevel sl, Player p, ItemStack s) {
-        if (GLOW.containsKey(p.getUUID()) || heat(s) <= 0) return;
-        int inst = Fx.play(sl, Fx.fx("ember_heat").caster(p).scale(0.6 + 0.4 * heat(s) / MAX_HEAT));
+        if (GLOW.containsKey(p.getUUID()) || heat(p) <= 0) return;
+        int inst = Fx.play(sl, Fx.fx("ember_heat").caster(p).scale(0.6 + 0.4 * heat(p) / MAX_HEAT));
         GLOW.put(p.getUUID(), inst);
         Tasks.add(() -> {
             ItemStack h = p.getMainHandItem();
-            if (p.isAlive() && !p.isRemoved() && p.level() == sl && h.getItem() instanceof EmberBlade && heat(h) > 0 && Fx.running(inst)) return true;
+            if (p.isAlive() && !p.isRemoved() && p.level() == sl && h.getItem() instanceof EmberBlade && heat(p) > 0 && Fx.running(inst)) return true;
             Fx.stop(sl, inst, "");
             GLOW.remove(p.getUUID(), inst);
             return false;

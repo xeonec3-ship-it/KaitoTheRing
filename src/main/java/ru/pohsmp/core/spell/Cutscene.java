@@ -22,7 +22,7 @@ import ru.pohsmp.core.net.Net;
 /**
  * Cast cutscenes of the great spells (client: DownfallCut). Every player within R of the caster is frozen in place,
  * cannot be hurt and watches the scene until it ends (or the cast stops). Scenes: 0 Downfall, 1 Milky Way, 2 Soul Devour, 3 Divine Taboo,
- * 4 Closing of Space, 5 Coven Arrival, 6 Star Fall, 7 Gate.
+ * 4 Closing of Space, 5 Coven Arrival, 6 Star Fall, 7 Gate, 8 Soul Seal, 9 Blessing.
  */
 public final class Cutscene {
     private Cutscene() {}
@@ -32,7 +32,8 @@ public final class Cutscene {
     public static final double R_COVEN = 98;
     /** «Безмолвные врата»: camera, music and silence for everyone this close to the caster or the strike point (owner 19.11, was 64). */
     public static final double R_GATE = 128;
-    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, STAR_FALL = 6, SILENT_GATE = 7;
+    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, STAR_FALL = 6, SILENT_GATE = 7,
+            SOUL_SEAL = 8, BLESSING = 9;   // T21: i of the packet = the target's entity id
 
     /**
      * Starts the scene for everyone within r of the caster (in the caster's level) or of `extra` in `extraLevel` (may be another dimension).
@@ -90,9 +91,14 @@ public final class Cutscene {
 
     /** Starts the scene for everyone near the caster. focus: the second point of the scene (rift, target, sky...), ang: a direction (radians). */
     public static List<UUID> start(ServerLevel sl, LivingEntity caster, int key, int scene, int dur, Vec3 focus, double ang) {
+        return start(sl, caster, key, scene, dur, focus, ang, 0);
+    }
+
+    /** The same with an extra int for the client (T21: the target's entity id). */
+    public static List<UUID> start(ServerLevel sl, LivingEntity caster, int key, int scene, int dur, Vec3 focus, double ang, int extra) {
         List<UUID> watchers = new ArrayList<>();
         long until = sl.getGameTime() + dur + 60;
-        Net.HFx cut = new Net.HFx(Net.HFx.CUT, key, caster.getId(), scene, dur, focus.x, focus.y, focus.z, ang, 0);
+        Net.HFx cut = new Net.HFx(Net.HFx.CUT, key, caster.getId(), scene, dur, focus.x, focus.y, focus.z, ang, extra);
         for (ServerPlayer sp : sl.players()) {
             if (sp.isSpectator() || sp.distanceToSqr(caster) > R * R) continue;
             Frozen f = new Frozen();

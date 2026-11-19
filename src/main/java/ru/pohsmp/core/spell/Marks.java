@@ -63,6 +63,13 @@ public final class Marks {
         return m;
     }
 
+    /** T21 "Blessing": drops every mark on the target (their effects go with the harmful ones). Returns how many there were. */
+    public static int cleanse(LivingEntity t) {
+        int n = 0;
+        for (Map<UUID, Mark> m : List.of(BLOOD_MARK, HEMORRHAGE, OVERLOAD, SPORES)) if (m.remove(t.getUUID()) != null) n++;
+        return n;
+    }
+
     // ---- Illusion decoys ----
 
     static final class Decoy {

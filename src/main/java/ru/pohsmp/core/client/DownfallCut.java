@@ -48,13 +48,17 @@ public final class DownfallCut {
         casterId = m.a;
         scene = Math.max(0, m.b);
         dur = m.dur;
-        start = now - Math.max(0, m.i);
+        boolean rite = scene == RITE_SEAL || scene == RITE_BLESS;
+        targetId = rite ? m.i : -1;   // T21: i = the target's entity id (the other scenes: a time offset)
+        start = rite ? now : now - Math.max(0, m.i);
+        releaseAt = -1;
         rift = new Vec3(m.x, m.y, m.z);
         Entity c = mc.level.getEntity(casterId);
         casterPos = c != null ? c.position() : mc.player.position();
         Vec3 d = rift.subtract(casterPos).multiply(1, 0, 1);
         dir = d.lengthSqr() < 1e-4 ? new Vec3(-Math.cos(m.f), 0, -Math.sin(m.f)) : d.normalize();
         if (scene == STAR) dir = new Vec3(Math.cos(m.f), 0, Math.sin(m.f));   // the server's caster -> impact, so the star path matches the fx
+        if (rite && d.lengthSqr() < 1e-4) dir = new Vec3(Math.cos(m.f), 0, Math.sin(m.f));   // Blessing on oneself: the way the caster looks
         portalYaw = m.f;
         retinue = 2;   // until the server says (older servers: two exits)
         active = true;
@@ -68,7 +72,120 @@ public final class DownfallCut {
     }
 
     public static void stop(int k) {
-        if (active && k == key) active = false;
+        if (!active || k != key) return;
+        if (scene != RITE_SEAL && scene != RITE_BLESS) {
+            active = false;
+            return;
+        }
+        ClientLevel lvl = Minecraft.getInstance().level;   // T21: the camera glides back to the player in 1 s
+        if (releaseAt < 0 && lvl != null) releaseAt = lvl.getGameTime();
+    }
+
+    // ---- T21 «Печать души» / «Благословение» (docs/specs/tasks/T21_soul_seal_blessing.md, «Ролики камеры») ----
+
+    private static final int RITE_SEAL = ru.pohsmp.core.spell.Cutscene.SOUL_SEAL, RITE_BLESS = ru.pohsmp.core.spell.Cutscene.BLESSING;
+    private static final int RELEASE = 20, BLEND = 12;
+    private static int targetId = -1;
+    private static long releaseAt = -1;
+    private static Vec3 lastPos;
+    private static float lastYaw, lastPitch;
+
+    private static double sine(double u) {
+        u = Math.max(0, Math.min(1, u));
+        return 0.5 - 0.5 * Math.cos(Math.PI * u);
+    }
+
+    /** Shot starts (ticks) and which starts are hard cuts (no glide into them). */
+    private static final int[] SEAL_AT = {0, 40, 80, 120, 160, 190, 200}, BLESS_AT = {0, 40, 80, 120, 180, 200};
+    private static final boolean[] SEAL_CUT = {false, false, false, true, false, false, false}, BLESS_CUT = {false, false, false, false, false, false};
+
+    /**
+     * The rite camera at tick t: the shot it is in, glided (easeInOutSine, BLEND ticks) from the end of the previous one unless it opens
+     * with a cut. c: caster, tg: target (the caster himself for a Blessing on oneself), dir: caster -> target (flat), side: its left.
+     * Returns pos, look and (shake, 0, 0).
+     */
+    private static Vec3[] rite(double t, Vec3 c, Vec3 tg, Vec3 dir, Vec3 side) {
+        boolean seal = scene == RITE_SEAL;
+        int[] at = seal ? SEAL_AT : BLESS_AT;
+        boolean[] cut = seal ? SEAL_CUT : BLESS_CUT;
+        int i = 0;
+        while (i < at.length - 1 && t >= at[i + 1]) i++;
+        Vec3[] now = riteShot(seal, i, t, c, tg, dir, side);
+        if (i == 0 || cut[i] || t - at[i] >= BLEND) return now;
+        Vec3[] prev = riteShot(seal, i - 1, at[i], c, tg, dir, side);
+        double u = sine((t - at[i]) / BLEND);
+        return new Vec3[] {prev[0].lerp(now[0], u), prev[1].lerp(now[1], u), now[2]};
+    }
+
+    private static Vec3[] riteShot(boolean seal, int i, double t, Vec3 c, Vec3 tg, Vec3 dir, Vec3 side) {
+        int[] at = seal ? SEAL_AT : BLESS_AT;
+        double end = i + 1 < at.length ? at[i + 1] : at[i] + 30;
+        double k = sine((t - at[i]) / Math.max(1, end - at[i]));
+        Vec3 mid = c.lerp(tg, 0.5);
+        double yaw = Math.atan2(dir.z, dir.x);
+        Vec3 pos, look;
+        double shake = 0;
+        if (seal) {
+            switch (i) {
+                case 0 -> {   // wide from the side: both in frame, the seal opening under the caster; slow push 9 -> 7
+                    pos = mid.add(side.scale(9 - 2 * k)).add(0, 3, 0);
+                    look = mid.add(0, 1, 0);
+                }
+                case 1 -> {   // the caster close: face and the open palm towards the target, a light orbit of 20°
+                    double a = yaw + Math.toRadians(70 + 20 * k);
+                    pos = c.add(Math.cos(a) * 2.2, 1.35, Math.sin(a) * 2.2);
+                    look = c.add(dir.scale(0.9)).add(0, 1.45, 0);
+                }
+                case 2 -> {   // from the target's feet up: the lock gathering over its head in the top third
+                    pos = tg.subtract(dir.scale(2.2)).add(side.scale(1.9)).add(0, 0.6 + 0.5 * k, 0);
+                    look = tg.add(0, 2.4, 0);
+                }
+                case 3 -> {   // cut: over the caster's shoulder at the target, a slow push along the axis
+                    double len = Math.max(2, tg.distanceTo(c));
+                    pos = c.subtract(dir.scale(3)).subtract(side.scale(0.5)).add(0, 1.9, 0).add(dir.scale(Math.min(len * 0.45, 4) * k));
+                    look = tg.add(0, 1.3, 0);
+                }
+                case 4 -> {   // the target close, chest high: the chains tighten, the camera trembles more and more
+                    pos = tg.subtract(dir.scale(2)).add(0, 1.3, 0);
+                    look = tg.add(0, 1.25, 0);
+                    shake = 0.015 + 0.08 * k;
+                }
+                default -> {   // the strike: a jerk back 2 -> 4 in 0.2 s, the shake; then the same shot, still
+                    double back = 2 + 2 * Math.min(1, (t - 190) / 4.0);
+                    pos = tg.subtract(dir.scale(back)).add(0, 1.3, 0);
+                    look = tg.add(0, 1.2, 0);
+                    shake = t < 200 ? 0.06 : 0.3 * Math.max(0, 1 - (t - 200) / 14.0);
+                }
+            }
+        } else {
+            switch (i) {
+                case 0 -> {   // high over the middle, looking down at 60°, a slow turn of 25°
+                    double a = yaw + Math.PI / 2 + Math.toRadians(25 * k);
+                    pos = mid.add(Math.cos(a) * 6.9, 12, Math.sin(a) * 6.9);
+                    look = mid;
+                }
+                case 1 -> {   // the caster close: hands folded, eyes down; still, the camera breathes
+                    pos = c.add(dir.scale(1.8)).add(0, 1.6 + 0.03 * Math.sin(t * 0.15), 0);
+                    look = c.add(0, 1.55, 0);
+                }
+                case 2 -> {   // the halo over the target, the pillar: from below and the side, rising along the light
+                    pos = tg.add(side.scale(2.5)).add(0, 0.8 + 1.4 * k, 0);
+                    look = tg.add(0, 4 + 3 * k, 0);
+                }
+                case 3 -> {   // the darkness leaves: an orbit of 120° round the target at 3.5, chest high
+                    double a = yaw + Math.PI + Math.toRadians(-60 + 120 * k);
+                    pos = tg.add(Math.cos(a) * 3.5, 1.3, Math.sin(a) * 3.5);
+                    look = tg.add(0, 1.2, 0);
+                }
+                default -> {   // the flash and the ring: back and up to the wide shot (6 away, 3 up), then still
+                    double a = yaw + Math.PI + Math.toRadians(60);
+                    Vec3 from = tg.add(Math.cos(a) * 3.5, 1.3, Math.sin(a) * 3.5), to = tg.subtract(dir.scale(6)).add(0, 3, 0);
+                    pos = from.lerp(to, i == 4 ? k : 1);
+                    look = tg.add(0, 1.2 - 0.7 * (i == 4 ? k : 1), 0);
+                }
+            }
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, 0, 0)};
     }
 
     public static boolean active() {
@@ -97,7 +214,8 @@ public final class DownfallCut {
         if (mc.level == null) return;
         float pt = (float) e.getPartialTick();
         double t = now(pt);
-        if (t > dur + 20 || t < 0) {
+        boolean riteScene = scene == RITE_SEAL || scene == RITE_BLESS;
+        if (t > dur + (riteScene ? ru.pohsmp.core.spell.RiteSpell.HOLD + 40 : 20) || t < 0) {
             active = false;
             return;
         }
@@ -107,7 +225,28 @@ public final class DownfallCut {
         double baseYaw = Math.atan2(dir.z, dir.x);
         Vec3 pos, look;
         double roll = 0, shake = 0;
-        if (scene == STAR) {
+        if (riteScene && releaseAt >= 0) {   // T21: back to the player's own eyes in 1 s
+            double u = sine((mc.level.getGameTime() + pt - releaseAt) / RELEASE);
+            Entity me = mc.getCameraEntity() != null ? mc.getCameraEntity() : mc.player;
+            if (u >= 1 || lastPos == null || me == null) {
+                active = false;
+                return;
+            }
+            Vec3 eye = me.getEyePosition(pt);
+            if (!apply(e.getCamera(), lastPos.lerp(eye, u))) return;
+            e.setYaw((float) (lastYaw + net.minecraft.util.Mth.wrapDegrees(me.getViewYRot(pt) - lastYaw) * u));
+            e.setPitch((float) (lastPitch + (me.getViewXRot(pt) - lastPitch) * u));
+            e.setRoll(0);
+            return;
+        }
+        if (riteScene) {
+            Entity te = targetId >= 0 ? mc.level.getEntity(targetId) : null;
+            Vec3 tg = te != null ? te.getPosition(pt) : rift;
+            Vec3[] pl = rite(t, c, tg, dir, side);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+        } else if (scene == STAR) {
             Vec3[] pl = star(t, c, rift, dir, side, baseYaw);
             pos = pl[0];
             look = pl[1];
@@ -177,6 +316,9 @@ public final class DownfallCut {
         e.setYaw(yaw);
         e.setPitch(pitch);
         e.setRoll((float) roll);
+        lastPos = pos;
+        lastYaw = yaw;
+        lastPitch = pitch;
     }
 
     private static double portalYaw;
@@ -492,8 +634,9 @@ public final class DownfallCut {
     }
 
     private static final String[] TITLES = {"fx.pohsmp_core.downfall.title", "fx.pohsmp_core.milky_way.title", "fx.pohsmp_core.soul_devour.title", "fx.pohsmp_core.divine_taboo.title",
-            "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title", "fx.pohsmp_core.silent_gate.title"};
-    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0};
+            "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title", "fx.pohsmp_core.silent_gate.title",
+            "fx.pohsmp_core.soul_seal.title", "fx.pohsmp_core.blessing.title"};
+    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xFF2A3A, 0x7FFFD0, 0x9A7BFF, 0xFFE38A};
 
     /** Lift the camera out of solid blocks (up to 6). */
     private static Vec3 free(ClientLevel lvl, Vec3 p) {
@@ -556,6 +699,8 @@ public final class DownfallCut {
         int w = g.guiWidth(), h = g.guiHeight();
         double t = now(e.getPartialTick());
         float in = (float) Math.min(1, t / 12.0);
+        if (releaseAt >= 0 && Minecraft.getInstance().level != null)   // T21: the bars go with the camera
+            in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + e.getPartialTick() - releaseAt) / RELEASE));
         int bar = (int) (h * 0.11 * in);
         g.fill(0, 0, w, bar, 0xFF000000);
         g.fill(0, h - bar, w, h, 0xFF000000);

@@ -74,6 +74,8 @@ public final class Reg {
     public static final RegistryObject<MobEffect> HEMORRHAGE = EFFECTS.register("hemorrhage", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x6E0010));
     public static final RegistryObject<MobEffect> OVERLOAD = EFFECTS.register("overload", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x8FD8FF));
     public static final RegistryObject<MobEffect> SPORES = EFFECTS.register("spores", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x8CB43A));
+    /** T21: the soul is sealed — no casting, for good (spell/SoulSeal); endless, milk and totems do not take it. */
+    public static final RegistryObject<MobEffect> SOUL_SEAL = EFFECTS.register("soul_seal", () -> new PohEffect(MobEffectCategory.HARMFUL, 0x9A7BFF));
 
     public static final ResourceKey<DamageType> SHIELD_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, "living_shield"));
     public static final ResourceKey<DamageType> SOUL_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, "soul_devour"));
@@ -200,7 +202,7 @@ public final class Reg {
 
     /** Built-in Divine and Mythic tier spells (besides Disintegration). */
     public static final List<String> DIVINE_SPELLS = List.of(ru.pohsmp.core.spell.TabooSpell.PATH, ru.pohsmp.core.spell.SoulDevourSpell.PATH,
-            ru.pohsmp.core.spell.ArkSpell.PATH);
+            ru.pohsmp.core.spell.ArkSpell.PATH, ru.pohsmp.core.spell.SoulSealSpell.PATH, ru.pohsmp.core.spell.BlessingSpell.PATH);
     public static final List<String> MYTHIC_SPELLS = List.of(ru.pohsmp.core.spell.ExplosionSpell.PATH,
             ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.FrozenHourSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell.PATH,
             ru.pohsmp.core.spell.CovenArrivalSpell.PATH);
@@ -213,6 +215,8 @@ public final class Reg {
         SPELLS.register(ru.pohsmp.core.spell.TabooSpell.PATH, ru.pohsmp.core.spell.TabooSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.SoulDevourSpell.PATH, ru.pohsmp.core.spell.SoulDevourSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ArkSpell.PATH, ru.pohsmp.core.spell.ArkSpell::new);
+        SPELLS.register(ru.pohsmp.core.spell.SoulSealSpell.PATH, ru.pohsmp.core.spell.SoulSealSpell::new);
+        SPELLS.register(ru.pohsmp.core.spell.BlessingSpell.PATH, ru.pohsmp.core.spell.BlessingSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ExplosionSpell.PATH, ru.pohsmp.core.spell.ExplosionSpell::new);
     }
 

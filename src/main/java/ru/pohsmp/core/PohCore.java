@@ -41,6 +41,8 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.Disp.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.TabooSpell.TabooEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.SoulDevourSpell.SoulDevourEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.RiteSpell.RiteEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.SoulSeal.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MadnessSpell.MadnessEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.Marks.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.IllusionSpell.IllusionEvents.class);

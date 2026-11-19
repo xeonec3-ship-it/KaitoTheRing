@@ -8,7 +8,7 @@
    "delay": 0,
    "duration": 12000,
    "at": "caster",
-   "radius": 128,
+   "radius": 170,
    "color": "#1E4A5A",
    "strength": 0.28,
    "in": {
@@ -460,7 +460,7 @@
    "delay": 948,
    "duration": 40,
    "at": "caster+0,0,26",
-   "radius": 44,
+   "radius": 132,
    "thickness": 2.0,
    "color": "@primary",
    "brightness": 0.6,

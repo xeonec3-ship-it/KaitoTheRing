@@ -34,7 +34,7 @@ GATE_UP = 48
 GATE = f'caster+0,{GATE_UP},{FWD}'    # врата
 NIMBUS = f'caster+0,{GATE_UP + 17},{FWD}'    # магический круг НАД вратами, плашмя (решение владельца 19.11: не за вратами) — врата выходят из него вниз
 AREA = f'caster+0,0,{FWD}'           # центр площади ударов
-AREA_R = 44                          # радиус площади (было 22)
+AREA_R = 132                         # радиус площади выстрелов (владелец 19.11: ×3; было 44, ещё раньше 22)
 AFTER = 30                           # выстрелы продолжаются ещё 30 с после конца заклинания (владелец 19.11)
 
 
@@ -45,7 +45,7 @@ def el(**kw):
 def build():
     rnd = random.Random(1300)
     # мир в бирюзовую ночь — у всех в радиусе ролика; к концу возвращается
-    el(type='tint', delay=0, duration=T(65), at='caster', radius=128, color='#1E4A5A', strength=0.28,
+    el(type='tint', delay=0, duration=T(65), at='caster', radius=170, color='#1E4A5A', strength=0.28,
        **{'in': {'duration': T(6), 'easing': 'easeInOutSine'}, 'out': {'duration': T(2.5), 'easing': 'easeInSine'}})
     # 0–14 с: редкие искры у ведьмы
     el(type='sprites', delay=0, duration=T(14), at='caster+0,0.8,0', texture='@sparks', count=60, rate=0.25, spread=2.2,
@@ -123,7 +123,7 @@ def build():
     # не дают: наведённые залпы в врагов пускает код (fx/silent_gate_beam.json), случайные удары по площади — beam_rain ниже
     # Печати-«блюдца» по всему небу; из КАЖДОЙ — свой луч прямо вниз до земли, градом и вразнобой (как в аниме и в видео мода:
     # лучи вспыхивают по одному в разные моменты под своими печатями, а не все вместе). Наведённые лучи во врагов — отдельно (код).
-    for i in range(90):
+    for i in range(220):                 # площадь ×9 — печатей больше (было 90), но не ×9, чтобы не перегружать клиент
         r = 6 + (AREA_R - 6) * math.sqrt(rnd.random())
         a = rnd.uniform(0, 2 * math.pi)
         x, z = r * math.cos(a), r * math.sin(a)

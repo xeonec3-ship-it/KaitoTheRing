@@ -719,5 +719,9 @@
   "subtitles.pohsmp_core.spell.illusion_decoy.hit_magic": "Illusion: decoy: spell weaves",
   "subtitles.pohsmp_core.spell.phantom_trap.cast": "Phantom Trap: spell weaves",
   "subtitles.pohsmp_core.spell.phantom_trap.hit": "Phantom Trap: heavy strike",
-  "subtitles.pohsmp_core.spell.phantom_trap.loop": "Phantom Trap: chains rattle"
+  "subtitles.pohsmp_core.spell.phantom_trap.loop": "Phantom Trap: chains rattle",
+  "subtitles.pohsmp_core.spell.gale_ward.cast": "Gale Ward: whoosh",
+  "subtitles.pohsmp_core.spell.gale_ward.loop": "Gale Ward: whoosh",
+  "subtitles.pohsmp_core.spell.wind_mark.cast": "Wind Mark: whoosh",
+  "subtitles.pohsmp_core.spell.wind_mark.loop": "Wind Mark: whoosh"
 }

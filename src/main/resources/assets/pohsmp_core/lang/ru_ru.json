@@ -719,5 +719,9 @@
   "subtitles.pohsmp_core.spell.illusion_decoy.hit_magic": "Иллюзия: приманка: плетётся заклятие",
   "subtitles.pohsmp_core.spell.phantom_trap.cast": "Призрачный капкан: плетётся заклятие",
   "subtitles.pohsmp_core.spell.phantom_trap.hit": "Призрачный капкан: тяжёлый удар",
-  "subtitles.pohsmp_core.spell.phantom_trap.loop": "Призрачный капкан: звенят цепи"
+  "subtitles.pohsmp_core.spell.phantom_trap.loop": "Призрачный капкан: звенят цепи",
+  "subtitles.pohsmp_core.spell.gale_ward.cast": "Вихревой заслон: свист",
+  "subtitles.pohsmp_core.spell.gale_ward.loop": "Вихревой заслон: свист",
+  "subtitles.pohsmp_core.spell.wind_mark.cast": "Метка ветра: свист",
+  "subtitles.pohsmp_core.spell.wind_mark.loop": "Метка ветра: свист"
 }

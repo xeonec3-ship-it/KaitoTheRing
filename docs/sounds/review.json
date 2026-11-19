@@ -2473,5 +2473,97 @@
   "replaces": [
    "CHAIN_PLACE"
   ]
+ },
+ {
+  "school": "wind",
+  "school_ru": "Ветер",
+  "spell": "gale_ward",
+  "spell_ru": "Вихревой заслон",
+  "event": "pohsmp_core:spell.gale_ward.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/wind/gale_ward_cast_1.ogg",
+   "spell/wind/gale_ward_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/gale_ward_cast_1.mp3",
+   "docs/sounds/mp3/gale_ward_cast_2.mp3"
+  ],
+  "what": "свист, взмах, порыв — начало каста (подпись школы: порывы и свист воздуха)",
+  "where": "GaleWardSpell.java onCast()",
+  "replaces": [
+   "ELYTRA_FLYING"
+  ]
+ },
+ {
+  "school": "wind",
+  "school_ru": "Ветер",
+  "spell": "gale_ward",
+  "spell_ru": "Вихревой заслон",
+  "event": "pohsmp_core:spell.gale_ward.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/wind/gale_ward_loop_1.ogg",
+   "spell/wind/gale_ward_loop_2.ogg",
+   "spell/wind/gale_ward_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/gale_ward_loop_1.mp3",
+   "docs/sounds/mp3/gale_ward_loop_2.mp3",
+   "docs/sounds/mp3/gale_ward_loop_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — пока действует (тики) (подпись школы: порывы и свист воздуха)",
+  "where": "GaleWardSpell.java tick()",
+  "replaces": [
+   "PHANTOM_FLAP"
+  ]
+ },
+ {
+  "school": "wind",
+  "school_ru": "Ветер",
+  "spell": "wind_mark",
+  "spell_ru": "Метка ветра",
+  "event": "pohsmp_core:spell.wind_mark.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/wind/wind_mark_cast_1.ogg",
+   "spell/wind/wind_mark_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_mark_cast_1.mp3",
+   "docs/sounds/mp3/wind_mark_cast_2.mp3"
+  ],
+  "what": "свист, взмах, порыв — начало каста (подпись школы: порывы и свист воздуха)",
+  "where": "WindMarkSpell.java onCast()",
+  "replaces": [
+   "ENDER_DRAGON_FLAP"
+  ]
+ },
+ {
+  "school": "wind",
+  "school_ru": "Ветер",
+  "spell": "wind_mark",
+  "spell_ru": "Метка ветра",
+  "event": "pohsmp_core:spell.wind_mark.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/wind/wind_mark_loop_1.ogg",
+   "spell/wind/wind_mark_loop_2.ogg",
+   "spell/wind/wind_mark_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/wind_mark_loop_1.mp3",
+   "docs/sounds/mp3/wind_mark_loop_2.mp3",
+   "docs/sounds/mp3/wind_mark_loop_3.mp3"
+  ],
+  "what": "свист, взмах, порыв — пока действует (тики) (подпись школы: порывы и свист воздуха)",
+  "where": "WindMarkSpell.java tick()",
+  "replaces": [
+   "PHANTOM_FLAP"
+  ]
  }
 ]

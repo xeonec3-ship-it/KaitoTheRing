@@ -1922,5 +1922,65 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.gale_ward.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.gale_ward.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/wind/gale_ward_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/wind/gale_ward_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.gale_ward.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.gale_ward.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/wind/gale_ward_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/wind/gale_ward_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/wind/gale_ward_loop_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.wind_mark.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.wind_mark.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/wind/wind_mark_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/wind/wind_mark_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.wind_mark.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.wind_mark.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/wind/wind_mark_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/wind/wind_mark_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/wind/wind_mark_loop_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

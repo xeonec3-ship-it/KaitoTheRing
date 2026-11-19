@@ -250,13 +250,19 @@ public final class ElementDraw {
         }
         double grow = el.num("grow", 0);
         double k = grow > 0 ? FxDraw.clamp01(te / grow) : 1;
-        Vec3 end = FxDraw.lerp(from, to, Easing.EASE_OUT_CUBIC.apply(k));
+        Easing ease = p.has("easing") ? Easing.byName(el.str("easing", "")) : Easing.EASE_OUT_CUBIC;
+        double tail = el.num("tail", 0);     // > 0: only the last `tail` share of the path is drawn (a falling star, not a rope)
+        double ke = ease.apply(k);
+        Vec3 end = FxDraw.lerp(from, to, ke);
+        if (tail > 0) from = FxDraw.lerp(from, to, Math.max(0, ke - tail));
         double w = el.num("width", 0.4) * s, core = el.num("core", 0.35), taper = el.num("taper", 0);
         double fl = el.num("flicker", 0);
         double al = a * (1 - fl * 0.5 * (1 + Math.sin(te * 1.7)));
-        FxDraw.line(f.add(FxDraw.tex("beam")), f, from, end, w, w * (1 - taper), col, al * 0.7, al * 0.7, 0, 1);
-        FxDraw.line(f.add(FxDraw.WHITE), f, from, end, w * core, w * core * (1 - taper), col, al, al, 0, 1);
-        FxDraw.billboard(f.add(FxDraw.tex("glow")), f, end, w * 1.6, 0, col, al * 0.6);
+        double w0 = tail > 0 ? w * (1 - taper) : w, w1 = tail > 0 ? w : w * (1 - taper);   // a star's trail narrows behind the head
+        double fade = tail > 0 ? 0.15 : 1;   // and fades out there
+        FxDraw.line(f.add(FxDraw.tex("beam")), f, from, end, w0, w1, col, al * 0.7 * fade, al * 0.7, 0, 1);
+        FxDraw.line(f.add(FxDraw.WHITE), f, from, end, w0 * core, w1 * core, col, al * fade, al, 0, 1);
+        FxDraw.billboard(f.add(FxDraw.tex("glow")), f, end, w * 1.6 * el.num("head", 1), 0, col, al * 0.6);
     }
 
     private static void beamRain(Frame f, FxRun run, Element el, State st, double te, double L, Vec3 at, double s, int col, double a, long seed) {
@@ -406,7 +412,8 @@ public final class ElementDraw {
     private static void decal(Frame f, Element el, double te, double L, Vec3 at, double s, int col, double a) {
         double fade = el.num("fadeOut", 0);
         double k = L > 0 && fade > 0 ? FxDraw.clamp01((L - te) / fade) : 1;
-        FxDraw.disc(f.add(FxDraw.tex(el.str("texture", "core"))), f, at.add(0, 0.04, 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1),
+        var tex = FxDraw.tex(el.str("texture", "core"));
+        FxDraw.disc("translucent".equals(el.str("blend", "")) ? f.trans(tex) : f.add(tex), f, at.add(0, 0.04 + el.num("lift", 0), 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1),
                 el.num("radius", 2) * s, 0, col, a * k);
     }
 }

@@ -54,6 +54,7 @@ public final class DownfallCut {
         casterPos = c != null ? c.position() : mc.player.position();
         Vec3 d = rift.subtract(casterPos).multiply(1, 0, 1);
         dir = d.lengthSqr() < 1e-4 ? new Vec3(-Math.cos(m.f), 0, -Math.sin(m.f)) : d.normalize();
+        if (scene == STAR) dir = new Vec3(Math.cos(m.f), 0, Math.sin(m.f));   // the server's caster -> impact, so the star path matches the fx
         portalYaw = m.f;
         active = true;
     }
@@ -98,7 +99,12 @@ public final class DownfallCut {
         double baseYaw = Math.atan2(dir.z, dir.x);
         Vec3 pos, look;
         double roll = 0, shake = 0;
-        if (scene == 5) {
+        if (scene == STAR) {
+            Vec3[] pl = star(t, c, rift, dir, side, baseYaw);
+            pos = pl[0];
+            look = pl[1];
+            shake = pl[2].x;
+        } else if (scene == 5) {
             Vec3[] pl = coven(t / 20.0, ce, pt);
             pos = pl[0];
             look = pl[1];
@@ -234,6 +240,48 @@ public final class DownfallCut {
         return new Vec3[] {pos, look, new Vec3(shake, 0, 0)};
     }
 
+    /** Scene 6, Star Fall. Timeline and sky point as in spell/StarFallSpell (CAST 160, the star from 100, impact at 160, 40 more). */
+    private static final int STAR = 6, SF_CAST = 160, SF_FALL_AT = 100;
+    private static final double SF_SKY_BACK = 45, SF_SKY_UP = 90;
+
+    /** The star's head at tick t (ease-in-cubic from the sky point to the impact, like the fx beam). */
+    private static Vec3 starHead(double t, Vec3 p, Vec3 dir) {
+        Vec3 s = p.add(dir.scale(SF_SKY_BACK)).add(0, SF_SKY_UP, 0);
+        double k = Math.max(0, Math.min(1, (t - SF_FALL_AT) / (SF_CAST - SF_FALL_AT)));
+        return s.lerp(p, k * k * k);
+    }
+
+    /**
+     * Star Fall shots by tick t. c: caster, p: impact point, dir: caster -> impact. 1: close-up of the caster (hands to the sky);
+     * 2: the camera climbs behind the caster into the sky; 3: from the side, following the falling star and its trail;
+     * 4: low side view of the impact, shaking after the hit. Returns camera position, look point and (shake, 0, 0).
+     */
+    private static Vec3[] star(double t, Vec3 c, Vec3 p, Vec3 dir, Vec3 side, double yaw) {
+        Vec3 s = p.add(dir.scale(SF_SKY_BACK)).add(0, SF_SKY_UP, 0);
+        Vec3 pos, look;
+        double shake = 0;
+        if (t < 40) {
+            double k = smooth(t / 40), a = yaw + Math.toRadians(-70 + 100 * k);
+            pos = c.add(Math.cos(a) * 3.2, 1.5 + 0.3 * k, Math.sin(a) * 3.2);
+            look = c.add(0, 1.5 + 0.6 * k, 0);
+        } else if (t < SF_FALL_AT) {
+            double k = smooth((t - 40) / (SF_FALL_AT - 40));
+            pos = c.subtract(dir.scale(3 + 6 * k)).add(side.scale(1.5)).add(0, 1.6 + 42 * k, 0);
+            look = c.add(0, 2.5, 0).lerp(s, k);
+            shake = 0.02;
+        } else if (t < 150) {
+            double u = smooth((t - SF_FALL_AT) / (150.0 - SF_FALL_AT));
+            pos = s.lerp(p, 0.25 + 0.45 * u).add(side.scale(38)).subtract(dir.scale(8));
+            look = starHead(t, p, dir);
+        } else {
+            double k = smooth((t - 150) / 50.0);
+            pos = p.add(side.scale(16 + 4 * k)).subtract(dir.scale(3)).add(0, 2.5 + 1.5 * k, 0);
+            look = p.add(0, 2 + 3 * k, 0);
+            if (t >= SF_CAST) shake = 0.4 * Math.max(0, 1 - (t - SF_CAST) / 18.0);
+        }
+        return new Vec3[] {pos, look, new Vec3(shake, 0, 0)};
+    }
+
     /** Shot boundaries (fractions of the cast) shared by the scenes 1-3. */
     private static final double[] CUTS = {0, 0.16, 0.32, 0.5, 0.68, 0.84, 1.0001};
 
@@ -294,8 +342,8 @@ public final class DownfallCut {
     }
 
     private static final String[] TITLES = {"fx.pohsmp_core.downfall.title", "fx.pohsmp_core.milky_way.title", "fx.pohsmp_core.soul_devour.title", "fx.pohsmp_core.divine_taboo.title",
-            "fx.pohsmp_core.space_closure.title"};
-    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF};
+            "fx.pohsmp_core.space_closure.title", "fx.pohsmp_core.coven_arrival.title", "fx.pohsmp_core.star_fall.title"};
+    private static final int[] TITLE_COLORS = {0xD4A017, 0xB89CFF, 0x7FF2EA, 0xFFE38A, 0xA890FF, 0xB49BFF, 0xCFE6FF};
 
     /** Lift the camera out of solid blocks (up to 6). */
     private static Vec3 free(ClientLevel lvl, Vec3 p) {

@@ -1,0 +1,20 @@
+{
+  "comment": "Без пепла: столб синего огня (14 урона в радиусе 1.5, горение 5 с). Огонь остаётся огнём: сплошной столб, завеса рваных языков-лучей, синие огоньки взлетают, вспышка и пузырь жара; в основании — печать огня, после — светящийся след печати на земле (пепла нет). Огненные кольца — отдельные sigils/higher_ashless_ring.json.",
+  "style": "higher",
+  "duration": 70,
+  "elements": [
+    { "type": "flash", "delay": 0, "duration": 12, "at": "caster+0,1,0", "size": 5, "anamorphic": 10, "rays": 10, "screen": 0.25, "color": "#CFE8FF" },
+    { "type": "wave", "shape": "sphere", "delay": 0, "duration": 12, "at": "caster+0,0.5,0", "radius": 3, "rim": 1.0, "color": "#4DA6FF" },
+    { "type": "sigil", "id": "higher_ashless_core", "delay": 0, "at": "caster+0,0.05,0" },
+    { "type": "column", "delay": 0, "duration": 26, "at": "caster", "radius": 1.5, "height": 14, "fill": 2, "rings": 3, "ringSpeed": 10, "color": "#4DA6FF",
+      "in": { "duration": 3, "easing": "easeOutCubic" }, "out": { "duration": 12, "easing": "easeInSine" } },
+    { "type": "curtain", "delay": 0, "duration": 26, "at": "caster", "count": 30, "radius": [0.3, 1.5], "height": 9, "grow": 6,
+      "width": [0.1, 0.3], "brightness": [0.5, 1.0], "texture": "beam_fade", "flicker": 0.7, "color": "#6FB8FF",
+      "out": { "duration": 10, "easing": "easeInSine" } },
+    { "type": "sprites", "delay": 0, "duration": 26, "at": "caster", "texture": "soul_mote", "count": 90, "rate": 4, "area": 1.5, "speed": 0.01,
+      "gravity": -0.01, "size": [0.6, 0.1], "life": 24, "color": "#4DA6FF" },
+    { "type": "sprites", "delay": 0, "duration": 30, "at": "caster+0,1,0", "texture": "spark_soft", "count": 40, "rate": 0, "spread": 0.6, "speed": 0.2,
+      "gravity": 0.006, "size": [0.2, 0.04], "life": 24, "color": "#CFE8FF" },
+    { "type": "decal", "delay": 20, "duration": 50, "at": "caster", "texture": "ashless_sigil", "radius": 2.2, "fadeOut": 44, "color": "#2A6ABF" }
+  ]
+}

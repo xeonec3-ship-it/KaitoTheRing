@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Rune mage: 1.5 s cast, a circle of 6 runes under the target. For 8 s no Iron's or MNA casting and no drinking.
@@ -62,9 +62,8 @@ public class SealSpell extends HigherSpell {
         if (!(level instanceof ServerLevel sl)) return;
         LivingEntity t = target(sl, md);
         if (t == null) return;
-        int k = key();
-        TELE.put(entity.getUUID(), k);
-        fx(sl, t.getX(), t.getY(), t.getZ(), new Net.HFx(Net.HFx.TELE, k, -1, t.getId(), CAST, t.getX(), t.getY(), t.getZ(), R, COLOR));
+        Integer old = TELE.put(entity.getUUID(), Fx.play(sl, Fx.fx("higher_seal_cast").at(t.position()).caster(entity).target(t)));
+        if (old != null) Fx.stop(sl, old, "");
     }
 
     @Override
@@ -79,7 +78,7 @@ public class SealSpell extends HigherSpell {
     @Override
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity entity, MagicData md, boolean cancelled) {
         Integer k = TELE.remove(entity.getUUID());
-        if (k != null && level instanceof ServerLevel sl) stop(sl, entity.getX(), entity.getY(), entity.getZ(), k);
+        if (k != null && level instanceof ServerLevel sl) Fx.stop(sl, k, "");
         super.onServerCastComplete(level, spellLevel, entity, md, cancelled);
     }
 
@@ -91,8 +90,15 @@ public class SealSpell extends HigherSpell {
             MobEffect s = ForgeRegistries.MOB_EFFECTS.getValue(MNA_SILENCE);
             if (s != null) t.addEffect(new MobEffectInstance(s, LIFE, 0, false, false, false));
         }
-        int k = key();
-        fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.SEAL, k, -1, -1, LIFE, c.x, c.y, c.z, R, 63));
+        // the circle, then one effect per rune (socket, pillar, rune, chain to the target) so a broken rune can be stopped alone
+        int ward = Fx.play(sl, Fx.fx("higher_seal").at(c));
+        Fx.owner(ward, caster.getUUID());
+        int[] runes = new int[6];
+        for (int i = 0; i < 6; i++) {
+            double a = i * Math.PI / 3;
+            runes[i] = Fx.play(sl, Fx.fx("higher_seal_rune_" + i).at(c.add(Math.cos(a) * R, 0, Math.sin(a) * R)).target(t));
+            Fx.owner(runes[i], caster.getUUID());
+        }
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 2f, 1.4f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.7f, 0.6f);
         Tasks.add(new Tasks.Task() {
@@ -102,7 +108,7 @@ public class SealSpell extends HigherSpell {
             public boolean tick() {
                 age++;
                 if (!t.isAlive() || t.isRemoved() || t.level() != sl || age >= LIFE || !t.hasEffect(Reg.SEAL.get())) {
-                    stop(sl, c.x, c.y, c.z, k);
+                    end();
                     return false;
                 }
                 if (age % 5 == 0) for (int i = 0; i < 6; i++) if ((mask & (1 << i)) != 0) {
@@ -126,7 +132,8 @@ public class SealSpell extends HigherSpell {
                 mask &= ~(1 << best);
                 double ra = best * Math.PI / 3, rx = c.x + Math.cos(ra) * R, rz = c.z + Math.sin(ra) * R;
                 hurt(sl, caster, t, dmg(DMG));
-                burst(sl, rx, c.y + 0.3, rz, 1.8, COLOR);
+                Fx.stop(sl, runes[best], "");
+                Fx.play(sl, Fx.fx("higher_seal_break").at(new Vec3(rx, c.y, rz)));
                 sl.playSound(null, rx, c.y, rz, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.5f, 0.7f);
                 sl.playSound(null, rx, c.y, rz, SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, SoundSource.PLAYERS, 0.8f, 1.2f);
                 DivineEvents.particle(sl, ParticleTypes.CRIT, rx, c.y + 0.6, rz, 25, 0.3, 0.3);
@@ -137,11 +144,15 @@ public class SealSpell extends HigherSpell {
                     t.setDeltaMovement(Vec3.ZERO);
                 }
                 if (mask == 0) {
-                    stop(sl, c.x, c.y, c.z, k);
+                    end();
                     return false;
                 }
-                fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.SEAL, k, -1, -1, LIFE - age, c.x, c.y, c.z, R, mask));
                 return true;
+            }
+
+            private void end() {
+                Fx.stop(sl, ward, "");
+                for (int i = 0; i < 6; i++) if ((mask & (1 << i)) != 0) Fx.stop(sl, runes[i], "");
             }
         });
     }

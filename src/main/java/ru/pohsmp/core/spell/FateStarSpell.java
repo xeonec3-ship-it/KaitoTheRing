@@ -22,7 +22,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.DivineEvents;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Astrologer: a constellation lights up over the target for 3 s, then a star falls (20 in r3, thrown up).
@@ -78,8 +78,8 @@ public class FateStarSpell extends HigherSpell {
     }
 
     private void star(ServerLevel sl, LivingEntity caster, LivingEntity t, int card, boolean main) {
-        int k = key();
-        fx(sl, t.getX(), t.getY(), t.getZ(), new Net.HFx(Net.HFx.STAR, k, -1, t.getId(), FALL, t.getX(), t.getY(), t.getZ(), R, card));
+        // constellation over the target, the card under it, the falling star at FALL - 14 and the impact at FALL (fx/higher_fate_<card>.json)
+        Fx.play(sl, Fx.fx("higher_fate_" + CARD[card]).at(t.position()).caster(caster).target(t));
         Tasks.add(new Tasks.Task() {
             int age;
             Vec3 last = t.position();
@@ -97,7 +97,6 @@ public class FateStarSpell extends HigherSpell {
     }
 
     private void impact(ServerLevel sl, LivingEntity caster, LivingEntity main, int card, boolean primary, Vec3 c) {
-        burst(sl, c.x, c.y + 0.2, c.z, R + 1, CARD_COLOR[card]);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIREWORK_ROCKET_LARGE_BLAST, SoundSource.PLAYERS, 3f, 0.7f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 1.5f, 1.5f);
         DivineEvents.particle(sl, ParticleTypes.END_ROD, c.x, c.y + 0.5, c.z, 60, 0.3, 0.35);

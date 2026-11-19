@@ -23,13 +23,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /** Dream mage: 2 s cast, the target sleeps 4 s; a hit wakes it with +50% damage, otherwise it wakes in dread and is thrown back. */
 public class CradleSpell extends HigherSpell {
     public static final String PATH = "nightmare_cradle";
     private static final int CAST = 40, SLEEP = 80, DREAD = 120;
-    private static final int COLOR = 0x8A4DFF;
     private static final Map<UUID, Integer> TELE = new HashMap<>();
 
     public CradleSpell() {
@@ -56,9 +55,8 @@ public class CradleSpell extends HigherSpell {
         if (!(level instanceof ServerLevel sl)) return;
         LivingEntity t = target(sl, md);
         if (t == null) return;
-        int k = key();
-        TELE.put(entity.getUUID(), k);
-        fx(sl, t.getX(), t.getY(), t.getZ(), new Net.HFx(Net.HFx.TELE, k, -1, t.getId(), CAST, t.getX(), t.getY(), t.getZ(), 1.6, COLOR));
+        Integer old = TELE.put(entity.getUUID(), Fx.play(sl, Fx.fx("higher_cradle_cast").at(t.position()).caster(entity).target(t)));
+        if (old != null) Fx.stop(sl, old, "");
     }
 
     @Override
@@ -73,7 +71,7 @@ public class CradleSpell extends HigherSpell {
     @Override
     public void onServerCastComplete(Level level, int spellLevel, LivingEntity entity, MagicData md, boolean cancelled) {
         Integer k = TELE.remove(entity.getUUID());
-        if (k != null && level instanceof ServerLevel sl) stop(sl, entity.getX(), entity.getY(), entity.getZ(), k);
+        if (k != null && level instanceof ServerLevel sl) Fx.stop(sl, k, "");
         super.onServerCastComplete(level, spellLevel, entity, md, cancelled);
     }
 
@@ -92,8 +90,9 @@ public class CradleSpell extends HigherSpell {
         t.removeEffect(Reg.NIGHTMARE.get());
         t.addEffect(new MobEffectInstance(Reg.NIGHTMARE.get(), SLEEP + 10, 0, false, true, true));
         hide(t, true);
-        int k = key();
-        fx(sl, t.getX(), t.getY(), t.getZ(), new Net.HFx(Net.HFx.SLEEP, k, -1, t.getId(), SLEEP, t.getX(), t.getY(), t.getZ(), 0, COLOR));
+        // the sleeper is the effect's "caster": its sigils follow it and the moon crown sits over its eyes
+        int k = Fx.play(sl, Fx.fx("higher_cradle_sleep").at(t.position()).caster(t));
+        Fx.owner(k, caster.getUUID());
         sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.ILLUSIONER_CAST_SPELL, SoundSource.PLAYERS, 1.5f, 0.6f);
         Tasks.add(new Tasks.Task() {
             int age;
@@ -102,13 +101,14 @@ public class CradleSpell extends HigherSpell {
             public boolean tick() {
                 age++;
                 if (!t.isAlive() || t.isRemoved() || t.level() != sl) {
-                    stop(sl, t.getX(), t.getY(), t.getZ(), k);
+                    Fx.stop(sl, k, "");
                     return false;
                 }
                 double cy = t.getY() + t.getBbHeight() + 0.3;
                 if (!t.hasEffect(Reg.NIGHTMARE.get())) {
                     hide(t, false);
-                    stop(sl, t.getX(), t.getY(), t.getZ(), k);
+                    Fx.stop(sl, k, "");
+                    Fx.play(sl, Fx.fx("higher_cradle_shatter").at(t.position()).caster(t));
                     sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1f, 0.6f);
                     DivineEvents.particle(sl, ParticleTypes.WITCH, t.getX(), cy, t.getZ(), 20, 0.4, 0.05);
                     return false;
@@ -122,8 +122,8 @@ public class CradleSpell extends HigherSpell {
                 Vec3 d = new Vec3(t.getX() - caster.getX(), 0, t.getZ() - caster.getZ());
                 d = d.lengthSqr() < 1e-4 ? new Vec3(1, 0, 0) : d.normalize();
                 push(t, d.scale(1.3).add(0, 0.45, 0));
-                stop(sl, t.getX(), t.getY(), t.getZ(), k);
-                burst(sl, t.getX(), t.getY() + t.getBbHeight() / 2, t.getZ(), 2.5, COLOR);
+                Fx.stop(sl, k, "");
+                Fx.play(sl, Fx.fx("higher_cradle_dread").at(t.position()).caster(t));
                 sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.WARDEN_ROAR, SoundSource.PLAYERS, 1f, 1.6f);
                 return false;
             }

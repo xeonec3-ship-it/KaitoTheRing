@@ -1,0 +1,14 @@
+{
+  "comment": "Вознесение: приземление — печать с крыльями размером с радиус лечения (5) раскрывается ударом, кольцо рун прорисовывается, затем мягко гаснет.",
+  "size": 5.0, "color": "#FFF2B0", "orientation": "ground", "lifetime": -1, "hold": 20,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.7, "color": "#FFD36B", "brightness": 0.8,
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "wings", "type": "disc", "texture": "asc_wings", "radius": 0.92, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": 6 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.05, "inner": 0.97, "repeat": 12, "heightOffset": 0.02, "color": "#FFFBE6",
+      "appear": { "delay": 4, "duration": 12, "easing": "easeInOutSine", "modes": ["draw"] }, "rotation": { "speed": -4 } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.2, "duration": 14, "sparks": 40 },
+  "dissolve": { "modes": ["reverse", "fade"], "duration": 20, "stagger": 4 }
+}

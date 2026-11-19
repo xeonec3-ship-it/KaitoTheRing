@@ -1,0 +1,14 @@
+{
+  "comment": "Колыбель кошмара: тусклая колыбельная печать под спящей целью, медленно дышит; гаснет при пробуждении.",
+  "size": 1.5, "color": "#8A4DFF", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.0, "color": "#1A0640", "brightness": 1.4,
+      "appear": { "delay": 0, "duration": 12, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.4, "period": 40 } },
+    { "id": "dream", "type": "disc", "texture": "cradle_dream", "radius": 0.9, "heightOffset": 0.01, "brightness": 0.75,
+      "appear": { "delay": 0, "duration": 12, "easing": "easeOutCubic", "modes": ["fade", "twist"], "twist": 60 }, "rotation": { "speed": -6 },
+      "pulse": { "amp": 0.25, "period": 40 } },
+    { "id": "moons", "type": "band", "texture": "cradle_moon_band", "radius": 1.06, "inner": 0.92, "repeat": 4, "heightOffset": 0.02, "color": "#C8A8FF",
+      "brightness": 0.7, "appear": { "delay": 4, "duration": 12, "easing": "easeOutCubic", "modes": ["fade"] }, "rotation": { "speed": 9 } }
+  ],
+  "dissolve": { "modes": ["fade", "collapse"], "duration": 14 }
+}

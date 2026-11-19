@@ -1,0 +1,12 @@
+{
+  "comment": "Без пепла, каст 1.5 с: под целью рисуется печать синего огня, над ней поднимаются синие огоньки, у руки мага тлеют искры. Останавливается в конце каста или при срыве.",
+  "style": "higher",
+  "duration": 30,
+  "elements": [
+    { "type": "sigil", "id": "higher_ashless_mark", "delay": 0, "at": "target+0,0.05,0", "follow": true },
+    { "type": "sprites", "delay": 2, "at": "target", "follow": true, "texture": "soul_mote", "count": 50, "rate": 1.8, "area": 1.6, "speed": 0.004,
+      "gravity": -0.004, "size": [0.28, 0.05], "life": 18, "color": "#4DA6FF" },
+    { "type": "sprites", "delay": 0, "at": "caster.hand", "follow": true, "texture": "spark_soft", "count": 30, "rate": 1, "spread": 0.15, "speed": 0.01,
+      "gravity": -0.002, "size": [0.15, 0.03], "life": 10, "color": "#8FC8FF" }
+  ]
+}

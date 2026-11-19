@@ -1,0 +1,108 @@
+{
+ "comment": "Звезда судьбы, карта Луны: полумесяц, звёзды и капли росы, удар ослепляет. Ложится под цель, пока горит созвездие.",
+ "size": 2.4,
+ "color": "#A8C8FF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.7,
+   "color": "#E8F0FF",
+   "brightness": 0.5,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 16
+   }
+  },
+  {
+   "id": "card",
+   "type": "disc",
+   "texture": "fate_card_moon",
+   "radius": 0.8,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 0,
+    "duration": 24,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": 5
+   }
+  },
+  {
+   "id": "houses",
+   "type": "disc",
+   "texture": "fate_constellation",
+   "radius": 1.0,
+   "heightOffset": 0.02,
+   "color": "#E8F0FF",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 10,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "twist"
+    ],
+    "twist": -120
+   },
+   "rotation": {
+    "speed": -8
+   }
+  },
+  {
+   "id": "orbit",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.1,
+   "width": 0.025,
+   "heightOffset": 0.03,
+   "count": 4,
+   "arcLength": 60,
+   "appear": {
+    "delay": 20,
+    "duration": 22,
+    "easing": "easeInOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 20,
+    "boost": 4
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#E8F0FF",
+  "size": 1.2,
+  "duration": 10,
+  "sparks": 20
+ },
+ "dissolve": {
+  "modes": [
+   "shatter"
+  ],
+  "duration": 12
+ }
+}

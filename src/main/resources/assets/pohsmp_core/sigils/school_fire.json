@@ -1,0 +1,111 @@
+{
+ "comment": "Знак школы «fire» под магом при каждом касте обычной магии: огонь: языки пламени по ободу, искры-огоньки вверх. Прорисовка пером, лента школы навстречу, дуги смыкаются.",
+ "size": 1.9,
+ "color": "#FF7A2A",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": 12,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.8,
+   "heightOffset": 0.0,
+   "color": "#7A1E00",
+   "brightness": 1.2,
+   "appear": {
+    "delay": 0,
+    "duration": 5,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "sign",
+   "type": "disc",
+   "texture": "sigil_fire",
+   "radius": 0.86,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 0,
+    "duration": 9,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": 1
+   },
+   "rotation": {
+    "speed": 40,
+    "boost": 3
+   }
+  },
+  {
+   "id": "band",
+   "type": "band",
+   "texture": "school_fire_band",
+   "radius": 1.12,
+   "inner": 0.9,
+   "repeat": 6,
+   "heightOffset": 0.02,
+   "color": "#FFD27A",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 2,
+    "duration": 9,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 270,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": -24.0,
+    "boost": 2
+   }
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.22,
+   "width": 0.035,
+   "heightOffset": 0.03,
+   "count": 3,
+   "arcLength": 80,
+   "appear": {
+    "delay": 3,
+    "duration": 10,
+    "easing": "easeInOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 16.0,
+    "boost": 4
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFD27A",
+  "size": 1.3,
+  "duration": 8,
+  "sparks": 18
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

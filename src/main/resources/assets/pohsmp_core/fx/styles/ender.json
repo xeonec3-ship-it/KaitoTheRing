@@ -1,0 +1,21 @@
+{
+ "comment": "Школа Iron's «ender» для знаков при касте (fx/school_ender.json): Эндер: глаза и звёзды, искры затягивает к центру.",
+ "palette": {
+  "primary": "#C060FF",
+  "secondary": "#F0C8FF",
+  "core": "#FFFFFF",
+  "shadow": "#2A0A4A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_ender_band",
+  "shards": "spark_soft",
+  "sigil": "sigil_ender"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 1.0,
+  "jitter": 0.0,
+  "easing": "easeOutCubic"
+ }
+}

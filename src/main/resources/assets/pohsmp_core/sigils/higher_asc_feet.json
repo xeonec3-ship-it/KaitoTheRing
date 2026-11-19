@@ -1,0 +1,13 @@
+{
+  "comment": "Вознесение: круг-опора под ногами мага, летит вместе с ним — нимб с лучами и вращающиеся спицы.",
+  "size": 1.4, "color": "#FFF2B0", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 1.0, "color": "#FFD36B", "brightness": 0.7,
+      "appear": { "delay": 0, "duration": 6, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "halo", "type": "disc", "texture": "asc_halo", "radius": 1.0, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 8, "easing": "easeOutBack", "modes": ["grow"] }, "rotation": { "speed": 30 } },
+    { "id": "spokes", "type": "spokes", "texture": "spokes", "radius": 0.6, "heightOffset": 0.02, "color": "#FFFFFF", "brightness": 0.8,
+      "appear": { "delay": 2, "duration": 8, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "rotation": { "speed": -60 } }
+  ],
+  "dissolve": { "modes": ["collapse"], "duration": 10 }
+}

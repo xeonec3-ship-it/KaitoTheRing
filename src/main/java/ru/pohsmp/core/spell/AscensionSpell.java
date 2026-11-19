@@ -19,7 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /**
  * Holy mage: the caster rises ~6 blocks and hangs 3 s in a column of light; every 0.5 s a beam from the sky hits the nearest foe within 12 (5).
@@ -63,8 +63,7 @@ public class AscensionSpell extends HigherSpell {
         c.removeEffect(Reg.ASCENSION.get());
         c.addEffect(new MobEffectInstance(Reg.ASCENSION.get(), RISE + HOVER + FALL_MAX + 20, 0, false, true, true));
         hidden(c, MobEffects.LEVITATION, RISE, 6);
-        int k = key();
-        fx(sl, c.getX(), c.getY(), c.getZ(), new Net.HFx(Net.HFx.ASC, k, c.getId(), -1, RISE + HOVER, c.getX(), c.getY(), c.getZ(), 0, COLOR));
+        int k = Fx.play(sl, Fx.fx("higher_ascension").at(c.position()).caster(c));
         sl.playSound(null, c.getX(), c.getY(), c.getZ(), SoundEvents.PHANTOM_FLAP, SoundSource.PLAYERS, 2f, 0.6f);
         DivineEvents.particle(sl, ParticleTypes.CLOUD, c.getX(), c.getY() + 0.2, c.getZ(), 30, 0.6, 0.1);
         Tasks.add(new Tasks.Task() {
@@ -74,7 +73,7 @@ public class AscensionSpell extends HigherSpell {
             public boolean tick() {
                 age++;
                 if (!c.isAlive() || c.isRemoved() || c.level() != sl) {
-                    stop(sl, c.getX(), c.getY(), c.getZ(), k);
+                    Fx.stop(sl, k, "");
                     return false;
                 }
                 c.fallDistance = 0;
@@ -86,7 +85,7 @@ public class AscensionSpell extends HigherSpell {
                 if (age == RISE + HOVER) {
                     c.removeEffect(MobEffects.LEVITATION);
                     hidden(c, MobEffects.SLOW_FALLING, FALL_MAX, 0);
-                    stop(sl, c.getX(), c.getY(), c.getZ(), k);
+                    Fx.stop(sl, k, "");
                 }
                 if (age <= RISE + HOVER) return true;
                 if (!c.onGround() && !c.isInWater() && age < RISE + HOVER + FALL_MAX) return true;
@@ -100,8 +99,7 @@ public class AscensionSpell extends HigherSpell {
         LivingEntity t = around(sl, c.position(), BEAM_R, e -> foe(c, e) && c.hasLineOfSight(e)).stream()
                 .min(Comparator.comparingDouble(e -> e.distanceToSqr(c))).orElse(null);
         if (t == null) return;
-        fx(sl, t.getX(), t.getY(), t.getZ(), new Net.HFx(Net.HFx.PILLAR, key(), -1, -1, 14, t.getX(), t.getY() - 0.5, t.getZ(), 0.45, COLOR));
-        burst(sl, t.getX(), t.getY() + 0.1, t.getZ(), 1.5, COLOR);
+        Fx.play(sl, Fx.fx("higher_ascension_beam").at(t.position()));
         sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 2f, 1.4f);
         sl.playSound(null, t.getX(), t.getY(), t.getZ(), SoundEvents.FIREWORK_ROCKET_TWINKLE, SoundSource.PLAYERS, 1f, 1.2f);
         DivineEvents.particle(sl, ParticleTypes.END_ROD, t.getX(), t.getY() + 1, t.getZ(), 15, 0.2, 0.15);
@@ -112,7 +110,7 @@ public class AscensionSpell extends HigherSpell {
         c.removeEffect(MobEffects.SLOW_FALLING);
         c.removeEffect(MobEffects.LEVITATION);
         c.fallDistance = 0;
-        burst(sl, c.getX(), c.getY() + 0.1, c.getZ(), HEAL_R, COLOR);
+        Fx.play(sl, Fx.fx("higher_ascension_land").at(c.position()));
         sl.playSound(null, c.getX(), c.getY(), c.getZ(), SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 2f, 1.3f);
         sl.playSound(null, c.getX(), c.getY(), c.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 2f, 1.0f);
         for (LivingEntity e : around(sl, c.position(), HEAL_R, e -> ally(c, e))) {

@@ -1,0 +1,13 @@
+{
+  "comment": "Колыбель кошмара: удар разбудил цель (урон +50%) — сон бьётся, как стекло: вспышка у головы, фиолетовые осколки, пузырь. Играть с caster = цель.",
+  "style": "higher",
+  "duration": 30,
+  "elements": [
+    { "type": "flash", "delay": 0, "duration": 8, "at": "caster.eyes", "size": 2.2, "rays": 6, "color": "#E0CCFF" },
+    { "type": "wave", "shape": "sphere", "delay": 0, "duration": 10, "at": "caster+0,1,0", "radius": 1.6, "rim": 0.9, "color": "#B48CFF" },
+    { "type": "sprites", "delay": 0, "duration": 24, "at": "caster.eyes", "texture": "shard", "count": 30, "rate": 0, "spread": 0.3, "speed": 0.18,
+      "gravity": 0.012, "spin": 300, "size": [0.22, 0.06], "life": 22, "color": "#B48CFF" },
+    { "type": "sprites", "delay": 0, "duration": 24, "at": "caster.eyes", "texture": "crescent", "count": 10, "rate": 0, "spread": 0.2, "speed": 0.1,
+      "gravity": 0.006, "spin": 200, "size": [0.2, 0.05], "life": 20, "color": "#E0CCFF" }
+  ]
+}

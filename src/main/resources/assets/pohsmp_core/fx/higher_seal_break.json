@@ -1,0 +1,12 @@
+{
+  "comment": "Печать запрета: цель вышла из круга, ближайшая руна ломается (6 урона, цель возвращает внутрь) — вспышка, алые осколки, кольцо, трещины на земле. Точка эффекта — гнездо руны.",
+  "style": "higher",
+  "duration": 40,
+  "elements": [
+    { "type": "flash", "delay": 0, "duration": 8, "at": "caster+0,1.1,0", "size": 2.4, "rays": 8, "color": "#FF8A7A" },
+    { "type": "wave", "shape": "ring", "delay": 0, "duration": 12, "at": "caster", "radius": 2, "color": "#FF3B3B" },
+    { "type": "sprites", "delay": 0, "duration": 26, "at": "caster+0,1.1,0", "texture": "shard", "count": 24, "rate": 0, "spread": 0.3, "speed": 0.2,
+      "gravity": 0.015, "spin": 300, "size": [0.25, 0.06], "life": 24, "color": "#FF3B3B" },
+    { "type": "decal", "delay": 0, "duration": 50, "at": "caster", "texture": "higher_cracks", "radius": 1.2, "fadeOut": 30, "color": "#FF2A3A" }
+  ]
+}

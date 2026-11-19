@@ -1,0 +1,23 @@
+{
+  "comment": "Вознесение ветра: взлёт 1 с и 3 с в столбе света (AscensionSpell.RISE + HOVER = 80). Столб следует за магом (основание глубоко под ногами, кольца бегут вверх), большая печать с крыльями остаётся на земле, круг-опора под ногами, нимб над головой, крылья за спиной, на взлёте — порыв ветра: вихри и полосы вверх; всё время сыплются перья.",
+  "style": "divine",
+  "duration": 80,
+  "elements": [
+    { "type": "flash", "delay": 0, "duration": 10, "at": "caster+0,0.5,0", "size": 3, "rays": 8, "color": "#FFF2B0" },
+    { "type": "wave", "shape": "ring", "delay": 0, "duration": 16, "at": "caster", "radius": 4, "color": "#FFFBE6" },
+    { "type": "sigil", "id": "higher_asc_ground", "delay": 0, "at": "caster+0,0.05,0", "until": 80 },
+    { "type": "column", "delay": 2, "duration": 78, "at": "caster+0,-8,0", "follow": true, "radius": 1.1, "height": 48, "fill": 2, "rings": 4,
+      "ringSpeed": 8, "color": "#FFF2B0", "in": { "duration": 8, "easing": "easeOutCubic" }, "out": { "duration": 10, "easing": "easeInSine" } },
+    { "type": "sigil", "id": "higher_asc_feet", "delay": 0, "at": "caster+0,-0.1,0", "follow": true, "until": 80 },
+    { "type": "sigil", "id": "higher_asc_halo", "delay": 6, "at": "caster.eyes+0,0.55,0", "follow": true, "until": 80 },
+    { "type": "wings", "delay": 8, "duration": 72, "at": "caster", "follow": true, "size": 1.8, "flap": { "amp": 14, "period": 40 }, "color": "#FFF4D6",
+      "in": { "duration": 10, "easing": "easeOutCubic" }, "out": { "duration": 10, "easing": "easeInSine" } },
+    { "type": "curtain", "delay": 0, "duration": 26, "at": "caster", "follow": true, "count": 24, "radius": [1.4, 2.2], "height": 4, "grow": 10,
+      "width": [0.03, 0.06], "brightness": [0.3, 0.7], "texture": "beam_fade", "flicker": 0.6, "color": "#FFFFFF",
+      "out": { "duration": 10, "easing": "easeInSine" } },
+    { "type": "sprites", "delay": 0, "duration": 24, "at": "caster", "follow": true, "texture": "swirl", "count": 36, "rate": 1.5, "area": 1.5,
+      "speed": 0.01, "gravity": -0.006, "spin": 300, "size": [0.35, 0.1], "life": 20, "color": "#E8FFF8" },
+    { "type": "sprites", "delay": 10, "duration": 70, "at": "caster+0,3,0", "follow": true, "texture": "feather", "count": 70, "rate": 1, "area": 2.5,
+      "speed": 0.01, "gravity": 0.003, "spin": 40, "tumble": 0.6, "sway": 0.8, "size": [0.3, 0.2], "life": 50, "color": "#FFF8E0" }
+  ]
+}

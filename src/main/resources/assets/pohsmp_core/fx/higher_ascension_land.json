@@ -1,0 +1,15 @@
+{
+  "comment": "Вознесение: приземление, лечение 4 союзникам в радиусе 5 — печать с крыльями раскрывается по земле, кольцо-волна, тёплая вспышка, перья взлетают и опадают, огоньки исцеления поднимаются, на земле гаснет след крыльев.",
+  "style": "divine",
+  "duration": 60,
+  "elements": [
+    { "type": "flash", "delay": 0, "duration": 10, "at": "caster+0,0.4,0", "size": 3.4, "rays": 8, "anamorphic": 8, "color": "#FFF2B0" },
+    { "type": "wave", "shape": "ring", "delay": 0, "duration": 18, "at": "caster", "radius": 5.5, "color": "#FFF2B0" },
+    { "type": "sigil", "id": "higher_asc_land", "delay": 0, "at": "caster+0,0.05,0" },
+    { "type": "sprites", "delay": 0, "duration": 50, "at": "caster+0,0.3,0", "texture": "feather", "count": 24, "rate": 0, "spread": 0.4, "speed": 0.12,
+      "gravity": 0.006, "spin": 60, "tumble": 0.6, "sway": 0.6, "size": [0.35, 0.25], "life": 45, "color": "#FFF8E0" },
+    { "type": "sprites", "delay": 4, "duration": 40, "at": "caster", "texture": "spark_soft", "count": 50, "rate": 2, "area": 4.5, "speed": 0.004,
+      "gravity": -0.004, "size": [0.22, 0.05], "life": 26, "color": "#FFFBE0" },
+    { "type": "decal", "delay": 30, "duration": 60, "at": "caster", "texture": "asc_wings", "radius": 4.6, "fadeOut": 50, "color": "#8A6420" }
+  ]
+}

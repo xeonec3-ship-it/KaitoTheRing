@@ -7,7 +7,8 @@
 (idle / walk / run / cast), `textures/armor/silent_witch_armor.png` (128×128, своя прорисовка у каждой части) и `_glowmask.png`;
 превью — `tools/outfit_preview.html`. **Рендер:** юбка сидит на костях ног — в рендере брони ведьмы поворачивать
 `bipedRightLeg` / `bipedLeftLeg` только на 25 % от поворота ноги игрока (переопределить `applyBaseTransformations`), иначе платье на шаге
-разъезжается пополам (замечание владельца 19.11). Кости для кода: `cape`, `cape_low`, `hood_tip`, `hem_r`, `hem_l`, `nero`, `nero_head`, `nero_eyes`, `nero_tail`.
+разъезжается пополам (замечание владельца 19.11). И пока надеты поножи (юбка), **сам игрок шагает вдвое мельче** — поворот
+его ног ×0.5 (в `setupAnim` модели игрока / рендере), иначе нога на шаге выходит из-под платья наискосок. Кости для кода: `cape` (спина пелерины), `cape_fl` / `cape_fr` (передние полы пелерины), `cape_low`, `hood_tip`, `hem_r`, `hem_l`, `nero`, `nero_head`, `nero_eyes`, `nero_tail`.
 
 ## Предметы
 

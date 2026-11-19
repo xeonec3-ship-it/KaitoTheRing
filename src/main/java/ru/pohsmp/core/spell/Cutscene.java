@@ -21,7 +21,8 @@ import ru.pohsmp.core.net.Net;
 
 /**
  * Cast cutscenes of the great spells (client: DownfallCut). Every player within R of the caster is frozen in place,
- * cannot be hurt and watches the scene until it ends (or the cast stops). Scenes: 0 Downfall, 1 Milky Way, 2 Soul Devour, 3 Divine Taboo, 4 Closing of Space, 5 Coven Arrival, 6 Gate.
+ * cannot be hurt and watches the scene until it ends (or the cast stops). Scenes: 0 Downfall, 1 Milky Way, 2 Soul Devour, 3 Divine Taboo,
+ * 4 Closing of Space, 5 Coven Arrival, 6 Star Fall, 7 Gate.
  */
 public final class Cutscene {
     private Cutscene() {}
@@ -29,7 +30,7 @@ public final class Cutscene {
     public static final double R = 64;
     /** Coven Arrival: watchers within this of the arena and of the caster (the other scenes use R). */
     public static final double R_COVEN = 98;
-    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, SILENT_GATE = 6;
+    public static final int DOWNFALL = 0, MILKY_WAY = 1, SOUL_DEVOUR = 2, TABOO = 3, SPACE_CLOSURE = 4, COVEN_ARRIVAL = 5, STAR_FALL = 6, SILENT_GATE = 7;
 
     /**
      * Starts the scene for everyone within r of the caster (in the caster's level) or of `extra` in `extraLevel` (may be another dimension).
@@ -60,6 +61,11 @@ public final class Cutscene {
     public static void refreeze(ServerPlayer sp, Vec3 pos) {
         Frozen f = FROZEN.get(sp.getUUID());
         if (f != null) f.pos = pos;
+    }
+
+    /** Lets the watchers move, be hurt and be thrown again while their camera keeps playing (Star Fall: the impact inside the scene). */
+    public static void thaw(List<UUID> who) {
+        for (UUID u : who) FROZEN.remove(u);
     }
 
     /** Ends the scene for some watchers only (they left for another dimension). */

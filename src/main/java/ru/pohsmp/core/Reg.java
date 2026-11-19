@@ -128,6 +128,8 @@ public final class Reg {
     public static final RegistryObject<SchoolType> SILENT = SCHOOLS.register("silent", () -> new SchoolType(SILENT_ID, SILENT_FOCUS,
             Component.translatable("school.pohsmp_core.silent").withStyle(Style.EMPTY.withColor(SILENT_COLOR)),
             SILENT_POWER, SILENT_RESIST, () -> SoundEvents.AMETHYST_BLOCK_CHIME, SILENT_DAMAGE, false, false));
+    /** Black flame of Worgan: 1.5 damage a second, water does not put it out, milk does not cure it. */
+    public static final RegistryObject<MobEffect> BLACK_FLAME = EFFECTS.register("black_flame", ru.pohsmp.core.spell.silent.WorganFlameSpell.BlackFlame::new);
 
     /** Sounds of sounds.json that the code plays. */
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, PohCore.MODID);
@@ -222,8 +224,9 @@ public final class Reg {
             ru.pohsmp.core.spell.OblivionBladesSpell.PATH, ru.pohsmp.core.spell.WorldRiftSpell.PATH, ru.pohsmp.core.spell.MirrorPrisonSpell.PATH,
             ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell.PATH,
             ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.CountdownSpell.PATH,
-            ru.pohsmp.core.spell.ScarletCutSpell.PATH);
+            ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH);
     static {
+        SPELLS.register(ru.pohsmp.core.spell.StarFallSpell.PATH, ru.pohsmp.core.spell.StarFallSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.ScarletCutSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.CountdownSpell.PATH, ru.pohsmp.core.spell.CountdownSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.DisintegrationReplicaSpell::new);

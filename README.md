@@ -1,7 +1,7 @@
 # PohSMP Core (`pohsmp_core`)
 
 Мод сервера PohSMP для Minecraft 1.20.1 на Forge 47.4.21. Добавляет свои школы, заклинания, посохи и свитки для Iron's Spells 'n Spellbooks 3.16.1;
-посохи анимирует GeckoLib 4.8.4. Последняя версия — **1.10.1**.
+посохи анимирует GeckoLib 4.8.4. Последняя версия — **1.13.0**.
 
 Подробное описание того, что есть в моде: [docs/MOD_README.md](docs/MOD_README.md); план заклинаний: [docs/SPELLS_PLAN.md](docs/SPELLS_PLAN.md);
 команды выдачи: [docs/give_commands.txt](docs/give_commands.txt).

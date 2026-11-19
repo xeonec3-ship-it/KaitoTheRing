@@ -36,12 +36,12 @@ import ru.pohsmp.core.fx.Fx;
 /**
  * Mythic, level 1. "Explosion!": a 15 s chant that cannot be interrupted. Seven magic circles light up one by one in the sky above
  * the point the caster looked at; then a flash, a pillar of flame, a shock wave and a smoke cloud. 60 + 25% of max health
- * in 12 blocks (weaker toward the edge), everyone but the caster, no blocks broken. The caster collapses for 10 s afterwards.
+ * in 24 blocks (owner 19.11: x2; weaker toward the edge), everyone but the caster, no blocks broken. The caster collapses for 10 s afterwards.
  */
 public class ExplosionSpell extends PohSpell {
     public static final String PATH = "explosion";
     public static final int CAST = 300, SPENT_TICKS = 200;
-    private static final double R = 12, FLAT = 60, PCT = 0.25, RANGE = 48;
+    private static final double R = 24, FLAT = 60, PCT = 0.25, RANGE = 48;
     private static final int COLOR = 0xFF5A1E, CIRCLES = 7;
     private static final String[] CHANT = {
             "Алое пламя, что старше самих звёзд, — услышь мой зов.",
@@ -177,7 +177,7 @@ public class ExplosionSpell extends PohSpell {
             @Override
             public boolean tick() {
                 age++;
-                double r = Math.min(R * 1.6, age * 1.1);
+                double r = Math.min(R * 1.6, age * 2.2);
                 int n = (int) (r * 4) + 8;
                 if (age <= 18) for (int i = 0; i < n; i++) {
                     double a = i * Math.PI * 2 / n;

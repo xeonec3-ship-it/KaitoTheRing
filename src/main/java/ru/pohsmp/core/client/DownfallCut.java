@@ -410,8 +410,9 @@ public final class DownfallCut {
             look = starHead(t, p, dir);
         } else {
             double k = smooth((t - 150) / 50.0);
-            pos = p.add(side.scale(16 + 4 * k)).subtract(dir.scale(3)).add(0, 2.5 + 1.5 * k, 0);
-            look = p.add(0, 2 + 3 * k, 0);
+            // owner 19.11: radius x3 (crater 24, light column 60 up) — the side camera ~2.7x farther, so the whole crater fits the frame
+            pos = p.add(side.scale(44 + 10 * k)).subtract(dir.scale(6)).add(0, 6 + 4 * k, 0);
+            look = p.add(0, 5 + 9 * k, 0);
             if (t >= SF_CAST) shake = 0.4 * Math.max(0, 1 - (t - SF_CAST) / 18.0);
         }
         return new Vec3[] {pos, look, new Vec3(shake, 0, 0)};

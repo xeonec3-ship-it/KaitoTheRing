@@ -32,13 +32,13 @@ import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.fx.Fx;
 
 /**
- * Mythic, level 1. "Heaven's Fall": a 10 s cast under a darkening sky, then for 20 s meteors rain within 20 blocks of the cast point.
+ * Mythic, level 1. "Heaven's Fall": a 10 s cast under a darkening sky, then for 20 s meteors rain within 40 blocks of the cast point (owner 19.11: x2).
  * Each one is marked by a burning circle a second before it lands. No blocks are broken.
  */
 public class HeavenFallSpell extends PohSpell {
     public static final String PATH = "heaven_fall";
     public static final int CAST = 200, RAIN = 400;
-    private static final double R = 20, HIT_R = 3, DMG = 14;
+    private static final double R = 40, HIT_R = 3, DMG = 14;
     private static final int COLOR = 0xB0301A, WARN = 20, FALL = 10;
     private static final DustParticleOptions ORANGE = new DustParticleOptions(new Vector3f(1f, 0.45f, 0.1f), 1.5f);
 
@@ -91,7 +91,7 @@ public class HeavenFallSpell extends PohSpell {
             sl.playSound(null, c.at.x, c.at.y, c.at.z, SoundEvents.AMBIENT_CAVE.value(), SoundSource.PLAYERS, 4f, 0.5f);
         }
         if (c.age % 3 == 0)
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 30; i++) {
                 double a = sl.random.nextDouble() * Math.PI * 2, r = Math.sqrt(sl.random.nextDouble()) * R;
                 DivineEvents.particle(sl, ParticleTypes.ASH, c.at.x + Math.cos(a) * r, c.at.y + 2 + sl.random.nextDouble() * 12, c.at.z + Math.sin(a) * r, 1, 0, 0);
             }
@@ -119,13 +119,17 @@ public class HeavenFallSpell extends PohSpell {
         sl.playSound(null, o.x, o.y, o.z, SoundEvents.WITHER_SPAWN, SoundSource.PLAYERS, 4f, 0.5f);
         Tasks.add(new Tasks.Task() {
             int age;
+            List<LivingEntity> foes = new java.util.ArrayList<>();
 
             @Override
             public boolean tick() {
                 age++;
-                if (age % 5 == 0 && age <= RAIN) {
+                // owner 19.11: radius x2 (area x4) — 4 meteors per 5 ticks instead of 1 (one on each of 4 ticks), the same density;
+                // the foes are looked up once per 5 ticks
+                if (age % 5 == 0) foes = new java.util.ArrayList<>(HigherSpell.around(sl, o, R, e -> HigherSpell.foe(caster, e) || (e instanceof Player && !HigherSpell.friendly(caster, e))));
+                if (age % 5 != 4 && age >= 5 && age <= RAIN) {
                     Vec3 p;
-                    List<LivingEntity> foes = HigherSpell.around(sl, o, R, e -> HigherSpell.foe(caster, e) || (e instanceof Player && !HigherSpell.friendly(caster, e)));
+                    foes.removeIf(e -> !e.isAlive() || e.isRemoved());
                     if (!foes.isEmpty() && sl.random.nextFloat() < 0.45f) {
                         LivingEntity t = foes.get(sl.random.nextInt(foes.size()));
                         p = t.position().add((sl.random.nextDouble() - 0.5) * 3, 0, (sl.random.nextDouble() - 0.5) * 3);

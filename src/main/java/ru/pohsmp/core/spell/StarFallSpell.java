@@ -39,7 +39,7 @@ import ru.pohsmp.core.fx.Fx;
 public class StarFallSpell extends HigherSpell {
     public static final String PATH = "star_fall";
     public static final int CAST = 160, FALL_AT = 100, AFTER = 40, CRATER = 600;
-    public static final double RANGE = 48, R = 8;
+    public static final double RANGE = 48, R = 24;   // owner 19.11: radius x3
     /** The star comes from behind the target (as seen by the caster): this far back and this high. Same numbers in DownfallCut. */
     public static final double SKY_BACK = 45, SKY_UP = 90;
     /** fx/star_fall.json (ideas chat, tools/gen_higher_fx.py). */
@@ -144,7 +144,7 @@ public class StarFallSpell extends HigherSpell {
         sl.playSound(null, i.x, i.y, i.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.PLAYERS, 4f, 0.5f);
         DivineEvents.particle(sl, ParticleTypes.EXPLOSION_EMITTER, i.x, i.y + 0.5, i.z, 2, 1, 0);
         DivineEvents.particle(sl, ParticleTypes.END_ROD, i.x, i.y + 1, i.z, 120, R * 0.3, 0.4);
-        CameraShakeManager.addCameraShake(new CameraShakeData(sl, 40, i, 40));
+        CameraShakeManager.addCameraShake(new CameraShakeData(sl, 40, i, 64));
         Cutscene.flash(sl, c.watchers, 14, COLOR);
         double base = ServerConfig.STAR_FALL_DAMAGE.get(), edge = ServerConfig.STAR_FALL_EDGE.get();
         for (LivingEntity e : HigherSpell.around(sl, i, R + 2, e -> e != caster && !HigherSpell.friendly(caster, e))) {

@@ -105,3 +105,9 @@
   его `ru.pohsmp.core.SilentWitch.hasFullSet` теперь видит настоящие вещи). Из одежды — только иммунитет к магии, пока носитель
   кастует заклинание с id `[silent_witch] gateSpell` (`gateMagicImmune`).
 - Эффекты `fx/silent_witch_cast.json`, `fx/silent_barrier.json` и печать `silent_barrier` — от чата идей. Временные: иконки `textures/item/silent_witch_{hood,robe,skirt}.png`, `textures/mob_effect/silent_barrier_cooldown.png`.
+
+## Повторная проверка в игре (владелец, 19.11)
+
+- [ ] **Ник скрыт в JourneyMap.** Один игрок надевает полный комплект (капюшон, мантия, полы), второй смотрит на него
+  на миникарте и на большой карте JourneyMap: точки и ника носителя там быть не должно. Без полного комплекта — снова виден.
+  Первая проверка — владелец, 19.11; эта — повторная, «на всякий случай».

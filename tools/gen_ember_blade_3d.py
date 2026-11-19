@@ -65,7 +65,7 @@ class Model:
         self.box(cx - sx / 2, cy - sy / 2, cz - sz / 2, cx + sx / 2, cy + sy / 2, cz + sz / 2, col, **kw)
 
 
-def build(hot):
+def build(hot, handle_only=False):
     m = Model()
     CX, CZ = 8.0, 8.0
     # --- навершие (y 1.2–3.6): расширенная головка, гранёная
@@ -88,8 +88,14 @@ def build(hot):
     m.cbox(CX - 2.2, 12.0, CZ, 1.0, 1.8, 1.0, 'iron3', rot=('z', 22.5, (CX - 2.2, 12.0, CZ)))      # крюк
     m.cbox(CX - 2.7, 13.0, CZ, 0.7, 0.9, 0.8, 'iron4', rot=('z', 45, (CX - 2.7, 13.0, CZ)))
     # --- клинок (y 12.6–32): сегменты по 1.25, изгиб — смещение по x; обух (−x) толстый, тело, дол, кромка (+x) тонкая
-    n, y0, y1 = 16, 12.6, 32.0
+    # владелец 19.11: «ступеньки» на клинке — сегментов втрое больше (шаг 0.4 вместо 1.2), изгиб и сужение почти гладкие
+    n, y0, y1 = 48, 12.6, 32.0
     seg = (y1 - y0) / n
+    if handle_only:                                                     # форма хлыста: клинок «ушёл» в хлыст — раскалённый обрубок
+        for i, (h, w, col) in enumerate(((0.7, 3.2, 'hot3'), (0.6, 2.6, 'hot5'), (0.5, 1.8, 'hot6'), (0.4, 1.0, 'hot7'))):
+            yb = 12.6 + sum(x[0] for x in ((0.7, 0, 0), (0.6, 0, 0), (0.5, 0, 0), (0.4, 0, 0))[:i])
+            m.box(CX - 1.4, yb, CZ - 0.45, CX - 1.4 + w, yb + h + 0.05, CZ + 0.45, col, glow=True)
+        n = 0
     for i in range(n):
         t = (i + 0.5) / n
         ya, yb = y0 + i * seg, y0 + (i + 1) * seg + 0.05
@@ -108,13 +114,14 @@ def build(hot):
         m.box(spine_x0 + sp_w + 0.2, ya, CZ - 0.42, spine_x0 + sp_w + 0.2 + max(0.3, w * 0.18), yb, CZ + 0.42,
               c_full if not hot else 'hot6', glow=g)                                                                                     # дол
         m.box(edge_x1 - w * 0.25, ya, CZ - 0.22, edge_x1, yb, CZ + 0.22, c_edge, glow=g)                                                # кромка
-        if i < 5:                                                                       # руны у пяты — по обеим сторонам
+        if i < 15 and i % 3 == 0:                                                       # руны у пяты — по обеим сторонам
             for zz in (CZ - 0.47, CZ + 0.41):
                 m.box(spine_x0 + sp_w + 0.6, ya + 0.25, zz, spine_x0 + sp_w + 0.95, yb - 0.35, zz + 0.06, 'hot7' if hot else 'rune', glow=g)
     # остриё
     bend1 = -1.3 * math.sin(math.pi * 0.9) + 1.2
-    tx = CX - 1.4 + bend1
-    m.box(tx, 31.8, CZ - 0.3, tx + 0.9, 32.0, CZ + 0.3, 'hot7' if hot else 'iron6', glow=hot)
+    if not handle_only:
+        tx = CX - 1.4 + bend1
+        m.box(tx, 31.8, CZ - 0.3, tx + 0.9, 32.0, CZ + 0.3, 'hot7' if hot else 'iron6', glow=hot)
     flat = 'pohsmp_core:item/ember_blade_hot' if hot else 'pohsmp_core:item/ember_blade'
     base = {
         'textures': {'p': 'pohsmp_core:item/ember_blade_3d', 'particle': flat},
@@ -150,7 +157,7 @@ def preview(els):
             out.append([e['from'], e['to'], PAL[key], 1 if 'forge_data' in e['faces']['north'] else 0,
                         [e['rotation']['axis'], e['rotation']['angle'], e['rotation']['origin']] if 'rotation' in e else None])
         return out
-    data = {'cold': to_js(els[0]), 'hot': to_js(els[1])}
+    data = {'cold': to_js(els[0]), 'hot': to_js(els[1]), 'whip': to_js(els[2])}
     html = '''<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Меч 3D</title>
 <style>body{margin:0;background:#262a33;color:#ddd;font:14px system-ui}#t{position:fixed;left:12px;top:8px}</style></head><body>
 <div id="t">«Раскалённые угли» — объёмный вариант (тяните мышью)</div>
@@ -164,7 +171,7 @@ function make(list,ox){const g=new THREE.Group();for(const [a,b,col,glow,rot] of
  if(rot){const p=new THREE.Group();p.position.set(rot[2][0]-8,rot[2][1]-16,rot[2][2]-8);const ang=rot[1]*Math.PI/180;p.rotation[rot[0]]=ang;
   m.position.set(c[0]-rot[2][0],c[1]-rot[2][1],c[2]-rot[2][2]);p.add(m);g.add(p);}else{m.position.set(c[0]-8,c[1]-16,c[2]-8);g.add(m);}}
  g.position.x=ox;g.rotation.z=-0.62;S.add(g);return g;}
-const G=[make(D.cold,-9),make(D.hot,9)];
+const G=[make(D.cold,-16),make(D.hot,0),make(D.whip,16)];
 let drag=null;addEventListener('pointerdown',e=>drag=[e.clientX,e.clientY,yaw,pitch]);addEventListener('pointerup',()=>drag=null);
 addEventListener('pointermove',e=>{if(!drag)return;yaw=drag[2]-(e.clientX-drag[0])*0.01;pitch=Math.max(-1.2,Math.min(1.2,drag[3]+(e.clientY-drag[1])*0.01));});
 window.setView=(y,p)=>{yaw=y;pitch=p;};
@@ -177,11 +184,22 @@ function f(){const d=62;C.position.set(Math.sin(yaw)*Math.cos(pitch)*d,Math.sin(
 if __name__ == '__main__':
     palette_png()
     els = []
-    for hot, name in ((False, 'ember_blade_3d'), (True, 'ember_blade_hot_3d')):
-        doc, el = build(hot)
+    docs = {}
+    for name, hot, ho in (('ember_blade_3d', False, False), ('ember_blade_hot_3d', True, False), ('ember_whip_handle_3d', True, True)):
+        doc, el = build(hot, ho)
         els.append(el)
+        docs[name] = doc
         with open(os.path.join(A, 'models', 'item', name + '.json'), 'w', encoding='utf-8') as fh:
             json.dump(doc, fh, ensure_ascii=False, indent=1)
         print('wrote', name, len(el), 'elements')
+    # подключено в игру (владелец 19.11: «так и не сделал мне 3д модель»): ember_blade.json = объёмный холодный меч + переключение формы
+    main = dict(docs['ember_blade_3d'])
+    main['overrides'] = [
+        {'predicate': {'pohsmp_core:form': 1}, 'model': 'pohsmp_core:item/ember_blade_hot_3d'},
+        {'predicate': {'pohsmp_core:form': 2}, 'model': 'pohsmp_core:item/ember_whip_handle_3d'},
+    ]
+    with open(os.path.join(A, 'models', 'item', 'ember_blade.json'), 'w', encoding='utf-8') as fh:
+        json.dump(main, fh, ensure_ascii=False, indent=1)
+    print('wrote ember_blade (3D + overrides)')
     preview(els)
     print('wrote tools/ember_blade_3d_preview.html')

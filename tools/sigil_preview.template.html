@@ -326,6 +326,81 @@ function pieceState(def, l, k, t, stopAt) {
     brightness: 1 + pc.lockFlash * (stopped ? 0 : Math.max(0, 1 - Math.abs(t - (start + fly)) / 5)) };
 }
 
+// ---------------------------------------------------------------- надписи (type "text", T07): те же формулы, что SigilText (Java)
+const FONTS = DATA.fonts || {};
+function glyphOf(font, ch) {
+  const g = font.glyphs;
+  return g[ch] || (font.upper && g[ch.toUpperCase()]) || g[ch.toLowerCase()] || g[ch.toUpperCase()];
+}
+function resolveGlyph(font, ch) {             // шрифт, потом его запасные (fallback)
+  for (let f = font, d = 0; f && d < 5; d++, f = f.fallback ? FONTS[f.fallback] : null) {
+    const g = glyphOf(f, ch); if (g) return { font: f, cell: g[0], adv: g[1] };
+  }
+  return null;
+}
+function textSpec(l) {
+  return { text: l.text ?? "", font: (l.font || "latin").toLowerCase(), size: Math.max(0.005, l.size ?? 0.12), spacing: l.spacing ?? 0.06,
+    repeat: Math.max(0, Math.floor(l.repeat ?? 1)), side: l.side || "outer", align: l.align || "center", angle: l.angle, slot: l.slot ?? null,
+    change: Math.max(1, l.change ?? 6), changeFlash: l.changeFlash ?? 0.8, fit: l.fit !== false };
+}
+const textAnchor = (s) => (s.angle !== undefined ? s.angle : s.side === "outer" ? 90 : s.side === "inner" ? 270 : 0);
+function textLayout(s, text, radius) {
+  const font = FONTS[s.font];
+  if (!font || !text) return { letters: [], perCopy: 0, copies: 0, size: 0 };
+  const items = [...text].map((ch) => {
+    if (/\s/.test(ch)) return { r: null, adv: font.space };
+    const r = resolveGlyph(font, ch); return r ? { r, adv: r.adv } : { r: null, adv: font.space };
+  });
+  const units = items.reduce((a, it) => a + it.adv, 0) + s.spacing * Math.max(0, items.length - 1);
+  let size = s.size, copies = 1;
+  const r = Math.abs(radius), line = s.side === "line" || r < 1e-4;
+  if (!line) {
+    copies = s.repeat === 0 ? Math.max(1, Math.floor(2 * Math.PI * r / ((units + font.space + s.spacing) * size))) : s.repeat;
+    const avail = 0.97 * 2 * Math.PI * r / copies;
+    if (s.fit && units * size > avail) size = avail / units;
+  }
+  const len = units * size, anchor = s.align === "center" ? len / 2 : s.align === "start" ? 0 : len;
+  const drop = (0.5 - (font.baseline - font.capHeight / 2)) * size, A = textAnchor(s), out = [];
+  const perCopy = items.filter((it) => it.r).length;
+  for (let c = 0; c < copies; c++) {
+    let pos = 0, order = 0;
+    for (const it of items) {
+      const adv = it.adv * size, mid = pos + adv / 2 - anchor;
+      pos += adv + s.spacing * size;
+      if (!it.r) continue;
+      const f = it.r.font, cx = it.r.cell % f.cols, cy = Math.floor(it.r.cell / f.cols);
+      const uv = [cx / f.cols, cy / f.rows, (cx + 1) / f.cols, (cy + 1) / f.rows];
+      if (line) {
+        const k = A * D2R, ux = Math.cos(k), uy = Math.sin(k), off = radius - drop;
+        out.push({ texture: f.texture, uv, x: ux * mid - uy * off, y: uy * mid + ux * off, up: A + 90, size, order: order++, copy: 0 });
+      } else {
+        const outer = s.side === "outer", dir = outer ? -1 : 1, th = A + dir * c * 360 / copies + dir * (mid / r) / D2R;
+        const rc = r - drop * (outer ? 1 : -1);
+        out.push({ texture: f.texture, uv, x: Math.cos(th * D2R) * rc, y: Math.sin(th * D2R) * rc, up: outer ? th : th + 180, size, order: order++, copy: c });
+      }
+    }
+  }
+  return { letters: out, perCopy, copies: line ? 1 : copies, size };
+}
+const TEXT_SOFT = 1.5;
+function reveal(order, count, p, dir) {           // буква за буквой: прозрачность, «наплыв» и вспышка при появлении
+  if (p >= 1 || count <= 0) return { alpha: 1, scale: 1, bright: 1 };
+  if (p <= 0) return { alpha: 0, scale: 1.35, bright: 1 };
+  const k = dir < 0 ? count - 1 - order : order, a = clamp01((p * (count + TEXT_SOFT) - k) / TEXT_SOFT);
+  return { alpha: a, scale: 1 + 0.35 * (1 - a), bright: 1 + 0.9 * 4 * a * (1 - a) };
+}
+function letterState(l, s, order, count, lt, since) {   // как SigilTimeline.letter
+  const ap = l.appear || {};
+  let st = { alpha: 1, scale: 1, bright: 1 };
+  if ((ap.modes || []).includes("draw")) {
+    const e = clamp01(ease(ap.easing, (lt - (ap.delay || 0)) / Math.max(1, ap.duration || 1)));
+    st = reveal(order, count, lt < (ap.delay || 0) ? 0 : e, ap.direction || 1);
+  }
+  if (since === null) return st;
+  const p = clamp01(since / s.change), c = reveal(order, count, p, 1), flash = 1 + s.changeFlash * (1 - p) * (1 - p);
+  return { alpha: st.alpha * c.alpha, scale: Math.max(st.scale, c.scale), bright: st.bright * c.bright * flash };
+}
+
 // ---------------------------------------------------------------- общий хеш (как SigilHit.hash в Java: те же числа)
 function ihash(a, b) {
   let h = Math.imul(a, 0x27D4EB2D) ^ Math.imul(b, 0x165667B1);
@@ -474,6 +549,7 @@ class Sigil {
     this.id = id; this.def = DATA.sigils[id]; this.origin = origin.clone(); this.t0 = opts.t0 ?? 0; this.scale = opts.scale ?? 1;
     this.orientation = opts.orientation || this.def.orientation; this.stopAt = null; this.flashed = false; this.childrenDone = false;
     this.children = []; this.parentHold = opts.isChild; this.stopAfter = opts.stopAfter ?? null;   // stopAfter — для печатей с hold -1: «код гасит» в превью
+    this.texts = { ...(opts.texts || {}) }; this.textChanged = {}; this.script = (opts.script || []).map((s) => ({ at: s[0], slot: s[1], text: s[2] }));
     this.T = timings(this.def);
     this.root = new THREE.Group(); scene.add(this.root);
     this.plane = new THREE.Group(); this.root.add(this.plane);          // плоскость печати: локальная XY, нормаль +Z
@@ -487,7 +563,9 @@ class Sigil {
     const g = new THREE.Group(); g.position.z = l.heightOffset || 0; this.plane.add(g);
     const color = l.color || this.def.color;
     const L = { def: l, group: g, rot: 0, meshes: [], lastLen: -1, color: new THREE.Color(color), alpha: 0, ang: 0, k: 1 };
-    if (l.type === "arcs") {
+    if (l.type === "text") {
+      L.text = { spec: textSpec(l), key: null, lay: null, letters: [] };
+    } else if (l.type === "arcs") {
       for (let i = 0; i < (l.count || 4); i++) { const m = new THREE.Mesh(new THREE.BufferGeometry(), mat(l.texture || "arc_strip", color)); g.add(m); L.meshes.push(m); }
     } else if ((l.appear?.modes || []).includes("pieces")) {
       // каждая часть — сектор слоя в своей «оси» (pivot) с центром в центре сектора
@@ -504,6 +582,24 @@ class Sigil {
       const m = new THREE.Mesh(new THREE.BufferGeometry(), mat(l.texture, color)); g.add(m); L.meshes.push(m);
     }
     return L;
+  }
+  setText(slot, text, lt) {                       // как Fx.text / Core.sigilText: новая надпись вписывается со вспышкой
+    if (this.texts[slot] === text) return;
+    this.texts[slot] = text; this.textChanged[slot] = lt;
+    this.children.forEach((c) => c.setText(slot, text, lt - (c.t0 - this.t0)));
+  }
+  buildText(L) {
+    const s = L.text.spec, txt = s.slot && this.texts[s.slot] !== undefined ? this.texts[s.slot] : s.text;
+    if (txt === L.text.key) return;
+    L.text.letters.forEach((m) => { L.group.remove(m.mesh); m.mesh.geometry.dispose(); m.mesh.material.dispose(); });
+    L.text.key = txt; L.text.lay = textLayout(s, txt, L.def.radius ?? 1);
+    L.text.letters = L.text.lay.letters.map((le) => {
+      const g = new THREE.PlaneGeometry(1, 1), uv = g.attributes.uv;           // вершины: ↖ ↗ ↙ ↘; у three v вверх, у атласа — вниз
+      uv.setXY(0, le.uv[0], 1 - le.uv[1]); uv.setXY(1, le.uv[2], 1 - le.uv[1]); uv.setXY(2, le.uv[0], 1 - le.uv[3]); uv.setXY(3, le.uv[2], 1 - le.uv[3]);
+      const mesh = new THREE.Mesh(g, mat(le.texture, L.def.color || this.def.color));
+      mesh.position.set(le.x, le.y, 0); mesh.rotation.z = (le.up - 90) * D2R; L.group.add(mesh);
+      return { le, mesh };
+    });
   }
   stop(t) { if (this.stopAt === null) { this.stopAt = t; this.children.forEach((c) => c.stop(t)); } }
   done(t) { return this.stopAt !== null && t > this.stopAt + (this.def.dissolve?.duration || 20) + 2 && this.children.every((c) => c.done(t)); }
@@ -544,7 +640,7 @@ class Sigil {
     // волна: поверх каждого слоя — та же текстура на плотной сетке, яркость в вершине = HIT.glow в её точке плоскости
     for (const L of this.layers) {
       const l = L.def;
-      if (l.type === "arcs" || lt < (l.appear?.delay || 0) + (l.appear?.duration || 0) || L.alpha < 0.003) { if (L.ov) L.ov.visible = false; continue; }
+      if (l.type === "arcs" || l.type === "text" || lt < (l.appear?.delay || 0) + (l.appear?.duration || 0) || L.alpha < 0.003) { if (L.ov) L.ov.visible = false; continue; }   // надписи (T07) волной не светятся
       if (!live) { if (L.ov) L.ov.visible = false; continue; }
       if (!L.ov) {
         L.ov = new THREE.Mesh(polarGrid(l.type === "band", l.inner ?? 0.85, l.repeat || 6), new THREE.MeshBasicMaterial({ map: TEX[l.texture], vertexColors: true,
@@ -602,7 +698,7 @@ class Sigil {
       const pivot = new THREE.Group(); cr.group.add(pivot);
       const meshes = [];
       for (const L of this.layers) {
-        if (L.alpha < 0.003) continue;
+        if (L.alpha < 0.003 || L.text) continue;                     // надписи (T07) на осколки не режутся
         const geo = shardGeo(c, seed, reach, k, j, L, cx, cy); if (!geo) continue;
         const m = new THREE.Mesh(geo, mat(L.def.type === "arcs" ? (L.def.texture || "arc_strip") : L.def.texture, "#FFFFFF"));
         m.material.color.copy(L.color); m.position.z = L.def.heightOffset || 0; pivot.add(m); meshes.push({ m, a: L.alpha });
@@ -670,9 +766,10 @@ class Sigil {
     if (this.orientation === "ground") this.root.rotation.set(-Math.PI / 2, 0, 0);
     else if (this.orientation === "sky") this.root.rotation.set(Math.PI / 2, 0, 0);
     else if (this.orientation === "billboard") this.root.quaternion.copy(cam.quaternion);
-    else this.root.rotation.set(0, 0, 0);                                // facing: смотрит по взгляду кастера (+Z)
+    else this.root.rotation.set(0, Math.PI, 0);                          // facing: перед кастером (+Z), u — вправо от кастера (−X), как в игре: надписи читаются со стороны кастера
     this.root.visible = lt >= 0;
     if (lt < 0) return;
+    for (const s of this.script) if (!s.done && lt >= s.at) { s.done = true; this.setText(s.slot, s.text, s.at); }
     // рост всей печати после формирования слоёв
     let S = this.scale * def.size;
     if (def.expand) S *= 1 + (def.expand.scale - 1) * ease(def.expand.easing, (lt - T.expandStart) / Math.max(1, def.expand.duration));
@@ -706,14 +803,21 @@ class Sigil {
       if (!breaking) L.rot += (rot.speed || 0) * (1 + (rot.boost || 0) * (1 - clamp01(e))) * dt / TPS;   // трещины: расколотая печать не крутится
       let ang = L.rot + (m.includes("twist") ? (ap.twist || -120) * (1 - clamp01(e)) : 0);
       L.group.rotation.set(m.includes("unfold") ? (1 - clamp01(e)) * Math.PI / 2 : 0, 0, ang * D2R);
-      L.group.scale.setScalar(sc * (l.radius || 1));
+      L.group.scale.setScalar(sc * (l.type === "text" ? 1 : (l.radius || 1)));   // у надписи радиус уже в раскладке букв
       const pul = l.pulse ? 1 + l.pulse.amp * Math.sin(2 * Math.PI * lt / l.pulse.period) : 1;
       const alpha = clamp01(a * globalA) * (l.brightness ?? 1) * pul;
       if (!breaking) { L.alpha = alpha; L.ang = ang; L.k = sc * (l.radius || 1); }
       // геометрия: прорисовка (draw) и сборка дуг (assemble)
       const len = m.includes("draw") ? 2 * Math.PI * clamp01(e) : 2 * Math.PI;
       const start = (ap.startAngle || 0) * D2R, dir = ap.direction || 1;
-      if (L.pieces) {
+      if (L.text) {
+        this.buildText(L);
+        const s = L.text.spec, ch = s.slot ? this.textChanged[s.slot] : undefined, since = ch === undefined ? null : lt - ch;
+        L.text.letters.forEach(({ le, mesh }) => {
+          const st = letterState(l, s, le.order, L.text.lay.perCopy, lt, since);
+          mesh.scale.setScalar(le.size * st.scale); mesh.material.opacity = alpha * st.alpha * st.bright;
+        });
+      } else if (L.pieces) {
         const Z = new THREE.Vector3(0, 0, 1);
         L.pieces.forEach((P, k) => {
           const s = pieceState(def, l, k, lt, this.stopAt === null ? null : this.stopAt - this.t0), a2 = (s.centerAngle + s.orbit) * D2R;
@@ -780,13 +884,13 @@ class Sigil {
   spawnChildren(t) {
     for (const ch of this.def.onFormed || []) {
       const arc = ch.arc;
-      if (!arc) { this.children.push(new Sigil(ch.id, this.origin, { t0: t, isChild: true })); continue; }
+      if (!arc) { this.children.push(new Sigil(ch.id, this.origin, { t0: t, isChild: true, texts: this.texts })); continue; }
       for (let i = 0; i < arc.count; i++) {
         const u = arc.count > 1 ? i / (arc.count - 1) : 0.5, th = (-arc.angle / 2 + arc.angle * u) * D2R;
         // дуга за спиной кастера (кастер смотрит в +Z): точки на окружности вокруг него, центр дуги — сзади
         const back = arc.behind ? -1 : 1, base = ch.anchor === "caster" ? caster.position : this.origin;
         const pos = new THREE.Vector3(base.x + Math.sin(th) * arc.radius, base.y + arc.height + Math.cos(th * 2) * 0.12, base.z + back * Math.cos(th) * arc.radius);
-        this.children.push(new Sigil(ch.id, pos, { t0: t + i * (arc.stagger || 0), isChild: true }));
+        this.children.push(new Sigil(ch.id, pos, { t0: t + i * (arc.stagger || 0), isChild: true, texts: this.texts }));
       }
     }
   }
@@ -1173,6 +1277,11 @@ const SCENES = {
   "Золотой круг": () => [new Sigil("golden_halo", new THREE.Vector3(0, 1.4, -1.2))],
   "Печать Ковена": () => [new Sigil("coven_seal", new THREE.Vector3(0, 10, 0))],
   "Время: циферблат": () => [new Sigil("time_clock", new THREE.Vector3(0, 2.2, 2.4))],
+  "Надпись на печати": () => { caster.visible = false; return [new Sigil("text_demo", new THREE.Vector3(0, 0.02, 0), { texts: { text: "Ковен" } })]; },
+  // «Обратный отсчёт»: удары по цели — число в центре циферблата вписывается заново со вспышкой (Fx.text / Core.sigilText)
+  // (кастер скрыт: циферблат висит над целью, смотрим из-за спины кастера — с той стороны, где надписи читаются)
+  "Циферблат с числом": () => { caster.visible = false; return [new Sigil("time_clock", new THREE.Vector3(0, 2.2, 2.4), { texts: { count: "0" },
+    script: [[46, "count", "4.5"], [58, "count", "9"], [66, "count", "16"], [84, "count", "23"], [100, "count", "31"], [118, "count", "40"]] })]; },
   "Звёзды: созвездия": () => [new Sigil("stars_orbit", new THREE.Vector3(0, 0.02, 0))],
   "Божественная: солнце": () => [new Sigil("divine_sun", new THREE.Vector3(0, 8, 0))],
   "Высшая: трещины и клинки": () => [new Sigil("higher_blades", new THREE.Vector3(0, 0.02, 0))],
@@ -1210,11 +1319,11 @@ DATA.sigils.__cracks_sky = { ...JSON.parse(JSON.stringify(DATA.sigils.silent_gat
 const HIT_SCENES = new Set(["Отклик на урон", "Отклик на урон: Тихий барьер", "Отклик на урон: Дезинтеграция", "Отклик на урон: купол Барьера"]);
 const MAIN_ID = { "Отклик на урон: купол Барьера": "silent_dome", "Отклик на урон": "higher_blades", "Отклик на урон: Тихий барьер": "silent_barrier", "Отклик на урон: Дезинтеграция": "disintegration_field",
   "Распад трещинами": "higher_blades", "Распад трещинами: небесная печать": "__cracks_sky", "Меч-хлыст: Последний жар": "ember_last_heat", "Меч-хлыст: Огненный вихрь": "ember_vortex", "Алый разрез": "scarlet_cut", "Падение звезды": "star_fall", "Алое стекло (модель)": "star_glass", "Ведьма: каст в одежде": "silent_witch_cast", "Ведьма: Тихий барьер": "silent_barrier", "Копьё ветра (модель)": "silent_spear", "Купол Барьера (модель)": "silent_dome", "Тень дракона (модель)": "worgan_dragon", "Чёрное пламя Ворганы": "silent_worgan_flame", "Безмолвный залп": "silent_volley", "Врата (весь эффект)": "silent_gate", "Врата (модель)": "silent_gate", "Редактор печати": "__edit", "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
-  "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
+  "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Надпись на печати": "text_demo", "Циферблат с числом": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
 const VIEW_FOR = { "Отклик на урон: купол Барьера": "side", "Отклик на урон": "hit", "Отклик на урон: Тихий барьер": "barrier", "Отклик на урон: Дезинтеграция": "hitBig", "Распад трещинами": "hit",
   "Распад трещинами: небесная печать": "crackSky", "Меч-хлыст: Последний жар": "ember", "Меч-хлыст: Огненный вихрь": "ember", "Алый разрез": "cut", "Падение звезды": "star", "Алое стекло (модель)": "close", "Ведьма: каст в одежде": "volley", "Ведьма: Тихий барьер": "volley", "Копьё ветра (модель)": "close", "Купол Барьера (модель)": "side", "Тень дракона (модель)": "dragon", "Чёрное пламя Ворганы": "dragon", "Безмолвный залп": "volley", "Врата (весь эффект)": "gateFx", "Врата (модель)": "gate", "Редактор печати": "pieces", "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
-  "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
+  "Время: циферблат": "close", "Надпись на печати": "above", "Циферблат с числом": "dial", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
 // T06: темы школ Iron's — печать под магом (ступень Высшая) и венец над головой (Мифическая/Божественная).
 // Печати держатся, пока идёт каст (hold -1), в превью «каст» длится 7 с, затем распад.
@@ -1235,7 +1344,7 @@ let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = perf
 const sel = $("scene");
 for (const k of Object.keys(SCENES)) { const o = document.createElement("option"); o.value = k; o.textContent = k; sel.appendChild(o); }
 function start() {
-  INST.forEach((s) => s.dispose()); INST = SCENES[cur](); t = 0;
+  INST.forEach((s) => s.dispose()); caster.visible = true; INST = SCENES[cur](); t = 0;
   $("sceneName").textContent = cur;
   $("hitBox").hidden = !HIT_SCENES.has(cur); hitQueue = []; nextAutoHit = 24;
   $("hint").textContent = HIT_SCENES.has(cur) ? "Щёлкните по печати — удар в эту точку; тяните — камера" : "Тяните, чтобы повернуть камеру";
@@ -1261,7 +1370,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { hit: [0.55, 0.78, 8.5, 0.2], hitBig: [0.55, 0.62, 13, 0.2], barrier: [0.45, 0.12, 6.2, 1.0], crackSky: [0.45, -0.12, 26, 7.5], ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+const VIEWS = { hit: [0.55, 0.78, 8.5, 0.2], hitBig: [0.55, 0.62, 13, 0.2], barrier: [0.45, 0.12, 6.2, 1.0], crackSky: [0.45, -0.12, 26, 7.5], ember: [0.7, 0.45, 20, 1.5], cut: [2.7, 0.12, 9, 1.2], star: [2.5, 0.22, 60, 14], side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], gate: [0.35, 0.12, 24, 4], gateFx: [2.95, -0.22, 46, 17], dial: [3.14, 0.05, 6.5, 2.2], volley: [3.4, 0.25, 12, 1.5], dragon: [-0.9, 0.12, 8, 2.0], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 VIEWS.school = [0.55, 0.55, 9.5, 1.1]; VIEWS.gallery = [0.0, 1.32, 27, 0];   // сцены «Школа: …» (T06)
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
@@ -1331,7 +1440,7 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 // ---------------------------------------------------------------- редактор печати
-const ED = { MODES: ["grow", "fade", "draw", "twist", "unfold", "assemble", "pieces"], TYPES: ["disc", "band", "arcs", "spokes"],
+const ED = { MODES: ["grow", "fade", "draw", "twist", "unfold", "assemble", "pieces"], TYPES: ["disc", "band", "arcs", "spokes", "text"], FONTS: Object.keys(FONTS).sort(),
   EASE: Object.keys(EASE), ORIENT: ["ground", "sky", "facing", "billboard"], TEX: Object.keys(DATA.textures).sort() };
 function edDef() { return DATA.sigils.__edit; }
 function edSave() { try { localStorage.setItem(ED_KEY, JSON.stringify(edDef())); } catch (e) {} }
@@ -1409,6 +1518,12 @@ function edRender() {
       slider("Разгон при появлении", () => l.rotation?.boost || 0, (v) => (l.rotation = { ...(l.rotation || { speed: 0 }), boost: v }), 0, 4, 0.1, (v) => v.toFixed(1)));
     if (l.type === "band") g.append(slider("Внутр. край", () => l.inner ?? 0.85, (v) => (l.inner = v), 0.3, 0.98, 0.01, (v) => v.toFixed(2)),
       slider("Повторов текстуры", () => l.repeat || 6, (v) => (l.repeat = v), 1, 24, 1));
+    if (l.type === "text") g.append(textIn("Текст", () => l.text ?? "", (v) => (l.text = v)),
+      choice("Шрифт", ED.FONTS, () => l.font || "latin", (v) => (l.font = v)),
+      choice("Сторона", ["outer", "inner", "line"], () => l.side || "outer", (v) => (l.side = v)),
+      slider("Кегль", () => l.size ?? 0.12, (v) => (l.size = v), 0.03, 0.5, 0.01, (v) => v.toFixed(2)),
+      slider("Разрядка", () => l.spacing ?? 0.06, (v) => (l.spacing = v), -0.1, 0.6, 0.01, (v) => v.toFixed(2)),
+      slider("Копий (0 — сколько влезет)", () => l.repeat ?? 1, (v) => (l.repeat = v), 0, 8, 1));
     if (l.type === "arcs") g.append(slider("Дуг", () => l.count || 4, (v) => (l.count = v), 2, 12, 1), slider("Длина дуги, °", () => l.arcLength || 45, (v) => (l.arcLength = v), 10, 170, 1));
     if ((ap.modes || []).includes("pieces")) {
       const pc = (ap.pieces = ap.pieces || {});

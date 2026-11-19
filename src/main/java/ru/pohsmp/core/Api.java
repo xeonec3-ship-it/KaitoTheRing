@@ -24,7 +24,8 @@ public final class Api {
     /**
      * Starts a sigil (assets/pohsmp_core/sigils/&lt;id&gt;.json, docs/sigils.md) for players nearby; returns its instance id (0 on failure).
      * options: JSON, all optional: {"orientation":"ground|sky|facing|billboard", "scale":1.5, "color":"#B49BFF",
-     * "duration":ticks, "attachEntity":"uuid", "offset":[x,y,z], "yaw":deg}. Nothing is written to chat.
+     * "duration":ticks, "attachEntity":"uuid", "offset":[x,y,z], "yaw":deg, "text":"…", "texts":{"slot":"…"}}. Nothing is written to chat.
+     * "text" fills the text layers with slot "text", "texts" — any slots (docs/sigils.md «Надписи»).
      */
     public static int sigil(Level level, String id, double x, double y, double z, String options) {
         if (!(level instanceof ServerLevel sl) || ru.pohsmp.core.fx.FxLib.sigil(id) == null) return 0;
@@ -44,6 +45,8 @@ public final class Api {
                 oy = a.get(1).getAsDouble();
                 oz = a.get(2).getAsDouble();
             }
+            if (o.has("text")) s.text("text", o.get("text").getAsString());
+            if (o.has("texts")) for (var e : o.getAsJsonObject("texts").entrySet()) s.text(e.getKey(), e.getValue().getAsString());
             if (o.has("attachEntity")) attach = sl.getEntity(java.util.UUID.fromString(o.get("attachEntity").getAsString()));
         }
         if (attach != null) {
@@ -52,6 +55,14 @@ public final class Api {
             s.at(attach.getX() + ox, attach.getY() + oy, attach.getZ() + oz);
         } else s.at(x + ox, y + oy, z + oz);
         return ru.pohsmp.core.fx.Fx.play(sl, s);
+    }
+
+    /**
+     * Replaces the inscription of a running sigil (text layers with this slot; "text" = the one {@code "text"} option fills), e.g. a
+     * counter: <code>Core.sigilText(level, id, "count", "12")</code>. The new text writes itself in with a flare.
+     */
+    public static void sigilText(Level level, int instanceId, String slot, String text) {
+        if (level instanceof ServerLevel sl) ru.pohsmp.core.fx.Fx.text(sl, instanceId, slot, text);
     }
 
     /** Dissolves a sigil started by {@link #sigil}; mode "" = as defined, or collapse / fade / shatter / reverse. */

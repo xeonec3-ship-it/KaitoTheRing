@@ -96,7 +96,9 @@ function cast_end(e) {
   Конфиг клиента, раздел `[fx]`: `maxDistance` (128), `maxInstances` (96), `quality` (high/low).
   Команды (оп 2): `/pohsmp sigil play <id> [масштаб] [ориентация]`, `/pohsmp sigil stop`, `/pohsmp fx play <id> [стиль]`, `/pohsmp mesh play <id> [секунды]`,
   `/pohsmp fx reload`. Из скриптов CNPC: `Core.sigil(level, id, x, y, z, '{"orientation":"ground","scale":1}')`, `Core.sigilStop(level, id, "")`,
-  `Core.fx(level, id, x, y, z, yaw, стиль)`.
+  `Core.fx(level, id, x, y, z, yaw, стиль)`. Надписи на печатях (T07, слой `text`, раздел «Надписи» в `docs/sigils.md`): текст подставляется
+  при запуске — `'{"text":"Ковен"}'` (слот `text`) или `'{"texts":{"count":"0"}}'`, и меняется на живой печати —
+  `Core.sigilText(level, id, "count", "12")` (вписывается буква за буквой со вспышкой). Шрифты: `runic`, `latin`, `cyrillic`.
 - **Скрытие сущностей** (1.12.1, `Hidden`, клиент `client/HiddenEntities`, пакет `HideMsg`): любую живую сущность — игрока, моба,
   NPC CustomNPCs — не видно никому: модель, броня, предметы в руках, имя, тень, огонь и контур свечения. Хитбокс F3+B остаётся.
   Сервер держит на ней ванильную невидимость (только флаг — без частиц и иконки), шлёт пакет всем, кто её видит, и каждому,

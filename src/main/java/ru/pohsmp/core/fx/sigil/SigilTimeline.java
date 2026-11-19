@@ -17,7 +17,7 @@ public final class SigilTimeline {
     /** Key moments of a sigil (ticks from its start). */
     public record Timings(int layersEnd, int expandStart, int formedAt) {}
 
-    /** What to draw for one layer. Angles in degrees. */
+    /** What to draw for one layer. Angles in degrees. scale = grow × radius (for TEXT layers: grow only). */
     public record LayerState(double alpha, double scale, double angle, double tilt, double drawFraction, double drawStart,
                              int drawDirection, double arcRadiusMul, double arcLength) {
         public boolean visible() {
@@ -121,7 +121,9 @@ public final class SigilTimeline {
             arcLen = l.arcLength() + (closed - l.arcLength()) * asm;
             arcR = 1 + 0.9 * (1 - asm);
         }
-        return new LayerState(alpha, scale * l.radius(), angle, tilt, draw, ap.startAngle(), ap.direction(), arcR, arcLen);
+        // TEXT: the radius is inside the letter layout (it may be 0 for a line), so scale is the grow factor alone
+        double radial = l.type() == LayerType.TEXT ? 1 : l.radius();
+        return new LayerState(alpha, scale * radial, angle, tilt, draw, ap.startAngle(), ap.direction(), arcR, arcLen);
     }
 
     // ---------------------------------------------------------------- pieces
@@ -174,6 +176,30 @@ public final class SigilTimeline {
         double flash = stopped ? 0 : Math.max(0, 1 - Math.abs(t - lockAt) / 5);
         return new PieceState(u, t < start ? 0 : clamp01(u * 2.5), centerAngle, centerRadius, 1 + pc.fly() * w, pc.orbit() * w * side,
                 pc.lift() * w, pc.tilt() * w * side, pc.spin() * w * side, 1 + pc.lockFlash() * flash);
+    }
+
+    // ---------------------------------------------------------------- text (T07)
+
+    /**
+     * One letter of a TEXT layer at tick t. With appear mode {@code draw} the letters write themselves one by one over the appear
+     * window ({@link SigilText#reveal}, {@code appear.direction} −1 = from the last letter); otherwise they are all there and the layer's
+     * own fade/grow applies. {@code sinceChange} — ticks since the layer's text was replaced (NaN = never): the new text writes itself
+     * in over {@code change} ticks and the layer flares ({@link SigilText#changeFlash}). The layer alpha from {@link #layer} still
+     * multiplies the result.
+     */
+    public static SigilText.LetterState letter(SigilDef def, int index, int order, int count, double t, double sinceChange) {
+        Layer l = def.layers().get(index);
+        SigilDef.Appear ap = l.appear();
+        SigilText.LetterState s = SigilText.LetterState.SHOWN;
+        if (ap.modes().contains(AppearMode.DRAW)) {
+            double e = clamp01(ap.easing().apply(clamp01((t - ap.delay()) / ap.duration())));
+            s = SigilText.reveal(order, count, t < ap.delay() ? 0 : e, ap.direction());
+        }
+        SigilText.Spec sp = l.text();
+        if (sp == null || Double.isNaN(sinceChange)) return s;
+        SigilText.LetterState c = SigilText.reveal(order, count, SigilText.changeProgress(sinceChange, sp.change()), 1);
+        double flash = SigilText.changeFlash(sinceChange, sp.change(), sp.changeFlash());
+        return new SigilText.LetterState(s.alpha() * c.alpha(), Math.max(s.scale(), c.scale()), s.brightness() * c.brightness() * flash);
     }
 
     /** How far an ARCS layer has assembled (0..1), for {@link LayerState#arcOffset}. */

@@ -62,7 +62,7 @@ public abstract class PohSpell extends AbstractSpell {
                        io.redspace.ironsspellbooks.api.magic.MagicData md) {
         if (level instanceof ServerLevel sl && caster != null) {
             String school = getSchoolType() == null ? "" : getSchoolType().getId().getPath();
-            if (SIGIL_SCHOOLS.contains(school))
+            if (SIGIL_SCHOOLS.contains(school) && !ru.pohsmp.core.SchoolSeals.shown(caster))   // T06: a tier seal is up — no second sign
                 ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx("school_" + school).at(caster.position()).caster(caster));
         }
         super.onCast(level, spellLevel, caster, source, md);

@@ -148,6 +148,15 @@ public final class Fx {
             return this;
         }
 
+        /**
+         * Inscription for the sigil's text layers with this {@code slot} (docs/sigils.md «Надписи»), e.g.
+         * {@code Fx.sigil("time_clock").text("count", "0")}. Up to {@link FxMsg#MAX_TEXT} characters.
+         */
+        public Spec text(String slot, String text) {
+            if (slot != null && text != null) m.texts.put(slot, clip(text));
+            return this;
+        }
+
         public Spec seed(long seed) {
             m.seed = seed;
             return this;
@@ -279,6 +288,28 @@ public final class Fx {
         m.yaw = yaw;
         m.pitch = pitch;
         sendTo(sl, a, m);
+    }
+
+    /**
+     * Replaces the inscription in a running sigil's text layers with this slot: the new text writes itself in over the layer's
+     * {@code change} ticks with a flare (counter on the Countdown clock, T04). Late joiners get the latest text. Same text — nothing sent.
+     */
+    public static void text(ServerLevel sl, int inst, String slot, String text) {
+        Active a = ACTIVE.get(inst);
+        if (a == null || slot == null || text == null) return;
+        String t = clip(text);
+        if (t.equals(a.msg.texts.get(slot))) return;
+        a.msg.texts.put(slot, t);
+        FxMsg m = new FxMsg();
+        m.op = FxMsg.TEXT;
+        m.inst = inst;
+        m.slot = slot;
+        m.text = t;
+        sendTo(sl, a, m);
+    }
+
+    private static String clip(String s) {
+        return s.length() <= FxMsg.MAX_TEXT ? s : s.substring(0, FxMsg.MAX_TEXT);
     }
 
     public static boolean running(int inst) {

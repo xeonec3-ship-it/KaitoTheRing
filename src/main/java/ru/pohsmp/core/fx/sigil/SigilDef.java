@@ -22,7 +22,8 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
     /** OUTWARD: fixed, laid on a sphere around the element's anchor (normal from the anchor to the sigil), e.g. seals on a dome. */
     public enum Orientation { GROUND, SKY, FACING, BILLBOARD, OUTWARD }
 
-    public enum LayerType { DISC, BAND, ARCS, SPOKES }
+    /** TEXT — an inscription (T07): letters from a glyph atlas along the circle {@code radius} or a line, see {@link SigilText}. */
+    public enum LayerType { DISC, BAND, ARCS, SPOKES, TEXT }
 
     public enum AppearMode { GROW, FADE, DRAW, TWIST, UNFOLD, ASSEMBLE, PIECES }
 
@@ -57,7 +58,7 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
 
     public record Layer(String id, LayerType type, String texture, double radius, double heightOffset, int color, double brightness,
                         double inner, int repeat, int count, double arcLength, double width,
-                        Appear appear, Rotation rotation, Pulse pulse) {}
+                        Appear appear, Rotation rotation, Pulse pulse, SigilText.Spec text) {}
 
     public record Expand(double scale, int delay, int duration, Easing easing) {}
 
@@ -256,10 +257,11 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
             JsonObject p = l.getAsJsonObject("pulse");
             pulse = new Pulse(num(p, "amp", 0), Math.max(1, num(p, "period", 20)));
         }
-        return new Layer(str(l, "id", ""), LayerType.valueOf(str(l, "type", "disc").toUpperCase(Locale.ROOT)), str(l, "texture", "core"),
+        LayerType type = LayerType.valueOf(str(l, "type", "disc").toUpperCase(Locale.ROOT));
+        return new Layer(str(l, "id", ""), type, str(l, "texture", "core"),
                 num(l, "radius", 1), num(l, "heightOffset", 0), l.has("color") ? color(str(l, "color", "#FFFFFF")) : defColor,
                 num(l, "brightness", 1), num(l, "inner", 0.85), (int) num(l, "repeat", 6), (int) num(l, "count", 4),
-                num(l, "arcLength", 45), num(l, "width", 0.05), appear, rot, pulse);
+                num(l, "arcLength", 45), num(l, "width", 0.05), appear, rot, pulse, type == LayerType.TEXT ? SigilText.Spec.parse(l) : null);
     }
 
     static int color(String hex) {

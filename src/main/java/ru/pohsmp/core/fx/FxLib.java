@@ -14,10 +14,11 @@ import java.util.stream.Stream;
 import net.minecraftforge.fml.ModList;
 import ru.pohsmp.core.PohCore;
 import ru.pohsmp.core.fx.sigil.SigilDef;
+import ru.pohsmp.core.fx.sigil.SigilText;
 
 /**
  * Definitions read straight from the mod jar (assets/pohsmp_core/...), the same on the server (timings) and the client (drawing):
- * sigils/&lt;id&gt;.json, fx/&lt;id&gt;.json, fx/styles/&lt;id&gt;.json, fx/meshes/&lt;id&gt;.json. Cached; {@link #reload()} drops the cache.
+ * sigils/&lt;id&gt;.json, fx/&lt;id&gt;.json, fx/styles/&lt;id&gt;.json, fx/meshes/&lt;id&gt;.json, textures/sigil/glyphs_&lt;font&gt;.json. Cached; {@link #reload()} drops the cache.
  * A broken or missing file is logged once and gives null, never an exception.
  */
 public final class FxLib {
@@ -32,6 +33,11 @@ public final class FxLib {
 
     public static SigilDef sigil(String id) {
         return (SigilDef) get("sigil:" + id, () -> SigilDef.parse(id, read("sigils/" + id + ".json")));
+    }
+
+    /** Glyph atlas map of an inscription font (runic, latin, cyrillic — tools/gen_sigil_glyphs.py), null if there is none. */
+    public static SigilText.Font font(String name) {
+        return (SigilText.Font) get("font:" + name, () -> SigilText.Font.parse(read("textures/sigil/glyphs_" + name + ".json")));
     }
 
     public static FxDef fx(String id) {

@@ -108,6 +108,11 @@ public class CovenArrivalSpell extends PohSpell {
     }
 
     @Override public CastType getCastType() { return CastType.LONG; }
+    /**
+     * The 90 s scene has a fixed timeline: cast time reduction (e.g. the Silent Witch robe) must not end the cast before it —
+     * owner 19.11: the cast "completed" right as the dome began to form.
+     */
+    @Override public int getEffectiveCastTime(int spellLevel, @javax.annotation.Nullable LivingEntity entity) { return CAST; }
     @Override public boolean canBeInterrupted(Player player) { return false; }
     @Override public boolean allowCrafting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.of(SoundEvents.BEACON_ACTIVATE); }

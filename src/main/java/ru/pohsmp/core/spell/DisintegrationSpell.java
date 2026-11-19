@@ -217,7 +217,7 @@ public class DisintegrationSpell extends AbstractSpell {
             HOLDS.remove(caster.getUUID());
             release(h);
             Net.sendNear(sl, caster.getX(), caster.getY(), caster.getZ(), h.x, h.y, h.z, fx(2, caster.getId(), t.getId(), 0, h.x, h.y, h.z));
-            if (caster instanceof ServerPlayer sp) Utils.serverSideCancelCast(sp);
+            NpcCast.cancelAny(caster);
             return;
         }
         h.age++;

@@ -56,7 +56,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.Fx.FxServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.FxCommands.class);
         MinecraftForge.EVENT_BUS.register(Hidden.class);
-        MinecraftForge.EVENT_BUS.register(NpcCast.NpcCastEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.NpcCast.Events.class);
         if (FMLEnvironment.dist == Dist.CLIENT) ClientInit.init(modBus);
     }
 

@@ -4,34 +4,30 @@
 
 ## Каст
 
+Полное описание с таблицей вызовов, правилами и примером босса — `docs/MOD_README.md`, раздел «NPC-маги: `Core.cast`».
+Кратко:
+
 | Вызов | Что делает |
 |---|---|
-| `Core.cast(npc, "pohsmp_core:disintegration", target)` | NPC кастует заклинание (мода или Iron's, можно просто `"fireball"`) в цель-сущность; уровень = минимальный |
-| `Core.cast(npc, id, target, level)` | то же с уровнем |
-| `Core.castAt(npc, id, x, y, z, level)` | в точку |
-| `Core.isCasting(npc)` | кастует ли сейчас |
-| `Core.cancelCast(npc)` | прервать; неотменяемые заклинания (Распад, Взрыв, Ковен...) не прерываются |
-| `Core.forceCancelCast(npc)` | прервать что угодно (смерть, смена фазы) |
+| `Core.cast(npc, "pohsmp_core:disintegration", target[, level])` | NPC кастует как игрок; target — сущность, точка (`IPos`, `[x, y, z]`, `{x, y, z}`) или `null`; уровень по умолчанию максимальный |
+| `Core.cast(npc, id, x, y, z[, level])`, `Core.castAt(...)` | в точку |
+| `Core.isCasting(npc)`, `Core.castingSpell(npc)` | кастует ли, какое заклинание |
+| `Core.cancelCast(npc)` | прервать; неотменяемые (Дезинтеграция и др.) не прерываются |
+| `Core.cancelCast(npc, true)`, `Core.forceCancelCast(npc)` | прервать что угодно |
 
-`cast` возвращает `false`, если NPC уже кастует, заклинание неизвестно или оно само отказало (нет цели в радиусе). Если цель
-задана скриптом, но заклинание её «не видит», цель всё равно удерживается.
-
-Работает как у мобов Iron's: проверка цели, предкаст, тики, удар в конце (у непрерывных — каждые 10 тиков), завершение.
-Эффекты и ролики те же, что у игрока. Маны и перезарядок нет — когда кастовать, решает скрипт. NPC поднимает руки на время
-каста. В скрипт NPC приходят события `cast_start(e)` и `cast_end(e)`, id заклинания в `e.caster`.
+Цель проверяется по правилам заклинания, как у игрока: вне дальности или не видна — `cast` вернёт `false` (причина в логе).
+На модели NPC у игроков проигрывается та же анимация каста, что у игрока. События скрипта: `cast_start(e)`, `cast_end(e)`
+(`e.spell`, `e.cancelled`; id заклинания также в `e.caster`).
 
 ```javascript
 var Core = Java.type("ru.pohsmp.core.Api")
 
-/**
- * @param {NpcEvent.TargetEvent} e
- */
 function target(e) {
     if (!Core.isCasting(e.npc)) Core.cast(e.npc, "pohsmp_core:disintegration", e.entity)
 }
 
 function cast_end(e) {
-    e.npc.say("...")
+    if (!e.cancelled) e.npc.say("...")
 }
 ```
 

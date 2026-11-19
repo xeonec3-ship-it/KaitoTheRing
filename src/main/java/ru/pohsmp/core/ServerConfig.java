@@ -28,6 +28,7 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue VOLLEY_COOLDOWN, VOLLEY_RADIUS, VOLLEY_ARC, VOLLEY_SEAL_RADIUS, VOLLEY_DAMAGE;
     public static final ForgeConfigSpec.IntValue BARRIER_CAST, BARRIER_MANA, BARRIER_SECONDS;
     public static final ForgeConfigSpec.DoubleValue BARRIER_COOLDOWN, BARRIER_RADIUS;
+    public static final ForgeConfigSpec.IntValue SILENT_PLAYER_AGGRO;
     public static final ForgeConfigSpec.IntValue FLAME_CAST, FLAME_MANA, FLAME_BREATH, FLAME_INTERVAL, FLAME_BURN;
     public static final ForgeConfigSpec.DoubleValue FLAME_COOLDOWN, FLAME_CONE, FLAME_RANGE, FLAME_DAMAGE, FLAME_BURN_DPS;
 
@@ -55,6 +56,8 @@ public final class ServerConfig {
         b.pop();
         b.comment("Silent Witch staff spells: Wind Spears, Silent Volley, Barrier, Black Flame of Worgan.",
                 "Damage is multiplied by the caster's Silent spell power (the staff itself gives +25%).").push("silent_staff");
+        SILENT_PLAYER_AGGRO = b.comment("Silent Witch magic hurts only hostile creatures; a player counts as hostile to the caster",
+                "for this many seconds after hitting the caster (every hit starts it again)").defineInRange("playerAggroSeconds", 60, 0, 3600);
         b.push("wind_spears");
         SPEARS_CAST = b.comment("Cast time (ticks)").defineInRange("castTicks", 20, 0, 1200);
         SPEARS_COOLDOWN = b.comment("Cooldown (seconds)").defineInRange("cooldown", 6.0, 0.0, 3600.0);

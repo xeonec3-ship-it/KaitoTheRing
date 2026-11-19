@@ -205,3 +205,25 @@ def skill_icon():
 if __name__ == '__main__':
     skill_icon()
 
+
+
+def whip_handle():
+    """Форма хлыста (владелец 19.11: «клинок не превращается в хлыст — модель хлыста накладывается на него»): в руке остаётся
+    только рукоять с раскалённой пятой, клинок «уходит» в хлыст (хлыст рисует EmberWhipClient от кисти).
+    ember_whip_handle.png — рукоять, обмотка, навершие, крюк пяты раскалён, из пяты — короткий светящийся обрубок (начало хлыста)."""
+    full = draw(True)
+    M = sample()
+    im = Image.new('RGBA', (N, N), (0, 0, 0, 0))
+    for (px, py), (kind, u, v, k) in M.items():
+        if kind in ('pommel', 'grip'):
+            im.putpixel((px, py), full.getpixel((px, py)))
+        elif kind == 'guard':
+            im.putpixel((px, py), hexc(HOT[3] if v < -1.0 else HOT[5]))
+        elif kind == 'blade' and k < 0.06:
+            im.putpixel((px, py), hexc(HOT[6] if 0.25 < v < 0.75 else HOT[4]))
+    im.save(os.path.join(OUT, 'ember_whip_handle.png'))
+    print('wrote ember_whip_handle.png')
+
+
+if __name__ == '__main__':
+    whip_handle()

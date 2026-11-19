@@ -4,6 +4,6 @@
     "layer0": "pohsmp_core:item/ember_blade"
   },
   "overrides": [
-    { "predicate": { "pohsmp_core:hot": 1 }, "model": "pohsmp_core:item/ember_blade_hot" }
+    { "predicate": { "pohsmp_core:hot": 1 }, "model": "pohsmp_core:item/ember_whip_handle" }
   ]
 }

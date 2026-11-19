@@ -12,7 +12,7 @@ import ru.pohsmp.core.net.IlluMsg;
 public final class Zones {
     private Zones() {}
 
-    public static final int VEIL = IlluMsg.Z_VEIL, LABYRINTH = IlluMsg.Z_LABYRINTH, NIGHTMARE = IlluMsg.Z_NIGHTMARE, DREAM = IlluMsg.Z_DREAM, HOUSE = IlluMsg.Z_HOUSE, NO_AWAKENING = IlluMsg.Z_NO_AWAKENING;
+    public static final int VEIL = IlluMsg.Z_VEIL, LABYRINTH = IlluMsg.Z_LABYRINTH, NIGHTMARE = IlluMsg.Z_NIGHTMARE, DREAM = IlluMsg.Z_DREAM, HOUSE = IlluMsg.Z_HOUSE, NO_AWAKENING = IlluMsg.Z_NO_AWAKENING, WAKING = IlluMsg.Z_WAKING;
 
     public record Zone(int kind, int caster, double x, double y, double z, double r, long until, String text) {}
 

@@ -42,6 +42,7 @@ public final class ClientInit {
         modBus.addListener(ru.pohsmp.core.client.nightmare.NightmareWorld::colors);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.HouseClient.class);   // T25 «Дом, которого нет»
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.NoAwakeningClient.class);   // T25 «Пробуждение не наступит»
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.nightmare.WakingClient.class);   // T22 «Кошмар наяву»: people as the caster's monster
         modBus.register(ScrollModels.class);
         modBus.addListener(TargetPoseClient::setup);
         MinecraftForge.EVENT_BUS.register(EmberHud.class);

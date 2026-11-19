@@ -57,7 +57,7 @@ public final class IlluMsg {
     /** «Сон бабочки»: the waking scene starts on this client (the glass breaks 34 ticks later). */
     public static final int DREAM_WAKE = 21;
     /** zone kinds (i of ZONE / ZONE_END) */
-    public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4, Z_HOUSE = 5, Z_NO_AWAKENING = 6;
+    public static final int Z_VEIL = 1, Z_LABYRINTH = 2, Z_NIGHTMARE = 3, Z_DREAM = 4, Z_HOUSE = 5, Z_NO_AWAKENING = 6, Z_WAKING = 7;
 
     public final byte kind;
     public final int entity, ticks, i;

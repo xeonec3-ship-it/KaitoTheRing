@@ -141,6 +141,9 @@ public class WakingNightmareSpell extends IllusionBase {
         if (MONSTERS && t instanceof ServerPlayer p)
             Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE, caster.getId(), ticks, IlluMsg.Z_NIGHTMARE, null, "",
                     t.getX(), t.getY(), t.getZ(), MONSTERS_R, 0));
+        else if (t instanceof ServerPlayer p)   // owner 19.11: every person round the victim wears the caster's monster (nm_dread), on its client
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE, caster.getId(), ticks, IlluMsg.Z_WAKING, null, "",
+                    t.getX(), t.getY(), t.getZ(), MONSTERS_R, 0));
         DREAMS.put(t.getUUID(), d);
     }
 
@@ -150,7 +153,8 @@ public class WakingNightmareSpell extends IllusionBase {
         d.monsters.clear();
         d.target.removeEffect(Reg.WAKING_NIGHTMARE.get());
         if (d.target instanceof ServerPlayer p)
-            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE_END, d.caster.getId(), 0, IlluMsg.Z_NIGHTMARE, null, "", 0, 0, 0, 0, 0));
+            Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE_END, d.caster.getId(), 0, MONSTERS ? IlluMsg.Z_NIGHTMARE : IlluMsg.Z_WAKING,
+                    null, "", 0, 0, 0, 0, 0));
     }
 
     /** A faceless monster on every living thing round the victim, only for the victim (refreshed, as the fx lives 60 ticks). */

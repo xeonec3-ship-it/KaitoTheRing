@@ -736,10 +736,14 @@ def coven_arrival_cast():
     # 19–38: невидим в портале — нейтральная поза, тело стоит «внутри портала»
     a.pose(19.05, body={'y': 0, 'z': -2.5}, rightArm=CALM_R, leftArm=mirror(CALM_R))   # ещё шаг вперёд, в портал
     a.pose(20.0, body={'y': 0, 'z': COVEN_WALK_FROM})   # уже скрыт (с 19 с): тело отводится к точке выхода у портала
-    a.pose(37.0, rightArm=CALM_R, leftArm=mirror(CALM_R), head={'pitch': 6, 'yaw': 0, 'roll': 0}, torso=TORSO0,
+    a.pose(35.0, rightArm=CALM_R, leftArm=mirror(CALM_R), head={'pitch': 6, 'yaw': 0, 'roll': 0}, torso=TORSO0,
            body={'y': 0, 'z': COVEN_WALK_FROM}, rightLeg=ZERO_LEG, leftLeg=ZERO_LEG)
-    # 38–48: выход — левая за спиной, правая свободно, медленный шаг
-    _behind(a, 37.6, 'left')
+    # 38–48: выход — левая за спиной, правая свободно, медленный шаг.
+    # Владелец 19.11: «при выходе из портала иногда ломается левая рука» — разворот руки за спину (yaw 0→150 со сгибом) шёл
+    # в 37.6–38.3 с и при выходе в 38 с его было видно на полпути (рука вывернута). Теперь он целиком внутри портала (35.5–36.2 с),
+    # к выходу рука уже спокойно за спиной.
+    _behind(a, 35.5, 'left')
+    a.key(37.0, 'leftArm', **mirror(BEHIND_R))
     _steps(a, 38.4, 47.4, 0.95, COVEN_WALK_FROM, 0.0)
     a.pose(47.6, head={'pitch': -4, 'yaw': 0, 'roll': 0})
     # 48–56: оглядывает арену

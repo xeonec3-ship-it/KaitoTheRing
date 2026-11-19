@@ -1,0 +1,170 @@
+{
+ "comment": "Благословение, 0–2 с: золотой круг под заклинателем (и меньший — под целью, scale 0.62): розетка прорисовывается, священная печать с доворотом, надпись «БЛАГОСЛОВЕНИЕ», нежно-голубой обод.",
+ "size": 2.6,
+ "color": "#FFC94D",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": -0.01,
+   "color": "#FFE7A0",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 50
+   }
+  },
+  {
+   "id": "rays",
+   "type": "spokes",
+   "texture": "rays",
+   "radius": 1.4,
+   "heightOffset": -0.005,
+   "color": "#FFF4D6",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 1
+   }
+  },
+  {
+   "id": "rose",
+   "type": "disc",
+   "texture": "bless_rose",
+   "radius": 0.96,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 28,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 3
+   }
+  },
+  {
+   "id": "holy",
+   "type": "disc",
+   "texture": "holy_seal",
+   "radius": 0.42,
+   "heightOffset": 0.01,
+   "color": "#FFFFFF",
+   "appear": {
+    "delay": 10,
+    "duration": 20,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "twist",
+     "fade"
+    ],
+    "twist": -120
+   },
+   "rotation": {
+    "speed": -6
+   }
+  },
+  {
+   "id": "words",
+   "type": "text",
+   "radius": 1.03,
+   "heightOffset": 0.02,
+   "color": "#A8DCFF",
+   "brightness": 0.95,
+   "appear": {
+    "delay": 16,
+    "duration": 22,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "text": "БЛАГОСЛОВЕНИЕ ✦ ",
+   "font": "cyrillic",
+   "size": 0.085,
+   "repeat": 3,
+   "side": "outer"
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.13,
+   "heightOffset": 0.025,
+   "color": "#A8DCFF",
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 22,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   }
+  },
+  {
+   "id": "star",
+   "type": "disc",
+   "texture": "star_ring",
+   "radius": 0.2,
+   "heightOffset": 0.03,
+   "color": "#FFFFFF",
+   "appear": {
+    "delay": 26,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 12
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFF4D6",
+  "size": 1.2,
+  "duration": 12,
+  "sparks": 24
+ },
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "collapse"
+  ],
+  "duration": 24,
+  "stagger": 2
+ }
+}

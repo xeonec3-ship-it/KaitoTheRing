@@ -1,0 +1,429 @@
+{
+ "comment": "Благословение, каст 10 с (200 тиков) и финал до 220. Точки: caster — заклинатель, target — цель (без цели код передаёт target = caster). 0–2 с золотые круги под обоими, падают перья, за спиной встают золотые круги; 2–6 с над целью раскрывается нимб-печать, сверху столб мягкого света; 6–9 с свет опускается на цель, тёмные осколки дебаффов вылетают и сгорают; 9.5–10 с вспышка, кольцо по земле, перья разлетаются.",
+ "style": "blessing",
+ "duration": 220,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "blessing_ground",
+   "until": 198
+  },
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "target+0,0.07,0",
+   "id": "blessing_ground",
+   "scale": 0.62,
+   "until": 198
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 40,
+   "texture": "spark_soft",
+   "count": 90,
+   "rate": 2.2,
+   "area": 2.4,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "size": [
+    0.15,
+    0.03
+   ],
+   "life": 36,
+   "color": "#FFE7A0",
+   "glow": 0.4
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,4.2,0",
+   "duration": 190,
+   "texture": "feather",
+   "count": 110,
+   "rate": 0.6,
+   "area": 2.6,
+   "speed": 0.003,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "tumble": 0.6,
+   "size": [
+    0.32,
+    0.22
+   ],
+   "life": 150,
+   "color": "@secondary",
+   "comment": "перья падают у заклинателя"
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "target+0,4.6,0",
+   "duration": 180,
+   "texture": "feather",
+   "count": 110,
+   "rate": 0.6,
+   "area": 2.0,
+   "speed": 0.003,
+   "gravity": 0.0012,
+   "sway": 1.2,
+   "tumble": 0.6,
+   "size": [
+    0.32,
+    0.22
+   ],
+   "life": 150,
+   "color": "#A8DCFF",
+   "brightness": 0.8,
+   "comment": "перья падают у цели"
+  },
+  {
+   "type": "sigil",
+   "delay": 18,
+   "at": "caster+-1.2,2.05,-0.55",
+   "id": "golden_halo"
+  },
+  {
+   "type": "sigil",
+   "delay": 22,
+   "at": "caster+1.2,2.05,-0.55",
+   "id": "golden_halo"
+  },
+  {
+   "type": "sigil",
+   "delay": 26,
+   "at": "caster+-0.7,1.93,-0.55",
+   "id": "golden_halo"
+  },
+  {
+   "type": "sigil",
+   "delay": 30,
+   "at": "caster+0.7,1.93,-0.55",
+   "id": "golden_halo"
+  },
+  {
+   "type": "sigil",
+   "delay": 40,
+   "at": "target+0,2.7,0",
+   "follow": true,
+   "id": "blessing_halo",
+   "until": 188
+  },
+  {
+   "type": "column",
+   "delay": 50,
+   "at": "target",
+   "duration": 150,
+   "radius": 0.85,
+   "height": 18,
+   "rings": 3,
+   "ringSpeed": 2,
+   "fill": 0,
+   "brightness": 0.5,
+   "color": "@secondary",
+   "in": {
+    "duration": 30,
+    "easing": "easeInOutSine"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "comment": "столб мягкого света сверху"
+  },
+  {
+   "type": "curtain",
+   "delay": 60,
+   "at": "target",
+   "duration": 130,
+   "radius": [
+    1.1,
+    2.3
+   ],
+   "count": 14,
+   "height": 16,
+   "grow": 40,
+   "width": [
+    0.04,
+    0.1
+   ],
+   "brightness": [
+    0.2,
+    0.5
+   ],
+   "flicker": 0.2,
+   "texture": "beam_fade",
+   "color": "#A8DCFF",
+   "out": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "halo",
+   "delay": 110,
+   "at": "target",
+   "follow": true,
+   "duration": 90,
+   "size": 0.42,
+   "spin": 2,
+   "color": "@primary",
+   "in": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 120,
+   "at": "target+0,2.7,0",
+   "to": "target+0,0.1,0",
+   "follow": true,
+   "duration": 70,
+   "width": 0.55,
+   "core": 0.3,
+   "grow": 40,
+   "easing": "easeInOutSine",
+   "color": "@secondary",
+   "brightness": 0.8,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "comment": "свет опускается на цель"
+  },
+  {
+   "type": "aura",
+   "delay": 124,
+   "at": "target",
+   "target": "target",
+   "duration": 76,
+   "thickness": 0.12,
+   "pulse": [
+    0.2,
+    20
+   ],
+   "motes": 18,
+   "texture": "spark_soft",
+   "color": "#FFF4D6",
+   "in": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 124,
+   "at": "target+0,1.0,0",
+   "follow": true,
+   "duration": 56,
+   "texture": "shard",
+   "count": 70,
+   "rate": 1.25,
+   "spread": 0.45,
+   "speed": 0.05,
+   "gravity": -0.0035,
+   "tumble": 1,
+   "size": [
+    0.3,
+    0.06
+   ],
+   "life": 26,
+   "color": "#2A0F3A",
+   "blend": "translucent",
+   "comment": "тёмные осколки дебаффов вылетают из тела вверх"
+  },
+  {
+   "type": "sprites",
+   "delay": 128,
+   "at": "target+0,2.1,0",
+   "follow": true,
+   "duration": 56,
+   "texture": "spark_soft",
+   "count": 120,
+   "rate": 2.1,
+   "spread": 0.85,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    0.22,
+    0.02
+   ],
+   "life": 18,
+   "color": "#FFB347",
+   "glow": 0.6,
+   "comment": "и сгорают золотыми искрами"
+  },
+  {
+   "type": "flash",
+   "delay": 132,
+   "at": "target+0.33,2.24,0.55",
+   "duration": 7,
+   "size": 0.4040035869734757,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 137,
+   "at": "target+0.19,2.25,-0.68",
+   "duration": 7,
+   "size": 0.4090140908740526,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 145,
+   "at": "target+0.49,1.95,0.01",
+   "duration": 7,
+   "size": 0.5484377554642412,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 148,
+   "at": "target+0.05,2.21,0.41",
+   "duration": 7,
+   "size": 0.5988432558974023,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 157,
+   "at": "target+0.07,1.92,-0.5",
+   "duration": 7,
+   "size": 0.43223233658848204,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 162,
+   "at": "target+-0.36,1.92,0.01",
+   "duration": 7,
+   "size": 0.5352554452000362,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 166,
+   "at": "target+0.6,2.22,0.37",
+   "duration": 7,
+   "size": 0.4880007187434622,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 173,
+   "at": "target+-0.3,2.37,0.45",
+   "duration": 7,
+   "size": 0.4674855043476178,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 179,
+   "at": "target+0.14,2.05,-0.31",
+   "duration": 7,
+   "size": 0.5921922493780285,
+   "rays": 4,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 190,
+   "at": "target+0,1.3,0",
+   "duration": 14,
+   "size": 5,
+   "anamorphic": 12,
+   "rays": 12,
+   "screen": 0.45,
+   "color": "#FFF8E6"
+  },
+  {
+   "type": "wave",
+   "delay": 190,
+   "at": "target",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 7,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 192,
+   "at": "target",
+   "duration": 26,
+   "shape": "ring",
+   "radius": 4.5,
+   "color": "#A8DCFF"
+  },
+  {
+   "type": "wave",
+   "delay": 190,
+   "at": "target+0,1,0",
+   "duration": 18,
+   "shape": "sphere",
+   "radius": 2.6,
+   "rim": 1.2,
+   "color": "#A8DCFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 190,
+   "at": "target+0,1.4,0",
+   "duration": 3,
+   "texture": "feather",
+   "count": 40,
+   "rate": 40,
+   "spread": 0.4,
+   "speed": 0.2,
+   "gravity": 0.003,
+   "sway": 1.0,
+   "tumble": 1,
+   "size": [
+    0.45,
+    0.3
+   ],
+   "life": 50,
+   "color": "@secondary",
+   "comment": "перья разлетаются"
+  },
+  {
+   "type": "sprites",
+   "delay": 191,
+   "at": "target+0,1.2,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 60,
+   "rate": 60,
+   "spread": 0.5,
+   "speed": 0.16,
+   "gravity": -0.002,
+   "size": [
+    0.25,
+    0.03
+   ],
+   "life": 26,
+   "color": "#FFE7A0",
+   "glow": 0.5
+  }
+ ]
+}

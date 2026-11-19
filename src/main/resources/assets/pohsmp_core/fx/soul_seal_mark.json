@@ -1,0 +1,32 @@
+{
+ "comment": "Печать души: постоянный знак на груди (duration −1, пока код не остановит; caster = запечатанный игрок, follow — едет за ним). Тихие фиолетовые пылинки.",
+ "style": "soul_seal",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,1.35,0.2",
+   "follow": true,
+   "id": "soul_seal_mark"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.35,0.2",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.15,
+   "spread": 0.12,
+   "speed": 0.004,
+   "gravity": -0.001,
+   "size": [
+    0.06,
+    0.01
+   ],
+   "life": 30,
+   "color": "#9A6CFF"
+  }
+ ]
+}

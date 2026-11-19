@@ -1,0 +1,60 @@
+{
+ "comment": "Печать-замок: вертикальные кольца над целью (вместе с замком дают объём «гироскопа»).",
+ "size": 1.05,
+ "color": "#D9A441",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "saw",
+   "type": "disc",
+   "texture": "orbit_saw",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#9A6CFF",
+   "brightness": 1.2,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -40,
+    "boost": 3
+   }
+  },
+  {
+   "id": "dash",
+   "type": "disc",
+   "texture": "orbit_dash",
+   "radius": 1.2,
+   "heightOffset": 0.02,
+   "color": "#E6F0FF",
+   "brightness": 0.7,
+   "appear": {
+    "delay": 8,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 26
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "collapse"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

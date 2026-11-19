@@ -1,0 +1,21 @@
+{
+ "comment": "Благословение: тёплое золото, белый, нежно-голубой; перья, нимб, столб мягкого света.",
+ "palette": {
+  "primary": "#FFC94D",
+  "secondary": "#FFF4D6",
+  "core": "#FFFFFF",
+  "shadow": "#5A8AB8"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "feather",
+  "sigil": "bless_halo"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.5,
+  "jitter": 0.0,
+  "easing": "easeOutSine"
+ }
+}

@@ -1,0 +1,21 @@
+{
+ "comment": "Печать души: тёмное золото, холодный белый, фиолетовые цепи.",
+ "palette": {
+  "primary": "#D9A441",
+  "secondary": "#E6F0FF",
+  "core": "#FFFFFF",
+  "shadow": "#3A1E6A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "shard",
+  "sigil": "soul_lock"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.7,
+  "jitter": 0.0,
+  "easing": "easeOutSine"
+ }
+}

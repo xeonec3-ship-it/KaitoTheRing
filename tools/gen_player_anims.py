@@ -1524,6 +1524,66 @@ _T22 = [illusion_mirror_images_cast, illusion_false_step_cast, illusion_veil_cas
         illusion_butterfly_wake]
 
 
+# ---------------------------------------------------------------- T24: «Стёртое имя» (Запретная, «Мироздание»), 15 с = 300 тиков ровно
+# Шкала — docs/specs/tasks/T24_erased_name.md (раздел «Ролик») и fx/erased_name_cast.json (tools/gen_forbidden_fx.py).
+# Левая ладонь держит невидимую «книгу имён» у груди, правая — «перо»: пишет имя в воздухе, вычёркивает его (6 с), стирает
+# ладонью строки (7–11.5 с), заносит руку (12–14 с), замирает в тишине (14.0–14.45) и последним росчерком рассекает воздух (14.5 с).
+EN_T = 15.0
+EN_POINT_R = _fk(pitch=-92, yaw=2, roll=-2, bend=-6)            # рука к цели
+EN_SWEEP_END_R = _fk(pitch=-80, yaw=10, roll=46, bend=-6)       # конец первого росчерка: рука ушла вправо-вперёд
+EN_PALM_R = _fk(pitch=-84, yaw=4, roll=8, bend=-8)              # ладонь вниз перед собой
+EN_LEGS = dict(rightLeg=_TO(pitch=-10, roll=5, bend=10), leftLeg=_TO(pitch=12, roll=-5, bend=6))
+
+
+def erased_name_cast():
+    a, r = Anim('pohsmp_erased_name_cast', EN_T), Rig()
+    _start(a)
+    book_l = r.L(2.6, 16.8, 6.4, elbow_out=1.4)                  # левая ладонь вверх у груди — «книга»
+    a.pose(0.9, 'easeInOutSine', rightArm=r.R(-2.2, 18.4, 6.2, elbow_out=1.3), leftArm=book_l, torso=_TO(pitch=4, bend=4),
+           head=_HL(pitch=18))                                    # смотрит в «книгу»
+    a.pose(1.55, 'easeOutCubic', rightArm=EN_POINT_R, torso=_TO(pitch=1, yaw=-4, bend=1), head=_HL(pitch=-2, yaw=4), **EN_LEGS)
+    # 1.6–3.4 с: пишет имя в воздухе слева направо, мелкими дугами
+    t, k = 1.7, 0
+    while t < 3.4:
+        prog = (t - 1.7) / 1.7
+        a.pose(t, 'easeInOutSine', rightArm=_fk(pitch=-95 if k % 2 == 0 else -87, yaw=2, roll=-10 + 26 * prog, bend=-8 - 4 * (k % 2)),
+               head=_HL(pitch=-3, yaw=4 - 6 * prog))
+        t += 0.17
+        k += 1
+    a.sway(1.55, 5.6, 0.7, 'leftArm', book_l, 'roll', -2)
+    # 3.4–5.6: рука уходит к левому плечу — замах
+    wind_r = r.R(2.6, 20.4, 5.6, elbow_out=1.4)
+    a.pose(4.6, 'easeInOutCubic', rightArm=wind_r, torso=_TO(pitch=-1, yaw=-16, bend=-1), head=_HL(pitch=-2, yaw=12))
+    a.sway(4.6, 5.55, 0.3, 'rightArm', wind_r, 'pitch', 1.5)
+    # 5.6–6.15: росчерк слева направо — черта по имени (fx: 114–123 тик)
+    a.pose(5.85, 'easeInQuad', rightArm=_fk(pitch=-92, yaw=0, roll=4, bend=-10), torso=_TO(pitch=2, yaw=0, bend=2), head=_HL(pitch=-2, yaw=2))
+    a.pose(6.1, 'easeOutCubic', rightArm=EN_SWEEP_END_R, torso=_TO(pitch=3, yaw=16, bend=2), head=_HL(pitch=-2, yaw=-10))
+    a.pose(6.35, rightArm=EN_SWEEP_END_R)
+    # 7–11.5: ладонь вниз, медленно стирает строки — два проведения
+    a.pose(7.0, 'easeInOutSine', rightArm=EN_PALM_R, torso=_TO(pitch=3, yaw=2, bend=2), head=_HL(pitch=0, yaw=-2))
+    for tt, roll, ty in ((8.4, -22, -8), (9.8, 30, 8), (11.2, -12, -4)):
+        a.pose(tt, 'easeInOutSine', rightArm=_fk(pitch=-82, yaw=4, roll=roll, bend=-8), torso=_TO(pitch=3, yaw=ty, bend=2), head=_HL(pitch=0, yaw=-ty * 0.6))
+    # 11.5–13.6: рука взлетает высоко вправо — замах; левая отпускает «книгу» вниз-в сторону
+    up_t = _TO(yaw=22, pitch=-3)
+    a.pose(13.2, 'easeInOutCubic', rightArm=SLASH_UP_R, leftArm=_fk(pitch=-20, roll=-14, bend=-30), torso=up_t, head=_HL(yaw=-14, pitch=-4),
+           body={'y': 0.02})
+    a.sway(13.2, 13.95, 0.12, 'rightArm', SLASH_UP_R, 'roll', 1.2)     # дрожь силы перед тишиной
+    a.pose(14.0, rightArm=SLASH_UP_R, torso=up_t)
+    a.pose(14.45, rightArm=SLASH_UP_R, torso=up_t, head=_HL(yaw=-14, pitch=-4))   # 14.0–14.45: тишина, полная неподвижность
+    # 14.45–14.65: последний росчерк наискось вниз-влево (fx/erased_vanish на 290 тике)
+    end_t = _TO(yaw=-24, pitch=8, bend=4)
+    end_l = _fk(pitch=-6, roll=-22, bend=-20)
+    a.pose(14.65, 'easeOutQuart', rightArm=SLASH_DOWN_R, leftArm=end_l, torso=end_t, head=_HL(yaw=12, pitch=4), body={'y': -0.06},
+           rightLeg=_TO(pitch=-12, roll=5, bend=14), leftLeg=_TO(pitch=14, roll=-5, bend=6))
+    a.pose(EN_T, rightArm=SLASH_DOWN_R, leftArm=end_l, torso=end_t, head=_HL(yaw=12, pitch=6), body={'y': -0.06})
+    return a, (SLASH_DOWN_R, end_l, end_t, (_TO(pitch=-12, roll=5, bend=14), _TO(pitch=14, roll=-5, bend=6)), -0.06)
+
+
+_T24 = [lambda: erased_name_cast()[0],
+        lambda: _finish('pohsmp_erased_name_finish', *erased_name_cast()[1][:3], head=_HL(yaw=12, pitch=6), legs=erased_name_cast()[1][3],
+                        body_y=-0.06, length=1.2)]
+
+
 def pose_gallery():
     """Только для превью: по 1.4 с на каждую позу библиотеки."""
     out = []
@@ -1560,7 +1620,7 @@ _BL = (lambda: blessing_cast()[0],
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
          scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
          silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish,
-         *_SS, *_BL, *_T22]
+         *_SS, *_BL, *_T22, *_T24]
 
 
 def main():

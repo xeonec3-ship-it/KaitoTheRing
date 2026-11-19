@@ -1,0 +1,63 @@
+{
+ "comment": "Стёртое имя: пустота на месте груди (к камере) — кольцо обломков букв вокруг пустого центра, сжимается в точку за 1 с (цель уходит в ничто).",
+ "size": 1.2,
+ "color": "#F6F2E8",
+ "orientation": "billboard",
+ "lifetime": -1,
+ "hold": 0,
+ "layers": [
+  {
+   "id": "void",
+   "type": "disc",
+   "texture": "erase_void",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#F6F2E8",
+   "brightness": 1.3,
+   "appear": {
+    "delay": 0,
+    "duration": 3,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": -40
+   }
+  },
+  {
+   "id": "ring",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 0.36,
+   "heightOffset": 0.01,
+   "color": "#C8182E",
+   "brightness": 1.6,
+   "inner": 0.9,
+   "repeat": 1,
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  }
+ ],
+ "expand": {
+  "scale": 0.04,
+  "delay": 2,
+  "duration": 18,
+  "easing": "easeInCubic"
+ },
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 4,
+  "stagger": 2
+ }
+}

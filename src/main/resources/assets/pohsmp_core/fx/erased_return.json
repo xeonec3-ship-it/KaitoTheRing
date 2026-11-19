@@ -1,0 +1,113 @@
+{
+ "comment": "Стёртое имя: возвращение в мир (код при истечении 10 мин / «Благословении», caster = вернувшийся, follow). 0–18 буквы со всех сторон стягиваются к нему, контур проявляется; над головой заново вписывается имя (слот name); на 18 тике — мягкая тёплая вспышка, кольцо: мир «вспомнил». Модель показывать с 18 тика (по желанию — полупрозрачной 18–30).",
+ "style": "erased_name",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "duration": 20,
+   "radius": 2.6,
+   "height": 2.2,
+   "arms": 4,
+   "speed": 3,
+   "pull": 1,
+   "texture": "mote_erased",
+   "particles": 90,
+   "life": 18,
+   "size": 0.16,
+   "color": "#F6F2E8"
+  },
+  {
+   "type": "aura",
+   "delay": 4,
+   "at": "caster",
+   "target": "caster",
+   "duration": 40,
+   "thickness": 0.08,
+   "motes": 16,
+   "texture": "spark_soft",
+   "color": "#FFF1D6",
+   "in": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 24,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 6,
+   "at": "caster+0,2.75,0",
+   "follow": true,
+   "id": "erased_nameplate_return",
+   "until": 56
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 36,
+   "radius": 6,
+   "color": "#8E8A84",
+   "strength": 0.4,
+   "saturation": 0.2,
+   "in": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeInOutSine"
+   },
+   "comment": "серость уходит — мир снова цветной"
+  },
+  {
+   "type": "flash",
+   "delay": 18,
+   "at": "caster+0,1.1,0",
+   "follow": true,
+   "duration": 12,
+   "size": 2.0,
+   "rays": 6,
+   "anamorphic": 3,
+   "color": "#FFF4DE"
+  },
+  {
+   "type": "wave",
+   "delay": 18,
+   "at": "caster+0,0.05,0",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 3.2,
+   "thickness": 0.14,
+   "color": "#FFE6B0",
+   "brightness": 0.8
+  },
+  {
+   "type": "sprites",
+   "delay": 18,
+   "at": "caster+0,0.9,0",
+   "follow": true,
+   "duration": 20,
+   "texture": "spark_soft",
+   "count": 50,
+   "rate": 2.5,
+   "spread": 0.4,
+   "speed": 0.02,
+   "gravity": -0.005,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 26,
+   "color": "#FFE6B0",
+   "glow": 0.6,
+   "comment": "цвет возвращается тёплыми искрами"
+  }
+ ]
+}

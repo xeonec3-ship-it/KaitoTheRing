@@ -1,0 +1,22 @@
+{
+ "comment": "Стёртое имя (Запретная, «Мироздание»): бумага и чернила — пепельно-белые строки, багровые вычёркивания, серая пустота; движение тихое и вязкое, без рывков.",
+ "palette": {
+  "primary": "#E9E4D8",
+  "secondary": "#C8182E",
+  "core": "#FFFFFF",
+  "shadow": "#16141A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "mote_erased",
+  "sigil": "erase_ledger"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.5,
+  "jitter": 0.05,
+  "easing": "easeInOutSine"
+ },
+ "sigilTheme": "книга имён, вычёркивание, пепел букв"
+}

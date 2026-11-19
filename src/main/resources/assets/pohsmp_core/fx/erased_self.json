@@ -1,0 +1,47 @@
+{
+ "comment": "Стёртое имя: тихий фон у самого стёртого (только ему: Fx…only(игрок), duration −1, follow; код останавливает при возвращении). Редкие бледные буквы и пепел медленно плывут вокруг — «мир тебя не помнит». Накладка экрана — textures/gui/overlay/erased_*.png (код).",
+ "style": "erased_name",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "follow": true,
+   "texture": "mote_erased",
+   "count": 100000,
+   "rate": 0.12,
+   "spread": 3.2,
+   "speed": 0.002,
+   "gravity": -0.0006,
+   "spin": 20,
+   "size": [
+    0.12,
+    0.04
+   ],
+   "life": 80,
+   "color": "#9C978E",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "follow": true,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 0.06,
+   "spread": 3.6,
+   "speed": 0.002,
+   "gravity": 0.0008,
+   "tumble": 0.8,
+   "size": [
+    0.12,
+    0.05
+   ],
+   "life": 90,
+   "color": "#4A4648",
+   "blend": "translucent"
+  }
+ ]
+}

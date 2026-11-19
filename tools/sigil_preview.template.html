@@ -1383,6 +1383,13 @@ const SCENES = {
   "Иллюзии: стеклянная бабочка (модель)": () => { caster.visible = false; return [new Portal("illusion_butterfly", new THREE.Vector3(0, 1, 0), { noAuto: true, scale: 2.5 })]; },
   "Иллюзии: Сон бабочки — проявление": () => [new FxRun("illusion_butterfly_reveal", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
   "Иллюзии: Сон бабочки — пробуждение": () => [new FxRun("illusion_butterfly_wake", { caster: new THREE.Vector3(0, 0, 0), noTarget: true }), new FxRun("illusion_butterfly_wake_hit", { caster: new THREE.Vector3(0, 0, 0), noLift: true })],
+  "Запретная: печать ступени «Мироздание»": () => [new FxRun("school_forbidden_cast_creation", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Стёртое имя: каст (15 с)": () => [new FxRun("erased_name_cast", { caster: new THREE.Vector3(0, 0, -7), noLift: true, faceCaster: true })],
+  "Стёртое имя: исчезновение": () => [new FxRun("erased_vanish", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Стёртое имя: возвращение в мир": () => [new FxRun("erased_return", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Стёртое имя: табличка с именем": () => [new Sigil("erased_nameplate", new THREE.Vector3(0, 2.0, 0), { stopAfter: 200 })],
+  "Стёртое имя: печать под целью": () => [new Sigil("erased_target", new THREE.Vector3(0, 0.03, 0), { stopAfter: 160 })],
+  "Стёртое имя: небесная книга": () => [new Sigil("erased_sky", new THREE.Vector3(0, 6, 0), { stopAfter: 160 })],
   "Редактор печати": () => [new Sigil("__edit", new THREE.Vector3(0, DATA.sigils.__edit.orientation === "ground" ? 0.02 : DATA.sigils.__edit.orientation === "sky" ? 6 : 2, 0))],
 };
 // небесная печать Silent Gate с разборкой «трещины» — только для превью (сам файл не меняется)
@@ -1432,6 +1439,13 @@ MAIN_ID["Иллюзии: Сон бабочки — каст"] = "illusion_butter
 MAIN_ID["Иллюзии: стеклянная бабочка (модель)"] = "illusion_butterfly"; VIEW_FOR["Иллюзии: стеклянная бабочка (модель)"] = "close";
 MAIN_ID["Иллюзии: Сон бабочки — проявление"] = "illusion_butterfly_reveal"; VIEW_FOR["Иллюзии: Сон бабочки — проявление"] = "close";
 MAIN_ID["Иллюзии: Сон бабочки — пробуждение"] = "illusion_butterfly_wake"; VIEW_FOR["Иллюзии: Сон бабочки — пробуждение"] = "dream";
+MAIN_ID["Запретная: печать ступени «Мироздание»"] = "school_forbidden_cast_creation"; VIEW_FOR["Запретная: печать ступени «Мироздание»"] = "school";
+MAIN_ID["Стёртое имя: каст (15 с)"] = "erased_name_cast"; VIEW_FOR["Стёртое имя: каст (15 с)"] = "t24";
+MAIN_ID["Стёртое имя: исчезновение"] = "erased_vanish"; VIEW_FOR["Стёртое имя: исчезновение"] = "close";
+MAIN_ID["Стёртое имя: возвращение в мир"] = "erased_return"; VIEW_FOR["Стёртое имя: возвращение в мир"] = "close";
+MAIN_ID["Стёртое имя: табличка с именем"] = "erased_nameplate"; VIEW_FOR["Стёртое имя: табличка с именем"] = "t21chest";
+MAIN_ID["Стёртое имя: печать под целью"] = "erased_target"; VIEW_FOR["Стёртое имя: печать под целью"] = "above";
+MAIN_ID["Стёртое имя: небесная книга"] = "erased_sky"; VIEW_FOR["Стёртое имя: небесная книга"] = "t21lock";
 
 let hitQueue = [], nextAutoHit = 24;
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -1468,6 +1482,7 @@ const VIEWS = { whip: [1.35, 0.18, 8, 1.0], hit: [0.55, 0.78, 8.5, 0.2], hitBig:
 VIEWS.t21 = [1.15, 0.2, 13, 1.8]; VIEWS.t21lock = [0.4, -0.35, 6.5, 2.6]; VIEWS.t21chest = [0.25, 0.1, 3.4, 1.3];   // T21
 VIEWS.school = [0.55, 0.55, 9.5, 1.1]; VIEWS.gallery = [0.0, 1.32, 27, 0];   // сцены «Школа: …» (T06)
 VIEWS.dome = [0.6, 0.35, 40, 3]; VIEWS.dream = [0.5, 0.3, 22, 3];   // T22, «Иллюзии»
+VIEWS.t24 = [1.0, 0.22, 15, 2.2];   // T24, «Стёртое имя»
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

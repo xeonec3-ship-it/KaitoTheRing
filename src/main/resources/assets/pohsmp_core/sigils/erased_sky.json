@@ -1,0 +1,142 @@
+{
+ "comment": "Стёртое имя: «небесная книга» над целью (план сверху): огромная книга имён, кольцо надписи «ЧЕГО НЕ ПОМНЯТ — ТОГО НЕТ», багровые дуги вычёркиваний; тихо вращается, гаснет к тишине.",
+ "size": 6.0,
+ "color": "#E9E4D8",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.01,
+   "color": "#9C978E",
+   "brightness": 0.22,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "warp",
+   "type": "disc",
+   "texture": "creation_warp",
+   "radius": 0.62,
+   "heightOffset": 0.0,
+   "color": "#9C978E",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 4
+   }
+  },
+  {
+   "id": "ledger",
+   "type": "disc",
+   "texture": "erase_ledger",
+   "radius": 0.9,
+   "heightOffset": 0.005,
+   "appear": {
+    "delay": 6,
+    "duration": 46,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -1.5
+   }
+  },
+  {
+   "id": "motto",
+   "type": "text",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "color": "#F6F2E8",
+   "brightness": 0.85,
+   "appear": {
+    "delay": 34,
+    "duration": 50,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 1
+   },
+   "text": "ЧЕГО НЕ ПОМНЯТ — ТОГО НЕТ ✦ ",
+   "font": "cyrillic",
+   "size": 0.055,
+   "repeat": 2,
+   "side": "outer"
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "rim",
+   "radius": 1.1,
+   "heightOffset": 0.015,
+   "color": "#D4A017",
+   "brightness": 0.7,
+   "inner": 0.9,
+   "repeat": 1,
+   "appear": {
+    "delay": 40,
+    "duration": 18,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": -90
+   }
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.2,
+   "heightOffset": 0.02,
+   "color": "#C8182E",
+   "brightness": 1.0,
+   "count": 6,
+   "arcLength": 30,
+   "width": 0.012,
+   "appear": {
+    "delay": 60,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -5
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade",
+   "shatter"
+  ],
+  "duration": 30,
+  "stagger": 2
+ }
+}

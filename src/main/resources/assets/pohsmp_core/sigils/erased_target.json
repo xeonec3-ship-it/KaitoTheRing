@@ -1,0 +1,142 @@
+{
+ "comment": "Стёртое имя: печать под целью — книга имён меньше, надпись «ТЕБЯ НЕ БЫЛО», которую перечёркивает багровая черта; к 13 с разбирается «осколками» (cracks) с пеплом.",
+ "size": 1.9,
+ "color": "#E9E4D8",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 0.95,
+   "heightOffset": -0.005,
+   "color": "#9C978E",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 20,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 40
+   }
+  },
+  {
+   "id": "ledger",
+   "type": "disc",
+   "texture": "erase_ledger",
+   "radius": 0.92,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 36,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 2
+   }
+  },
+  {
+   "id": "words",
+   "type": "text",
+   "radius": 1.02,
+   "heightOffset": 0.008,
+   "color": "#F6F2E8",
+   "brightness": 0.95,
+   "appear": {
+    "delay": 30,
+    "duration": 40,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -2
+   },
+   "text": "ТЕБЯ НЕ БЫЛО ✕ ",
+   "font": "cyrillic",
+   "size": 0.1,
+   "repeat": 3,
+   "side": "outer"
+  },
+  {
+   "id": "strike",
+   "type": "text",
+   "radius": 1.0,
+   "heightOffset": 0.014,
+   "color": "#C8182E",
+   "brightness": 1.5,
+   "spacing": -0.32,
+   "appear": {
+    "delay": 100,
+    "duration": 40,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -2
+   },
+   "text": "—————————————————————————————————————————————————————————————————————————————————",
+   "font": "latin",
+   "size": 0.13,
+   "repeat": 1,
+   "side": "outer"
+  },
+  {
+   "id": "rim",
+   "type": "band",
+   "texture": "thin_ring",
+   "radius": 1.13,
+   "heightOffset": 0.02,
+   "brightness": 0.8,
+   "inner": 0.985,
+   "repeat": 1,
+   "appear": {
+    "delay": 20,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90,
+    "direction": -1
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "cracks"
+  ],
+  "duration": 34,
+  "cracks": {
+   "count": 8,
+   "rings": 1,
+   "irregular": 0.45,
+   "jag": 0.3,
+   "crackTime": 0.35,
+   "fallTime": 0.5,
+   "gap": 0.03,
+   "push": 0.15,
+   "pop": 0.2,
+   "fall": 0.8,
+   "tumble": 120,
+   "spin": 50,
+   "glow": 1.2,
+   "dust": 40,
+   "color": "#D8D2C6"
+  }
+ }
+}

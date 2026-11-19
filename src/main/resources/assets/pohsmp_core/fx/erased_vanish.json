@@ -1,0 +1,128 @@
+{
+ "comment": "Стёртое имя: исчезновение (код на 290 тике каста, caster = цель; на 10 тике этого эффекта = 300 тике каста цель скрывают). Тело рассыпается буквами и пеплом, пустота на месте груди сжимается в точку, по земле — бледное кольцо; ни вспышки, ни звона — тихо. Годится и для других случаев «исчезнуть из мира».",
+ "style": "erased_name",
+ "duration": 50,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "id": "erased_void",
+   "until": 24
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "mote_erased",
+   "count": 90,
+   "rate": 30,
+   "spread": 0.45,
+   "speed": 0.07,
+   "gravity": -0.002,
+   "spin": 120,
+   "tumble": 1,
+   "size": [
+    0.22,
+    0.05
+   ],
+   "life": 34,
+   "color": "#F6F2E8"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 6,
+   "texture": "mote_ash",
+   "count": 50,
+   "rate": 10,
+   "spread": 0.5,
+   "speed": 0.05,
+   "gravity": -0.001,
+   "tumble": 1,
+   "size": [
+    0.2,
+    0.08
+   ],
+   "life": 40,
+   "color": "#1E1B1E",
+   "blend": "translucent"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 12,
+   "thickness": 0.1,
+   "motes": 30,
+   "texture": "mote_erased",
+   "color": "#F6F2E8",
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInCubic"
+   }
+  },
+  {
+   "type": "wave",
+   "delay": 2,
+   "at": "caster+0,1.0,0",
+   "duration": 14,
+   "shape": "sphere",
+   "radius": 1.6,
+   "rim": 0.8,
+   "color": "#E9E4D8",
+   "brightness": 0.5
+  },
+  {
+   "type": "wave",
+   "delay": 8,
+   "at": "caster+0,0.05,0",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 4.0,
+   "thickness": 0.18,
+   "color": "#E9E4D8",
+   "brightness": 0.5
+  },
+  {
+   "type": "decal",
+   "delay": 8,
+   "at": "caster+0,0.03,0",
+   "duration": 42,
+   "texture": "void",
+   "radius": 0.9,
+   "grow": 10,
+   "fadeOut": 30,
+   "color": "#050506",
+   "blend": "translucent",
+   "comment": "пустое место, где стояла цель"
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "at": "caster+0,1.4,0",
+   "duration": 24,
+   "texture": "mote_erased",
+   "count": 16,
+   "rate": 0.7,
+   "spread": 0.5,
+   "speed": 0.002,
+   "gravity": 0.0015,
+   "spin": 30,
+   "size": [
+    0.12,
+    0.05
+   ],
+   "life": 30,
+   "color": "#9C978E",
+   "comment": "последние буквы оседают"
+  }
+ ]
+}

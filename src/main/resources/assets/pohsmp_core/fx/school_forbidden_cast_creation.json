@@ -1,0 +1,51 @@
+{
+ "comment": "Запретная, ступень «Мироздание»: печать каста под заклинателем (общая для школы, как school_<школа>_cast_divine у других). Держится, пока код не остановит (duration −1).",
+ "style": "forbidden",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "forbidden_creation_seal"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.15,0",
+   "texture": "mote_erased",
+   "count": 100000,
+   "rate": 0.35,
+   "area": 4.2,
+   "speed": 0.004,
+   "gravity": -0.0025,
+   "spin": 40,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 60,
+   "color": "#E9E4D8",
+   "brightness": 0.7,
+   "comment": "буквы-формулы медленно поднимаются от печати"
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,0.1,0",
+   "texture": "spark_sharp",
+   "count": 100000,
+   "rate": 0.25,
+   "area": 4.4,
+   "speed": 0.006,
+   "gravity": -0.004,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 26,
+   "color": "#D4A017",
+   "glow": 0.4
+  }
+ ]
+}

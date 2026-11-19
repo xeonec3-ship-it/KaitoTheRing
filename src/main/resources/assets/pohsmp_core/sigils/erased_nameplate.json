@@ -1,0 +1,105 @@
+{
+ "comment": "Стёртое имя: табличка с ИМЕНЕМ цели над её головой (всегда к камере). Имя — слот «name» (код: ник цели; без слота — «НЕКТО»), пишется буква за буквой 0–2 с; в 4.5 с (90-й тик печати) багровая черта перечёркивает его слева направо; к 10.3 с буквы рассыпаются.",
+ "size": 0.95,
+ "color": "#F6F2E8",
+ "orientation": "billboard",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.01,
+   "color": "#9C978E",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "plate",
+   "type": "disc",
+   "texture": "erase_plate",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#E9E4D8",
+   "brightness": 0.85,
+   "appear": {
+    "delay": 0,
+    "duration": 16,
+    "easing": "easeOutCubic",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "name",
+   "type": "text",
+   "radius": 0.0,
+   "heightOffset": 0.01,
+   "color": "#F6F2E8",
+   "brightness": 1.2,
+   "slot": "name",
+   "change": 10,
+   "changeFlash": 0.6,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "text": "НЕКТО",
+   "font": "cyrillic",
+   "size": 0.25,
+   "repeat": 1,
+   "side": "line"
+  },
+  {
+   "id": "strike",
+   "type": "text",
+   "radius": 0.05,
+   "heightOffset": 0.02,
+   "color": "#C8182E",
+   "brightness": 1.8,
+   "spacing": -0.34,
+   "appear": {
+    "delay": 90,
+    "duration": 9,
+    "easing": "easeInCubic",
+    "modes": [
+     "draw"
+    ]
+   },
+   "text": "——————————————————",
+   "font": "latin",
+   "size": 0.36,
+   "repeat": 1,
+   "side": "line"
+  }
+ ],
+ "formedFlash": {
+  "color": "#F6F2E8",
+  "size": 0.9,
+  "duration": 8,
+  "sparks": 8
+ },
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 24,
+  "stagger": 2
+ }
+}

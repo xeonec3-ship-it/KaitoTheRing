@@ -1,0 +1,67 @@
+{
+ "comment": "Стёртое имя: строка рун, обвивающая тело цели кольцом (3 штуки на высотах 0.5 / 1.05 / 1.6), пишется, потом её перечёркивают — и она рвётся.",
+ "size": 0.62,
+ "color": "#E9E4D8",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "runes",
+   "type": "text",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#F6F2E8",
+   "brightness": 1.25,
+   "appear": {
+    "delay": 0,
+    "duration": 26,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 20
+   },
+   "text": "NOMEN NESCIO ✕ ",
+   "font": "runic",
+   "size": 0.24,
+   "repeat": 2,
+   "side": "outer"
+  },
+  {
+   "id": "strike",
+   "type": "text",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "color": "#C8182E",
+   "brightness": 1.6,
+   "spacing": -0.32,
+   "appear": {
+    "delay": 40,
+    "duration": 18,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 20
+   },
+   "text": "—————————————————————————————————————————————",
+   "font": "latin",
+   "size": 0.24,
+   "repeat": 1,
+   "side": "outer"
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 16,
+  "stagger": 2
+ }
+}

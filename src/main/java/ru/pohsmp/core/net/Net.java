@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "13";   // 13: IlluMsg (T22); 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
+    private static final String V = "14";   // 14: IlluMsg WALK, NIGHT, IMMERSION, dream kinds (an old client is refused, owner 19.11); 13: IlluMsg (T22); 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {

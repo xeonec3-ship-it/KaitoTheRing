@@ -1,0 +1,165 @@
+{
+ "comment": "Сон бабочки: ролик пробуждения, мир (2.5 с = 50 тиков; caster = жертва, follow; у каждой жертвы и у заклинателя — caster = он). Старт — тик сна 2366 (130.3 с от начала каста, удар в музыке). 0–34: зеркальная плёнка под ногами трескается от центра, трещины светлеют, бабочки замирают и стекленеют (экранная сетка — код); 34 (132.0 с, конец сна, второй акцент музыки): всё бьётся — осколки плёнки взлетают и падают, бабочки рассыпаются стеклом, белая вспышка, кольцо r24; код в этот тик делает Fx.stop мира сна и роняет куски экрана (illusion_wake_shards). 34–50: осколки оседают и тают в настоящем мире. Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 50,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "duration": 36,
+   "texture": "illusion_world_cracks",
+   "radius": 24,
+   "grow": 30,
+   "glow": 0.2,
+   "rotation": 15,
+   "color": "#EFE6FF",
+   "brightness": 0.9,
+   "comment": "плёнка трескается"
+  },
+  {
+   "type": "decal",
+   "delay": 8,
+   "at": "caster+0,0.11,0",
+   "follow": true,
+   "duration": 28,
+   "texture": "illusion_world_cracks",
+   "radius": 12,
+   "grow": 20,
+   "glow": 0.15,
+   "rotation": -40,
+   "color": "#FFB8E6",
+   "brightness": 0.6,
+   "pulse": 8
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "follow": true,
+   "duration": 34,
+   "texture": "spark_soft",
+   "count": 120,
+   "rate": 3.5,
+   "area": 10,
+   "speed": 0.004,
+   "gravity": -0.001,
+   "size": [
+    0.1,
+    0.0
+   ],
+   "life": 20,
+   "color": "#FFFFFF",
+   "comment": "воздух звенит"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.5,0",
+   "follow": true,
+   "duration": 4,
+   "size": 1.6,
+   "screen": 0.12,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "flash",
+   "delay": 34,
+   "at": "caster+0,1.5,0",
+   "follow": true,
+   "duration": 8,
+   "size": 6,
+   "rays": 14,
+   "anamorphic": 14,
+   "screen": 0.55,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "wave",
+   "delay": 34,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 24,
+   "color": "#EFE6FF"
+  },
+  {
+   "type": "wave",
+   "delay": 34,
+   "at": "caster+0,1,0",
+   "duration": 16,
+   "shape": "sphere",
+   "radius": 10,
+   "rim": 1.5,
+   "color": "@primary",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 34,
+   "at": "caster+0,0.2,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 260,
+   "rate": 90,
+   "area": 20,
+   "speed": 0.16,
+   "gravity": 0.012,
+   "spin": 320,
+   "tumble": 1,
+   "size": [
+    0.34,
+    0.12
+   ],
+   "life": 26,
+   "color": "#EFE6FF",
+   "glow": 0.35,
+   "comment": "плёнка разлетается осколками"
+  },
+  {
+   "type": "sprites",
+   "delay": 34,
+   "at": "caster+0,2.5,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 160,
+   "rate": 55,
+   "area": 10,
+   "speed": 0.03,
+   "gravity": 0.014,
+   "spin": 300,
+   "tumble": 1,
+   "size": [
+    0.3,
+    0.1
+   ],
+   "life": 24,
+   "color": "#9AE6FF",
+   "glow": 0.3,
+   "comment": "бабочки → стекло"
+  },
+  {
+   "type": "sprites",
+   "delay": 34,
+   "at": "caster+0,6,0",
+   "duration": 4,
+   "texture": "mote_glass_petal",
+   "count": 120,
+   "rate": 30,
+   "area": 16,
+   "speed": 0.01,
+   "gravity": 0.016,
+   "spin": 200,
+   "tumble": 1,
+   "size": [
+    0.24,
+    0.1
+   ],
+   "life": 22,
+   "color": "#FFB8E6",
+   "glow": 0.3,
+   "comment": "лепестки бьются и сыплются"
+  }
+ ]
+}

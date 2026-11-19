@@ -11,22 +11,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.protocol.game.ClientboundHurtAnimationPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.damagesource.CombatRules;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -34,6 +41,7 @@ import net.minecraftforge.network.PacketDistributor;
 import ru.pohsmp.core.Reg;
 import ru.pohsmp.core.ServerConfig;
 import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.illusion.Copies;
 import ru.pohsmp.core.illusion.Illusions;
 import ru.pohsmp.core.net.HideMsg;
 import ru.pohsmp.core.net.IlluMsg;
@@ -43,11 +51,11 @@ import ru.pohsmp.core.spell.Cutscene;
 import ru.pohsmp.core.spell.HigherSpell;
 
 /**
- * T22 «Сон бабочки» (Mythic): a 12 s cast with the camera scene (Cutscene.BUTTERFLY_DREAM). Then for [butterfly_dream] seconds every enemy
- * player within its radius is in the mirror world: the caster and its allies are not drawn for it (a strike or a cast shows the one who did it
- * for 1 s with a flickering outline); hits on it are full, but [butterfly_dream] share of each is written down as illusory; at the waking the
- * butterflies break and that illusory part never comes back - it is real, with one shard strike (fx wake_hit, tick 8). Blessing before the
- * waking: the dream is over for that one and its illusory part comes back as usual.
+ * T22 «Сон бабочки» (Mythic, reworked by the owner 19.11): a 12 s cast with the camera scene (Cutscene.BUTTERFLY_DREAM) and the music.
+ * Then for 2 minutes every enemy player within 64 blocks is in the mirror world (left and right swapped): the caster and its allies are not
+ * drawn for it (a strike or a cast shows the one who did it for 1 s), 3-5 copies of the caster of its own hunt it. Every hit by the caster,
+ * its allies and the copies is not real: it takes illusory health only; at none left the victim «dies» in the dream and wakes up elsewhere in
+ * it. The waking deals nothing - it was just a dream. Hits from outside the dream stay real.
  */
 public class ButterflyDreamSpell extends IllusionBase {
     public static final String PATH = "butterfly_dream";
@@ -73,7 +81,7 @@ public class ButterflyDreamSpell extends IllusionBase {
     @Override
     public List<MutableComponent> getUniqueInfo(int level, LivingEntity caster) {
         return List.of(ui("cast", CAST / 20), ui("zone", n(d(ServerConfig.BD_RADIUS)), n(d(ServerConfig.BD_SECONDS))),
-                ui("half"));
+                ui("fake"), ui("death"));
     }
 
     // ---------------------------------------------------------------- the cast and its scene
@@ -81,6 +89,16 @@ public class ButterflyDreamSpell extends IllusionBase {
     private static final class Cast {
         int cutKey, fx = -1, age;
         List<UUID> watchers = List.of();
+        /** who hears the music (the caster, its allies and the victims within the dream radius at the start) */
+        final List<UUID> music = new ArrayList<>();
+    }
+
+    /** The music track: 158 s; the waking falls on 132 s of it. */
+    private static final int MUSIC_TICKS = 3160;
+
+    private static void music(ServerLevel sl, UUID id, int i, int ticks) {
+        ServerPlayer p = sl.getServer().getPlayerList().getPlayer(id);
+        if (p != null) Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.DREAM_MUSIC, p.getId(), ticks, i, null, "", 0, 0, 0, 0, 0));
     }
 
     private static final Map<UUID, Cast> CASTS = new HashMap<>();
@@ -99,6 +117,12 @@ public class ButterflyDreamSpell extends IllusionBase {
         c.watchers = Cutscene.start(sl, caster, c.cutKey, Cutscene.BUTTERFLY_DREAM, CAST + TAIL, caster.position().add(dir.scale(5)), Math.atan2(dir.z, dir.x));
         Vec3 touch = caster.position().add(dir.scale(0.65)).add(0, 1.4, 0);
         c.fx = fx(sl, Fx.fx("illusion_butterfly_cast").at(caster.position()).caster(caster).point("touch", touch), "illusion_butterfly_cast");
+        double r = d(ServerConfig.BD_RADIUS);
+        for (ServerPlayer p : sl.players())
+            if (!p.isSpectator() && p.distanceToSqr(caster) <= r * r) {
+                c.music.add(p.getUUID());
+                music(sl, p.getUUID(), 0, MUSIC_TICKS);
+            }
         CASTS.put(caster.getUUID(), c);
         return c;
     }
@@ -138,6 +162,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             if (cancelled) {
                 if (c.fx >= 0) Fx.stop(sl, c.fx, "");
                 Cutscene.end(sl, caster, c.watchers, c.cutKey);
+                for (UUID id : c.music) music(sl, id, 1, 20);   // the track fades in 1 s
             } else {   // the scene keeps its 1 s tail (the camera comes back after it)
                 List<UUID> w = c.watchers;
                 int key = c.cutKey;
@@ -154,25 +179,42 @@ public class ButterflyDreamSpell extends IllusionBase {
 
     // ---------------------------------------------------------------- the dream
 
+    /**
+     * «Death» in the dream (owner 19.11): the dark screen lasts DEATH_SCREEN, the victim is moved on DEATH_MOVE under it, and takes no dream
+     * damage for DEATH_GRACE. The new place: random within the dream, on solid ground, not closer than MIN_FROM_CASTER to the caster.
+     */
+    private static final int DEATH_SCREEN = 40, DEATH_MOVE = 8, DEATH_GRACE = 50, COPY_REFILL = 160;
+    private static final double MIN_FROM_CASTER = 12, COPY_LEASH = 28;
+
     private static final class Dream {
         final LivingEntity caster;
         final ServerLevel sl;
+        final Vec3 center;
+        final double r;
         final List<LivingEntity> hidden = new ArrayList<>();
         /** victim -> its waking time */
         final Map<UUID, Long> victims = new HashMap<>();
         final Map<UUID, Integer> worldFx = new HashMap<>();
         /** hidden one's id -> shown till */
         final Map<Integer, Long> revealed = new HashMap<>();
-        /** victim -> the held back part of the hits on it (strikes at the waking) */
-        final Map<UUID, Double> deferred = new HashMap<>();
+        /** victim -> health it has «lost» in the dream (its real health is untouched; its hearts show real - lost) */
+        final Map<UUID, Double> lost = new HashMap<>();
+        /** victim -> no dream damage till (it has just «died») */
+        final Map<UUID, Long> grace = new HashMap<>();
+        /** victim -> its own copies of the caster, how many it keeps, when a broken one comes back */
+        final Map<UUID, List<Copies.Copy>> copies = new HashMap<>();
+        final Map<UUID, Integer> copyCount = new HashMap<>();
+        final Map<UUID, Long> nextCopy = new HashMap<>();
         final int tag;
         long wakeAll;
         boolean woke;
 
-        Dream(LivingEntity caster, ServerLevel sl, int tag) {
+        Dream(LivingEntity caster, ServerLevel sl, int tag, double r) {
             this.caster = caster;
             this.sl = sl;
             this.tag = tag;
+            this.center = caster.position();
+            this.r = r;
         }
     }
 
@@ -182,7 +224,7 @@ public class ButterflyDreamSpell extends IllusionBase {
     private static void dream(ServerLevel sl, LivingEntity caster) {
         double r = d(ServerConfig.BD_RADIUS);
         int ticks = ticks(ServerConfig.BD_SECONDS);
-        Dream d = new Dream(caster, sl, ++TAG);
+        Dream d = new Dream(caster, sl, ++TAG, r);
         d.hidden.add(caster);
         for (ServerPlayer p : sl.players())
             if (p != caster && !p.isSpectator() && p.distanceToSqr(caster) <= r * r && Illusions.ally(caster, p)) d.hidden.add(p);
@@ -190,14 +232,20 @@ public class ButterflyDreamSpell extends IllusionBase {
         for (ServerPlayer v : Illusions.victims(sl, caster, r)) {
             if (v.isCreative()) continue;
             int t = Illusions.duration(v, ticks);
-            d.victims.put(v.getUUID(), now + t);
+            UUID id = v.getUUID();
+            d.victims.put(id, now + t);
             d.wakeAll = Math.max(d.wakeAll, now + t);
             Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.ZONE, caster.getId(), t, IlluMsg.Z_DREAM, null, "",
                     caster.getX(), caster.getY(), caster.getZ(), (float) r, 0));
             for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), t + 2));
             int f = fx(sl, Fx.fx("illusion_butterfly_world").at(v.position()).caster(v).attach(v).duration(t).only(v), "illusion_butterfly_world");
-            if (f >= 0) d.worldFx.put(v.getUUID(), f);
+            if (f >= 0) d.worldFx.put(id, f);
             v.addEffect(new MobEffectInstance(Reg.BUTTERFLY_DREAM.get(), t, 0, false, false, true));
+            d.lost.put(id, 0.0);
+            d.copies.put(id, new ArrayList<>());
+            int n = 3 + sl.random.nextInt(3);   // 3-5 copies, each victim its own
+            d.copyCount.put(id, n);
+            for (int k = 0; k < n; k++) spawnCopy(d, v);
         }
         if (d.victims.isEmpty()) d.wakeAll = now + ticks;
         sl.playSound(null, caster.getX(), caster.getY() + 1, caster.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 3f, 0.5f);
@@ -208,60 +256,175 @@ public class ButterflyDreamSpell extends IllusionBase {
         return d.sl.getServer().getPlayerList().getPlayer(id);
     }
 
-    /** The dream is over for v (waking, Blessing, gone): the hidden ones are drawn again, its mirror world goes; the held back part is
-     * dropped here (Blessing, logout, death: it burns) - the waking takes it before. */
-    private static void release(Dream d, UUID id) {
-        Integer f = d.worldFx.remove(id);
-        if (f != null) Fx.stop(d.sl, f, "");
-        d.deferred.remove(id);
-        ServerPlayer v = player(d, id);
-        if (v == null) return;
-        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), IlluMsg.of(IlluMsg.ZONE_END, d.caster.getId(), 0));
-        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", 0, 0, 0, 0, 0));
-        for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), 0));
-        v.removeEffect(Reg.BUTTERFLY_DREAM.get());
+    /** One more copy of the caster for v only, 5-9 blocks from it: it walks up and strikes (illusory, like everything in the dream). */
+    private static void spawnCopy(Dream d, ServerPlayer v) {
+        Long end = d.victims.get(v.getUUID());
+        List<Copies.Copy> l = d.copies.get(v.getUUID());
+        if (end == null || l == null) return;
+        long left = end - Illusions.now();
+        if (left < 20) return;
+        Vec3 at = near(d.sl, v.position(), 5, 9);
+        if (at == null) return;
+        Copies.Copy c = Copies.spawn(d.caster, Copies.Mode.HUNTER, at, null, (int) left, i(ServerConfig.MI_HITS), 0, List.of(v));
+        c.damage = (float) d(ServerConfig.BD_COPY_DAMAGE);
+        c.damageReturn = 20;
+        c.tag = d.tag;
+        l.add(c);
+        fx(d.sl, Fx.fx("illusion_mirror_image_spawn").at(at).only(v), "illusion_mirror_image_spawn");
+    }
+
+    /** A standing place min..max blocks from around (same height +-4), or null. */
+    private static Vec3 near(ServerLevel sl, Vec3 around, double min, double max) {
+        var rnd = sl.random;
+        for (int k = 0; k < 14; k++) {
+            double a = rnd.nextDouble() * Math.PI * 2, dist = min + rnd.nextDouble() * (max - min);
+            Vec3 p = ground(sl, around.x + Math.cos(a) * dist, around.z + Math.sin(a) * dist, around.y + 4, 8);
+            if (p != null) return p;
+        }
+        return null;
+    }
+
+    /** From top down `span` blocks: the first block a player can stand in (solid top below, no liquid, room for the body). */
+    private static Vec3 ground(ServerLevel sl, double x, double z, double top, int span) {
+        int bx = net.minecraft.util.Mth.floor(x), bz = net.minecraft.util.Mth.floor(z), y0 = net.minecraft.util.Mth.floor(top);
+        BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos(bx, y0, bz);
+        if (!sl.isLoaded(p)) return null;
+        for (int y = y0; y > y0 - span && y > sl.getMinBuildHeight(); y--) {
+            p.set(bx, y, bz);
+            BlockPos below = p.below();
+            if (!sl.getBlockState(below).isFaceSturdy(sl, below, Direction.UP)) continue;
+            if (!sl.getFluidState(p).isEmpty() || !sl.getFluidState(below).isEmpty() || !sl.getFluidState(p.above()).isEmpty()) continue;
+            if (!sl.noCollision(new AABB(bx + 0.2, y + 0.01, bz + 0.2, bx + 0.8, y + 1.8, bz + 0.8))) continue;
+            return new Vec3(bx + 0.5, y, bz + 0.5);
+        }
+        return null;
+    }
+
+    /** Where v wakes up inside the dream after a «death». */
+    private static Vec3 respawnSpot(Dream d, ServerPlayer v) {
+        var rnd = d.sl.random;
+        boolean ceiling = d.sl.dimensionType().hasCeiling();
+        for (int k = 0; k < 40; k++) {
+            double a = rnd.nextDouble() * Math.PI * 2, dist = Math.sqrt(rnd.nextDouble()) * Math.max(4, d.r - 2);
+            double x = d.center.x + Math.cos(a) * dist, z = d.center.z + Math.sin(a) * dist;
+            double dx = x - d.caster.getX(), dz = z - d.caster.getZ();
+            if (dx * dx + dz * dz < MIN_FROM_CASTER * MIN_FROM_CASTER) continue;
+            BlockPos col = BlockPos.containing(x, d.center.y, z);
+            if (!d.sl.isLoaded(col)) continue;
+            Vec3 p;
+            if (ceiling) p = ground(d.sl, x, z, d.center.y + 16, 48);
+            else {
+                int top = d.sl.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, col.getX(), col.getZ());
+                if (Math.abs(top - d.center.y) > 40) continue;
+                p = ground(d.sl, x, z, top, 2);
+            }
+            if (p != null) return p;
+        }
+        Vec3 p = near(d.sl, v.position(), 4, 10);
+        return p != null ? p : v.position();
+    }
+
+    private static void fakeHp(ServerPlayer v, double lost) {
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", lost, 0, 0, 0, 0));
+    }
+
+    /** The ripple the others see where a dreamer vanishes and comes back. */
+    private static void ripple(ServerLevel sl, Vec3 at) {
+        if (fx(sl, Fx.fx("illusion_dream_ripple").at(at), "illusion_dream_ripple") < 0) fx(sl, Fx.fx("illusion_poof").at(at), "illusion_poof");
+        sl.playSound(null, at.x, at.y + 1, at.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.2f, 0.6f);
     }
 
     /**
-     * Waking of v (owner 19.11): the shards fly in, on tick 8 the held back part of every hit in the dream strikes at once as real damage
-     * (it can kill). Till then the victim's hearts show the full damage (FAKE_HP), so the strike looks like nothing new on its bar.
+     * v «died» in the dream: nothing real happens (no items or XP lost, the real health as it was). The dark screen, under it v is moved to
+     * another place of the dream with its illusory health full again; its copies come back around it.
      */
-    private static void wake(Dream d, UUID id) {
-        double owed = d.deferred.getOrDefault(id, 0.0);
-        d.deferred.remove(id);
-        ServerPlayer v = player(d, id);
-        // the dream goes, but the hearts keep showing the full damage until the strike lands
-        Integer f = d.worldFx.remove(id);
-        if (f != null) Fx.stop(d.sl, f, "");
-        if (v != null) {
-            Net.CH.send(PacketDistributor.PLAYER.with(() -> v), IlluMsg.of(IlluMsg.ZONE_END, d.caster.getId(), 0));
-            for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), 0));
-            v.removeEffect(Reg.BUTTERFLY_DREAM.get());
+    private static void dreamDeath(Dream d, ServerPlayer v) {
+        UUID id = v.getUUID();
+        long now = Illusions.now();
+        d.grace.put(id, now + DEATH_GRACE);
+        d.lost.put(id, 0.0);
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.DREAM_DEATH, v.getId(), DEATH_SCREEN, 0, null, "", 0, 0, 0, 0, 0));
+        v.playNotifySound(SoundEvents.AMETHYST_BLOCK_BREAK, SoundSource.PLAYERS, 1f, 0.5f);
+        List<Copies.Copy> l = d.copies.get(id);
+        if (l != null) {
+            for (Copies.Copy c : new ArrayList<>(l)) Copies.gone(c);
+            l.clear();
         }
-        if (v == null || !v.isAlive()) return;
-        fx(d.sl, Fx.fx("illusion_butterfly_wake_hit").at(v.position()).caster(d.caster).target(v).attach(v), "illusion_butterfly_wake_hit");
+        d.nextCopy.put(id, 0L);
+        Vec3 to = respawnSpot(d, v);
         int[] t = {0};
-        LivingEntity caster = d.caster;
-        ServerLevel sl = d.sl;
         ru.pohsmp.core.spell.Tasks.add(() -> {
-            if (++t[0] < WAKE_HIT) return true;
-            Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", 0, 0, 0, 0, 0));
-            if (!v.isAlive() || v.hasDisconnected()) return false;
-            if (owed > 0.01) {
-                if (owed < v.getHealth()) {   // the part already went through armour once: straight off the health
-                    v.setHealth((float) (v.getHealth() - owed));
-                    sl.getChunkSource().broadcastAndSend(v, new ClientboundHurtAnimationPacket(v));
-                } else {
-                    v.invulnerableTime = 0;
-                    v.hurt(Illusions.source(sl, caster), 1_000_000f);
-                }
-                sl.playSound(null, v.getX(), v.getY() + 1, v.getZ(), SoundEvents.PLAYER_HURT, SoundSource.PLAYERS, 1f, 1f);
-                v.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.butterfly_dream.wake", n(Math.round(owed * 10) / 10.0))
-                        .withStyle(s -> s.withColor(Reg.ILLUSION_COLOR)), true);
-            }
-            sl.playSound(null, v.getX(), v.getY() + 1, v.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.2f, 1.3f);
+            if (++t[0] < DEATH_MOVE) return true;
+            if (!d.victims.containsKey(id) || !v.isAlive() || v.hasDisconnected() || v.level() != d.sl) return false;
+            Vec3 old = v.position();
+            v.connection.teleport(to.x, to.y, to.z, v.getYRot(), v.getXRot());
+            v.setDeltaMovement(Vec3.ZERO);
+            v.fallDistance = 0;
+            Cutscene.refreeze(v, to);
+            ripple(d.sl, old);
+            ripple(d.sl, to);
+            fakeHp(v, 0);
+            for (int k = d.copyCount.getOrDefault(id, 3); k > 0; k--) spawnCopy(d, v);
             return false;
         });
+    }
+
+    /** The dream is over for v (waking, Blessing, death, gone): its world, copies and hidden ones go. fade: its music fades in 2 s. */
+    private static void release(Dream d, UUID id, boolean fade) {
+        Integer f = d.worldFx.remove(id);
+        if (f != null) Fx.stop(d.sl, f, "");
+        d.lost.remove(id);
+        d.grace.remove(id);
+        d.nextCopy.remove(id);
+        List<Copies.Copy> l = d.copies.remove(id);
+        if (l != null) for (Copies.Copy c : new ArrayList<>(l)) Copies.gone(c);
+        ServerPlayer v = player(d, id);
+        if (v == null) return;
+        Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.ZONE_END, d.caster.getId(), 0, IlluMsg.Z_DREAM, null, "", 0, 0, 0, 0, 0));
+        fakeHp(v, 0);
+        for (LivingEntity h : d.hidden) Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new HideMsg(h.getId(), 0));
+        v.removeEffect(Reg.BUTTERFLY_DREAM.get());
+        if (fade) music(d.sl, id, 1, 40);
+    }
+
+    /** The waking (owner 19.11: «это был просто сон»): only the look of it - the shards fly into v and break; nothing is dealt. */
+    private static void wakeFx(Dream d, ServerPlayer v) {
+        fx(d.sl, Fx.fx("illusion_butterfly_wake_hit").at(v.position()).caster(d.caster).target(v).attach(v), "illusion_butterfly_wake_hit");
+        d.sl.playSound(null, v.getX(), v.getY() + 1, v.getZ(), SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.2f, 1.3f);
+        v.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.butterfly_dream.wake")
+                .withStyle(s -> s.withColor(Reg.ILLUSION_COLOR)), true);
+    }
+
+    /** Every tick for a dreamer: a «death» when the lost health reaches the real one (real hits from outside count too); copies come back. */
+    private static void tend(Dream d, ServerPlayer v, long now) {
+        UUID id = v.getUUID();
+        if (now >= d.grace.getOrDefault(id, 0L) && d.lost.getOrDefault(id, 0.0) >= v.getHealth()) {
+            dreamDeath(d, v);
+            return;
+        }
+        if (now % 10 != 0) return;
+        List<Copies.Copy> l = d.copies.get(id);
+        if (l == null) return;
+        l.removeIf(c -> {
+            if (c.gone()) return true;
+            if (c.pos().distanceToSqr(v.position()) <= COPY_LEASH * COPY_LEASH) return false;
+            Copies.gone(c);   // left far behind (a pearl, a fall): it comes back near
+            return true;
+        });
+        int want = d.copyCount.getOrDefault(id, 3);
+        if (l.size() >= want || now < d.grace.getOrDefault(id, 0L)) return;
+        long next = d.nextCopy.getOrDefault(id, 0L);
+        if (next == 0) d.nextCopy.put(id, now + COPY_REFILL);   // a broken copy: a new one in 8 s
+        else if (now >= next) {
+            spawnCopy(d, v);
+            d.nextCopy.put(id, 0L);
+        }
+    }
+
+    /** Hits by the caster, its allies or its copies (the illusion damage type has the caster as its source) are dream hits. */
+    private static boolean fromDream(Dream d, DamageSource s) {
+        Entity a = s.getEntity();
+        return a != null && Illusions.ally(d.caster, a);
     }
 
     private static void reveal(LivingEntity who) {
@@ -311,7 +474,7 @@ public class ButterflyDreamSpell extends IllusionBase {
             boolean any = false;
             for (Dream d : DREAMS)
                 if (d.victims.remove(t.getUUID()) != null) {
-                    release(d, t.getUUID());   // the held back part burns (owner 19.11)
+                    release(d, t.getUUID(), true);   // Blessing: awake early, the music fades for it
                     any = true;
                 }
             return any;
@@ -339,11 +502,15 @@ public class ButterflyDreamSpell extends IllusionBase {
                 for (var vi = d.victims.entrySet().iterator(); vi.hasNext(); ) {
                     var en = vi.next();
                     ServerPlayer v = player(d, en.getKey());
-                    if (now >= en.getValue() || v == null || !v.isAlive() || v.level() != d.sl) {
+                    long end = en.getValue();
+                    if (now >= end || v == null || !v.isAlive() || v.level() != d.sl) {
                         vi.remove();
-                        if (v != null && v.isAlive() && now >= en.getValue()) wake(d, en.getKey());
-                        else release(d, en.getKey());
+                        boolean woke = v != null && v.isAlive() && now >= end;
+                        release(d, en.getKey(), !woke || end < d.wakeAll - WAKE_ANIM_LEAD);   // woke with everyone: the track plays on to its end
+                        if (woke && v.level() == d.sl) wakeFx(d, v);
+                        continue;
                     }
+                    tend(d, v, now);
                 }
                 // a shown one is hidden again after its second
                 for (var ri = d.revealed.entrySet().iterator(); ri.hasNext(); ) {
@@ -374,20 +541,24 @@ public class ButterflyDreamSpell extends IllusionBase {
         }
 
         /**
-         * Owner 19.11: «половина сейчас, половина при пробуждении». Of each hit on a dreamer only (1 - share) really goes through; the
-         * rest is held back and strikes at the waking. The victim's own hearts show the full damage (FAKE_HP: the held back sum).
+         * Owner 19.11: all damage in the dream is not real. A hit on a dreamer by the caster, its allies or its copies does not go through
+         * (the flinch and knockback stay, armour is not worn); after armour it is written down as lost dream health and shown on the
+         * dreamer's hearts. Hits from outside the dream (mobs, lava, falls, other players) stay real.
          */
         @SubscribeEvent(priority = EventPriority.LOWEST)
-        public static void onDamage(LivingDamageEvent e) {
-            if (DREAMS.isEmpty() || e.isCanceled() || e.getAmount() <= 0) return;
-            if (!(e.getEntity() instanceof ServerPlayer v)) return;
+        public static void onHurt(LivingHurtEvent e) {
+            if (DREAMS.isEmpty() || e.isCanceled() || !(e.getEntity() instanceof ServerPlayer v)) return;
+            UUID id = v.getUUID();
             for (Dream d : DREAMS) {
-                if (!d.victims.containsKey(v.getUUID())) continue;
-                double share = Math.max(0, Math.min(1, IllusionBase.cfg(ServerConfig.BD_SHARE::get, 0.5)));
-                float held = (float) (e.getAmount() * share);
-                e.setAmount(e.getAmount() - held);
-                double sum = d.deferred.merge(v.getUUID(), (double) held, Double::sum);
-                Net.CH.send(PacketDistributor.PLAYER.with(() -> v), new IlluMsg(IlluMsg.FAKE_HP, v.getId(), 0, 0, null, "", sum, 0, 0, 0, 0));
+                if (!d.victims.containsKey(id) || !fromDream(d, e.getSource())) continue;
+                float amount = e.getAmount();
+                e.setCanceled(true);
+                if (amount <= 0 || Illusions.now() < d.grace.getOrDefault(id, 0L)) return;
+                float dealt = e.getSource().is(DamageTypeTags.BYPASSES_ARMOR) ? amount
+                        : CombatRules.getDamageAfterAbsorb(amount, v.getArmorValue(), (float) v.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
+                double sum = d.lost.merge(id, (double) dealt, Double::sum);
+                fakeHp(v, sum);
+                if (sum >= v.getHealth()) dreamDeath(d, v);
                 return;
             }
         }

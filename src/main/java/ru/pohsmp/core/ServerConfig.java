@@ -59,7 +59,11 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.DoubleValue BF_COOLDOWN, BF_SECONDS, BF_MEMORY;
     public static final ForgeConfigSpec.DoubleValue LAB_RADIUS, LAB_SECONDS, LAB_WALL_DAMAGE, LAB_WALL_RETURN, LAB_PUSH;
     public static final ForgeConfigSpec.DoubleValue NM_RANGE, NM_SECONDS;
-    public static final ForgeConfigSpec.DoubleValue BD_RADIUS, BD_SECONDS, BD_SHARE;
+    public static final ForgeConfigSpec.DoubleValue BD_RADIUS, BD_SECONDS, BD_COPY_DAMAGE;
+    // [nightmare] - T25
+    public static final ForgeConfigSpec.DoubleValue IM_DECAY, IM_DAMAGE, IM_RETURN, HOUSE_RANGE, HOUSE_SECONDS, HOUSE_FALL,
+            NIGHT_RADIUS, NIGHT_SECONDS, NIGHT_STEP, NA_RADIUS, NA_SECONDS, NA_THICKEN;
+    public static final ForgeConfigSpec.IntValue IM_LIMIT_1, IM_LIMIT_2, IM_LIMIT_3, IM_LIMIT_MYTHIC, IM_LIMIT_SERVER, NIGHT_LIGHT;
     // [mythic_t23] - T23 Mythic: World Tree, Abyss Eye, Last Dawn
     public static final ForgeConfigSpec.DoubleValue WT_RANGE, WT_RADIUS, WT_SECONDS, WT_PULL, WT_ROOT_COOLDOWN, WT_CROWN, WT_BLOOM_RADIUS;
     public static final ForgeConfigSpec.IntValue WT_ROOT_HITS;
@@ -120,9 +124,37 @@ public final class ServerConfig {
         NM_SECONDS = b.comment("Lifetime (seconds)").defineInRange("seconds", 12.0, 1.0, 600.0);
         b.pop();
         b.push("butterfly_dream");
-        BD_RADIUS = b.comment("Enemies within this radius fall into the dream (blocks)").defineInRange("radius", 32.0, 2.0, 128.0);
-        BD_SECONDS = b.comment("Dream lifetime (seconds)").defineInRange("seconds", 25.0, 1.0, 600.0);
-        BD_SHARE = b.comment("Share of every hit on a dreamer that is illusory; at the wake it all becomes real at once").defineInRange("illusoryShare", 0.5, 0.0, 1.0);
+        // keys renamed 19.11 (radius 32 -> 64, 25 s -> 120 s): old files get the new values instead of keeping the old ones
+        BD_RADIUS = b.comment("Enemies within this radius fall into the dream (blocks)").defineInRange("dreamRadius", 64.0, 2.0, 128.0);
+        BD_SECONDS = b.comment("Dream lifetime (seconds)").defineInRange("dreamSeconds", 120.0, 1.0, 600.0);
+        BD_COPY_DAMAGE = b.comment("Illusory damage of a dream copy's strike (all damage in the dream is illusory)").defineInRange("copyDamage", 3.0, 0.0, 1000.0);
+        b.pop();
+        b.pop();
+        b.comment("T25 school \"Nightmares\": «Погружение» - the world turns into a nightmare around the victim, only for it (stages 1-3).",
+                "Damage is multiplied by the caster's Nightmare spell power.").push("nightmare");
+        IM_DECAY = b.comment("A stage falls by one when the victim was not hit by a Nightmare spell for this long (seconds)").defineInRange("stageDecaySeconds", 20.0, 1.0, 600.0);
+        IM_LIMIT_1 = b.comment("Nightmares around one victim at stage 1").defineInRange("limitStage1", 2, 0, 64);
+        IM_LIMIT_2 = b.comment("... at stage 2").defineInRange("limitStage2", 5, 0, 64);
+        IM_LIMIT_3 = b.comment("... at stage 3").defineInRange("limitStage3", 10, 0, 64);
+        IM_LIMIT_MYTHIC = b.comment("... in «Пробуждение не наступит» at its deepest").defineInRange("limitMythic", 16, 0, 64);
+        IM_LIMIT_SERVER = b.comment("Nightmares on the whole server at once").defineInRange("limitServer", 96, 0, 1000);
+        IM_DAMAGE = b.comment("Illusory damage of a hallucination's or a nightmare's strike").defineInRange("illusoryDamage", 3.0, 0.0, 1000.0);
+        IM_RETURN = b.comment("...that comes back after this many seconds if the victim lives").defineInRange("illusoryReturnSeconds", 10.0, 0.5, 600.0);
+        b.push("house_that_isnt");
+        HOUSE_RANGE = b.comment("Target range (blocks)").defineInRange("range", 24.0, 1.0, 128.0);
+        HOUSE_SECONDS = b.comment("The victim is in the corridor this long (seconds)").defineInRange("seconds", 60.0, 1.0, 600.0);
+        HOUSE_FALL = b.comment("Walking in the corridor the victim cannot step off an edge higher than this (blocks)").defineInRange("maxFall", 3.0, 0.0, 64.0);
+        b.pop();
+        b.push("endless_night");
+        NIGHT_RADIUS = b.comment("Zone radius (blocks)").defineInRange("radius", 24.0, 2.0, 128.0);
+        NIGHT_SECONDS = b.comment("Lifetime (seconds)").defineInRange("seconds", 120.0, 1.0, 600.0);
+        NIGHT_STEP = b.comment("A victim inside goes one stage deeper this often (seconds)").defineInRange("stageEverySeconds", 8.0, 0.5, 600.0);
+        NIGHT_LIGHT = b.comment("Block light at the victim at least this keeps its stage from going deeper").defineInRange("holdingLight", 10, 0, 15);
+        b.pop();
+        b.push("no_awakening");
+        NA_RADIUS = b.comment("Enemies within this radius fall into the nightmare (blocks)").defineInRange("radius", 64.0, 2.0, 128.0);
+        NA_SECONDS = b.comment("Lifetime (seconds)").defineInRange("seconds", 300.0, 1.0, 1800.0);
+        NA_THICKEN = b.comment("The nightmare thickens one step this often (seconds)").defineInRange("thickenEverySeconds", 60.0, 5.0, 600.0);
         b.pop();
         b.pop();
         b.comment("T23 Mythic spells. Damage is multiplied by the caster's school spell power.").push("mythic_t23");

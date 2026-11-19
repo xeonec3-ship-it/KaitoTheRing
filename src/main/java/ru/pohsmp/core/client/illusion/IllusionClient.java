@@ -67,7 +67,12 @@ public final class IllusionClient {
             case IlluMsg.FAKE_HP -> ZoneDraw.fakeLoss = Math.max(0, m.x);
             case IlluMsg.ERASED -> ErasedClient.set(m.ticks);
             case IlluMsg.GHOST -> Ghosts.set(m.entity, m.ticks);
+            case IlluMsg.DREAM_DEATH -> ZoneDraw.dreamDeath(m.ticks);
+            case IlluMsg.DREAM_MUSIC -> DreamMusic.handle(m.i, m.ticks);
+            case IlluMsg.IMMERSION -> ru.pohsmp.core.client.nightmare.NightmareClient.set(m.i, m.ticks);
+            case IlluMsg.NIGHT -> ru.pohsmp.core.client.nightmare.NightmareClient.night(m.ticks);
             case IlluMsg.SKY ->ru.pohsmp.core.client.mythic.SkyClient.set(m.i, m.ticks);
+            case IlluMsg.WALK -> ru.pohsmp.core.client.ScriptedWalk.start(m.entity, m.x, m.y, m.z, m.ticks, m.yaw);
             case IlluMsg.ANIM -> {
                 var lvl = Minecraft.getInstance().level;
                 if (lvl != null && lvl.getEntity(m.entity) instanceof Player p)

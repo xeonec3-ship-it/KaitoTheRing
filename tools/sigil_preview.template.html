@@ -1382,7 +1382,13 @@ const SCENES = {
   "Иллюзии: Сон бабочки — каст": () => [new FxRun("illusion_butterfly_cast", { caster: new THREE.Vector3(0, 0, 0), noTarget: true, points: { touch: [0, 1.4, 0.65] } })],
   "Иллюзии: стеклянная бабочка (модель)": () => { caster.visible = false; return [new Portal("illusion_butterfly", new THREE.Vector3(0, 1, 0), { noAuto: true, scale: 2.5 })]; },
   "Иллюзии: Сон бабочки — проявление": () => [new FxRun("illusion_butterfly_reveal", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
-  "Иллюзии: Сон бабочки — пробуждение": () => [new FxRun("illusion_butterfly_wake", { caster: new THREE.Vector3(0, 0, 0), noTarget: true }), new FxRun("illusion_butterfly_wake_hit", { caster: new THREE.Vector3(0, 0, 0), noLift: true })],
+  "Иллюзии: Сон бабочки — пробуждение": () => [new FxRun("illusion_butterfly_wake", { caster: new THREE.Vector3(0, 0, 0), noTarget: true }), new FxRun("illusion_dream_wake", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Сон бабочки — мир сна (2 мин)": () => [new FxRun("illusion_butterfly_world", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Сон бабочки — смерть во сне": () => [new FxRun("illusion_dream_death", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Сон бабочки — возрождение во сне": () => [new FxRun("illusion_dream_respawn", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Сон бабочки — рябь переноса (видят другие)": () => [new FxRun("illusion_dream_ripple", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Сон бабочки — вход в отражение": () => [new FxRun("illusion_dream_enter", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
+  "Иллюзии: Сон бабочки — рана (бабочка-метка)": () => [new FxRun("illusion_dream_wound", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
   "Запретная: печать ступени «Мироздание»": () => [new FxRun("school_forbidden_cast_creation", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
   "Стёртое имя: каст (15 с)": () => [new FxRun("erased_name_cast", { caster: new THREE.Vector3(0, 0, -7), noLift: true, faceCaster: true })],
   "Стёртое имя: исчезновение": () => [new FxRun("erased_vanish", { caster: new THREE.Vector3(0, 0, 0), noTarget: true })],
@@ -1449,6 +1455,12 @@ MAIN_ID["Иллюзии: Сон бабочки — каст"] = "illusion_butter
 MAIN_ID["Иллюзии: стеклянная бабочка (модель)"] = "illusion_butterfly"; VIEW_FOR["Иллюзии: стеклянная бабочка (модель)"] = "close";
 MAIN_ID["Иллюзии: Сон бабочки — проявление"] = "illusion_butterfly_reveal"; VIEW_FOR["Иллюзии: Сон бабочки — проявление"] = "close";
 MAIN_ID["Иллюзии: Сон бабочки — пробуждение"] = "illusion_butterfly_wake"; VIEW_FOR["Иллюзии: Сон бабочки — пробуждение"] = "dream";
+MAIN_ID["Иллюзии: Сон бабочки — мир сна (2 мин)"] = "illusion_butterfly_world"; VIEW_FOR["Иллюзии: Сон бабочки — мир сна (2 мин)"] = "dream";
+MAIN_ID["Иллюзии: Сон бабочки — смерть во сне"] = "illusion_dream_death"; VIEW_FOR["Иллюзии: Сон бабочки — смерть во сне"] = "close";
+MAIN_ID["Иллюзии: Сон бабочки — возрождение во сне"] = "illusion_dream_respawn"; VIEW_FOR["Иллюзии: Сон бабочки — возрождение во сне"] = "close";
+MAIN_ID["Иллюзии: Сон бабочки — рябь переноса (видят другие)"] = "illusion_dream_ripple"; VIEW_FOR["Иллюзии: Сон бабочки — рябь переноса (видят другие)"] = "close";
+MAIN_ID["Иллюзии: Сон бабочки — вход в отражение"] = "illusion_dream_enter"; VIEW_FOR["Иллюзии: Сон бабочки — вход в отражение"] = "close";
+MAIN_ID["Иллюзии: Сон бабочки — рана (бабочка-метка)"] = "illusion_dream_wound"; VIEW_FOR["Иллюзии: Сон бабочки — рана (бабочка-метка)"] = "close";
 MAIN_ID["Запретная: печать ступени «Мироздание»"] = "school_forbidden_cast_creation"; VIEW_FOR["Запретная: печать ступени «Мироздание»"] = "school";
 MAIN_ID["Стёртое имя: каст (15 с)"] = "erased_name_cast"; VIEW_FOR["Стёртое имя: каст (15 с)"] = "t24";
 MAIN_ID["Стёртое имя: исчезновение"] = "erased_vanish"; VIEW_FOR["Стёртое имя: исчезновение"] = "close";

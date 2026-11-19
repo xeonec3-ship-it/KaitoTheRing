@@ -1,0 +1,30 @@
+{
+ "version": 3,
+ "name": "pohsmp_coven_bow",
+ "author": "pohsmp_core",
+ "emote": {
+  "beginTick": 0,
+  "endTick": 34,
+  "stopTick": 36,
+  "degrees": true,
+  "easeBeforeKeyframe": true,
+  "moves": [
+   { "tick": 0, "easing": "easeInOutSine", "torso": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 0.0 } },
+   { "tick": 0, "easing": "easeInOutSine", "head": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0 } },
+   { "tick": 0, "easing": "easeInOutSine", "rightArm": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 0.0 } },
+   { "tick": 0, "easing": "easeInOutSine", "leftArm": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 0.0 } },
+   { "tick": 9, "easing": "easeOutSine", "torso": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 32.0 } },
+   { "tick": 9, "easing": "easeOutSine", "head": { "pitch": 22.0, "yaw": 0.0, "roll": 0.0 } },
+   { "tick": 9, "easing": "easeOutSine", "rightArm": { "pitch": -38.0, "yaw": 28.0, "roll": 0.0, "bend": -30.0 } },
+   { "tick": 9, "easing": "easeOutSine", "leftArm": { "pitch": 8.0, "yaw": 0.0, "roll": -4.0, "bend": 0.0 } },
+   { "tick": 22, "easing": "easeInOutSine", "torso": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 34.0 } },
+   { "tick": 22, "easing": "easeInOutSine", "head": { "pitch": 24.0, "yaw": 0.0, "roll": 0.0 } },
+   { "tick": 22, "easing": "easeInOutSine", "rightArm": { "pitch": -38.0, "yaw": 28.0, "roll": 0.0, "bend": -30.0 } },
+   { "tick": 22, "easing": "easeInOutSine", "leftArm": { "pitch": 8.0, "yaw": 0.0, "roll": -4.0, "bend": 0.0 } },
+   { "tick": 34, "easing": "easeInOutSine", "torso": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 0.0 } },
+   { "tick": 34, "easing": "easeInOutSine", "head": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0 } },
+   { "tick": 34, "easing": "easeInOutSine", "rightArm": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 0.0 } },
+   { "tick": 34, "easing": "easeInOutSine", "leftArm": { "pitch": 0.0, "yaw": 0.0, "roll": 0.0, "bend": 0.0 } }
+  ]
+ }
+}

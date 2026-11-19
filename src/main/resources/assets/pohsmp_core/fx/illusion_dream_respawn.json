@@ -1,0 +1,88 @@
+{
+ "comment": "Сон бабочки: жертва появляется в новой точке сна (caster = жертва в новой точке; видит она — и её клиент сразу показывает мир сна вокруг). Бабочки слетаются в силуэт, оболочка проявляется сверху вниз, кольцо по земле, звон. 24 тика (код делает модель видимой с 14 тика). Сгенерировано tools/gen_illusion_fx.py.",
+ "style": "illusion",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "texture": "mote_butterfly",
+   "count": 40,
+   "rate": 7,
+   "spread": 2.4,
+   "speed": -0.12,
+   "gravity": 0,
+   "sway": 1,
+   "size": [
+    0.3,
+    0.18
+   ],
+   "life": 12,
+   "color": "#EFE6FF",
+   "glow": 0.5,
+   "comment": "бабочки слетаются в тело"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "texture": "mote_glass_petal",
+   "count": 24,
+   "rate": 4,
+   "spread": 2.0,
+   "speed": -0.1,
+   "spin": 120,
+   "size": [
+    0.2,
+    0.12
+   ],
+   "life": 12,
+   "color": "#FFB8E6",
+   "glow": 0.4
+  },
+  {
+   "type": "aura",
+   "delay": 8,
+   "at": "caster",
+   "target": "caster",
+   "duration": 14,
+   "thickness": 0.07,
+   "pulse": [
+    0.4,
+    4
+   ],
+   "motes": 10,
+   "texture": "mote_glass",
+   "color": "#EFE6FF",
+   "in": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "caster+0,1.1,0",
+   "duration": 8,
+   "size": 2.0,
+   "rays": 6,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "wave",
+   "delay": 12,
+   "at": "caster",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 4,
+   "color": "@primary"
+  }
+ ]
+}

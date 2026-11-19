@@ -1,48 +1,67 @@
 {
- "comment": "Сон бабочки, «пробуждение» (конец 25 с; caster = маг, видят ВСЕ в r48): бабочки по всей зоне рассыпаются стеклом, белая вспышка, кольцо-звон до r32, осколки падают. Удар по жертвам — illusion_butterfly_wake_hit на каждой. Звук — звон стекла (GLASS_BREAK + AMETHYST_CLUSTER_BREAK, громко). Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки, «пробуждение» у заклинателя (caster = маг, видят ВСЕ в r64; урона НЕТ — «это был просто сон»). Старт одновременно с роликом пробуждения (тик сна 2366); на 34 тике (132.0 с, конец сна) — бабочки по всей зоне рассыпаются стеклом, белая вспышка, кольцо-звон до r64, «небо» трескается. Звук — GLASS_BREAK + AMETHYST_CLUSTER_BREAK громко на 34 тике. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
- "duration": 50,
+ "duration": 64,
  "elements": [
   {
-   "type": "flash",
+   "type": "sprites",
    "delay": 0,
+   "at": "caster+0,2,0",
+   "duration": 34,
+   "texture": "spark_soft",
+   "count": 200,
+   "rate": 6,
+   "area": 24,
+   "speed": 0.004,
+   "gravity": -0.001,
+   "size": [
+    0.14,
+    0.0
+   ],
+   "life": 24,
+   "color": "#EFE6FF",
+   "comment": "воздух звенит перед разломом"
+  },
+  {
+   "type": "flash",
+   "delay": 34,
    "at": "caster+0,1.5,0",
    "duration": 12,
    "size": 6,
    "rays": 14,
    "anamorphic": 14,
-   "screen": 0.6,
+   "screen": 0.4,
    "color": "#FFFFFF"
   },
   {
    "type": "wave",
-   "delay": 0,
+   "delay": 34,
    "at": "caster",
-   "duration": 22,
+   "duration": 24,
    "shape": "ring",
-   "radius": 32,
+   "radius": 64,
    "color": "#EFE6FF"
   },
   {
    "type": "wave",
-   "delay": 2,
+   "delay": 36,
    "at": "caster+0,1,0",
    "duration": 26,
    "shape": "sphere",
-   "radius": 32,
+   "radius": 48,
    "rim": 1.5,
    "color": "@primary",
-   "brightness": 0.6
+   "brightness": 0.5
   },
   {
    "type": "sprites",
-   "delay": 0,
+   "delay": 34,
    "at": "caster+0,6,0",
    "duration": 4,
    "texture": "mote_glass",
    "count": 400,
    "rate": 100,
-   "area": 30,
+   "area": 40,
    "speed": 0.02,
    "gravity": 0.02,
    "spin": 300,
@@ -58,13 +77,13 @@
   },
   {
    "type": "sprites",
-   "delay": 0,
+   "delay": 34,
    "at": "caster+0,3,0",
    "duration": 4,
    "texture": "spark_soft",
    "count": 300,
    "rate": 75,
-   "area": 30,
+   "area": 40,
    "speed": 0.02,
    "gravity": 0.004,
    "size": [
@@ -76,11 +95,11 @@
   },
   {
    "type": "sigil",
-   "delay": 0,
+   "delay": 34,
    "at": "caster+0,12,0",
    "id": "illusion_mirror_crack",
    "scale": 20,
-   "until": 8,
+   "until": 42,
    "orientation": "sky",
    "comment": "небо-зеркало трескается"
   }

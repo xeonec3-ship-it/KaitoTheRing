@@ -1,5 +1,5 @@
 {
- "comment": "Сон бабочки: накопленный иллюзорный урон становится настоящим (target = жертва): бабочки вокруг неё вспыхивают и бьются в неё осколками, трещина-вспышка у груди, розово-белая вспышка, звон. 20 тиков. Сгенерировано tools/gen_illusion_fx.py.",
+ "comment": "Сон бабочки (после пересмотра — БЕЗ урона): на 34 тике ролика пробуждения бабочки-метки ранений жертвы (target = жертва, как зовёт ButterflyDreamSpell.wakeFx; видят жертва и заклинатель) вспыхивают и разлетаются стеклом — «раны были сном». Код в этот тик убирает свои бабочки-метки. 22 тика. Сгенерировано tools/gen_illusion_fx.py.",
  "style": "illusion",
  "duration": 22,
  "elements": [
@@ -11,56 +11,50 @@
    "texture": "mote_glass",
    "count": 36,
    "rate": 12,
-   "spread": 1.4,
-   "speed": -0.12,
-   "gravity": 0,
+   "spread": 0.9,
+   "speed": 0.12,
+   "gravity": 0.008,
    "spin": 260,
    "tumble": 1,
    "size": [
-    0.3,
-    0.08
+    0.24,
+    0.06
    ],
-   "life": 12,
+   "life": 16,
    "color": "#EFE6FF",
-   "comment": "осколки летят В цель"
-  },
-  {
-   "type": "sigil",
-   "delay": 6,
-   "at": "target+0,1.2,0",
-   "follow": true,
-   "id": "illusion_mirror_crack",
-   "scale": 1.1,
-   "until": 16,
-   "orientation": "billboard"
-  },
-  {
-   "type": "flash",
-   "delay": 8,
-   "at": "target+0,1.2,0",
-   "follow": true,
-   "duration": 8,
-   "size": 2.0,
-   "rays": 8,
-   "color": "#FFB8E6"
+   "glow": 0.3,
+   "comment": "осколки разлетаются ОТ жертвы"
   },
   {
    "type": "sprites",
-   "delay": 8,
-   "at": "target+0,1.2,0",
-   "duration": 2,
-   "texture": "spark_sharp",
-   "count": 24,
-   "rate": 12,
-   "spread": 0.3,
-   "speed": 0.16,
-   "gravity": 0.004,
+   "delay": 0,
+   "at": "target+0,1.1,0",
+   "duration": 3,
+   "texture": "mote_butterfly",
+   "count": 12,
+   "rate": 4,
+   "spread": 0.9,
+   "speed": 0.08,
+   "gravity": -0.004,
+   "sway": 1.6,
    "size": [
-    0.2,
-    0.02
+    0.24,
+    0.0
    ],
-   "life": 14,
-   "color": "#FFFFFF"
+   "life": 20,
+   "color": "#FFB8E6",
+   "glow": 0.5,
+   "comment": "бабочки-метки улетают и тают"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "target+0,1.2,0",
+   "follow": true,
+   "duration": 8,
+   "size": 1.6,
+   "rays": 8,
+   "color": "#FFB8E6"
   }
  ]
 }

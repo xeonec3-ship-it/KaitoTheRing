@@ -108,6 +108,8 @@ public class CovenArrivalSpell extends PohSpell {
     public static final double PORTAL_Y = 1.86;
     /** Where the retinue stands at the start: to the sides of the caster, a little behind. */
     private static final double R_SIDE = 1.8, R_BACK = 0.5, R_BEHIND = 2.0;
+    /** The retinue within this of its place beside the caster walks there; farther ones are moved at once. */
+    private static final double APPROACH_MAX = 24;
     /** CNPC model animations: bow, arms forward. */
     private static final int NPC_BOW = 11, NPC_RITUAL = 3;
 
@@ -275,6 +277,8 @@ public class CovenArrivalSpell extends PohSpell {
         float cYaw;
         /** Who walks now (out of the arena portal, or into the caster's): from, to, start tick, length. */
         final Map<UUID, Walk> walks = new HashMap<>();
+        /** Retinue players told to walk the current walk by themselves (Cutscene.walk). */
+        final java.util.Set<UUID> walkSent = new java.util.HashSet<>();
         /** The retinue beside the caster on the cast level until they enter his portal. */
         final Map<UUID, Vec3> pre = new HashMap<>();
         /** CNPC NPCs: the model animation they had before the arrival changed it. */
@@ -355,6 +359,13 @@ public class CovenArrivalSpell extends PohSpell {
             LivingEntity e = a.retinue.get(i);
             Vec3 spot = i == 2 ? a.cAt.subtract(a.cFw.scale(R_BEHIND))
                     : a.cAt.add(cRt.scale(i == 0 ? -R_SIDE : R_SIDE)).subtract(a.cFw.scale(R_BACK));
+            // owner 19.11 («only teleported to the cast spot»): who stands near walks up to the caster, the far ones are brought
+            double far = e.level() == sl ? e.position().distanceTo(spot) : Double.MAX_VALUE;
+            if (far <= APPROACH_MAX) {
+                if (far > 0.3) a.walks.put(e.getUUID(), new Walk(e.position(), spot, 0, (int) Math.max(20, Math.min(T_BOW - 20, far / 0.16))));
+                a.pre.put(e.getUUID(), e.position());
+                continue;
+            }
             LivingEntity moved = move(e, sl, spot, a.cYaw);
             a.retinue.set(i, moved);
             a.pre.put(moved.getUUID(), spot);
@@ -389,6 +400,9 @@ public class CovenArrivalSpell extends PohSpell {
         if (t % 100 == 0 && t < T_PORTAL) ar.playSound(null, a.at.x, a.at.y + 3, a.at.z, SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 5f, 0.45f);
         if (t == 200) ar.playSound(null, a.at.x, a.at.y, a.at.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 4f, 0.5f);
         if (t == T_BOW || t == T_BOW_END) for (LivingEntity e : a.retinue) {
+            if (e instanceof ServerPlayer sp && t == T_BOW && sp.isAlive())   // owner 19.11: the retinue players bow too
+                Net.CH.send(net.minecraftforge.network.PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sp),
+                        new ru.pohsmp.core.net.IlluMsg(ru.pohsmp.core.net.IlluMsg.ANIM, sp.getId(), 0, 0, null, "pohsmp_coven_bow", 0, 0, 0, 0, 0));
             if (e instanceof Player || !e.isAlive()) continue;
             if (t == T_BOW) {
                 int old = CnpcHooks.anim(e, NPC_BOW);
@@ -429,6 +443,16 @@ public class CovenArrivalSpell extends PohSpell {
             if (le == null || !le.isAlive() || le.level() != ar) continue;
             float yaw = baseYaw;
             Walk w = a.walks.get(le.getUUID());
+            if (w != null && le instanceof ServerPlayer sp) {   // owner 19.11 «пусть ходит по-настоящему»: its own client walks it
+                if (a.walkSent.add(sp.getUUID())) Cutscene.walk(sp, w.to(), Math.max(1, w.start() + w.len() - t), baseYaw);
+                e.setValue(w.to());
+                if (t >= w.start() + w.len()) {
+                    a.walks.remove(sp.getUUID());
+                    a.walkSent.remove(sp.getUUID());
+                }
+                Cutscene.refreeze(sp, w.to(), baseYaw);   // ignored while it walks; after it, holds it at the goal
+                continue;
+            }
             if (w != null) {   // walking: the server leads it in small steps, the client animates the legs
                 double k = Math.min(1, (t - w.start()) / (double) w.len());
                 double s = k * k * (3 - 2 * k);
@@ -483,6 +507,7 @@ public class CovenArrivalSpell extends PohSpell {
         // (CNPC NPCs ignore invisibility when drawn, so Hidden cancels their rendering), unhurt and not pushed until their exit
         a.pre.clear();
         a.walks.clear();
+        a.walkSent.clear();
         Vec3 p = a.inside;
         List<LivingEntity> all = new ArrayList<>(a.retinue);
         all.add(caster);

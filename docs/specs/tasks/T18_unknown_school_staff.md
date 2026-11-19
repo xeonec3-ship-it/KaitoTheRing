@@ -32,3 +32,23 @@
 - Файлы (готовит чат идей генератором `tools/gen_silent_staff.py`): `geo/item/silent_witch_staff.geo.json`,
   `animations/item/silent_witch_staff.animation.json`, `textures/item/silent_witch_staff.png` + `_glowmask.png`, `models/item/silent_witch_staff.json`.
 - «Врата» с посоха кастуются **только в полном комплекте одежды ведьмы** (T19); без него посох — обычный посох с бонусами.
+
+## Статус (основной чат, 19.11)
+
+Сделано в коде:
+- Школа `Reg.SILENT` (`pohsmp_core:silent`), атрибуты `SILENT_POWER` / `SILENT_RESIST` (добавлены всем сущностям в `PohCore`),
+  тип урона `data/pohsmp_core/damage_type/silent_magic.json` (в `bypasses_armor`), фокус `tags/items/silent_focus.json` (пустой),
+  звук школы — `amethyst_block.chime`; школа не выпадает в добыче.
+- `Tier.UNKNOWN` («Неизвестная», #7FFFD0, переливается); `Reg.UNKNOWN_SPELLS` — встроенная ступень пяти заклинаний.
+- Заклинания-заглушки в `spell/silent/`: `SilentGateSpell`, `WindSpearsSpell`, `SilentVolleySpell`, `SageBarrierSpell`,
+  `WorganFlameSpell` на общей базе `SilentStaffSpell` (школа, 1 уровень, без свитков/добычи, без звука произнесения, «дзынь» в конце,
+  каст только с посохом). Пока `ready()` = false — каст пишет «Это заклинание ещё не готово». **T03/T20:** наполнить свой класс,
+  вернуть `ready()` true, условия сверх посоха — в `whyNot()` (у «Врат» — полный комплект T19). Каст/откат/мана в заглушках — из T03/T20.
+- Посох `SilentWitchStaff` (`pohsmp_core:silent_witch_staff`): `AnimatedStaff` + `IPresetSpellContainer`, 5 заблокированных слотов
+  в порядке `Reg.SILENT_STAFF_SPELLS`; старые посохи раз в секунду подтягиваются к этому списку. Бонусы +25 % / +10 % / +25 %.
+  Во вкладке творческого — после Посоха Низвержения.
+- Временно: пока нет `geo/item/silent_witch_staff.geo.json`, рисуется модель `divine_staff` (`fallbackModel`, само переключится,
+  когда файлы появятся); `models/item/silent_witch_staff.json` — копия настроек посоха Низвержения с частицей `divine_staff`
+  (генератор может её перезаписать). Иконки заклинаний `textures/gui/spell_icons/<id>.png` — простые временные 16×16.
+
+Осталось: модель и анимации (чат идей), стиль `fx/styles/silent.json`, проверка в игре.

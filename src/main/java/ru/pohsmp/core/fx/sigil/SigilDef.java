@@ -16,7 +16,8 @@ import java.util.Set;
  * Times are ticks, angles degrees, sizes blocks.
  */
 public record SigilDef(String id, double size, int color, Orientation orientation, int lifetime, int hold,
-                       List<Layer> layers, Expand expand, Flash formedFlash, List<Child> onFormed, Dissolve dissolve) {
+                       List<Layer> layers, Expand expand, Flash formedFlash, List<Child> onFormed, Dissolve dissolve,
+                       GroundLight groundLight, BlockGlow blockGlow) {
 
     public enum Orientation { GROUND, SKY, FACING, BILLBOARD }
 
@@ -70,6 +71,30 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
         public static final Dissolve DEFAULT = new Dissolve(EnumSet.of(DissolveMode.FADE), 20, 0);
     }
 
+    /**
+     * Soft disc of the sigil's colour on the nearest surface under it, follows the sigil. radius — share of the sigil's current
+     * radius (grows with expand, shrinks with collapse); strength — brightness 0..1+; reach — how far down (blocks) to look for
+     * the surface. null = off.
+     */
+    public record GroundLight(double radius, double strength, double reach) {
+        public static final GroundLight DEFAULT = new GroundLight(0.8, 0.6, 32);
+    }
+
+    /**
+     * Top faces of blocks within radius (share of the sigil's current radius, around the point under its centre) tinted with its
+     * colour, dimmer towards the edge. strength — brightness at the centre; falloff — edge exponent (1 linear, 2 softer centre);
+     * reach — how far down (blocks) to look for the ground under the sigil. null = off.
+     */
+    public record BlockGlow(double radius, double strength, double falloff, double reach) {
+        public static final BlockGlow DEFAULT = new BlockGlow(1.1, 0.35, 1.5, 32);
+
+        /** Brightness at relative distance x = dist / radius: strength at 0, 0 at 1 and beyond. */
+        public double at(double x) {
+            if (x >= 1) return 0;
+            return strength * Math.pow(1 - Math.max(0, x), falloff);
+        }
+    }
+
     // ------------------------------------------------------------------ parsing
 
     public static SigilDef parse(String id, String json) {
@@ -110,8 +135,28 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
             if (modes.isEmpty()) modes.add(DissolveMode.FADE);
             dissolve = new Dissolve(modes, (int) num(d, "duration", 20), (int) num(d, "stagger", 0));
         }
+        GroundLight gl = null;
+        if (o.has("groundLight") && !o.get("groundLight").isJsonNull() && !isFalse(o.get("groundLight"))) {
+            JsonObject g = o.get("groundLight").isJsonObject() ? o.getAsJsonObject("groundLight") : new JsonObject();
+            GroundLight d = GroundLight.DEFAULT;
+            gl = new GroundLight(Math.max(0.01, num(g, "radius", d.radius())), Math.max(0, num(g, "strength", d.strength())),
+                    Math.max(1, num(g, "reach", d.reach())));
+        }
+        BlockGlow bg = null;
+        if (o.has("blockGlow") && !o.get("blockGlow").isJsonNull() && !isFalse(o.get("blockGlow"))) {
+            JsonObject g = o.get("blockGlow").isJsonObject() ? o.getAsJsonObject("blockGlow") : new JsonObject();
+            BlockGlow d = BlockGlow.DEFAULT;
+            bg = new BlockGlow(Math.max(0.01, num(g, "radius", d.radius())), Math.max(0, num(g, "strength", d.strength())),
+                    Math.max(0.1, num(g, "falloff", d.falloff())), Math.max(1, num(g, "reach", d.reach())));
+        }
         return new SigilDef(id, num(o, "size", 1), color, Orientation.valueOf(str(o, "orientation", "ground").toUpperCase(Locale.ROOT)),
-                (int) num(o, "lifetime", -1), (int) num(o, "hold", -1), List.copyOf(layers), expand, flash, List.copyOf(children), dissolve);
+                (int) num(o, "lifetime", -1), (int) num(o, "hold", -1), List.copyOf(layers), expand, flash, List.copyOf(children), dissolve,
+                gl, bg);
+    }
+
+    /** {@code "groundLight": false} switches the flag off explicitly; {@code true} means "on with defaults". */
+    private static boolean isFalse(JsonElement e) {
+        return e.isJsonPrimitive() && e.getAsJsonPrimitive().isBoolean() && !e.getAsBoolean();
     }
 
     private static Layer layer(JsonObject l, int defColor) {

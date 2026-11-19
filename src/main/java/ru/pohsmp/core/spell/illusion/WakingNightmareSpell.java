@@ -45,6 +45,8 @@ import ru.pohsmp.core.spell.CastAnims;
 public class WakingNightmareSpell extends IllusionBase {
     public static final String PATH = "waking_nightmare";
     private static final int CAST = 70, MONSTERS_R = 40, MONSTERS_MAX = 32, REFRESH = 54;
+    /** Owner 19.11: off - no faceless monsters on everyone for the victim (the code kept for if it comes back). */
+    private static final boolean MONSTERS = false;
 
     public WakingNightmareSpell() {
         super(PATH, Rank.HIGHER, CAST);
@@ -135,7 +137,8 @@ public class WakingNightmareSpell extends IllusionBase {
             }
         t.addEffect(new MobEffectInstance(Reg.WAKING_NIGHTMARE.get(), ticks, 0, false, false, true));
         sl.playSound(null, t.getX(), t.getY() + 1, t.getZ(), SoundEvents.WARDEN_HEARTBEAT, SoundSource.PLAYERS, 1.5f, 0.7f);
-        if (t instanceof ServerPlayer p)
+        // owner 19.11: «убери всех монстров» - also here: the victim's client no longer hides everyone (no zone) and wears no monsters on them
+        if (MONSTERS && t instanceof ServerPlayer p)
             Net.CH.send(PacketDistributor.PLAYER.with(() -> p), new IlluMsg(IlluMsg.ZONE, caster.getId(), ticks, IlluMsg.Z_NIGHTMARE, null, "",
                     t.getX(), t.getY(), t.getZ(), MONSTERS_R, 0));
         DREAMS.put(t.getUUID(), d);
@@ -188,7 +191,7 @@ public class WakingNightmareSpell extends IllusionBase {
                     continue;
                 }
                 if (d.target instanceof ServerPlayer p) {
-                    if (now >= d.nextRefresh) {
+                    if (MONSTERS && now >= d.nextRefresh) {
                         monsters(d, p);
                         d.nextRefresh = now + REFRESH;
                     }

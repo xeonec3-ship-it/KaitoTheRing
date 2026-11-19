@@ -10,18 +10,24 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.SplittableRandom;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.client.fx.FxDraw.Frame;
 import ru.pohsmp.core.fx.FxDef;
 import ru.pohsmp.core.fx.FxDef.Element;
 import ru.pohsmp.core.fx.FxLib;
 import ru.pohsmp.core.fx.FxMath;
+import ru.pohsmp.core.fx.FxShapes;
 import ru.pohsmp.core.fx.sigil.Easing;
 import ru.pohsmp.core.fx.sigil.SigilDef;
 
 /**
  * Element types of docs/fx.md drawn on the client: sigil, mesh, flash, wave, beam, beam_rain, sprites, curtain, column,
- * tint, decal (disc or crack), trail (slash). Random choices come from the effect seed, so every player sees the same. Unknown types are skipped.
+ * tint, decal (disc or crack), trail with shape "slash" (crescent) here; trail, ribbon, slash, lightning, vortex, chains in
+ * {@link LineDraw}; aura, wings, halo in {@link BodyDraw}. Random choices come from the effect seed, so every player sees the same.
+ * Unknown types are skipped.
  */
 public final class ElementDraw {
     private ElementDraw() {}
@@ -32,6 +38,7 @@ public final class ElementDraw {
         SigilRun sigil;
         MeshDraw.Run mesh;
         final Map<Integer, SigilRun> impacts = new HashMap<>();
+        ru.pohsmp.core.fx.FxTrail trail;
     }
 
     /** Returns true while the element still has something to draw (sub-sigils dissolving after its end count). */
@@ -63,7 +70,19 @@ public final class ElementDraw {
             case "column" -> column(f, el, te, at, s, col, a);
             case "tint" -> tint(el, at, col, a);
             case "decal" -> decal(f, run, el, te, L, at, s, col, a, seed, ctx);
-            case "trail", "ribbon" -> trail(f, run, el, te, L, at, s, col, a, seed, ctx);
+            // "trail" with shape "slash" is the crescent the mythic/higher effects use; any other trail follows its point
+            case "trail" -> {
+                if ("slash".equals(el.str("shape", ""))) trail(f, run, el, te, L, at, s, col, a, seed, ctx);
+                else LineDraw.trail(f, run, el, st, te, ctx, s, col, a, false);
+            }
+            case "ribbon" -> LineDraw.trail(f, run, el, st, te, ctx, s, col, a, true);
+            case "slash" -> LineDraw.slash(f, run, el, te, at, ctx, s, col, a, seed);
+            case "lightning" -> LineDraw.lightning(f, el, te, at, target(el, st, ctx, at), s, col, a, seed);
+            case "vortex" -> LineDraw.vortex(f, run, el, te, at, s, col, a, seed);
+            case "chains" -> LineDraw.chains(f, el, te, at, target(el, st, ctx, at), s, col, a);
+            case "aura" -> BodyDraw.aura(f, run, el, te, live(el, ctx), s, col, a, seed);
+            case "wings" -> BodyDraw.wings(f, run, el, te, live(el, ctx), ctx, s, col, a);
+            case "halo" -> BodyDraw.halo(f, run, el, te, live(el, ctx), ctx, s, col, a);
             default -> {}
         }
         return true;
@@ -76,6 +95,11 @@ public final class ElementDraw {
         if (el.duration() >= 0) return el.duration();
         if (el.params().has("until")) return el.params().get("until").getAsDouble() - el.delay();
         return -1;
+    }
+
+    /** The anchor right now, whatever `follow` says: body dressing (aura, wings, halo) always moves with its wearer. */
+    static Vec3 live(Element el, FxDef.Context ctx) {
+        return FxRun.w(el.at().resolve(ctx));
     }
 
     static double env(Element el, double te, double L) {
@@ -182,23 +206,33 @@ public final class ElementDraw {
     private static void flash(Frame f, Element el, double te, double L, Vec3 at, double s, int col, double a) {
         double dur = L > 0 ? L : 10;
         double p = FxDraw.clamp01(te / dur);
-        double k = p < 0.2 ? p / 0.2 : 1 - (p - 0.2) / 0.8;
-        k = Math.max(0, k) * a;
+        double k = FxShapes.flash(Math.max(1e-3, p), 0.18) * a;
+        if (k <= 0.002) return;
         double size = el.num("size", 2) * s;
-        FxDraw.billboard(f.add(FxDraw.tex("glow")), f, at, size * (0.6 + 0.4 * p), 0, col, k);
-        FxDraw.billboard(f.add(FxDraw.tex("glow")), f, at, size * 0.3, 0, 0xFFFFFF, k);
+        VertexConsumer glow = f.add(FxDraw.tex("glow"));
+        FxDraw.billboard(glow, f, at, size * (1.4 + 0.6 * p), 0, col, k * 0.35);              // wide soft halo
+        FxDraw.billboard(glow, f, at, size * (0.6 + 0.4 * p), 0, col, k);
+        FxDraw.billboard(glow, f, at, size * 0.3 * (1.1 - 0.4 * p), 0, 0xFFFFFF, k * 1.2);      // hot core, shrinks
         double ana = el.num("anamorphic", 0) * s;
-        if (ana > 0) FxDraw.billboard(f.add(FxDraw.tex("spark_soft")), f, at, ana * (0.5 + 0.5 * p), size * 0.06, 0, col, k);
+        if (ana > 0) {
+            VertexConsumer sp = f.add(FxDraw.tex("spark_soft"));
+            FxDraw.billboard(sp, f, at, ana * (0.5 + 0.5 * p), size * 0.08, 0, col, k);
+            FxDraw.billboard(sp, f, at, ana * (0.4 + 0.4 * p), size * 0.025, 0, 0xFFFFFF, k);
+        }
         int rays = (int) el.num("rays", 0);
         if (rays > 0) {
-            VertexConsumer vc = f.add(FxDraw.tex("beam"));
+            VertexConsumer vc = f.add(FxDraw.tex("strip_soft"));
             Vec3 l = f.left(), u = f.up();
             for (int i = 0; i < rays; i++) {
                 double ang = Math.PI * 2 * i / rays + te * 0.02;
                 Vec3 dir = l.scale(Math.cos(ang)).add(u.scale(Math.sin(ang)));
-                FxDraw.line(vc, f, at, at.add(dir.scale(size * (0.9 + 0.3 * (i % 2)))), size * 0.06, col, k);
+                Vec3 end = at.add(dir.scale(size * (0.9 + 0.3 * (i % 2)) * (0.7 + 0.5 * p)));
+                FxDraw.line(vc, f, at, end, size * 0.12, size * 0.02, col, k, 0, 0, 1);
+                FxDraw.line(vc, f, at, end, size * 0.04, size * 0.01, 0xFFFFFF, k * 0.8, 0, 0, 1);
             }
         }
+        if (el.params().has("ring") && el.params().get("ring").getAsBoolean())
+            FxDraw.billboard(f.add(FxDraw.tex("thin_ring")), f, at, size * (0.3 + 1.4 * Easing.EASE_OUT_CUBIC.apply(p)), 0, col, a * (1 - p) * 1.4);
         double screen = el.num("screen", 0);
         if (screen > 0) FxClient.screenFlash(at, 0xFFFFFF, screen * k, 32);
     }
@@ -215,8 +249,53 @@ public final class ElementDraw {
             return;
         }
         double fade = a * (1 - p);
-        FxDraw.disc(f.add(FxDraw.tex("thin_ring")), f, at.add(0, 0.08, 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1), R, 0, col, fade * 1.5);
-        FxDraw.disc(f.add(FxDraw.tex("glow")), f, at.add(0, 0.06, 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1), R, 0, col, fade * 0.25);
+        boolean terrain = el.params().has("followTerrain") && el.params().get("followTerrain").getAsBoolean();
+        double th = el.num("thickness", el.num("radius", 4) * 0.12) * s * (0.6 + 0.4 * p);
+        if (!terrain) {
+            FxDraw.disc(f.add(FxDraw.tex("thin_ring")), f, at.add(0, 0.08, 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1), R, 0, col, fade * 1.5);
+            FxDraw.disc(f.add(FxDraw.tex("glow")), f, at.add(0, 0.06, 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1), R, 0, col, fade * 0.25);
+        }
+        band(f, at, R, th, col, fade * 0.7, terrain);                                          // soft band trailing the front
+        band(f, at, R, Math.min(th, 0.12 * s), FxDraw.mix(col, 0xFFFFFF, 0.5), fade, terrain);  // thin hot edge
+        String tex = el.str("texture", null);
+        if (tex != null) FxDraw.disc(f.add(FxDraw.tex(tex)), f, at.add(0, 0.1, 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1), R, te * el.num("spin", 0), col, fade);
+    }
+
+    /** Flat soft annulus from R - th (transparent) to R (brightest) and a little beyond; follows the ground when asked. */
+    static void band(Frame f, Vec3 c, double R, double th, int col, double a, boolean terrain) {
+        int seg = f.low() ? 32 : 64;
+        double[] rr = {Math.max(0, R - th), R - th * 0.15, R + th * 0.2};
+        double[] aa = {0, a, 0};
+        VertexConsumer vc = f.add(FxDraw.WHITE);
+        var lvl = terrain ? Minecraft.getInstance().level : null;
+        double[][] ys = new double[seg + 1][3];
+        for (int i = 0; i <= seg; i++) {
+            double ang = Math.PI * 2 * i / seg;
+            for (int k = 0; k < 3; k++) {
+                double x = c.x + Math.cos(ang) * rr[k], z = c.z + Math.sin(ang) * rr[k];
+                ys[i][k] = (lvl == null ? c.y : groundY(lvl, x, c.y, z)) + 0.07;
+            }
+        }
+        for (int i = 0; i < seg; i++) {
+            double a0 = Math.PI * 2 * i / seg, a1 = Math.PI * 2 * (i + 1) / seg;
+            for (int k = 0; k < 2; k++) {
+                FxDraw.vert(vc, f, c.x + Math.cos(a0) * rr[k], ys[i][k], c.z + Math.sin(a0) * rr[k], 0.5f, 0.5f, col, aa[k]);
+                FxDraw.vert(vc, f, c.x + Math.cos(a1) * rr[k], ys[i + 1][k], c.z + Math.sin(a1) * rr[k], 0.5f, 0.5f, col, aa[k]);
+                FxDraw.vert(vc, f, c.x + Math.cos(a1) * rr[k + 1], ys[i + 1][k + 1], c.z + Math.sin(a1) * rr[k + 1], 0.5f, 0.5f, col, aa[k + 1]);
+                FxDraw.vert(vc, f, c.x + Math.cos(a0) * rr[k + 1], ys[i][k + 1], c.z + Math.sin(a0) * rr[k + 1], 0.5f, 0.5f, col, aa[k + 1]);
+            }
+        }
+    }
+
+    /** Top of the ground near height y at (x, z): looks from 3 blocks above down to 6 below. */
+    private static double groundY(net.minecraft.world.level.Level lvl, double x, double y, double z) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(Mth.floor(x), Mth.floor(y) + 3, Mth.floor(z));
+        for (int i = 0; i < 10; i++) {
+            var shape = lvl.getBlockState(pos).getCollisionShape(lvl, pos);
+            if (!shape.isEmpty()) return pos.getY() + shape.max(Direction.Axis.Y);
+            pos.move(0, -1, 0);
+        }
+        return y;
     }
 
     static void sphere(Frame f, Vec3 c, double R, double rim, int col, double a) {
@@ -235,6 +314,9 @@ public final class ElementDraw {
                 }
             }
         }
+        Vec3 spec = c.add(f.up().scale(R * 0.45)).add(f.left().scale(R * 0.4));    // glint, as on a soap bubble
+        FxDraw.billboard(f.add(FxDraw.tex("glow")), f, spec, R * 0.28, 0, 0xFFFFFF, a * 0.45);
+        FxDraw.billboard(f.add(FxDraw.tex("spark_soft")), f, spec, R * 0.16, 15, 0xFFFFFF, a * 0.5);
     }
 
     private static Vec3 sp(double lat, double lon) {
@@ -261,9 +343,19 @@ public final class ElementDraw {
         double al = a * (1 - fl * 0.5 * (1 + Math.sin(te * 1.7)));
         double w0 = tail > 0 ? w * (1 - taper) : w, w1 = tail > 0 ? w : w * (1 - taper);   // a star's trail narrows behind the head
         double fade = tail > 0 ? 0.15 : 1;   // and fades out there
+        FxDraw.line(f.add(FxDraw.tex("strip_soft")), f, from, end, w0 * 2.6, w1 * 2.6, col, al * 0.3 * fade, al * 0.3, 0, 1);
         FxDraw.line(f.add(FxDraw.tex("beam")), f, from, end, w0, w1, col, al * 0.7 * fade, al * 0.7, 0, 1);
-        FxDraw.line(f.add(FxDraw.WHITE), f, from, end, w0 * core, w1 * core, col, al * fade, al, 0, 1);
+        FxDraw.line(f.add(FxDraw.WHITE), f, from, end, w0 * core, w1 * core, FxDraw.mix(col, 0xFFFFFF, 0.35), al * fade, al, 0, 1);
         FxDraw.billboard(f.add(FxDraw.tex("glow")), f, end, w * 1.6 * el.num("head", 1), 0, col, al * 0.6);
+        if (tail <= 0) FxDraw.billboard(f.add(FxDraw.tex("glow")), f, from, w * 1.2, 0, col, al * 0.4);
+        double scroll = el.num("scroll", 0);                       // clots of light running along the beam, beam lengths per second
+        if (scroll != 0) {
+            VertexConsumer g = f.add(FxDraw.tex("glow"));
+            for (int q = 0; q < 3; q++) {
+                double fr = ((te * scroll / 20 + q / 3.0) % 1 + 1) % 1;
+                FxDraw.billboard(g, f, FxDraw.lerp(from, end, fr), w * 1.3, 0, FxDraw.mix(col, 0xFFFFFF, 0.4), al * 0.6 * Math.sin(Math.PI * fr));
+            }
+        }
     }
 
     private static void beamRain(Frame f, FxRun run, Element el, State st, double te, double L, Vec3 at, double s, int col, double a, long seed) {
@@ -272,7 +364,7 @@ public final class ElementDraw {
         List<FxMath.Strike> strikes = FxMath.beamRain(seed, FxRun.v(at), area, count, interval);
         String impact = el.str("impact", null);
         SigilDef impactDef = impact != null ? FxLib.sigil(impact) : null;
-        VertexConsumer glow = f.add(FxDraw.tex("beam")), core = f.add(FxDraw.WHITE);
+        VertexConsumer glow = f.add(FxDraw.tex("beam")), core = f.add(FxDraw.WHITE), halo = f.add(FxDraw.tex("strip_soft"));
         for (int i = 0; i < strikes.size(); i++) {
             FxMath.Strike sk = strikes.get(i);
             double age = te - sk.tick();
@@ -280,9 +372,16 @@ public final class ElementDraw {
             Vec3 ground = new Vec3(sk.x(), at.y, sk.z());
             double grow = FxDraw.clamp01(age / 3), fade = a * (age < 8 ? 1 : 1 - (age - 8) / 6);
             Vec3 top = ground.add(0, h, 0), bottom = FxDraw.lerp(top, ground, grow);
+            FxDraw.line(halo, f, top, bottom, w * 2.8, col, fade * 0.28);
             FxDraw.line(glow, f, top, bottom, w, col, fade * 0.7);
-            FxDraw.line(core, f, top, bottom, w * 0.35, col, fade);
-            if (grow >= 1 && impactDef == null) FxDraw.billboard(f.add(FxDraw.tex("glow")), f, ground.add(0, 0.2, 0), w * 4, 0, col, fade);
+            FxDraw.line(core, f, top, bottom, w * 0.35, FxDraw.mix(col, 0xFFFFFF, 0.4), fade);
+            if (grow < 1) FxDraw.billboard(f.add(FxDraw.tex("glow")), f, bottom, w * 2, 0, col, fade * 0.8);   // bright head on the way down
+            if (grow >= 1 && impactDef == null) {
+                double hit = age - 3;
+                FxDraw.billboard(f.add(FxDraw.tex("glow")), f, ground.add(0, 0.2, 0), w * (4 + Math.max(0, 3 - hit) * 1.5), 0, col, fade);
+                FxDraw.disc(f.add(FxDraw.tex("thin_ring")), f, ground.add(0, 0.06, 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1),
+                        w * (1 + hit * 0.9), 0, col, fade * Math.max(0, 1 - hit / 11) * 1.4);
+            }
             if (grow >= 1 && impactDef != null && !st.impacts.containsKey(i)) {
                 SigilRun r = new SigilRun();
                 r.def = impactDef;
@@ -310,6 +409,8 @@ public final class ElementDraw {
         double s0 = range(p, "size", 0.2, 0) * s, s1 = range(p, "size", 0.2, 1) * s;
         double emitEnd = L >= 0 ? L : Double.MAX_VALUE;
         VertexConsumer vc = f.add(FxDraw.tex(run.style.texture(el.str("texture", "@sparks"))));
+        double glowK = el.num("glow", 0);
+        VertexConsumer gl = glowK > 0 ? f.add(FxDraw.tex("glow")) : null;
         int step = f.low() ? 2 : 1;
         for (int i = 0; i < count; i += step) {
             double birth = rate > 0 ? i / rate : 0;
@@ -336,6 +437,7 @@ public final class ElementDraw {
             double rot = Math.toDegrees(phase) + spin * age / 20 + (tumble > 0 ? Math.sin(age * 0.2 + phase) * 40 * tumble : 0);
             double sy = tumble > 0 ? size * (0.4 + 0.6 * Math.abs(Math.cos(age * 0.15 * tumble + phase))) : size;
             FxDraw.billboard(vc, f, pos, size, sy, rot, col, al);
+            if (gl != null) FxDraw.billboard(gl, f, pos, size * 2.2, 0, col, al * glowK);
         }
     }
 
@@ -411,15 +513,27 @@ public final class ElementDraw {
     }
 
     private static void decal(Frame f, FxRun run, Element el, double te, double L, Vec3 at, double s, int col, double a, long seed, FxDef.Context ctx) {
-        double fade = el.num("fadeOut", 0);
+        double fade = el.num("fadeOut", 0), grow = el.num("grow", 0);
         double k = L > 0 && fade > 0 ? FxDraw.clamp01((L - te) / fade) : 1;
         if ("crack".equals(el.str("shape", "disc"))) {
             crack(f, run, el, te, at, s, col, a * k, seed, ctx);
             return;
         }
-        var tex = FxDraw.tex(el.str("texture", "core"));
-        FxDraw.disc("translucent".equals(el.str("blend", "")) ? f.trans(tex) : f.add(tex), f, at.add(0, 0.04 + el.num("lift", 0), 0), new Vec3(1, 0, 0), new Vec3(0, 0, -1),
-                el.num("radius", 2) * s, 0, col, a * k);
+        k *= FxDraw.clamp01(te / 3);                                              // soft appearance instead of a pop
+        double R = el.num("radius", 2) * s * (grow > 0 ? 0.25 + 0.75 * Easing.EASE_OUT_CUBIC.apply(FxDraw.clamp01(te / grow)) : 1);
+        Vec3 ux = new Vec3(1, 0, 0), uz = new Vec3(0, 0, -1), c = at.add(0, 0.04 + el.num("lift", 0), 0);
+        double rot = el.num("rotation", 0) + te * el.num("spin", 0);
+        String tex = el.str("texture", "core");
+        if ("translucent".equals(el.str("blend", ""))) {   // a dark patch (crater), not light: no glow, no white-hot start
+            FxDraw.disc(f.trans(FxDraw.tex(tex)), f, c, ux, uz, R, rot, col, a * k);
+            return;
+        }
+        double glow = el.num("glow", 0.2);
+        if (glow > 0) FxDraw.disc(f.add(FxDraw.tex("glow")), f, c.add(0, -0.01, 0), ux, uz, R * 1.15, 0, col, a * k * glow);
+        double pulse = el.num("pulse", 0) > 0 ? 0.8 + 0.2 * Math.sin(Math.PI * 2 * te / el.num("pulse", 1)) : 1;
+        FxDraw.disc(f.add(FxDraw.tex(tex)), f, c, ux, uz, R, rot, col, a * k * pulse);
+        // fresh lines are white-hot and cool down to the colour over the first 20 ticks
+        if (te < 20) FxDraw.disc(f.add(FxDraw.tex(tex)), f, c.add(0, 0.005, 0), ux, uz, R, rot, FxDraw.mix(col, 0xFFFFFF, 0.6), a * k * (1 - te / 20) * 0.6);
     }
 
     /**

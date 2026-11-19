@@ -30,6 +30,9 @@ import ru.pohsmp.core.net.Net;
 
 /** Higher school, level 1 only, Legendary in Iron's eyes (the tooltip shows "Higher"). No mana, no cooldown: scrolls are given by admins. */
 public abstract class HigherSpell extends AbstractSpell {
+    /** Owner 19.11: no scroll of our spells ever appears in a chest (see ru.pohsmp.core.NoLoot). */
+    @Override public boolean allowLooting() { return false; }
+
     private final ResourceLocation id;
     private final DefaultConfig config = new DefaultConfig()
             .setMinRarity(SpellRarity.LEGENDARY)

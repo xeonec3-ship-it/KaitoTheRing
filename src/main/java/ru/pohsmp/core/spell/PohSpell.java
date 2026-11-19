@@ -18,6 +18,9 @@ import ru.pohsmp.core.PohCore;
 
 /** Base of the ordinary-school spells of this mod (Iron's schools, levels 1..max, mana and cooldown as usual). */
 public abstract class PohSpell extends AbstractSpell {
+    /** Owner 19.11: no scroll of our spells ever appears in a chest (see ru.pohsmp.core.NoLoot). */
+    @Override public boolean allowLooting() { return false; }
+
     private final ResourceLocation id;
     private final DefaultConfig config;
 

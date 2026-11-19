@@ -51,6 +51,9 @@ import ru.pohsmp.core.fx.Fx;
  * so the cast time is fixed (cast speed does not change it) and the hit always lands with the column.
  */
 public class DisintegrationSpell extends AbstractSpell {
+    /** Owner 19.11: no scroll of our spells ever appears in a chest (see ru.pohsmp.core.NoLoot). */
+    @Override public boolean allowLooting() { return false; }
+
     public static final ResourceLocation ID = new ResourceLocation(PohCore.MODID, "disintegration");
     public static final int CAST_TICKS = 200;
 

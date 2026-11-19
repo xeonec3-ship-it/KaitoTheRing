@@ -321,5 +321,11 @@ public final class Reg {
         SOUNDS.register(modBus);
         ITEMS.register(modBus);
         TABS.register(modBus);
+        LOOT_MODIFIERS.register(modBus);
     }
+
+    /** Owner 19.11: nothing of this mod ever appears in a chest (or any other loot) - see {@link NoLoot}. */
+    public static final DeferredRegister<com.mojang.serialization.Codec<? extends net.minecraftforge.common.loot.IGlobalLootModifier>> LOOT_MODIFIERS =
+            DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, PohCore.MODID);
+    public static final RegistryObject<com.mojang.serialization.Codec<NoLoot>> NO_LOOT = LOOT_MODIFIERS.register("no_loot", NoLoot.CODEC);
 }

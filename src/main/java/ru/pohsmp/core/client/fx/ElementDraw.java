@@ -56,6 +56,12 @@ public final class ElementDraw {
         if (!Double.isNaN(run.stopAt)) env *= Math.max(0, 1 - (t - run.stopAt) / 12);
         if (env <= 0.002) return true;
         Vec3 at = anchor(el, st, ctx);
+        double travel = el.num("travel", 0);
+        if (travel != 0 && L > 0) {   // the element flies forward (along the effect's yaw) this many blocks over its life
+            FxMath.Vec fw = FxMath.forward(ctx.yaw());
+            double k = Math.min(1, te / L);
+            at = at.add(fw.x() * travel * k, 0, fw.z() * travel * k);
+        }
         int col = run.color >= 0 && el.color() == null ? run.color : run.style.color(el.color());
         double a = env * el.brightness();
         double s = el.scale() * run.scale;
@@ -173,6 +179,11 @@ public final class ElementDraw {
             else if (run.color >= 0) r.color = run.color;
             String o = el.str("orientation", null);
             if (o != null) for (SigilDef.Orientation v : SigilDef.Orientation.values()) if (v.name().equalsIgnoreCase(o)) r.orient = v;
+            if ((r.orient != null ? r.orient : d.orientation()) == SigilDef.Orientation.OUTWARD) {
+                ru.pohsmp.core.fx.FxDef.Anchor a = el.at();
+                Vec3 centre = FxRun.w(new ru.pohsmp.core.fx.FxDef.Anchor(a.kind(), a.arg(), 0, 0, 0).resolve(ctx));
+                r.normal = at.subtract(centre);
+            }
             r.seed = run.seed + el.delay();
             double L = until(el);
             if (L >= 0) r.stopAfter = L;

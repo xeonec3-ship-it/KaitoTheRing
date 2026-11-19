@@ -49,21 +49,6 @@
    "brightness": 0.9
   },
   {
-   "type": "beam",
-   "at": "point:impact",
-   "fromSky": 60,
-   "delay": 40,
-   "duration": 124,
-   "width": 0.12,
-   "core": 0.5,
-   "flicker": 0.4,
-   "color": "@primary",
-   "in": {
-    "duration": 20
-   },
-   "comment": "тонкий луч-наводка с неба"
-  },
-  {
    "type": "sigil",
    "id": "star_fall_sky",
    "delay": 64,

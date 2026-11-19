@@ -23,8 +23,13 @@ public final class CastAnims {
 
     /** Client side only: draw the caster's hands empty for the cast (castTicks) and the finish animation. */
     public static void hideHands(Level level, LivingEntity caster, int castTicks) {
+        hideHands(level, caster, castTicks, FINISH_TICKS);
+    }
+
+    /** Same, with a longer tail after the cast (finish ticks), e.g. the Gate scene. Another spell cast meanwhile shows the hands at once. */
+    public static void hideHands(Level level, LivingEntity caster, int castTicks, int finishTicks) {
         if (!level.isClientSide) return;
-        int ticks = castTicks + FINISH_TICKS;
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.HiddenHands.hide(caster, ticks));
+        int ticks = castTicks + finishTicks;
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ru.pohsmp.core.client.HiddenHands.hide(caster, ticks, finishTicks));
     }
 }

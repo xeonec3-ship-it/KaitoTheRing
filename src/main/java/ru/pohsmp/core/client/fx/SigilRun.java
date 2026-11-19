@@ -19,6 +19,8 @@ public final class SigilRun {
     public int color = -1;
     public double scale = 1, alpha = 1;
     public SigilDef.Orientation orient;
+    /** Plane normal for OUTWARD (from the anchor to the sigil); null = straight up. */
+    public Vec3 normal;
     /** Absolute game time (ticks) of the start. */
     public double start;
     /** Ticks since start when the dissolve began; NaN while running. */

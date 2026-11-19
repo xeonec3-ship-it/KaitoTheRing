@@ -14,8 +14,6 @@
     { "type": "sprites", "at": "point:impact", "delay": 0, "duration": 160, "count": 240, "rate": 2, "area": 7, "speed": 0.03, "gravity": -0.004,
       "life": 50, "size": [0.14, 0.02], "texture": "spark_soft", "color": "#FF6A70",
       "comment": "искры поднимаются над прицелом" },
-    { "type": "beam", "at": "point:impact", "fromSky": 60, "delay": 40, "duration": 124, "width": 0.12, "core": 0.5, "flicker": 0.4, "color": "@primary",
-      "in": { "duration": 20 }, "comment": "тонкий луч-наводка с неба" },
 
     { "type": "flash", "at": "point:sky", "delay": 96, "duration": 16, "size": 9, "rays": 8, "anamorphic": 14, "color": "#FFFFFF",
       "comment": "звезда вспыхивает в небе" },

@@ -117,6 +117,24 @@ public final class CnpcHooks {
         }
     }
 
+    /**
+     * Sets the NPC's home (DataAI start position) and returns the previous one (null if not a CNPC NPC or on failure). Owner 19.11
+     * («the NPCs have no animations again»): CNPC's EntityAIAnimation shows the chosen model animation only while a returning NPC is
+     * very near its home; carried off to the portal and the arena, it fell back to the normal pose every tick.
+     */
+    public static net.minecraft.core.BlockPos home(Entity npc, net.minecraft.core.BlockPos to) {
+        if (!isNpc(npc)) return null;
+        try {
+            Object ais = field(npc.getClass(), "ais").get(npc);
+            net.minecraft.core.BlockPos old = (net.minecraft.core.BlockPos) ais.getClass().getMethod("startPos").invoke(ais);
+            if (!to.equals(old)) ais.getClass().getMethod("setStartPos", net.minecraft.core.BlockPos.class).invoke(ais, to);
+            return old;
+        } catch (Throwable t) {
+            LOG.warn("[pohsmp] CNPC home for {} failed: {}", npc.getUUID(), t.toString());
+            return null;
+        }
+    }
+
     /** For the log: whether e is a CNPC NPC, its model animation and whether its script is on (-1 / false when unknown). */
     public static String describe(Entity e) {
         if (!isNpc(e)) return "not a CNPC NPC";

@@ -279,6 +279,8 @@ public class CovenArrivalSpell extends PohSpell {
         final Map<UUID, Vec3> pre = new HashMap<>();
         /** CNPC NPCs: the model animation they had before the arrival changed it. */
         final Map<UUID, Integer> poses = new HashMap<>();
+        /** CNPC NPCs: their home before the scene (held at the spot the scene keeps them, given back at the end). */
+        final Map<UUID, net.minecraft.core.BlockPos> homes = new HashMap<>();
         /** Retinue members whose exit came while they could not be found (chunk not loaded yet): retried every tick. */
         final Map<UUID, Vec3> pendingExit = new HashMap<>();
     }
@@ -437,6 +439,9 @@ public class CovenArrivalSpell extends PohSpell {
                 continue;
             }
             if (le.position().distanceToSqr(p) > 0.0004) le.teleportTo(p.x, p.y, p.z);
+            // CNPC shows the model animation (bow, ritual) only at the NPC's home: home = where the scene holds it
+            net.minecraft.core.BlockPos old = CnpcHooks.home(le, net.minecraft.core.BlockPos.containing(p));
+            if (old != null) a.homes.putIfAbsent(le.getUUID(), old);
             le.fallDistance = 0;
             le.setDeltaMovement(Vec3.ZERO);
             le.setYRot(yaw);
@@ -612,6 +617,10 @@ public class CovenArrivalSpell extends PohSpell {
         for (var p : a.poses.entrySet()) {
             LivingEntity le = find(ar.getServer(), p.getKey());
             if (le != null) CnpcHooks.anim(le, p.getValue());
+        }
+        for (var h : a.homes.entrySet()) {
+            LivingEntity le = find(ar.getServer(), h.getKey());
+            if (le != null) CnpcHooks.home(le, h.getValue());
         }
         HIDDEN.values().removeIf(c -> c.equals(caster.getUUID()));
         if (cancelled) {

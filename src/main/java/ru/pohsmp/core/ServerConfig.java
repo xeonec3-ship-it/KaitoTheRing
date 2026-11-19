@@ -16,6 +16,7 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> JOINT_SPELLS;
     public static final ForgeConfigSpec.DoubleValue JOINT_RADIUS, JOINT_WINDOW, JOINT_MULT;
     public static final ForgeConfigSpec.DoubleValue COUNTDOWN_MAX;
+    public static final ForgeConfigSpec.DoubleValue STAR_FALL_DAMAGE, STAR_FALL_EDGE;
     public static final ForgeConfigSpec.IntValue SCARLET_CUTS_MIN, SCARLET_CUTS_MAX, SCARLET_INTERVAL, SCARLET_CRACK_DELAY;
     public static final ForgeConfigSpec.DoubleValue SCARLET_DAMAGE, SCARLET_WIDTH, SCARLET_NEAR, SCARLET_FAR,
             SCARLET_SHARD_DAMAGE, SCARLET_SHARD_RADIUS, SCARLET_KNOCK_UP;
@@ -109,6 +110,10 @@ public final class ServerConfig {
         b.pop();
         b.push("countdown");
         COUNTDOWN_MAX = b.comment("Countdown: the repeated hit is capped at this share of the target's max health").defineInRange("maxRepeat", 0.4, 0.0, 100.0);
+        b.pop();
+        b.push("star_fall");
+        STAR_FALL_DAMAGE = b.comment("Star Fall: damage in the centre of the impact (before spell power and resistances)").defineInRange("damage", 40.0, 0.0, 100000.0);
+        STAR_FALL_EDGE = b.comment("Star Fall: share of that damage at the edge of the radius (8 blocks); it falls off linearly from the centre").defineInRange("edgeShare", 0.35, 0.0, 1.0);
         b.pop();
         b.push("scarlet_cut");
         SCARLET_CUTS_MIN = b.comment("Scarlet Cut: fewest cuts in a series").defineInRange("cutsMin", 3, 1, 20);

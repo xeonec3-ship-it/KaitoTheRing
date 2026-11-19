@@ -69,7 +69,7 @@
 | type | Ключевые параметры |
 |---|---|
 | `sigil` | `id` печати, `orientation`, `scale` — см. [`sigils.md`](sigils.md) |
-| `beam` | `at` → `to` (или `fromSky`: высота), `width`, `core` (доля ширины яркого ядра), `taper` (сужение к концу), `scroll` (скорость прокрутки текстуры), `grow` (тики роста от начала к концу), `flicker` |
+| `beam` | `at` → `to` (или `fromSky`: высота), `width`, `core` (доля ширины яркого ядра), `taper` (сужение к концу), `scroll` (скорость прокрутки текстуры), `grow` (тики роста от начала к концу), `easing` (плавность роста, по умолчанию `easeOutCubic`; `easeInCubic` — падение с ускорением), `tail` (доля пути за концом, которая видна: шлейф падающей звезды, сужается и гаснет к хвосту), `head` (множитель свечения на конце), `flicker` |
 | `beam_rain` | `area` (радиус), `count`, `interval` (тики между лучами), `width`, `height`, `impact` (id печати или вспышки на месте удара) |
 | `wave` | `shape`: `ring` (по земле, `followTerrain`) или `sphere` (пузырь); `radius`, `speed`, `thickness`, `rim` (яркость края сферы) |
 | `flash` | `size`, `anamorphic` (длина горизонтального блика), `rays` (число лучиков), `screen` (засветка экрана у кастера: сила 0–1) |
@@ -79,7 +79,7 @@
 | `vortex` | `radius`, `height`, `arms`, `speed`, `pull` (к центру, минус — выброс), `texture` |
 | `chains` | `at` → `to`, `link` (размер звена), `sag` (провис), `tension` |
 | `aura` | `target`, `thickness`, `pulse` |
-| `decal` | `texture` (трещины, выжженный след…), `radius`, `fadeOut` (тики); `shape: "crack"` — рисованная трещина поперёк взгляда: `length`, `width`, `grow` (тики раскрытия от середины), `branches`, `pulse` (0–1, свечение пульсирует всё чаще к концу элемента), `yaw` |
+| `decal` | `texture` (трещины, выжженный след…), `radius`, `fadeOut` (тики); `shape: "crack"` — рисованная трещина поперёк взгляда: `length`, `width`, `grow` (тики раскрытия от середины), `branches`, `pulse` (0–1, свечение пульсирует всё чаще к концу элемента), `yaw`; `blend`: `translucent` — тёмное пятно (кратер), иначе свет; `lift` (подъём над землёй, чтобы декали не мерцали друг о друга) |
 | `wings` / `halo` | `size`, `flap` (амплитуда и период взмаха), `offset` |
 | `curtain` | завеса из вертикальных лучей: `count`, `radius` (или кольцо `[от, до]`), `height`, `grow`, `width` и `brightness` — число или `[от, до]`, `texture` (`beam_fade` гаснет кверху), `fromTop` (растут сверху вниз), `flicker` |
 | `column` | сплошной столб: `radius`, `height`, ядро ярче краёв; кольца неподвижные на `ringHeights` или скользящие (`rings`, `ringSpeed`); `fill` |

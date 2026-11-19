@@ -75,9 +75,13 @@ const G = D.geo["minecraft:geometry"][0], TW = G.description.texture_width, TH =
 const D2R = Math.PI / 180, BONES = {}, root = new THREE.Group(); scene.add(root);
 function cubeMesh(c) {
   const g = new THREE.BoxGeometry(c.size[0] || 0.001, c.size[1] || 0.001, c.size[2] || 0.001);
-  const uv = g.attributes.uv, f = c.uv.north || Object.values(c.uv)[0];
-  const u0 = f.uv[0] / TW, v0 = 1 - f.uv[1] / TH, u1 = (f.uv[0] + f.uv_size[0]) / TW, v1 = 1 - (f.uv[1] + f.uv_size[1]) / TH;
-  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) ? u1 : u0, uv.getY(i) ? v0 : v1);
+  // у каждой грани своя развёртка; порядок граней BoxGeometry: +x, -x, +y, -y, +z, -z (x уже зеркален как в GeckoLib)
+  const uv = g.attributes.uv, ORDERF = ["east", "west", "up", "down", "south", "north"];
+  for (let fi = 0; fi < 6; fi++) {
+    const f = c.uv[ORDERF[fi]] || c.uv.north || Object.values(c.uv)[0];
+    const u0 = f.uv[0] / TW, v0 = 1 - f.uv[1] / TH, u1 = (f.uv[0] + f.uv_size[0]) / TW, v1 = 1 - (f.uv[1] + f.uv_size[1]) / TH;
+    for (let i = fi * 4; i < fi * 4 + 4; i++) uv.setXY(i, uv.getX(i) ? u1 : u0, uv.getY(i) ? v0 : v1);
+  }
   const grp = new THREE.Group(), m = new THREE.Mesh(g, base); grp.add(m);
   if (glow) grp.add(new THREE.Mesh(g, glow));
   // как GeckoLib: x геометрии зеркалится (x -> -x), у вращений x и y меняют знак
@@ -155,7 +159,7 @@ function frame(now) {
       // руки качаются полностью; кости ног (с юбкой) — на 25 %, как в рендере брони ведьмы; сами ноги фигуры шагают полностью
       if (n === "bipedLeftArm") lx = sw; if (n === "bipedRightArm") lx = -sw;
       if (n === "bipedRightLeg") lx = sw * 0.25; if (n === "bipedLeftLeg") lx = -sw * 0.25;
-      if (LEGS[n]) LEGS[n].rotation.x = (n === "bipedRightLeg" ? sw : -sw) * 0.75; }
+      if (LEGS[n]) LEGS[n].rotation.x = (n === "bipedRightLeg" ? sw : -sw) * 0.25; }   // в юбке шаг вдвое мельче: нога 50 %, юбка 25 %
     else if (LEGS[n]) LEGS[n].rotation.x = 0;
     inner.rotation.set(-rest[0] - r[0] * D2R + lx, -rest[1] - r[1] * D2R, rest[2] + r[2] * D2R, "ZYX");
     inner.scale.set(s[0], s[1], s[2]); inner.position.set(p[0], p[1], p[2]);

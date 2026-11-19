@@ -109,6 +109,7 @@ public final class SigilDraw {
         double gs = SigilTimeline.globalScale(d, t, r.stopAt, r.scale);
         double ga = SigilTimeline.globalAlpha(d, t, r.stopAt) * r.alpha;
         if (gs <= 1e-4 || ga <= 0.002) return;
+        SigilLight.draw(f, r, d, t, c, gs);
         for (int i = 0; i < d.layers().size(); i++) {
             Layer l = d.layers().get(i);
             LayerState st = SigilTimeline.layer(d, i, t, r.stopAt);

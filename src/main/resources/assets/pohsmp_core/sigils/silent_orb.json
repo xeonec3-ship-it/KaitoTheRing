@@ -1,0 +1,15 @@
+{
+  "comment": "Зелёная светящаяся сфера (между золотыми кругами во «Вратах»).",
+  "size": 0.45,
+  "color": "#7FFFD0",
+  "orientation": "billboard",
+  "lifetime": -1,
+  "hold": -1,
+  "layers": [
+    { "id": "halo", "type": "disc", "texture": "glow", "radius": 1.8, "brightness": 0.6,
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.25, "period": 30 } },
+    { "id": "core", "type": "disc", "texture": "core", "radius": 1.0, "color": "#E6FFF6",
+      "appear": { "delay": 2, "duration": 10, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "rotation": { "speed": 30 } }
+  ],
+  "dissolve": { "modes": ["collapse"], "duration": 10 }
+}

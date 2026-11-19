@@ -674,7 +674,7 @@ def fire():
 
     rings = []
     for i in range(7):
-        rings.append(E('sigil', 37 * (i + 1), off(0, 22 + i * 4.2, 0), id='explosion_ring', scale=round(24 - i * 2.2, 2), until=310))
+        rings.append(E('sigil', 37 * (i + 1), off(0, 36 + i * 5.0, 0), id='explosion_ring', scale=round(24 - i * 2.2, 2), until=310))
     sigil('explosion_ring', 'Взрыв: один из семи кругов над целью (радиус задаёт scale): пламя, руны, обод; быстро разгоняется.',
           1.0, FIRE, 'sky', [
               L('glow', 'disc', 'glow', 0.7, -0.02, ap(0, 14, 'fade'), br=0.4, pulse=(0.2, 14)),
@@ -694,7 +694,7 @@ def fire():
         E('sprites', 20, 'caster', duration=290, texture='spark_sharp', count=4500, rate=15, area=22, speed=0.02, gravity=-0.006,
           size=[0.22, 0.04], life=40, color='@primary'),
         E('tint', 150, 'caster', duration=160, radius=96, color='#FF5A1E', strength=0.3, **{'in': ease(140, 'easeInSine')}),
-        E('beam', 260, 'caster', to='caster+0,48,0', duration=45, width=2.0, core=0.3, grow=30, flicker=0.4, color='@secondary'),
+        E('beam', 260, 'caster', to='caster+0,68,0', duration=45, width=2.0, core=0.3, grow=30, flicker=0.4, color='@secondary'),
     ])
     fx('explosion_boom', 'Взрыв: удар — засветка, огненный столб, пузырь и кольцо по земле, трещины и угли.', 'pyre', 200, [
         E('flash', 0, 'caster+0,3,0', duration=20, size=44, anamorphic=90, rays=16, screen=1.0, color='#FFE2B0'),

@@ -13,7 +13,7 @@
   {
    "type": "sigil",
    "delay": 37,
-   "at": "caster+0,22,0",
+   "at": "caster+0,36,0",
    "id": "explosion_ring",
    "scale": 24.0,
    "until": 310
@@ -21,7 +21,7 @@
   {
    "type": "sigil",
    "delay": 74,
-   "at": "caster+0,26.2,0",
+   "at": "caster+0,41,0",
    "id": "explosion_ring",
    "scale": 21.8,
    "until": 310
@@ -29,7 +29,7 @@
   {
    "type": "sigil",
    "delay": 111,
-   "at": "caster+0,30.4,0",
+   "at": "caster+0,46,0",
    "id": "explosion_ring",
    "scale": 19.6,
    "until": 310
@@ -37,7 +37,7 @@
   {
    "type": "sigil",
    "delay": 148,
-   "at": "caster+0,34.6,0",
+   "at": "caster+0,51,0",
    "id": "explosion_ring",
    "scale": 17.4,
    "until": 310
@@ -45,7 +45,7 @@
   {
    "type": "sigil",
    "delay": 185,
-   "at": "caster+0,38.8,0",
+   "at": "caster+0,56,0",
    "id": "explosion_ring",
    "scale": 15.2,
    "until": 310
@@ -53,7 +53,7 @@
   {
    "type": "sigil",
    "delay": 222,
-   "at": "caster+0,43,0",
+   "at": "caster+0,61,0",
    "id": "explosion_ring",
    "scale": 13.0,
    "until": 310
@@ -61,7 +61,7 @@
   {
    "type": "sigil",
    "delay": 259,
-   "at": "caster+0,47.2,0",
+   "at": "caster+0,66,0",
    "id": "explosion_ring",
    "scale": 10.8,
    "until": 310
@@ -101,7 +101,7 @@
    "type": "beam",
    "delay": 260,
    "at": "caster",
-   "to": "caster+0,48,0",
+   "to": "caster+0,68,0",
    "duration": 45,
    "width": 2.0,
    "core": 0.3,

@@ -13,6 +13,7 @@
     "ItemRendererMixin",
     "GameRendererMixin",
     "ClientLevelMixin",
+    "LevelRendererMixin",
     "MouseHandlerMixin",
     "JourneyMapPlayersMixin",
     "JourneyMapPlayersDataMixin",

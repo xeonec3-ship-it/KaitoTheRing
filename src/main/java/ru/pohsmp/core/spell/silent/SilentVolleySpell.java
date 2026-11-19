@@ -1,4 +1,6 @@
-package ru.pohsmp.core.spell;
+package ru.pohsmp.core.spell.silent;
+
+import ru.pohsmp.core.spell.Tasks;
 
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
@@ -169,7 +171,6 @@ public class SilentVolleySpell extends SilentSpell {
             a.delay = j % 4;
             arrows.add(a);
         }
-        sl.playSound(null, caster.getX(), caster.getY() + 1.5, caster.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.6f, 1.4f);
         Tasks.add(new Tasks.Task() {
             int age;
 

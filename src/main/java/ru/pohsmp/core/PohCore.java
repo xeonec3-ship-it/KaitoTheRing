@@ -44,17 +44,22 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.IllusionSpell.IllusionEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MirrorPrisonSpell.MirrorPrisonEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.FrozenHourSpell.FrozenHourEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.CountdownSpell.CountdownEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.ArkSpell.ArkEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DownfallSpell.DownfallEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.EightShieldsSpell.EightShieldsEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.Cutscene.CutsceneEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MilkyWaySpell.MilkyWayEvents.class);
         MinecraftForge.EVENT_BUS.register(AnimatedStaff.StaffAnimEvents.class);
-        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.SageBarrierSpell.BarrierEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.silent.SageBarrierSpell.BarrierEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.SpaceClosureSpell.SpaceClosureEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.CovenArrivalSpell.CovenArrivalEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.Fx.FxServerEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.fx.FxCommands.class);
+        MinecraftForge.EVENT_BUS.register(Hidden.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.NpcCast.Events.class);
+        MinecraftForge.EVENT_BUS.register(Charges.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.JointCast.class);
         if (FMLEnvironment.dist == Dist.CLIENT) ClientInit.init(modBus);
     }
 

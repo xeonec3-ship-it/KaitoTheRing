@@ -1,4 +1,6 @@
-package ru.pohsmp.core.spell;
+package ru.pohsmp.core.spell.silent;
+
+import ru.pohsmp.core.spell.Tasks;
 
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.CastSource;
@@ -99,7 +101,6 @@ public class WindSpearsSpell extends SilentSpell {
                     .point("start", s.pos).color(COLOR).seed(i + 1L));
             spears.add(s);
         }
-        sl.playSound(null, caster.getX(), caster.getY() + 1.6, caster.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.5f, 1.9f);
         Tasks.add(new Tasks.Task() {
             int age;
 

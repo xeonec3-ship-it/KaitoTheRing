@@ -1,4 +1,6 @@
-package ru.pohsmp.core.spell;
+package ru.pohsmp.core.spell.silent;
+
+import ru.pohsmp.core.spell.Tasks;
 
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.CastSource;

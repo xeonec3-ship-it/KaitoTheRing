@@ -1,4 +1,6 @@
-package ru.pohsmp.core.spell;
+package ru.pohsmp.core.spell.silent;
+
+import ru.pohsmp.core.spell.Tasks;
 
 import io.redspace.ironsspellbooks.api.events.SpellPreCastEvent;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -115,7 +117,6 @@ public class SageBarrierSpell extends SilentSpell {
         Dome d = new Dome(owner, sl, radius, ticks);
         d.fxInst = fx(sl, "silent_barrier_dome", Fx.fx("silent_barrier_dome").caster(owner).attach(owner).scale(radius).color(COLOR).duration(ticks));
         DOMES.add(d);
-        sl.playSound(null, owner.getX(), owner.getY(), owner.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.7f, 1.6f);
         return d;
     }
 

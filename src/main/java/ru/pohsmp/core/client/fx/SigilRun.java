@@ -27,6 +27,8 @@ public final class SigilRun {
     public double stopAfter = -1;
     public long seed;
     public boolean spawned;
+    /** Surface heights cached by {@link SigilLight} (groundLight / blockGlow). */
+    Object light;
     public final List<SigilRun> children = new ArrayList<>();
 
     public Vec3 pos(float pt) {

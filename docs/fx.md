@@ -73,13 +73,13 @@
 | `beam_rain` | `area` (радиус), `count`, `interval` (тики между лучами), `width`, `height`, `impact` (id печати или вспышки на месте удара) |
 | `wave` | `shape`: `ring` (по земле, `followTerrain`) или `sphere` (пузырь); `radius`, `speed`, `thickness`, `rim` (яркость края сферы) |
 | `flash` | `size`, `anamorphic` (длина горизонтального блика), `rays` (число лучиков), `screen` (засветка экрана у кастера: сила 0–1) |
-| `trail` / `ribbon` | `width`, `length` (тики памяти), `fade`; `slash`: `radius`, `arc` (°), `thickness`, `bend`, `secondary` (тонкая вторая дуга) |
+| `trail` / `ribbon` | `width`, `length` (тики памяти), `fade`; `shape: "slash"` (в игре пока только он): `radius`, `arc` (°), `thickness`, `bend` (концы загнуты назад, серп глубже), `secondary` (тонкая вторая дуга, 0–1), `sweep` (тики пролёта), `tail` (доля дуги за головой, 1 — вся), `roll` (наклон вокруг оси взгляда, °), `rollAlt` (наклон и направление чередуются по seed — для серий), `reverse`, `pitch`, `yaw`. Середина дуги — в точке `at`, плоскость — по взгляду (yaw экземпляра) |
 | `sprites` | `texture` (`@shards`, `feather`…), `count`, `rate`, `spread`, `speed`, `gravity`, `spin`, `tumble`, `sway` (покачивание при падении — для перьев), `size` (`[от, до]` по времени), `life` |
 | `lightning` | `at` → `to`, `branches`, `jaggedness`, `regen` (перегенерация формы каждые N тиков), `width` |
 | `vortex` | `radius`, `height`, `arms`, `speed`, `pull` (к центру, минус — выброс), `texture` |
 | `chains` | `at` → `to`, `link` (размер звена), `sag` (провис), `tension` |
 | `aura` | `target`, `thickness`, `pulse` |
-| `decal` | `texture` (трещины, выжженный след…), `radius`, `fadeOut` (тики) |
+| `decal` | `texture` (трещины, выжженный след…), `radius`, `fadeOut` (тики); `shape: "crack"` — рисованная трещина поперёк взгляда: `length`, `width`, `grow` (тики раскрытия от середины), `branches`, `pulse` (0–1, свечение пульсирует всё чаще к концу элемента), `yaw` |
 | `wings` / `halo` | `size`, `flap` (амплитуда и период взмаха), `offset` |
 | `curtain` | завеса из вертикальных лучей: `count`, `radius` (или кольцо `[от, до]`), `height`, `grow`, `width` и `brightness` — число или `[от, до]`, `texture` (`beam_fade` гаснет кверху), `fromTop` (растут сверху вниз), `flicker` |
 | `column` | сплошной столб: `radius`, `height`, ядро ярче краёв; кольца неподвижные на `ringHeights` или скользящие (`rings`, `ringSpeed`); `fill` |

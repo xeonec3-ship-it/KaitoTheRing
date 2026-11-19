@@ -109,30 +109,40 @@ public final class SigilDraw {
         double gs = SigilTimeline.globalScale(d, t, r.stopAt, r.scale);
         double ga = SigilTimeline.globalAlpha(d, t, r.stopAt) * r.alpha;
         if (gs <= 1e-4 || ga <= 0.002) return;
+        SigilLight.draw(f, r, d, t, c, gs);
+        layers(f, r, d, t, c, bs, gs, ga, false);
+        // joint cast (T15): a second outline, raised, wider, turned and spinning the other way
+        if (ru.pohsmp.core.client.JointFx.isJoint(r.caster != null ? r.caster : r.follow)) layers(f, r, d, t, c, bs, gs, ga, true);
+        flash(f, r, d, t, c, bs, gs, ga);
+    }
+
+    private static void layers(Frame f, SigilRun r, SigilDef d, double t, Vec3 c, Basis bs, double gs, double ga, boolean echo) {
+        double lift = echo ? ru.pohsmp.core.client.JointFx.LIFT : 0, sc = echo ? ru.pohsmp.core.client.JointFx.SCALE : 1;
+        double turn = echo ? Math.toDegrees(ru.pohsmp.core.client.JointFx.TURN) : 0, am = echo ? ru.pohsmp.core.client.JointFx.ALPHA : 1;
         for (int i = 0; i < d.layers().size(); i++) {
             Layer l = d.layers().get(i);
             LayerState st = SigilTimeline.layer(d, i, t, r.stopAt);
             if (!st.visible()) continue;
-            double R = gs * st.scale();
-            Vec3 lc = c.add(bs.n.scale(l.heightOffset() * r.scale));
+            double R = gs * st.scale() * sc;
+            Vec3 lc = c.add(bs.n.scale(l.heightOffset() * r.scale + lift));
             double tl = Math.toRadians(st.tilt());
             Vec3 u = bs.u, v = bs.v.scale(Math.cos(tl)).add(bs.n.scale(Math.sin(tl))), n = bs.n.scale(Math.cos(tl)).subtract(bs.v.scale(Math.sin(tl)));
             int col = r.color >= 0 ? r.color : l.color();
-            double a = st.alpha() * ga;
+            double a = st.alpha() * ga * am;
+            double ang = echo ? -st.angle() * 1.3 + turn : st.angle();
             VertexConsumer vc = f.add(FxDraw.tex(l.texture()));
             Plane pl = new Plane(lc, u, v, n);
-            if (l.appear().modes().contains(AppearMode.PIECES)) pieces(f, vc, pl, d, l, i, t, r.stopAt, R, st.angle(), col, a);
+            if (l.appear().modes().contains(AppearMode.PIECES)) pieces(f, vc, pl, d, l, i, t, r.stopAt, R, ang, col, a);
             else switch (l.type()) {
                 case DISC, SPOKES -> {
-                    if (st.drawFraction() >= 0.999) FxDraw.disc(vc, f, lc, u, v, R, st.angle(), col, a);
-                    else fan(f, vc, pl, R, st.angle(), st.drawStart(), st.drawDirection() * st.drawFraction() * 360, col, a);
+                    if (st.drawFraction() >= 0.999) FxDraw.disc(vc, f, lc, u, v, R, ang, col, a);
+                    else fan(f, vc, pl, R, ang, st.drawStart(), st.drawDirection() * st.drawFraction() * 360, col, a);
                 }
-                case BAND -> band(f, vc, pl, R, l.inner(), l.repeat(), st.angle(), st.drawStart(),
+                case BAND -> band(f, vc, pl, R, l.inner(), l.repeat(), ang, st.drawStart(),
                         st.drawDirection() * st.drawFraction() * 360, col, a);
                 case ARCS -> arcs(f, vc, pl, l, st, SigilTimeline.assemble(d, i, t), R, col, a);
             }
         }
-        flash(f, r, d, t, c, bs, gs, ga);
     }
 
     private record Plane(Vec3 c, Vec3 u, Vec3 v, Vec3 n) {

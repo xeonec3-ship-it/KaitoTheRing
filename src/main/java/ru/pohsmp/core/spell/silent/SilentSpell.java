@@ -1,18 +1,14 @@
-package ru.pohsmp.core.spell;
+package ru.pohsmp.core.spell.silent;
 
-import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.spells.SpellRarity;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -20,22 +16,20 @@ import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.joml.Vector3f;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.SilentWitchStaff;
 import ru.pohsmp.core.fx.Fx;
 import ru.pohsmp.core.fx.FxLib;
 
 /**
- * Base of the Silent Witch staff spells (T20): "Silent" school, "Unknown" tier, level 1 only, no scrolls, cast only with
- * {@link SilentWitchStaff} in hand (no outfit needed). Silent magic: no cast sounds and no lines. Cast time, mana and cooldown
- * come from the [silent_staff] section of the server config; damage is multiplied by the caster's Silent spell power.
+ * The four finished Silent Witch staff spells (T20) on top of {@link SilentStaffSpell} (school, tier, staff in the main hand,
+ * no scrolls, no cast voice - only the staff's short crystal chime; no outfit needed). Cast time, mana and cooldown come from the
+ * [silent_staff] section of the server config; damage is multiplied by the caster's Silent spell power. Shared target and effect helpers.
  */
-public abstract class SilentSpell extends PohSpell {
+public abstract class SilentSpell extends SilentStaffSpell {
     public static final int COLOR = Reg.SILENT_COLOR;
     public static final DustParticleOptions TURQUOISE = new DustParticleOptions(new Vector3f(0.5f, 1f, 0.82f), 1.0f);
     public static final DustParticleOptions TURQUOISE_SMALL = new DustParticleOptions(new Vector3f(0.5f, 1f, 0.82f), 0.55f);
@@ -48,7 +42,7 @@ public abstract class SilentSpell extends PohSpell {
 
     protected SilentSpell(String path, int castTicks, int mana, double cooldown,
                           ForgeConfigSpec.IntValue castCfg, ForgeConfigSpec.IntValue manaCfg, ForgeConfigSpec.DoubleValue cooldownCfg) {
-        super(path, Reg.SILENT_ID, SpellRarity.LEGENDARY, 1, cooldown, castTicks, mana, 0);
+        super(path, cooldown, castTicks, mana);
         this.castCfg = castCfg;
         this.manaCfg = manaCfg;
         this.cooldownCfg = cooldownCfg;
@@ -67,24 +61,11 @@ public abstract class SilentSpell extends PohSpell {
         }
     }
 
+    @Override protected boolean ready() { return true; }
     @Override public int getCastTime(int level) { return getCastType() == io.redspace.ironsspellbooks.api.spells.CastType.INSTANT ? 0 : cfg(castCfg::get, castDef); }
     @Override public int getManaCost(int level) { return cfg(manaCfg::get, manaDef); }
     @Override public int getSpellCooldown() { return (int) Math.round(cfg(cooldownCfg::get, cooldownDef) * 20); }
-    @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
-    @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.empty(); }
-    @Override public boolean allowCrafting() { return false; }
-    @Override public boolean allowLooting() { return false; }
     @Override public org.joml.Vector3f getTargetingColor() { return new org.joml.Vector3f(0, 0, 0); }
-
-    @Override
-    public boolean checkPreCastConditions(Level level, int spellLevel, LivingEntity entity, MagicData md) {
-        if (!SilentWitchStaff.holds(entity)) {
-            if (entity instanceof Player p)
-                p.displayClientMessage(Component.translatable("ui.pohsmp_core.silent.need_staff").withStyle(s -> s.withColor(COLOR)), true);
-            return false;
-        }
-        return super.checkPreCastConditions(level, spellLevel, entity, md);
-    }
 
     /** Damage with the caster's Silent spell power. */
     protected double dmg(LivingEntity caster, double base) {

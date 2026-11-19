@@ -82,6 +82,41 @@ public final class Api {
         return Hidden.isHidden(mc(entity));
     }
 
+    /**
+     * An NPC (or any non-player mob) casts a spell like a player: animation, effects, cutscene. id: "pohsmp_core:disintegration",
+     * "irons_spellbooks:fireball" (or just "fireball"). target: an entity (CNPC or Minecraft) or null (straight ahead).
+     * Spell level = its minimum. Returns false if it could not start (already casting, unknown spell, the spell refused).
+     */
+    public static boolean cast(Object npc, String id, Object target) {
+        return cast(npc, id, target, 0);
+    }
+
+    public static boolean cast(Object npc, String id, Object target, int level) {
+        net.minecraft.world.entity.Entity t = mc(target);
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le
+                && NpcCast.cast(le, id, level, t instanceof net.minecraft.world.entity.LivingEntity lt ? lt : null,
+                        t != null ? t.position() : null);
+    }
+
+    /** Same, aimed at a point. */
+    public static boolean castAt(Object npc, String id, double x, double y, double z, int level) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.cast(le, id, level, null, new net.minecraft.world.phys.Vec3(x, y, z));
+    }
+
+    /** Stops the NPC's cast; a spell that cannot be interrupted is not stopped. Returns true if stopped. */
+    public static boolean cancelCast(Object npc) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.cancel(le, false);
+    }
+
+    /** Stops it even if the spell cannot be interrupted (the boss dies, the phase changes). */
+    public static boolean forceCancelCast(Object npc) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.cancel(le, true);
+    }
+
+    public static boolean isCasting(Object npc) {
+        return mc(npc) instanceof net.minecraft.world.entity.LivingEntity le && NpcCast.isCasting(le);
+    }
+
     /** A CNPC script wrapper (IEntity) or a Minecraft entity to the Minecraft entity; null if neither. */
     static net.minecraft.world.entity.Entity mc(Object o) {
         if (o instanceof net.minecraft.world.entity.Entity e) return e;

@@ -23,9 +23,9 @@ NPC CustomNPCs (или любой моб, кроме игрока) кастуе�
 |---|---|
 | `Core.cast(npc, "pohsmp_core:disintegration", target)` | каст на максимальном уровне заклинания; `true`, если каст начался |
 | `Core.cast(npc, id, target, level)` | то же с уровнем (обрезается до уровней заклинания; 0 — максимальный) |
-| `Core.cast(npc, id, x, y, z)` / `Core.cast(npc, id, x, y, z, level)` | каст в точку |
+| `Core.cast(npc, id, x, y, z[, level])`, `Core.castAt(npc, id, x, y, z[, level])` | каст в точку |
 | `Core.cancelCast(npc)` | прервать каст; `false`, если NPC не кастует или заклинание неотменяемое |
-| `Core.cancelCast(npc, true)` | прервать любой каст (сброс босса, смена фазы) |
+| `Core.cancelCast(npc, true)`, `Core.forceCancelCast(npc)` | прервать любой каст (сброс босса, смена фазы) |
 | `Core.isCasting(npc)` | идёт ли каст |
 | `Core.castingSpell(npc)` | id заклинания в касте или `""` |
 
@@ -43,8 +43,8 @@ NPC CustomNPCs (или любой моб, кроме игрока) кастуе�
   - если цель удержания пропала (умерла, ушла в другое измерение), заклинание само прерывает каст;
   - смерть или выгрузка NPC прерывает каст.
 - Во время долгого каста NPC стоит на месте и смотрит на цель.
-- Когда каст закончился (успешно или прерван), мод вызывает в скрипте NPC функцию `pohsmp_cast_end(e)`, если она есть.
-  Поля `e`: `npc`, `spell` (id), `cancelled` (`true`, если каст прерван), `x`, `y`, `z`.
+- В начале и в конце каста (успешном или прерванном) мод вызывает в скрипте NPC функции `cast_start(e)` и `cast_end(e)`,
+  если они есть. Поля `e`: `npc`, `spell` (id; то же в `caster` для старых скриптов), `cancelled` (`true`, если каст прерван), `x`, `y`, `z`.
   У мгновенных заклинаний каст проходит сразу, поэтому функция вызывается ещё внутри `Core.cast`.
 - Команды для проверки (оп 2): `/pohsmp npccast <кто> "<id>" [уровень] [entity <цель> | at <x y z>]`
   и `/pohsmp npccancel <кто> [true]`. Во втором аргументе id заклинания пишется в кавычках.
@@ -73,7 +73,7 @@ function damaged(e) {
     Core.cast(e.npc, "pohsmp_core:singularity", e.npc.getX(), e.npc.getY() + 1, e.npc.getZ() + 6);  // в точку
 }
 
-function pohsmp_cast_end(e) {
+function cast_end(e) {
     if (!e.cancelled) e.npc.say("§6" + e.spell + "!");
 }
 ```

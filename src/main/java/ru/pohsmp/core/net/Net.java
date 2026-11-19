@@ -24,7 +24,8 @@ public final class Net {
         CH.messageBuilder(Fx.class, 0, NetworkDirection.PLAY_TO_CLIENT).encoder(Fx::encode).decoder(Fx::new).consumerMainThread(Fx::handle).add();
         CH.messageBuilder(HFx.class, 1, NetworkDirection.PLAY_TO_CLIENT).encoder(HFx::encode).decoder(HFx::new).consumerMainThread(HFx::handle).add();
         CH.messageBuilder(FxMsg.class, 2, NetworkDirection.PLAY_TO_CLIENT).encoder(FxMsg::encode).decoder(FxMsg::new).consumerMainThread(FxMsg::handle).add();
-        CH.messageBuilder(NpcCastMsg.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(NpcCastMsg::encode).decoder(NpcCastMsg::new).consumerMainThread(NpcCastMsg::handle).add();
+        CH.messageBuilder(HideMsg.class, 3, NetworkDirection.PLAY_TO_CLIENT).encoder(HideMsg::encode).decoder(HideMsg::new).consumerMainThread(HideMsg::handle).add();
+        CH.messageBuilder(NpcCastMsg.class, 4, NetworkDirection.PLAY_TO_CLIENT).encoder(NpcCastMsg::encode).decoder(NpcCastMsg::new).consumerMainThread(NpcCastMsg::handle).add();
     }
 
     /**

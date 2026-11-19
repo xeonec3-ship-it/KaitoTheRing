@@ -35,6 +35,8 @@ public class AnimatedStaff extends PohStaff implements GeoItem {
     private static final RawAnimation FLASH = RawAnimation.begin().thenPlay("flash").thenLoop("idle");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public final String model;
+    /** Model drawn while the staff's own GeckoLib files are missing (null: always its own). */
+    public String fallbackModel;
 
     public AnimatedStaff(String model, Supplier<Attribute> school, double schoolPct, double powerPct, double regenPct) {
         super(school, schoolPct, powerPct, regenPct);

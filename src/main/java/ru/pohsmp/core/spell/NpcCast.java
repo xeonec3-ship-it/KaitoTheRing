@@ -126,6 +126,7 @@ public final class NpcCast {
         md.initiateCast(spell, lv, ticks, CastSource.MOB, "mainhand");
         CASTS.put(caster.getUUID(), c);
         send(caster, new Net.NpcCastMsg(Net.NpcCastMsg.START, caster.getId(), spell.getSpellId(), lv, ticks));
+        CnpcHooks.callWith(caster, "cast_start", new CastEvent(caster, spell.getSpellId(), false));
         spell.onServerPreCast(sl, lv, caster, md);
         if (c.done) return null; // the spell itself stopped the cast in its pre-cast
         if (ticks == 0) tick(c);
@@ -207,18 +208,19 @@ public final class NpcCast {
         if (complete && c.caster.level() instanceof ServerLevel sl) c.spell.onServerCastComplete(sl, c.level, c.caster, c.md, cancelled);
         else c.md.resetCastingState();
         send(c.caster, new Net.NpcCastMsg(cancelled ? Net.NpcCastMsg.CANCEL : Net.NpcCastMsg.FINISH, c.caster.getId(), c.spell.getSpellId(), c.level, 0));
-        CnpcHooks.callWith(c.caster, "pohsmp_cast_end", new EndEvent(c.caster, c.spell.getSpellId(), cancelled));
+        CnpcHooks.callWith(c.caster, "cast_end", new CastEvent(c.caster, c.spell.getSpellId(), cancelled));
     }
 
-    /** What the NPC script function pohsmp_cast_end(e) gets. */
-    public static final class EndEvent {
+    /** What the NPC script functions cast_start(e) / cast_end(e) get; caster repeats the spell id (older scripts read it there). */
+    public static final class CastEvent {
         public Object npc;
-        public final String spell;
+        public final String spell, caster;
         public final boolean cancelled;
         public final double x, y, z;
 
-        EndEvent(LivingEntity caster, String spell, boolean cancelled) {
+        CastEvent(LivingEntity caster, String spell, boolean cancelled) {
             this.spell = spell;
+            this.caster = spell;
             this.cancelled = cancelled;
             this.x = caster.getX();
             this.y = caster.getY();

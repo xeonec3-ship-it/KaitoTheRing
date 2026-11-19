@@ -635,5 +635,11 @@
   "subtitles.pohsmp_core.spell.frost_spike_wall.cast_shatter": "Стена ледяных шипов: раскалывается",
   "subtitles.pohsmp_core.spell.frost_spike_wall.hit": "Стена ледяных шипов: раскалывается",
   "subtitles.pohsmp_core.spell.glacial_tombs.cast_shatter": "Ледяные гробницы: раскалывается",
-  "subtitles.pohsmp_core.spell.glacial_tombs.cast_snow": "Ледяные гробницы: метёт снег"
+  "subtitles.pohsmp_core.spell.glacial_tombs.cast_snow": "Ледяные гробницы: метёт снег",
+  "subtitles.pohsmp_core.spell.ground_shock.cast": "Ударная волна: разряд",
+  "subtitles.pohsmp_core.spell.ground_shock.loop": "Ударная волна: трещит",
+  "subtitles.pohsmp_core.spell.lightning_rod.cast": "Громоотвод: раскат",
+  "subtitles.pohsmp_core.spell.lightning_rod.hit": "Громоотвод: разряд",
+  "subtitles.pohsmp_core.spell.overload.cast": "Перегрузка: сила нарастает",
+  "subtitles.pohsmp_core.spell.overload.hit": "Перегрузка: разряд"
 }

@@ -754,5 +754,95 @@
         "volume": 0.5
       }
     ]
+  },
+  "spell.ground_shock.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.ground_shock.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/lightning/ground_shock_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/ground_shock_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.ground_shock.loop": {
+    "subtitle": "subtitles.pohsmp_core.spell.ground_shock.loop",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/lightning/ground_shock_loop_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/ground_shock_loop_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/ground_shock_loop_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.lightning_rod.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.lightning_rod.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/lightning/lightning_rod_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/lightning_rod_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.lightning_rod.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.lightning_rod.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/lightning/lightning_rod_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/lightning_rod_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/lightning_rod_hit_3",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.overload.cast": {
+    "subtitle": "subtitles.pohsmp_core.spell.overload.cast",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/lightning/overload_cast_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/overload_cast_2",
+        "volume": 0.5
+      }
+    ]
+  },
+  "spell.overload.hit": {
+    "subtitle": "subtitles.pohsmp_core.spell.overload.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:spell/lightning/overload_hit_1",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/overload_hit_2",
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:spell/lightning/overload_hit_3",
+        "volume": 0.5
+      }
+    ]
   }
 }

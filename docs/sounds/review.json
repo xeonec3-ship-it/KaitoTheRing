@@ -578,5 +578,143 @@
   "replaces": [
    "POWDER_SNOW_PLACE"
   ]
+ },
+ {
+  "school": "lightning",
+  "school_ru": "Молния",
+  "spell": "ground_shock",
+  "spell_ru": "Ударная волна",
+  "event": "pohsmp_core:spell.ground_shock.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/lightning/ground_shock_cast_1.ogg",
+   "spell/lightning/ground_shock_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ground_shock_cast_1.mp3",
+   "docs/sounds/mp3/ground_shock_cast_2.mp3"
+  ],
+  "what": "разряд / вспышка удара — начало каста (подпись школы: разряд, треск электричества, гул и раскат грома)",
+  "where": "GroundShockSpell.java onCast()",
+  "replaces": [
+   "LIGHTNING_BOLT_IMPACT"
+  ]
+ },
+ {
+  "school": "lightning",
+  "school_ru": "Молния",
+  "spell": "ground_shock",
+  "spell_ru": "Ударная волна",
+  "event": "pohsmp_core:spell.ground_shock.loop",
+  "role": "loop",
+  "role_ru": "пока действует (тики)",
+  "files": [
+   "spell/lightning/ground_shock_loop_1.ogg",
+   "spell/lightning/ground_shock_loop_2.ogg",
+   "spell/lightning/ground_shock_loop_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/ground_shock_loop_1.mp3",
+   "docs/sounds/mp3/ground_shock_loop_2.mp3",
+   "docs/sounds/mp3/ground_shock_loop_3.mp3"
+  ],
+  "what": "треск-жужжание — пока действует (тики) (подпись школы: разряд, треск электричества, гул и раскат грома)",
+  "where": "GroundShockSpell.java tick()",
+  "replaces": [
+   "BEEHIVE_WORK"
+  ]
+ },
+ {
+  "school": "lightning",
+  "school_ru": "Молния",
+  "spell": "lightning_rod",
+  "spell_ru": "Громоотвод",
+  "event": "pohsmp_core:spell.lightning_rod.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/lightning/lightning_rod_cast_1.ogg",
+   "spell/lightning/lightning_rod_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/lightning_rod_cast_1.mp3",
+   "docs/sounds/mp3/lightning_rod_cast_2.mp3"
+  ],
+  "what": "раскат грома — начало каста (подпись школы: разряд, треск электричества, гул и раскат грома)",
+  "where": "LightningRodSpell.java onCast()",
+  "replaces": [
+   "TRIDENT_THUNDER"
+  ]
+ },
+ {
+  "school": "lightning",
+  "school_ru": "Молния",
+  "spell": "lightning_rod",
+  "spell_ru": "Громоотвод",
+  "event": "pohsmp_core:spell.lightning_rod.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/lightning/lightning_rod_hit_1.ogg",
+   "spell/lightning/lightning_rod_hit_2.ogg",
+   "spell/lightning/lightning_rod_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/lightning_rod_hit_1.mp3",
+   "docs/sounds/mp3/lightning_rod_hit_2.mp3",
+   "docs/sounds/mp3/lightning_rod_hit_3.mp3"
+  ],
+  "what": "разряд / вспышка удара — удар / взрыв / попадание (подпись школы: разряд, треск электричества, гул и раскат грома)",
+  "where": "LightningRodSpell.java tick()",
+  "replaces": [
+   "LIGHTNING_BOLT_IMPACT"
+  ]
+ },
+ {
+  "school": "lightning",
+  "school_ru": "Молния",
+  "spell": "overload",
+  "spell_ru": "Перегрузка",
+  "event": "pohsmp_core:spell.overload.cast",
+  "role": "cast",
+  "role_ru": "начало каста",
+  "files": [
+   "spell/lightning/overload_cast_1.ogg",
+   "spell/lightning/overload_cast_2.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/overload_cast_1.mp3",
+   "docs/sounds/mp3/overload_cast_2.mp3"
+  ],
+  "what": "нарастание силы, «включение» — начало каста (подпись школы: разряд, треск электричества, гул и раскат грома)",
+  "where": "OverloadSpell.java onCast()",
+  "replaces": [
+   "BEACON_POWER_SELECT"
+  ]
+ },
+ {
+  "school": "lightning",
+  "school_ru": "Молния",
+  "spell": "overload",
+  "spell_ru": "Перегрузка",
+  "event": "pohsmp_core:spell.overload.hit",
+  "role": "hit",
+  "role_ru": "удар / взрыв / попадание",
+  "files": [
+   "spell/lightning/overload_hit_1.ogg",
+   "spell/lightning/overload_hit_2.ogg",
+   "spell/lightning/overload_hit_3.ogg"
+  ],
+  "mp3": [
+   "docs/sounds/mp3/overload_hit_1.mp3",
+   "docs/sounds/mp3/overload_hit_2.mp3",
+   "docs/sounds/mp3/overload_hit_3.mp3"
+  ],
+  "what": "разряд / вспышка удара — удар / взрыв / попадание (подпись школы: разряд, треск электричества, гул и раскат грома)",
+  "where": "Marks.java tickOverload()",
+  "replaces": [
+   "LIGHTNING_BOLT_IMPACT"
+  ]
  }
 ]

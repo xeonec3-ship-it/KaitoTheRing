@@ -635,5 +635,11 @@
   "subtitles.pohsmp_core.spell.frost_spike_wall.cast_shatter": "Frost Spike Wall: shatters",
   "subtitles.pohsmp_core.spell.frost_spike_wall.hit": "Frost Spike Wall: shatters",
   "subtitles.pohsmp_core.spell.glacial_tombs.cast_shatter": "Glacial Tombs: shatters",
-  "subtitles.pohsmp_core.spell.glacial_tombs.cast_snow": "Glacial Tombs: snow swirls"
+  "subtitles.pohsmp_core.spell.glacial_tombs.cast_snow": "Glacial Tombs: snow swirls",
+  "subtitles.pohsmp_core.spell.ground_shock.cast": "Ground Shock: discharge",
+  "subtitles.pohsmp_core.spell.ground_shock.loop": "Ground Shock: crackle",
+  "subtitles.pohsmp_core.spell.lightning_rod.cast": "Lightning Rod: thunderclap",
+  "subtitles.pohsmp_core.spell.lightning_rod.hit": "Lightning Rod: discharge",
+  "subtitles.pohsmp_core.spell.overload.cast": "Overload: power rises",
+  "subtitles.pohsmp_core.spell.overload.hit": "Overload: discharge"
 }

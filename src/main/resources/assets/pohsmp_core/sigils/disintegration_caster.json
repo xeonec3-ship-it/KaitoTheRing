@@ -1,11 +1,35 @@
 {
-  "comment": "Дезинтеграция: вертикальная печать перед молящимся заклинателем — почти в рост, кольцо шестиугольников с цепью, руны, святая печать, лиловое кольцо.",
-  "size": 1.9,
+  "comment": "Дезинтеграция: вертикальная печать перед молящимся заклинателем — почти в рост, кольцо шестиугольников с цепью, руны, святая печать, лиловое кольцо. Формирование — как у небесной печати Silent Gate (tools/apply_silent_gate_formation.py); итоговый радиус 1.9.",
+  "size": 0.475,
   "color": "#FFC94A",
   "orientation": "facing",
   "lifetime": -1,
   "hold": -1,
   "layers": [
+    {
+      "id": "arcs",
+      "type": "arcs",
+      "texture": "arc_strip",
+      "radius": 1.08,
+      "width": 0.05,
+      "heightOffset": 0.0,
+      "count": 4,
+      "arcLength": 55,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 0,
+        "duration": 22,
+        "easing": "easeInOutCubic",
+        "modes": [
+          "assemble",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 60,
+        "boost": 3.0
+      }
+    },
     {
       "id": "glow",
       "type": "disc",
@@ -15,54 +39,38 @@
       "color": "#FF4A1E",
       "brightness": 0.8,
       "appear": {
-        "delay": 0,
-        "duration": 10,
-        "easing": "easeOutCubic",
-        "modes": [
-          "fade"
-        ]
-      },
-      "pulse": {
-        "amp": 0.3,
-        "period": 10
-      }
-    },
-    {
-      "id": "violet",
-      "type": "disc",
-      "texture": "thin_ring",
-      "radius": 1.08,
-      "heightOffset": -0.01,
-      "color": "#C04CFF",
-      "appear": {
-        "delay": 2,
+        "delay": 18,
         "duration": 10,
         "easing": "easeOutCubic",
         "modes": [
           "grow",
           "fade"
         ]
+      },
+      "pulse": {
+        "amp": 0.25,
+        "period": 30
       }
     },
     {
-      "id": "hex",
+      "id": "seal",
       "type": "disc",
-      "texture": "hex_ring",
-      "radius": 1.0,
-      "heightOffset": 0.0,
-      "color": "#FFD23A",
+      "texture": "holy_seal",
+      "radius": 0.45,
+      "heightOffset": 0.02,
+      "color": "#FFF2C8",
       "appear": {
-        "delay": 0,
-        "duration": 12,
+        "delay": 22,
+        "duration": 8,
         "easing": "easeOutBack",
         "modes": [
-          "unfold",
-          "grow"
+          "grow",
+          "fade"
         ]
       },
       "rotation": {
-        "speed": 18,
-        "boost": 3
+        "speed": 24,
+        "boost": 2.0
       }
     },
     {
@@ -75,26 +83,7 @@
       "heightOffset": 0.01,
       "color": "#FF8A2E",
       "appear": {
-        "delay": 6,
-        "duration": 12,
-        "easing": "easeInOutSine",
-        "modes": [
-          "draw"
-        ]
-      },
-      "rotation": {
-        "speed": -16
-      }
-    },
-    {
-      "id": "seal",
-      "type": "disc",
-      "texture": "holy_seal",
-      "radius": 0.45,
-      "heightOffset": 0.02,
-      "color": "#FFF2C8",
-      "appear": {
-        "delay": 10,
+        "delay": 28,
         "duration": 10,
         "easing": "easeInOutSine",
         "modes": [
@@ -102,20 +91,72 @@
         ]
       },
       "rotation": {
-        "speed": 24
+        "speed": -16,
+        "boost": 2.0
+      }
+    },
+    {
+      "id": "hex",
+      "type": "disc",
+      "texture": "hex_ring",
+      "radius": 1.0,
+      "heightOffset": 0.0,
+      "color": "#FFD23A",
+      "appear": {
+        "delay": 34,
+        "duration": 8,
+        "easing": "easeOutCubic",
+        "modes": [
+          "unfold",
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 18,
+        "boost": 2.0
+      }
+    },
+    {
+      "id": "violet",
+      "type": "disc",
+      "texture": "thin_ring",
+      "radius": 1.08,
+      "heightOffset": -0.01,
+      "color": "#C04CFF",
+      "appear": {
+        "delay": 40,
+        "duration": 8,
+        "easing": "easeOutCubic",
+        "modes": [
+          "fade",
+          "grow"
+        ]
+      },
+      "rotation": {
+        "speed": 8,
+        "boost": 2.0
       }
     }
   ],
   "dissolve": {
     "modes": [
+      "reverse",
       "collapse"
     ],
-    "duration": 8
+    "duration": 20,
+    "stagger": 3
   },
   "formedFlash": {
     "color": "#FFFFFF",
-    "size": 1.5,
-    "duration": 8,
-    "sparks": 20
+    "size": 1.25,
+    "duration": 12,
+    "sparks": 40
+  },
+  "expand": {
+    "scale": 4.0,
+    "delay": 4,
+    "duration": 20,
+    "easing": "easeOutCubic"
   }
 }

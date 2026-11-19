@@ -1,11 +1,35 @@
 {
-  "comment": "Башня, вершина: святая печать.",
-  "size": 1.0,
+  "comment": "Башня, вершина: святая печать. Формирование — как у небесной печати Silent Gate (tools/apply_silent_gate_formation.py); итоговый радиус 1.0.",
+  "size": 0.25,
   "color": "#FFFFFF",
   "orientation": "ground",
   "lifetime": -1,
   "hold": -1,
   "layers": [
+    {
+      "id": "arcs",
+      "type": "arcs",
+      "texture": "arc_strip",
+      "radius": 1.0,
+      "width": 0.05,
+      "heightOffset": 0.0,
+      "count": 4,
+      "arcLength": 55,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 0,
+        "duration": 22,
+        "easing": "easeInOutCubic",
+        "modes": [
+          "assemble",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 60,
+        "boost": 3.0
+      }
+    },
     {
       "id": "glow",
       "type": "disc",
@@ -15,16 +39,17 @@
       "color": "#FFE08A",
       "brightness": 0.7,
       "appear": {
-        "delay": 0,
-        "duration": 8,
+        "delay": 18,
+        "duration": 10,
         "easing": "easeOutCubic",
         "modes": [
+          "grow",
           "fade"
         ]
       },
       "pulse": {
-        "amp": 0.3,
-        "period": 12
+        "amp": 0.25,
+        "period": 30
       }
     },
     {
@@ -34,28 +59,38 @@
       "radius": 1.0,
       "heightOffset": 0.0,
       "appear": {
-        "delay": 0,
-        "duration": 10,
-        "easing": "easeInOutSine",
+        "delay": 22,
+        "duration": 8,
+        "easing": "easeOutBack",
         "modes": [
-          "draw"
+          "grow",
+          "fade"
         ]
       },
       "rotation": {
-        "speed": -36
+        "speed": -36,
+        "boost": 2.0
       }
     }
   ],
   "dissolve": {
     "modes": [
-      "fade"
+      "reverse",
+      "collapse"
     ],
-    "duration": 16
+    "duration": 20,
+    "stagger": 3
   },
   "formedFlash": {
     "color": "#FFFFFF",
-    "size": 1.6,
-    "duration": 8,
-    "sparks": 12
+    "size": 1.25,
+    "duration": 12,
+    "sparks": 40
+  },
+  "expand": {
+    "scale": 4.0,
+    "delay": 4,
+    "duration": 20,
+    "easing": "easeOutCubic"
   }
 }

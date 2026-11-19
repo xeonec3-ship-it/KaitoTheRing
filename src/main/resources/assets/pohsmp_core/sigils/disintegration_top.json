@@ -1,6 +1,6 @@
 {
-  "comment": "Дезинтеграция: верхняя печать — колесо (кольцо оранжевых рун, жёлтые брусья-зубья, толстый белый обод, двойной двенадцатиугольник, звезда), чуть шире завесы; после формирования — 6 малых печатей на кольце.",
-  "size": 4.8,
+  "comment": "Дезинтеграция: верхняя печать — колесо (кольцо оранжевых рун, жёлтые брусья-зубья, толстый белый обод, двойной двенадцатиугольник, звезда), чуть шире завесы; после формирования — 6 малых печатей на кольце. Формирование — как у небесной печати Silent Gate (tools/apply_silent_gate_formation.py); итоговый радиус 4.8.",
+  "size": 1.2,
   "color": "#FFC94A",
   "orientation": "ground",
   "lifetime": -1,
@@ -10,15 +10,15 @@
       "id": "arcs",
       "type": "arcs",
       "texture": "arc_strip",
-      "radius": 0.84,
+      "radius": 1.0,
       "width": 0.05,
       "heightOffset": 0.0,
       "count": 4,
-      "arcLength": 60,
+      "arcLength": 55,
       "color": "#FFFFFF",
       "appear": {
         "delay": 0,
-        "duration": 14,
+        "duration": 22,
         "easing": "easeInOutCubic",
         "modes": [
           "assemble",
@@ -26,29 +26,71 @@
         ]
       },
       "rotation": {
-        "speed": 16,
-        "boost": 4
+        "speed": 60,
+        "boost": 3.0
       }
     },
     {
-      "id": "runes",
-      "type": "band",
-      "texture": "rune_band",
-      "radius": 1.0,
-      "inner": 0.9,
-      "repeat": 12,
-      "heightOffset": 0.01,
-      "color": "#FF8A2E",
+      "id": "glow",
+      "type": "disc",
+      "texture": "glow",
+      "radius": 0.55,
+      "heightOffset": -0.01,
+      "brightness": 0.8,
       "appear": {
-        "delay": 6,
-        "duration": 16,
-        "easing": "easeInOutSine",
+        "delay": 18,
+        "duration": 10,
+        "easing": "easeOutCubic",
         "modes": [
-          "draw"
+          "grow",
+          "fade"
+        ]
+      },
+      "pulse": {
+        "amp": 0.25,
+        "period": 30
+      }
+    },
+    {
+      "id": "seal",
+      "type": "disc",
+      "texture": "holy_seal",
+      "radius": 0.5,
+      "heightOffset": 0.03,
+      "color": "#FFF2C8",
+      "appear": {
+        "delay": 22,
+        "duration": 8,
+        "easing": "easeOutBack",
+        "modes": [
+          "grow",
+          "fade"
         ]
       },
       "rotation": {
-        "speed": -6
+        "speed": -14,
+        "boost": 2.0
+      }
+    },
+    {
+      "id": "dodeca",
+      "type": "disc",
+      "texture": "dodeca_ring",
+      "radius": 0.72,
+      "heightOffset": 0.02,
+      "color": "#FFFFFF",
+      "appear": {
+        "delay": 28,
+        "duration": 8,
+        "easing": "easeOutCubic",
+        "modes": [
+          "grow",
+          "fade"
+        ]
+      },
+      "rotation": {
+        "speed": 10,
+        "boost": 2.0
       }
     },
     {
@@ -61,70 +103,54 @@
       "heightOffset": 0.015,
       "color": "#FFD23A",
       "appear": {
-        "delay": 12,
-        "duration": 12,
-        "easing": "easeOutCubic",
-        "modes": [
-          "fade",
-          "grow"
-        ]
-      },
-      "rotation": {
-        "speed": -6
-      }
-    },
-    {
-      "id": "dodeca",
-      "type": "disc",
-      "texture": "dodeca_ring",
-      "radius": 0.72,
-      "heightOffset": 0.02,
-      "color": "#FFFFFF",
-      "appear": {
-        "delay": 16,
-        "duration": 12,
-        "easing": "easeOutBack",
-        "modes": [
-          "grow",
-          "fade"
-        ]
-      },
-      "rotation": {
-        "speed": 10
-      }
-    },
-    {
-      "id": "seal",
-      "type": "disc",
-      "texture": "holy_seal",
-      "radius": 0.5,
-      "heightOffset": 0.03,
-      "color": "#FFF2C8",
-      "appear": {
-        "delay": 22,
-        "duration": 12,
+        "delay": 34,
+        "duration": 10,
         "easing": "easeInOutSine",
         "modes": [
           "draw"
-        ],
-        "startAngle": -90
+        ]
       },
       "rotation": {
-        "speed": -14
+        "speed": -6,
+        "boost": 2.0
+      }
+    },
+    {
+      "id": "runes",
+      "type": "band",
+      "texture": "rune_band",
+      "radius": 1.0,
+      "inner": 0.9,
+      "repeat": 12,
+      "heightOffset": 0.01,
+      "color": "#FF8A2E",
+      "appear": {
+        "delay": 40,
+        "duration": 10,
+        "easing": "easeInOutSine",
+        "modes": [
+          "draw"
+        ]
+      },
+      "rotation": {
+        "speed": -6,
+        "boost": 2.0
       }
     }
   ],
   "dissolve": {
     "modes": [
-      "fade"
+      "reverse",
+      "collapse"
     ],
-    "duration": 16
+    "duration": 20,
+    "stagger": 3
   },
   "formedFlash": {
-    "color": "#FFF2C8",
-    "size": 1.15,
-    "duration": 10,
-    "sparks": 30
+    "color": "#FFFFFF",
+    "size": 1.25,
+    "duration": 12,
+    "sparks": 40
   },
   "onFormed": [
     {
@@ -138,5 +164,11 @@
         "stagger": 2
       }
     }
-  ]
+  ],
+  "expand": {
+    "scale": 4.0,
+    "delay": 4,
+    "duration": 20,
+    "easing": "easeOutCubic"
+  }
 }

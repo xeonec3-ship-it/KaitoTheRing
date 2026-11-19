@@ -80,7 +80,8 @@ public final class DivineEvents {
         TRACK.remove(e.getEntity().getUUID());
     }
 
-    private static Tier scrollTier(ServerPlayer sp, MagicData md, String spellId) {
+    /** Tier of the scroll the spell is cast from (the casting item or a hand), or null. */
+    public static Tier scrollTier(ServerPlayer sp, MagicData md, String spellId) {
         ItemStack casting = md.getPlayerCastingItem();
         if (spellId.equals(Tier.spellIdOf(casting))) return Tier.of(casting);
         for (InteractionHand h : InteractionHand.values()) {

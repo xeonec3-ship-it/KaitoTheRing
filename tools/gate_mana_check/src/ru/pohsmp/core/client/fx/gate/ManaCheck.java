@@ -42,11 +42,13 @@ public class ManaCheck {
         // ---- staff pose: as GateStaff drew it before (t=0 float, t=800 fist), continuous over the take
         double[] l0 = GateStaffPose.local(0), l8 = GateStaffPose.local(800);
         check(Math.abs(l0[0] - .75) < 1e-9 && Math.abs(l0[1] - 1.15) < 1e-9 && Math.abs(l0[2] - .65) < 1e-9, "float pose = old GateStaff (0.75, 1.15, 0.65)");
-        check(Math.abs(l8[0] - .36) < 1e-9 && Math.abs(l8[1] - .98) < 1e-9 && Math.abs(l8[2] - .3) < 1e-9 && l8[3] == 0 && l8[4] == 0, "fist pose = old GateStaff (0.36, 0.98, 0.3), upright");
+        check(Math.abs(l8[0] - .36) < 1e-9 && Math.abs(l8[1] - .98) < 1e-9 && Math.abs(l8[2] - .3) < 1e-9 && Math.abs(l8[3] % 360) < 1e-9 && l8[4] == 0,
+                "fist pose = old GateStaff (0.36, 0.98, 0.3), upright (after the full 360° turn)");
         Vec3 feet = new Vec3(10, 64, -5);
         double step = 0;
         for (double t = 700; t < 820; t += 1) step = Math.max(step, GateStaffPose.head(t + 1, feet, 30).distanceTo(GateStaffPose.head(t, feet, 30)));
-        check(step < .12, "staff head moves < .12 block per tick over the take (" + String.format("%.3f", step) + ")");
+        // owner 19.11: a 360° turn over TAKE_FROM..TAKE_TO (28 ticks, smootherstep peaks at 1.875x): the head (1.55 out) may move up to ~0.65/tick
+        check(step < .7, "staff head moves < .7 block per tick over the take, no jump (" + String.format("%.3f", step) + ")");
         Vec3 h = GateStaffPose.head(0, feet, 0), f0 = GateStaffPose.foot(0, feet, 0);
         check(h.y > f0.y + 2.4 && h.x > feet.x, "yaw 0 (facing +z): staff upright, on the caster's left (+x)");
 

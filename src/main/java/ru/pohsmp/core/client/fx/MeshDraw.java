@@ -102,8 +102,8 @@ public final class MeshDraw {
         double hc = 1, hs = 0, hx = 0, hz = 0;
         if (r.hinge != null) {   // turn about the vertical through pivot (model coordinates), as the preview: x' = x c + z s, z' = -x s + z c
             JsonObject h = r.hinge;
-            double k = Easing.byName(str(h, "easing", "easeInOutCubic")).apply(FxDraw.clamp01((t - num(h, "delay", 0)) / Math.max(1, num(h, "duration", 1))));
-            double ang = Math.toRadians(num(h, "angle", 0) * k);
+            double ang = Math.toRadians(h.has("keys") ? hingeKeys(h.getAsJsonArray("keys"), t)
+                    : num(h, "angle", 0) * Easing.byName(str(h, "easing", "easeInOutCubic")).apply(FxDraw.clamp01((t - num(h, "delay", 0)) / Math.max(1, num(h, "duration", 1)))));
             hc = Math.cos(ang);
             hs = Math.sin(ang);
             JsonArray pv = h.has("pivot") ? h.getAsJsonArray("pivot") : null;
@@ -420,6 +420,25 @@ public final class MeshDraw {
 
     private static Vector3f vec(JsonArray a) {
         return new Vector3f(a.get(0).getAsFloat(), a.size() > 1 ? a.get(1).getAsFloat() : 0, a.size() > 2 ? a.get(2).getAsFloat() : 0);
+    }
+
+    /**
+     * mesh.hinge.keys (docs/fx.md, 19.11): [[tick, angle°, easing], …], tick from the element start; the easing is that of the way to
+     * this key (default easeInOutSine). Before the first key — its angle, after the last — the last.
+     */
+    static double hingeKeys(JsonArray keys, double t) {
+        if (keys.size() == 0) return 0;
+        JsonArray first = keys.get(0).getAsJsonArray();
+        if (t <= first.get(0).getAsDouble()) return first.get(1).getAsDouble();
+        for (int i = 1; i < keys.size(); i++) {
+            JsonArray a = keys.get(i - 1).getAsJsonArray(), b = keys.get(i).getAsJsonArray();
+            double t0 = a.get(0).getAsDouble(), t1 = b.get(0).getAsDouble();
+            if (t > t1) continue;
+            String ease = b.size() > 2 && !b.get(2).isJsonNull() ? b.get(2).getAsString() : "easeInOutSine";
+            double k = Easing.byName(ease).apply(FxDraw.clamp01((t - t0) / Math.max(1e-6, t1 - t0)));
+            return a.get(1).getAsDouble() + (b.get(1).getAsDouble() - a.get(1).getAsDouble()) * k;
+        }
+        return keys.get(keys.size() - 1).getAsJsonArray().get(1).getAsDouble();
     }
 
     static double num(JsonObject o, String k, double d) {

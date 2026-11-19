@@ -95,7 +95,7 @@ public class SilentGateSpell extends SilentStaffSpell {
         int age, cutKey, scene = -1, strikeFx = -1;
         /** Age when the wait began / when the command came; -1 before. */
         int waitFrom = -1, command = -1;
-        boolean cast, done;
+        boolean cast, done, sceneOver;
         List<UUID> watchers = new ArrayList<>();
         final Map<UUID, Integer> lastHit = new HashMap<>();
         /** foe -> tick of its next aimed shot */
@@ -264,7 +264,7 @@ public class SilentGateSpell extends SilentStaffSpell {
         RUNNING.remove(c);
         if (c.scene >= 0) Fx.stop(c.sl, c.scene, "collapse");
         if (c.strikeFx >= 0) Fx.stop(c.sl, c.strikeFx, "collapse");
-        Cutscene.end(c.sl, c.caster, c.watchers, c.cutKey);
+        if (!c.sceneOver) Cutscene.end(c.sl, c.caster, c.watchers, c.cutKey);
     }
 
     // ---- the scene clock: the Iron's cast covers 0-50 s, the strike runs on here until 65 s ----
@@ -286,17 +286,28 @@ public class SilentGateSpell extends SilentStaffSpell {
             if (t - c.waitFrom >= WAIT_MAX) command(c);   // no click for 30 s: the command comes by itself
             return;
         }
-        int s = t - c.command - STRIKE_LAG;   // strike time
+        int since = t - c.command, s = since - STRIKE_LAG;   // ticks from the command; strike time (first aimed shots at +0.35 s)
         if (s == 0) phase(c, ANIM_STRIKE);   // the hand is down: the strike animation
-        if (s >= 0 && s <= STRIKE_RAYS) rays(c, t);
-        if (s >= STRIKE_END) {
+        if (s >= 0 && since < SCENE_AFTER_CMD + AFTER) rays(c, t);   // aimed shots without a break until +45 s
+        if (since == SCENE_AFTER_CMD) {   // +15 s: the scene (camera, music, freeze) ends; the gate, the halo and the shots go on
+            c.sceneOver = true;
+            Cutscene.end(c.sl, c.caster, c.watchers, c.cutKey);
+        }
+        if (since >= SCENE_AFTER_CMD + AFTER) {   // +45 s: everything goes out
             c.done = true;
             RUNNING.remove(c);
             if (c.scene >= 0) Fx.stop(c.sl, c.scene, "");
             if (c.strikeFx >= 0) Fx.stop(c.sl, c.strikeFx, "");
-            Cutscene.end(c.sl, c.caster, c.watchers, c.cutKey);
         }
     }
+
+    /**
+     * Owner 19.11 (night): after the scene ends the gate keeps shooting the foes for 30 s more while the players move again
+     * (fx/silent_gate_strike.json is 45.2 s long); then fx/silent_gate.json stops.
+     */
+    static final int AFTER = 600;
+    /** Owner's timeline 19.11: the scene ends 15 s after the command. */
+    static final int SCENE_AFTER_CMD = 300;
 
     /**
      * Aimed shots (owner 19.11: not all together): over each foe in the area a new circle appears at the height of the sky field,

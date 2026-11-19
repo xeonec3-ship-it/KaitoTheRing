@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "12";   // 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
+    private static final String V = "13";   // 13: IlluMsg (T22); 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -35,6 +35,32 @@ public final class Net {
                 .consumerMainThread(GateCommand::handle).add();
         CH.messageBuilder(EmberMsg.class, 9, NetworkDirection.PLAY_TO_CLIENT).encoder(EmberMsg::encode).decoder(EmberMsg::new)
                 .consumerMainThread(EmberMsg::handle).add();
+        CH.messageBuilder(IlluMsg.class, 10, NetworkDirection.PLAY_TO_CLIENT).encoder(IlluMsg::encode).decoder(IlluMsg::new)
+                .consumerMainThread(IlluMsg::handle).add();
+        CH.messageBuilder(CopyHit.class, 11, NetworkDirection.PLAY_TO_SERVER).encoder(CopyHit::encode).decoder(CopyHit::new)
+                .consumerMainThread(CopyHit::handle).add();
+    }
+
+    /** T22: this client struck false copy id (it exists only on the server and in the victims' clients). */
+    public static final class CopyHit {
+        public final int id;
+
+        public CopyHit(int id) {
+            this.id = id;
+        }
+
+        public CopyHit(FriendlyByteBuf b) {
+            id = b.readVarInt();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeVarInt(id);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            ServerPlayer p = ctx.get().getSender();
+            if (p != null) ru.pohsmp.core.illusion.Copies.hitBy(p, id);
+        }
     }
 
     /** T14: the Ember Blade holder's heat and form (the server keeps them, ember/EmberBlade). */

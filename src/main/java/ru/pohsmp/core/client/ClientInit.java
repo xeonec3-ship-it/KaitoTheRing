@@ -26,6 +26,8 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(IceWallClient.class);
         MinecraftForge.EVENT_BUS.register(NpcCastClient.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.fx.FxClient.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.IllusionClient.class);   // T22
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.illusion.Copies.class);
         modBus.register(ScrollModels.class);
         modBus.addListener(TargetPoseClient::setup);
         MinecraftForge.EVENT_BUS.register(EmberHud.class);

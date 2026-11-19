@@ -66,6 +66,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.silent.SilentWitchEvents.class);
         ru.pohsmp.core.silent.compat.Compat.common(modBus);
         MinecraftForge.EVENT_BUS.register(Hidden.class);
+        ru.pohsmp.core.spell.illusion.IllusionSpells.registerEvents();   // T22
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.NpcCast.Events.class);
         MinecraftForge.EVENT_BUS.register(Charges.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.JointCast.class);
@@ -90,6 +91,8 @@ public class PohCore {
             if (!e.has(type, Reg.SILENT_POWER.get())) e.add(type, Reg.SILENT_POWER.get());
             if (!e.has(type, Reg.SILENT_RESIST.get())) e.add(type, Reg.SILENT_RESIST.get());
             if (!e.has(type, Reg.SILENT_CAST.get())) e.add(type, Reg.SILENT_CAST.get());
+            if (!e.has(type, Reg.ILLUSION_POWER.get())) e.add(type, Reg.ILLUSION_POWER.get());
+            if (!e.has(type, Reg.ILLUSION_RESIST.get())) e.add(type, Reg.ILLUSION_RESIST.get());
         }
     }
 }

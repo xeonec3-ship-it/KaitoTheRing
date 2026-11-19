@@ -99,6 +99,7 @@ public class BlessingSpell extends RiteSpell {
             n++;
         }
         n += Marks.cleanse(t);
+        n += ru.pohsmp.core.illusion.Illusions.cleanse(t);   // T22: every illusion and mark of the school, illusory damage comes back
         if (t instanceof ServerPlayer p && SoulSeal.clear(p)) {
             n++;
             p.displayClientMessage(net.minecraft.network.chat.Component.translatable("ui.pohsmp_core.soul_seal.freed").withStyle(s -> s.withColor(Reg.DIVINE_COLOR)), false);

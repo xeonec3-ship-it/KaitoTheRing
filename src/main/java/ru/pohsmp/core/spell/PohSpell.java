@@ -43,11 +43,11 @@ public abstract class PohSpell extends AbstractSpell {
 
     /** Iron's schools with a drawn sign: effect fx/school_&lt;school&gt;.json (sigil sigils/school_&lt;school&gt;.json, style fx/styles/&lt;school&gt;.json). */
     private static final java.util.Set<String> SIGIL_SCHOOLS =
-            java.util.Set.of("fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind");
+            java.util.Set.of("fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind", "illusion");
 
     /** The same schools in HFx.SIGIL order (b) and their colors: the joint cast (T15) still draws its double outline through HFx. */
-    private static final String[] SIGIL_ORDER = {"fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind"};
-    private static final int[] SIGIL_COLORS = {0xFF7A2A, 0x9FE0FF, 0x6BE6FF, 0x7EE04A, 0xFFE38A, 0xE0242C, 0xC060FF, 0xDDE6F0, 0x3FD6B8, 0xBFF2E8};
+    private static final String[] SIGIL_ORDER = {"fire", "ice", "lightning", "nature", "holy", "blood", "ender", "evocation", "eldritch", "wind", "illusion"};
+    private static final int[] SIGIL_COLORS = {0xFF7A2A, 0x9FE0FF, 0x6BE6FF, 0x7EE04A, 0xFFE38A, 0xE0242C, 0xC060FF, 0xDDE6F0, 0x3FD6B8, 0xBFF2E8, 0xC9A8FF};
 
     /** Index of the drawn sigil of an Iron's school (by path), -1 if it has none. */
     public static int sigilIndex(String school) {

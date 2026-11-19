@@ -50,6 +50,14 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <button type="button" data-a="cast">Каст</button>
     <button type="button" id="close">Кот крупно</button>
   </div>
+  <div class="row" role="group" aria-label="Кот Неро">
+    <button type="button" data-c="nero_shoulder" aria-pressed="true">Кот: плечо</button>
+    <button type="button" data-c="nero_jump_up">Прыжок на капюшон</button>
+    <button type="button" data-c="nero_head">На капюшоне</button>
+    <button type="button" data-c="nero_jump_down">Обратно</button>
+    <button type="button" data-c="nero_dragon">Превращение</button>
+    <button type="button" data-c="nero_return">Возвращение</button>
+  </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -115,7 +123,11 @@ function sample(track, t, def) {
   }
   return track[Object.keys(track).find((x) => +x === ks[ks.length - 1])];
 }
-let cur = "idle", t0 = performance.now();
+let cur = "idle", t0 = performance.now(), catCur = "nero_shoulder", c0 = performance.now();
+document.querySelectorAll("[data-c]").forEach((b) => b.addEventListener("click", () => {
+  catCur = b.dataset.c; c0 = performance.now();
+  document.querySelectorAll("[data-c]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+}));
 document.querySelectorAll("[data-a]").forEach((b) => b.addEventListener("click", () => {
   cur = b.dataset.a; t0 = performance.now();
   document.querySelectorAll("[data-a]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
@@ -131,8 +143,12 @@ function frame(now) {
   let t = window.STEP !== null ? window.STEP : (now - t0) / 1000;
   if (A.loop) t %= len; else if (t > len + 0.6) { cur = "idle"; t0 = now; document.querySelector('[data-a="idle"]').click(); }
   t = Math.min(t, len);
+  const CA = D.anim.animations[catCur];
+  let ct = window.CSTEP !== undefined && window.CSTEP !== null ? window.CSTEP : (now - c0) / 1000;
+  if (CA.loop === true) ct %= CA.animation_length; else ct = Math.min(ct, CA.animation_length);
   for (const [n, o] of Object.entries(BONES)) {
-    const tr = A.bones[n] || {}, r = sample(tr.rotation, t, [0, 0, 0]), s = sample(tr.scale, t, [1, 1, 1]), p = sample(tr.position, t, [0, 0, 0]);
+    const isCat = n.startsWith("nero");
+    const tr = (isCat ? (CA.bones[n] || {}) : (A.bones[n] || {})), tt = isCat ? ct : t, r = sample(tr.rotation, tt, [0, 0, 0]), s = sample(tr.scale, tt, [1, 1, 1]), p = sample(tr.position, tt, [0, 0, 0]);
     const rest = o.userData.rest, inner = o.children[0];
     let lx = 0;
     if (LIMB[cur]) { const [L, amp] = LIMB[cur], sw = Math.sin(2 * Math.PI * t / L) * amp * D2R;

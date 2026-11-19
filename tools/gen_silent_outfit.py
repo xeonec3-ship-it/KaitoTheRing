@@ -11,11 +11,12 @@
 armorLeftArm / armorRightLeg / armorLeftLeg. ВАЖНО для кода: юбка сидит на костях ног, поэтому рендер брони ведьмы должен
 поворачивать кости ног (bipedRightLeg / bipedLeftLeg) только на 25 % от поворота ноги игрока — иначе платье на шаге разъезжается
 пополам (переопределить applyBaseTransformations в GeoArmorRenderer). Колышутся свои кости: cape (пелерина), cape_low (задний клин юбки), hood_tip, hem_r / hem_l
-(низ юбки), кот — nero, nero_head, nero_eyes, nero_tail.
+(низ юбки); кот — две копии: nero* на плече и nero_hood* на капюшоне, свой контроллер анимаций.
 
 Выход (assets/pohsmp_core): geo/armor/silent_witch_armor.geo.json, animations/armor/silent_witch_armor.animation.json,
 textures/armor/silent_witch_armor.png (+ _glowmask.png — глаза кота и золото узора на переде слегка светятся ночью, сила — в отрисовщике).
-Анимации: idle, walk, run, cast. Координаты — геометрия Bedrock/GeckoLib в пикселях (голова — куб от -4,24,-4 размером 8;
+Анимации ткани: idle, walk, run, cast; кота (отдельный контроллер): nero_shoulder, nero_jump_up, nero_head, nero_jump_down,
+nero_dragon, nero_return, nero_hidden. Координаты — геометрия Bedrock/GeckoLib в пикселях (голова — куб от -4,24,-4 размером 8;
 +x — левая сторона, перед — -z). Запуск: python3 tools/gen_silent_outfit.py
 """
 import json
@@ -270,21 +271,10 @@ def build():
         box(bn, s * 3.4, 17.2, -2.9, s * 9.0, 24.4, 2.9, 'sleeve')
         box(bn, s * 3.6, 17.0, -2.7, s * 8.8, 17.3, 2.7, 'lining')
 
-    # ---- кот Неро на левом плече (код прячет кость без полного комплекта и на бегу)
-    bone('nero', B, [6.0, 24.6, 0])
-    box('nero', 4.7, 24.6, -1.0, 7.5, 26.8, 2.4, 'fur')
-    box('nero', 5.0, 24.6, -1.6, 7.2, 25.4, -0.8, 'fur')
-    bone('nero_head', 'nero', [6.1, 26.6, -1.0])
-    box('nero_head', 4.8, 26.4, -3.0, 7.4, 28.8, -0.6, 'fur')
-    box('nero_head', 4.9, 28.7, -2.4, 5.6, 29.6, -1.6, 'fur')
-    box('nero_head', 6.6, 28.7, -2.4, 7.3, 29.6, -1.6, 'fur')
-    box('nero_head', 5.9, 27.0, -3.15, 6.3, 27.3, -3.0, 'nose')
-    bone('nero_eyes', 'nero_head', [6.1, 27.8, -3.05])
-    box('nero_eyes', 5.15, 27.5, -3.15, 5.75, 28.1, -3.0, 'eye')
-    box('nero_eyes', 6.45, 27.5, -3.15, 7.05, 28.1, -3.0, 'eye')
-    bone('nero_tail', 'nero', [6.1, 25.0, 2.2])
-    box('nero_tail', 5.8, 22.2, 2.0, 6.4, 25.2, 2.6, 'fur')
-    box('nero_tail', 5.8, 21.2, 2.2, 6.4, 22.4, 3.4, 'fur')
+    # ---- кот Неро: две копии — на левом плече (в теле) и на макушке капюшона (в голове, следует за поворотом головы).
+    # Какая видна — решает отдельный контроллер анимаций кота (nero_shoulder / nero_jump_up / nero_head / nero_jump_down / nero_dragon / nero_return).
+    cat('nero', B, 6.0, 24.6, 0.0)
+    cat('nero_hood', H, 0.0, 33.5, 1.0)
 
     # ---- юбка на ногах: широкая, расклешённая, до середины голени; низ колышется
     for s, bn, hem in ((-1, 'armorRightLeg', 'hem_r'), (1, 'armorLeftLeg', 'hem_l')):
@@ -295,6 +285,26 @@ def build():
         xo2 = px + s * 3.8
         box(hem, min(x_in, xo2), 2.4, -3.8, max(x_in, xo2), 7.2, 3.8, 'skirt')
         box(hem, min(x_in, xo2) + 0.2, 2.6, -3.6, max(x_in, xo2) - 0.2, 2.8, 3.6, 'lining')
+
+
+def cat(p, parent, ox, oy, oz):
+    """Сидящий чёрный кот: туловище, лапы, голова с ушами и носом, глаза (моргают), хвост. Опорная точка — середина под котом."""
+    def b(bn, x0, y0, z0, x1, y1, z1, mat):
+        box(bn, ox + x0, oy + y0, oz + z0, ox + x1, oy + y1, oz + z1, mat)
+    bone(p, parent, [ox, oy, oz])
+    b(p, -1.3, 0.0, -1.0, 1.5, 2.2, 2.4, 'fur')
+    b(p, -1.0, 0.0, -1.6, 1.2, 0.8, -0.8, 'fur')
+    bone(p + '_head', p, [ox + 0.1, oy + 2.0, oz - 1.0])
+    b(p + '_head', -1.2, 1.8, -3.0, 1.4, 4.2, -0.6, 'fur')
+    b(p + '_head', -1.1, 4.1, -2.4, -0.4, 5.0, -1.6, 'fur')
+    b(p + '_head', 0.6, 4.1, -2.4, 1.3, 5.0, -1.6, 'fur')
+    b(p + '_head', -0.1, 2.4, -3.15, 0.3, 2.7, -3.0, 'nose')
+    bone(p + '_eyes', p + '_head', [ox + 0.1, oy + 3.2, oz - 3.05])
+    b(p + '_eyes', -0.85, 2.9, -3.15, -0.25, 3.5, -3.0, 'eye')
+    b(p + '_eyes', 0.45, 2.9, -3.15, 1.05, 3.5, -3.0, 'eye')
+    bone(p + '_tail', p, [ox + 0.1, oy + 0.4, oz + 2.2])
+    b(p + '_tail', -0.2, -2.4, 2.0, 0.4, 0.6, 2.6, 'fur')
+    b(p + '_tail', -0.2, -3.4, 2.2, 0.4, -2.2, 3.4, 'fur')
 
 
 def write_geo():
@@ -337,16 +347,48 @@ def keys(*kv):
     return {f'{t:.4g}': [r3(x), r3(y), r3(z)] for t, x, y, z in kv}
 
 
-def nero(length):
-    """Кот: моргает и вертит головой (в покое), машет хвостом."""
-    out = {'nero_tail': {'rotation': wave(length, (10, 0, 0), [(1, 0, 0, 0, 18), (2, 0.25, 6, 0, 0)])}}
-    if length >= 2:
-        b = length * 0.55
-        out['nero_head'] = {'rotation': wave(length, (0, 0, 0), [(1, 0, 4, 18, 0)])}
-        out['nero_eyes'] = {'scale': keys((0, 1, 1, 1), (b, 1, 1, 1), (b + 0.06, 1, 0.12, 1), (b + 0.14, 1, 1, 1), (length, 1, 1, 1))}
-    else:
-        out['nero_head'] = {'rotation': wave(length, (0, 0, 0), [(1, 0, 3, 6, 0)])}
-    return out
+def cat_life(p, length=4):
+    """Кот живой: моргает, вертит головой, машет хвостом."""
+    b = length * 0.55
+    return {p + '_tail': {'rotation': wave(length, (10, 0, 0), [(1, 0, 0, 0, 18), (2, 0.25, 6, 0, 0)])},
+            p + '_head': {'rotation': wave(length, (0, 0, 0), [(1, 0, 4, 18, 0)])},
+            p + '_eyes': {'scale': keys((0, 1, 1, 1), (b, 1, 1, 1), (b + 0.06, 1, 0.12, 1), (b + 0.14, 1, 1, 1), (length, 1, 1, 1))}}
+
+
+HIDE = {'scale': keys((0, 0, 0, 0))}
+SHOW = {'scale': keys((0, 1, 1, 1))}
+
+
+def cat_anims():
+    """Отдельный контроллер кота (код): плечо ⇄ капюшон на касте; превращение в тень дракона на «Чёрном пламени Ворганы».
+    Смещения — в пикселях модели; плечо (6, 24.6, 0) → макушка (0, 33.5, 1) — это около (-6, +9, +1) в теле, но голова свою копию держит сама."""
+    an = {}
+    a = {'nero': SHOW, 'nero_hood': HIDE}
+    a.update(cat_life('nero'))
+    an['nero_shoulder'] = {'loop': True, 'animation_length': 4, 'bones': a}
+    # прыжок на капюшон: присел, дуга вверх-внутрь, исчез на плече; на макушке «приземлился» с пружинкой
+    an['nero_jump_up'] = {'loop': 'hold_on_last_frame', 'animation_length': 0.5, 'bones': {
+        'nero': {'position': keys((0, 0, 0, 0), (0.08, 0, -0.6, 0), (0.25, 3, 6, 0.5), (0.35, 5, 9, 1)),
+                 'scale': keys((0, 1, 1, 1), (0.08, 1.1, 0.8, 1.1), (0.3, 1, 1, 1), (0.34, 1, 1, 1), (0.35, 0, 0, 0), (0.5, 0, 0, 0))},
+        'nero_hood': {'scale': keys((0, 0, 0, 0), (0.349, 0, 0, 0), (0.35, 1.15, 0.8, 1.15), (0.43, 0.95, 1.08, 0.95), (0.5, 1, 1, 1))}}}
+    a = {'nero': HIDE, 'nero_hood': SHOW}
+    a.update(cat_life('nero_hood'))
+    a['nero_hood_head'] = {'rotation': wave(4, (-8, 0, 0), [(1, 0, 3, 10, 0)])}       # смотрит вперёд, туда же, куда ведьма
+    an['nero_head'] = {'loop': True, 'animation_length': 4, 'bones': a}
+    an['nero_jump_down'] = {'loop': 'hold_on_last_frame', 'animation_length': 0.5, 'bones': {
+        'nero_hood': {'scale': keys((0, 1, 1, 1), (0.08, 1.1, 0.8, 1.1), (0.14, 1, 1, 1), (0.15, 0, 0, 0), (0.5, 0, 0, 0))},
+        'nero': {'position': keys((0, 5, 9, 1), (0.149, 5, 9, 1), (0.3, 2, 4, 0.5), (0.42, 0, 0, 0)),
+                 'scale': keys((0, 0, 0, 0), (0.149, 0, 0, 0), (0.15, 1, 1, 1), (0.42, 1.15, 0.8, 1.15), (0.5, 1, 1, 1))}}}
+    # превращение: кот спрыгивает вперёд с плеча, вытягивается и растворяется — в этот момент код запускает тень дракона
+    an['nero_dragon'] = {'loop': 'hold_on_last_frame', 'animation_length': 0.6, 'bones': {
+        'nero': {'position': keys((0, 0, 0, 0), (0.1, 0, -0.5, 0), (0.35, -1, 4, -6), (0.6, -2, 6, -10)),
+                 'scale': keys((0, 1, 1, 1), (0.1, 1.1, 0.85, 1.1), (0.35, 1.2, 1.2, 1.6), (0.55, 0.3, 0.3, 0.6), (0.6, 0, 0, 0))},
+        'nero_hood': HIDE}}
+    an['nero_return'] = {'loop': 'hold_on_last_frame', 'animation_length': 0.5, 'bones': {
+        'nero': {'scale': keys((0, 0, 0, 0), (0.2, 0, 0, 0), (0.32, 1.2, 1.2, 1.2), (0.42, 0.95, 0.95, 0.95), (0.5, 1, 1, 1))},
+        'nero_hood': HIDE}}
+    an['nero_hidden'] = {'loop': True, 'animation_length': 1, 'bones': {'nero': HIDE, 'nero_hood': HIDE}}
+    return an
 
 
 def write_anim():
@@ -356,13 +398,11 @@ def write_anim():
          'cape_low': {'rotation': wave(4, (-3, 0, 0), [(1, -0.1, -2.5, 0, 1.2)])},
          'hood_tip': {'rotation': wave(4, (0, 0, 0), [(1, -0.2, -3, 0, 2)])},
          'hem_r': {'rotation': wave(4, (0, 0, 0), [(1, 0, 1.5, 0, -1.5)])}, 'hem_l': {'rotation': wave(4, (0, 0, 0), [(1, 0.5, 1.5, 0, 1.5)])}}
-    a.update(nero(4))
     anims['idle'] = {'loop': True, 'animation_length': 4, 'bones': a}
     a = {'cape': {'rotation': wave(1, (-3, 0, 0), [(2, 0, -2, 0, 0)])},
          'cape_low': {'rotation': wave(1, (-12, 0, 0), [(2, -0.15, -6, 0, 2)])},
          'hood_tip': {'rotation': wave(1, (-6, 0, 0), [(2, -0.25, -5, 0, 3)])},
          'hem_r': {'rotation': wave(1, (0, 0, 0), [(1, 0, 9, 0, -3)])}, 'hem_l': {'rotation': wave(1, (0, 0, 0), [(1, 0.5, 9, 0, 3)])}}
-    a.update(nero(1))
     anims['walk'] = {'loop': True, 'animation_length': 1, 'bones': a}
     a = {'cape': {'rotation': wave(0.6, (-10, 0, 0), [(2, 0, -4, 0, 0)])},
          'cape_low': {'rotation': wave(0.6, (-30, 0, 0), [(2, -0.15, -9, 0, 4)])},
@@ -373,8 +413,8 @@ def write_anim():
          'cape_low': {'rotation': wave(1, (-32, 0, 0), [(3, -0.2, -8, 0, 4)])},
          'hood_tip': {'rotation': wave(1, (-24, 0, 0), [(3, -0.3, -6, 0, 3)])},
          'hem_r': {'rotation': wave(1, (8, 0, -10), [(3, 0, 6, 0, -4)])}, 'hem_l': {'rotation': wave(1, (8, 0, 10), [(3, 0.5, 6, 0, 4)])}}
-    a.update(nero(1))
     anims['cast'] = {'loop': True, 'animation_length': 1, 'bones': a}
+    anims.update(cat_anims())
     for an in anims.values():
         for b in an['bones']:
             assert b in BONES, b

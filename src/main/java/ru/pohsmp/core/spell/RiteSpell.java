@@ -35,6 +35,8 @@ import ru.pohsmp.core.fx.Fx;
  */
 public abstract class RiteSpell extends PohSpell {
     public static final int CAST = 200, HOLD = 30, LOST_MAX = 20;
+    /** The cast effect lives this much past the cast (its ending after the rite takes effect; manager 19.11: blessing_cast runs to 230). */
+    public static final int TAIL = 40;
     public static final double RANGE = 24, KEEP = 32;
 
     protected static final class Rite {
@@ -137,7 +139,7 @@ public abstract class RiteSpell extends PohSpell {
         Vec3 d = t.position().subtract(caster.position());
         double ang = d.horizontalDistanceSqr() < 1e-4 ? Math.toRadians(caster.getYRot() + 90) : Math.atan2(d.z, d.x);
         r.watchers = Cutscene.start(sl, caster, r.cutKey, scene, CAST, t.position(), ang, t.getId());
-        r.fx = Fx.play(sl, Fx.fx(fxCast).at(caster.position()).caster(caster).target(t).duration(CAST));
+        r.fx = Fx.play(sl, Fx.fx(fxCast).at(caster.position()).caster(caster).target(t).duration(CAST + TAIL));
         return r;
     }
 
@@ -176,7 +178,7 @@ public abstract class RiteSpell extends PohSpell {
             if (r != null && holds(sl, r)) {
                 Cutscene.flash(sl, r.watchers, flashTicks(), flashColor());
                 apply(sl, caster, r.target);
-                Fx.stop(sl, r.fx, "");
+                // the cast effect is not stopped here: it plays its own ending (blessing_cast: the flash at 190, the feathers down to 230)
                 Tasks.add(new Tasks.Task() {   // the camera holds the last shot a little (spec: 1.5 s after the cast)
                     int left = HOLD;
 

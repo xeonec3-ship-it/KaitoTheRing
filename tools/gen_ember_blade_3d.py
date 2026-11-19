@@ -51,7 +51,9 @@ class Model:
             if glow:
                 fd['forge_data'] = {'block_light': 15, 'sky_light': 15}
             faces[f] = fd
-        e = {'from': [R3(min(x0, x1)), R3(min(y0, y1)), R3(min(z0, z1))], 'to': [R3(max(x0, x1)), R3(max(y0, y1)), R3(max(z0, z1))],
+        # Minecraft refuses the whole model if any coordinate leaves [-16, 32] (the blade tip's overlap reached 32.05)
+        cl = lambda a: R3(max(-16.0, min(32.0, a)))
+        e = {'from': [cl(min(x0, x1)), cl(min(y0, y1)), cl(min(z0, z1))], 'to': [cl(max(x0, x1)), cl(max(y0, y1)), cl(max(z0, z1))],
              'faces': faces}
         if name:
             e['name'] = name

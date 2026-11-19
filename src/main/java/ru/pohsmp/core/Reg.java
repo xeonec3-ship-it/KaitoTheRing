@@ -150,6 +150,21 @@ public final class Reg {
     public static final RegistryObject<MobEffect> ERASED =EFFECTS.register("erased", () -> new PohEffect(MobEffectCategory.HARMFUL, 0xE9E4D8));
     public static final RegistryObject<MobEffect> BORROWED_FACE =EFFECTS.register("borrowed_face", () -> new PohEffect(MobEffectCategory.BENEFICIAL, ILLUSION_COLOR));
 
+    /** T25 «Кошмары» (docs/specs/tasks/T25_nightmare_school.md): «Погружение» - the world turns into a nightmare around the victim, only for it. */
+    public static final int NIGHTMARE_COLOR = 0x7A1040;
+    public static final RegistryObject<Attribute> NIGHTMARE_POWER = ATTRS.register("nightmare_spell_power",
+            () -> new RangedAttribute("attribute.pohsmp_core.nightmare_spell_power", 1.0, 0.0, 10.0).setSyncable(true));
+    public static final RegistryObject<Attribute> NIGHTMARE_RESIST = ATTRS.register("nightmare_magic_resist",
+            () -> new RangedAttribute("attribute.pohsmp_core.nightmare_magic_resist", 1.0, -100.0, 100.0).setSyncable(true));
+    public static final ResourceKey<DamageType> NIGHTMARE_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, "nightmare_magic"));
+    public static final TagKey<Item> NIGHTMARE_FOCUS = ItemTags.create(new ResourceLocation(PohCore.MODID, "nightmare_focus"));
+    public static final ResourceLocation NIGHTMARE_ID = new ResourceLocation(PohCore.MODID, "nightmare");
+    public static final RegistryObject<SchoolType> NIGHTMARE_SCHOOL = SCHOOLS.register("nightmare", () -> new SchoolType(NIGHTMARE_ID, NIGHTMARE_FOCUS,
+            Component.translatable("school.pohsmp_core.nightmare").withStyle(Style.EMPTY.withColor(NIGHTMARE_COLOR)),
+            NIGHTMARE_POWER, NIGHTMARE_RESIST, () -> SoundEvents.WARDEN_HEARTBEAT, NIGHTMARE_DAMAGE, false, false));
+    /** The stage of «Погружение» as an icon (the state itself lives in nightmare/Immersion). */
+    public static final RegistryObject<MobEffect> IMMERSION = EFFECTS.register("immersion", () -> new PohEffect(MobEffectCategory.HARMFUL, NIGHTMARE_COLOR));
+
     /** Silent Witch outfit (T19): the barrier's cooldown, shown as an effect icon; milk does not remove it. */
     public static final RegistryObject<MobEffect> SILENT_BARRIER_COOLDOWN = EFFECTS.register("silent_barrier_cooldown",
             () -> new PohEffect(MobEffectCategory.NEUTRAL, SILENT_COLOR));
@@ -238,8 +253,11 @@ public final class Reg {
     public static final List<String> MYTHIC_SPELLS = List.of(ru.pohsmp.core.spell.ExplosionSpell.PATH,
             ru.pohsmp.core.spell.HeavenFallSpell.PATH, ru.pohsmp.core.spell.FrozenHourSpell.PATH, ru.pohsmp.core.spell.SpaceClosureSpell.PATH,
             ru.pohsmp.core.spell.CovenArrivalSpell.PATH, ILLUSION_MYTHIC, ru.pohsmp.core.mythic.WorldTreeSpell.PATH,
-            ru.pohsmp.core.mythic.AbyssEyeSpell.PATH, ru.pohsmp.core.mythic.LastDawnSpell.PATH);
+            ru.pohsmp.core.mythic.AbyssEyeSpell.PATH, ru.pohsmp.core.mythic.LastDawnSpell.PATH, ru.pohsmp.core.nightmare.NightmareSpells.NO_AWAKENING);
     static {
+        SPELLS.register(ru.pohsmp.core.nightmare.NightmareSpells.NO_AWAKENING,
+                () -> ru.pohsmp.core.nightmare.NightmareSpells.make(ru.pohsmp.core.nightmare.NightmareSpells.NO_AWAKENING));   // T25
+        for (String p : ru.pohsmp.core.nightmare.NightmareSpells.HIGHER) SPELLS.register(p, () -> ru.pohsmp.core.nightmare.NightmareSpells.make(p));
         SPELLS.register(ru.pohsmp.core.mythic.WorldTreeSpell.PATH, ru.pohsmp.core.mythic.WorldTreeSpell::new);   // T23
         SPELLS.register(ru.pohsmp.core.mythic.AbyssEyeSpell.PATH, ru.pohsmp.core.mythic.AbyssEyeSpell::new);
         SPELLS.register(ru.pohsmp.core.mythic.LastDawnSpell.PATH, ru.pohsmp.core.mythic.LastDawnSpell::new);
@@ -290,7 +308,8 @@ public final class Reg {
             ru.pohsmp.core.spell.OblivionBladesSpell.PATH, ru.pohsmp.core.spell.WorldRiftSpell.PATH, ru.pohsmp.core.spell.MirrorPrisonSpell.PATH,
             ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell.PATH,
             ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.CountdownSpell.PATH,
-            ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH, ILLUSION_HIGHER.get(0), ILLUSION_HIGHER.get(1));
+            ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH, ILLUSION_HIGHER.get(0), ILLUSION_HIGHER.get(1),
+            ru.pohsmp.core.nightmare.NightmareSpells.HOUSE, ru.pohsmp.core.nightmare.NightmareSpells.NIGHT);
     static {
         SPELLS.register(ru.pohsmp.core.spell.StarFallSpell.PATH, ru.pohsmp.core.spell.StarFallSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.ScarletCutSpell::new);
@@ -341,6 +360,14 @@ public final class Reg {
             tip.add(Component.translatable("item.pohsmp_core.illusion_prism.allies").withStyle(net.minecraft.ChatFormatting.GRAY));
         }
     });
+    /** T25: the focus of the Nightmares school (tag nightmare_focus) - a cracked music box. */
+    public static final RegistryObject<Item> BROKEN_LULLABY = ITEMS.register("broken_lullaby", () -> new Item(new Item.Properties().stacksTo(64)) {
+        @Override
+        public void appendHoverText(ItemStack st, @org.jetbrains.annotations.Nullable net.minecraft.world.level.Level lvl, List<Component> tip,
+                                    net.minecraft.world.item.TooltipFlag flag) {
+            tip.add(Component.translatable("item.pohsmp_core.broken_lullaby.desc").withStyle(Style.EMPTY.withColor(NIGHTMARE_COLOR)));
+        }
+    });
 
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, PohCore.MODID);
     public static final RegistryObject<CreativeModeTab> TAB = TABS.register("main", () -> CreativeModeTab.builder()
@@ -364,6 +391,7 @@ public final class Reg {
                 out.accept(SILENT_WITCH_STAFF.get());
                 out.accept(EMBER_BLADE.get());
                 out.accept(ILLUSION_PRISM.get());
+                out.accept(BROKEN_LULLABY.get());
             })
             .build());
 

@@ -67,6 +67,8 @@ public class PohCore {
         ru.pohsmp.core.silent.compat.Compat.common(modBus);
         MinecraftForge.EVENT_BUS.register(Hidden.class);
         ru.pohsmp.core.spell.illusion.IllusionSpells.registerEvents();   // T22
+        ru.pohsmp.core.nightmare.NightmareSpells.registerEvents();   // T25
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.nightmare.Immersion.class);   // T25
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.Erased.class);   // T24
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.erased.ErasedNameSpell.Events.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.mythic.MythicT23.Events.class);   // T23
@@ -98,6 +100,8 @@ public class PohCore {
             if (!e.has(type, Reg.SILENT_CAST.get())) e.add(type, Reg.SILENT_CAST.get());
             if (!e.has(type, Reg.ILLUSION_POWER.get())) e.add(type, Reg.ILLUSION_POWER.get());
             if (!e.has(type, Reg.ILLUSION_RESIST.get())) e.add(type, Reg.ILLUSION_RESIST.get());
+            if (!e.has(type, Reg.NIGHTMARE_POWER.get())) e.add(type, Reg.NIGHTMARE_POWER.get());
+            if (!e.has(type, Reg.NIGHTMARE_RESIST.get())) e.add(type, Reg.NIGHTMARE_RESIST.get());
         }
     }
 }

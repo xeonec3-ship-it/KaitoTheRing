@@ -36,7 +36,12 @@ public abstract class IllusionBase extends PohSpell {
 
     /** Higher or Mythic spell. */
     protected IllusionBase(String path, Rank rank, int castTicks) {
-        super(path, Reg.ILLUSION_ID, SpellRarity.LEGENDARY, 1, 0, castTicks, 0, 0);
+        this(path, rank, castTicks, Reg.ILLUSION_ID);
+    }
+
+    /** Higher or Mythic spell of another school that works on the same rules (T25 «Кошмары»). */
+    protected IllusionBase(String path, Rank rank, int castTicks, net.minecraft.resources.ResourceLocation school) {
+        super(path, school, SpellRarity.LEGENDARY, 1, 0, castTicks, 0, 0);
         this.rank = rank;
         this.manaCfg = null;
         this.cooldownCfg = null;

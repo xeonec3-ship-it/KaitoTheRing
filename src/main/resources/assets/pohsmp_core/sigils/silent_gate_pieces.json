@@ -1,0 +1,31 @@
+{
+  "comment": "Пример сборки по частям (как печать, из которой выходит портал в Silent Gate): каждый слой режется на секторы, они слетаются по одному, на подлёте кувыркаются и со щелчком-вспышкой встают на место; разборка как у других печатей — слои гаснут в обратном порядке, печать сжимается в точку. Режим appear «pieces», формат — docs/sigils.md.",
+  "size": 4.5,
+  "color": "#8FF3FF",
+  "orientation": "ground",
+  "lifetime": -1,
+  "hold": 100,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.7, "heightOffset": -0.01, "brightness": 0.75,
+      "appear": { "delay": 0, "duration": 14, "easing": "easeOutCubic", "modes": ["grow", "fade"] },
+      "pulse": { "amp": 0.25, "period": 30 } },
+    { "id": "core", "type": "disc", "texture": "core", "radius": 0.32, "heightOffset": 0.01,
+      "appear": { "delay": 6, "duration": 24, "easing": "easeOutBack", "modes": ["pieces"],
+        "pieces": { "count": 6, "order": "alternate", "pieceTime": 0.5, "fly": 1.2, "lift": 1.4, "orbit": 30, "tilt": 90, "spin": 180 } },
+      "rotation": { "speed": 30, "boost": 1.5 } },
+    { "id": "spirals", "type": "disc", "texture": "spiral_ring", "radius": 0.66, "heightOffset": 0.02,
+      "appear": { "delay": 22, "duration": 34, "easing": "easeOutBack", "modes": ["pieces"],
+        "pieces": { "count": 8, "order": "scatter", "fly": 0.9, "lift": 0.8, "orbit": 45, "tilt": 80, "spin": 140 } },
+      "rotation": { "speed": -20, "boost": 1.5 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 0.86, "inner": 0.8, "repeat": 6, "heightOffset": 0.03,
+      "appear": { "delay": 46, "duration": 36, "easing": "easeOutCubic", "modes": ["pieces"],
+        "pieces": { "count": 12, "order": "around", "pieceTime": 0.4, "fly": 0.5, "lift": 0.35, "orbit": 70, "tilt": 45, "spin": 20 } },
+      "rotation": { "speed": 12 } },
+    { "id": "rim", "type": "disc", "texture": "rim", "radius": 1.0, "heightOffset": 0.04,
+      "appear": { "delay": 70, "duration": 36, "easing": "easeOutBack", "modes": ["pieces"],
+        "pieces": { "count": 16, "order": "scatter", "pieceTime": 0.35, "fly": 0.35, "lift": 0.3, "orbit": 25, "tilt": 90, "spin": 50 } },
+      "rotation": { "speed": -6 } }
+  ],
+  "formedFlash": { "color": "#FFFFFF", "size": 1.2, "duration": 12, "sparks": 40 },
+  "dissolve": { "modes": ["reverse", "collapse"], "duration": 20, "stagger": 3 }
+}

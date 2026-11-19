@@ -135,4 +135,40 @@ class SigilTimelineTest {
         for (int i = 0; i < def.layers().size(); i++) if (def.layers().get(i).id().equals(layerId)) return i;
         throw new AssertionError("no layer " + layerId);
     }
+
+    @Test
+    void piecesFlyInAndLock() throws Exception {
+        SigilDef d = SigilDef.parse("silent_gate_pieces", java.nio.file.Files.readString(
+                java.nio.file.Path.of("src/main/resources/assets/pohsmp_core/sigils/silent_gate_pieces.json")));
+        int rim = 4;
+        SigilDef.Pieces pc = d.layers().get(rim).appear().pieces();
+        org.junit.jupiter.api.Assertions.assertEquals(16, pc.count());
+        org.junit.jupiter.api.Assertions.assertEquals(SigilDef.PieceOrder.SCATTER, pc.order());
+        // ranks are a permutation for every order and size
+        for (SigilDef.PieceOrder o : SigilDef.PieceOrder.values())
+            for (int n = 1; n <= 24; n++) {
+                boolean[] seen = new boolean[n];
+                for (int k = 0; k < n; k++) seen[SigilTimeline.pieceRank(o, k, n)] = true;
+                for (boolean b : seen) org.junit.jupiter.api.Assertions.assertTrue(b, o + " " + n);
+            }
+        org.junit.jupiter.api.Assertions.assertEquals(1, SigilTimeline.pieceRank(SigilDef.PieceOrder.ALTERNATE, 3, 6)); // 0, 3, 1, 4, 2, 5
+        org.junit.jupiter.api.Assertions.assertEquals(0, SigilTimeline.piece(d, rim, 0, 0, Double.NaN).alpha(), 1e-9);
+        var ap = d.layers().get(rim).appear();
+        var mid = SigilTimeline.piece(d, rim, 0, ap.delay() + 2, Double.NaN);   // easeOutBack overshoots past 1 later (bounce on lock)
+        org.junit.jupiter.api.Assertions.assertTrue(mid.u() > 0 && mid.u() < 1 && mid.lift() > 0);
+        for (int k = 0; k < pc.count(); k++) {
+            var s = SigilTimeline.piece(d, rim, k, ap.end() + 20, Double.NaN);
+            org.junit.jupiter.api.Assertions.assertEquals(1, s.u(), 1e-9);
+            org.junit.jupiter.api.Assertions.assertEquals(1, s.radialMul(), 1e-9);
+            org.junit.jupiter.api.Assertions.assertEquals(0, s.lift(), 1e-9);
+            org.junit.jupiter.api.Assertions.assertEquals(0, s.tilt(), 1e-9);
+            org.junit.jupiter.api.Assertions.assertEquals(1, s.brightness(), 1e-9);
+        }
+        // dissolve: pieces stay in place, the whole sigil collapses like the others
+        double stop = 300;
+        var after = SigilTimeline.piece(d, rim, 3, stop + 10, stop);
+        org.junit.jupiter.api.Assertions.assertEquals(1, after.u(), 1e-9);
+        org.junit.jupiter.api.Assertions.assertTrue(SigilTimeline.globalScale(d, stop + 10, stop, 1) < d.size());
+        org.junit.jupiter.api.Assertions.assertEquals(0, SigilTimeline.globalScale(d, stop + 20, stop, 1), 1e-9);
+    }
 }

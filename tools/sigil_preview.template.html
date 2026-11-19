@@ -166,16 +166,36 @@ function mat(texName, color) {
 // диск с прорисовкой: сектор круга с плоскими UV
 function discGeo(len, start) { return new THREE.CircleGeometry(1, 96, start, Math.max(0.0001, len)); }
 // лента: кольцо от inner до 1, u — вдоль окружности (repeat раз), v — по радиусу
-function bandGeo(inner, len, start, repeat) {
+function bandGeo(inner, len, start, repeat, u0 = 0) {
   const seg = Math.max(2, Math.ceil(160 * len / (2 * Math.PI))), pos = [], uv = [], idx = [];
   for (let i = 0; i <= seg; i++) {
-    const a = start + len * i / seg, c = Math.cos(a), s = Math.sin(a), u = (a - start) / (2 * Math.PI) * repeat;
+    const a = start + len * i / seg, c = Math.cos(a), s = Math.sin(a), u = u0 + (a - start) / (2 * Math.PI) * repeat;
     pos.push(c * inner, s * inner, 0, c, s, 0); uv.push(u, 0, u, 1);
     if (i < seg) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
   }
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
   return g;
+}
+
+// ---------------------------------------------------------------- сборка по частям (appear.modes "pieces"), как SigilTimeline.piece
+const PIECES_DEFAULT = { count: 8, pieceTime: 0.45, order: "scatter", fly: 0.9, lift: 0.5, orbit: 40, tilt: 75, spin: 120, lockFlash: 0.8 };
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+function pieceRank(order, k, n) {
+  if (order === "around") return k;
+  if (order === "alternate") { const half = Math.floor((n + 1) / 2); return k < half ? 2 * k : 2 * (k - half) + 1; }
+  let s = Math.max(1, Math.round(n * 0.382)); while (gcd(s, n) !== 1) s++;
+  return (k * s) % n;
+}
+function pieceState(def, l, k, t, stopAt) {
+  const ap = l.appear || {}, pc = { ...PIECES_DEFAULT, ...(ap.pieces || {}) }, n = pc.count, rank = pieceRank(pc.order, k, n);
+  const dur = Math.max(1, ap.duration || 1), fly = dur * pc.pieceTime, start = (ap.delay || 0) + (n > 1 ? (dur - fly) * rank / (n - 1) : 0);
+  let u = t < start ? 0 : ease(ap.easing, clamp01((t - start) / fly));
+  const stopped = stopAt !== null;   // разборка — общая для печати (reverse/collapse…), части не разлетаются
+  const side = k % 2 === 0 ? 1 : -1, w = 1 - u, sector = 360 / n;
+  return { u, alpha: t < start ? 0 : clamp01(u * 2.5), centerAngle: (k + 0.5) * sector, centerRadius: l.type === "band" ? ((l.inner ?? 0.85) + 1) / 2 : 0.62,
+    radialMul: 1 + pc.fly * w, orbit: pc.orbit * w * side, lift: pc.lift * w, tilt: pc.tilt * w * side, spin: pc.spin * w * side,
+    brightness: 1 + pc.lockFlash * (stopped ? 0 : Math.max(0, 1 - Math.abs(t - (start + fly)) / 5)) };
 }
 
 // ---------------------------------------------------------------- экземпляр печати
@@ -197,6 +217,17 @@ class Sigil {
     const L = { def: l, group: g, rot: 0, meshes: [], lastLen: -1 };
     if (l.type === "arcs") {
       for (let i = 0; i < (l.count || 4); i++) { const m = new THREE.Mesh(new THREE.BufferGeometry(), mat(l.texture || "arc_strip", color)); g.add(m); L.meshes.push(m); }
+    } else if ((l.appear?.modes || []).includes("pieces")) {
+      // каждая часть — сектор слоя в своей «оси» (pivot) с центром в центре сектора
+      const n = { ...PIECES_DEFAULT, ...(l.appear.pieces || {}) }.count, sec = 2 * Math.PI / n;
+      const cr = l.type === "band" ? ((l.inner ?? 0.85) + 1) / 2 : 0.62;
+      L.pieces = [];
+      for (let k = 0; k < n; k++) {
+        const s0 = k * sec, geo = l.type === "band" ? bandGeo(l.inner ?? 0.85, sec, s0, l.repeat || 6, s0 / (2 * Math.PI) * (l.repeat || 6)) : discGeo(sec, s0);
+        const m = new THREE.Mesh(geo, mat(l.texture, color)), pivot = new THREE.Group(), ca = s0 + sec / 2;
+        m.position.set(-Math.cos(ca) * cr, -Math.sin(ca) * cr, 0); pivot.add(m); g.add(pivot);
+        L.pieces.push({ pivot, mesh: m }); L.meshes.push(m);
+      }
     } else {
       const m = new THREE.Mesh(new THREE.BufferGeometry(), mat(l.texture, color)); g.add(m); L.meshes.push(m);
     }
@@ -249,7 +280,18 @@ class Sigil {
       // геометрия: прорисовка (draw) и сборка дуг (assemble)
       const len = m.includes("draw") ? 2 * Math.PI * clamp01(e) : 2 * Math.PI;
       const start = (ap.startAngle || 0) * D2R, dir = ap.direction || 1;
-      if (l.type === "arcs") {
+      if (L.pieces) {
+        const Z = new THREE.Vector3(0, 0, 1);
+        L.pieces.forEach((P, k) => {
+          const s = pieceState(def, l, k, lt, this.stopAt === null ? null : this.stopAt - this.t0), a2 = (s.centerAngle + s.orbit) * D2R;
+          P.pivot.position.set(Math.cos(a2) * s.centerRadius * s.radialMul, Math.sin(a2) * s.centerRadius * s.radialMul, s.lift);
+          const tan = new THREE.Vector3(-Math.sin(a2), Math.cos(a2), 0);
+          const q = new THREE.Quaternion().setFromAxisAngle(tan, s.tilt * D2R)
+            .multiply(new THREE.Quaternion().setFromAxisAngle(Z, s.spin * D2R)).multiply(new THREE.Quaternion().setFromAxisAngle(Z, s.orbit * D2R));
+          P.pivot.quaternion.copy(q);
+          P.mesh.material.opacity = alpha * s.alpha * s.brightness;
+        });
+      } else if (l.type === "arcs") {
         const cnt = L.meshes.length, closed = 360 / cnt, asm = m.includes("assemble") ? clamp01(e) : 1;
         const arcLen = ((l.arcLength || 45) + (closed - (l.arcLength || 45)) * asm) * D2R;
         const rf = 1 + 0.9 * (1 - asm), w = l.width || 0.05;
@@ -539,6 +581,7 @@ class FxRun {
 const SCENES = {
   "Silent Gate: земля и небо": () => [new Sigil("silent_gate_ground", new THREE.Vector3(0, 0.02, 0)), new Sigil("silent_gate_sky", new THREE.Vector3(0, 9, 0), { t0: 24 })],
   "Небесная печать": () => [new Sigil("silent_gate_sky", new THREE.Vector3(0, 9, 0))],
+  "Сборка по частям (пример)": () => [new Sigil("silent_gate_pieces", new THREE.Vector3(0, 0.02, 0))],
   "Земная печать + золотые круги": () => [new Sigil("silent_gate_ground", new THREE.Vector3(0, 0.02, 0))],
   "Золотой круг": () => [new Sigil("golden_halo", new THREE.Vector3(0, 1.4, -1.2))],
   "Печать Ковена": () => [new Sigil("coven_seal", new THREE.Vector3(0, 10, 0))],
@@ -551,10 +594,10 @@ const SCENES = {
   "Дезинтеграция: Реплика": () => [new FxRun("disintegration_replica")],
   "Портал Ковена": () => [new Portal("coven_portal", new THREE.Vector3(0, 0, -3.5)), new Sigil("coven_seal", new THREE.Vector3(0, 0.02, -3.5), { orientation: "ground", t0: 20, scale: 0.9 })],
 };
-const MAIN_ID = { "Silent Gate: земля и небо": "silent_gate_sky", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
+const MAIN_ID = { "Silent Gate: земля и небо": "silent_gate_sky", "Сборка по частям (пример)": "silent_gate_pieces", "Небесная печать": "silent_gate_sky", "Земная печать + золотые круги": "silent_gate_ground",
   "Золотой круг": "golden_halo", "Печать Ковена": "coven_seal", "Время: циферблат": "time_clock", "Звёзды: созвездия": "stars_orbit",
   "Божественная: солнце": "divine_sun", "Высшая: трещины и клинки": "higher_blades", "Запретная: цепи": "forbidden_chains", "Портал Ковена": "coven_portal", "Дезинтеграция (аниме)": "disintegration", "Дезинтеграция: Реплика": "disintegration_replica" };
-const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
+const VIEW_FOR = { "Silent Gate: земля и небо": "side", "Сборка по частям (пример)": "pieces", "Небесная печать": "low", "Земная печать + золотые круги": "close", "Золотой круг": "close", "Печать Ковена": "low",
   "Время: циферблат": "close", "Звёзды: созвездия": "above", "Божественная: солнце": "low", "Высшая: трещины и клинки": "above", "Запретная: цепи": "above", "Портал Ковена": "portal", "Дезинтеграция (аниме)": "dis", "Дезинтеграция: Реплика": "dis" };
 
 let cur = Object.keys(SCENES)[0], t = 0, speed = 1, autoStop = true, last = performance.now();
@@ -585,7 +628,7 @@ document.querySelectorAll("[data-speed]").forEach((b) => b.addEventListener("cli
 
 // ---------------------------------------------------------------- камера
 let yaw = 0.6, pitch = 0.18, dist = 16, tgtY = 4, drag = null;
-const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
+const VIEWS = { side: [0.6, 0.18, 16, 4], low: [0.3, -0.05, 9, 7], top: [0.2, 1.35, 22, 2], close: [2.6, 0.32, 7.5, 1.1], above: [0.3, 1.25, 8.5, 0], portal: [0.5, 0.12, 11, 2.6], pieces: [0.5, 0.5, 13, 0.6], dis: [0.75, -0.08, 20, 4.4], disUp: [0.4, -0.6, 11, 7.0] };
 function setView(v) {
   document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
   if (v && VIEWS[v]) [yaw, pitch, dist, tgtY] = VIEWS[v];

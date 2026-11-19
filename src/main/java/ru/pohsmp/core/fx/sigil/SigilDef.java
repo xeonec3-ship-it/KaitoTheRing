@@ -22,14 +22,29 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
 
     public enum LayerType { DISC, BAND, ARCS, SPOKES }
 
-    public enum AppearMode { GROW, FADE, DRAW, TWIST, UNFOLD, ASSEMBLE }
+    public enum AppearMode { GROW, FADE, DRAW, TWIST, UNFOLD, ASSEMBLE, PIECES }
 
     public enum DissolveMode { REVERSE, COLLAPSE, FADE, SHATTER }
 
-    public record Appear(int delay, int duration, Easing easing, Set<AppearMode> modes, double startAngle, int direction, double twist) {
+    public record Appear(int delay, int duration, Easing easing, Set<AppearMode> modes, double startAngle, int direction, double twist,
+                         Pieces pieces) {
         public int end() {
             return delay + duration;
         }
+    }
+
+    /** Order in which pieces arrive. */
+    public enum PieceOrder { SCATTER, AROUND, ALTERNATE }
+
+    /**
+     * Mode {@code pieces}: the layer is cut into {@code count} equal sectors that fly in one after another and lock into place.
+     * pieceTime — share of appear.duration one piece flies; fly — extra distance from the centre (share of radius); lift — height
+     * above the plane (share of radius); orbit — degrees around the centre; tilt — degrees around the piece's tangent;
+     * spin — degrees around its own centre; lockFlash — extra brightness at the moment it locks.
+     */
+    public record Pieces(int count, double pieceTime, PieceOrder order, double fly, double lift, double orbit, double tilt, double spin,
+                         double lockFlash) {
+        public static final Pieces DEFAULT = new Pieces(8, 0.45, PieceOrder.SCATTER, 0.9, 0.5, 40, 75, 120, 0.8);
     }
 
     public record Rotation(double speed, double boost) {
@@ -104,8 +119,16 @@ public record SigilDef(String id, double size, int color, Orientation orientatio
         Set<AppearMode> modes = EnumSet.noneOf(AppearMode.class);
         for (JsonElement m : arr(ap, "modes")) modes.add(AppearMode.valueOf(m.getAsString().toUpperCase(Locale.ROOT)));
         if (modes.isEmpty()) modes.add(AppearMode.FADE);
+        Pieces pieces = null;
+        if (modes.contains(AppearMode.PIECES)) {
+            JsonObject pc = ap.has("pieces") && ap.get("pieces").isJsonObject() ? ap.getAsJsonObject("pieces") : new JsonObject();
+            Pieces d = Pieces.DEFAULT;
+            pieces = new Pieces(Math.max(1, (int) num(pc, "count", d.count())), Math.max(0.05, Math.min(1, num(pc, "pieceTime", d.pieceTime()))),
+                    PieceOrder.valueOf(str(pc, "order", "scatter").toUpperCase(Locale.ROOT)), num(pc, "fly", d.fly()), num(pc, "lift", d.lift()),
+                    num(pc, "orbit", d.orbit()), num(pc, "tilt", d.tilt()), num(pc, "spin", d.spin()), num(pc, "lockFlash", d.lockFlash()));
+        }
         Appear appear = new Appear((int) num(ap, "delay", 0), Math.max(1, (int) num(ap, "duration", 1)), Easing.byName(str(ap, "easing", null)),
-                modes, num(ap, "startAngle", 0), (int) num(ap, "direction", 1), num(ap, "twist", -120));
+                modes, num(ap, "startAngle", 0), (int) num(ap, "direction", 1), num(ap, "twist", -120), pieces);
         Rotation rot = Rotation.NONE;
         if (l.has("rotation")) {
             JsonObject r = l.getAsJsonObject("rotation");

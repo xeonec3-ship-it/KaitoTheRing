@@ -112,6 +112,58 @@ public final class SigilTimeline {
         return new LayerState(alpha, scale * l.radius(), angle, tilt, draw, ap.startAngle(), ap.direction(), arcR, arcLen);
     }
 
+    // ---------------------------------------------------------------- pieces
+
+    /**
+     * One flying piece of a PIECES layer. The piece is the sector [k·360/n, (k+1)·360/n] of the layer (plus the layer angle).
+     * Draw it at its rest place, then: rotate by {@code spin} around the normal through its centre, by {@code tilt} around the
+     * tangent through its centre, move its centre to radius {@code centerRadius · radialMul} at {@code centerAngle + orbit}, raise by
+     * {@code lift} along the normal (all in layer units, i.e. times the layer radius). {@code u} is 0 far away, 1 locked.
+     */
+    public record PieceState(double u, double alpha, double centerAngle, double centerRadius, double radialMul, double orbit, double lift,
+                             double tilt, double spin, double brightness) {}
+
+    /** Arrival rank of piece k (0 = first): a permutation of 0..n-1, the same in the preview. */
+    public static int pieceRank(SigilDef.PieceOrder order, int k, int n) {
+        switch (order) {
+            case AROUND: return k;
+            case ALTERNATE: {
+                int half = (n + 1) / 2;
+                return k < half ? 2 * k : 2 * (k - half) + 1;
+            }
+            default: return (int) ((long) k * scatterStride(n) % n);
+        }
+    }
+
+    /** Smallest stride ≥ round(0.382·n) coprime with n: pieces arrive spread around the circle. */
+    public static int scatterStride(int n) {
+        int s = Math.max(1, (int) Math.round(n * 0.382));
+        while (gcd(s, n) != 1) s++;
+        return s;
+    }
+
+    private static int gcd(int a, int b) {
+        return b == 0 ? a : gcd(b, a % b);
+    }
+
+    public static PieceState piece(SigilDef def, int index, int k, double t, double stopAt) {
+        Layer l = def.layers().get(index);
+        SigilDef.Appear ap = l.appear();
+        SigilDef.Pieces pc = ap.pieces() != null ? ap.pieces() : SigilDef.Pieces.DEFAULT;
+        int n = pc.count(), rank = pieceRank(pc.order(), k, n);
+        double fly = ap.duration() * pc.pieceTime(), gap = ap.duration() - fly;
+        double start = ap.delay() + (n > 1 ? gap * rank / (n - 1) : 0), lockAt = start + fly;
+        double u = ap.easing().apply(clamp01((t - start) / fly));
+        if (t < start) u = 0;
+        boolean stopped = !Double.isNaN(stopAt);          // разборка — общая для печати (reverse/collapse…), части не разлетаются
+        double side = k % 2 == 0 ? 1 : -1, w = 1 - u;
+        double sector = 360.0 / n, centerAngle = (k + 0.5) * sector;
+        double centerRadius = l.type() == LayerType.BAND ? (l.inner() + 1) / 2 : 0.62;
+        double flash = stopped ? 0 : Math.max(0, 1 - Math.abs(t - lockAt) / 5);
+        return new PieceState(u, t < start ? 0 : clamp01(u * 2.5), centerAngle, centerRadius, 1 + pc.fly() * w, pc.orbit() * w * side,
+                pc.lift() * w, pc.tilt() * w * side, pc.spin() * w * side, 1 + pc.lockFlash() * flash);
+    }
+
     /** How far an ARCS layer has assembled (0..1), for {@link LayerState#arcOffset}. */
     public static double assemble(SigilDef def, int index, double t) {
         Layer l = def.layers().get(index);

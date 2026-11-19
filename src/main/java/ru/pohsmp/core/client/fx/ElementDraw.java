@@ -84,7 +84,7 @@ public final class ElementDraw {
             case "ribbon" -> LineDraw.trail(f, run, el, st, te, ctx, s, col, a, true);
             case "slash" -> LineDraw.slash(f, run, el, te, at, ctx, s, col, a, seed);
             case "lightning" -> LineDraw.lightning(f, el, te, at, target(el, st, ctx, at), s, col, a, seed);
-            case "vortex" -> LineDraw.vortex(f, run, el, te, at, s, col, a, seed);
+            case "vortex" -> LineDraw.vortex(f, run, el, te, at, el.to() != null ? target(el, st, ctx, at) : null, s, col, a, seed);
             case "chains" -> LineDraw.chains(f, el, te, at, target(el, st, ctx, at), s, col, a);
             case "aura" -> BodyDraw.aura(f, run, el, te, live(el, ctx), s, col, a, seed);
             case "wings" -> BodyDraw.wings(f, run, el, te, live(el, ctx), ctx, s, col, a);
@@ -205,6 +205,8 @@ public final class ElementDraw {
             m.pitch = run.caster == null ? run.pitch : 0;   // a moved instance (spear) tilts along its flight
             m.start = run.start + el.delay();
             m.scale = el.scale() * run.scale;
+            m.move = el.params().has("move") ? el.params().getAsJsonObject("move") : null;
+            m.hinge = el.params().has("hinge") ? el.params().getAsJsonObject("hinge") : null;
             st.mesh = m;
         }
         if (el.follow()) {   // rides with the anchor: the caster, or the instance the server moves (Fx.move)
@@ -382,13 +384,23 @@ public final class ElementDraw {
         String impact = el.str("impact", null);
         SigilDef impactDef = impact != null ? FxLib.sigil(impact) : null;
         VertexConsumer glow = f.add(FxDraw.tex("beam")), core = f.add(FxDraw.WHITE), halo = f.add(FxDraw.tex("strip_soft"));
+        // ground: true - every beam ends on the surface under its point (heightmap), not at the height of the anchor; the top stays
+        // at the anchor height + height, so a beam into a valley is longer («Безмолвные врата», owner 19.11)
+        boolean onGround = el.params().has("ground") && el.params().get("ground").getAsBoolean();
+        var lvl = net.minecraft.client.Minecraft.getInstance().level;
         for (int i = 0; i < strikes.size(); i++) {
             FxMath.Strike sk = strikes.get(i);
             double age = te - sk.tick();
             if (age < 0 || age > 14) continue;
-            Vec3 ground = new Vec3(sk.x(), at.y, sk.z());
+            double gy = at.y;
+            if (onGround && lvl != null) {
+                int bx = (int) Math.floor(sk.x()), bz = (int) Math.floor(sk.z());
+                if (lvl.hasChunk(bx >> 4, bz >> 4))
+                    gy = lvl.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING, bx, bz);
+            }
+            Vec3 ground = new Vec3(sk.x(), gy, sk.z());
             double grow = FxDraw.clamp01(age / 3), fade = a * (age < 8 ? 1 : 1 - (age - 8) / 6);
-            Vec3 top = ground.add(0, h, 0), bottom = FxDraw.lerp(top, ground, grow);
+            Vec3 top = new Vec3(sk.x(), at.y + h, sk.z()), bottom = FxDraw.lerp(top, ground, grow);
             FxDraw.line(halo, f, top, bottom, w * 2.8, col, fade * 0.28);
             FxDraw.line(glow, f, top, bottom, w, col, fade * 0.7);
             FxDraw.line(core, f, top, bottom, w * 0.35, FxDraw.mix(col, 0xFFFFFF, 0.4), fade);

@@ -38,8 +38,14 @@ public final class GateStaff {
         RUNS.put(key, new Run(casterId, now));
     }
 
+    /**
+     * The scene ended or the cast was cancelled: the floating staff goes and the caster's hands show at once (owner 19.11: after a
+     * cancel the staff stayed hidden for the finish-animation time).
+     */
     public static void stop(int key) {
-        RUNS.remove(key);
+        Run r = RUNS.remove(key);
+        Minecraft mc = Minecraft.getInstance();
+        if (r != null && mc.level != null && mc.level.getEntity(r.caster()) instanceof LivingEntity le) HiddenHands.show(le);
     }
 
     @SubscribeEvent
@@ -73,10 +79,8 @@ public final class GateStaff {
                 ps.translate(0.75, 1.15 + 0.08 * Math.sin(t * 0.06), 0.65);
                 ps.mulPose(Axis.ZP.rotationDegrees((float) (4 * Math.sin(t * 0.045))));
                 ps.mulPose(Axis.XP.rotationDegrees((float) (3 * Math.sin(t * 0.037 + 1))));
-            } else {          // in the left hand, low and slanted
-                ps.translate(0.38, 0.72, 0.18);
-                ps.mulPose(Axis.ZP.rotationDegrees(-28));
-                ps.mulPose(Axis.XP.rotationDegrees(12));
+            } else {          // in the left fist at the belt, a little forward (pose STAFF_L): the staff stands upright (owner 19.11)
+                ps.translate(0.36, 0.98, 0.3);
             }
             int light = LevelRenderer.getLightColor(mc.level, BlockPos.containing(p.add(0, 1, 0)));
             mc.getItemRenderer().renderStatic(st, ItemDisplayContext.NONE, light, OverlayTexture.NO_OVERLAY, ps, buf, mc.level, en.getId());

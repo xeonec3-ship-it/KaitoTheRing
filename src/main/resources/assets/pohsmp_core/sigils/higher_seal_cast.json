@@ -1,0 +1,15 @@
+{
+  "comment": "Печать запрета, каст 1.5 с (SealSpell.CAST = 30): под целью пером прорисовывается тот же круг запрета, кольцо рун сходится навстречу, четыре дуги смыкаются снаружи внутрь — как будто круг затягивается вокруг цели.",
+  "size": 3.33, "color": "#FF3B3B", "orientation": "ground", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.8, "color": "#4A0008", "brightness": 1.0,
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutCubic", "modes": ["grow", "fade"] } },
+    { "id": "ward", "type": "disc", "texture": "seal_ward", "radius": 1.0, "heightOffset": 0.01, "brightness": 0.7,
+      "appear": { "delay": 0, "duration": 26, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90, "direction": 1 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.05, "inner": 0.98, "repeat": 6, "heightOffset": 0.02, "color": "#FF8A7A",
+      "appear": { "delay": 4, "duration": 22, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 90, "direction": -1 }, "rotation": { "speed": -20 } },
+    { "id": "arcs", "type": "arcs", "texture": "arc_strip", "radius": 1.12, "width": 0.03, "heightOffset": 0.03, "count": 4, "arcLength": 60,
+      "appear": { "delay": 4, "duration": 26, "easing": "easeInOutCubic", "modes": ["assemble", "fade"] }, "rotation": { "speed": 40, "boost": 3 } }
+  ],
+  "dissolve": { "modes": ["fade"], "duration": 6 }
+}

@@ -1,0 +1,12 @@
+{
+  "comment": "Печать запрета, каст 1.5 с: под целью затягивается круг запрета, от руки мага к цели тянется красная цепь, у цели мелкие алые искры. Останавливается в конце каста или при срыве.",
+  "style": "higher",
+  "duration": 30,
+  "elements": [
+    { "type": "sigil", "id": "higher_seal_cast", "delay": 0, "at": "target+0,0.05,0", "follow": true },
+    { "type": "chains", "delay": 6, "at": "caster.hand", "to": "target+0,1,0", "follow": true, "link": 0.18, "sag": 0.6, "tension": 0.3,
+      "color": "#FF6A5A", "in": { "duration": 8, "easing": "easeOutCubic" } },
+    { "type": "sprites", "delay": 0, "at": "target", "follow": true, "texture": "spark_sharp", "count": 40, "rate": 1.5, "area": 2.2, "speed": 0.004,
+      "gravity": -0.004, "size": [0.14, 0.03], "life": 16, "color": "#FF6A5A" }
+  ]
+}

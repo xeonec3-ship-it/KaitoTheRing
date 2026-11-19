@@ -1,0 +1,13 @@
+{
+  "comment": "Сингулярность: светящееся кольцо горизонта событий вокруг чёрного шара, всегда повёрнуто к камере, с бликами-лучами (искривлённый свет).",
+  "size": 1.6, "color": "#C89BFF", "orientation": "billboard", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "halo", "type": "disc", "texture": "glow", "radius": 1.5, "color": "#6A2ABF", "brightness": 0.8,
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.25, "period": 14 } },
+    { "id": "streaks", "type": "spokes", "texture": "spokes", "radius": 1.7, "heightOffset": 0.01, "color": "#9B4DFF", "brightness": 0.45,
+      "appear": { "delay": 2, "duration": 10, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "rotation": { "speed": 30 } },
+    { "id": "ring", "type": "disc", "texture": "event_ring", "radius": 1.0, "heightOffset": 0.02, "color": "#E0C8FF",
+      "appear": { "delay": 0, "duration": 10, "easing": "easeOutBack", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.2, "period": 8 } }
+  ],
+  "dissolve": { "modes": ["collapse"], "duration": 6 }
+}

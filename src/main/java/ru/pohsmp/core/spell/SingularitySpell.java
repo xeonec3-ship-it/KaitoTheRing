@@ -22,7 +22,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import ru.pohsmp.core.DivineEvents;
 import ru.pohsmp.core.Reg;
-import ru.pohsmp.core.net.Net;
+import ru.pohsmp.core.fx.Fx;
 
 /** Gravity mage: a black sphere where the caster looks (up to 24 blocks) pulls everything within 8 for 4 s, pins it down, then collapses (16 in r4, thrown out). */
 public class SingularitySpell extends HigherSpell {
@@ -58,8 +58,8 @@ public class SingularitySpell extends HigherSpell {
                 e -> e instanceof LivingEntity && e.isAlive() && !friendly(caster, e), 0.3f);
         Vec3 c = er != null ? new Vec3(er.getEntity().getX(), er.getEntity().getY() + 1, er.getEntity().getZ())
                 : hr.getType() == HitResult.Type.MISS ? end : hr.getLocation().subtract(look.scale(0.8));
-        int k = key();
-        fx(sl, c.x, c.y, c.z, new Net.HFx(Net.HFx.SING, k, -1, -1, LIFE, c.x, c.y, c.z, PULL_R, COLOR));
+        Vec3 floor = PohSpell.ground(sl, caster, c);
+        Fx.play(sl, Fx.fx("higher_singularity").at(c).point("floor", floor));
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 3f, 0.5f);
         Tasks.add(new Tasks.Task() {
             int age;
@@ -89,14 +89,14 @@ public class SingularitySpell extends HigherSpell {
                 }
                 if (age % 20 == 0) sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_AMBIENT, SoundSource.PLAYERS, 3f, 0.5f);
                 if (age < LIFE) return true;
-                collapse(sl, caster, c);
+                collapse(sl, caster, c, floor);
                 return false;
             }
         });
     }
 
-    private void collapse(ServerLevel sl, LivingEntity caster, Vec3 c) {
-        burst(sl, c.x, c.y, c.z, 6, COLOR);
+    private void collapse(ServerLevel sl, LivingEntity caster, Vec3 c, Vec3 floor) {
+        Fx.play(sl, Fx.fx("higher_singularity_collapse").at(c).point("floor", floor));
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 3f, 0.5f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 3f, 0.5f);
         DivineEvents.particle(sl, ParticleTypes.REVERSE_PORTAL, c.x, c.y, c.z, 150, 0.3, 0.8);

@@ -1,0 +1,14 @@
+{
+  "comment": "Печать запрета, 8 с: круг падает под цель с ударом (вспышка, кольцо-волна), по ободу встаёт низкая завеса алых лучей — граница, за которую нельзя выйти. Руны с цепями — отдельные fx/higher_seal_rune_*.json. Длится, пока SealSpell его не остановит.",
+  "style": "higher",
+  "duration": -1,
+  "elements": [
+    { "type": "sigil", "id": "higher_seal_ward", "delay": 0, "at": "caster+0,0.05,0" },
+    { "type": "flash", "delay": 0, "duration": 10, "at": "caster+0,0.4,0", "size": 3.2, "rays": 6, "anamorphic": 8, "color": "#FF8A7A" },
+    { "type": "wave", "shape": "ring", "delay": 0, "duration": 14, "at": "caster", "radius": 4.5, "color": "#FF3B3B" },
+    { "type": "curtain", "delay": 2, "at": "caster", "count": 48, "radius": [2.55, 2.65], "height": 1.6, "grow": 10,
+      "width": [0.02, 0.05], "brightness": [0.3, 0.65], "texture": "beam_fade", "flicker": 0.3, "color": "#FF3B3B",
+      "in": { "duration": 6, "easing": "easeOutCubic" } },
+    { "type": "decal", "delay": 0, "duration": 30, "at": "caster", "texture": "higher_cracks", "radius": 2.2, "fadeOut": 26, "color": "#FF2A3A" }
+  ]
+}

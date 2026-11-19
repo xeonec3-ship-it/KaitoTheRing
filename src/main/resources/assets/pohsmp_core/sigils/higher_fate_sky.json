@@ -1,0 +1,17 @@
+{
+  "comment": "Звезда судьбы: созвездие-пентаграмма в 7 блоках над целью, лицом вниз. Звёзды загораются по кругу почти весь отсчёт (45 тиков), дуги орбит смыкаются, кольцо рун; перед падением печать чуть расширяется и вспыхивает, при падении звезды сжимается в неё. Цвет задаёт карта (цвет элемента в fx/higher_fate_*.json).",
+  "size": 2.2, "color": "#FFFFFF", "orientation": "sky", "lifetime": -1, "hold": -1,
+  "layers": [
+    { "id": "glow", "type": "disc", "texture": "glow", "radius": 0.8, "brightness": 0.6,
+      "appear": { "delay": 0, "duration": 16, "easing": "easeOutCubic", "modes": ["grow", "fade"] }, "pulse": { "amp": 0.3, "period": 12 } },
+    { "id": "stars", "type": "disc", "texture": "fate_constellation", "radius": 0.95, "heightOffset": 0.01,
+      "appear": { "delay": 0, "duration": 45, "easing": "linear", "modes": ["draw"], "startAngle": 90, "direction": -1 }, "rotation": { "speed": 6 } },
+    { "id": "orbits", "type": "arcs", "texture": "arc_strip", "radius": 1.1, "width": 0.03, "heightOffset": 0.02, "count": 2, "arcLength": 120,
+      "appear": { "delay": 10, "duration": 30, "easing": "easeInOutCubic", "modes": ["assemble", "fade"] }, "rotation": { "speed": -18, "boost": 3 } },
+    { "id": "runes", "type": "band", "texture": "rune_band", "radius": 1.26, "inner": 1.14, "repeat": 8, "heightOffset": 0.03,
+      "appear": { "delay": 20, "duration": 24, "easing": "easeInOutSine", "modes": ["draw"], "startAngle": 270, "direction": 1 }, "rotation": { "speed": -5 } }
+  ],
+  "expand": { "scale": 1.15, "delay": 0, "duration": 8, "easing": "easeOutCubic" },
+  "formedFlash": { "color": "#FFFFFF", "size": 1.4, "duration": 10, "sparks": 30 },
+  "dissolve": { "modes": ["collapse"], "duration": 8 }
+}

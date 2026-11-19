@@ -1,0 +1,23 @@
+{
+  "comment": "Сингулярность, 4 с (SingularitySpell.LIFE = 80). Точка эффекта — центр шара; point:floor — земля под ним. Чёрный шар (три тёмных диска), кольцо горизонта к камере, аккреционный диск, вихрь затягивает искры, колодец на земле, завеса тонких лучей по границе притяжения, рядом темнеет. Схлопывание — fx/higher_singularity_collapse.json.",
+  "style": "higher",
+  "duration": 80,
+  "elements": [
+    { "type": "tint", "delay": 0, "duration": 80, "at": "caster", "radius": 10, "color": "#1A0A30", "strength": 0.35,
+      "in": { "duration": 16, "easing": "easeOutCubic" }, "out": { "duration": 6, "easing": "easeInSine" } },
+    { "type": "flash", "delay": 0, "duration": 8, "at": "caster", "size": 3, "rays": 6, "color": "#E0C8FF" },
+    { "type": "wave", "shape": "sphere", "delay": 0, "duration": 12, "at": "caster", "radius": 3, "rim": 1.0, "color": "#C89BFF" },
+    { "type": "mesh", "model": "higher_sing_void", "delay": 0, "duration": 80, "at": "caster", "yaw": 0 },
+    { "type": "mesh", "model": "higher_sing_void", "delay": 0, "duration": 80, "at": "caster", "yaw": 60 },
+    { "type": "mesh", "model": "higher_sing_void", "delay": 0, "duration": 80, "at": "caster", "yaw": 120 },
+    { "type": "sigil", "id": "higher_sing_horizon", "delay": 0, "at": "caster", "until": 80 },
+    { "type": "sigil", "id": "higher_sing_disc", "delay": 2, "at": "caster", "until": 80 },
+    { "type": "sigil", "id": "higher_sing_well", "delay": 0, "at": "point:floor+0,0.06,0", "until": 80 },
+    { "type": "vortex", "delay": 0, "duration": 80, "at": "caster+0,-1.5,0", "radius": 8, "height": 3, "arms": 5, "speed": 8, "pull": 1,
+      "texture": "spark_soft", "color": "#B47CFF", "in": { "duration": 10, "easing": "easeOutCubic" } },
+    { "type": "curtain", "delay": 0, "duration": 80, "at": "point:floor", "count": 40, "radius": [7.6, 8.0], "height": 3, "grow": 14,
+      "width": [0.03, 0.08], "brightness": [0.3, 0.7], "texture": "beam_fade", "flicker": 0.5, "color": "#9B4DFF" },
+    { "type": "sprites", "delay": 0, "duration": 80, "at": "caster", "texture": "spark_soft", "count": 160, "rate": 2, "spread": 1.2, "speed": 0.01,
+      "size": [0.12, 0.02], "life": 18, "color": "#E0C8FF" }
+  ]
+}

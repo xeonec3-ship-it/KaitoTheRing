@@ -1,0 +1,151 @@
+{
+ "comment": "Звезда судьбы, карта Мира: венок и звезда, звёзды падают ещё на двух врагов. Созвездие над целью 3 с (следует за ней), под целью карта; на 46-м тике звезда падает лучом, на 60-м удар (тики совпадают с FateStarSpell.FALL). Цвет созвездия — цвет карты.",
+ "style": "higher",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "sigil",
+   "id": "higher_fate_sky",
+   "delay": 0,
+   "at": "target+0,7,0",
+   "follow": true,
+   "until": 62,
+   "color": "#7DFFB0"
+  },
+  {
+   "type": "sigil",
+   "id": "higher_fate_card_world",
+   "delay": 6,
+   "at": "target+0,0.05,0",
+   "follow": true,
+   "until": 62
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "duration": 56,
+   "at": "target+0,7,0",
+   "follow": true,
+   "texture": "star5",
+   "count": 40,
+   "rate": 0.8,
+   "spread": 2.6,
+   "speed": 0.01,
+   "gravity": 0.0,
+   "spin": 60,
+   "size": [
+    0.25,
+    0.05
+   ],
+   "life": 30,
+   "color": "#D8FFE8"
+  },
+  {
+   "type": "beam",
+   "delay": 46,
+   "duration": 16,
+   "at": "target+0,7,0",
+   "to": "target",
+   "follow": true,
+   "width": 0.5,
+   "core": 0.3,
+   "taper": 0.6,
+   "grow": 14,
+   "color": "#7DFFB0",
+   "in": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 46,
+   "duration": 16,
+   "at": "target+0,7,0",
+   "follow": true,
+   "size": 2.6,
+   "rays": 6,
+   "color": "#D8FFE8"
+  },
+  {
+   "type": "flash",
+   "delay": 60,
+   "duration": 14,
+   "at": "target+0,0.4,0",
+   "size": 6,
+   "anamorphic": 12,
+   "rays": 10,
+   "screen": 0.2,
+   "color": "#7DFFB0"
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 60,
+   "duration": 22,
+   "at": "target",
+   "radius": 4.5,
+   "color": "#7DFFB0"
+  },
+  {
+   "type": "wave",
+   "shape": "sphere",
+   "delay": 60,
+   "duration": 14,
+   "at": "target+0,0.5,0",
+   "radius": 3.2,
+   "rim": 0.9,
+   "color": "#D8FFE8",
+   "out": {
+    "duration": 8,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "id": "higher_fate_impact",
+   "delay": 60,
+   "at": "target+0,0.06,0",
+   "color": "#7DFFB0"
+  },
+  {
+   "type": "sprites",
+   "delay": 60,
+   "duration": 30,
+   "at": "target+0,0.6,0",
+   "texture": "star5",
+   "count": 40,
+   "rate": 0,
+   "spread": 0.6,
+   "speed": 0.22,
+   "gravity": 0.01,
+   "spin": 200,
+   "size": [
+    0.35,
+    0.08
+   ],
+   "life": 28,
+   "color": "#D8FFE8"
+  },
+  {
+   "type": "decal",
+   "delay": 62,
+   "duration": 60,
+   "at": "target",
+   "texture": "fate_card_world",
+   "radius": 2.4,
+   "fadeOut": 50,
+   "color": "#7DFFB0",
+   "brightness": 0.6
+  },
+  {
+   "type": "wave",
+   "shape": "ring",
+   "delay": 66,
+   "duration": 26,
+   "at": "target",
+   "radius": 7,
+   "color": "#D8FFE8"
+  }
+ ]
+}

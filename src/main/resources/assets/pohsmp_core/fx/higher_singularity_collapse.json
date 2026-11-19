@@ -1,0 +1,16 @@
+{
+  "comment": "Сингулярность схлопнулась (урон 16 в радиусе 4, всех отбрасывает): ослепительная вспышка с бликом, сфера-ударная волна, кольцо по земле, осколки разлетаются, на земле гаснет след колодца.",
+  "style": "higher",
+  "duration": 50,
+  "elements": [
+    { "type": "flash", "delay": 0, "duration": 12, "at": "caster", "size": 7, "anamorphic": 16, "rays": 12, "screen": 0.35, "color": "#E0C8FF" },
+    { "type": "wave", "shape": "sphere", "delay": 0, "duration": 16, "at": "caster", "radius": 6, "rim": 1.0, "color": "#9B4DFF",
+      "out": { "duration": 8, "easing": "easeInSine" } },
+    { "type": "wave", "shape": "ring", "delay": 1, "duration": 20, "at": "point:floor", "radius": 7, "color": "#C89BFF" },
+    { "type": "sprites", "delay": 0, "duration": 30, "at": "caster", "texture": "shard", "count": 40, "rate": 0, "spread": 0.5, "speed": 0.3,
+      "gravity": 0.01, "spin": 360, "size": [0.35, 0.06], "life": 26, "color": "#C89BFF" },
+    { "type": "sprites", "delay": 0, "duration": 30, "at": "caster", "texture": "spark_sharp", "count": 30, "rate": 0, "spread": 0.3, "speed": 0.4,
+      "size": [0.3, 0.05], "life": 16, "color": "#FFFFFF" },
+    { "type": "decal", "delay": 0, "duration": 60, "at": "point:floor", "texture": "gravity_well", "radius": 4, "fadeOut": 50, "color": "#6A2ABF" }
+  ]
+}

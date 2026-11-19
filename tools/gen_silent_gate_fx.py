@@ -55,16 +55,16 @@ def build():
     # Никаких лучей-лент от руки к вратам (решение владельца 19.11).
     hand = dict(delay=T(14.6), duration=T(11.4), at='caster.hand', follow=True)
     # Плотность урезана (в игре экран заливало белым, 19.11): без вспышки у кисти, без свечения (glow), облачка — редкие и тусклые;
-    # искры быстрее уходят от руки, чтобы не копиться у камеры. Читается как поток искр и звёздочек, не как туман.
-    el(type='sprites', texture='spark_soft', count=900, rate=5, cone=46, speed=0.14, gravity=-0.0006, size=[0.06, 0.015], life=34,
+    # искры быстрее уходят от руки, чтобы не копиться у камеры; поток загибается вверх (как в видео мода: вперёд-вверх от руки). Читается как поток искр и звёздочек, не как туман.
+    el(type='sprites', texture='spark_soft', count=900, rate=5, cone=40, speed=0.12, gravity=-0.0035, size=[0.06, 0.015], life=34,
        color='#E8F4FF', **hand, comment='мелкие белые искры — основа потока')
-    el(type='sprites', texture='spark_soft', count=500, rate=3, cone=58, speed=0.11, gravity=-0.0004, size=[0.07, 0.015], life=38,
+    el(type='sprites', texture='spark_soft', count=500, rate=3, cone=50, speed=0.1, gravity=-0.003, size=[0.07, 0.015], life=38,
        color='#9FE6F2', **hand, comment='бледно-бирюзовые')
-    el(type='sprites', texture='spark_soft', count=260, rate=1.5, cone=70, speed=0.09, gravity=-0.0003, size=[0.06, 0.015], life=40,
+    el(type='sprites', texture='spark_soft', count=260, rate=1.5, cone=60, speed=0.08, gravity=-0.0025, size=[0.06, 0.015], life=40,
        color='#D8A8D8', **hand, comment='розово-лиловый отлив по краям')
-    el(type='sprites', texture='glow', count=40, rate=0.25, cone=40, speed=0.1, gravity=-0.0002, size=[0.5, 1.2], life=40,
+    el(type='sprites', texture='glow', count=40, rate=0.25, cone=36, speed=0.08, gravity=-0.002, size=[0.5, 1.2], life=40,
        color='#2A2638', **hand, comment='редкие тусклые облачка туманности (далеко от руки)')
-    el(type='sprites', texture='glint4', count=120, rate=0.7, cone=54, speed=0.1, gravity=-0.0004, spin=60, size=[0.3, 0.05], life=34,
+    el(type='sprites', texture='glint4', count=120, rate=0.7, cone=46, speed=0.09, gravity=-0.003, spin=60, size=[0.3, 0.05], life=34,
        color='#FFFFFF', **hand, comment='четырёхлучевые звёздочки в потоке')
     el(type='sprites', delay=T(14.6), duration=T(11.4), at='caster+0,1.6,2.5', texture='glint4', count=60, rate=0.3, spread=6,
        speed=0.004, gravity=0.0, spin=30, size=[0.0, 0.4], life=50, color='#FFFFFF', comment='редкие звёздочки, мерцающие в воздухе вокруг')

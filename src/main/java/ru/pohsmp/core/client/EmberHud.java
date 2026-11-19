@@ -13,14 +13,12 @@ import ru.pohsmp.core.Reg;
 import ru.pohsmp.core.ember.EmberBlade;
 
 /**
- * T14, client: the heat gauge — a bent bar of "embers" over the hotbar, only while the blade is in hand; dark red to bright
- * orange, pulses when full (special attack ready). Temporary drawing in rectangles until the manager's HUD texture.
+ * T14, client: the heat gauge over the hotbar (the manager's texture), only while the blade is in hand; pulses when full
+ * (special attack ready).
  * Also the item property pohsmp_core:hot (whip form model).
  */
 public final class EmberHud {
     private EmberHud() {}
-
-    private static final int SEG = 30, SEG_W = 4, GAP = 1;
 
     public static void setup(FMLClientSetupEvent e) {
         e.enqueueWork(() -> ItemProperties.register(Reg.EMBER_BLADE.get(), new ResourceLocation(PohCore.MODID, "hot"),
@@ -35,27 +33,26 @@ public final class EmberHud {
         if (!(s.getItem() instanceof EmberBlade)) return;
         GuiGraphics g = e.getGuiGraphics();
         int w = g.guiWidth(), h = g.guiHeight();
-        float heat = EmberBlade.heat(s) / EmberBlade.MAX_HEAT;
-        boolean full = heat >= 1f;
+        float heat = Math.min(1f, EmberBlade.heat(s) / EmberBlade.MAX_HEAT);
         double t = (mc.player.tickCount + e.getPartialTick()) / 10.0;
-        float pulse = full ? 0.75f + 0.25f * (float) Math.sin(t * Math.PI) : 1f;
-        int total = SEG * (SEG_W + GAP) - GAP, x0 = w / 2 - total / 2, base = mc.player.isCreative() ? h - 32 : h - 60;   // over the hotbar; in survival over hearts and armor
-        int lit = (int) Math.ceil(heat * SEG - 1e-4);
-        for (int i = 0; i < SEG; i++) {
-            double u = (i + 0.5) / SEG * 2 - 1;   // -1..1 across the bar
-            int y = base + (int) Math.round(u * u * 5);   // bent like a smile over the hotbar
-            int x = x0 + i * (SEG_W + GAP);
-            g.fill(x - 1, y - 1, x + SEG_W + 1, y + 4, 0xAA120806);
-            if (i < lit) {
-                float k = (float) i / (SEG - 1);
-                int col = lerp(0x5A0E08, 0xFF9A2A, k);
-                g.fill(x, y, x + SEG_W, y + 3, 0xFF000000 | dim(col, pulse));
-                g.fill(x, y, x + SEG_W, y + 1, 0xFF000000 | dim(lerp(col, 0xFFE7A0, 0.45f), pulse));
-            }
+        float alpha = heat >= 1f ? 0.65f + 0.35f * (float) Math.sin(t * Math.PI) : 1f;   // full: the fill pulses (special attack ready)
+        int x0 = w / 2 - BAR_W / 2, y = mc.player.isCreative() ? h - 40 : h - 76;   // over the hotbar; in survival over hearts and armor
+        int fill = Math.round(heat * BAR_W);
+        com.mojang.blaze3d.systems.RenderSystem.enableBlend();
+        if (fill > 0) {   // bottom half of the texture: the fill, left to right by the heat share
+            g.setColor(1f, 1f, 1f, alpha);
+            g.blit(BAR, x0, y, 0, BAR_H, fill, BAR_H, BAR_W, BAR_H * 2);
+            g.setColor(1f, 1f, 1f, 1f);
         }
+        g.blit(BAR, x0, y, 0, 0, BAR_W, BAR_H, BAR_W, BAR_H * 2);   // top half: the frame
+        com.mojang.blaze3d.systems.RenderSystem.disableBlend();
         if (EmberBlade.hot(s))   // a small flame mark at the right end: whip form
-            g.fill(x0 + total + 3, base + 2, x0 + total + 6, base + 6, 0xFFFF6A1A);
+            g.fill(x0 + BAR_W + 3, y + 6, x0 + BAR_W + 6, y + 10, 0xFFFF6A1A);
     }
+
+    /** textures/gui/ember_heat_bar.png (manager): 128x32, top 16 rows the frame, bottom 16 the fill. */
+    private static final ResourceLocation BAR = new ResourceLocation(PohCore.MODID, "textures/gui/ember_heat_bar.png");
+    private static final int BAR_W = 128, BAR_H = 16;
 
     private static int lerp(int a, int b, float k) {
         int r = (int) (((a >> 16) & 255) + (((b >> 16) & 255) - ((a >> 16) & 255)) * k);

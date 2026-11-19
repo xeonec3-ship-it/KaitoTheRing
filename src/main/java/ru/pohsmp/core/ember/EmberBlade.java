@@ -130,6 +130,7 @@ public class EmberBlade extends SwordItem {
         float heat = t.getFloat(HEAT) + HEAT_PER_HIT;
         target.setSecondsOnFire(hot ? 5 : 3);
         set(s, heat, streak, hot, now);
+        glow(sl, p, s);
         if (hot && !wasHot) {   // the blade catches fire
             sl.playSound(null, p.getX(), p.getY(), p.getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.8f);
             DivineEvents.particle(sl, ParticleTypes.FLAME, p.getX(), p.getY() + 1.2, p.getZ(), 20, 0.4, 0.05);
@@ -219,62 +220,78 @@ public class EmberBlade extends SwordItem {
         return InteractionResultHolder.sidedSuccess(s, level.isClientSide);
     }
 
-    /** Sword form: the blade into the ground, three waves of fire pillars spread out, then the blade cools down. */
+    /** Ticks of fx/ember_last_heat.json when its three waves of pillars rise (the damage goes with them). */
+    static final int[] WAVE_TICKS = {4, 12, 20};
+    /** Tick of fx/ember_vortex.json when the ring goes out (damage, fire, knock-back). */
+    static final int VORTEX_HIT = 4;
+
+    /**
+     * Sword form: the blade into the ground in front of the holder, three waves of fire pillars spread out from it, then the blade
+     * cools down (fx/ember_last_heat.json, the manager's look).
+     */
     private static void lastEmber(ServerLevel sl, Player p, ItemStack s) {
-        Vec3 c = p.position();
+        Vec3 c = p.position().add(flat(p.getLookAngle()).scale(0.9));
         float dmg = damage(p) * 1.2f;
         set(s, 0, 0, false, sl.getGameTime());
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.ANVIL_LAND, SoundSource.PLAYERS, 0.6f, 0.6f);
+        int fx = Fx.play(sl, Fx.fx("ember_last_heat").at(c).yaw(p.getYRot()));
         Set<LivingEntity> burnt = new HashSet<>();
-        Tasks.add(new Tasks.Task() {
-            int age;
+        for (int w = 0; w < WAVES.length; w++) {
+            double r = WAVES[w];
+            float pitch = 0.6f + w * 0.15f;
+            Fx.at(sl, fx, WAVE_TICKS[w], () -> {
+                if (!p.isAlive()) return;
+                for (LivingEntity e : HigherSpell.around(sl, c, r + 1.2, e -> e != p && !HigherSpell.friendly(p, e))) {
+                    double d = Math.sqrt(e.distanceToSqr(c.x, e.getY(), c.z));
+                    if (d < r - 1.6 || burnt.contains(e) || Math.abs(e.getY() - c.y) > 3) continue;
+                    burnt.add(e);
+                    hurt(sl, p, e, dmg, 6);
+                }
+                sl.playSound(null, c.x, c.y, c.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.2f, pitch);
+            });
+        }
+        Fx.at(sl, fx, 22, () -> sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1f, 0.8f));
+    }
 
-            @Override
-            public boolean tick() {
-                int w = age / 8;
-                if (age % 8 == 0 && w < WAVES.length) {
-                    double r = WAVES[w];
-                    int n = (int) Math.round(Math.PI * 2 * r / 1.1);
-                    for (int i = 0; i < n; i++) {
-                        double a = i * Math.PI * 2 / n;
-                        double x = c.x + Math.cos(a) * r, z = c.z + Math.sin(a) * r;
-                        for (double h = 0; h < 3; h += 0.5)
-                            DivineEvents.particle(sl, ParticleTypes.FLAME, x, c.y + h, z, 2, 0.12, 0.02);
-                        DivineEvents.particle(sl, ParticleTypes.LAVA, x, c.y + 0.3, z, 1, 0.1, 0);
-                    }
-                    for (LivingEntity e : HigherSpell.around(sl, c, r + 1.2, e -> e != p && !HigherSpell.friendly(p, e))) {
-                        double d = Math.sqrt(e.distanceToSqr(c.x, e.getY(), c.z));
-                        if (d < r - 1.6 || burnt.contains(e) || Math.abs(e.getY() - c.y) > 3) continue;
-                        burnt.add(e);
-                        hurt(sl, p, e, dmg, 6);
-                    }
-                    sl.playSound(null, c.x, c.y, c.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.2f, 0.6f + w * 0.15f);
-                }
-                if (age >= 18 && age < 50 && age % 3 == 0) {   // the blade cools: steam and smoke from the caster's hand
-                    Vec3 h = p.position().add(0, 1.0, 0).add(flat(p.getLookAngle()).scale(0.5));
-                    DivineEvents.particle(sl, ParticleTypes.CAMPFIRE_COSY_SMOKE, h.x, h.y, h.z, 1, 0.08, 0.01);
-                    DivineEvents.particle(sl, ParticleTypes.CLOUD, h.x, h.y, h.z, 1, 0.08, 0.01);
-                }
-                if (age == 18) sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 1f, 0.8f);
-                return ++age < 50;
-            }
+    // ---------------------------------------------------------------- the glowing blade while heat > 0 (fx/ember_heat.json)
+
+    /** holder -> running ember_heat instance */
+    private static final java.util.Map<java.util.UUID, Integer> GLOW = new java.util.HashMap<>();
+
+    /** Starts the glow on the holder's hand once; it watches itself and goes out when the heat is 0 or the blade leaves the hand. */
+    static void glow(ServerLevel sl, Player p, ItemStack s) {
+        if (GLOW.containsKey(p.getUUID()) || heat(s) <= 0) return;
+        int inst = Fx.play(sl, Fx.fx("ember_heat").caster(p).scale(0.6 + 0.4 * heat(s) / MAX_HEAT));
+        GLOW.put(p.getUUID(), inst);
+        Tasks.add(() -> {
+            ItemStack h = p.getMainHandItem();
+            if (p.isAlive() && !p.isRemoved() && p.level() == sl && h.getItem() instanceof EmberBlade && heat(h) > 0 && Fx.running(inst)) return true;
+            Fx.stop(sl, inst, "");
+            GLOW.remove(p.getUUID(), inst);
+            return false;
         });
     }
 
-    /** Whip form: a full turn of the whip, a ring of fire r 5 burns and throws everyone out; the whip stays hot. */
+    /**
+     * Whip form: a full turn of the whip, a ring of fire r 5 burns and throws everyone out on tick {@link #VORTEX_HIT}; the whip
+     * stays hot (fx/ember_vortex.json, the manager's look).
+     */
     private static void fireVortex(ServerLevel sl, Player p, ItemStack s) {
-        Vec3 c = p.position(), o = c.add(0, p.getBbHeight() * 0.6, 0), f = flat(p.getLookAngle());
+        Vec3 c = p.position(), f = flat(p.getLookAngle());
         set(s, 0, HOT_AFTER, true, sl.getGameTime());
         float dmg = damage(p) * 1.1f;
-        for (LivingEntity e : HigherSpell.around(sl, c, VORTEX_R + 0.5, e -> e != p && !HigherSpell.friendly(p, e))) {
-            if (Math.abs(e.getY() - c.y) > 3) continue;
-            hurt(sl, p, e, dmg, 6);
-            Vec3 out = e.position().subtract(c).multiply(1, 0, 1);
-            out = out.lengthSqr() < 1e-4 ? f : out.normalize();
-            HigherSpell.push(e, out.scale(1.3).add(0, 0.4, 0));
-        }
-        sl.playSound(null, c.x, c.y, c.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.3f, 0.7f);
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 1f, 0.6f);
-        sweep(sl, o, Math.atan2(f.z, f.x), 0, Math.PI * 2, 8, true);
+        int fx = Fx.play(sl, Fx.fx("ember_vortex").at(c).yaw(p.getYRot()));
+        Fx.at(sl, fx, VORTEX_HIT, () -> {
+            if (!p.isAlive()) return;
+            for (LivingEntity e : HigherSpell.around(sl, c, VORTEX_R + 0.5, e -> e != p && !HigherSpell.friendly(p, e))) {
+                if (Math.abs(e.getY() - c.y) > 3) continue;
+                hurt(sl, p, e, dmg, 6);
+                Vec3 out = e.position().subtract(c).multiply(1, 0, 1);
+                out = out.lengthSqr() < 1e-4 ? f : out.normalize();
+                HigherSpell.push(e, out.scale(1.3).add(0, 0.4, 0));
+            }
+            sl.playSound(null, c.x, c.y, c.z, SoundEvents.BLAZE_SHOOT, SoundSource.PLAYERS, 1.3f, 0.7f);
+        });
     }
 }

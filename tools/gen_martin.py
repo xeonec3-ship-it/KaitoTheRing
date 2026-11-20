@@ -572,7 +572,7 @@ def build_martin():
         m.box(leg, (X - 1.6, 0.0, -4.4), (X + 1.6, 1.2, -3.6), 'steel', base=4)
     # ---------------------------------------------------------------- меч, щит (на спине и в руке), знамя в руке (для установки знамени)
     add_sword(m, 'sword', 'right_forearm', (5.6, 10.6, -0.2))
-    add_shield(m, 'shield_back', 'torso', (0, 17, 4.6), (0, 15.0, 5.0), face='south')
+    add_shield(m, 'shield_back', 'torso', (0,) + SHB_PIV, (0,) + SHB_CENTER, rot=(SHB_TILT, 0, 0), face='south')
     add_shield(m, 'shield_hand', 'left_forearm', (-5.6, 14.0, 0), (-5.6, 12.5, -3.9), face='north')
     build_held_banner(m)
     return m
@@ -626,34 +626,51 @@ def grip_point(m, pose, y):
 HAND = {'left': np.array([-5.6, 10.6, -0.2]), 'right': np.array([5.6, 10.6, -0.2])}
 
 
+ARM_STARTS = ([60.0, 0.0, 0.0, 20.0], [-40.0, 0.0, 0.0, 30.0], [10.0, 0.0, 0.0, 50.0], [100.0, 0.0, 0.0, 30.0], [160.0, 0.0, 0.0, 40.0],
+              [40.0, 0.0, -40.0, 40.0], [40.0, 0.0, 40.0, 40.0], [120.0, 30.0, 0.0, 70.0], [120.0, -30.0, 0.0, 70.0])
+
+
 def solve_arm(m, pose, side, target, init=None, iters=300):
-    """Повороты <side>_arm (x, y, z) и <side>_forearm (x), чтобы кисть легла в target (покоординатный спуск)."""
-    x = np.array(init if init is not None else [-60.0, 0.0, 0.0, -20.0], float)
+    """Повороты <side>_arm (x, y, z) и <side>_forearm (x), чтобы кисть легла в target (покоординатный спуск).
+    Внутренние оси (как у GeckoLib): forearm X > 0 — кисть к передней стороне плеча (сгиб локтя), X < 0 — разгиб назад —
+    запрещён (правка 20.11: раньше штраф стоял наоборот, и IK выворачивал локоть). С init (решение прошлого кадра) — малый
+    шаг и штраф за отход от него: решение не перескакивает на другую ветвь между кадрами. Без init — несколько стартов."""
     arm, fore = side + '_arm', side + '_forearm'
 
-    def err(v):
+    def err(v, ref=None):
         p = dict(pose)
         p[arm] = dict(pose.get(arm, {}), rot=[v[0], v[1], v[2]])
         p[fore] = {'rot': [v[3], 0, 0]}
         e = world_pt(m, p, fore, getattr(m, 'hand', HAND)[side]) - target
-        pen = 0.002 * (max(0, v[3]) ** 2 + max(0, -v[3] - 125) ** 2) + 0.0004 * (v[1] ** 2 + v[2] ** 2) * 0.05
+        pen = 0.002 * (max(0, -v[3]) ** 2 + max(0, v[3] - 125) ** 2) + 0.00002 * (v[1] ** 2 + v[2] ** 2)
+        if ref is not None:
+            pen += 0.0004 * float(np.sum((v - ref) ** 2))
         return float(e @ e) + pen
-    step = 16.0
-    best = err(x)
-    for _ in range(iters):
-        improved = False
-        for k in range(4):
-            for d in (step, -step):
-                y = x.copy()
-                y[k] += d
-                e = err(y)
-                if e < best:
-                    best, x, improved = e, y, True
-        if not improved:
-            step *= 0.6
-            if step < 0.05:
-                break
-    return x, math.sqrt(max(0, best))
+
+    def descend(x, step, ref):
+        best = err(x, ref)
+        for _ in range(iters):
+            improved = False
+            for k in range(4):
+                for d in (step, -step):
+                    y = x.copy()
+                    y[k] += d
+                    e = err(y, ref)
+                    if e < best:
+                        best, x, improved = e, y, True
+            if not improved:
+                step *= 0.6
+                if step < 0.05:
+                    break
+        return x
+
+    if init is not None:
+        ref = np.array(init, float)
+        x = descend(ref.copy(), 3.0, ref)
+    else:
+        cands = [descend(np.array(s0, float), 16.0, None) for s0 in ARM_STARTS]
+        x = min(cands, key=lambda v: err(v))
+    return x, math.sqrt(max(0, err(x)))
 
 
 def solve_left(m, pose, target, init=None, iters=300):
@@ -663,8 +680,8 @@ def solve_left(m, pose, target, init=None, iters=300):
 # ================================================================== анимации
 def ease(k, kind='io'):
     k = min(1.0, max(0.0, k))
-    if kind == 'in':
-        return k * k * k
+    if kind == 'in':                        # удар: разгон. Было k³ — последний кадр (0.04 с) давал половину пути, клинок
+        return k * k                        # «прыгал» на 100°+; k² — треть пути (правка 20.11)
     if kind == 'out':
         return 1 - (1 - k) ** 3
     if kind == 'back':                      # с перехлёстом (удар)
@@ -690,26 +707,220 @@ HIDE = [0, 0, 0]
 SHOW = [1, 1, 1]
 
 
-def cape_follow(t, o, base=4.0, sway=1.0, lag=0.0, period=3.0, wind=0.0):
-    """Плащ: лёгкое колыхание + отставание от движения корпуса (lag: + назад, градусы)."""
+# ------------------------------------------------------------------ плащ, табард, щит на спине (правка 20.11)
+# Знак: во внутренних углах генератора (Anim.key; в JSON знак X меняется) поворот X > 0 уводит НИЗ свисающей кости ВПЕРЁД (−z),
+# X < 0 — НАЗАД. Раньше cape_follow писал «+ = назад» → плащ шёл вперёд сквозь ноги (замечание владельца по видео T29).
+# Теперь плащ висит «по гравитации» в мире: желаемый угол назад от вертикали + ограничения в боковой плоскости (y, z): не входит
+# в спину, позади ног и заднего табарда, над землёй, под щитом на спине (щит подвешен у верхнего края и качается вместе с плащом).
+CAPE_PIV = (23.6, 3.6)          # кость cape (y, z модели)
+CAPE_HINGE = (11.0, 3.7)        # кость cape_low
+CAPE_HEM = 0.4                  # низ плаща (y)
+CAPE_FRONT, CAPE_BACK = 3.3, 4.1
+SHB_PIV = (25.0, 4.4)           # щит на спине: ось у верхнего края (ремень)
+SHB_CENTER = (15.0, 5.3)
+SHB_TILT = -4.0                 # покой: низ щита чуть отходит назад от спины (внутр. угол X)
+SHB_INNER = 4.6                 # внутренняя грань рамки щита (z покоя) и низ щита (y)
+SHB_BOTTOM = 4.8
+TAB_F = ((12.2, -3.1), 2.2)     # табард спереди: ось (y, z), низ (y)
+TAB_B = ((12.2, 3.0), 3.4)      # табард сзади
+
+
+def _R(a, v):
+    a = math.radians(a)
+    c, s = math.cos(a), math.sin(a)
+    return np.array([v[0] * c - v[1] * s, v[0] * s + v[1] * c])
+
+
+def _rx(o, b):
+    v = o.get(b, {}).get('rot')
+    return float(v[0]) if v is not None else 0.0
+
+
+class Side:
+    """Боковая плоскость (y вверх, z назад) позы o: мировые точки body/torso/ног (повороты X; Y/Z костей малы и не учитываются)."""
+
+    def __init__(self, o):
+        pos = o.get('body', {}).get('pos', [0, 0, 0])
+        self.Ob = np.array([12.0 + pos[1], pos[2]])
+        self.Ab = _rx(o, 'body')
+        self.At = self.Ab + _rx(o, 'torso')
+        self.Ot = self.Ob + _R(self.Ab, (12.0, 0.0))
+        self.legs = [self.Ab + _rx(o, 'right_leg'), self.Ab + _rx(o, 'left_leg')]
+
+    def torso(self, p, rel=0.0, piv=None):
+        """Точка p (y, z модели) кости-ребёнка торса с осью piv и своим поворотом rel."""
+        if piv is None:
+            return self.Ot + _R(self.At, np.subtract(p, (24.0, 0.0)))
+        return self.torso(piv) + _R(self.At + rel, np.subtract(p, piv))
+
+    def leg_pts(self):
+        out = []
+        for a in self.legs:
+            for y, z in ((12, 2.0), (9, 2.0), (6.6, 2.0), (4, 2.0), (1.8, 2.2), (0, 2.2), (0, -1), (0, -3.6), (0, -4.4), (1.2, -4.4),
+                         (4, -2.3), (6, -3.25), (9, -2.3), (12, -2.3)):
+                out.append(self.Ob + _R(a, (y - 12.0, z)))
+        return out
+
+
+def _behind(P0, P1, pts, off, margin, front=False, smin=-0.5):
+    """Насколько точки pts заходят за грань полосы P0→P1 (грань смещена на off по нормали «назад»; front — по нормали «вперёд»).
+    > 0 — пересечение. Нормаль «назад» для отвесного отрезка сверху вниз — +z."""
+    d = P1 - P0
+    L = float(np.linalg.norm(d))
+    d = d / L
+    n = np.array([d[1], -d[0]]) * (-1 if front else 1)
+    worst = -1e9
+    for q in pts:
+        w = q - P0
+        s = float(w @ d)
+        if smin <= s <= L + 0.3:
+            worst = max(worst, float(w @ n) - off + margin)
+    return worst
+
+
+def cape_follow(t, o, base=4.0, sway=1.0, lag=0.0, period=3.0, wind=0.0, side=0.0):
+    """Плащ: lag/wind — отлёт НАЗАД от движения (градусы, +), sway — колыхание, side — отлёт вбок (Z).
+    Только запоминает желаемое; итоговые углы cape/cape_low/табардов/щита на спине считает solve_cape() из vis()."""
+    bb_in(o)
     s = math.sin(TAU * t / period)
-    o['cape'] = {'rot': [base + lag + wind + 1.5 * sway * s, 0, 0.8 * sway * math.sin(TAU * t / period * 0.5)]}
-    o['cape_low'] = {'rot': [2.0 + lag * 0.6 + 2.0 * sway * math.sin(TAU * t / period - 0.8), 0, 0]}
-    o['tabard_front'] = {'rot': [-1.5 * sway * s - lag * 0.25, 0, 0]}
-    o['tabard_back'] = {'rot': [1.5 * sway * s + lag * 0.3, 0, 0]}
+    back = max(1.5, base + lag + wind + 1.5 * sway * s)
+    low = max(0.0, 2.0 + 0.6 * max(lag, 0.0) + 0.4 * wind + 2.0 * sway * math.sin(TAU * t / period - 0.8))
+    tw = o.get('torso', {}).get('rot', [0, 0, 0])[1] + (((o.get('body', {}).get('rot', [0, 0, 0])[1] + 180) % 360) - 180)
+    z = 0.8 * sway * math.sin(TAU * t / period * 0.5) + side - 0.15 * tw       # поворот корпуса — полы отстают вбок
+    o['_cape'] = dict(back=back, low=low, z=max(-9.0, min(9.0, z)), tab=1.5 * sway * s)
     return o
 
 
+def solve_cape(o, shield_back):
+    """Итоговые углы cape, cape_low, tabard_front/back и shield_back для позы o (внутренние углы: X < 0 — низ назад)."""
+    prm = o.pop('_cape', None) or dict(back=3.0, low=2.0, z=0.0, tab=0.0)
+    S = Side(o)
+    legs = S.leg_pts()
+    # --- табарды: висят отвесно (+ лёгкое колыхание), не входят в ноги и в землю. Верх (3 ед. у оси) не проверяем: торс
+    #     вращается вокруг плеч, и у пояса бёдра и так заходят под табард — это шов модели, поворотом табарда его не убрать
+    tb = float(np.clip(-S.At + 0.5 * prm['tab'], -80, 4))
+    for _ in range(80):
+        P0, P1 = S.torso(TAB_B[0]), S.torso((TAB_B[1], TAB_B[0][1]), tb, TAB_B[0])
+        if (_behind(P0, P1, legs, -0.1, 0.2, smin=3.0) <= 0 and P1[0] >= 0.2) or tb < -70:
+            break
+        tb -= 1.5
+    tf = float(np.clip(-S.At - 0.5 * prm['tab'], -6, 80))
+    for _ in range(80):
+        P0, P1 = S.torso(TAB_F[0]), S.torso((TAB_F[1], TAB_F[0][1]), tf, TAB_F[0])
+        if (_behind(P0, P1, legs, 0.3, 0.0, front=True, smin=3.0) <= 0 and P1[0] >= 0.2) or tf > 70:
+            break
+        tf += 1.5      # грань наколенника (−3.25) в покое уже под табардом — сверяем с лицевой гранью (−3.4)
+    obst = legs + [S.torso((y, 3.05), tb, TAB_B[0]) for y in (12.2, 7.8, 3.4)]      # грань табарда 3.3 = грань плаща (касание)
+    # --- плащ и щит
+    rc = min(-0.5, -prm['back'] - S.At)
+    rl = -prm['low']
+
+    def cape(rc, rl):
+        Pc = S.torso(CAPE_PIV)
+        Ph = S.torso(CAPE_HINGE, rc, CAPE_PIV)
+        Pe = Ph + _R(S.At + rc + rl, (CAPE_HEM - CAPE_HINGE[0], 0.0))
+        return Pc, Ph, Pe
+
+    def cape_back_pts(rc, rl):
+        up = [S.torso((y, CAPE_BACK), rc, CAPE_PIV) for y in (20.0, 16.0, 12.0)]
+        Ph = S.torso(CAPE_HINGE, rc, CAPE_PIV)
+        lo = [Ph + _R(S.At + rc + rl, (y - CAPE_HINGE[0], CAPE_BACK - CAPE_HINGE[1])) for y in (9.0, 7.0, 5.0)]
+        return up + lo
+
+    def shield(rc):
+        top = S.torso((24.0, SHB_INNER), rc + SHB_TILT, SHB_PIV)
+        bot = S.torso((SHB_BOTTOM, SHB_INNER), rc + SHB_TILT, SHB_PIV)
+        out = S.torso((SHB_BOTTOM, 6.0), rc + SHB_TILT, SHB_PIV)
+        return top, bot, out
+
+    def v_cape_shield(rc, rl):
+        if not shield_back:
+            return -1.0
+        top, bot, _ = shield(rc)
+        return _behind(top, bot, cape_back_pts(rc, rl), 0.0, 0.1)
+
+    for _ in range(400):
+        Pc, Ph, Pe = cape(rc, rl)
+        v_up = _behind(Pc, Ph, obst, CAPE_FRONT - CAPE_PIV[1], 0.3)
+        v_lo = _behind(Ph, Pe, obst, CAPE_FRONT - CAPE_PIV[1], 0.3)
+        v_gr = 0.25 - min(Pe[0], (Pe + _R(S.At + rc + rl, (0.0, 0.8)))[0])      # высота — y (индекс 0)
+        if shield_back:
+            top, bot, out = shield(rc)
+            v_sh = max(0.25 - min(bot[0], out[0]), _behind(top, bot, legs, 0.0, 0.3))
+        else:
+            v_sh = -1.0
+        v_cs = v_cape_shield(rc, rl)
+        if max(v_up, v_lo, v_gr, v_sh, v_cs) <= 0 or rc < -120:
+            break
+        if v_up > 0 or v_sh > 0:
+            rc -= 1.0
+        elif v_lo > 0 or v_gr > 0:
+            if rl > -110 and v_cape_shield(rc, rl - 1.5) <= 0:
+                rl -= 1.5
+            else:
+                rc -= 1.0
+        else:
+            rl += 0.5
+    o['cape'] = {'rot': [rc, 0, prm['z']]}
+    o['cape_low'] = {'rot': [rl, 0, -0.4 * prm['z']]}
+    o['tabard_front'] = {'rot': [tf, 0, 0]}
+    o['tabard_back'] = {'rot': [tb, 0, 0]}
+    o['shield_back'] = dict(o.get('shield_back', {}), rot=[rc if shield_back else 0.0, 0, 0.6 * prm['z'] if shield_back else 0.0])
+    return o
+
+
+CLOTH = ('cape', 'cape_low', 'tabard_front', 'tabard_back', 'shield_back')
+
+
+def smooth_cloth(a, rate=450.0):
+    """Ткань и щит на спине не прыгают: скорость угла не больше rate °/с (ткань чуть отстаёт, а не дёргается, когда ограничения
+    решателя переключаются от кадра к кадру). У петли — два прохода, чтобы начало совпало с концом."""
+    for b in CLOTH:
+        kf = a.keys.get(b, {}).get('rot')
+        if not kf:
+            continue
+        ts = sorted(kf)
+        cur = np.array(kf[ts[-1]] if a.loop is True else kf[ts[0]], float)
+        for _ in range(2 if a.loop is True else 1):
+            prev_t = ts[0]
+            for t in ts:
+                lim = rate * max(t - prev_t, 0.04 if t == ts[0] and a.loop is True else 0.0)
+                tgt = np.array(kf[t], float)
+                cur = cur + np.clip(tgt - cur, -lim, lim) if t != ts[0] or a.loop is True else tgt
+                kf[t] = [float(x) for x in cur]
+                prev_t = t
+    return a
+
+
 def vis(o, shield_hand=False, banner=False):
+    bb_in(o)
     o['shield_hand'] = dict(o.get('shield_hand', {}), scale=SHOW if shield_hand else HIDE)
     o['shield_back'] = dict(o.get('shield_back', {}), scale=HIDE if shield_hand else SHOW)
     o['banner_held'] = dict(o.get('banner_held', {}), scale=SHOW if banner else HIDE)
+    solve_cape(o, not shield_hand)
+    o.pop('_int', None)
     return o
 
 
 def unit(v):
     v = np.asarray(v, float)
     return v / np.linalg.norm(v)
+
+
+def bb_in(o):
+    """Позы в анимациях заданы вручную по правилам Blockbench/Iron's (X > 0 — руку/ногу назад, торс вперёд; X < 0 — руку вперёд,
+    голову вверх). Внутренние оси генератора (FK/IK, Anim.key) — это оси GeckoLib после чтения JSON: X и Y со знаком минус.
+    Переводим ручные углы ОДИН раз на позу, до IK (цель кисти — в осях торса) и до решателя плаща. Углы, которые потом
+    дописывают IK/решатель, уже внутренние. До правки 20.11 перевода не было, и Anim.to_json переворачивал X/Y ещё раз:
+    вручную заданные кости (торс, голова, свободная левая рука, предплечья, ноги, плащ) шли в обратную сторону."""
+    if o.get('_int'):
+        return o
+    for b, ch in list(o.items()):
+        if isinstance(ch, dict) and 'rot' in ch:
+            r = ch['rot']
+            o[b] = dict(ch, rot=[-r[0], -r[1], r[2]])
+    o['_int'] = True
+    return o
 
 
 class Grip:
@@ -721,9 +932,10 @@ class Grip:
         self.reset()
 
     def reset(self):
-        self.pr, self.pl, self.c = None, None, None
+        self.pr, self.pl, self.c, self.a = None, None, None, None
 
     def __call__(self, o, hand, d, left=1.0, ly=GRIP_L):
+        bb_in(o)
         m = self.m
         Mt, ot = fk(m, o, 'torso')
         tgt = Mt @ np.asarray(hand, float) + ot
@@ -733,11 +945,27 @@ class Grip:
         o['right_forearm'] = {'rot': [sol[3], 0, 0]}
         Mf, _ = fk(m, o, 'right_forearm')
         v = Mf.T @ (Mt @ unit(d))
-        a = math.degrees(math.asin(max(-1, min(1, v[2]))))
-        c = math.degrees(math.atan2(-v[0], v[1]))
-        if self.c is not None:
-            c += 360 * round((self.c - c) / 360)
-        self.c = c
+        # углы кости меча [a, 0, c]: у направления два равных представления (a, c) и (180 − a, c + 180), а у клинка вдоль оси Z
+        # предплечья крен c вообще не определён. Берём вариант, ближайший к прошлому кадру (правка 20.11: были провороты на 180°)
+        c0 = math.degrees(math.atan2(-v[0], v[1]))
+        cands = [c0, c0 + 180.0] + ([self.c] if self.c is not None else [])
+        best = None
+        for c in cands:
+            cr = math.radians(c)
+            a = math.degrees(math.atan2(v[2], -math.sin(cr) * v[0] + math.cos(cr) * v[1]))
+            ar = math.radians(a)
+            dirr = np.array([-math.sin(cr) * math.cos(ar), math.cos(cr) * math.cos(ar), math.sin(ar)])
+            derr = float(np.linalg.norm(dirr - v))
+            if self.c is not None:
+                c += 360 * round((self.c - c) / 360)
+                a += 360 * round((self.a - a) / 360)
+                cost = abs(c - self.c) + abs(a - self.a) + 400 * derr
+            else:
+                cost = abs(a) + 400 * derr
+            if best is None or cost < best[0]:
+                best = (cost, a, c)
+        _, a, c = best
+        self.a, self.c = a, c
         rest = m.bones['sword'].rot
         o['sword'] = {'rot': [a - rest[0], 0, c - rest[2]]}
         if left > 0.001:
@@ -759,6 +987,7 @@ class ShieldFront:
         self.prev = None
 
     def __call__(self, o, hand, tilt=0.0, yaw=0.0, w=1.0):
+        bb_in(o)
         m = self.m
         Mt, ot = fk(m, o, 'torso')
         sol, _ = solve_arm(m, o, 'left', Mt @ np.asarray(hand, float) + ot, self.prev)
@@ -772,11 +1001,35 @@ class ShieldFront:
         return o
 
 
-def lerp_dir(a, b, k):
-    return unit(np.asarray(a, float) * (1 - k) + np.asarray(b, float) * k)
+def slerp_dir(a, b, k):
+    a, b = unit(a), unit(b)
+    w = math.acos(max(-1.0, min(1.0, float(a @ b))))
+    if w < 1e-4:
+        return a
+    return unit((math.sin((1 - k) * w) * a + math.sin(k * w) * b) / math.sin(w))
+
+
+VIA_FWD = (0.0, 0.3, -1.0)      # почти противоположные направления клинка — проводим через «вперёд»
+
+
+def lerp_dir(a, b, k, via=None):
+    """Направление клинка между a и b: по дуге (slerp), равномерно по углу. Было линейное смешение векторов — у почти
+    противоположных (размах справа налево, замах → удар сверху, меч из земли вверх) вектор проходил возле нуля и клинок
+    разворачивался на 110–130° за кадр (правка 20.11). Угол > 140° без via — через VIA_FWD."""
+    a, b = unit(a), unit(b)
+    if via is None and float(a @ b) < math.cos(math.radians(140)):
+        via = VIA_FWD
+    if via is None:
+        return slerp_dir(a, b, k)
+    v = unit(via)
+    wa = math.acos(max(-1.0, min(1.0, float(a @ v))))
+    wb = math.acos(max(-1.0, min(1.0, float(v @ b))))
+    s0 = k * (wa + wb)
+    return slerp_dir(a, v, s0 / wa) if s0 <= wa else slerp_dir(v, b, (s0 - wa) / max(1e-6, wb))
 
 
 # ключевые хваты (точки кисти и направления клинка в осях торса; торс в покое: плечи y 22, пояс y 12, перед −z)
+AROUND_HEAD = np.array([2.0, 0.0, -5.0])     # подъём меча над головой: кисть идёт дугой вперёд-вправо, клинок не режет шлем и рога
 GUARD = ((2.2, 14.6, -6.4), (-0.3, 0.72, -0.62))           # стойка: клинок вверх-вперёд, острие на противника
 LEAN = ((0.3, 18.6, -7.6), (0.0, -0.99, -0.12))            # опирается: меч остриём в землю перед ним
 SHOULDER = ((4.6, 18.0, -4.6), (0.18, 0.62, 0.76))         # на плече (ходьба): клинок назад через плечо
@@ -792,6 +1045,16 @@ def anims(m):
         an.append(a)
         g.reset()
         sf.prev = None
+        if loop is True:                       # петля: прогон «вхолостую», чтобы IK к кадру 0 пришёл с ветви конца петли
+            raw = a.sample
+
+            def sample(fn, dt=0.05, t0=0.0, t1=None, raw=raw):
+                for _ in range(2):
+                    n = max(1, int(round(length / dt)))
+                    for i in range(n + 1):
+                        fn(length * i / n)
+                return raw(fn, dt, t0, t1)
+            a.sample = sample
         return a
 
     # ---------------------------------------------------------------- idle: двуручник в стойке, тяжёлое дыхание
@@ -843,17 +1106,18 @@ def anims(m):
     # ---------------------------------------------------------------- overhead: рубящий сверху, клинок в землю (удар 0.95)
     def overhead(t):
         k = float(track(t, [(0, 0), (0.7, 1, 'out'), (0.95, 2, 'in'), (1.5, 2), (2.0, 3)]))
-        P = [GUARD[0], (1.0, 31.0, 0.5), (0.5, 12.5, -9.0), (0.5, 12.5, -9.0), GUARD[0]]
-        D = [GUARD[1], (0.0, 0.25, 0.97), (0.0, -0.5, -0.87), (0.0, -0.5, -0.87), GUARD[1]]
+        # замах из-за правого плеча (была кисть над макушкой — внутри шлема, клинок резал рога)
+        P = [GUARD[0], (5.5, 30.0, 2.0), (0.5, 12.5, -9.0), (0.5, 12.5, -9.0), GUARD[0]]
+        D = [GUARD[1], (0.15, 0.35, 0.92), (0.0, -0.5, -0.87), (0.0, -0.5, -0.87), GUARD[1]]
         i = min(3, int(k))
         f = k - i
-        hand = np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f
+        hand = np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f + AROUND_HEAD * math.sin(math.pi * f) * (i == 0)
         d = lerp_dir(D[i], D[i + 1], f)
         up = float(track(t, [(0, 0), (0.7, 1, 'out'), (0.95, -1, 'in'), (1.5, -1), (2.0, 0)]))
         dn = max(0, -up)
         o = {'body': {'pos': [0, -2.4 * dn, -1.6 * dn]}, 'torso': {'rot': [-10 * max(0, up) + 30 * dn, 0, 0]},
              'head': {'rot': [8 * max(0, up) - 20 * dn, 0, 0]},
-             'right_leg': {'rot': [-34 * dn, 0, 4]}, 'left_leg': {'rot': [40 * dn, 0, -4]}}
+             'right_leg': {'rot': [40 * dn, 0, 4]}, 'left_leg': {'rot': [-34 * dn, 0, -4]}}    # вперёд левая: клинок справа от неё
         cape_follow(t, o, lag=-6 * max(0, up) + 14 * dn)
         g(o, hand, d)
         return vis(o)
@@ -890,7 +1154,8 @@ def anims(m):
         if k > 0.01:
             sf(o, (-1.5, 15.5, -6.5 - 1.5 * d), tilt=-6 * d, yaw=-14, w=min(1, k * 1.3))
         cape_follow(t, o, lag=18 * d)
-        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([6.5, 14.0, 2.0]) * k, lerp_dir(GUARD[1], (0.35, 0.3, 0.88), k), left=0)
+        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([6.5, 14.0, 2.0]) * k + np.array([3.0, 0.0, -2.0]) * math.sin(math.pi * k),
+          lerp_dir(GUARD[1], (0.35, 0.3, 0.88), k), left=0)
         return vis(o, shield_hand=0.12 < t < 1.4)
     a = A('shield_bash', 1.5)
     a.sample(bash, 0.04)
@@ -940,14 +1205,15 @@ def anims(m):
         D = [GUARD[1], (0.05, 1.0, 0.05), (0.0, -0.15, -0.99), (0.0, -0.15, -0.99), GUARD[1]]
         i = min(3, int(k))
         f = k - i
-        up = 1.0 if 1 <= k < 2 else (k if k < 1 else 0)
-        fw = 1.0 if 2 <= k < 3 else (k - 1 if 1 <= k < 2 else (3 - k if k >= 3 else 0))
+        up = (2 - k) if 1 <= k < 2 else (k if k < 1 else 0)          # без разрывов (правка 20.11: были скачки на 2.0 и 3.4)
+        fw = (3 - k) if k >= 2 else (k - 1 if k >= 1 else 0)
         o = {'body': {'pos': [0, -1.2 * fw, -1.4 * fw]}, 'torso': {'rot': [-12 * up + 14 * fw, 0, 0]},
              'head': {'rot': [26 * up * (1 - fw) - 6 * fw, 0, 0]},
              'left_arm': {'rot': [-10 * up, 0, -36 * up]}, 'left_forearm': {'rot': [-20, 0, 0]},
              'right_leg': {'rot': [-26 * fw, 0, 0]}, 'left_leg': {'rot': [24 * fw, 0, 0]}}
         cape_follow(t, o, lag=12 * fw, wind=6 * up)
-        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f, lerp_dir(D[i], D[i + 1], f), left=max(0, 1 - k) if k < 1 else (k - 3 if k > 3 else 0))
+        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f + AROUND_HEAD * math.sin(math.pi * f) * (i == 0), lerp_dir(D[i], D[i + 1], f),
+          left=max(0, 1 - k) if k < 1 else (k - 3 if k > 3 else 0))
         return vis(o)
     a = A('cavalry', 3.4)
     a.sample(cavalry, 0.04)
@@ -1018,7 +1284,7 @@ def anims(m):
              'torso': {'rot': [16 * sq - 8 * (1 if 2 <= k < 2.6 else 0), 0, 0]}, 'head': {'rot': [-20 * (1 if 1.9 <= k < 2.8 else 0), 0, 0]},
              'right_leg': {'rot': [-30 * sq, 0, 0]}, 'left_leg': {'rot': [30 * sq, 0, 0]}}
         cape_follow(t, o, wind=10 * (1 if k >= 1.9 else 0))
-        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f, lerp_dir(D[i], D[i + 1], f))
+        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f + AROUND_HEAD * math.sin(math.pi * f) * (i == 1), lerp_dir(D[i], D[i + 1], f))
         return vis(o)
     a = A('phase3', 3.2)
     a.sample(phase3, 0.04)
@@ -1117,13 +1383,14 @@ def anims(m):
         D = [GUARD[1], (0.0, 1.0, 0.1), (0.0, -0.35, -0.94), GUARD[1]]
         i = min(2, int(k))
         f = k - i
-        up = 1.0 if 1 <= k < 1.2 else (k if k < 1 else 0)
+        up = max(0.0, 2 - k) if k >= 1 else k                       # без разрыва на 1.2 (правка 20.11)
         fw = float(track(t, [(0, 0), (1.05, 0), (1.2, 1, 'in'), (1.7, 1), (2.2, 0)]))
         o = {'body': {'pos': [0, -1.0 * fw, -1.0 * fw]}, 'torso': {'rot': [-10 * up + 12 * fw, 0, 0]}, 'head': {'rot': [22 * up - 6 * fw, 0, 0]},
              'left_arm': {'rot': [-30 * up, 0, -50 * up]}, 'left_forearm': {'rot': [-20, 0, 0]},
              'right_leg': {'rot': [-22 * fw, 0, 0]}, 'left_leg': {'rot': [20 * fw, 0, 0]}}
         cape_follow(t, o, lag=10 * fw, wind=4 * up)
-        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f, lerp_dir(D[i], D[i + 1], f), left=max(0, 1 - 3 * k) if k < 2.5 else (k - 2.5) * 2)
+        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f + AROUND_HEAD * math.sin(math.pi * f) * (i == 0), lerp_dir(D[i], D[i + 1], f),
+          left=max(0, 1 - 3 * k) if k < 2.5 else (k - 2.5) * 2)
         return vis(o)
     a = A('volley', 2.2)
     a.sample(volley, 0.04)
@@ -1171,8 +1438,74 @@ def iron_anims():
         bones = v.setdefault('bones', {})
         bones['shield_hand'] = {'scale': {'0': [0, 0, 0]}}
         bones['banner_held'] = {'scale': {'0': [0, 0, 0]}}
+        # у Iron's нет предплечий и кости меча: без явных ключей GeckoLib оставит их в позе прошлой анимации Мартина
+        # (согнутый локоть, повёрнутый меч) — задаём покой: рука прямая, меч как предмет Iron's в руке (правка 20.11)
+        for b in ('right_forearm', 'left_forearm', 'sword'):
+            bones.setdefault(b, {})['rotation'] = {'0': [0, 0, 0]}
+        bones['shield_back'] = dict(bones.get('shield_back', {}), scale={'0': [1, 1, 1]})
+        bones['sword'] = dict(bones['sword'], scale={'0': [1, 1, 1]})
+        iron_cape(v)
         out_[k] = v
     return out_
+
+
+def _num(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return 0.0                          # molang-выражения Iron's: для плаща считаем 0
+
+
+def _chan_at(chan, t):
+    if isinstance(chan, dict) and 'vector' in chan:
+        chan = chan['vector']
+    if isinstance(chan, list):
+        return [_num(x) for x in chan]
+    ks = sorted((float(k), (v.get('vector') if isinstance(v, dict) else v)) for k, v in chan.items())
+    ks = [(k, [_num(x) for x in v]) for k, v in ks]
+    if t <= ks[0][0]:
+        return ks[0][1]
+    for (t0, v0), (t1, v1) in zip(ks, ks[1:]):
+        if t <= t1:
+            f = (t - t0) / max(1e-6, t1 - t0)
+            return [a + (b - a) * f for a, b in zip(v0, v1)]
+    return ks[-1][1]
+
+
+def iron_cape(v):
+    """Анимации Iron's не знают о плаще: по их ключам body/torso/ног считаем плащ, табарды и щит на спине тем же решателем
+    (иначе на наклонах/приседаниях каста плащ висит «как приклеенный» к торсу и уходит в ноги)."""
+    bones = v['bones']
+    ts = {0.0}
+    for b in ('body', 'torso', 'right_leg', 'left_leg'):
+        for ch in ('rotation', 'position'):
+            c = bones.get(b, {}).get(ch)
+            if isinstance(c, dict) and 'vector' not in c:
+                ts.update(float(k) for k in c)
+    length = float(v.get('animation_length') or max(ts))
+    ts = sorted(t for t in ts if t <= length + 1e-6)
+    dense = []
+    for a, b in zip(ts, ts[1:]):
+        n = max(1, int((b - a) / 0.1))
+        dense += [a + (b - a) * i / n for i in range(n)]
+    dense.append(ts[-1])
+    an = Anim('tmp', length, False)
+    for t in dense:
+        o = {}
+        for b in ('body', 'torso', 'right_leg', 'left_leg'):
+            r = bones.get(b, {}).get('rotation')
+            if r is not None:
+                x, y, z = _chan_at(r, t)
+                o[b] = {'rot': [-x, -y, z]}
+            if b == 'body' and bones.get(b, {}).get('position') is not None:
+                x, y, z = _chan_at(bones[b]['position'], t)
+                o.setdefault(b, {})['pos'] = [-x, y, z]
+        o['_cape'] = dict(back=3.0, low=2.0, z=0.0, tab=0.0)
+        solve_cape(o, True)
+        for b in ('cape', 'cape_low', 'tabard_front', 'tabard_back', 'shield_back'):
+            an.key(b, 'rot', t, o[b]['rot'])
+    for b, j in an.to_json()['bones'].items():
+        bones.setdefault(b, {})['rotation'] = j['rotation']
 
 
 # ================================================================== 3D-предмет меча (models/item/martin_sword.json)
@@ -1244,7 +1577,7 @@ def build_all():
     m = build_martin()
     m.pack()
     m.paint()
-    an = anims(m)
+    an = [smooth_cloth(a) for a in anims(m)]
     write_json('geo/entity/martin.geo.json', m.geo_json(), compact=True)
     m.image.save(out('textures/entity/martin/martin.png'), optimize=True)
     if m.glow is not None:

@@ -413,6 +413,8 @@ class Anim:
         for i in range(n + 1):
             t = t0 + (t1 - t0) * i / n
             for bone, chans in fn(t).items():
+                if bone.startswith('_'):          # служебные метки позы (например, '_int' у Мартина)
+                    continue
                 for ch, v in chans.items():
                     self.key(bone, ch, t, v)
 

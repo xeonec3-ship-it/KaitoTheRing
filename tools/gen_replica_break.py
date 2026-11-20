@@ -298,16 +298,18 @@ def anim_irina(an):
     """Ирина, 2.0 с: левая ладонь вверх к печатям (нити ползут), 'bind' 0.5 — нити оплели; дрожь натяжения;
     'break' 1.0 — сжала ладонь и рванула к себе; 1.0–1.6 лоскуты втягиваются в рукава (руки чуть врозь), 2.0 — покой."""
     idle = sample(an, 'irina_idle', 0)
-    # оси как у Iron's: рука вперёд/вверх — x минус (−160 — над головой), левая в сторону — z минус; голова вверх — x минус
-    reach = mod(idle, left_arm=dict(rotation=[-166, 8, -16]), head=dict(rotation=[-22, -8, 4]), torso=dict(rotation=[-6, -10, 0]),
-                right_arm=dict(rotation=[-10, 0, 14]))
+    # оси как у Iron's: рука вперёд/вверх — x минус (−160 — над головой), левая в сторону — z минус; голова вверх — x минус.
+    # Проверка 20.11: ладонь вверх-вперёд-в сторону (не над головой — иначе рука проходит сквозь поля шляпы); правая держит посох
+    # в хвате покоя (tools/gen_irina.py R_HOLD), без резких поворотов древка.
+    reach = mod(idle, left_arm=dict(rotation=[-124, 6, 30]), head=dict(rotation=[-22, -8, 4]), torso=dict(rotation=[-6, -10, 0]),
+                right_arm=dict(rotation=[-44, 0, 16]))
     strain = mod(reach, left_arm=dict(rot_add=[5, 0, -4]), torso=dict(rot_add=[2, 2, 0]), head=dict(rot_add=[3, 0, 0]))
     clench = mod(idle, left_arm=dict(rotation=[-62, 22, -6]), torso=dict(rotation=[10, 16, 0]), head=dict(rotation=[12, 10, 4]),
-                 right_arm=dict(rotation=[-6, 0, 12]), body=dict(position=[0, -0.6, 0]))
-    draw = mod(idle, left_arm=dict(rotation=[-28, -6, -52]), right_arm=dict(rotation=[-14, 0, 30]), torso=dict(rotation=[-4, 0, 0]),
+                 right_arm=dict(rotation=[-42, 0, 14]), body=dict(position=[0, -0.6, 0]))
+    draw = mod(idle, left_arm=dict(rotation=[-28, -6, -52]), right_arm=dict(rotation=[-40, 0, 30]), torso=dict(rotation=[-4, 0, 0]),
                head=dict(rotation=[-6, 0, 4]))
     speak = mod(clench, head=dict(rotation=[2, -16, 10]), left_arm=dict(rotation=[-48, 18, -16]), torso=dict(rotation=[2, 8, 0]))
-    keys = [(0, idle, None), (0.45, reach, 'out'), (0.62, strain, 'io'), (0.78, reach, 'io'), (0.9, strain, 'io'),
+    keys = [(0, idle, None), (0.45, reach, 'io'), (0.62, strain, 'io'), (0.78, reach, 'io'), (0.9, strain, 'io'),
             (1.0, clench, 'inq'), (1.25, speak, 'io'), (1.6, mod(draw, head=dict(rotation=[0, -10, 8])), 'io'), (2.2, idle, 'io')]
     return bake(2.2, keys, [(0.5, 'bind'), (1.0, 'break'), (1.25, 'speak')])
 
@@ -335,7 +337,7 @@ def anim_martin(an):
     up = mod(sample(an, 'martin_shield_wall', 0.6), **SH_HAND)
     up = mod(up, left_arm=dict(rot_add=[-66, 0, -12]), head=dict(rot_add=[-16, 0, 0]))
     jolt = mod(up, body=dict(pos_add=[0, -1.2, 0]), left_arm=dict(rot_add=[10, 0, 0]), torso=dict(rot_add=[4, 0, 0]))
-    ow, oh = sample(an, 'martin_overhead', 0.6), sample(an, 'martin_overhead', 0.96)
+    ow, oh = sample(an, 'martin_overhead', 0.6), sample(an, 'martin_overhead', 0.88)    # 0.88: клинок ещё над землёй (0.96 — уже в земле)
     w1 = mod(ow, **SH_BACK, torso=dict(rot_add=[-8, -30, 26]), head=dict(rot_add=[-12, 0, 0]))
     h1 = mod(oh, **SH_BACK, torso=dict(rot_add=[8, 34, -30]))
     w2 = mod(ow, **SH_BACK, torso=dict(rot_add=[-8, 30, -26]), head=dict(rot_add=[-12, 0, 0]))
@@ -604,7 +606,7 @@ def on_seals(fn):
 
 def fx_irina():
     T = 'T27 Ирина ломает «Дезинтеграцию: Реплику» (caster = Ирина, анимация irina_replica_break 2.0 с). '
-    els = [E('trail', 0, at(-0.45, 1.3, 0.1), duration=22, width=0.07, length=14, fade=1.2, head=0, count=6, follow=True, color='@primary',
+    els = [E('trail', 0, at(-0.55, 1.6, 0.6), duration=22, width=0.07, length=14, fade=1.2, head=0, count=6, follow=True, color='@primary',
              orbit={'radius': 1.3, 'speed': 16, 'rise': 0.3, 'risePeriod': 26, 'climb': 6.0}, comment='нити ползут из рукавов вверх по печатям'),
            E('trail', 2, at(0, 0.4, 0), duration=16, width=0.06, length=12, fade=1.2, head=0, count=5, follow=True, color='@primary',
              orbit={'radius': 3.4, 'speed': -12, 'rise': 0.2, 'risePeriod': 20})]
@@ -612,9 +614,9 @@ def fx_irina():
         E('sigil', 5 + 2 * i, at(0, y, 0), id='irina_replica_web', scale=r, until=20, comment='сеть нитей на печати ' + n),
         E('sprites', 10, at(0, y, 0), duration=3, texture='mote_thread', count=18, rate=8, area=r, speed=0.02, spin=60, size=[0.3, 0.2], life=14,
           color='#E3262F', glow=0.4, comment='bind: нити затянулись')])
-    els += [E('flash', 10, at(-0.45, 2.95, 0.15), duration=8, size=0.9, color='@primary', comment='поднятая ладонь')]
+    els += [E('flash', 10, at(-0.55, 2.03, 0.74), duration=8, size=0.9, color='@primary', comment='поднятая ладонь (кисть в 0.5 с, проверка 20.11)')]
     els += [E('flash', 20, at(0, 2.42, 0), duration=10, size=3.2, rays=8, color='#FF1934', comment='break: сжала ладонь — печати рвутся'),
-            E('flash', 20, at(-0.3, 1.6, 0.6), duration=6, size=0.8, color='#FFE0E6')]
+            E('flash', 20, at(-0.11, 1.11, 0.78), duration=6, size=0.8, color='#FFE0E6')]
     els += on_seals(lambda n, y, r, i: [
         E('sprites', 20, at(0, y, 0), duration=3, texture='mote_thread', count=55, rate=20, area=r, speed=0.12, gravity=0.0, spin=140, tumble=True,
           size=[0.42, 0.18], life=26, color='#E3262F', glow=0.5, comment='алые лоскуты-нити'),
@@ -622,12 +624,12 @@ def fx_irina():
           life=16, color='#FF1934', glow=0.6)])
     els += [E('vortex', 22, at(0, 1.2, 0), duration=18, radius=4.6, height=4.4, arms=6, speed=20, pull=0.45, funnel=0.12, turns=1.5, width=0.12,
               texture='mote_thread', particles=140, life=18, size=0.28, color='@primary', comment='лоскуты втягиваются к ней воронкой'),
-            E('sprites', 30, at(-0.5, 1.45, 0.15), duration=10, texture='mote_thread', count=18, rate=3, spread=0.35, speed=-0.04, size=[0.3, 0.06],
+            E('sprites', 30, at(-0.97, 0.97, 0.4), duration=10, texture='mote_thread', count=18, rate=3, spread=0.35, speed=-0.04, size=[0.3, 0.06],
               life=10, color='#E3262F', glow=0.4, comment='в левый рукав'),
-            E('sprites', 30, at(0.5, 1.45, 0.15), duration=10, texture='mote_thread', count=18, rate=3, spread=0.35, speed=-0.04, size=[0.3, 0.06],
+            E('sprites', 30, at(0.69, 0.89, 0.6), duration=10, texture='mote_thread', count=18, rate=3, spread=0.35, speed=-0.04, size=[0.3, 0.06],
               life=10, color='#E3262F', glow=0.4, comment='в правый рукав'),
-            E('flash', 40, at(-0.5, 1.45, 0.15), duration=6, size=0.6, color='@secondary'),
-            E('flash', 40, at(0.5, 1.45, 0.15), duration=6, size=0.6, color='@secondary')]
+            E('flash', 40, at(-0.9, 0.92, 0.45), duration=6, size=0.6, color='@secondary'),
+            E('flash', 40, at(0.68, 0.9, 0.6), duration=6, size=0.6, color='@secondary')]
     return 'irina', (T + '0–20 нити ползут из рукавов и оплетают печати Реплики (+0.06/+2.42/+4.82); 10 (bind) — затянулись; '
            '20 (break) — Ирина сжала ладонь: код Fx.stop экземпляра Реплики, сети рвутся алыми лоскутами; 22–40 лоскуты втягиваются в рукава. '
            'Лучей к заклинателю нет.'), 46, els
@@ -847,20 +849,20 @@ def frames():
                         'op': 0.9, 'closed': True})
     F['irina'] = [
         dict(cam, anim='irina_replica_break', t=0.55, label='Ирина — до разрыва', sub='0.5 с (bind): нити оплели печати Реплики',
-             rbfx=seals(ext) + overlay('irina_replica_web', RED, 1.0) + threads + [glow([-0.45, 2.95, 0.15], 0.9, RED)]),
+             rbfx=seals(ext) + overlay('irina_replica_web', RED, 1.0) + threads + [glow([-0.55, 2.03, 0.74], 0.9, RED)]),
         dict(cam, anim='irina_replica_break', t=1.0, label='break — 1.0 с', sub='сжала ладонь: печати рвутся алыми лоскутами',
              rbfx=seals(ext, (0.55, 0.35, 0.55)) + overlay('irina_replica_web', RED, 0.45, sx=1.08, sz=1.08) +
              [glow([0, y, 0], 1.6 * r, '#FF1934', 0.28) for _, y, r in SEALS] +
              [spr('mote_thread', 70, [0, y, 0], (0, 0.25, 0), (0.35, 0.6), RED, 1.0, seed=11 + i, spin=3, ring=(0.35 * r, r))
               for i, (_, y, r) in enumerate(SEALS)] +
              [spr('spark_soft', 40, [0, y, 0], (0, 0.2, 0), (0.12, 0.22), '#FF1934', 0.9, seed=21 + i, ring=(0.5 * r, r))
-              for i, (_, y, r) in enumerate(SEALS)] + [glow([-0.35, 1.55, 0.6], 0.8, '#FFE0E6', 0.8)]),
+              for i, (_, y, r) in enumerate(SEALS)] + [glow([-0.11, 1.11, 0.78], 0.8, '#FFE0E6', 0.8)]),
         dict(cam, anim='irina_replica_break', t=1.45, label='после — 1.45 с', sub='лоскуты-нити втягиваются в её рукава',
              rbfx=[spr('mote_thread', 26, [0, 0.9 + 0.75 * k, 0], (0, 0.15, 0), (0.3, 0.5), RED, 0.95, seed=40 + k, spin=3,
                        ring=(0.5 + 0.45 * k, 0.9 + 0.55 * k)) for k in range(5)] +
              [{'k': 'tube', 'pts': helix(0, 4.2 - 0.3 * k, 1.45, 3.4 - 0.2 * k, 0.45, -1.3, phase=k * 1.25), 'w': 0.03, 'color': RED,
                'op': 0.85} for k in range(5)] +
-             [glow([-0.5, 1.45, 0.15], 0.7, '#B99BE0', 0.8), glow([0.5, 1.45, 0.15], 0.7, '#B99BE0', 0.8)])]
+             [glow([-0.97, 0.97, 0.4], 0.7, '#B99BE0', 0.8), glow([0.69, 0.89, 0.6], 0.7, '#B99BE0', 0.8)])]
     # ---------------------------------------------------------------- Арис
     cam = _cam('aris')
     HIT = [-0.25, 0.12, 1.35]

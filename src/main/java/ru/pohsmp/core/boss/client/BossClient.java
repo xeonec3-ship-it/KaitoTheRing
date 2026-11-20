@@ -38,15 +38,19 @@ public final class BossClient {
 
     private static void setup(FMLClientSetupEvent e) {
         e.enqueueWork(ru.pohsmp.core.boss.cult.client.CultLeaderClient::setup);   // T26: camera plans
+        e.enqueueWork(ru.pohsmp.core.boss.irina.client.IrinaClient::setup);       // T27: camera plans
         e.enqueueWork(ru.pohsmp.core.boss.aris.client.ArisClient::setup);   // T28: camera plans, NPC look, steam fog
         e.enqueueWork(ru.pohsmp.core.boss.martin.client.MartinClient::setup);     // T29: camera plans, NPC look, status icons
+        e.enqueueWork(ru.pohsmp.core.boss.ereb.client.ErebClient::setup);         // T30: camera plans, «Предательство»
     }
 
     private static void renderers(EntityRenderersEvent.RegisterRenderers e) {
         for (var t : Bosses.NPCS.values()) e.registerEntityRenderer(t.get(), BossNpcRenderer::new);
         ru.pohsmp.core.boss.cult.client.CultLeaderClient.renderers(e);
+        ru.pohsmp.core.boss.irina.client.IrinaClient.renderers(e);   // T27
         ru.pohsmp.core.boss.aris.client.ArisClient.renderers(e);   // T28
         ru.pohsmp.core.boss.martin.client.MartinClient.renderers(e);   // T29
+        ru.pohsmp.core.boss.ereb.client.ErebClient.renderers(e);
     }
 
     public static void handle(BossNet.Msg m) {

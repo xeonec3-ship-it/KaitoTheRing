@@ -37,23 +37,41 @@ def S(**kw):
 def rest_ground():
     """Покой: голова молота стоит на земле у правой ноги, рукоять наклонно вверх к руке."""
     d = AN.nrm((0.22, -0.72, -0.66))
-    return (AN.ham_from_strike((10.5, 0.0, -9.5), d, (0.4, -1, 0.3)), d, (0.4, -1, 0.3))
+    return (AN.ham_from_strike((12.0, 0.0, -9.5), d, (0.4, -1, 0.3)), d, (0.4, -1, 0.3))
 
 
 def guard():
     """Боевая стойка: двуручный хват наискось перед собой, голова молота вверху слева."""
-    return ((0.5, 18.0, -7.0), (0.45, 0.8, -0.4), (0.6, -0.3, 0.75))
+    return ((0.5, 18.0, -7.0), (0.45, 0.8, -0.4), (0.85, -0.45, 0.05))     # бойки влево-вправо (не к лицу)
 
 
 def carry(bob=0.0):
     """На плече (в координатах тела): кулак у правого плеча спереди, рукоять лежит на наплечнике, голова за спиной."""
-    return ((5.0, 21.0 + bob, -6.5), (0.18, 0.34, 0.92), (0.9, 0.35, -0.25), 'body')
+    return ((5.0, 21.0 + bob, -6.5), (0.2, 0.28, 0.94), (0.3, 0.95, -0.1), 'body')      # бойки вверх-вниз: не задевают шлем и косу
+
+
+WINDUP = dict(body=(10, -12, 0), torso=(8, -6, 0), head=(8, 16, 0), bpos=(0, 0.6, 0.5), right_leg=(-14, 0, 8), left_leg=(22, 0, -6),
+              right_shin=(-4, 0, 0), left_shin=(-10, 0, 0), rpole=(0.9, 0.1, 0.3), lpole=(-0.6, -0.3, -0.6))
+
+
+RAISE = ((8.0, 21.0, -4.0), (0.35, 0.93, 0.1), (0, 0, -1))          # молот поднят вертикально у правого плеча (путь в замах — сбоку)
+FWD_UP = ((4.5, 27.0, -9.0), (0.25, 0.7, -0.67), (0, 0.67, -0.74))  # молот пошёл вниз: над правым плечом спереди, дальше удар
+
+
+def windup():
+    """Замах для удара сверху (правка 20.11): молот над ПРАВЫМ плечом, голова молота за спиной — рукоять не проходит сквозь шлем и рога.
+    Левая рука придерживает (lh≈0.45) и перехватывает рукоять на пути вниз."""
+    return ((7.0, 27.0, 4.0), (0.3, 0.45, 0.84), (0.1, 0.85, -0.5))
 
 
 def planted():
-    """Молот стоит головой вниз (как кость hammer_ground в покое): хват в мире, d вниз, боёк вдоль x."""
+    """Молот стоит головой вниз справа от неё (как hammer_ground с поворотом HG_PLANT): хват в мире, d вниз, бойки вперёд-назад (−z/+z).
+    Правка 20.11: раньше бойки смотрели вдоль x — левый боёк заходил в правое колено/голень (появление, сдача, мирный NPC)."""
     g = G.hg_world_rest((0, G.HAM_GRIP, 0))
-    return (g, (0, -1, 0), (1, 0, 0))
+    return (g, (0, -1, 0), (0, 0, -1))
+
+
+HG_PLANT = {'rot': (0, 90, 0), 'pos': (0, 0, 0)}      # hammer_ground стоит головой вниз, повёрнут на 90° вокруг рукояти: бойки вдоль z
 
 
 def fallen(ry=135.0, rot_extra=95.0):
@@ -93,20 +111,20 @@ def slam(rig):
     """Удар по земле двумя руками: замах из-за головы, удар в 0.75 с (событие impact), отдача."""
     gd = guard()
     d_imp = (0.0, -0.42, -0.9)
-    imp = (AN.ham_from_strike((0.8, 0.0, -20.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
-    imp2 = (AN.ham_from_strike((0.8, 1.0, -20.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0.2))
+    imp = (AN.ham_from_strike((0.8, 0.0, -21.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    imp2 = (AN.ham_from_strike((0.8, 1.0, -21.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0.2))
     k = [
         K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
-        K(0.42, 'io', **S(ham=((2.0, 29.0, 3.0), (0.05, 0.42, 0.9), (0, 1, 0)), lh=1, body=(12, 0, 0), torso=(10, 0, 0), head=(14, 0, 0),
-                           bpos=(0, 0.6, 0.5), right_leg=(-14, 0, 8), left_leg=(22, 0, -6), right_shin=(-4, 0, 0), left_shin=(-10, 0, 0),
-                           rpole=(0.8, 0.2, 0.4), lpole=(-0.8, 0.2, 0.4))),
-        K(0.62, 'in', **S(ham=((1.5, 27.0, -8.0), (0.0, 0.7, -0.72), (0, 0.6, -0.8)), lh=1, body=(-8, 0, 0), torso=(-4, 0, 0), head=(4, 0, 0),
+        K(0.22, 'io', **S(ham=RAISE, lh=0.6, body=(4, -6, 0), torso=(4, -3, 0), head=(2, 8, 0), rpole=(0.9, -0.2, 0.3), lpole=(-0.7, -0.4, 0.5),
+                           **GUARD_LEGS)),
+        K(0.42, 'io', **S(ham=windup(), lh=0.45, **WINDUP)),
+        K(0.62, 'in', **S(ham=FWD_UP, lh=1, body=(-8, 0, 0), torso=(-4, 0, 0), head=(4, 0, 0),
                            bpos=(0, -0.5, -0.5), right_leg=(-18, 0, 8), left_leg=(30, 0, -6), right_shin=(-10, 0, 0), left_shin=(-24, 0, 0),
                            rpole=(0.9, -0.2, 0.3), lpole=(-0.9, -0.2, 0.3))),
-        K(0.75, 'in3', **S(ham=imp, lh=1, body=(-26, 0, 0), torso=(-8, 0, 0), head=(18, 0, 0), bpos=(0, -3.0, -1.0),
+        K(0.75, 'in3', **S(ham=imp, lh=1, body=(-18, 0, 0), torso=(-6, 0, 0), head=(14, 0, 0), bpos=(0, -3.0, -1.0),
                             right_leg=(-6, 0, 10), left_leg=(52, 0, -8), right_shin=(-26, 0, 0), left_shin=(-52, 0, 0),
                             rpole=(0.8, -0.4, 0.3), lpole=(-0.8, -0.4, 0.3))),
-        K(0.92, 'out', **S(ham=imp2, lh=1, body=(-22, 0, 0), torso=(-6, 0, 0), head=(14, 0, 0), bpos=(0, -2.6, -1.0),
+        K(0.92, 'out', **S(ham=imp2, lh=1, body=(-16, 0, 0), torso=(-5, 0, 0), head=(12, 0, 0), bpos=(0, -2.6, -1.0),
                             right_leg=(-6, 0, 10), left_leg=(48, 0, -8), right_shin=(-24, 0, 0), left_shin=(-48, 0, 0))),
         K(1.6, 'io', **S(ham=gd, lh=1, **GUARD_LEGS)),
     ]
@@ -118,15 +136,23 @@ def swing(rig):
     gd = guard()
     k = [
         K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
-        K(0.45, 'io', **S(ham=((7.0, 18.0, 1.0), (0.55, 0.25, 0.8), (0.75, 0, -0.6)), lh=1, body=(0, -38, 0), torso=(0, -14, 0), head=(0, 30, 0),
+        K(0.25, 'io', **S(ham=((6.0, 19.0, -6.0), (0.9, 0.42, -0.1), (0.1, 0, -1)), lh=0.8, body=(0, -18, 0), torso=(0, -6, 0), head=(0, 16, 0),
+                           right_leg=(-10, 0, 10), left_leg=(16, 0, -7), right_shin=(-8, 0, 0), left_shin=(-10, 0, 0), bpos=(0, -0.6, 0),
+                           rpole=(0.6, -0.6, 0.5), lpole=(-0.3, -0.7, 0.6))),
+        K(0.45, 'io', **S(ham=((9.5, 18.0, -1.0), (0.7, 0.25, 0.67), (0.69, 0, -0.72)), lh=1, body=(0, -38, 0), torso=(0, -14, 0), head=(0, 30, 0),
                            right_leg=(-12, 0, 12), left_leg=(18, 0, -8), right_shin=(-10, 0, 0), left_shin=(-10, 0, 0), bpos=(0, -1.2, 0),
                            rpole=(0.6, -0.6, 0.5), lpole=(-0.3, -0.7, 0.6))),
-        K(0.62, 'in3', **S(ham=((2.0, 16.0, -9.5), (-0.15, 0.08, -0.99), (-1, 0, 0)), lh=1, body=(-6, 6, 0), torso=(0, 6, 0), head=(0, -4, 0),
+        K(0.55, 'in', **S(ham=((7.0, 16.5, -9.5), (0.45, 0.05, -0.89), (0.89, 0, 0.45)), lh=1, body=(-4, -10, 0), torso=(0, -4, 0), head=(0, 12, 0),
+                           right_leg=(-14, 0, 12), left_leg=(22, 0, -8), right_shin=(-12, 0, 0), left_shin=(-14, 0, 0), bpos=(0, -1.6, -0.3),
+                           rpole=(0.6, -0.7, 0.3), lpole=(-0.5, -0.7, 0.4))),
+        K(0.62, 'in3', **S(ham=((2.0, 16.0, -9.5), (-0.45, 0.06, -0.89), (-0.89, 0, 0.45)), lh=1, body=(-6, 6, 0), torso=(0, 6, 0), head=(0, -4, 0),
                             right_leg=(-16, 0, 12), left_leg=(26, 0, -8), right_shin=(-14, 0, 0), left_shin=(-18, 0, 0), bpos=(0, -2.0, -0.5),
                             rpole=(0.6, -0.7, 0.3), lpole=(-0.6, -0.7, 0.3))),
-        K(0.86, 'out', **S(ham=((-6.5, 18.0, -5.0), (-0.9, 0.15, -0.4), (-0.4, 0, 0.9)), lh=1, body=(-4, 42, 0), torso=(0, 16, 0), head=(0, -30, 0),
+        K(0.86, 'out', **S(ham=((-6.0, 18.0, -8.5), (-0.85, 0.1, -0.5), (-0.5, 0, 0.85)), lh=1, body=(-4, 42, 0), torso=(0, 16, 0), head=(0, -30, 0),
                             right_leg=(-10, 0, 12), left_leg=(20, 0, -8), right_shin=(-12, 0, 0), left_shin=(-12, 0, 0), bpos=(0, -1.6, 0),
                             rpole=(0.2, -0.8, 0.5), lpole=(-0.7, -0.6, 0.3))),
+        K(1.1, 'io', **S(ham=((-2.0, 20.0, -9.0), (-0.2, 0.95, -0.25), (1, 0, 0)), lh=1, body=(-2, 14, 0), torso=(0, 6, 0), head=(0, -12, 0),
+                          rpole=(0.4, -0.8, 0.4), lpole=(-0.7, -0.6, 0.3), **GUARD_LEGS)),
         K(1.4, 'io', **S(ham=gd, lh=1, **GUARD_LEGS)),
     ]
     return AN.bake(rig, 'swing', 1.4, k, loop=False, ground='feet', events={0.45: 'windup', 0.62: 'hit'})
@@ -137,9 +163,9 @@ def cast(rig):
     k = [
         K(0.0, **S(ham=carry(), **GUARD_LEGS)),
         K(0.5, 'io', **S(ham=carry(-0.5), larm=(60, 0, -40), lfore=(70, 0, 0), torso=(-4, 8, 0), head=(-6, 6, 0), **GUARD_LEGS)),
-        K(0.8, 'back', **S(ham=carry(0.4), larm=(168, -10, -18), lfore=(6, 0, 0), torso=(8, -4, 0), head=(18, -4, 0), body=(4, 0, 0),
+        K(0.8, 'back', **S(ham=carry(0.4), larm=(168, -10, -18), lfore=(6, 0, 0), torso=(8, -4, 0), head=(8, -4, 0), body=(4, 0, 0),
                             right_leg=(-8, 0, 7), left_leg=(14, 0, -6), right_shin=(-6, 0, 0), left_shin=(-14, 0, 0))),
-        K(1.15, 'io', **S(ham=carry(0.2), larm=(160, -10, -18), lfore=(10, 0, 0), torso=(6, -4, 0), head=(14, -4, 0), body=(3, 0, 0), **GUARD_LEGS)),
+        K(1.15, 'io', **S(ham=carry(0.2), larm=(160, -10, -18), lfore=(10, 0, 0), torso=(6, -4, 0), head=(6, -4, 0), body=(3, 0, 0), **GUARD_LEGS)),
         K(1.6, 'io', **S(ham=carry(), **GUARD_LEGS)),
     ]
     return AN.bake(rig, 'cast', 1.6, k, loop=False, ground='feet', events={0.8: 'cast'})
@@ -148,10 +174,12 @@ def cast(rig):
 def forge(rig):
     """Особое «Горн» (4.0 с): три ритмичных удара по земле (1.0, 1.8, 2.6 — strike), на 3.3 — кулак к небу (ignite)."""
     gd = guard()
-    d_imp = (0.0, -0.5, -0.86)
-    hit = lambda y: (AN.ham_from_strike((1.0, y, -16.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
-    up = ((2.0, 25.0, -3.0), (0.0, 0.85, -0.5), (0, 0.5, -0.86))
-    low = dict(body=(-18, 0, 0), torso=(-6, 0, 0), head=(12, 0, 0), bpos=(0, -2.2, -0.6), right_leg=(-8, 0, 10), left_leg=(40, 0, -8),
+    d_imp = (0.0, -0.45, -0.89)
+    hit = lambda y: (AN.ham_from_strike((1.0, y, -19.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    d_h = (0.1, -0.88, -0.46)                                              # держит: рукоять почти вертикально, навершие не в кирасе
+    hold = lambda y: (AN.ham_from_strike((2.0, y, -15.0), d_h, (0, -1, 0)), d_h, (0, -1, 0))
+    up = ((2.0, 25.0, -7.5), (0.0, 0.85, -0.5), (0, 0.5, -0.86))           # навершие не уходит в кирасу
+    low = dict(body=(-12, 0, 0), torso=(-5, 0, 0), head=(12, 0, 0), bpos=(0, -2.2, -0.6), right_leg=(-8, 0, 10), left_leg=(40, 0, -8),
                right_shin=(-20, 0, 0), left_shin=(-40, 0, 0))
     high = dict(body=(4, 0, 0), torso=(4, 0, 0), head=(6, 0, 0), bpos=(0, -0.6, 0), right_leg=(-10, 0, 9), left_leg=(22, 0, -7),
                 right_shin=(-8, 0, 0), left_shin=(-18, 0, 0))
@@ -162,10 +190,10 @@ def forge(rig):
         if ti < 2.6:
             k.append(K(ti + 0.5, 'io', **S(ham=up, lh=1, **high)))
     k += [
-        K(3.05, 'io', **S(ham=hit(1.5), lh=0.0, larm=(60, 0, -30), lfore=(60, 0, 0), **low)),
-        K(3.3, 'back', **S(ham=hit(0.4), lh=0.0, larm=(172, -10, -12), lfore=(4, 0, 0), body=(-6, 0, 0), torso=(10, 0, 0), head=(22, 0, 0),
+        K(3.05, 'io', **S(ham=hold(1.5), lh=0.0, larm=(60, 0, -30), lfore=(60, 0, 0), **low)),
+        K(3.3, 'back', **S(ham=hold(0.4), lh=0.0, larm=(172, -10, -12), lfore=(4, 0, 0), body=(-6, 0, 0), torso=(10, 0, 0), head=(22, 0, 0),
                             bpos=(0, -1.6, -0.3), right_leg=(-8, 0, 10), left_leg=(34, 0, -8), right_shin=(-16, 0, 0), left_shin=(-34, 0, 0))),
-        K(4.0, 'io', **S(ham=hit(0.4), lh=0.0, larm=(166, -10, -12), lfore=(8, 0, 0), body=(-6, 0, 0), torso=(8, 0, 0), head=(18, 0, 0),
+        K(4.0, 'io', **S(ham=hold(0.4), lh=0.0, larm=(166, -10, -12), lfore=(8, 0, 0), body=(-6, 0, 0), torso=(8, 0, 0), head=(18, 0, 0),
                           bpos=(0, -1.6, -0.3), right_leg=(-8, 0, 10), left_leg=(34, 0, -8), right_shin=(-16, 0, 0), left_shin=(-34, 0, 0))),
     ]
     return AN.bake(rig, 'forge', 4.0, k, loop='hold', ground='feet', events={1.0: 'strike', 1.8: 'strike', 2.6: 'strike', 3.3: 'ignite'})
@@ -176,14 +204,14 @@ def last_blow(rig):
     удар 4.0 (blow) — глубокий присед, молот в земле; 4.0–5.0 держит."""
     gd = guard()
     wide = dict(right_leg=(-14, 0, 16), left_leg=(18, 0, -16), right_shin=(-12, 0, 0), left_shin=(-18, 0, 0))
-    over = ((1.0, 31.0, 1.5), (0.0, 0.25, 0.97), (0, 1, 0))
-    d_imp = (0.0, -0.3, -0.95)
-    imp = (AN.ham_from_strike((0.5, 0.0, -21.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    over = ((8.5, 30.0, 3.5), (0.25, 0.7, 0.67), (0, 0.7, -0.7))            # над правым плечом: рукоять не проходит сквозь шлем и рога
+    d_imp = (0.0, -0.45, -0.89)
+    imp = (AN.ham_from_strike((0.5, 0.0, -23.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
     k = [K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
          K(0.6, 'io', **S(ham=gd, lh=1, bpos=(0, -1.8, 0), body=(-4, 0, 0), **wide))]
     for i, t in enumerate((1.4, 2.2, 3.0)):
         f = (i + 1) / 3
-        g = np.array(gd[0]) * (1 - f) + np.array(over[0]) * f
+        g = np.array(gd[0]) * (1 - f) + np.array(over[0]) * f + np.array([0, 0, -3.0 * math.sin(math.pi * f)])   # руки впереди груди
         dd = AN.nrm(np.array(gd[1]) * (1 - f) + np.array(over[1]) * f)
         k.append(K(t, 'io', **S(ham=(g, dd, (0, 1, 0)), lh=1, bpos=(0, -1.8 + 1.4 * f, 0), body=(-4 + 14 * f, 0, 0), torso=(10 * f, 0, 0),
                                head=(-4 + 30 * f, 0, 0), rpole=(0.8, 0.3, 0.4), lpole=(-0.8, 0.3, 0.4), **wide)))
@@ -192,11 +220,11 @@ def last_blow(rig):
         k.append(K(float(t), 'linear', **S(ham=((over[0][0] + j, over[0][1], over[0][2] - abs(j)), over[1], over[2]), lh=1, bpos=(0, -0.4, 0),
                                            body=(10 + j, 0, 0), torso=(10, 0, 0), head=(26, 0, 0), rpole=(0.8, 0.3, 0.4), lpole=(-0.8, 0.3, 0.4), **wide)))
     k += [
-        K(3.85, 'in', **S(ham=((1.0, 30.0, -9.0), (0, 0.6, -0.8), (0, 0.8, -0.6)), lh=1, bpos=(0, -1.5, -1.0), body=(-10, 0, 0), torso=(-4, 0, 0),
+        K(3.85, 'in', **S(ham=((4.5, 29.0, -10.0), (0.15, 0.85, -0.5), (0, 0.5, -0.86)), lh=1, bpos=(0, -1.5, -1.0), body=(-10, 0, 0), torso=(-4, 0, 0),
                            head=(10, 0, 0), right_leg=(-10, 0, 16), left_leg=(34, 0, -14), right_shin=(-16, 0, 0), left_shin=(-30, 0, 0))),
-        K(4.0, 'in3', **S(ham=imp, lh=1, bpos=(0, -4.5, -1.5), body=(-30, 0, 0), torso=(-10, 0, 0), head=(24, 0, 0),
+        K(4.0, 'in3', **S(ham=imp, lh=1, bpos=(0, -4.5, -1.5), body=(-20, 0, 0), torso=(-10, 0, 0), head=(24, 0, 0),
                            right_leg=(-2, 0, 18), left_leg=(62, 0, -14), right_shin=(-40, 0, 0), left_shin=(-70, 0, 0))),
-        K(5.0, 'out', **S(ham=imp, lh=1, bpos=(0, -4.2, -1.5), body=(-26, 0, 0), torso=(-8, 0, 0), head=(20, 0, 0),
+        K(5.0, 'out', **S(ham=imp, lh=1, bpos=(0, -4.2, -1.5), body=(-18, 0, 0), torso=(-8, 0, 0), head=(20, 0, 0),
                            right_leg=(-2, 0, 18), left_leg=(60, 0, -14), right_shin=(-38, 0, 0), left_shin=(-66, 0, 0))),
     ]
     return AN.bake(rig, 'last_blow', 5.0, k, loop='hold', ground='feet', events={0.6: 'charge', 3.1: 'peak', 4.0: 'blow'})
@@ -205,14 +233,14 @@ def last_blow(rig):
 def phase2(rig):
     """Переход в фазу 2 (2.0 с): полный оборот с молотом на вытянутых руках и удар головой молота в землю (1.0, roar)."""
     gd = guard()
-    out_ = ((0.0, 17.0, -9.0), (0.0, 0.1, -1.0), (-1, 0, 0), 'body')
+    out_ = ((0.0, 17.0, -10.5), (0.0, 0.1, -1.0), (-1, 0, 0), 'body')
     k = [K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS))]
     for i, t in enumerate((0.2, 0.4, 0.6, 0.8)):
         k.append(K(t, 'linear' if i else 'in', **S(ham=out_, lh=1, body=(-6, -90 * (i + 1) + 30, 0), bpos=(0, -1.2, 0), torso=(0, 0, 0),
                                                     head=(4, 0, 0), right_leg=(-10, 0, 10), left_leg=(10, 0, -10), right_shin=(-8, 0, 0),
                                                     left_shin=(-8, 0, 0))))
     d_imp = (0.0, -0.55, -0.83)
-    imp = (AN.ham_from_strike((1.0, 0.0, -17.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    imp = (AN.ham_from_strike((1.0, 0.0, -19.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
     k += [
         K(1.0, 'in3', **S(ham=imp, lh=1, body=(-20, -360, 0), bpos=(0, -2.5, -0.8), head=(26, 0, 0), right_leg=(-6, 0, 10), left_leg=(42, 0, -8),
                            right_shin=(-22, 0, 0), left_shin=(-44, 0, 0))),
@@ -225,7 +253,7 @@ def phase2(rig):
 
 def phase3(rig):
     """Переход в фазу 3 «Мифический сплав» (3.0 с): сжимается, 1.6 — распрямляется, руки в стороны (ignite: текстура → aris_mythic)."""
-    hang = ((9.0, 13.0, -2.5), (0.25, -0.95, -0.2), (1, 0, 0))
+    hang = ((10.5, 13.0, -3.5), (0.35, -0.92, -0.2), (0, 0.2, -0.98))      # молот висит у правого бедра, навершие не в боку
     k = [
         K(0.0, **S(ham=guard(), lh=1, **GUARD_LEGS)),
         K(0.7, 'io', **S(ham=hang, lh=0.0, larm=(40, 0, -10), lfore=(90, 0, 0), body=(-20, 0, 0), torso=(-14, 0, 0), head=(-26, 0, 0), bpos=(0, -2.2, 0),
@@ -256,10 +284,10 @@ def spawn(rig):
     gd = guard()
     p = planted()
     d_imp = (0.0, -0.45, -0.89)
-    imp = (AN.ham_from_strike((0.8, 0.0, -19.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    imp = (AN.ham_from_strike((0.8, 0.0, -21.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
     under['hg'] = {'rot': (0, 0, 0), 'pos': (0, -40, 0)}
     under['ham'] = (p[0] + np.array([0, -40.0, 0]), p[1], p[2])
-    kn2 = dict(kn, hg={'rot': (0, 0, 0), 'pos': (0, 0, 0)})
+    kn2 = dict(kn, hg=HG_PLANT)
     under = S(**under)
     under.update(vis=(1, 0), head=(-30, 0, 0), torso=(-10, 0, 0))
     k = [
@@ -267,12 +295,20 @@ def spawn(rig):
         K(4.5, 'out', **S(**dict(kn2, head=(-24, 0, 0), torso=(-10, 0, 0)))),
         K(5.2, 'io', **S(**dict(kn2, head=(0, 0, 0), torso=(-4, 0, 0)))),
         K(6.0, 'io', **S(ham=(p[0] + np.array([0, 2.0, 0]), p[1], p[2]), rslide=8.5, rpole=(0.6, -0.4, 0.7), head=(6, 0, 0), **GUARD_LEGS)),
-        K(6.7, 'io', **S(ham=((2.0, 29.0, 3.0), (0.05, 0.42, 0.9), (0, 1, 0)), lh=1, body=(12, 0, 0), torso=(10, 0, 0), head=(16, 0, 0),
-                          right_leg=(-14, 0, 8), left_leg=(22, 0, -6), right_shin=(-4, 0, 0), left_shin=(-10, 0, 0), rpole=(0.8, 0.2, 0.4),
-                          lpole=(-0.8, 0.2, 0.4))),
-        K(7.0, 'in3', **S(ham=imp, lh=1, body=(-26, 0, 0), torso=(-8, 0, 0), head=(18, 0, 0), bpos=(0, -3.0, -1.0), right_leg=(-6, 0, 10),
+        # правка 20.11: молот не крутится через корпус — поднимается вертикально у правого бока (бойки вперёд-назад), уходит
+        # на правое плечо за спину и только оттуда — замах из-за головы и удар вперёд (impact по-прежнему 7.0)
+        K(6.3, 'io', **S(ham=((10.0, 14.5, -1.5), (0.1, 0.98, 0.15), (0, 0, -1)), rpole=(0.9, -0.4, 0.2), head=(4, 0, 0), torso=(2, 0, 0),
+                          **GUARD_LEGS)),
+        K(6.55, 'io', **S(ham=((7.5, 24.0, 1.5), (0.35, 0.5, 0.8), (0, 0.85, -0.5)), lh=0.5, rpole=(0.9, 0.0, 0.4), lpole=(-0.8, 0.0, 0.5),
+                           body=(6, -8, 0), torso=(6, -4, 0), head=(10, 6, 0), right_leg=(-12, 0, 8), left_leg=(18, 0, -6),
+                           right_shin=(-4, 0, 0), left_shin=(-8, 0, 0))),
+        K(6.75, 'io', **S(ham=windup(), lh=0.45, **WINDUP)),
+        K(6.88, 'in', **S(ham=FWD_UP, lh=1, body=(-8, 0, 0), torso=(-4, 0, 0), head=(4, 0, 0),
+                           bpos=(0, -0.5, -0.5), right_leg=(-18, 0, 8), left_leg=(30, 0, -6), right_shin=(-10, 0, 0), left_shin=(-24, 0, 0),
+                           rpole=(0.9, -0.2, 0.3), lpole=(-0.9, -0.2, 0.3))),
+        K(7.0, 'in3', **S(ham=imp, lh=1, body=(-18, 0, 0), torso=(-6, 0, 0), head=(14, 0, 0), bpos=(0, -3.0, -1.0), right_leg=(-6, 0, 10),
                            left_leg=(52, 0, -8), right_shin=(-26, 0, 0), left_shin=(-52, 0, 0))),
-        K(7.6, 'out', **S(ham=imp, lh=1, body=(-20, 0, 0), torso=(-4, 0, 0), head=(24, 0, 0), bpos=(0, -2.6, -1.0), right_leg=(-6, 0, 10),
+        K(7.6, 'out', **S(ham=imp, lh=1, body=(-15, 0, 0), torso=(-4, 0, 0), head=(24, 0, 0), bpos=(0, -2.6, -1.0), right_leg=(-6, 0, 10),
                            left_leg=(48, 0, -8), right_shin=(-24, 0, 0), left_shin=(-48, 0, 0))),
         K(9.0, 'io', **S(ham=gd, lh=1, **GUARD_LEGS)),
     ]
@@ -289,7 +325,7 @@ def surrender(rig):
     2.6 horns_out; 2.6–3.1 рука соскальзывает, молот падает (3.2 — hammer_drop, удар о землю); 3.6 — speak (фраза). Дальше держит."""
     gd = guard()
     kn = kneel_ham()
-    stag = ((6.0, 12.5, -6.0), (0.4, -0.6, -0.7), (0.6, -0.6, 0.5))
+    stag = ((6.0, 12.5, -6.0), (0.4, -0.6, -0.7), (0, -0.76, 0.65))       # бойки в плоскости yz: не задевают колено
     fall = fallen()
     kneel_body = dict(KNEEL)
     bow = dict(head=(-34, 0, 0), torso=(-14, 0, 0))
@@ -298,10 +334,10 @@ def surrender(rig):
         K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
         K(0.4, 'out', **S(ham=stag, lh=0.0, larm=(-20, 0, -30), lfore=(30, 0, 0), body=(10, 0, 0), torso=(8, 0, 0), head=(14, 0, 0),
                            bpos=(0, -0.5, 1.2), right_leg=(-20, 0, 8), left_leg=(6, 0, -8), right_shin=(-20, 0, 0), left_shin=(-6, 0, 0))),
-        K(1.2, 'io', **S(vis=(1, 0), lh=0.0, head=(-20, 0, 0), torso=(-10, 0, 0), **lknee, **kn)),
-        K(1.25, 'linear', **S(vis=(0, 1), lh=0.0, head=(-20, 0, 0), torso=(-10, 0, 0), **lknee, **kn)),
-        K(2.0, 'io', **S(vis=(0, 1), lh=0.0, **bow, **lknee, **kn)),
-        K(2.6, 'io', **S(vis=(0, 1), lh=0.0, head=(-40, 0, 0), torso=(-18, 0, 0), **lknee, **kn)),
+        K(1.2, 'io', **S(vis=(1, 0), lh=0.0, head=(-20, 0, 0), torso=(-10, 0, 0), **lknee, **kn, hg=HG_PLANT)),
+        K(1.25, 'linear', **S(vis=(0, 1), lh=0.0, head=(-20, 0, 0), torso=(-10, 0, 0), **lknee, **kn, hg=HG_PLANT)),
+        K(2.0, 'io', **S(vis=(0, 1), lh=0.0, **bow, **lknee, **kn, hg=HG_PLANT)),
+        K(2.6, 'io', **S(vis=(0, 1), lh=0.0, head=(-40, 0, 0), torso=(-18, 0, 0), **lknee, **kn, hg=HG_PLANT)),
         K(3.0, 'in', **S(vis=(0, 1), lh=0.0, rh=0.0, rarm=(14, 0, 14), rfore=(20, 0, 0), head=(-42, 0, 0), torso=(-20, 0, 0), **lknee, **kn,
                           hg={'rot': (fall['rot'][0] * 0.7, fall['rot'][1], 0), 'pos': (0, 1.6, 0)})),
         K(3.2, 'in', **S(vis=(0, 1), lh=0.0, rh=0.0, rarm=(10, 0, 12), rfore=(16, 0, 0), head=(-42, 0, 0), torso=(-20, 0, 0), **lknee, **kn, hg=fall)),
@@ -323,7 +359,7 @@ def npc_stand(rig):
     k = []
     for t in (0, 1, 2, 3, 4):
         ph = 2 * math.pi * t / 4
-        k.append(K(t, 'io', **S(ham=planted(), rslide=6.5, vis=(0, 1), rpole=(0.5, -0.6, 0.6), larm=(-6, 0, -34), lfore=(80, 0, 0),
+        k.append(K(t, 'io', **S(ham=planted(), rslide=6.5, vis=(0, 1), hg=HG_PLANT, rpole=(0.5, -0.6, 0.6), larm=(-6, 0, -34), lfore=(80, 0, 0),
                                  body=(0, 0, 3), bpos=(0, -0.2 + 0.2 * math.cos(ph), 0), right_leg=(0, 0, 4), left_leg=(6, 0, -8), left_shin=(-10, 0, 0),
                                  torso=(1.5 * math.sin(ph), 0, -2), head=(-4 + 3 * math.sin(ph * 2), 22 * math.sin(ph), 4))))
     return AN.bake(rig, 'npc_stand', 4.0, k, loop=True, ground='feet', wind=0.3)
@@ -334,13 +370,13 @@ def npc_sit(rig):
     # куда положить hammer_ground, чтобы центр головы оказался под ней (0, 3.4, 1.0); рукоять уходит вправо-вперёд
     R = AN.euler((G.HG_REST[0] + 95, 60, 0))
     head_rest = G.hg_offset((0, G.HAM_HEAD, 0))
-    want = np.array([0.0, 3.4, 1.0])
+    want = np.array([0.0, 2.9, 1.0])
     pos = want - (np.array(G.HG_PIVOT) + R @ head_rest)
     hg = {'rot': (95, 60, 0), 'pos': tuple(pos)}
     k = []
     for t in (0, 1, 2, 3, 4):
         ph = 2 * math.pi * t / 4
-        k.append(K(t, 'io', **S(vis=(0, 1), hg=hg, rh=0.0, bpos=(0, -4.6 + 0.12 * math.cos(ph), 1.0), body=(-12, 0, 0),
+        k.append(K(t, 'io', **S(vis=(0, 1), hg=hg, rh=0.0, bpos=(0, -4.25 + 0.12 * math.cos(ph), 1.0), body=(-12, 0, 0),
                                  right_leg=(78, 0, 14), right_shin=(-96, 0, 0), left_leg=(84, 0, -10), left_shin=(-104, 0, 0),
                                  rarm=(62, 0, 6), rfore=(92, 0, 0), larm=(40, 0, -10), lfore=(36, 0, 0),
                                  torso=(-6 + 1.5 * math.sin(ph), 0, 0), head=(-6 + 2 * math.sin(ph), -10 + 8 * math.sin(ph / 2), 8))))
@@ -364,8 +400,8 @@ def billet(rig):
 def chains(rig):
     """«Цепи кузни» (1.6 с): бьёт навершием молота в землю, левый кулак рывком вверх — цепи вырываются из земли (chains 0.8)."""
     d_dn = (0.15, -0.95, -0.25)
-    pomm = ((7.0, 14.0, -5.0), (0.15, 0.95, 0.25), (1, 0, 0))            # молот головой вверх, навершие у земли
-    hitp = ((6.5, 11.5, -4.5), (0.12, 0.97, 0.2), (1, 0, 0))
+    pomm = ((8.5, 14.0, -5.0), (0.2, 0.95, 0.2), (0, 0, -1))             # молот головой вверх у правого плеча, навершие у земли; бойки вперёд-назад
+    hitp = ((8.0, 11.5, -4.5), (0.18, 0.97, 0.15), (0, 0, -1))
     k = [
         K(0.0, **S(ham=carry(), **GUARD_LEGS)),
         K(0.5, 'io', **S(ham=pomm, larm=(40, 0, -20), lfore=(80, 0, 0), body=(6, 0, 0), torso=(6, 0, 0), head=(6, 0, 0),
@@ -384,10 +420,12 @@ def quench(rig):
     rg = rest_ground()
     k = [
         K(0.0, **S(ham=guard(), lh=1, **GUARD_LEGS)),
+        K(0.22, 'io', **S(ham=RAISE, lh=0.3, larm=(120, 0, -10), lfore=(40, 0, 0), head=(8, 0, 0), torso=(4, 0, 0), rpole=(0.9, -0.3, 0.2))),
         K(0.45, 'io', **S(ham=rg, larm=(176, 0, -6), lfore=(40, 0, 0), head=(16, 0, 0), torso=(8, 0, 0))),
         K(0.8, 'out', **S(ham=rg, larm=(168, 0, -10), lfore=(70, 0, 0), head=(-20, 0, 0), torso=(-10, 0, 0), body=(-6, 0, 0), bpos=(0, -0.8, 0),
                            right_shin=(-10, 0, 0), left_shin=(-10, 0, 0))),
         K(1.3, 'io', **S(ham=rg, larm=(30, 0, -36), lfore=(40, 0, 0), head=(-8, 0, 0), torso=(-4, 0, 0))),
+        K(1.55, 'io', **S(ham=RAISE, lh=0.3, larm=(20, 0, -30), lfore=(40, 0, 0), head=(-2, 0, 0), rpole=(0.9, -0.3, 0.2), **GUARD_LEGS)),
         K(1.8, 'io', **S(ham=guard(), lh=1, **GUARD_LEGS)),
     ]
     return AN.bake(rig, 'quench', 1.8, k, loop=False, ground='feet', events={0.8: 'splash'})
@@ -395,7 +433,7 @@ def quench(rig):
 
 def bellows(rig):
     """«Мехи» (1.5 с): 0–0.8 замах молотом низко назад (предупреждение-конус), 0.8 (gust) — мощный взмах снизу-вперёд, порыв жара."""
-    low = ((7.0, 10.0, 6.0), (0.25, -0.35, 0.9), (0, -1, 0))
+    low = ((9.5, 10.0, 4.5), (0.45, -0.3, 0.84), (0, -1, 0))
     up = ((1.5, 24.0, -8.0), (0.0, 0.75, -0.66), (0, 0.66, 0.75))
     wide = dict(right_leg=(-16, 0, 14), left_leg=(28, 0, -12), right_shin=(-14, 0, 0), left_shin=(-30, 0, 0))
     k = [

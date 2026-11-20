@@ -119,6 +119,21 @@ public final class ArisClient {
                 .cut(ArisMath.LAST_FALL, (k, t, c) -> Shot.of(c.focus.add(playerSide(c).scale(24)).add(0, 10, 0), c.focus.add(0, 4, 0))   // падение, удар
                         .shake(t >= ArisMath.LAST_BLOW && t < ArisMath.LAST_BLOW + 10 ? 0.25 : 0));
 
+        // the finisher: only the victim's camera (2 s) — close on her head and hammer from beside the victim (pressed to the ground)
+        BossCam.plan("aris.finisher", ArisMath.FINISHER_CAM)
+                .shot(0, (k, t, c) -> {
+                    Vec3 head = c.b.add(0, 2.2, 0);
+                    net.minecraft.world.entity.Entity v = c.extra;
+                    if (v == null) return Shot.of(c.rel(c.b, 3.2, 0, 1.4), head);
+                    Vec3 vp = v.getPosition(c.pt), d = vp.subtract(c.b).multiply(1, 0, 1);
+                    d = d.lengthSqr() < 1e-3 ? c.fwd : d.normalize();
+                    double a = Math.toRadians(20);
+                    Vec3 dd = new Vec3(d.x * Math.cos(a) - d.z * Math.sin(a), 0, d.x * Math.sin(a) + d.z * Math.cos(a));
+                    Vec3 pos = c.b.add(dd.scale(3.2));
+                    int slam = ArisMath.FINISHER_SLAM - ArisMath.FINISHER_CAM_FROM;
+                    return Shot.of(new Vec3(pos.x, c.b.y + 1.2, pos.z), head).shake(t >= slam && t < slam + 5 ? 0.12 : 0);
+                });
+
         // «Сдача» 5.0 s (focus = where she kneels)
         BossCam.plan("aris.surrender", ArisMath.SURRENDER)
                 .shot(0, (k, t, c) -> Shot.of(c.orbit(c.b, 30 + 15 * sine(k), 5, 1.6), c.b.add(0, 1.6, 0)))           // сломлена

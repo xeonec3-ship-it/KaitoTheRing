@@ -20,8 +20,8 @@ public final class ArisMath {
 
     /** Animation names (animation.aris.<name>) and their lengths in ticks. */
     public static final String[] ANIMS = {"", "slam", "swing", "cast", "forge", "last_blow", "phase2", "phase3", "spawn", "surrender",
-            "billet", "chains", "quench", "bellows", "replica_break"};
-    public static final int[] ANIM_TICKS = {0, 32, 28, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40};
+            "billet", "chains", "quench", "bellows", "replica_break", "finisher"};
+    public static final int[] ANIM_TICKS = {0, 32, 28, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40, 48};
 
     public static int anim(String name) {
         for (int i = 1; i < ANIMS.length; i++) if (ANIMS[i].equals(name)) return i;
@@ -199,6 +199,23 @@ public final class ArisMath {
     public static double[] billetArc(double[] from, double[] to, int k, int n) {
         double u = Math.max(0, Math.min(1, k / (double) n));
         return new double[] {from[0] + (to[0] - from[0]) * u, from[1] + (to[1] - from[1]) * u + 3 * 4 * u * (1 - u), from[2] + (to[2] - from[2]) * u};
+    }
+
+    // ---------------------------------------------------------------- finisher (owner 20.11: «всем боссам добивание»)
+
+    /**
+     * animation.aris.finisher (fx aris_finisher) — PROVISIONAL until the visual letter's «Добивание» lands: 2.4 s, the victim is pulled
+     * 1.6 before her in 0.7 s and pressed to the ground, the hammer comes down like on a billet at 1.5 s, death at 2.2 s.
+     */
+    public static final int FINISHER = 48, FINISHER_PULL = 14, FINISHER_SLAM = 30, FINISHER_KILL = 44, FINISHER_CAM_FROM = 6, FINISHER_CAM = 40;
+    public static final double FINISHER_DIST = 1.6;
+    /** Animations the visual assistant has not delivered yet (the test only checks them once they exist). */
+    public static final java.util.Set<String> PENDING = java.util.Set.of("finisher");
+
+    /** Pull of the victim toward the hold point at finisher tick t (0..1, ease in-out). */
+    public static double finisherPull(int t) {
+        double u = Math.max(0, Math.min(1, t / (double) FINISHER_PULL));
+        return u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
     }
 
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика» (animation.aris.replica_break, 2.0 s)

@@ -178,6 +178,48 @@ public class ButterflyDreamSpell extends IllusionBase implements ru.pohsmp.core.
         super.onServerCastComplete(level, spellLevel, caster, md, cancelled);
     }
 
+    // ---------------------------------------------------------------- T30: the whole spell from a point (Эреб's finale)
+
+    /**
+     * T30 «Эреб, Первый Предатель», finale: the spell cast by `point` — an invisible caster standing where the boss stood (the boss
+     * itself vanishes during the scene, the point must live to the end of the dream). The same scene, music, fx and sounds as a real
+     * cast; after CAST ticks the dream falls on every enemy player within `radius` for `dreamTicks`. No Iron's cast, no mana.
+     */
+    public static void castFromPoint(ServerLevel sl, LivingEntity point, double radius, int dreamTicks) {
+        Cast c = startCast(sl, point);
+        ru.pohsmp.core.spell.Tasks.add(() -> {
+            if (point.isRemoved()) {   // the point is gone (server stop...): the scene ends
+                CASTS.remove(point.getUUID());
+                if (c.fx >= 0) Fx.stop(sl, c.fx, "");
+                Cutscene.end(sl, point, c.watchers, c.cutKey);
+                return false;
+            }
+            c.age++;
+            Vec3 a = point.position();
+            if (c.age == 40) sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 1.5f, 1.6f);
+            if (c.age == 160) sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 3f, 0.5f);
+            if (c.age == 180 || c.age == 234) {
+                if (c.age == 180) Cutscene.flash(sl, c.watchers, 16, Reg.ILLUSION_COLOR);
+                sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.ELYTRA_FLYING, SoundSource.PLAYERS, 1.2f, 0.5f);
+                sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2.5f, 0.6f);
+            }
+            if (c.age == 236) Cutscene.flash(sl, c.watchers, 14, 0xFFFFFF);
+            if (c.age % 40 == 0) sl.playSound(null, a.x, a.y + 1, a.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 2f, 0.5f + c.age / 480f);
+            if (c.age < CAST) return true;
+            CASTS.remove(point.getUUID());
+            dream(sl, point, radius, dreamTicks);
+            List<UUID> w = c.watchers;
+            int key = c.cutKey;
+            int[] left = {TAIL};
+            ru.pohsmp.core.spell.Tasks.add(() -> {   // the scene keeps its 1 s tail
+                if (--left[0] > 0) return true;
+                Cutscene.end(sl, point, w, key);
+                return false;
+            });
+            return false;
+        });
+    }
+
     // ---------------------------------------------------------------- the dream
 
     /**
@@ -231,8 +273,11 @@ public class ButterflyDreamSpell extends IllusionBase implements ru.pohsmp.core.
     private static int TAG = 5_000_000;
 
     private static void dream(ServerLevel sl, LivingEntity caster) {
-        double r = d(ServerConfig.BD_RADIUS);
-        int ticks = ticks(ServerConfig.BD_SECONDS);
+        dream(sl, caster, d(ServerConfig.BD_RADIUS), ticks(ServerConfig.BD_SECONDS));
+    }
+
+    /** The dream on every enemy player within r of the caster for `ticks` (T30: Эреб's finale gives its own radius and time). */
+    private static void dream(ServerLevel sl, LivingEntity caster, double r, int ticks) {
         Dream d = new Dream(caster, sl, ++TAG, r);
         d.hidden.add(caster);
         for (ServerPlayer p : sl.players())

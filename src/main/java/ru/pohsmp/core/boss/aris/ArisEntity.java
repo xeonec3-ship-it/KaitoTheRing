@@ -318,7 +318,7 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         setTarget(null);
         int before = tex();
         play("surrender");
-        Fx.play(sl, Fx.fx("aris_surrender").caster(this).at(position()).yaw(getYRot()));
+        Fx.play(sl, Fx.fx("aris_surrender").at(position()).yaw(getYRot()));
         List<ServerPlayer> who = core.scene("aris.surrender", ArisMath.SURRENDER, BossNet.SCENE_LOCK_INPUT | BossNet.SCENE_BARS | BossNet.SCENE_NO_HUD,
                 48, position(), getYRot(), -1);
         core.play(new BossTimeline("scene:surrender", ArisMath.SURRENDER)
@@ -338,6 +338,58 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
                     core.actionbar(48, ArisFight.ui("surrendered"));
                     core.endFinale();
                 }));
+    }
+
+    // ---------------------------------------------------------------- finisher (framework BossFinisher; T28 «Добивание»)
+
+    private Vec3 holdPoint;
+
+    @Override
+    public int finisherTicks() {
+        return ArisMath.FINISHER;
+    }
+
+    @Override
+    public int finisherKillTick() {
+        return ArisMath.FINISHER_KILL;
+    }
+
+    /** The victim is pressed to the ground: the held pose of TargetPose (no PlayerAnimator pose of her own yet). */
+    @Override
+    public String finisherVictimAnim() {
+        return null;
+    }
+
+    @Override
+    public void onFinisherStart(ServerPlayer victim) {
+        if (!(level() instanceof ServerLevel sl)) return;
+        fight.onFinisher();
+        getNavigation().stop();
+        float yaw = (float) (Math.atan2(victim.getZ() - getZ(), victim.getX() - getX()) * 180 / Math.PI) - 90;
+        fight.face(yaw);
+        holdPoint = ArisFight.ground(sl, position().add(Vec3.directionFromRotation(0, yaw).scale(ArisMath.FINISHER_DIST)));
+        play("finisher");
+        core.sound("aris.swing", 1.5f, 0.7f);
+        Fx.play(sl, Fx.fx("aris_finisher").at(position()).yaw(yaw).target(victim));
+        core.play(new BossTimeline("finisher_cam", ArisMath.FINISHER_CAM_FROM + 1)
+                .at(ArisMath.FINISHER_CAM_FROM, () -> core.sceneFor(victim, "aris.finisher", ArisMath.FINISHER_CAM,
+                        BossNet.SCENE_LOCK_INPUT | BossNet.SCENE_NO_HUD, holdPoint, yaw, victim.getId())));
+    }
+
+    /** Pulled 1.6 before her (body forward) and held on the ground. */
+    @Override
+    public Vec3 finisherVictimPos(ServerPlayer victim, int t, Vec3 from) {
+        if (holdPoint == null) return from;
+        return from.lerp(holdPoint, ArisMath.finisherPull(t));
+    }
+
+    @Override
+    public void onFinisherTick(ServerPlayer victim, int t) {
+        if (t == ArisMath.FINISHER_SLAM && level() instanceof ServerLevel sl && holdPoint != null) {
+            core.sound(holdPoint, "aris.slam", 3, 0.9f);
+            vanilla(net.minecraft.sounds.SoundEvents.ANVIL_LAND, 1.5f, 0.8f);
+            Fx.play(sl, Fx.fx("aris_slam").at(holdPoint).yaw(getYRot()));
+        }
     }
 
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика»

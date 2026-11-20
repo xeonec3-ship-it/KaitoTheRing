@@ -612,7 +612,30 @@ def keys_track(t, keys):
 
 
 RIBS = ['rib_%02d' % k for k in range(20)]
-STAFF_HOLD = {'right_arm': [12, 0, 4]}           # поза хвата посоха: предплечье чуть вперёд
+# ---- поза покоя (оси Blockbench/Iron's, см. bb()). Правая рука держит посох (хват gen_irina_staff.DISPLAY): рука вперёд на 50° —
+# древко наклонно перед ней, крюк впереди на уровне груди. Проверка 20.11 (tools/irina_anim_check.py): чистая зона правой руки с посохом —
+# вперёд 10–55°, в сторону 5–60°; при наклоне головы вниз > 12° — вперёд не больше 25° (иначе поля шляпы ложатся на древко).
+R_HOLD = [-50, 0, 12]
+L_IDLE = [-36, 22, -4]
+HEAD0 = [-3, 0, 4]
+IDLE0 = {'body': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}, 'torso': {'rot': [0, 0, 0]}, 'head': {'rot': list(HEAD0)}, 'hat': {'rot': [0, 0, 0]},
+         'right_arm': {'rot': list(R_HOLD)}, 'left_arm': {'rot': list(L_IDLE)}, 'right_leg': {'rot': [0, 0, 0]}, 'left_leg': {'rot': [0, 0, 0]}}
+
+
+def bb(pose):
+    """Позы ниже записаны в осях Blockbench / GeckoLib-JSON, как у Iron's (casting_animations.json): рука вперёд и вверх — x минус
+    (−90 — вперёд, −180 — над головой), правая рука в сторону — z плюс, левая — z минус; торс/голова вперёд-вниз — x плюс;
+    поворот тела вправо — y плюс; свисающая ткань назад — x плюс; position: x плюс — влево от неё, z минус — вперёд.
+    Anim.to_json (nightmare_geo) пишет JSON как (−x, −y, z) от внутренних осей — переводим сюда, чтобы в файле оказались ровно эти числа.
+    (Проверка 20.11: до этого перевода X/Y уходили в файл с обратным знаком — касты и удары уходили за спину.)"""
+    for ch in pose.values():
+        if 'rot' in ch:
+            r = ch['rot']
+            ch['rot'] = [-r[0], -r[1], r[2]]
+        if 'pos' in ch:
+            q = ch['pos']
+            ch['pos'] = [-q[0], q[1], q[2]]
+    return pose
 
 
 def body_bones():
@@ -634,36 +657,70 @@ def pose_mix(*poses):
 
 def idle_pose(t, per=4.0):
     br = math.sin(t * TAU / per)
-    return {'body': {'pos': [0, br * 0.25, 0]}, 'torso': {'rot': [br * 1.2, 0, 0]},
-            'head': {'rot': [-3 + br * 1.5, 6 * math.sin(t * TAU / (per * 2)), 4]}, 'hat': {'rot': [0, 0, 0]},
-            'right_arm': {'rot': [4 + br * 2, 0, 9]}, 'left_arm': {'rot': [-36 - br * 2, 22, -4 - br * 2]},
+    return {'body': {'pos': [0, br * 0.25, 0], 'rot': [0, 0, 0]}, 'torso': {'rot': [br * 1.2, 0, 0]},
+            'head': {'rot': [HEAD0[0] + br * 1.5, 6 * math.sin(t * TAU / (per * 2)), HEAD0[2]]}, 'hat': {'rot': [0, 0, 0]},
+            'right_arm': {'rot': [R_HOLD[0] + br * 1.5, 0, R_HOLD[2]]}, 'left_arm': {'rot': [L_IDLE[0] - br * 2, L_IDLE[1], L_IDLE[2] - br * 2]},
             'right_leg': {'rot': [0, 0, 0]}, 'left_leg': {'rot': [0, 0, 0]}}
 
 
-def cloth_pose(t, wind=0.0, amp=1.0, per=4.0, swirl=1.0, thr_r=1.0, walk=None):
-    """Ленты/рукава/волосы/шляпа/нити. wind — наклон назад (градусы), amp — сила качания, swirl — скорость нитей."""
+def keyed(t, keys, base=None):
+    """Анимация ключевыми позами: keys = [(t, {кость: {'rot'|'pos': [x, y, z]}})], между ключами — smoothstep (без рывков и без
+    переходов через ±180°). Кость, которой нет в ключе, берётся из позы покоя IDLE0 (все кости тела всегда с ключами)."""
+    full = []
+    for tk, p in keys:
+        q = {b: {c: list(v) for c, v in ch.items()} for b, ch in (base or IDLE0).items()}
+        for b, ch in p.items():
+            q.setdefault(b, {}).update({c: list(v) for c, v in ch.items()})
+        full.append((tk, q))
+    out = {}
+    for b in full[0][1]:
+        for c in full[0][1][b]:
+            tr = [(tk, q[b][c]) for tk, q in full]
+            out.setdefault(b, {})[c] = keys_track(t, tr)
+    return out
+
+
+def P(**bones):
+    """Короткая запись позы: P(right_arm=[x, y, z], body_pos=[…]) → {кость: {'rot'|'pos': …}}."""
+    o = {}
+    for k, v in bones.items():
+        if k.endswith('_pos'):
+            o.setdefault(k[:-4], {})['pos'] = list(v)
+        else:
+            o.setdefault(k, {})['rot'] = list(v)
+    return o
+
+
+def cloth_pose(t, wind=0.0, amp=1.0, per=4.0, swirl=1.0, thr_r=1.0, legs=None):
+    """Ленты/рукава/завязки/кончик шляпы/нити (оси Blockbench, см. bb()). wind — ветер движения (градусы): ВСЯ ткань уходит назад и
+    вниз (свисающая ткань назад — x плюс), передние ленты — слабее, чтобы не лечь на ноги; качание — со смещением назад на свою
+    амплитуду, поэтому конец ленты не выходит вперёд дальше позы покоя. legs = (правая, левая) — насколько нога вынесена вперёд (°):
+    передние ленты над этой ногой она подталкивает вперёд (не сквозь ногу)."""
     o = {}
     for k, bn in enumerate(RIBS):
         a = TAU * (k + 0.5) / 20
+        fwd = math.cos(a)                    # 1 — лента спереди, −1 — сзади (модель смотрит на −z)
+        side = math.sin(a)                   # + справа
         ph = t * TAU / per + k * 0.7
         sw = math.sin(ph) * 3.0 * amp
         tw = math.sin(ph * 0.5 + k) * 4 * amp
-        front = -math.cos(a)
-        wx = wind * front * 0.7 + (walk[0] * front * 1.0 if walk else 0)
-        o[bn] = {'rot': [sw * front + wx, tw * 0.3, sw * math.sin(a) * 0.8]}
-        o[bn + '_b'] = {'rot': [math.sin(ph - 0.9) * 5 * amp + wind * 0.4 * front, 0, math.sin(ph - 0.9) * 3 * amp * math.sin(a)]}
+        back = wind * (0.35 if fwd > 0.3 else 1.0) + 3.0 * amp
+        kick = 0.0
+        if legs:
+            cl = lambda v: max(0.0, min(1.0, v))
+            kick = max(legs[0] * cl(0.75 + side), legs[1] * cl(0.75 - side)) * cl(1.3 * fwd) * 1.15
+        o[bn] = {'rot': [back + sw - kick, tw * 0.3, sw * side * 0.8]}
+        o[bn + '_b'] = {'rot': [0.4 * back + 5 * amp + math.sin(ph - 0.9) * 5 * amp - 0.3 * kick, 0, math.sin(ph - 0.9) * 3 * amp * side]}
     for sn in 'rl':
         s = 1 if sn == 'r' else -1
-        o['sleeve_' + sn] = {'rot': [math.sin(t * TAU / per + s) * 3 * amp + wind * 0.3, 0, s * math.sin(t * TAU / per * 0.5) * 2 * amp]}
-        o['tie_' + sn] = {'rot': [math.sin(t * TAU / per + s * 0.5) * 6 * amp - wind * 0.5, 0, s * 3]}
-        o['tie_%s_b' % sn] = {'rot': [math.sin(t * TAU / per + s * 0.5 - 1) * 8 * amp - wind * 0.3, 0, 0]}
-        o['sash_' + sn] = {'rot': [math.sin(t * TAU / per * 1.3 + s) * 8 * amp + wind, 0, s * (6 + 3 * math.sin(t * TAU / per))]}
-    o['hat_tip'] = {'rot': [math.sin(t * TAU / per) * 3 * amp + wind * 0.3, 0, math.sin(t * TAU / per * 0.5) * 4 * amp]}
-    o['hat_tip2'] = {'rot': [math.sin(t * TAU / per - 0.6) * 4 * amp, 0, math.sin(t * TAU / per * 0.5 - 0.6) * 5 * amp]}
-    o['hat_tip3'] = {'rot': [math.sin(t * TAU / per - 1.2) * 6 * amp, 0, 0]}
-    o['hood_drape'] = {'rot': [math.sin(t * TAU / per + 1) * 2 * amp + wind * 0.4, 0, 0]}
-    for k in range(10):
-        pass
+        o['sleeve_' + sn] = {'rot': [math.sin(t * TAU / per + s) * 3 * amp + 3 * amp + wind * 0.3, 0, s * math.sin(t * TAU / per * 0.5) * 2 * amp]}
+        o['tie_' + sn] = {'rot': [math.sin(t * TAU / per + s * 0.5) * 2.5 * amp + 2.5 * amp + wind * 0.15, 0, s * 3]}
+        o['tie_%s_b' % sn] = {'rot': [math.sin(t * TAU / per + s * 0.5 - 1) * 3 * amp + 3 * amp + wind * 0.1, 0, 0]}
+        o['sash_' + sn] = {'rot': [math.sin(t * TAU / per * 1.3 + s) * 8 * amp + 8 * amp + wind, 0, s * (6 + 3 * math.sin(t * TAU / per))]}
+    o['hat_tip'] = {'rot': [math.sin(t * TAU / per) * 3 * amp - wind * 0.3, 0, math.sin(t * TAU / per * 0.5) * 4 * amp]}
+    o['hat_tip2'] = {'rot': [math.sin(t * TAU / per - 0.6) * 4 * amp - wind * 0.2, 0, math.sin(t * TAU / per * 0.5 - 0.6) * 5 * amp]}
+    o['hat_tip3'] = {'rot': [math.sin(t * TAU / per - 1.2) * 6 * amp - wind * 0.2, 0, 0]}
+    o['hood_drape'] = {'rot': [math.sin(t * TAU / per + 1) * 2 * amp + 2 * amp + wind * 0.4, 0, 0]}
     o['mantle'] = {'rot': [0, 0, 0]}
     # нити: вращение вокруг вертикали (знак и скорость свои), лёгкое «дыхание» радиуса
     L = per
@@ -675,293 +732,283 @@ def cloth_pose(t, wind=0.0, amp=1.0, per=4.0, swirl=1.0, thr_r=1.0, walk=None):
     return o
 
 
+def walk_legs(t):
+    s = math.sin(t / 1.2 * TAU)
+    return s * 26, -s * 26                   # правая/левая нога: плюс — назад
+
+
+# ---- шляпа в смерти: слетает назад-вправо и остаётся лежать на земле, пока Ирина падает (кость hat — дочь head, поэтому
+# её ключи — обратное преобразование головы; считается по геометрии geo/entity/irina.geo.json тем же FK, что у GeckoLib)
+HAT_LAND = ([14.0, 2.0, 16.0], [3, -35, -3])   # мир модели (x вправо, y вверх, z назад): точка кости hat и её поворот (внутренние оси, Z·Y·X)
+DEATH_T = (2.3, 2.45, 2.9)                   # снялась — приподнялась — легла (событие 'hat' 2.4)
+
+
 def anims():
     out = []
 
-    def mk(name, length, fn, loop=False, dt=0.05, events=None):
+    def mk(name, length, fn, loop=False, dt=0.05, events=None, post=None):
         a = Anim(name, length, loop=loop)
-        a.sample(fn, dt)
+        a.sample(lambda t: bb(post(t, fn(t)) if post else fn(t)), dt)
         for tt, ev in (events or {}).items():
             a.instruction(tt, ev)
         out.append(a)
         return a
 
-    # ---------------- контроллер «тело» (body/torso/head/hat/руки/ноги)
+    # ---------------- контроллер «тело» (body/torso/head/hat/руки/ноги); у каждой анимации ключи на ВСЕХ костях тела
     mk('irina_idle', 4.0, lambda t: idle_pose(t), loop=True)
 
     def walk(t):
         ph = t / 1.2 * TAU
         s = math.sin(ph)
-        p = {'body': {'pos': [0, abs(math.cos(ph)) * 0.5, 0], 'rot': [0, s * 4, 0]}, 'torso': {'rot': [3, -s * 3, 0]},
-             'head': {'rot': [-2, s * 2, 3]}, 'hat': {'rot': [0, 0, 0]},
-             'right_arm': {'rot': [16 - s * 6, 0, 6]}, 'left_arm': {'rot': [s * 22, 0, -10]},
-             'right_leg': {'rot': [s * 26, 0, 0]}, 'left_leg': {'rot': [-s * 26, 0, 0]}}
-        return p
+        rl, ll = walk_legs(t)
+        return {'body': {'pos': [0, abs(math.cos(ph)) * 0.5, 0], 'rot': [0, s * 4, 0]}, 'torso': {'rot': [3, -s * 3, 0]},
+                'head': {'rot': [-2, s * 2, 3]}, 'hat': {'rot': [0, 0, 0]},
+                'right_arm': {'rot': [R_HOLD[0] + 4 + s * 4, 0, R_HOLD[2]]}, 'left_arm': {'rot': [-12 + s * 20, 0, -10]},
+                'right_leg': {'rot': [rl, 0, 0]}, 'left_leg': {'rot': [ll, 0, 0]}}
     mk('irina_walk', 1.2, walk, loop=True)
 
     def cast_short(t):
-        e = env(t, 0.0, 0.25, 0.45, 0.8)
-        p = idle_pose(t)
-        return pose_mix(p, {'torso': {'rot': [-4 * e, 18 * e, 0]}, 'head': {'rot': [-4 * e, 10 * e, 0]},
-                            'left_arm': {'rot': [-70 * e, -20 * e, 18 * e]}, 'right_arm': {'rot': [-30 * e, 0, 8 * e]}})
+        # левая ладонь выбрасывает каст вперёд (0.35), посох в правой — на месте
+        return keyed(t, [(0, {}), (0.25, P(left_arm=[-88, -8, 6], torso=[2, 10, 0], head=[-5, 6, 0], right_arm=[-46, 0, 14])),
+                         (0.45, P(left_arm=[-92, -8, 6], torso=[3, 10, 0], head=[-5, 6, 0], right_arm=[-46, 0, 14])), (0.8, {})])
     mk('irina_cast_short', 0.8, cast_short, dt=0.025, events={0.35: 'cast'})
 
-    def cast_long(t):
+    def cast_long_pose(t):
         ph = t / 2.0 * TAU
-        p = idle_pose(t)
-        return pose_mix(p, {'torso': {'rot': [-6, 0, 0]}, 'head': {'rot': [-8, 0, 0]},
-                            'right_arm': {'rot': [-98 + math.sin(ph) * 4, -10, 10]},
-                            'left_arm': {'rot': [-60 + math.sin(ph) * 12, 30 + math.cos(ph) * 18, -24 + math.sin(ph * 2) * 6]}})
-    mk('irina_cast_long', 2.0, cast_long, loop=True)
+        return {'body': {'pos': [0, 0, 0], 'rot': [0, 0, 0]}, 'torso': {'rot': [-4, 0, 0]}, 'head': {'rot': [-8, 0, 4]}, 'hat': {'rot': [0, 0, 0]},
+                'right_arm': {'rot': [-60 + math.sin(ph) * 3, 0, 16]},                       # посох поднят перед собой, навершие вверх
+                'left_arm': {'rot': [-78 + math.sin(ph) * 10, -16 + math.cos(ph) * 14, -18 + math.sin(ph * 2) * 6]},  # ладонь ткёт нити
+                'right_leg': {'rot': [0, 0, 0]}, 'left_leg': {'rot': [0, 0, 0]}}
+    mk('irina_cast_long', 2.0, cast_long_pose, loop=True)
 
     def cast_long_end(t):
-        e = 1 - env(t, 0.0, 0.5)
-        return pose_mix(idle_pose(t), {'right_arm': {'rot': [-112 * e, -10 * e, 4 * e]}, 'left_arm': {'rot': [-40 * e, 30 * e, -10 * e]}})
+        return keyed(t, [(0, cast_long_pose(0)), (0.5, {})])
     mk('irina_cast_long_end', 0.5, cast_long_end, dt=0.025)
 
     def staff_attack(t):
-        # замах посохом через плечо и косой удар крюком вниз-вперёд
-        wind = env(t, 0.0, 0.35, 0.4, 0.55)
-        hit = env(t, 0.4, 0.58, 0.75, 1.2)
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'rot': [0, -24 * wind + 30 * hit, 0], 'pos': [0, -0.6 * hit, -1.2 * hit]},
-                            'torso': {'rot': [10 * wind - 18 * hit, -10 * wind + 14 * hit, 0]},
-                            'right_arm': {'rot': [-160 * wind + 70 * hit * (1 - wind), -20 * wind + 30 * hit, 20 * wind - 10 * hit]},
-                            'left_arm': {'rot': [-20 * wind - 40 * hit, 0, -30 * hit]},
-                            'right_leg': {'rot': [-20 * hit, 0, 0]}, 'left_leg': {'rot': [16 * hit, 0, 0]},
-                            'head': {'rot': [6 * wind - 8 * hit, 12 * wind - 14 * hit, 0]}})
+        # удар крюком сверху: замах — рука справа на уровне плеча, посох стоит вертикально, крюк высоко справа от шляпы
+        # (поворот тела вправо, отклон назад) → удар вниз-вперёд по дуге справа, крюк перед ней на уровне груди цели (0.55),
+        # шаг вперёд правой; возврат в хват
+        wind = P(body=[0, 20, 0], body_pos=[0, 0, 0.6], torso=[-8, 6, 0], head=[-8, -14, 0], right_arm=[-100, 45, 0],
+                 left_arm=[-34, 0, -24], right_leg=[4, 0, 0], left_leg=[-4, 0, 0])
+        hit = P(body=[0, -14, 0], body_pos=[0, -0.6, -1.4], torso=[16, -4, 0], head=[4, 10, 0], right_arm=[-22, 0, 8],
+                left_arm=[-14, 0, -22], right_leg=[-10, 0, 0], left_leg=[12, 0, 0])
+        return keyed(t, [(0, {}), (0.36, wind), (0.42, wind), (0.58, hit), (0.75, hit), (1.2, {})])
     mk('irina_staff_attack', 1.2, staff_attack, dt=0.025, events={0.55: 'hit'})
 
     def staff_sweep(t):
-        # горизонтальный взмах крюком (по площади вокруг)
-        w = env(t, 0.0, 0.3)
-        s = env(t, 0.32, 0.6, 0.7, 1.0)
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'rot': [0, 40 * w - 120 * s * w + 0 * s, 0]},
-                            'torso': {'rot': [6 * w, 0, 0]},
-                            'right_arm': {'rot': [-80 * w + 10 * s, 60 * w - 110 * s, 30 * w]},
-                            'left_arm': {'rot': [-20 * w, 0, -40 * w]}, 'head': {'rot': [0, -20 * w + 30 * s, 0]}})
+        # горизонтальный взмах: замах вправо (тело повёрнуто вправо, посох в сторону), крюк проходит перед ней справа налево (0.46)
+        wind = P(body=[0, 46, 0], head=[0, -30, 0], right_arm=[-26, 0, 52], left_arm=[-30, 0, -30], torso=[0, 4, 0])
+        mid = P(body=[0, 0, 0], body_pos=[0, -0.4, -0.6], head=[2, 0, 0], right_arm=[-30, 0, 24], left_arm=[-24, 0, -34], torso=[6, 0, 0])
+        follow = P(body=[0, -40, 0], body_pos=[0, -0.4, -0.6], head=[0, 30, 0], right_arm=[-28, 0, 8], left_arm=[-20, 0, -40], torso=[6, -6, 0])
+        return keyed(t, [(0, {}), (0.3, wind), (0.46, mid), (0.62, follow), (0.72, follow), (1.0, {})])
     mk('irina_staff_sweep', 1.0, staff_sweep, dt=0.025, events={0.46: 'hit'})
 
     def mark(t):
-        # «Предмет ревности»: склоняет голову, указывает пальцем на цель, шляпу придерживает посохом
-        e = env(t, 0.0, 0.45, 1.0, 1.4)
-        p = idle_pose(t)
-        return pose_mix(p, {'head': {'rot': [-6 * e, 14 * e, 14 * e]}, 'torso': {'rot': [0, 20 * e, 0]},
-                            'left_arm': {'rot': [-84 * e, -18 * e, 6 * e]}, 'right_arm': {'rot': [-30 * e, 0, 10 * e]}})
+        # «Предмет ревности»: склоняет голову набок и указывает левой рукой на цель перед собой
+        p = P(left_arm=[-90, -4, 4], head=[2, 10, 14], torso=[0, 10, 0], right_arm=[-44, 0, 14])
+        return keyed(t, [(0, {}), (0.45, p), (1.0, p), (1.4, {})])
     mk('irina_mark', 1.4, mark, dt=0.025, events={0.7: 'mark'})
 
     def bind(t):
-        # «Красные нити»: руки скрещиваются у груди, затем разводятся — нити связывают пары
-        c = env(t, 0.0, 0.5, 0.75, 1.0)
-        o = env(t, 0.8, 1.05, 1.3, 1.6)
-        p = idle_pose(t)
-        return pose_mix(p, {'right_arm': {'rot': [-70 * c - 50 * o, -40 * c + 40 * o, -30 * c + 50 * o]},
-                            'left_arm': {'rot': [-70 * c - 50 * o, 40 * c - 40 * o, 30 * c - 50 * o]},
-                            'torso': {'rot': [8 * c - 10 * o, 0, 0]}, 'head': {'rot': [10 * c - 12 * o, 0, 0]},
-                            'body': {'pos': [0, -0.5 * c + 0.3 * o, 0]}})
+        # «Красные нити»: левая рука к груди, посох прижат (0.5), затем обе руки разводятся вперёд-в стороны — нити связывают пары (0.9)
+        cross = P(left_arm=[-74, 34, 34], right_arm=[-46, -8, 10], torso=[6, 0, 0], head=[6, 0, 0], body_pos=[0, -0.5, 0])
+        spread = P(left_arm=[-64, 0, -62], right_arm=[-36, 0, 52], torso=[-6, 0, 0], head=[-10, 0, 0], body_pos=[0, 0.3, 0])
+        return keyed(t, [(0, {}), (0.5, cross), (0.75, cross), (1.05, spread), (1.3, spread), (1.6, {})])
     mk('irina_bind', 1.6, bind, dt=0.025, events={0.9: 'bind'})
 
     def whip(t):
-        # фаза 3: нити хлещут — резкий взмах обеих рук наружу
-        w = env(t, 0.0, 0.3)
-        s = env(t, 0.32, 0.45, 0.6, 1.0)
-        p = idle_pose(t)
-        return pose_mix(p, {'right_arm': {'rot': [-60 * w + 40 * s, 30 * w, 30 * w + 60 * s]},
-                            'left_arm': {'rot': [-60 * w + 40 * s, -30 * w, -30 * w - 60 * s]},
-                            'torso': {'rot': [12 * w - 22 * s, 0, 0]}, 'head': {'rot': [10 * w - 16 * s, 0, 0]},
-                            'body': {'pos': [0, -0.8 * w + 0.6 * s, 0]}})
+        # фаза 3: нити хлещут — замах (левая вверх-внутрь), резкий взмах обеих рук вперёд-наружу (0.45)
+        wind = P(left_arm=[-100, 0, 10], right_arm=[-54, 0, -2], torso=[-10, 0, 0], head=[-8, 0, 0], body_pos=[0, -0.6, 0])
+        lash = P(left_arm=[-58, 0, -62], right_arm=[-30, 0, 54], torso=[12, 0, 0], head=[6, 0, 0], body_pos=[0, 0.2, -0.6])
+        return keyed(t, [(0, {}), (0.26, wind), (0.45, lash), (0.6, lash), (1.0, {})])
     mk('irina_whip', 1.0, whip, dt=0.025, events={0.45: 'lash'})
 
     def steal(t):
-        # кража эффектов: руки раскрыты к игрокам, затем сжимаются к груди (свет стягивается к ней)
-        o = env(t, 0.0, 0.3, 0.8, 1.1)
-        c = env(t, 0.85, 1.2, 1.3, 1.5)
-        p = idle_pose(t)
-        return pose_mix(p, {'right_arm': {'rot': [-60 * o - 50 * c, 40 * o - 50 * c, 40 * o - 20 * c]},
-                            'left_arm': {'rot': [-60 * o - 50 * c, -40 * o + 50 * c, -40 * o + 20 * c]},
-                            'torso': {'rot': [-8 * o + 12 * c, 0, 0]}, 'head': {'rot': [-12 * o + 16 * c, 0, 0]}})
+        # кража эффектов: руки раскрыты вперёд к игрокам (0.3), затем стягивает свет к груди (1.2)
+        opn = P(left_arm=[-80, 0, -36], right_arm=[-44, 0, 36], torso=[-6, 0, 0], head=[-8, 0, 0])
+        clutch = P(left_arm=[-72, 34, 30], right_arm=[-44, -6, 10], torso=[10, 0, 0], head=[8, 0, 0])
+        return keyed(t, [(0, {}), (0.3, opn), (0.85, opn), (1.2, clutch), (1.3, clutch), (1.5, {})])
     mk('irina_steal', 1.5, steal, dt=0.025, events={0.3: 'pull', 1.2: 'absorb'})
 
     def happiness(t):
-        # «Чужое счастье» (6 с): поднимается над землёй, руки широко, нити разворачиваются; с 3.6 — стягивает свет к груди; 5.2 — вспышка
-        rise = env(t, 0.3, 1.6, 5.2, 6.0)
-        spread = env(t, 0.5, 1.4, 3.4, 4.0)
-        clutch = env(t, 3.6, 4.4, 5.2, 6.0)
-        sway = math.sin(t * 2.2) * spread
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'pos': [0, 6 * rise, 0], 'rot': [0, sway * 4, 0]},
-                            'torso': {'rot': [-14 * spread + 16 * clutch, 0, 0]}, 'head': {'rot': [-26 * spread + 22 * clutch, 0, 0]},
-                            'right_arm': {'rot': [-30 * spread - 90 * clutch, 0, 80 * spread - 40 * clutch]},
-                            'left_arm': {'rot': [-30 * spread - 90 * clutch, 0, -80 * spread + 40 * clutch]},
-                            'right_leg': {'rot': [-10 * rise, 0, 4 * rise]}, 'left_leg': {'rot': [14 * rise, 0, -4 * rise]}})
+        # «Чужое счастье» (6 с): поднимается над землёй (0.3–1.6), руки широко (1.4), с 3.6 стягивает свет к груди, 5.2 — вспышка
+        up = P(body_pos=[0, 6, 0], right_leg=[0, 0, 4], left_leg=[6, 0, -4])
+        spread = dict(up, **P(left_arm=[-26, 0, -80], right_arm=[-34, 0, 58], head=[-18, 0, 0], torso=[-10, 0, 0]))
+        clutch = dict(up, **P(left_arm=[-74, 34, 30], right_arm=[-44, -6, 12], head=[10, 0, 0], torso=[12, 0, 0]))
+        sway = lambda tt: dict(spread, body={'rot': [0, 4 * math.sin(tt * 2.2), 0], 'pos': [0, 6, 0]})
+        return keyed(t, [(0, {}), (0.3, P()), (1.4, sway(1.4)), (2.4, sway(2.4)), (3.4, sway(3.4)), (4.4, clutch), (5.2, clutch),
+                         (5.4, dict(clutch, **P(head=[-6, 0, 0]))), (6.0, {})])
     mk('irina_others_happiness', 6.0, happiness, events={0.0: 'begin', 1.4: 'spread', 3.6: 'gather', 5.2: 'absorb', 6.0: 'end'})
 
     def only_mine(t):
-        # «Только мой» (6.2 с): тянется к жертве (0.6), рывок к себе (1.0), обнимает кокон (1.6–5.4), сжимает (5.4)
-        reach = env(t, 0.1, 0.6, 0.8, 1.1)
-        yank = env(t, 0.8, 1.1, 1.3, 1.7)
-        hug = env(t, 1.4, 1.9, 5.3, 5.5)
-        crush = env(t, 5.3, 5.5, 5.8, 6.2)
-        breathe = math.sin(t * 3) * hug
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'pos': [0, 0, -1.2 * reach + 1.0 * yank], 'rot': [0, 0, 0]},
-                            'torso': {'rot': [-10 * reach + 16 * yank + 6 * hug + 4 * breathe - 10 * crush, 0, 0]},
-                            'head': {'rot': [-6 * reach + 10 * hug + 8 * crush, 0, 16 * hug]},
-                            'left_arm': {'rot': [-95 * reach - 30 * yank + (-60) * hug - 20 * crush, 10 * reach + 40 * hug, -6 * reach + 30 * hug]},
-                            'right_arm': {'rot': [-20 * reach - 50 * hug - 20 * crush, 0, 10 * reach - 20 * hug]},
-                            'right_leg': {'rot': [-14 * reach, 0, 0]}, 'left_leg': {'rot': [10 * reach, 0, 0]}})
+        # «Только мой» (6.2 с): тянется левой рукой к жертве перед собой (0.6), рывок к себе (1.0), обнимает кокон перед собой
+        # (1.6–5.4, дышит), сжимает (5.4); посох в правой отведён в сторону
+        reach = P(left_arm=[-96, 0, 2], torso=[10, 0, 0], head=[4, 0, 0], body_pos=[0, 0, -1.2], right_arm=[-36, 0, 20],
+                  right_leg=[-8, 0, 0], left_leg=[8, 0, 0])
+        yank = P(left_arm=[-70, 18, 16], torso=[-8, 0, 0], head=[-4, 0, 0], body_pos=[0, 0, 0.4], right_arm=[-36, 0, 24])
+        hug = P(left_arm=[-82, 30, 26], right_arm=[-30, -10, 20], torso=[6, 0, 0], head=[10, 0, 14], body_pos=[0, 0, -0.4])
+        hug2 = dict(hug, **P(torso=[9, 0, 0], left_arm=[-80, 32, 28]))
+        crush = P(left_arm=[-78, 40, 34], right_arm=[-28, -10, 16], torso=[14, 0, 0], head=[14, 0, 14], body_pos=[0, -0.4, -0.4])
+        return keyed(t, [(0, {}), (0.6, reach), (0.8, reach), (1.1, yank), (1.9, hug), (2.8, hug2), (3.7, hug), (4.6, hug2), (5.3, hug),
+                         (5.5, crush), (5.8, crush), (6.2, {})])
     mk('irina_only_mine', 6.2, only_mine, events={0.6: 'reach', 1.0: 'yank', 1.6: 'cocoon', 5.4: 'crush', 6.2: 'end'})
 
     def only_mine_broken(t):
-        # кокон разорван союзниками: отшатывается, хватается за шляпу
-        s = env(t, 0.0, 0.15, 0.5, 1.2)
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'pos': [0, 0, 2.0 * s], 'rot': [0, 0, 0]}, 'torso': {'rot': [18 * s, 0, 6 * s]},
-                            'head': {'rot': [20 * s, 0, -10 * s]}, 'hat': {'rot': [-10 * s, 0, 8 * s]},
-                            'left_arm': {'rot': [-150 * s, 0, -10 * s]}, 'right_arm': {'rot': [-10 * s, 0, 30 * s]}})
+        # кокон разорван союзниками: отшатывается назад, левой рукой хватается за поля шляпы
+        p = P(body_pos=[0, 0, 2.0], torso=[-14, 0, 6], head=[-12, 0, -10], hat=[-8, 0, 8], left_arm=[-124, 8, 4], right_arm=[-34, 0, 30])
+        return keyed(t, [(0, {}), (0.25, p), (0.55, p), (1.2, {})])
     mk('irina_only_mine_broken', 1.2, only_mine_broken, dt=0.025, events={0.0: 'broken'})
 
     def phase2(t):
-        # переход 66%: тянет поля шляпы вниз (тень на глаза), затем резко поднимает голову — нити расходятся
-        d = env(t, 0.0, 0.6, 1.2, 1.5)
-        u = env(t, 1.3, 1.6, 2.1, 2.5)
-        p = idle_pose(t)
-        return pose_mix(p, {'head': {'rot': [16 * d - 18 * u, 0, 0]}, 'hat': {'rot': [10 * d - 6 * u, 0, 0]},
-                            'left_arm': {'rot': [-150 * d - 30 * u * 0, 0, -20 * d]}, 'right_arm': {'rot': [-20 * u, 0, 40 * u]},
-                            'torso': {'rot': [8 * d - 10 * u, 0, 0]}})
+        # переход 66%: левой рукой тянет поля шляпы вниз (голова склонена, посох опущен), затем резко поднимает голову (1.45)
+        d = P(head=[14, 0, 0], hat=[8, 0, 0], left_arm=[-102, 8, 2], right_arm=[-22, 0, 18], torso=[8, 0, 0])
+        u = P(head=[-16, 0, 0], hat=[-4, 0, 0], left_arm=[-44, 0, -44], right_arm=[-42, 0, 44], torso=[-10, 0, 0])
+        return keyed(t, [(0, {}), (0.6, d), (1.25, d), (1.55, u), (2.1, u), (2.5, {})])
     mk('irina_phase2', 2.5, phase2, events={1.45: 'burst'})
 
     def phase3(t):
         # переход 33%: ярость — запрокидывает голову, руки в стороны и вниз, шляпа съезжает набок
-        r = env(t, 0.2, 0.9, 2.3, 3.0)
-        sh = math.sin(t * 40) * env(t, 1.2, 1.4, 2.0, 2.3)
-        p = idle_pose(t)
-        return pose_mix(p, {'head': {'rot': [-30 * r, 0, sh * 3]}, 'hat': {'rot': [-6 * r, 0, -14 * r]},
-                            'torso': {'rot': [-12 * r, 0, sh]}, 'body': {'pos': [0, 1.0 * r, 0]},
-                            'right_arm': {'rot': [10 * r, 0, 70 * r]}, 'left_arm': {'rot': [10 * r, 0, -70 * r]},
-                            'right_leg': {'rot': [0, 0, 6 * r]}, 'left_leg': {'rot': [0, 0, -6 * r]}})
+        def r(tt):
+            sh = math.sin(tt * 40) * env(tt, 1.2, 1.4, 2.0, 2.3)
+            return P(head=[-28, 0, sh * 3], hat=[-6, 0, -14], torso=[-12, 0, sh], body_pos=[0, 1.0, 0], right_arm=[-22, 0, 62],
+                     left_arm=[-12, 0, -70], right_leg=[0, 0, 6], left_leg=[0, 0, -6])
+        ks = [(0, {}), (0.2, {})] + [(round(0.9 + 0.1 * i, 2), r(0.9 + 0.1 * i)) for i in range(15)] + [(3.0, {})]
+        return keyed(t, ks)
     mk('irina_phase3', 3.0, phase3, events={1.3: 'rage'})
 
     def finisher(t):
-        # добивание (2.6 с): нити опутывают жертву (0.2), подтягивает к себе (0.8), «только мой» — обнимает левой рукой,
-        # крюком посоха пронзает (1.3), шепчет (1.7), отпускает (2.2 — kill)
-        grab = env(t, 0.0, 0.3, 0.6, 0.8)
-        hold = env(t, 0.7, 0.9, 2.1, 2.5)
-        raise_ = env(t, 0.9, 1.15, 1.2, 1.3)
-        stab = env(t, 1.2, 1.32, 1.9, 2.3)
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'pos': [0, 0, -0.8 * hold]},
-                            'torso': {'rot': [-6 * grab + 10 * stab, 0, 0]},
-                            'head': {'rot': [12 * hold, -10 * hold, 18 * hold]},
-                            'left_arm': {'rot': [-80 * grab - 60 * hold, 20 * hold, 30 * hold]},
-                            'right_arm': {'rot': [-150 * raise_ * (1 - stab) - 70 * stab, 10 * stab, 20 * raise_]}})
+        # добивание (2.6 с), жертва ПЕРЕД ней (≈1.6 бл.): нити опутывают (0.2), левая рука тянет к себе (0.8), посох поднят (1.15),
+        # крюк сверху вперёд-вниз в грудь жертвы (1.3), склоняется к ней — шёпот (1.7), отпускает (2.2 — kill)
+        grab = P(left_arm=[-96, 0, 4], torso=[8, 0, 0], head=[4, 0, 0])
+        pull = P(left_arm=[-86, 24, 18], body_pos=[0, 0, -0.8], head=[8, -8, 12], torso=[4, 0, 0])
+        lift = dict(pull, **P(right_arm=[-96, 0, 40], torso=[-6, 0, 0], head=[-4, -8, 8]))
+        pierce = dict(pull, **P(right_arm=[-24, 0, 6], torso=[16, 0, 0], body_pos=[0, -0.4, -1.6], head=[8, -6, 10]))
+        whisper = dict(pierce, **P(head=[12, -10, 20]))
+        release = P(left_arm=[-40, 0, -22], right_arm=[-36, 0, 16], torso=[2, 0, 0], head=[2, 0, 6])
+        return keyed(t, [(0, {}), (0.3, grab), (0.8, pull), (1.15, lift), (1.32, pierce), (1.7, whisper), (2.1, whisper), (2.3, release), (2.6, {})])
     mk('irina_finisher', 2.6, finisher, dt=0.025, events={0.2: 'wrap', 0.8: 'pull_done', 1.3: 'pierce', 1.7: 'whisper', 2.2: 'kill'})
 
     def spawn(t):
-        # появление (7 с): кокон из нитей у земли (0–2.6) — она внутри, свернувшись; 2.6 нити расплетаются; поднимается (2.6–4.4);
-        # 4.6 — поправляет шляпу (поза); 5.4 — взмах посохом, нити расходятся кольцом; 7.0 — бой
-        curl = 1 - env(t, 2.6, 4.2)
-        hatfix = env(t, 4.4, 4.8, 5.0, 5.4)
-        flourish = env(t, 5.2, 5.6, 6.2, 7.0)
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'pos': [0, -9 * curl, 0]}, 'torso': {'rot': [40 * curl, 0, 0]},
-                            'head': {'rot': [30 * curl - 6 * hatfix, 0, 0]}, 'hat': {'rot': [0, 0, -4 * hatfix]},
-                            'right_arm': {'rot': [-40 * curl - 50 * flourish, 0, -10 * curl + 50 * flourish]},
-                            'left_arm': {'rot': [-40 * curl - 150 * hatfix, 0, 10 * curl - 10 * hatfix]},
-                            'right_leg': {'rot': [-80 * curl, 0, 0]}, 'left_leg': {'rot': [-80 * curl, 0, 0]}})
+        # появление (7 с): сидит в коконе, свернувшись (0–2.6; посох лежит вдоль бедра, над землёй), поднимается (2.6–4.4),
+        # поправляет шляпу левой рукой (4.6), взмах посохом наружу вправо — нити расходятся кольцом (5.4), 7.0 — бой.
+        # Посох всё время в хвате и не проходит через корпус: взмах — в сторону, без оборота.
+        curl = P(body_pos=[0, -9, 0], torso=[40, 0, 0], head=[30, 0, 0], right_arm=[-6, 0, 44], left_arm=[-40, 0, 10],
+                 right_leg=[-80, 0, 0], left_leg=[-80, 0, 0])
+        hat = P(left_arm=[-122, 10, 6], head=[-6, 0, 4], hat=[0, 0, -4])
+        flo = P(right_arm=[-40, 0, 70], body=[0, -10, 0], head=[-4, 8, 4], left_arm=[-30, 0, -30])
+        return keyed(t, [(0, curl), (2.6, curl), (4.2, {}), (4.4, {}), (4.8, hat), (5.0, hat), (5.35, {}), (5.75, flo), (6.2, flo), (7.0, {})])
     mk('irina_spawn', 7.0, spawn, events={0.0: 'cocoon', 2.6: 'unravel', 4.6: 'pose', 5.4: 'flourish', 7.0: 'ready'})
 
+    def death_body(t):
+        # смерть (5 с): удар (0–0.6), опускается на колени, опираясь на посох (1.6), тянется к слетевшей шляпе (3.2),
+        # ложится на левый бок (3.4–4.2); посох всё время над землёй
+        hit = P(body=[-6, 0, 0], body_pos=[0, 0, 1.2], head=[-10, 0, 4], right_arm=[-36, 0, 30], left_arm=[-20, 0, -16])
+        knee = P(body_pos=[0, -5.5, 0], torso=[16, 0, 0], head=[22, 0, 4], right_arm=[-58, 0, 22], left_arm=[-20, 0, -10],
+                 right_leg=[-80, 0, 0], left_leg=[-80, 0, 0])
+        reach = dict(knee, **P(left_arm=[-70, 20, -10], head=[10, 20, 4]))
+        fallen = P(body=[0, 0, 74], body_pos=[0, -10, 4], torso=[6, 0, 0], head=[12, 0, -6], right_arm=[-80, -30, 15], left_arm=[-40, 0, -20],
+                   right_leg=[-40, 0, 0], left_leg=[-50, 0, 0])
+        return keyed(t, [(0, {}), (0.2, hit), (0.4, hit), (1.6, knee), (2.7, knee), (3.2, reach), (4.2, fallen), (5.0, fallen)])
+
     def death(t):
-        # смерть (5 с): удар (0–0.6), шатается, опускается на колени (1.6), шляпа падает (2.4), тянется к шляпе, ложится на бок (3.4–4.2)
-        hit = env(t, 0.0, 0.2, 0.4, 0.9)
-        knee = env(t, 0.9, 1.6)
-        fall = env(t, 3.2, 4.2)
-        hatf = env(t, 2.3, 2.9)
-        reach = env(t, 2.7, 3.2, 3.6, 4.4)
-        p = idle_pose(t * 0.3)
-        return pose_mix(p, {'body': {'pos': [0, -5.5 * knee - 4.5 * fall, 1.2 * hit + 4 * fall], 'rot': [-6 * hit, 0, 74 * fall]},
-                            'torso': {'rot': [16 * knee - 10 * fall, 0, 0]}, 'head': {'rot': [22 * knee - 10 * fall, 0, -10 * fall]},
-                            'hat': {'rot': [40 * hatf, 0, 50 * hatf], 'pos': [6 * hatf, -14 * hatf, -8 * hatf]},
-                            'right_arm': {'rot': [10 * hit - 20 * knee, 0, 20 * knee - 10 * fall]},
-                            'left_arm': {'rot': [-60 * reach, 20 * reach, -10 * knee]},
-                            'right_leg': {'rot': [-80 * knee + 40 * fall, 0, 0]}, 'left_leg': {'rot': [-80 * knee + 30 * fall, 0, 0]}})
+        p = death_body(t)
+        if t > DEATH_T[0]:
+            p['hat'] = death_hat(t, p, death_body(DEATH_T[0]))
+        return p
     a = mk('irina_death', 5.0, death, events={0.0: 'hit', 1.6: 'knees', 2.4: 'hat', 3.4: 'fall', 4.2: 'unravel', 5.0: 'gone'})
     a.loop = 'hold'
 
     # ---------------- +4 заклинания (владелец 20.11)
     def gaze(t):
-        # «Ревнивый взгляд»: приподнимает поля шляпы пальцами — из тьмы капюшона «смотрит» (событие gaze — метка смотрящим)
-        e = env(t, 0.0, 0.35, 0.8, 1.2)
-        p = idle_pose(t)
-        return pose_mix(p, {'left_arm': {'rot': [-150 * e, 20 * e, -10 * e]}, 'head': {'rot': [-10 * e, 8 * e, 0]},
-                            'hat': {'rot': [-12 * e, 0, 0]}, 'torso': {'rot': [-4 * e, 10 * e, 0]}})
+        # «Ревнивый взгляд»: левой рукой приподнимает поля шляпы — из тьмы капюшона «смотрит» (событие gaze — метка смотрящим)
+        p = P(left_arm=[-122, 12, 6], head=[-10, 8, 0], hat=[-12, 0, 0], torso=[-4, 10, 0], right_arm=[-46, 0, 14])
+        return keyed(t, [(0, {}), (0.35, p), (0.8, p), (1.2, {})])
     mk('irina_gaze', 1.2, gaze, dt=0.025, events={0.5: 'gaze'})
 
     def knots(t):
-        # «Узлы»: приседает, ладонь к земле, ведёт рукой по дуге — узлы прорастают (событие knots)
-        d = env(t, 0.0, 0.45, 1.1, 1.6)
-        sweep = env(t, 0.5, 1.0)
-        p = idle_pose(t)
-        return pose_mix(p, {'body': {'pos': [0, -3.0 * d, 0]}, 'torso': {'rot': [26 * d, -20 * d + 40 * sweep * d, 0]},
-                            'head': {'rot': [16 * d, 0, 0]}, 'left_arm': {'rot': [-40 * d, -30 * d + 60 * sweep * d, -10 * d]},
-                            'right_leg': {'rot': [-30 * d, 0, 0]}, 'left_leg': {'rot': [20 * d, 0, 0]}})
+        # «Узлы»: приседает, левая ладонь к земле перед собой и ведёт по дуге — узлы прорастают (событие knots 0.9)
+        d0 = P(body_pos=[0, -3, 0], torso=[24, -16, 0], head=[14, 0, 0], left_arm=[-34, -30, -10], right_arm=[-22, 0, 22],
+               right_leg=[-4, 0, 0], left_leg=[12, 0, 0])
+        d1 = dict(d0, **P(torso=[24, 16, 0], left_arm=[-34, 30, -10]))
+        return keyed(t, [(0, {}), (0.45, d0), (1.0, d1), (1.1, d1), (1.6, {})])
     mk('irina_knots', 1.6, knots, dt=0.025, events={0.9: 'knots'})
 
     def swap(t):
-        # «Подмена любимого»: руки скрещены, резкий разворот кистей — двое меняются местами (событие swap)
-        c = env(t, 0.0, 0.5, 0.7, 0.8)
-        o = env(t, 0.75, 0.9, 1.05, 1.4)
-        p = idle_pose(t)
-        return pose_mix(p, {'right_arm': {'rot': [-80 * c - 40 * o, -45 * c + 50 * o, -20 * c + 60 * o]},
-                            'left_arm': {'rot': [-80 * c - 40 * o, 45 * c - 50 * o, 20 * c - 60 * o]},
-                            'body': {'rot': [0, 20 * c - 40 * o, 0]}, 'head': {'rot': [6 * c, 0, 14 * o]}})
+        # «Подмена любимого»: руки скрещены у груди, резко разводит — двое меняются местами (событие swap 0.8)
+        cross = P(left_arm=[-80, 40, 26], right_arm=[-46, -8, 10], body=[0, 14, 0], head=[6, 0, 0])
+        spread = P(left_arm=[-70, 0, -64], right_arm=[-40, 0, 54], body=[0, -14, 0], head=[0, 0, 14])
+        return keyed(t, [(0, {}), (0.5, cross), (0.7, cross), (0.9, spread), (1.05, spread), (1.4, {})])
     mk('irina_swap', 1.4, swap, dt=0.025, events={0.8: 'swap'})
 
     def puppet(t):
-        # «Марионетка»: руки поднимаются, пальцы «дёргают нити» (событие puppet — захват), дальше — irina_puppet_hold
-        u = env(t, 0.0, 0.6)
-        jerk = env(t, 0.65, 0.75, 0.8, 1.0)
-        p = idle_pose(t)
-        return pose_mix(p, {'right_arm': {'rot': [-120 * u - 10 * jerk, 0, 30 * u]}, 'left_arm': {'rot': [-120 * u - 10 * jerk, 0, -30 * u]},
-                            'head': {'rot': [-10 * u, 0, 8 * u]}, 'torso': {'rot': [-6 * u + 6 * jerk, 0, 0]}})
+        # «Марионетка»: левая рука поднимается и «держит крестовину», посох в правой поднят перед собой, как дирижёрская палочка;
+        # рывок нитей (0.7 — захват), дальше — irina_puppet_hold
+        up = P(left_arm=[-124, 0, -26], right_arm=[-60, 0, 20], head=[-10, 0, 8], torso=[-6, 0, 0])
+        jerk = P(left_arm=[-112, 0, -26], right_arm=[-54, 0, 20], head=[-10, 0, 8], torso=[0, 0, 0])
+        return keyed(t, [(0, {}), (0.6, up), (0.7, jerk), (0.8, jerk), (1.0, up)])
     mk('irina_puppet', 1.0, puppet, dt=0.025, events={0.7: 'puppet'})
 
     def puppet_hold(t):
-        # держит марионетку 3 с (loop 1 с): руки над собой поочерёдно подёргивают «крестовину»
+        # держит марионетку (loop 1 с): левая рука и посох поочерёдно подёргивают нити
         ph = t / 1.0 * TAU
-        p = idle_pose(t)
-        return pose_mix(p, {'right_arm': {'rot': [-128 + 8 * math.sin(ph), 0, 30]}, 'left_arm': {'rot': [-128 + 8 * math.sin(ph + math.pi), 0, -30]},
-                            'head': {'rot': [-10, 0, 8 + 3 * math.sin(ph)]}, 'body': {'rot': [0, 4 * math.sin(ph), 0]}})
+        return {'body': {'pos': [0, 0, 0], 'rot': [0, 4 * math.sin(ph), 0]}, 'torso': {'rot': [-6, 0, 0]},
+                'head': {'rot': [-10, 0, 8 + 3 * math.sin(ph)]}, 'hat': {'rot': [0, 0, 0]},
+                'left_arm': {'rot': [-124 + 8 * math.sin(ph), 0, -26]}, 'right_arm': {'rot': [-60 + 5 * math.sin(ph + math.pi), 0, 20]},
+                'right_leg': {'rot': [0, 0, 0]}, 'left_leg': {'rot': [0, 0, 0]}}
     mk('irina_puppet_hold', 1.0, puppet_hold, loop=True)
 
-    # ---------------- контроллер «ткань и нити» (ленты, рукава, волосы, кончик шляпы, нити)
+    # ---------------- контроллер «ткань и нити» (ленты, рукава, завязки, кончик шляпы, нити)
     mk('irina_cloth_idle', 4.0, lambda t: cloth_pose(t, per=4.0), loop=True)
-    mk('irina_cloth_walk', 1.2, lambda t: cloth_pose(t, wind=10, amp=1.4, per=1.2, swirl=0.4,
-                                                    walk=(math.sin(t / 1.2 * TAU) * 8,)), loop=True)
-    mk('irina_cloth_storm', 2.0, lambda t: cloth_pose(t, wind=18, amp=2.6, per=1.0, swirl=1.0 / 1.0, thr_r=1.25), loop=True)
+    mk('irina_cloth_walk', 1.2, lambda t: cloth_pose(t, wind=12, amp=1.2, per=1.2, swirl=0.4,
+                                                    legs=tuple(max(0.0, -v) for v in walk_legs(t))), loop=True)
+    mk('irina_cloth_storm', 2.0, lambda t: cloth_pose(t, wind=14, amp=2.0, per=1.0, swirl=1.0, thr_r=1.25), loop=True)
 
     def cloth_spawn(t):
         # нити плотно обвиты (радиус 0.35) и быстро вращаются — кокон; на 2.6 разлетаются (радиус 1.5), к 7.0 — обычный
         k = env(t, 2.6, 3.2)
         r = 0.32 + (1.55 - 0.32) * k - 0.55 * env(t, 3.4, 6.5)
-        o = cloth_pose(t, wind=12 * (1 - env(t, 4, 7)), amp=1 + 1.5 * k, per=1.0 + env(t, 3, 7) * 3, thr_r=r)
-        return o
+        lg = spawn(t)                        # ноги вперёд (сидит в коконе) — передние ленты лежат на коленях, а не сквозь них
+        return cloth_pose(t, wind=12 * (1 - env(t, 4, 7)), amp=1 + 1.0 * k, per=1.0 + env(t, 3, 7) * 3, thr_r=r,
+                          legs=(max(0.0, -lg['right_leg']['rot'][0]), max(0.0, -lg['left_leg']['rot'][0])))
     mk('irina_cloth_spawn', 7.0, cloth_spawn)
 
     def cloth_death(t):
         k = env(t, 3.6, 4.8)
-        o = cloth_pose(t, amp=1 - 0.8 * k, per=2.0 + 4 * k, swirl=1 - 0.7 * k, thr_r=max(0.001, 1.0 + 0.6 * env(t, 0, 1) - 1.6 * env(t, 3.8, 5.0)))
-        return o
+        lg = death_body(t)                   # на коленях / лёжа: передние ленты ложатся на ноги
+        return cloth_pose(t, amp=1 - 0.8 * k, per=2.0 + 4 * k, swirl=1 - 0.7 * k,
+                          thr_r=max(0.001, 1.0 + 0.6 * env(t, 0, 1) - 1.6 * env(t, 3.8, 5.0)),
+                          legs=(max(0.0, -lg['right_leg']['rot'][0]), max(0.0, -lg['left_leg']['rot'][0])))
     a = mk('irina_cloth_death', 5.0, cloth_death)
     a.loop = 'hold'
 
     def cloth_cocoon(t):
         # «Только мой»: нити вокруг неё уходят в кокон (сжимаются к 0 к 1.6, снова появляются к 5.8)
         r = 1.0 - env(t, 1.0, 1.6, 5.4, 5.9) * 0.999
-        return cloth_pose(t, wind=8, amp=1.6, per=1.4, swirl=1.6, thr_r=max(0.001, r))
+        return cloth_pose(t, wind=8, amp=1.4, per=1.4, swirl=1.6, thr_r=max(0.001, r))
     mk('irina_cloth_cocoon', 6.2, cloth_cocoon)
     return out
+
+
+def death_hat(t, pose, pose_off):
+    """Ключи кости hat в irina_death (оси Blockbench): до 2.3 — на голове; 2.3→2.45 приподнимается и уходит назад над капюшоном
+    (не задевая его), 2.45→2.9 падает назад-вправо на землю и дальше лежит в HAT_LAND, хотя голова падает вместе с телом.
+    Кость hat — дочь head, поэтому ключ = (мир головы)⁻¹ · (нужное место шляпы); FK тот же, что у GeckoLib (tools/irina_anim_check.py)."""
+    import irina_anim_check as CHK
+    rig = CHK.rig_cached()
+    t0, t1, t2 = DEATH_T
+    on_head = rig.world_json(pose_off)['hat']
+    lift = CHK.M4(on_head[:3, :3], on_head[:3, 3] + np.array([3.0, 6.0, 7.0]))
+    land = CHK.M4(CHK.zyx([HAT_LAND[1][0], HAT_LAND[1][1], HAT_LAND[1][2]]), np.array(HAT_LAND[0], float))
+    if t < t1:
+        D = CHK.blend(on_head, lift, ease_io((t - t0) / (t1 - t0)))
+    elif t < t2:
+        k = (t - t1) / (t2 - t1)
+        D = CHK.blend(lift, land, 1 - (1 - k) ** 2)     # в сторону — сразу (отлетает от капюшона), вниз — с ускорением
+        D[1, 3] = lift[1, 3] + (land[1, 3] - lift[1, 3]) * k ** 3
+    else:
+        D = land
+    return rig.local_json(rig.world_json(pose)['head'], 'hat', D)
 
 
 # ================================================================== запись

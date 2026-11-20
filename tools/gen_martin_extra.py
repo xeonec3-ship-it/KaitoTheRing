@@ -143,7 +143,7 @@ def soldier_anims(m):
 
     def base(t, k=1.0):
         o = {k2: {'rot': list(np.array(v['rot']) * k)} for k2, v in SHIELD_FWD.items()}
-        o['cape'] = {'rot': [6 + 2 * math.sin(TAU * t / 2.4), 0, 0]}
+        o['cape'] = {'rot': [6 + 2 * math.sin(TAU * t / 2.4), 0, 0]}      # по Blockbench: X > 0 — низ назад (перевод — M.bb_in в Grip)
         o['tabard_front'] = {'rot': [-1.5 * math.sin(TAU * t / 2.4), 0, 0]}
         return o
 

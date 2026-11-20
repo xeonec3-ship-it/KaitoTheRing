@@ -138,8 +138,12 @@ function attachStaff(model, ctx) {
 }
 
 // ------------------------------------------------------------------ анимации (контроллер тела + контроллер ткани)
-function chanAt(chan, t, def) {
-  const ks = Object.keys(chan), ts = ks.map(Number);
+const SORTED = new WeakMap();      // ключи по времени: Object.keys ставит целые ("0", "1", "2") вперёд остальных — без сортировки
+function chanAt(chan, t, def) {     // кадр между 0 и 1 с интерполировался бы от 0 прямо к 1 (проверка 20.11)
+  if (Array.isArray(chan)) return chan;
+  let ks = SORTED.get(chan);
+  if (!ks) { ks = Object.keys(chan).sort((a, b) => Number(a) - Number(b)); SORTED.set(chan, ks); }
+  const ts = ks.map(Number);
   if (!ts.length) return def;
   const get = i => { const v = chan[ks[i]]; return Array.isArray(v) ? v : (v.vector || v.post || v.pre); };
   if (t <= ts[0]) return get(0);
@@ -207,8 +211,14 @@ function setup(c) {
   }
   const m = buildModel();
   if (c.staff !== false) attachStaff(m);
+  if (c.arrow) {                                   // стрелка «вперёд» (по взгляду модели, −z) на земле — для проверочных кадров
+    const mat = new THREE.MeshBasicMaterial({ color: 0x3cff6a, side: THREE.DoubleSide });
+    const sh = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.4, 30), mat); sh.position.set(0, 0.3, -24); m.root.add(sh);
+    const hd = new THREE.Mesh(new THREE.ConeGeometry(4, 9, 4), mat); hd.rotation.x = -Math.PI / 2; hd.position.set(0, 0.3, -43); m.root.add(hd);
+  }
   pose(m, c.anim ? DATA.anims[c.anim] : null, c.cloth ? DATA.anims[c.cloth] : DATA.anims.irina_cloth_idle, c.t || 0, c.tc);
   if (c.noGlow) m.root.traverse(o => { if (o.userData.glow) o.visible = false; });
+  if (c.noThreads && m.bones.threads) m.bones.threads.visible = false;      // проверочные кадры: нити не заслоняют руки и посох
   if (c.compare && DATA.cl) {                     // рядом — Глава Культа (эталон), тот же масштаб и свет
     const cl = buildModel(DATA.cl); pose(cl, null, null, 0);
     const both = new THREE.Group(); m.root.position.x = -c.compare; cl.root.position.x = c.compare; both.add(m.root); both.add(cl.root);

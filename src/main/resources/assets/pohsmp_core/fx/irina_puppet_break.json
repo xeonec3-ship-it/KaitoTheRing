@@ -1,0 +1,34 @@
+{
+ "comment": "«Марионетка» снята (урон по боссу / конец; caster = игрок, 16 тиков): нити лопаются, крестовина рассыпается.",
+ "style": "irina",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 8,
+   "size": 1.4,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 4,
+   "texture": "mote_thread",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.4,
+   "speed": 0.2,
+   "gravity": 0.02,
+   "spin": 30,
+   "size": [
+    0.26,
+    0.06
+   ],
+   "life": 16,
+   "color": "@primary"
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 # T30 «Эреб, Первый Предатель» — визуальная часть готова (помощник по визуалу → управляющему; для чата Кодинга)
 
-Ветка `claude/cnpc-chats-repo-0hcody`. Java не трогал. Учтены поправки владельца и управляющего: рапира остаётся, Эреб прежде всего маг (атака магией руками `ereb_shard_cast` + fx `ereb_shards`), фраза финала (`ui…ereb.farewell`, событие `speak`), **текстура ×4 как у эталона** с ручной фактурой, волосы и лицо светлее, звуки. Чужие файлы (T27–T29) не трогал. Из общих файлов изменены только `lang/ru_ru.json`, `lang/en_us.json` (+28 ключей) и `sounds.json` (+12 событий `ereb.*`).
+Ветка `claude/cnpc-chats-repo-0hcody`. Java не трогал. Учтены поправки владельца и управляющего: рапира остаётся, Эреб прежде всего маг (атака магией руками `ereb_shard_cast` + fx `ereb_shards`), фраза финала (`ui…ereb.farewell`, событие `speak`), **текстура ×4 как у эталона** с ручной фактурой, волосы и лицо светлее, звуки. Чужие файлы (T27–T29) не трогал. Из общих файлов изменены только `lang/ru_ru.json`, `lang/en_us.json` (+34 ключа) и `sounds.json` (+13 событий `ereb.*`).
 
 Генератор — **`tools/gen_ereb.py`**:
 - он вызывает `gen_ereb_anims.py` (анимации), `gen_ereb_fx.py` (эффекты, полоса, титры, lang) и `gen_ereb_shots.py` (кадры);
@@ -17,6 +17,7 @@
 - `t30_model.jpg` — спереди, сзади, сбоку, лицо, улыбка, в темноте (глоумаска);
 - `t30_anims.jpg` — шаг, «ан гард», выпад, серия, парирование, каст, смена облика, «Ложный союзник»;
 - `t30_cinematics.jpg` — появление и финал;
+- `t30_spells.jpg` — +4 заклинания;
 - `t30_fx.jpg` — эффекты боя (на кадрах эффекты условные: спрайты T22 поверх модели — только композиция);
 - `t30_rapier.jpg`, `t30_textures.jpg`, `t30_ui.jpg` — рапира, текстуры, полоса по фазам и титры.
 
@@ -75,6 +76,16 @@
 | `ereb_phase` | 1.6 | `phase` 0.8 | переход 66% / 33%: круг рапирой и салют |
 | `ereb_spawn` | 5.0 | `form` 2.2, `bow` 2.6, `salute` 3.9, `ready` 5.0 | ролик появления (модель не рисовать до `form`) |
 | `ereb_finale` | 6.5 | `smile` 0.3, `butterfly` 1.4, `speak` 2.4, **`cast` 3.2**, **`vanish` 5.0** | финал: улыбка, бабочка из ладони, «Сон бабочки», исчезновение |
+
+## 2а. +4 заклинания (владелец 20.11) — таблица с событиями, fx и подписями — в ТЗ, раздел «+4 заклинания — визуал»
+| заклинание | анимации | fx |
+|---|---|---|
+| «Танец клинков» | `ereb_blade_dance` 4.4 с (4× `blink` + `hit`) | `ereb_blink`, `ereb_thrust` |
+| «Обманная брешь» | `ereb_feint` 2.4 с (окно `open` 0.3 … `close` 1.8), `ereb_feint_counter` 0.9 с | `ereb_feint_open`, `ereb_feint_counter` |
+| «Стеклянный дождь» | `ereb_glass_rain` 1.6 с (`marks` 0.4, `fall` 1.6) | `ereb_glass_rain_mark` (24 тика) → `ereb_glass_rain_hit` |
+| «Шаг сквозь отражение» | `ereb_mirror_step_out` (`gone` 0.5), `ereb_mirror_step_in` (`appear` 0) | `ereb_blink`, `ereb_mirror_step_warn` (12 тиков, блик за спиной) |
+
+Кадр — `docs/media/t30_spells.jpg`. lang: `ui.pohsmp_core.ereb.blade_dance`, `feint`, `feint_counter`, `glass_rain`, `mirror_step`; звук `ereb.rain` (+ субтитр).
 
 ## 3. Рапира — `models/item/ereb_rapier.json` (генератор: `rapier()` в `gen_ereb.py`)
 3D-модель из 77 брусков, `forge:separate_transforms`:

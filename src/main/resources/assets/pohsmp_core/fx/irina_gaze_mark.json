@@ -1,0 +1,33 @@
+{
+ "comment": "«Ревнивый взгляд» — метка-нить на смотревшем (caster = игрок, follow, 80 тиков = 4 с замедления): око над головой, нить обвивает ноги (низкая орбита). Без линии к Ирине.",
+ "style": "irina",
+ "duration": 80,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.3,0",
+   "follow": true,
+   "id": "irina_gaze_eye"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 80,
+   "width": 0.05,
+   "length": 12,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.55,
+    "speed": 10,
+    "rise": 0.15,
+    "risePeriod": 20
+   },
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

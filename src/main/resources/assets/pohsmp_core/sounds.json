@@ -941,5 +941,73 @@
         "volume": 0.8
       }
     ]
+  },
+  "ereb.rain": {
+    "subtitle": "subtitles.pohsmp_core.ereb.rain",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 1.1,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 0.9,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.amethyst_cluster.break",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      }
+    ]
+  },
+  "irina.gaze": {
+    "subtitle": "subtitles.pohsmp_core.irina.gaze",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:planar_sight_cast",
+        "pitch": 1.3
+      }
+    ]
+  },
+  "irina.knots": {
+    "subtitle": "subtitles.pohsmp_core.irina.knots",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:root_start",
+        "pitch": 1.3
+      }
+    ]
+  },
+  "irina.snare": {
+    "subtitle": "subtitles.pohsmp_core.irina.snare",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:root_emerge",
+        "pitch": 1.4
+      }
+    ]
+  },
+  "irina.swap": {
+    "subtitle": "subtitles.pohsmp_core.irina.swap",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:abyssal_teleport",
+        "pitch": 1.3
+      }
+    ]
+  },
+  "irina.puppet": {
+    "subtitle": "subtitles.pohsmp_core.irina.puppet",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:charge_chains",
+        "pitch": 1.6
+      }
+    ]
   }
 }

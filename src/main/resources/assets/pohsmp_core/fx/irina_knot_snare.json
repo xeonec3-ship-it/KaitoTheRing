@@ -1,0 +1,50 @@
+{
+ "comment": "«Узлы» — наступил: опутан 2 с (caster = игрок, follow, 40 тиков). Узел захлопывается, нити обвивают ноги и корпус.",
+ "style": "irina",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 6,
+   "size": 1.0,
+   "color": "@primary"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 40,
+   "width": 0.06,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 4,
+   "orbit": {
+    "radius": 0.5,
+    "speed": 22,
+    "rise": 0.5,
+    "risePeriod": 10,
+    "climb": 0.4
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "target": "caster",
+   "thickness": 0.12,
+   "pulse": [
+    0.3,
+    8
+   ],
+   "color": "@primary",
+   "motes": 8,
+   "follow": true
+  }
+ ]
+}

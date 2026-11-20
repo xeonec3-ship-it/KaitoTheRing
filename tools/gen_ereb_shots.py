@@ -126,6 +126,30 @@ def shots(M, args):
              fx=flash([0.1, 1.35, 2.2], 0.5, GO)),
     ]
     sh('t30_fx.jpg', cells, 4, (1800, 1000))
+    # ---------------------------------------------------------------- +4 заклинания
+    rain = [{'tex': 'mote_glass', 'n': 3, 'at': [d, 2.5, 2.5], 'spread': [0.3, 1.5, 0.3], 'size': [0.4, 0.6], 'color': GH, 'seed': 7 + i, 'spin': 0.3}
+            for i, d in enumerate((-2.5, 0.5, 3.0))]
+    rings = [{'tex': 'illusion_seal', 'n': 1, 'at': [d, 0, 2.5], 'spread': [0, 0, 0], 'size': [2.4, 2.4], 'color': GH, 'ground': True, 'op': 0.5}
+             for d in (-2.5, 0.5, 3.0)]
+    cells = [
+        dict(N, model='ereb', anim='ereb_blade_dance', t=0.12, yaw=40, pitch=8, dist=3.2, ty=15, label='«Танец клинков»', sub='шаг сквозь рябь (blink)',
+             fx=flash([0, 1.1, 0], 1.6, GH, 0.5) + shards([0, 1.0, 0], 10, [0.5, 0.9, 0.5])),
+        dict(N, model='ereb', anim='ereb_blade_dance', t=1.65, yaw=70, pitch=8, dist=3.4, ty=15, label='«Танец клинков»', sub='2-й укол (hit 1.65)',
+             fx=flash([0.1, 1.35, 2.2], 0.5, GO)),
+        dict(N, model='ereb', anim='ereb_feint', t=1.0, yaw=20, pitch=6, dist=3.0, ty=16, label='«Обманная брешь»', sub='нарочно открыт (окно 1.5 с)',
+             fx=flash([0, 1.6, 0.3], 0.5, GH, 0.6)),
+        dict(N, model='ereb', anim='ereb_feint_counter', t=0.12, yaw=40, pitch=6, dist=3.0, ty=16, label='контратака', sub='парирование (parry 0.1)',
+             fx=flash([0.2, 1.6, 0.6], 0.8, GO) + shards([0.2, 1.5, 0.7], 8, [0.3, 0.3, 0.3])),
+        dict(N, model='ereb', anim='ereb_glass_rain', t=0.9, yaw=150, pitch=14, dist=4.6, ty=20, label='«Стеклянный дождь»',
+             sub='метки на земле 1.2 с, осколки сверху', fx=rings + rain),
+        dict(N, model='ereb', anim='ereb_mirror_step_out', t=0.5, yaw=30, pitch=8, dist=3.0, ty=16, label='«Шаг сквозь отражение»',
+             sub='уходит в рябь (gone 0.5)', fx=flash([0, 1.1, 0], 1.4, GH, 0.5) + shards([0, 1.0, 0], 12, [0.5, 0.9, 0.5])),
+        dict(N, model='pyromancer', yaw=160, pitch=8, dist=2.4, ty=17, label='«Шаг сквозь отражение»', sub='блик за спиной 0.6 с',
+             fx=flash([0, 1.45, -0.9], 1.3, GH, 0.9) + shards([0, 1.45, -0.9], 4, [0.25, 0.2, 0.2])),
+        dict(N, model='ereb', anim='ereb_mirror_step_in', t=0.1, yaw=60, pitch=8, dist=3.0, ty=16, label='выход', sub='из ряби — в стойку',
+             fx=flash([0, 1.1, 0], 1.2, WH, 0.4)),
+    ]
+    sh('t30_spells.jpg', cells, 4, (1800, 1000))
     # ---------------------------------------------------------------- рапира крупно
     cells = [dict(N, model='rapier', yaw=y, pitch=p, dist=d, ty=ty, x=x, ground=False, label=l, sub=sb, h=16) for y, p, d, ty, x, l, sb in
              ((0, 0, 3.6, 2.8, -2.8, 'рапира целиком', 'чёрный клинок, золотая кромка и дол'),

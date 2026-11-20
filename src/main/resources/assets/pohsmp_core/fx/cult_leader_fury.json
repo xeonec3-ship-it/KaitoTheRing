@@ -1,0 +1,41 @@
+{
+ "comment": "Фаза 3, «ярость души» (облик души Тироса): огненный ореол на боссе, пока длится (caster = босс, follow, до Fx.stop).",
+ "style": "cult_leader",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "follow": true,
+   "thickness": 0.2,
+   "pulse": [
+    0.25,
+    12
+   ],
+   "color": "@secondary",
+   "motes": 30,
+   "texture": "mote_flame"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "follow": true,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.6,
+   "spread": 0.7,
+   "speed": 0.02,
+   "gravity": -0.02,
+   "size": [
+    0.35,
+    0.05
+   ],
+   "life": 22,
+   "color": "@primary",
+   "glow": 0.6
+  }
+ ]
+}

@@ -1,0 +1,52 @@
+{
+ "comment": "Игрок под запретом пытается колдовать: заклинание гаснет в руке пеплом (caster = игрок).",
+ "style": "cult_leader",
+ "duration": 14,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": 8,
+   "size": 0.9,
+   "color": "#C8320C"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 14,
+   "rate": 6,
+   "spread": 0.3,
+   "speed": 0.06,
+   "gravity": 0.01,
+   "spin": 60,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 16,
+   "color": "#62514E",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.2,
+   "speed": 0.08,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 8,
+   "color": "#FF7A1E"
+  }
+ ]
+}

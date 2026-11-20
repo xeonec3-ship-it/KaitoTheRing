@@ -1,0 +1,113 @@
+{
+ "comment": "T26 «Приговор Меллисто»: печать r24 на земле. Прорисовывается 2 с (предупреждение), на 40 тике — вспышка (запрет начался), держится, пока эффект не кончится (10 с запрета). Знаки восьми школ перечёркнуты, цепь, четыре клинка, око в пламени; надпись по кольцу. Сгенерировано tools/gen_cult_leader.py.",
+ "size": 24,
+ "color": "#F05A1E",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.02,
+   "color": "#4A0E10",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeInSine",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 30
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "mellisto_verdict",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 38,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 0.25,
+    "boost": 3
+   }
+  },
+  {
+   "id": "verdict",
+   "type": "text",
+   "radius": 0.748,
+   "heightOffset": 0.01,
+   "color": "#FFD24A",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 8,
+    "duration": 30,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -0.35
+   },
+   "text": "ПРИГОВОР МЕЛЛИСТО ✦ МАГИЯ ПОД ЗАПРЕТОМ ✦ ",
+   "font": "cyrillic",
+   "size": 0.05,
+   "repeat": 3,
+   "side": "outer"
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.03,
+   "heightOffset": 0.02,
+   "color": "#FF7A1E",
+   "brightness": 1.1,
+   "count": 6,
+   "arcLength": 40,
+   "width": 0.012,
+   "appear": {
+    "delay": 26,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -1.2
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFD24A",
+  "size": 1.05,
+  "duration": 14,
+  "sparks": 120
+ },
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

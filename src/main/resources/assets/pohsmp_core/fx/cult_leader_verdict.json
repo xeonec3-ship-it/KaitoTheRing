@@ -1,0 +1,159 @@
+{
+ "comment": "Фаза 2: «Приговор Меллисто». caster = центр зоны (босс в момент приговора; не follow). 0–40 тиков (2 с) — предупреждение: печать r24 прорисовывается, мир краснеет, низкая завеса по краю; на 40 тике вспышка — ЗАПРЕТ НАЧАЛСЯ (код: 40…240); 40–240 — печать держится, по краю r24 — завеса, пепел падает; конец — печать гаснет. Всего 240 тиков.",
+ "style": "cult_leader",
+ "duration": 240,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "id": "cult_verdict",
+   "scale": 1.0
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 240,
+   "radius": 24,
+   "color": "#4A0A08",
+   "strength": 0.28,
+   "in": {
+    "duration": 40,
+    "easing": "easeInSine"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "radius": 24,
+   "count": 140,
+   "height": 1.2,
+   "grow": 40,
+   "width": [
+    0.06,
+    0.16
+   ],
+   "brightness": [
+    0.3,
+    0.6
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.6,
+   "color": "@primary",
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "comment": "предупреждение: край зоны прорастает"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "target": "caster",
+   "thickness": 0.22,
+   "pulse": [
+    0.3,
+    8
+   ],
+   "color": "@secondary",
+   "motes": 30,
+   "comment": "босс поднял руку"
+  },
+  {
+   "type": "flash",
+   "delay": 40,
+   "at": "caster+0,1,0",
+   "duration": 14,
+   "size": 4.5,
+   "rays": 12,
+   "screen": 0.12,
+   "ring": true,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 40,
+   "at": "caster",
+   "duration": 18,
+   "shape": "ring",
+   "radius": 24,
+   "thickness": 1.6,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "curtain",
+   "delay": 40,
+   "at": "caster",
+   "duration": 200,
+   "radius": 24,
+   "count": 180,
+   "height": 3.2,
+   "grow": 8,
+   "width": [
+    0.08,
+    0.22
+   ],
+   "brightness": [
+    0.3,
+    0.65
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.35,
+   "color": "@primary",
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "comment": "граница запрета"
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "caster+0,6,0",
+   "duration": 200,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 1.2,
+   "area": 23,
+   "speed": 0.0,
+   "gravity": 0.004,
+   "spin": 30,
+   "size": [
+    0.18,
+    0.08
+   ],
+   "life": 80,
+   "color": "#62514E",
+   "blend": "translucent",
+   "comment": "пепел оседает в зоне"
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "caster+0,0.1,0",
+   "duration": 200,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.6,
+   "area": 24,
+   "speed": 0.01,
+   "gravity": -0.01,
+   "size": [
+    0.2,
+    0.03
+   ],
+   "life": 30,
+   "color": "#FF7A1E"
+  }
+ ]
+}

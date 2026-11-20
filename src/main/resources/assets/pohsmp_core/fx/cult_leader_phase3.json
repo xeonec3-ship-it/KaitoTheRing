@@ -1,0 +1,83 @@
+{
+ "comment": "Переход в фазу 3 (33% ХП): «Истинное пламя» — столб огня из босса, волна к краю арены r28 (на 30 тике код запускает cult_leader_firewall), вспышка. caster = босс. 4 с.",
+ "style": "cult_leader",
+ "duration": 80,
+ "elements": [
+  {
+   "type": "column",
+   "delay": 0,
+   "at": "caster",
+   "duration": 44,
+   "radius": 1.8,
+   "height": 16,
+   "fill": 0.7,
+   "color": "@primary",
+   "out": {
+    "duration": 18,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "radius": 3.2,
+   "height": 6,
+   "arms": 3,
+   "speed": 9,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "cult_emblem",
+   "scale": 1.6
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0,2,0",
+   "duration": 16,
+   "size": 5.5,
+   "rays": 12,
+   "screen": 0.28,
+   "color": "@secondary",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 30,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 28,
+   "thickness": 3.0,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 80,
+   "radius": 40,
+   "color": "#6A1A06",
+   "strength": 0.34,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

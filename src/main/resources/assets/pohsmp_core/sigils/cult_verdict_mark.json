@@ -1,0 +1,41 @@
+{
+ "comment": "T26: метка над головой игрока под «Приговором» (магия под запретом) — перечёркнутый знак культа, лежит над головой.",
+ "size": 0.42,
+ "color": "#F05A1E",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "mark",
+   "type": "disc",
+   "texture": "cult_verdict_mark",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2.0
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 20
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

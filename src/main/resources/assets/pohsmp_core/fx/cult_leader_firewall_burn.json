@@ -1,0 +1,49 @@
+{
+ "comment": "Игрок пересёк стену огня: вспышка пламени на нём (caster = игрок).",
+ "style": "cult_leader",
+ "duration": 18,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "target": "caster",
+   "thickness": 0.25,
+   "pulse": [
+    0.4,
+    4
+   ],
+   "color": "@primary",
+   "motes": 20,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.8,0",
+   "duration": 5,
+   "texture": "mote_flame",
+   "count": 30,
+   "rate": 8,
+   "spread": 0.7,
+   "speed": 0.12,
+   "gravity": -0.02,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.7
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "size": 1.4,
+   "color": "#FF7A1E"
+  }
+ ]
+}

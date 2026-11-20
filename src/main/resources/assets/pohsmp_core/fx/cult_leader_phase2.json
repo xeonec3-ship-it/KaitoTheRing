@@ -1,0 +1,86 @@
+{
+ "comment": "Переход в фазу 2 (66% ХП): «Глава Культа взывает к Меллисто» — рёв, знак культа под ним, кольцо r16 (caster = босс, follow). 3 с.",
+ "style": "cult_leader",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "cult_emblem",
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 44,
+   "target": "caster",
+   "thickness": 0.24,
+   "pulse": [
+    0.3,
+    6
+   ],
+   "color": "@primary",
+   "motes": 40,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "caster+0,1.8,0",
+   "duration": 12,
+   "size": 3.4,
+   "rays": 10,
+   "screen": 0.12,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 12,
+   "at": "caster",
+   "duration": 24,
+   "shape": "ring",
+   "radius": 16,
+   "thickness": 2.4,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+0,1.2,0",
+   "duration": 6,
+   "texture": "mote_flame",
+   "count": 70,
+   "rate": 12,
+   "spread": 1.4,
+   "speed": 0.32,
+   "gravity": 0.012,
+   "size": [
+    0.5,
+    0.05
+   ],
+   "life": 26,
+   "color": "@primary",
+   "glow": 0.6
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "radius": 32,
+   "color": "#4A0A08",
+   "strength": 0.25,
+   "in": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

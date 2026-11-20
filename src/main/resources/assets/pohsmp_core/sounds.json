@@ -381,5 +381,119 @@
         "volume": 0.5
       }
     ]
+  },
+  "cult_leader.spawn": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.spawn",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/fire_boss_summon_scythe",
+        "pitch": 0.75,
+        "volume": 1.4
+      }
+    ]
+  },
+  "cult_leader.death": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.death",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/fire_boss_death",
+        "pitch": 0.9
+      }
+    ]
+  },
+  "cult_leader.death_final": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.death_final",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/fire_boss_death_final",
+        "pitch": 0.85
+      }
+    ]
+  },
+  "cult_leader.verdict": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.verdict",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/fire_boss_enter_soul",
+        "pitch": 0.65,
+        "volume": 1.3
+      }
+    ]
+  },
+  "cult_leader.verdict_lock": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.verdict_lock",
+    "sounds": [
+      {
+        "name": "minecraft:block/respawn_anchor/deplete1",
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:block/respawn_anchor/deplete2",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "cult_leader.verdict_end": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.verdict_end",
+    "sounds": [
+      {
+        "name": "minecraft:block/respawn_anchor/charge1",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:block/respawn_anchor/charge2",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "cult_leader.phase": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.phase",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/fire_boss_stance_break",
+        "pitch": 0.85
+      }
+    ]
+  },
+  "cult_leader.firewall": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.firewall",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/fire_boss_summon_scythe",
+        "pitch": 0.55,
+        "volume": 1.5
+      }
+    ]
+  },
+  "cult_leader.firewall_loop": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.firewall_loop",
+    "sounds": [
+      {
+        "name": "minecraft:fire/fire",
+        "volume": 1.0,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "cult_leader.summon": {
+    "subtitle": "subtitles.pohsmp_core.cult_leader.summon",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/fire_boss_fireball",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "music.cult_leader": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.cult_leader",
+    "comment": "ЗАГЛУШКА до трека владельца: фон боя Тироса (Iron's). Трек владельца — pohsmp_core:music/cult_leader (stream).",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:fire_boss/music/backtrack",
+        "stream": true,
+        "volume": 0.6
+      }
+    ]
   }
 }

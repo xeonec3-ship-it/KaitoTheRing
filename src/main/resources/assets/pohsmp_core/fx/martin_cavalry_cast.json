@@ -1,0 +1,71 @@
+{
+ "comment": "Особое «Атака конницы» (caster = Мартин; анимация martin_cavalry 3.4 с: call 1.0, charge 2.0). Меч к небу: столб света, небо мрачнеет, вдали — туман. Полосы — martin_cavalry_lane (запускать на 1.0 с, call).",
+ "style": "martin",
+ "duration": 68,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 68,
+   "radius": 48,
+   "color": "#101820",
+   "strength": 0.3,
+   "in": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 24,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "beam",
+   "delay": 14,
+   "at": "caster+0.6,6.4,0.2",
+   "fromSky": 24,
+   "width": 0.5,
+   "core": 0.4,
+   "duration": 26,
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "comment": "свет с неба на поднятый клинок"
+  },
+  {
+   "type": "flash",
+   "delay": 20,
+   "at": "caster+0.6,6.6,0.2",
+   "duration": 14,
+   "size": 2.6,
+   "rays": 10,
+   "color": "#D8F6FF",
+   "screen": 0.08,
+   "comment": "call"
+  },
+  {
+   "type": "wave",
+   "delay": 20,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 26,
+   "thickness": 2.4,
+   "followTerrain": true,
+   "color": "#8FD8F0"
+  },
+  {
+   "type": "flash",
+   "delay": 40,
+   "at": "caster+0,4.4,2.2",
+   "duration": 10,
+   "size": 2.0,
+   "color": "@primary",
+   "anamorphic": 3,
+   "comment": "charge: взмах вперёд"
+  }
+ ]
+}

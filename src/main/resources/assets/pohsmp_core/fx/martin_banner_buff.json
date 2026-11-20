@@ -1,0 +1,22 @@
+{
+ "comment": "Солдат усилен знаменем (caster = солдат, follow, до Fx.stop): золотой ореол поверх призрачного.",
+ "style": "martin",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.12,
+   "pulse": [
+    0.3,
+    16
+   ],
+   "color": "@primary",
+   "motes": 8,
+   "ring": false
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+{
+ "comment": "Фаза 1 «Строй» (caster = Мартин, follow, до Fx.stop): герб строя на земле r4, призрачные искры от щитов. Пока строй стоит, урон по Мартину через строй слабее (код).",
+ "style": "martin_ghost",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "texture": "martin_emblem",
+   "radius": 4.2,
+   "glow": 0.25,
+   "pulse": 40,
+   "color": "@primary",
+   "grow": 16,
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.15,
+   "area": 4.0,
+   "speed": 0.01,
+   "gravity": -0.01,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 40,
+   "color": "#8FD8F0"
+  }
+ ]
+}

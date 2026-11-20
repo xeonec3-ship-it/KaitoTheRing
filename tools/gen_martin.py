@@ -25,14 +25,15 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from nightmare_geo import Model, Anim, euler, write_json as _wj, TAU  # noqa: E402
+from nightmare_geo import Model, Anim, euler, to_euler, fbm, vnoise, _hash, write_json as _wj, TAU  # noqa: E402
 
 ROOT = os.path.join(HERE, '..')
 A = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'pohsmp_core')
 JAR = os.path.join(ROOT, 'libs', 'irons_spellbooks-1.20.1-3.16.1.jar')
 I = 'assets/irons_spellbooks/'
 WRITTEN = []
-DENS = 2                 # пикселей на единицу модели (модель ×2 в мире → 1 тексель = 1/16 блока)
+GLOW_GOLD = 0.0          # солдаты: золотая кайма светится (glowmask)
+DENS = 4                 # пикселей на единицу UV — ×4, как у эталона (cult_leader.png: атлас 128 → 512 px), ручная фактура
 
 
 def out(rel):
@@ -79,6 +80,23 @@ def _pix(ctx):
     return i, j, pw, ph
 
 
+def _pix2(ctx):
+    """Сетка рисунка 2 пикселя на единицу (узоры, ламы, гербы — крупно), сама текстура — 4 пикселя на единицу."""
+    i, j, pw, ph = _pix(ctx)
+    return i // 2, j // 2, max(1, pw // 2), max(1, ph // 2)
+
+
+def handf(ctx, f=0.35, amp=1.0, seed=0, dots=0.03):
+    """Ручная фактура, как у эталона: крупные пятна-мазки в 2–3 тона (шум по точке тела, без швов между гранями) и редкие точки."""
+    n = fbm(ctx.P, f, seed, 3)
+    lv = np.clip(np.floor((n - 0.5) * 2.6 * amp + 0.5), -1, 1)
+    if dots:
+        i, j, pw, ph = _pix(ctx)
+        h = _hash(i + ctx.cube.px[ctx.face][0], j + ctx.cube.px[ctx.face][1], np.zeros_like(i), seed + 7)
+        lv = lv - (h < dots) + (h > 1 - dots * 0.6)
+    return lv
+
+
 SIDE = ('north', 'south', 'east', 'west')
 
 
@@ -111,7 +129,7 @@ def info(ctx, k, d=None):
 
 # ---------------------------------------------------------------- материалы Мартина
 def mat_steel(ctx):
-    i, j, pw, ph = _pix(ctx)
+    i, j, pw, ph = _pix2(ctx)
     lv = bevel(ctx, base=info(ctx, 'base', 3))
     R = np.repeat(R_STEEL[None], ctx.n, 0)
     lames = info(ctx, 'lames')
@@ -136,7 +154,16 @@ def mat_steel(ctx):
             g |= i >= pw - tw
     if trim and 'u' in trim and ctx.face == 'up':
         g |= (i == 0) | (j == 0) | (i == pw - 1) | (j == ph - 1)
+    lv = lv + handf(ctx, 0.32, 0.8, 11, 0.004) * (ctx.face != 'down')
+    fi, fj, fw, fh = _pix(ctx)
+    if ctx.face in SIDE and fh > 5:                                   # второй ряд светотени (полный размер текселя)
+        lv = lv + np.where(fj == 1, 0.5, 0) + np.where(fj == fh - 2, -0.5, 0)
     rgb = tone(R_STEEL, lv)
+    if info(ctx, 'fili') and ctx.face in SIDE and fw > 9 and fh > 9:  # золотая инкрустация: кант в 3 текселях от края + уголки
+        d = np.minimum(np.minimum(fi, fw - 1 - fi), np.minimum(fj, fh - 1 - fj))
+        line = d == 3
+        corner = (np.minimum(fi, fw - 1 - fi) <= 5) & (np.minimum(fj, fh - 1 - fj) <= 5) & (d >= 3)
+        rgb = np.where((line | (corner & ((fi + fj) % 2 == 0)))[:, None], tone(R_GOLD, np.where(fj < fh / 2, 4, 3)), rgb)
     if g.any():
         lg = np.where(j == ph - 1, 2, 4) if ctx.face in SIDE else np.full(ctx.n, 4)
         rgb = np.where(g[:, None], tone(R_GOLD, lg - (ctx.face == 'down') * 2), rgb)
@@ -150,23 +177,25 @@ def mat_steel(ctx):
 
 
 def mat_gold(ctx):
-    i, j, pw, ph = _pix(ctx)
+    i, j, pw, ph = _pix2(ctx)
     lv = bevel(ctx, base=info(ctx, 'base', 3))
     if info(ctx, 'engr') and ctx.face in SIDE and pw > 3 and ph > 3:  # гравировка: шахматный завиток
         lv = lv + np.where(((i + j) % 4 == 0) & (i > 0) & (j > 0) & (i < pw - 1) & (j < ph - 1), -1, 0)
+    lv = lv + handf(ctx, 0.5, 0.6, 31, 0.008)
     rgb = tone(R_GOLD, lv)
     deco = info(ctx, 'deco')
     if deco and ctx.face == info(ctx, 'deco_face', 'north'):
         rgb = DECO[deco](ctx, i, j, pw, ph, rgb, lv)
-    g = None
+    g = rgb * GLOW_GOLD if GLOW_GOLD else None
     return rgb, 1.0, g
 
 
 def mat_red(ctx):
-    i, j, pw, ph = _pix(ctx)
+    i, j, pw, ph = _pix2(ctx)
     lv = bevel(ctx, base=info(ctx, 'base', 3), left=0, right=0)
     if ctx.face in SIDE and info(ctx, 'folds', True):                 # складки ткани: вертикальные тени через 3 пикселя
         lv = lv + np.where(i % 4 == 3, -1, 0)
+    lv = lv + handf(ctx, 0.3, 1.0, 23, 0.02)
     rgb = tone(R_RED, lv)
     deco = info(ctx, 'deco')
     if deco and ctx.face == info(ctx, 'deco_face', 'north'):
@@ -176,13 +205,13 @@ def mat_red(ctx):
 
 def mat_cape(ctx):
     """Чёрно-белый плащ: снаружи чёрный с белой каймой по краям и низу, изнутри — белая подкладка в тени."""
-    i, j, pw, ph = _pix(ctx)
+    i, j, pw, ph = _pix2(ctx)
     lv = bevel(ctx, base=2, left=0, right=0, top=0)
     out_face = info(ctx, 'outer', 'south')
     inner = {'south': 'north', 'north': 'south', 'east': 'west', 'west': 'east'}[out_face]
     if ctx.face == out_face:
         lv = lv + np.where(i % 5 == 4, -1, 0) + np.where(i % 5 == 0, 1, 0) * 0     # складки
-        rgb = tone(R_BLACK, lv)
+        rgb = tone(R_BLACK, lv + handf(ctx, 0.25, 0.8, 41, 0.015))
         edge = np.zeros(ctx.n, bool)
         if info(ctx, 'edge_l', True):
             edge |= i <= 1
@@ -204,11 +233,11 @@ def mat_cape(ctx):
 
 
 def mat_leather(ctx):
-    i, j, pw, ph = _pix(ctx)
+    i, j, pw, ph = _pix2(ctx)
     lv = bevel(ctx, base=2)
     if ctx.face in SIDE and info(ctx, 'stitch'):
         lv = lv + np.where((j == 1) & (i % 2 == 0), 1, 0)
-    return tone(R_LEATHER, lv), 1.0, None
+    return tone(R_LEATHER, lv + handf(ctx, 0.6, 0.8, 51, 0.04)), 1.0, None
 
 
 def mat_dark(ctx):
@@ -216,7 +245,7 @@ def mat_dark(ctx):
 
 
 def mat_grip(ctx):
-    i, j, pw, ph = _pix(ctx)
+    i, j, pw, ph = _pix2(ctx)
     lv = bevel(ctx, base=2, top=0, bottom=0)
     if ctx.face in SIDE:                                            # обмотка: косые витки
         lv = lv + np.where((i + j) % 3 == 0, 1, 0)
@@ -230,13 +259,13 @@ def mat_blade(ctx):
         u = (i + 0.5) / pw
         if ctx.face == 'north':
             u = 1 - u
-        rgb = np.where((u < 1.2 / pw)[:, None] | (u > 1 - 1.2 / pw)[:, None], R_GOLD[6], R_GOLD[4])
+        rgb = np.where((u < 2.4 / pw)[:, None] | (u > 1 - 2.4 / pw)[:, None], R_GOLD[6], R_GOLD[4])
         if info(ctx, 'fuller', True):
-            dol = np.abs(u - 0.5) < (0.5 - 1.6 / pw) if pw >= 5 else np.zeros(ctx.n, bool)
-            lv = np.where(j % 6 == 0, 2, 1)
+            dol = np.abs(u - 0.5) < (0.5 - 3.4 / pw) if pw >= 9 else np.zeros(ctx.n, bool)
+            lv = np.where(j % 12 < 2, 2, 1)
             rgb = np.where(dol[:, None], tone(R_BLADE_DARK, lv - (np.abs(u - 0.5) > 0.12)), rgb)
         # отблеск — блик вдоль кромки
-        rgb = np.where(((u < 1.2 / pw) & (j % 7 == 2))[:, None], np.ones(3), rgb)
+        rgb = np.where(((u < 2.4 / pw) & (j % 14 < 2))[:, None], np.ones(3), rgb)
     elif ctx.face in ('east', 'west'):
         rgb = tone(R_GOLD, np.full(ctx.n, 5.0) + (ctx.face == 'east'))
     elif ctx.face == 'up':
@@ -252,7 +281,7 @@ def mat_eye(ctx):
     rgb = tone(R_DARK, np.zeros(ctx.n))
     g = np.zeros((ctx.n, 3))
     if ctx.face == 'north':
-        eye = (j == ph // 2) & (np.abs(i - pw * 0.5 + 0.5) < 0.6)
+        eye = (j == ph // 2) & (np.abs(i - pw * 0.5 + 0.5) < 1.1)
         rgb = np.where(eye[:, None], np.array([0.30, 0.52, 0.62]), rgb)
         g = np.where(eye[:, None], np.array([0.22, 0.42, 0.52]), g)
     return rgb, 1.0, g
@@ -444,10 +473,10 @@ def build_martin():
     # ---------------------------------------------------------------- торс
     m.bone('torso', 'body', (0, 24, 0))
     m.box('torso', (-4.5, 12, -2.5), (4.5, 24, 2.5), 'red', base=2)                         # красный поддоспешник
-    m.box('torso', (-3.5, 16.6, -3.1), (3.5, 24, 2.9), 'steel', deco='chest', lames=0)       # кираса
+    m.box('torso', (-3.5, 16.6, -3.1), (3.5, 24, 2.9), 'steel', deco='chest', lames=0, fili=True)       # кираса
     m.box('torso', (-0.55, 16.4, -3.55), (0.55, 23.4, -3.0), 'steel', base=4)               # рёберный кант
     m.box('torso', (-2.8, 13.4, -3.0), (2.8, 16.8, 2.8), 'steel', lames=4, base=3)           # пластины живота (плакарт)
-    m.box('torso', (-4.4, 17.0, 2.4), (4.4, 23.6, 3.1), 'steel', base=3)                    # спинная пластина
+    m.box('torso', (-4.4, 17.0, 2.4), (4.4, 23.6, 3.1), 'steel', base=3, fili=True)                    # спинная пластина
     # золотой ворот (горжет) и V-кант к груди — как на референсе
     m.box('torso', (-3.0, 23.2, -3.3), (3.0, 24.8, 2.7), 'gold', engr=True)
     for sx in (-1, 1):
@@ -480,7 +509,7 @@ def build_martin():
         m.box('cape_low', (x0, 0.4, -0.4), (x1, 11.0, 4.1), 'cape', outer='east' if sx > 0 else 'west', edge_r=False, edge_b=True)
     # ---------------------------------------------------------------- голова: шлем-корона, рога, золотое забрало
     m.bone('head', 'body', (0, 24, 0))
-    m.box('head', (-4.1, 24.2, -4.1), (4.1, 31.6, 4.1), 'steel', lames=0, base=3)
+    m.box('head', (-4.1, 24.2, -4.1), (4.1, 31.6, 4.1), 'steel', lames=0, base=3, fili=True)
     m.box('head', (-3.2, 25.0, -4.6), (3.2, 29.4, -4.1), 'gold', deco='visor', base=4)       # забрало
     m.box('head', (-3.0, 28.0, -4.75), (-0.7, 28.9, -4.5), 'eye')                         # глазные щели
     m.box('head', (0.7, 28.0, -4.75), (3.0, 28.9, -4.5), 'eye')
@@ -511,10 +540,10 @@ def build_martin():
         x0, x1 = xs(-1.5, 1.5)
         m.box(arm, (x0, 16.4, -1.5), (x1, 22.4, 1.5), 'red', base=2)
         x0, x1 = xs(-1.7, 1.75)
-        m.box(arm, (x0, 17.0, -1.75), (x1, 20.6, 1.75), 'steel', base=3)                  # наплечник руки (ребрасс)
+        m.box(arm, (x0, 17.0, -1.75), (x1, 20.6, 1.75), 'steel', base=3, fili=True)                  # наплечник руки (ребрасс)
         # наплечник: три ламы + шипы
         x0, x1 = xs(-2.2, 3.0)
-        m.box(arm, (x0, 21.0, -3.0), (x1, 24.2, 3.0), 'steel', trim='b', base=4)
+        m.box(arm, (x0, 21.0, -3.0), (x1, 24.2, 3.0), 'steel', trim='b', base=4, fili=True)
         x0, x1 = xs(-0.6, 3.4)
         m.box(arm, (x0, 19.4, -2.8), (x1, 21.4, 2.8), 'steel', trim='b')
         x0, x1 = xs(0.4, 3.5)
@@ -530,7 +559,7 @@ def build_martin():
         m.box(fore, (X - 1.8, 15.4, -1.9), (X + 1.8, 17.4, 1.7), 'steel', base=4)            # налокотник
         x0, x1 = xs(1.7, 2.3)
         m.box(fore, (x0, 14.8, -1.4), (x1, 17.8, 1.2), 'steel', base=3)                      # веер налокотника
-        m.box(fore, (X - 1.75, 12.8, -1.75), (X + 1.75, 15.4, 1.75), 'steel', base=3)        # наруч
+        m.box(fore, (X - 1.75, 12.8, -1.75), (X + 1.75, 15.4, 1.75), 'steel', base=3, fili=True)        # наруч
         m.box(fore, (X - 2.0, 11.8, -2.0), (X + 2.0, 13.2, 2.0), 'gold', engr=True)          # золотая манжета
         m.box(fore, (X - 1.4, 9.4, -1.4), (X + 1.4, 11.8, 1.4), 'gold', base=2)              # латная перчатка
         m.box(fore, (X - 1.5, 9.0, -1.5), (X + 1.5, 9.8, 1.5), 'steel', base=3)              # пальцы
@@ -542,17 +571,17 @@ def build_martin():
         leg = sn + '_leg'
         m.bone(leg, 'body', (X, 12, 0))
         m.box(leg, (X - 2.0, 6.6, -2.0), (X + 2.0, 12.0, 2.0), 'red', base=2)
-        m.box(leg, (X - 2.2, 7.2, -2.3), (X + 2.2, 11.4, 2.0), 'steel', base=3, trim='b')              # набедренник
+        m.box(leg, (X - 2.2, 7.2, -2.3), (X + 2.2, 11.4, 2.0), 'steel', base=3, trim='b', fili=True)              # набедренник
         m.box(leg, (X - 1.8, 5.2, -2.9), (X + 1.8, 7.8, -1.6), 'steel', base=4, trim='b')    # наколенник
         m.box(leg, (X - 1.2, 5.8, -3.25), (X + 1.2, 7.2, -2.9), 'steel', base=5)
-        m.box(leg, (X - 2.0, 1.6, -2.1), (X + 2.0, 6.6, 2.0), 'steel', lames=0, base=3)       # поножи
+        m.box(leg, (X - 2.0, 1.6, -2.1), (X + 2.0, 6.6, 2.0), 'steel', lames=0, base=3, fili=True)       # поножи
         m.box(leg, (X - 0.4, 1.8, -2.4), (X + 0.4, 6.0, -2.1), 'steel', base=4)              # ребро поножей
         m.box(leg, (X - 2.2, 0.0, -3.6), (X + 2.2, 1.8, 2.2), 'steel', lames=0, base=3, trim='t')  # сабатон
         m.box(leg, (X - 1.6, 0.0, -4.4), (X + 1.6, 1.2, -3.6), 'steel', base=4)
     # ---------------------------------------------------------------- меч, щит (на спине и в руке), знамя в руке (для установки знамени)
     add_sword(m, 'sword', 'right_forearm', (5.6, 10.6, -0.2))
     add_shield(m, 'shield_back', 'torso', (0, 17, 4.6), (0, 15.0, 5.0), face='south')
-    add_shield(m, 'shield_hand', 'left_forearm', (-5.6, 14.0, 0), (-5.6, 12.5, -3.2), face='north')
+    add_shield(m, 'shield_hand', 'left_forearm', (-5.6, 14.0, 0), (-5.6, 12.5, -3.9), face='north')
     build_held_banner(m)
     return m
 
@@ -599,7 +628,7 @@ def world_pt(m, pose, bone, pt):
 def grip_point(m, pose, y):
     """Точка на рукояти меча (y в координатах меча) в мире."""
     piv = m.bones['sword'].pivot
-    return world_pt(m, pose, 'sword', piv + [0, y - GRIP_R, 0])
+    return world_pt(m, pose, 'sword', piv + [0, y - getattr(m, 'grip_r', GRIP_R), 0])
 
 
 HAND = {'left': np.array([-5.6, 10.6, -0.2]), 'right': np.array([5.6, 10.6, -0.2])}
@@ -614,7 +643,7 @@ def solve_arm(m, pose, side, target, init=None, iters=300):
         p = dict(pose)
         p[arm] = dict(pose.get(arm, {}), rot=[v[0], v[1], v[2]])
         p[fore] = {'rot': [v[3], 0, 0]}
-        e = world_pt(m, p, fore, HAND[side]) - target
+        e = world_pt(m, p, fore, getattr(m, 'hand', HAND)[side]) - target
         pen = 0.002 * (max(0, v[3]) ** 2 + max(0, -v[3] - 125) ** 2) + 0.0004 * (v[1] ** 2 + v[2] ** 2) * 0.05
         return float(e @ e) + pen
     step = 16.0
@@ -730,6 +759,27 @@ class Grip:
         return o
 
 
+class ShieldFront:
+    """Щит в левой руке лицом вперёд: кисть — в точку hand (оси торса), щит повёрнут к торсу (tilt — наклон назад, yaw — разворот)."""
+
+    def __init__(self, m):
+        self.m = m
+        self.prev = None
+
+    def __call__(self, o, hand, tilt=0.0, yaw=0.0, w=1.0):
+        m = self.m
+        Mt, ot = fk(m, o, 'torso')
+        sol, _ = solve_arm(m, o, 'left', Mt @ np.asarray(hand, float) + ot, self.prev)
+        self.prev = sol
+        own = np.array(o.get('left_arm', {}).get('rot', [0, 0, 0]), float)
+        o['left_arm'] = dict(o.get('left_arm', {}), rot=list(own * (1 - w) + sol[:3] * w))
+        o['left_forearm'] = {'rot': [sol[3] * w, 0, 0]}
+        Mf, _ = fk(m, o, 'left_forearm')
+        R = Mf.T @ Mt @ euler([tilt, yaw, 0])
+        o['shield_hand'] = dict(o.get('shield_hand', {}), rot=list(np.array(to_euler(R)) * w))
+        return o
+
+
 def lerp_dir(a, b, k):
     return unit(np.asarray(a, float) * (1 - k) + np.asarray(b, float) * k)
 
@@ -743,11 +793,13 @@ SHOULDER = ((4.6, 18.0, -4.6), (0.18, 0.62, 0.76))         # на плече (х
 def anims(m):
     an = []
     g = Grip(m)
+    sf = ShieldFront(m)
 
     def A(name, length, loop=False):
         a = Anim('martin_' + name, length, loop)
         an.append(a)
         g.reset()
+        sf.prev = None
         return a
 
     # ---------------------------------------------------------------- idle: двуручник в стойке, тяжёлое дыхание
@@ -842,8 +894,9 @@ def anims(m):
         k = float(track(t, [(0, 0), (0.35, 1), (1.15, 1), (1.5, 0)]))
         d = float(track(t, [(0, 0), (0.45, 0), (0.75, 1, 'in'), (0.85, 1.1), (1.5, 0)]))
         o = {'body': {'pos': [0, -1.0 * k, -2 * d], 'rot': [0, 20 * k, 0]}, 'torso': {'rot': [16 * k, 12 * k, 0]},
-             'left_arm': {'rot': [-72 * k, -24 * k, 0]}, 'left_forearm': {'rot': [-14 * k, 0, 0]}, 'shield_hand': {'rot': [0, 54 * k, 0]},
              'right_leg': {'rot': [-30 * d, 0, 0]}, 'left_leg': {'rot': [30 * d, 0, 0]}, 'head': {'rot': [-8 * k, -18 * k, 0]}}
+        if k > 0.01:
+            sf(o, (-1.5, 15.5, -6.5 - 1.5 * d), tilt=-6 * d, yaw=-14, w=min(1, k * 1.3))
         cape_follow(t, o, lag=18 * d)
         g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([6.5, 14.0, 2.0]) * k, lerp_dir(GUARD[1], (0.35, 0.3, 0.88), k), left=0)
         return vis(o, shield_hand=0.12 < t < 1.4)
@@ -912,7 +965,6 @@ def anims(m):
     # ---------------------------------------------------------------- особое 2: «Приказ стоять насмерть» — щит в землю перед собой (wall 1.1)
     def hold_pose(k, br=0.0):
         return {'body': {'pos': [0, -2.4 * k + 0.1 * br, -0.6 * k]}, 'torso': {'rot': [12 * k + br, 0, 0]}, 'head': {'rot': [-10 * k - br, 0, 0]},
-                'left_arm': {'rot': [-44 * k, -14 * k, 4 * k]}, 'left_forearm': {'rot': [-30 * k, 0, 0]}, 'shield_hand': {'rot': [34 * k, 28 * k, 4 * k]},
                 'right_leg': {'rot': [-36 * k, 0, 6 * k]}, 'left_leg': {'rot': [24 * k, 0, -6 * k]}}
 
     HOLD_SW = ((5.0, 30.0, -2.0), (0.1, 0.9, -0.42))           # меч поднят над щитом, острие вперёд
@@ -921,6 +973,7 @@ def anims(m):
         k = float(track(t, [(0, 0), (0.7, 0.4), (1.1, 1, 'in'), (2.5, 1)]))
         o = hold_pose(k)
         cape_follow(t, o, lag=8 * k)
+        sf(o, (-0.8, 12.6, -6.4), tilt=8, w=min(1, t / 0.5))
         g(o, np.asarray(GUARD[0]) * (1 - k) + np.asarray(HOLD_SW[0]) * k, lerp_dir(GUARD[1], HOLD_SW[1], k), left=0)
         return vis(o, shield_hand=t > 0.15)
     a = A('hold_the_line', 2.5, 'hold')
@@ -932,6 +985,7 @@ def anims(m):
         br = math.sin(TAU * t / 2.0)
         o = hold_pose(1.0, br)
         cape_follow(t, o, lag=8, period=2.0)
+        sf(o, (-0.8, 12.6, -6.4), tilt=8)
         g(o, np.add(HOLD_SW[0], [0, 0.2 * br, 0]), HOLD_SW[1], left=0)
         return vis(o, shield_hand=True)
     A('hold_loop', 2.0, True).sample(hold_loop, 0.1)
@@ -940,7 +994,8 @@ def anims(m):
         k = float(track(t, [(0, 1), (0.8, 0)]))
         o = hold_pose(k)
         cape_follow(t, o, lag=8 * k)
-        g(o, np.asarray(GUARD[0]) * (1 - k) + np.asarray(HOLD_SW[0]) * k, lerp_dir(GUARD[1], HOLD_SW[1], k), left=1 - k)
+        sf(o, (-0.8, 12.6, -6.4), tilt=8, w=k)
+        g(o, np.asarray(GUARD[0]) * (1 - k) + np.asarray(HOLD_SW[0]) * k, lerp_dir(GUARD[1], HOLD_SW[1], k), left=0)
         return vis(o, shield_hand=t < 0.7)
     A('hold_end', 0.8).sample(hold_end, 0.04)
 
@@ -1012,10 +1067,11 @@ def anims(m):
         low = float(track(t, [(0, 0), (1.2, 0), (2.6, 1, 'io')]))
         o = {'body': {'pos': [0, -1.2 * b, 1.6 * rec]}, 'torso': {'rot': [8 * b - 10 * rec + 4 * low, -18 * b, 0]},
              'head': {'rot': [-6 * b + 14 * low, 0, 0]},
-             'left_arm': {'rot': [-80 * b + 10 * rec, -30 * b, 0]}, 'left_forearm': {'rot': [-20 * b, 0, 0]},
-             'shield_hand': {'rot': [0, 60 * b, 0]}, 'right_leg': {'rot': [-14 * b, 0, 0]}, 'left_leg': {'rot': [16 * b, 0, 0]}}
+             'right_leg': {'rot': [-14 * b, 0, 0]}, 'left_leg': {'rot': [16 * b, 0, 0]}}
         cape_follow(t, o, lag=6 * rec)
         DOWN = ((4.0, 13.5, -4.0), (0.12, -0.55, -0.83))                   # опущенный меч, острие к земле
+        if b > 0.01:
+            sf(o, (-1.2, 17.5 - 1.0 * rec, -6.0), tilt=-10 + 8 * rec, yaw=-10, w=b)
         g(o, np.asarray(GUARD[0]) * (1 - low) + np.asarray(DOWN[0]) * low, lerp_dir(GUARD[1], DOWN[1], low), left=0)
         return vis(o, shield_hand=t < 2.1)
     a = A('block_yield', 3.2, 'hold')

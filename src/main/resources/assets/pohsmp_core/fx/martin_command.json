@@ -1,0 +1,27 @@
+{
+ "comment": "Жест «в атаку!» (событие command анимации martin_command; caster = Мартин): вспышка на клинке, золотая волна к солдатам.",
+ "style": "martin",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0.6,5.6,1.6",
+   "duration": 12,
+   "size": 1.8,
+   "rays": 6,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 12,
+   "thickness": 1.2,
+   "followTerrain": true,
+   "color": "@primary"
+  }
+ ]
+}

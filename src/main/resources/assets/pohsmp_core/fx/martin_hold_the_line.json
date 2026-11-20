@@ -1,0 +1,73 @@
+{
+ "comment": "Особое «Приказ стоять насмерть» (caster = Мартин, follow; 10 с = 200 тиков, запускать на событии wall = 1.1 с анимации martin_hold_the_line). Спереди — щит-барьер дугой 120° (мэш martin_shield_wall), под ногами полукруг-герб; спереди неуязвим (код), бить со спины. Конец — Fx.stop или по длительности; затем анимация martin_hold_end.",
+ "style": "martin",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,2.2,2.2",
+   "duration": 12,
+   "size": 3.0,
+   "rays": 10,
+   "color": "@secondary",
+   "screen": 0.06,
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 12,
+   "thickness": 1.6,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "model": "martin_shield_wall",
+   "duration": 200,
+   "out": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "texture": "martin_emblem",
+   "radius": 3.0,
+   "glow": 0.3,
+   "pulse": 24,
+   "color": "@primary",
+   "duration": 200,
+   "fadeOut": 12
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,2.2",
+   "follow": true,
+   "duration": 200,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.5,
+   "spread": 1.6,
+   "speed": 0.01,
+   "gravity": -0.01,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 30,
+   "color": "@secondary"
+  }
+ ]
+}

@@ -1,0 +1,54 @@
+{
+ "comment": "Мартин опускает оружие (с события lower = 1.2 с; caster = Мартин, 80 тиков): строй и знамя гаснут, тьма уходит, мягкий золотой свет; на speak (2.4 с) — фраза ui.pohsmp_core.martin.yield.",
+ "style": "martin",
+ "duration": 80,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 70,
+   "target": "caster",
+   "thickness": 0.12,
+   "pulse": [
+    0.15,
+    30
+   ],
+   "color": "@primary",
+   "motes": 10,
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 60,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.4,
+   "area": 3,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 40,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 24,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 14,
+   "thickness": 1.2,
+   "followTerrain": true,
+   "color": "@secondary"
+  }
+ ]
+}

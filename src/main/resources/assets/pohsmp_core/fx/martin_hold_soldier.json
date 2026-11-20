@@ -1,0 +1,20 @@
+{
+ "comment": "То же на солдате (caster = солдат, follow, 10 с): малый щит-барьер (scale 0.5).",
+ "style": "martin",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "model": "martin_shield_wall",
+   "scale": 0.5,
+   "duration": 200,
+   "out": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

@@ -44,6 +44,20 @@ function facePoint(f, x0, y0, z0, x1, y1, z1, s, t) {
 }
 const NORM = { north: [0, 0, -1], south: [0, 0, 1], east: [1, 0, 0], west: [-1, 0, 0], up: [0, 1, 0], down: [0, -1, 0] };
 
+function boxFaces(c) {
+  const [u, v] = c.uv, [w, h, d] = c.size.map(x => Math.floor(x + 1e-6) || x);
+  const f = {
+    east:  { uv: [u, v + d], uv_size: [d, h] },
+    north: { uv: [u + d, v + d], uv_size: [w, h] },
+    west:  { uv: [u + d + w, v + d], uv_size: [d, h] },
+    south: { uv: [u + 2 * d + w, v + d], uv_size: [w, h] },
+    up:    { uv: [u + d + w, v + d], uv_size: [-w, -d] },
+    down:  { uv: [u + d + 2 * w, v], uv_size: [-w, d] },
+  };
+  if (c.mirror) { const e = f.east; f.east = f.west; f.west = e; for (const k in f) { f[k].uv = [f[k].uv[0] + f[k].uv_size[0], f[k].uv[1]]; f[k].uv_size = [-f[k].uv_size[0], f[k].uv_size[1]]; } }
+  return f;
+}
+
 const TEXC = {};
 function loadTex(src) {
   if (TEXC[src]) return TEXC[src];
@@ -72,14 +86,18 @@ function buildModel(entry) {
     grp.userData = { piv, rest: [-r[0], -r[1], r[2]].map(v => v * Math.PI / 180), parent: b.parent };
     bones[b.name] = grp;
     for (const c of (b.cubes || [])) {
+      if (Array.isArray(c.uv) === false && Object.keys(c.uv || {}).length === 0) continue;
+      if (c.size[0] * c.size[1] * c.size[2] === 0 && !Array.isArray(c.uv) && c.uv.north && c.uv.north.uv_size[0] === 0) continue;
+      const faces = Array.isArray(c.uv) ? boxFaces(c) : c.uv;
       const inf = c.inflate || 0;
       const x0 = -(c.origin[0] + c.size[0]) - inf, x1 = -c.origin[0] + inf;
       const y0 = c.origin[1] - inf, y1 = c.origin[1] + c.size[1] + inf;
       const z0 = c.origin[2] - inf, z1 = c.origin[2] + c.size[2] + inf;
       const cp = c.pivot ? [-c.pivot[0], c.pivot[1], c.pivot[2]] : piv;
       const pos = [], uv = [], nrm = [], idx = [];
-      for (const f in c.uv) {
-        const U = c.uv[f].uv, S = c.uv[f].uv_size, base = pos.length / 3;
+      for (const f in faces) {
+        const U = faces[f].uv, S = faces[f].uv_size, base = pos.length / 3;
+        if (!U || !S) continue;
         for (const [s, t] of [[0, 0], [1, 0], [1, 1], [0, 1]]) {
           const p = facePoint(f, x0, y0, z0, x1, y1, z1, s, t);
           pos.push(p[0] - cp[0], p[1] - cp[1], p[2] - cp[2]);
@@ -149,7 +167,7 @@ document.body.appendChild(renderer.domElement);
 function makeScene(entry, showGround) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(entry.bg || 0x1a1420);
-  scene.fog = new THREE.Fog(scene.background, 120, 260);
+  scene.fog = new THREE.Fog(scene.background, 900, 2400);
   scene.add(new THREE.HemisphereLight(0xffffff, 0x3a3634, 0.8));
   const d = new THREE.DirectionalLight(0xffffff, 0.7); d.position.set(30, 60, -40); scene.add(d);
   const d2 = new THREE.DirectionalLight(0xd8dce8, 0.3); d2.position.set(-40, 20, 50); scene.add(d2);
@@ -165,7 +183,7 @@ function makeScene(entry, showGround) {
 
 function cameraFor(entry, view) {
   const h = entry.height || 32;
-  const cam = new THREE.PerspectiveCamera(view.fov || 30, 1, 0.5, 2000);
+  const cam = new THREE.PerspectiveCamera(view.fov || 30, 1, 0.5, 6000);
   const yaw = (view.yaw ?? 25) * Math.PI / 180, pitch = (view.pitch ?? 8) * Math.PI / 180;
   const dist = (view.dist || 2.3) * h * (30 / (view.fov || 30));
   if (view.tx !== undefined) { cam.position.set(view.tx * 16 + Math.sin(yaw) * Math.cos(pitch) * dist, (view.ty ?? h * 0.48) + Math.sin(pitch) * dist, view.tz * 16 - Math.cos(yaw) * Math.cos(pitch) * dist); cam.lookAt(view.tx * 16, view.ty ?? h * 0.48, view.tz * 16); return cam; }
@@ -260,7 +278,8 @@ if (CELLS) {
     window.READY = true;
   };
   THREE.DefaultLoadingManager.onLoad = () => { if (!window.READY) setTimeout(draw, 50); };
-  for (const c of CELLS.cells) { buildModel(DATA[c.model]); for (const x of (c.models || [])) buildModel(DATA[x.model]); }   // текстуры грузятся заранее
+  for (const c of CELLS.cells) { buildModel(DATA[c.model]); for (const x of (c.models || [])) buildModel(DATA[x.model]); }
+  for (const k in (TEXS || {})) loadTex(TEXS[k]);   // текстуры грузятся заранее
 } else {
   const sel = document.getElementById('model'), asel = document.getElementById('anim');
   for (const n in DATA) sel.add(new Option(DATA[n].title || n, n));

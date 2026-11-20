@@ -1,0 +1,25 @@
+{
+ "comment": "T29 призрачное войско Мартина: холодный лунный свет, туман; движение плавное, мерное.",
+ "palette": {
+  "primary": "#8FD8F0",
+  "secondary": "#D8F6FF",
+  "core": "#FFFFFF",
+  "shadow": "#1C3A4A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_holy_band",
+  "shards": "mote_wisp",
+  "sigil": "martin_emblem"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.5,
+  "jitter": 0.0,
+  "easing": "easeInOutSine",
+  "pulse": {
+   "amp": 0.15,
+   "period": 20
+  }
+ }
+}

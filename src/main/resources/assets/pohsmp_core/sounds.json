@@ -731,5 +731,236 @@
         "volume": 0.6
       }
     ]
+  },
+  "martin.spawn": {
+    "subtitle": "subtitles.pohsmp_core.martin.spawn",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:dead_king/spawn",
+        "pitch": 0.8,
+        "volume": 1.4
+      }
+    ]
+  },
+  "martin.step": {
+    "subtitle": "subtitles.pohsmp_core.martin.step",
+    "sounds": [
+      {
+        "name": "minecraft:mob/irongolem/walk1",
+        "pitch": 0.7,
+        "volume": 1.1
+      },
+      {
+        "name": "minecraft:mob/irongolem/walk2",
+        "pitch": 0.7,
+        "volume": 1.1
+      },
+      {
+        "name": "minecraft:mob/irongolem/walk3",
+        "pitch": 0.7,
+        "volume": 1.1
+      },
+      {
+        "name": "minecraft:mob/irongolem/walk4",
+        "pitch": 0.7,
+        "volume": 1.1
+      }
+    ]
+  },
+  "martin.swing": {
+    "subtitle": "subtitles.pohsmp_core.martin.swing",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:dead_king/swing_01",
+        "pitch": 0.8
+      },
+      {
+        "name": "irons_spellbooks:dead_king/swing_02",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "martin.slam": {
+    "subtitle": "subtitles.pohsmp_core.martin.slam",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:dead_king/attack_slam",
+        "pitch": 0.85,
+        "volume": 1.3
+      }
+    ]
+  },
+  "martin.bash": {
+    "subtitle": "subtitles.pohsmp_core.martin.bash",
+    "sounds": [
+      {
+        "name": "minecraft:item/shield/block1",
+        "pitch": 0.6,
+        "volume": 1.4
+      },
+      {
+        "name": "minecraft:item/shield/block2",
+        "pitch": 0.6,
+        "volume": 1.4
+      },
+      {
+        "name": "minecraft:item/shield/block3",
+        "pitch": 0.6,
+        "volume": 1.4
+      }
+    ]
+  },
+  "martin.block": {
+    "subtitle": "subtitles.pohsmp_core.martin.block",
+    "sounds": [
+      {
+        "name": "minecraft:random/anvil_land",
+        "pitch": 1.4,
+        "volume": 1.2
+      },
+      {
+        "name": "minecraft:item/shield/block4",
+        "pitch": 0.8,
+        "volume": 1.4
+      }
+    ]
+  },
+  "martin.command": {
+    "subtitle": "subtitles.pohsmp_core.martin.command",
+    "sounds": [
+      {
+        "name": "minecraft:mob/ravager/roar1",
+        "pitch": 1.3,
+        "volume": 1.2
+      },
+      {
+        "name": "minecraft:mob/ravager/roar2",
+        "pitch": 1.3,
+        "volume": 1.2
+      },
+      {
+        "name": "minecraft:mob/ravager/roar3",
+        "pitch": 1.3,
+        "volume": 1.2
+      }
+    ]
+  },
+  "martin.horn": {
+    "subtitle": "subtitles.pohsmp_core.martin.horn",
+    "sounds": [
+      {
+        "name": "minecraft:event/raid/raidhorn",
+        "pitch": 0.9,
+        "volume": 1.6,
+        "stream": true
+      }
+    ]
+  },
+  "martin.gallop": {
+    "subtitle": "subtitles.pohsmp_core.martin.gallop",
+    "sounds": [
+      {
+        "name": "minecraft:mob/horse/gallop1",
+        "pitch": 0.75,
+        "volume": 1.3
+      },
+      {
+        "name": "minecraft:mob/horse/gallop2",
+        "pitch": 0.75,
+        "volume": 1.3
+      },
+      {
+        "name": "minecraft:mob/horse/gallop3",
+        "pitch": 0.75,
+        "volume": 1.3
+      },
+      {
+        "name": "minecraft:mob/horse/gallop4",
+        "pitch": 0.75,
+        "volume": 1.3
+      }
+    ]
+  },
+  "martin.banner_plant": {
+    "subtitle": "subtitles.pohsmp_core.martin.banner_plant",
+    "sounds": [
+      {
+        "name": "minecraft:random/anvil_land",
+        "pitch": 0.6,
+        "volume": 1.1
+      }
+    ]
+  },
+  "martin.banner_cut": {
+    "subtitle": "subtitles.pohsmp_core.martin.banner_cut",
+    "sounds": [
+      {
+        "name": "minecraft:mob/zombie/woodbreak",
+        "pitch": 0.8,
+        "volume": 1.2
+      }
+    ]
+  },
+  "martin.hold": {
+    "subtitle": "subtitles.pohsmp_core.martin.hold",
+    "sounds": [
+      {
+        "name": "minecraft:block/beacon/activate",
+        "pitch": 0.7,
+        "volume": 1.2
+      }
+    ]
+  },
+  "martin.soldier": {
+    "subtitle": "subtitles.pohsmp_core.martin.soldier",
+    "sounds": [
+      {
+        "name": "minecraft:block/beacon/ambient",
+        "pitch": 1.6,
+        "volume": 0.6
+      }
+    ]
+  },
+  "martin.soldier_vanish": {
+    "subtitle": "subtitles.pohsmp_core.martin.soldier_vanish",
+    "sounds": [
+      {
+        "name": "minecraft:block/beacon/deactivate",
+        "pitch": 1.5,
+        "volume": 0.5
+      }
+    ]
+  },
+  "martin.phase": {
+    "subtitle": "subtitles.pohsmp_core.martin.phase",
+    "sounds": [
+      {
+        "name": "minecraft:mob/ravager/roar1",
+        "pitch": 0.8,
+        "volume": 1.5
+      },
+      {
+        "name": "minecraft:mob/ravager/roar2",
+        "pitch": 0.8,
+        "volume": 1.5
+      },
+      {
+        "name": "minecraft:mob/ravager/roar3",
+        "pitch": 0.8,
+        "volume": 1.5
+      }
+    ]
+  },
+  "music.martin": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.martin",
+    "comment": "ЗАГЛУШКА до трека владельца: тема Мёртвого Короля (Iron's). Трек владельца — pohsmp_core:music/martin (stream).",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:dead_king/music/first_phase_melody",
+        "stream": true,
+        "volume": 0.6
+      }
+    ]
   }
 }

@@ -306,9 +306,10 @@ def anim_irina(an):
                  right_arm=dict(rotation=[-6, 0, 12]), body=dict(position=[0, -0.6, 0]))
     draw = mod(idle, left_arm=dict(rotation=[-28, -6, -52]), right_arm=dict(rotation=[-14, 0, 30]), torso=dict(rotation=[-4, 0, 0]),
                head=dict(rotation=[-6, 0, 4]))
+    speak = mod(clench, head=dict(rotation=[2, -16, 10]), left_arm=dict(rotation=[-48, 18, -16]), torso=dict(rotation=[2, 8, 0]))
     keys = [(0, idle, None), (0.45, reach, 'out'), (0.62, strain, 'io'), (0.78, reach, 'io'), (0.9, strain, 'io'),
-            (1.0, clench, 'inq'), (1.3, clench, 'io'), (1.6, draw, 'io'), (2.0, idle, 'io')]
-    return bake(2.0, keys, [(0.5, 'bind'), (1.0, 'break')])
+            (1.0, clench, 'inq'), (1.25, speak, 'io'), (1.6, mod(draw, head=dict(rotation=[0, -10, 8])), 'io'), (2.2, idle, 'io')]
+    return bake(2.2, keys, [(0.5, 'bind'), (1.0, 'break'), (1.25, 'speak')])
 
 
 def anim_aris(an):
@@ -318,10 +319,10 @@ def anim_aris(an):
     wind = sample(an, 'animation.aris.slam', 0.6)
     hit = sample(an, 'animation.aris.slam', 0.75)
     half = mod(sample(an, 'animation.aris.slam', 0.5), body=dict(pos_add=[0, 0.5, 0]))
-    hold = mod(hit, head=dict(rot_add=[-14, 0, 0]), torso=dict(rot_add=[-4, 0, 0]))
+    hold = mod(hit, head=dict(rot_add=[-8, -12, 0]), torso=dict(rot_add=[-6, 0, 0]), left_arm=dict(rot_add=[-18, 0, -14]))
     keys = [(0, idle, None), (0.25, sample(an, 'animation.aris.slam', 0.42), 'io'), (0.5, wind, 'out'), (0.65, hit, 'inq'),
             (0.75, hit, None), (0.95, half, 'out'), (1.15, hit, 'inq'), (1.4, hold, 'out'), (2.0, idle, 'io')]
-    return bake(2.0, keys, [(0.65, 'strike'), (1.15, 'break')])
+    return bake(2.0, keys, [(0.65, 'strike'), (1.15, 'break'), (1.4, 'speak')])
 
 
 def anim_martin(an):
@@ -341,8 +342,9 @@ def anim_martin(an):
     h2 = mod(oh, **SH_BACK, torso=dict(rot_add=[8, -34, 30]))
     keys = [(0, idle, None), (0.15, mod(idle, **SH_HAND), 'io'), (0.38, up, 'outq'), (0.45, jolt, 'out'), (0.6, up, 'io'),
             (0.62, mod(up, **SH_BACK), None), (0.78, w1, 'io'), (0.92, h1, 'inq'), (1.05, h1, None), (1.2, w2, 'io'),
-            (1.35, h2, 'inq'), (1.6, h2, None), (2.2, idle, 'io')]
-    return bake(2.2, keys, [(0.4, 'block'), (0.9, 'slash'), (1.35, 'break')])
+            (1.35, h2, 'inq'), (1.5, h2, None), (1.75, mod(h2, torso=dict(rot_add=[-10, 20, -18]), head=dict(rot_add=[-6, 12, 0])), 'io'),
+            (2.4, idle, 'io')]
+    return bake(2.4, keys, [(0.4, 'block'), (0.9, 'slash'), (1.35, 'break'), (1.7, 'speak')])
 
 
 def anim_ereb(an):
@@ -354,9 +356,10 @@ def anim_ereb(an):
     snap = mod(raise_, left_arm=dict(rot_add=[8, 0, 4]), bipedHandLeft=dict(rotation=[-18, 0, 0]))
     watch = mod(raise_, left_arm=dict(rotation=[-120, -20, -20]), head=dict(rotation=[-10, 4, 0]))
     bow = sample(an, 'ereb_spawn', 3.0)
+    talk = mod(idle, left_arm=dict(rotation=[-42, -14, -22]), head=dict(rotation=[-4, 14, 8]))
     keys = [(0, idle, None), (0.42, raise_, 'out'), (0.55, snap, 'inq'), (0.75, snap, None), (0.95, watch, 'io'),
-            (1.3, bow, 'io'), (1.45, bow, None), (1.8, idle, 'io')]
-    return bake(1.8, keys, [(0.55, 'snap'), (0.95, 'break')])
+            (1.25, bow, 'io'), (1.35, bow, None), (1.6, talk, 'io'), (1.95, talk, None), (2.3, idle, 'io')]
+    return bake(2.3, keys, [(0.55, 'snap'), (0.95, 'break'), (1.55, 'speak')])
 
 
 ANIMS = {'irina': anim_irina, 'aris': anim_aris, 'martin': anim_martin, 'ereb': anim_ereb}

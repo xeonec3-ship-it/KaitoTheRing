@@ -179,21 +179,41 @@ def meshes():
         'style': 'martin_ghost', 'center': 0, 'formedAt': 4, 'collapse': {'duration': 8, 'easing': 'easeInCubic'},
         'parts': [{'type': 'quad', 'texture': 'martin_lane', 'blend': 'additive', 'opacity': 0.9, 'doubleSided': True, 'color': '@primary',
                    'pulse': [0.45, 10], 'corners': [[-hw, 0.06, LANE_L], [hw, 0.06, LANE_L], [hw, 0.06, 0], [-hw, 0.06, 0]]}]})
-    # барьер: дуга 120° радиуса 2.4 перед носителем, высота 4.4 (под рост Мартина ×2), 6 плоскостей
-    parts = []
-    n, R, H = 6, 2.4, 4.4
+    # барьер «стоять насмерть»: дуга 120° ТОЛЬКО спереди из 6 призрачных башенных щитов (как его щит: кайма, герб), сзади открыто
+    n, R = 6, 3.2
+    boxes = []
     for k in range(n):
-        a0 = math.radians(-60 + 120 * k / n)
-        a1 = math.radians(-60 + 120 * (k + 1) / n)
-        p0 = [round(math.sin(a0) * R, 3), round(math.cos(a0) * R, 3)]
-        p1 = [round(math.sin(a1) * R, 3), round(math.cos(a1) * R, 3)]
-        parts.append({'type': 'quad', 'texture': 'martin_barrier', 'blend': 'additive', 'opacity': 0.5, 'doubleSided': True,
-                      'color': '@secondary', 'pulse': [0.25, 14],
-                      'corners': [[p0[0], H, p0[1]], [p1[0], H, p1[1]], [p1[0], 0.0, p1[1]], [p0[0], 0.0, p0[1]]]})
+        a = math.radians(-50 + 100 * k / (n - 1))
+        ca, sa = math.cos(a), math.sin(a)
+        cx, cz = sa * R, ca * R
+
+        def bx(lx0, ly0, lz0, lx1, ly1, lz1, tone_):
+            lx, ly, lz = (lx0 + lx1) / 2, (ly0 + ly1) / 2, (lz0 + lz1) / 2
+            wx, wz = cx + lx * ca + lz * sa, cz - lx * sa + lz * ca
+            hx_, hy, hz = (lx1 - lx0) / 2, (ly1 - ly0) / 2, (lz1 - lz0) / 2
+            boxes.append([round(v, 3) for v in (wx - hx_, ly - hy, wz - hz, wx + hx_, ly + hy, wz + hz)] + [tone_, [0, round(math.degrees(a), 2), 0]])
+        W2, H = 0.6, 2.7
+        bx(-W2, 0.05, -0.05, W2, H, 0.05, 0)                      # поле щита (полупрозрачный кармин)
+        bx(-W2 - 0.06, H, -0.08, W2 + 0.06, H + 0.1, 0.08, 2)     # золотая кайма (светится)
+        bx(-W2 - 0.06, 0.0, -0.08, W2 + 0.06, 0.1, 0.08, 2)
+        bx(-W2 - 0.06, 0.0, -0.08, -W2, H + 0.1, 0.08, 2)
+        bx(W2, 0.0, -0.08, W2 + 0.06, H + 0.1, 0.08, 2)
+        bx(-W2 + 0.12, 0.2, 0.05, W2 - 0.12, H - 0.2, 0.07, 1)    # внутренняя стальная рамка
+        bx(-0.28, 1.95, 0.07, 0.28, 2.1, 0.13, 3)                 # герб: корона
+        for dx in (-0.22, 0.0, 0.22):
+            bx(dx - 0.04, 2.1, 0.07, dx + 0.04, 2.24, 0.13, 3)
+        bx(-0.3, 1.7, 0.07, 0.3, 1.78, 0.13, 3)                   # гарда
+        bx(-0.04, 0.75, 0.07, 0.04, 1.7, 0.13, 3)                 # клинок остриём вниз
+    ys = [b_[1] for b_ in boxes] + [b_[4] for b_ in boxes]
     write('fx/meshes/martin_shield_wall.json', {
-        'comment': 'T29 «Приказ стоять насмерть»: щит-барьер дугой 120° (r %g, высота %g) перед носителем (по yaw), follow. '
-                   'Масштаб элемента: 1 — Мартин, 0.5 — солдат. Сгенерировано gen_martin_fx.py.' % (R, H),
-        'style': 'martin', 'center': 0, 'formedAt': 10, 'collapse': {'duration': 12, 'easing': 'easeInCubic'}, 'parts': parts})
+        'comment': 'T29 «Приказ стоять насмерть»: дуга 100° ТОЛЬКО спереди (по +z = yaw носителя, сзади открыто) из %d призрачных башенных щитов '
+                   '(r %g, высота 2.8): кармин в золотой кайме, герб — корона над мечом. Масштаб элемента: 1 — Мартин, 0.5 — солдат. '
+                   'Сгенерировано gen_martin_fx.py.' % (n, R),
+        'style': 'martin', 'center': 0, 'formedAt': 10, 'collapse': {'duration': 12, 'easing': 'easeInCubic'},
+        'parts': [{'type': 'boxes', 'tones': ['#C04858', '#D8E4EC', '#F6D88A', '#FFF1C4'], 'glowTones': [2, 3], 'blend': 'translucent',
+                   'opacity': 0.42, 'shade': True, 'boxes': boxes,
+                   'appear': {'delay': 0, 'duration': 10, 'easing': 'easeOutCubic', 'reveal': 'up', 'front': 0.4},
+                   'bounds': [round(min(ys), 3), round(max(ys), 3)]}]})
 
 
 # ================================================================== эффекты
@@ -345,14 +365,15 @@ def effects():
     # ---------------------------------------------------------------- особое: «Приказ стоять насмерть»
     fx('martin_hold_the_line', 'Особое «Приказ стоять насмерть» (caster = Мартин, follow; 10 с = %d тиков, запускать на событии wall = 1.1 с '
        'анимации martin_hold_the_line). Спереди — щит-барьер дугой 120° (мэш martin_shield_wall), под ногами полукруг-герб; спереди неуязвим '
-       '(код), бить со спины. Конец — Fx.stop или по длительности; затем анимация martin_hold_end.' % T_HOLD, T_HOLD, [
+       '(код), бить со спины; дуга 100° из 6 щитов r3.2, сзади открыто. Конец — Fx.stop или по длительности; затем анимация martin_hold_end.' % T_HOLD, T_HOLD, [
         E('flash', 0, at('caster', 0, 2.2, 2.2), duration=12, size=3.0, rays=10, color='@secondary', screen=0.06, ring=True),
         E('wave', 0, 'caster', duration=22, shape='ring', radius=12, thickness=1.6, followTerrain=True, color='@primary'),
         E('mesh', 0, 'caster', follow=True, model='martin_shield_wall', duration=T_HOLD, out=ease(12)),
+        *[E('sprites', 0, at('caster', math.sin(math.radians(a_)) * 3.2, 1.4, math.cos(math.radians(a_)) * 3.2), follow=True, duration=T_HOLD,
+            texture='spark_soft', count=100000, rate=0.25, spread=1.4, speed=0.01, gravity=-0.006, size=[0.14, 0.02], life=26, color='@secondary',
+            comment='золотые искры по кромкам щитов') for a_ in (-50, -10, 30, 50)],
         E('decal', 0, 'caster', follow=True, texture='martin_emblem', radius=3.0, glow=0.3, pulse=24, color='@primary', duration=T_HOLD,
           fadeOut=12),
-        E('sprites', 0, at('caster', 0, 0.2, 2.2), follow=True, duration=T_HOLD, texture='spark_soft', count=100000, rate=0.5, spread=1.6,
-          speed=0.01, gravity=-0.01, size=[0.14, 0.02], life=30, color='@secondary'),
     ])
     fx('martin_hold_soldier', 'То же на солдате (caster = солдат, follow, 10 с): малый щит-барьер (scale 0.5).', T_HOLD, [
         E('mesh', 0, 'caster', follow=True, model='martin_shield_wall', scale=0.5, duration=T_HOLD, out=ease(12)),
@@ -861,8 +882,8 @@ def shots():
              decals=[dict(tex='martin_banner_ring', pos=[-3.6, 0.03, -2.4], r=8, color='#e8b95a', opacity=0.7)]),
         dict(model='martin', anim='martin_cavalry', t=2.3, yaw=-28, pitch=36, dist=4.2, ty=10, tz=-20, tx=0,
              label='«Атака конницы»', sub='полосы 40×3 бл.: 2 с предупреждения, затем всадники', decals=lanes, meshes=riders),
-        dict(model='martin', anim='martin_hold_loop', t=0.5, yaw=20, pitch=10, dist=3.0, ty=34, label='«Приказ стоять насмерть»',
-             sub='щит-барьер спереди 120° — бить со спины', meshes=[dict(mesh='martin_shield_wall', pos=[0, 0, 0], ry=180, scale=1)])]},
+        dict(model='martin', anim='martin_hold_loop', t=0.5, yaw=40, pitch=22, dist=3.6, ty=30, label='«Приказ стоять насмерть»',
+             sub='дуга из 6 призрачных щитов только спереди — бить со спины', meshes=[dict(mesh='martin_shield_wall', pos=[0, 0, 0], ry=180, scale=1)])]},
             three, (1600, 1100))
 
 

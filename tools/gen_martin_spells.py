@@ -341,14 +341,14 @@ def lang_sounds():
 def shot():
     import martin_render as R
     three = os.environ.get('MARTIN_THREE') or None
-    wall = [dict(mesh='martin_shield_line', pos=[0, 0, -12], ry=180)]
+    wall = [dict(mesh='martin_shield_line', pos=[0, 0, -7], ry=180)]
     archers = [dict(mesh='martin_archer_ghost', pos=[(k - 3) * 1.8, 0, 5.0 + abs(k - 3) * 0.6], ry=180) for k in range(7)]
-    marks = [dict(tex='martin_arrow_mark', pos=[x, 0.04, z], r=1.6, color='#c22a2c', opacity=0.9) for x, z in ((-4, -8), (2, -10), (5, -6))]
-    arrows = [dict(mesh='martin_arrow', pos=[2 + dx, 4 + dy, -10 + dz]) for dx, dy, dz in ((0, 0, 0), (0.6, 2.5, -0.4), (-0.5, 5, 0.5))]
+    marks = [dict(tex='martin_arrow_mark', pos=[x, 0.04, z], r=1.6, color='#c22a2c', opacity=0.9) for x, z in ((-4, -5), (2, -7), (5, -4))]
+    arrows = [dict(mesh='martin_arrow', pos=[2 + dx, 2 + dy, -7 + dz]) for dx, dy, dz in ((0, 0, 0), (0.6, 2.0, -0.4), (-0.5, 4, 0.5))]
     R.sheet(os.path.join(FX.MEDIA, 't29_spells4.jpg'), {'cols': 4, 'cells': [
-        dict(model='martin', anim='martin_shield_wall', t=1.1, yaw=-30, pitch=24, dist=3.6, ty=30, label='«Стена щитов»',
+        dict(model='martin', anim='martin_shield_wall', t=1.1, yaw=-150, pitch=30, dist=5.0, ty=24, label='«Стена щитов»',
              sub='щит в землю (slam) — стена с просветами идёт на игроков', meshes=wall),
-        dict(model='martin', anim='martin_volley', t=1.25, yaw=-35, pitch=26, dist=3.8, ty=30, label='«Залп лучников»',
+        dict(model='martin', anim='martin_volley', t=1.25, yaw=-25, pitch=38, dist=5.4, ty=24, label='«Залп лучников»',
              sub='лучники за спиной, метки 1.5 с, стрелы', meshes=archers + arrows, decals=marks),
         dict(model='martin', anim='martin_duel', t=1.1, yaw=-40, pitch=30, dist=3.6, ty=30, label='«Вызов на дуэль»',
              sub='кольцо r6: внутри — только двое', decals=[dict(tex='martin_duel_ring', pos=[0, 0.04, -3], r=6.4, color='#e8b95a', opacity=0.9)]),

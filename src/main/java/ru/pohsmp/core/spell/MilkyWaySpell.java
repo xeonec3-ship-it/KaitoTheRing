@@ -39,7 +39,7 @@ import ru.pohsmp.core.fx.Fx;
  * the chosen direction (where the caster looked when the cast began) for 8 s. Everything caught is drawn into it and carried,
  * takes magic damage twice a second, is slowed hard and every 1.5 s is thrown up by a star stream.
  */
-public class MilkyWaySpell extends HigherSpell {
+public class MilkyWaySpell extends HigherSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "milky_way";
     public static final int CAST = 200, LIFE = 160, TOSS_EVERY = 30;
     public static final double SPEED = 0.3, RAD = 6, HEIGHT = 1.6, DMG = 3;

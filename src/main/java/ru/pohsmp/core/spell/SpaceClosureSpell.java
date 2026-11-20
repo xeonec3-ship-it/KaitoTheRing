@@ -55,7 +55,7 @@ import ru.pohsmp.core.net.Net.HFx;
  * can cast Iron's spells, MNA is silenced and nobody else can drink potions. Lasts 5/10/20/30 min; casting it again ends the dome early.
  * Not kept across a server restart.
  */
-public class SpaceClosureSpell extends PohSpell {
+public class SpaceClosureSpell extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "space_closure";
     public static final String ID = "pohsmp_core:" + PATH;
     public static final double R = 86;

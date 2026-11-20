@@ -21,7 +21,7 @@
   {
    "type": "flash",
    "delay": 18,
-   "at": "caster+0.6,0.2,1.2",
+   "at": "caster+1.05,0.2,2.1",
    "duration": 8,
    "size": 1.6,
    "color": "@secondary",
@@ -30,10 +30,10 @@
   {
    "type": "decal",
    "delay": 18,
-   "at": "caster+0.6,0,1.2",
+   "at": "caster+1.05,0,2.1",
    "duration": 110,
    "texture": "higher_cracks",
-   "radius": 3,
+   "radius": 4,
    "grow": 10,
    "glow": 0.5,
    "fadeOut": 30,

@@ -237,6 +237,17 @@ if (CELLS) {
     CELLS.cells.forEach((c, i) => {
       const { e, m } = setup(c);
       const sc = makeScene(c); sc.add(m.root);
+      if (c.scale) m.root.scale.setScalar(c.scale);
+      if (c.x) m.root.position.x = c.x * 16;
+      for (const x of (c.models || [])) {                         // несколько моделей в клетке (сравнение роста)
+        const r = setup({ ...x, noGlow: x.noGlow }); r.m.root.scale.setScalar(x.scale || 1); r.m.root.position.set((x.x || 0) * 16, (x.y || 0) * 16, (x.z || 0) * 16); r.m.root.rotation.y = (x.ry || 0) * Math.PI / 180; sc.add(r.m.root);
+      }
+      if (c.ruler) {                                              // линейка: столбик из блоков 1×1 (чередование цветов)
+        for (let k = 0; k < c.ruler; k++) {
+          const b = new THREE.Mesh(new THREE.BoxGeometry(4, 16, 4), new THREE.MeshLambertMaterial({ color: k % 2 ? 0xd8c8b8 : 0x6a5a50 }));
+          b.position.set(c.rulerX * 16, k * 16 + 8, 0); sc.add(b);
+        }
+      }
       if (c.light) { const p = new THREE.PointLight(0xff7a30, c.light, 120, 2); p.position.set(0, 30, -20); sc.add(p); }
       const cam = cameraFor(e, c); cam.aspect = cw / ch; cam.updateProjectionMatrix();
       const x = (i % cols) * cw, y = H - (Math.floor(i / cols) + 1) * ch;
@@ -252,7 +263,7 @@ if (CELLS) {
     window.READY = true;
   };
   THREE.DefaultLoadingManager.onLoad = () => { if (!window.READY) setTimeout(draw, 50); };
-  for (const c of CELLS.cells) setup(c);
+  for (const c of CELLS.cells) { setup(c); for (const x of (c.models || [])) setup(x); }
 } else {
   const sel = document.getElementById('model'), asel = document.getElementById('anim');
   for (const n in DATA.models) sel.add(new Option(DATA.models[n].title || n, n));

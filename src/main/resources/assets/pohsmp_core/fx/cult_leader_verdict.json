@@ -71,7 +71,7 @@
   {
    "type": "flash",
    "delay": 40,
-   "at": "caster+0,1,0",
+   "at": "caster+0,1.75,0",
    "duration": 14,
    "size": 4.5,
    "rays": 12,

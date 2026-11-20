@@ -21,12 +21,12 @@
   {
    "type": "sprites",
    "delay": 0,
-   "at": "caster+0,1.2,0",
+   "at": "caster+0,2.1,0",
    "follow": true,
    "texture": "mote_flame",
    "count": 100000,
    "rate": 0.6,
-   "spread": 0.7,
+   "spread": 1.2,
    "speed": 0.02,
    "gravity": -0.02,
    "size": [

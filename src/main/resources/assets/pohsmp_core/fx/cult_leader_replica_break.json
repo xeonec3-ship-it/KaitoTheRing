@@ -75,8 +75,8 @@
   {
    "type": "slash",
    "delay": 30,
-   "at": "caster+0.4,2.6,0.8",
-   "radius": 2.6,
+   "at": "caster+0.7,4,1.4",
+   "radius": 4.5,
    "arc": 150,
    "thickness": 0.4,
    "bend": 1,

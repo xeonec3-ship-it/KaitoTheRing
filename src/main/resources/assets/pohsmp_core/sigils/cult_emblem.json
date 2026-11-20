@@ -1,6 +1,6 @@
 {
  "comment": "T26: знак культа (око в пламени) под Главой Культа — ролик появления и переходы фаз. Сгенерировано tools/gen_cult_leader.py.",
- "size": 3.2,
+ "size": 4.6,
  "color": "#FF7A1E",
  "orientation": "ground",
  "lifetime": -1,

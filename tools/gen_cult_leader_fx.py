@@ -31,7 +31,7 @@ R_VERDICT, R_WALL = 24, 28
 T_WARN, T_BAN = 40, 200   # предупреждение 2 с, запрет 10 с
 T_INTRO = 175             # ролик появления = анимация fire_boss_spawn (8.75 с)
 T_DEATH = 70              # ролик смерти 3.5 с (первые 3.5 с анимации fire_boss_death)
-GATE = -3.75              # проём огня — за спиной босса: fire_boss_spawn начинает с body.z = +60 px (3.75 бл. позади) и выводит вперёд
+GATE = -6.56              # проём огня — за спиной босса (рост ×1.75): fire_boss_spawn начинает с body.z = +60 px (60·1.75/16 = 6.56 бл. позади) и выводит вперёд
 
 
 def write(rel, obj):
@@ -245,7 +245,7 @@ def sigils():
                   color=FIRE, br=1.1),
             ], hold=-1, flash={'color': FIRE_HOT, 'size': 1.05, 'duration': 14, 'sparks': 120}, dissolve=('fade', 'collapse'), ddur=20)
     F.sigil('cult_emblem', 'T26: знак культа (око в пламени) под Главой Культа — ролик появления и переходы фаз. Сгенерировано tools/gen_cult_leader.py.',
-            3.2, FIRE, 'ground', [
+            4.6, FIRE, 'ground', [
                 L('glow', 'disc', 'glow', 1.0, -0.01, ap(0, 10, 'fade'), color=FIRE_DEEP, br=0.6, pulse=(0.2, 16)),
                 L('seal', 'disc', 'cult_emblem', 1.0, 0.0, ap(0, 18, 'draw', startAngle=90, easing='easeOutCubic'), rot=1.5, boost=6),
                 L('rim', 'band', 'school_fire_band', 1.18, 0.01, ap(8, 12, 'draw', startAngle=90, direction=-1), inner=0.9, repeat=3, rot=-2.5,
@@ -282,7 +282,7 @@ def effects():
     G = at('caster', 0, 0, GATE)
     # ---------------------------------------------------------------- появление
     fx('cult_leader_intro', 'Ролик появления (8.75 с = 175 тиков = анимация fire_boss_spawn). caster = босс на конечной точке, yaw — куда он смотрит. '
-       'Проём огня G — в 3.75 бл. за спиной босса (анимация выводит его оттуда). 0–2 с трещины и жар у G, 1–6.5 с завеса пламени и столб в G, '
+       'Проём огня G — в 6.56 бл. за спиной босса (рост ×1.75) (анимация выводит его оттуда). 0–2 с трещины и жар у G, 1–6.5 с завеса пламени и столб в G, '
        '2–6.4 с силуэт идёт сквозь огонь (огненный венок на теле), 6.0 с — взмах косой: волна r12 и вспышка; 6.5 с — знак культа под ним (титр), '
        '8.75 с — полоса босса (код).', T_INTRO, [
         E('tint', 0, 'caster', duration=T_INTRO, radius=48, color='#3A0A04', strength=0.32, **{'in': ease(30), 'out': ease(30, 'easeInSine')}),
@@ -291,18 +291,18 @@ def effects():
         E('sprites', 0, at(G, 0, 0.1, 0), duration=150, texture='mote_flame', count=100000, rate=0.5, area=3.5, speed=0.02, gravity=-0.012,
           size=[0.22, 0.04], life=34, color=FIRE, glow=0.6, comment='искры из трещин'),
         E('sigil', 10, at(G, 0, 0.05, 0), id='cult_emblem', comment='знак культа под проёмом'),
-        E('curtain', 22, G, duration=118, radius=[0.4, 2.1], count=30, height=5.6, grow=30, width=[0.6, 1.3], brightness=[0.6, 1.0], flicker=0.55,
+        E('curtain', 22, G, duration=118, radius=[0.6, 3.2], count=34, height=7.5, grow=30, width=[0.6, 1.3], brightness=[0.6, 1.0], flicker=0.55,
           texture='cult_flame_tongue', color='@primary', out=ease(28, 'easeInSine'), comment='стена пламени — из неё выходит силуэт'),
-        E('curtain', 30, G, duration=100, radius=[0.2, 1.4], count=16, height=3.4, grow=24, width=[0.4, 0.9], brightness=[0.8, 1.0], flicker=0.6,
+        E('curtain', 30, G, duration=100, radius=[0.3, 2.2], count=18, height=5, grow=24, width=[0.4, 0.9], brightness=[0.8, 1.0], flicker=0.6,
           texture='cult_flame_tongue', color='@secondary', out=ease(24, 'easeInSine')),
-        E('column', 26, G, duration=96, radius=1.5, height=8, fill=0.45, color='@primary', out=ease(26, 'easeInSine')),
+        E('column', 26, G, duration=96, radius=2.2, height=11, fill=0.45, color='@primary', out=ease(26, 'easeInSine')),
         E('sprites', 30, at(G, 0, 0.4, 0), duration=100, texture='mote_flame', count=100000, rate=1.4, spread=1.4, speed=0.06, gravity=-0.02,
           size=[0.7, 0.1], life=26, color='@secondary', glow=0.8),
         E('aura', 40, 'caster', duration=92, follow=True, target='caster', thickness=0.16, pulse=[0.25, 10], color='@primary', motes=24,
           texture='mote_flame', ring=False, out=ease(20), comment='огненный венок на силуэте, пока он идёт сквозь пламя'),
         E('wave', 120, 'caster', duration=26, shape='ring', radius=12, thickness=2.2, followTerrain=True, color='@primary', comment='взмах косой (6.0 с)'),
-        E('flash', 120, at('caster', 0, 2.0, 0), duration=12, size=3.2, rays=8, color='@secondary', ring=True),
-        E('sprites', 121, at('caster', 0, 1.2, 0), duration=6, texture='mote_flame', count=60, rate=10, spread=1.2, speed=0.3, gravity=0.01,
+        E('flash', 120, at('caster', 0, 3.5, 0), duration=12, size=3.2, rays=8, color='@secondary', ring=True),
+        E('sprites', 121, at('caster', 0, 2.1, 0), duration=6, texture='mote_flame', count=60, rate=10, spread=1.2, speed=0.3, gravity=0.01,
           size=[0.5, 0.05], life=24, color='@primary', glow=0.7),
         E('sigil', 130, at('caster', 0, 0.04, 0), id='cult_emblem', comment='знак под боссом — в этот момент титр (6.5 с)'),
         E('sprites', 130, at('caster', 0, 0.2, 0), duration=45, texture='mote_flame', count=100000, rate=0.4, area=2.4, speed=0.02, gravity=-0.01,
@@ -317,7 +317,7 @@ def effects():
         E('curtain', 0, 'caster', duration=T_WARN, radius=R_VERDICT, count=140, height=1.2, grow=40, width=[0.06, 0.16], brightness=[0.3, 0.6],
           texture='beam_fade', flicker=0.6, color='@primary', out=ease(6), comment='предупреждение: край зоны прорастает'),
         E('aura', 0, 'caster', duration=T_WARN, target='caster', thickness=0.22, pulse=[0.3, 8], color='@secondary', motes=30, comment='босс поднял руку'),
-        E('flash', T_WARN, at('caster', 0, 1.0, 0), duration=14, size=4.5, rays=12, screen=0.12, ring=True, color='@secondary'),
+        E('flash', T_WARN, at('caster', 0, 1.75, 0), duration=14, size=4.5, rays=12, screen=0.12, ring=True, color='@secondary'),
         E('wave', T_WARN, 'caster', duration=18, shape='ring', radius=R_VERDICT, thickness=1.6, followTerrain=True, color='@primary'),
         E('curtain', T_WARN, 'caster', duration=T_BAN, radius=R_VERDICT, count=180, height=3.2, grow=8, width=[0.08, 0.22], brightness=[0.3, 0.65],
           texture='beam_fade', flicker=0.35, color='@primary', out=ease(20), comment='граница запрета'),
@@ -361,24 +361,24 @@ def effects():
     fx('cult_leader_phase2', 'Переход в фазу 2 (66% ХП): «Глава Культа взывает к Меллисто» — рёв, знак культа под ним, кольцо r16 (caster = босс, follow). 3 с.', 60, [
         E('sigil', 0, at('caster', 0, 0.04, 0), id='cult_emblem', follow=True),
         E('aura', 0, 'caster', duration=44, target='caster', thickness=0.24, pulse=[0.3, 6], color='@primary', motes=40, follow=True),
-        E('flash', 12, at('caster', 0, 1.8, 0), duration=12, size=3.4, rays=10, screen=0.12, color='@secondary'),
+        E('flash', 12, at('caster', 0, 3.15, 0), duration=12, size=3.4, rays=10, screen=0.12, color='@secondary'),
         E('wave', 12, 'caster', duration=24, shape='ring', radius=16, thickness=2.4, followTerrain=True, color='@primary'),
-        E('sprites', 12, at('caster', 0, 1.2, 0), duration=6, texture='mote_flame', count=70, rate=12, spread=1.4, speed=0.32, gravity=0.012,
+        E('sprites', 12, at('caster', 0, 2.1, 0), duration=6, texture='mote_flame', count=70, rate=12, spread=1.4, speed=0.32, gravity=0.012,
           size=[0.5, 0.05], life=26, color='@primary', glow=0.6),
         E('tint', 0, 'caster', duration=60, radius=32, color='#4A0A08', strength=0.25, **{'in': ease(10), 'out': ease(30)}),
     ])
     fx('cult_leader_phase3', 'Переход в фазу 3 (33% ХП): «Истинное пламя» — столб огня из босса, волна к краю арены r28 (на 30 тике код запускает '
        'cult_leader_firewall), вспышка. caster = босс. 4 с.', 80, [
         E('column', 0, 'caster', duration=44, radius=1.8, height=16, fill=0.7, color='@primary', out=ease(18, 'easeInSine')),
-        E('vortex', 0, 'caster', duration=40, radius=3.2, height=6, arms=3, speed=9, texture='mote_flame', color='@secondary', out=ease(10)),
+        E('vortex', 0, 'caster', duration=40, radius=3.6, height=9, arms=3, speed=9, texture='mote_flame', color='@secondary', out=ease(10)),
         E('sigil', 0, at('caster', 0, 0.04, 0), id='cult_emblem', scale=1.6),
-        E('flash', 30, at('caster', 0, 2.0, 0), duration=16, size=5.5, rays=12, screen=0.28, color='@secondary', ring=True),
+        E('flash', 30, at('caster', 0, 3.5, 0), duration=16, size=5.5, rays=12, screen=0.28, color='@secondary', ring=True),
         E('wave', 30, 'caster', duration=30, shape='ring', radius=R_WALL, thickness=3.0, followTerrain=True, color='@primary'),
         E('tint', 0, 'caster', duration=80, radius=40, color='#6A1A06', strength=0.34, **{'in': ease(20), 'out': ease(40)}),
     ])
     fx('cult_leader_fury', 'Фаза 3, «ярость души» (облик души Тироса): огненный ореол на боссе, пока длится (caster = босс, follow, до Fx.stop).', -1, [
         E('aura', 0, 'caster', target='caster', follow=True, thickness=0.2, pulse=[0.25, 12], color='@secondary', motes=30, texture='mote_flame'),
-        E('sprites', 0, at('caster', 0, 1.2, 0), follow=True, texture='mote_flame', count=100000, rate=0.6, spread=0.7, speed=0.02,
+        E('sprites', 0, at('caster', 0, 2.1, 0), follow=True, texture='mote_flame', count=100000, rate=0.6, spread=1.2, speed=0.02,
           gravity=-0.02, size=[0.35, 0.05], life=22, color='@primary', glow=0.6),
     ])
     fx('cult_leader_summon', 'Призыв огненного культиста (фаза 3, 2–4 шт.): caster = точка появления. Печать огня, столб, вспышка; на 24 тике код ставит культиста.', 40, [
@@ -399,16 +399,16 @@ def effects():
        'стекает вниз; 2.6 с (52) — пламя головы гаснет (код выключает слой огня), дымный выдох, искры; 2.6–3.5 — пепел поднимается с тела. '
        'caster = босс. Стену огня гасить на 52 тике (Fx.stop).', T_DEATH + 30, [
         E('tint', 0, 'caster', duration=T_DEATH + 30, radius=32, color='#2A0806', strength=0.3, **{'in': ease(20), 'out': ease(30)}),
-        E('vortex', 0, 'caster', duration=52, radius=1.4, height=3.2, arms=3, speed=-6, flow=-1, texture='mote_flame', color='@primary', out=ease(12),
+        E('vortex', 0, 'caster', duration=52, radius=2.2, height=5.6, arms=3, speed=-6, flow=-1, texture='mote_flame', color='@primary', out=ease(12),
           comment='пламя спиралью стекает вниз по телу'),
-        E('sprites', 0, at('caster', 0, 1.6, 0), duration=50, texture='mote_flame', count=100000, rate=0.8, spread=0.6, speed=0.02, gravity=0.01,
+        E('sprites', 0, at('caster', 0, 2.8, 0), duration=50, texture='mote_flame', count=100000, rate=0.8, spread=0.6, speed=0.02, gravity=0.01,
           size=[0.4, 0.05], life=20, color='@secondary'),
-        E('flash', 52, at('caster', 0, 1.9, 0), duration=10, size=2.4, color=FIRE_HOT, comment='пламя гаснет'),
-        E('sprites', 52, at('caster', 0, 2.0, 0), duration=8, texture='mote_ash', count=40, rate=6, spread=0.5, speed=0.05, gravity=-0.012, spin=40,
+        E('flash', 52, at('caster', 0, 2.6, 0), duration=10, size=2.4, color=FIRE_HOT, comment='пламя гаснет'),
+        E('sprites', 52, at('caster', 0, 2.6, 0), duration=8, texture='mote_ash', count=40, rate=6, spread=0.5, speed=0.05, gravity=-0.012, spin=40,
           size=[0.5, 0.2], life=40, color=SOOT, blend='translucent', comment='дымный выдох'),
-        E('sprites', 52, at('caster', 0, 1.0, 0), duration=6, texture='spark_soft', count=50, rate=10, spread=0.8, speed=0.2, gravity=0.015,
+        E('sprites', 52, at('caster', 0, 1.75, 0), duration=6, texture='spark_soft', count=50, rate=10, spread=0.8, speed=0.2, gravity=0.015,
           size=[0.15, 0.02], life=18, color=FIRE),
-        E('sprites', 54, at('caster', 0, 0.9, 0), duration=46, texture='mote_ash', count=100000, rate=1.2, spread=0.7, speed=0.01, gravity=-0.008,
+        E('sprites', 54, at('caster', 0, 1.6, 0), duration=46, texture='mote_ash', count=100000, rate=1.2, spread=0.7, speed=0.01, gravity=-0.008,
           spin=30, size=[0.22, 0.06], life=50, color=ASH, blend='translucent', comment='пепел с тела'),
         E('decal', 52, 'caster', duration=48, texture='glow', radius=3.0, blend='translucent', color=SOOT, fadeOut=30, comment='выжженное пятно'),
         E('wave', 52, 'caster', duration=20, shape='ring', radius=8, thickness=1.2, followTerrain=True, color=FIRE_DEEP),

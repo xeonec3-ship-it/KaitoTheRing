@@ -68,6 +68,9 @@ def model_entry(name):
         return {'geo': json.load(open(os.path.join(A, 'geo', 'entity', 'fire_cultist.geo.json'), encoding='utf-8')),
                 'tex': b64(os.path.join(T, 'fire_cultist.png')), 'glow': b64(os.path.join(T, 'fire_cultist_glowmask.png')),
                 'height': 33, 'title': 'Огненный культист'}
+    if name == 'steve':                 # игрок для сравнения роста: каркас мага Iron's + простой «Стив» (рисуется здесь, в мод не идёт)
+        return {'geo': jar_json('assets/irons_spellbooks/geo/abstract_casting_mob.geo.json'), 'tex': pil_b64(steve_skin()), 'height': 32,
+                'title': 'игрок'}
     if name == 'pyromancer':
         I = 'assets/irons_spellbooks/'
         return {'geo': jar_json(I + 'geo/abstract_casting_mob.geo.json'), 'tex': b64(jar_bytes(I + 'textures/entity/pyromancer.png')),
@@ -75,11 +78,42 @@ def model_entry(name):
     raise KeyError(name)
 
 
+def steve_skin():
+    from PIL import Image, ImageDraw
+    im = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+    d = ImageDraw.Draw(im)
+    SK, HA, SH, PA, BO = (188, 134, 98, 255), (59, 40, 26, 255), (0, 168, 168, 255), (60, 60, 170, 255), (90, 90, 90, 255)
+
+    def box(u, v, w, h, dd, side, top=None, bottom=None, front=None):
+        d.rectangle([u, v + dd, u + 2 * (dd + w) - 1, v + dd + h - 1], fill=side)
+        d.rectangle([u + dd, v, u + dd + w - 1, v + dd - 1], fill=top or side)
+        d.rectangle([u + dd + w, v, u + dd + 2 * w - 1, v + dd - 1], fill=bottom or side)
+        if front:
+            front(u + dd, v + dd)
+    def face(x, y):
+        d.rectangle([x, y, x + 7, y + 1], fill=HA)
+        d.point((x + 1, y + 4), fill=(255, 255, 255, 255)); d.point((x + 2, y + 4), fill=(70, 50, 140, 255))
+        d.point((x + 6, y + 4), fill=(255, 255, 255, 255)); d.point((x + 5, y + 4), fill=(70, 50, 140, 255))
+        d.rectangle([x + 3, y + 6, x + 4, y + 6], fill=(110, 60, 40, 255))
+    box(0, 0, 8, 8, 8, SK, top=HA, front=face)
+    d.rectangle([0, 8, 31, 9], fill=HA)
+    face(8, 8)
+    box(16, 16, 8, 12, 4, SH)
+    for (u, v) in ((40, 16), (32, 48)):
+        box(u, v, 4, 12, 4, SK)
+        d.rectangle([u, v + 4, u + 15, v + 8], fill=SH)
+    for (u, v) in ((0, 16), (16, 48)):
+        box(u, v, 4, 12, 4, PA)
+        d.rectangle([u, v + 13, u + 15, v + 15], fill=BO)
+    return im
+
+
 def page(models, cells=None, three=None, anims=None):
     with open(os.path.join(HERE, 'cult_leader_preview.template.html'), encoding='utf-8') as fh:
         html = fh.read()
     if anims is None:
-        need = None if cells is None else {c['anim'] for c in cells['cells'] if c.get('anim')}
+        need = None if cells is None else ({c['anim'] for c in cells['cells'] if c.get('anim')}
+                                           | {x['anim'] for c in cells['cells'] for x in c.get('models', []) if x.get('anim')})
         anims = iron_anims(need)
     d = {'models': {n: model_entry(n) for n in models}, 'anims': anims}
     html = html.replace('/*DATA*/null', json.dumps(d, ensure_ascii=False, separators=(',', ':')))
@@ -116,7 +150,7 @@ const { chromium } = require('playwright');
 
 
 def sheet(out, cells, three=None, size=(1600, 1000), scale=1):
-    models = sorted({c['model'] for c in cells['cells']})
+    models = sorted({c['model'] for c in cells['cells']} | {x['model'] for c in cells['cells'] for x in c.get('models', [])})
     shoot(page(models, cells, three), out, size, scale)
 
 

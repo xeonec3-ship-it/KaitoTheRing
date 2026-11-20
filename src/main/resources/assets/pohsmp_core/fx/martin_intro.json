@@ -1,0 +1,382 @@
+{
+ "comment": "Ролик появления (6.5 с = 130 тиков = анимация martin_spawn). caster = Мартин (стоит на колене, меч воткнут перед ним), yaw — его взгляд. 0–1 с туман и тьма, 0.5 с герб под ним, 1.0 с (look) — блик в щели забрала, луч света сверху; 1–2.6 с за его спиной из тумана встают ряды призрачных солдат (мэш) и опускаются; 2.6 (rise) — волна; 4.0 (pull) — меч из земли: искры и трещины; 5.0 (salute) — вспышка на клинке, золотое кольцо; 5.4 с — титр; 6.5 с — полоса (код).",
+ "style": "martin",
+ "duration": 130,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 130,
+   "radius": 48,
+   "color": "#10141C",
+   "strength": 0.35,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 110,
+   "texture": "mote_wisp",
+   "count": 100000,
+   "rate": 1.2,
+   "area": 9.0,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "size": [
+    0.9,
+    1.6
+   ],
+   "life": 60,
+   "color": "#8FD8F0",
+   "blend": "translucent",
+   "comment": "стелющийся призрачный туман"
+  },
+  {
+   "type": "decal",
+   "delay": 10,
+   "at": "caster",
+   "duration": 120,
+   "texture": "martin_emblem",
+   "radius": 5.5,
+   "grow": 30,
+   "glow": 0.35,
+   "fadeOut": 30,
+   "color": "@primary",
+   "comment": "герб под Мартином"
+  },
+  {
+   "type": "column",
+   "delay": 16,
+   "at": "caster",
+   "duration": 70,
+   "radius": 1.6,
+   "height": 18,
+   "fill": 0.25,
+   "color": "@secondary",
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   },
+   "comment": "луч света сверху на коленопреклонённого"
+  },
+  {
+   "type": "flash",
+   "delay": 20,
+   "at": "caster+0,4.6,-0.5",
+   "duration": 10,
+   "size": 0.8,
+   "color": "#D8F6FF",
+   "anamorphic": 1.8,
+   "comment": "блик в щели забрала (look)"
+  },
+  {
+   "type": "mesh",
+   "delay": 22,
+   "at": "caster+-4.4,0,-4.5",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 58,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 1, место 1: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 22,
+   "at": "caster+-2.2,0,-4.5",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 58,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 1, место 2: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 22,
+   "at": "caster+0,0,-4.5",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 58,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 1, место 3: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 22,
+   "at": "caster+2.2,0,-4.5",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 58,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 1, место 4: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 22,
+   "at": "caster+4.4,0,-4.5",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 58,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 1, место 5: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 26,
+   "at": "caster+-4.4,0,-7.1",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 54,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 2, место 1: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 26,
+   "at": "caster+-2.2,0,-7.1",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 54,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 2, место 2: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 26,
+   "at": "caster+0,0,-7.1",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 54,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 2, место 3: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 26,
+   "at": "caster+2.2,0,-7.1",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 54,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 2, место 4: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "mesh",
+   "delay": 26,
+   "at": "caster+4.4,0,-7.1",
+   "model": "martin_soldier_ghost",
+   "yaw": 0,
+   "duration": 54,
+   "move": {
+    "from": [
+     0,
+     -2.4,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 22,
+    "easing": "easeOutCubic"
+   },
+   "comment": "ряд 2, место 5: призрачный солдат встаёт из тумана за спиной"
+  },
+  {
+   "type": "wave",
+   "delay": 52,
+   "at": "caster",
+   "duration": 24,
+   "shape": "ring",
+   "radius": 10,
+   "thickness": 1.6,
+   "followTerrain": true,
+   "color": "@primary",
+   "comment": "rise"
+  },
+  {
+   "type": "decal",
+   "delay": 80,
+   "at": "caster+0,0,2.8",
+   "texture": "higher_cracks",
+   "radius": 2.2,
+   "glow": 0.4,
+   "fadeOut": 40,
+   "color": "@primary",
+   "comment": "pull: меч выходит из земли"
+  },
+  {
+   "type": "sprites",
+   "delay": 80,
+   "at": "caster+0,0.3,2.8",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 40,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.22,
+   "gravity": 0.02,
+   "size": [
+    0.18,
+    0.03
+   ],
+   "life": 16,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 80,
+   "at": "caster+0,0.3,2.8",
+   "duration": 8,
+   "texture": "mote_ash",
+   "count": 24,
+   "rate": 4,
+   "spread": 0.8,
+   "speed": 0.06,
+   "gravity": -0.004,
+   "size": [
+    0.5,
+    0.9
+   ],
+   "life": 30,
+   "color": "#8A8070",
+   "blend": "translucent"
+  },
+  {
+   "type": "flash",
+   "delay": 100,
+   "at": "caster+0,6,1.2",
+   "duration": 14,
+   "size": 2.6,
+   "rays": 8,
+   "color": "@secondary",
+   "ring": true,
+   "comment": "salute: клинок у лица"
+  },
+  {
+   "type": "wave",
+   "delay": 100,
+   "at": "caster",
+   "duration": 26,
+   "shape": "ring",
+   "radius": 14,
+   "thickness": 2.0,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "aura",
+   "delay": 100,
+   "at": "caster",
+   "duration": 30,
+   "target": "caster",
+   "thickness": 0.18,
+   "pulse": [
+    0.3,
+    10
+   ],
+   "color": "@primary",
+   "motes": 20,
+   "out": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

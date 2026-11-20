@@ -1,0 +1,71 @@
+{
+ "comment": "«Марионетка» — на игроке (caster = игрок, follow, 60 тиков = 3 с или до Fx.stop при уроне по боссу): крестовина над головой, нити обвивают тело на трёх высотах. Нитей к Ирине НЕТ — шаги к ней делает код.",
+ "style": "irina",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.6,0",
+   "follow": true,
+   "id": "irina_puppet_cross"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,0.4,0",
+   "duration": 60,
+   "width": 0.05,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.5,
+    "speed": 14,
+    "rise": 0.1,
+    "risePeriod": 14
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 60,
+   "width": 0.05,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.45,
+    "speed": -16,
+    "rise": 0.1,
+    "risePeriod": 12
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,1.5,0",
+   "duration": 60,
+   "width": 0.05,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.4,
+    "speed": 18,
+    "rise": 0.1,
+    "risePeriod": 10
+   },
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

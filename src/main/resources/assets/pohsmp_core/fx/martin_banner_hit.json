@@ -1,0 +1,34 @@
+{
+ "comment": "Удар по знамени (caster = точка удара, 6 тиков): щепки и искры; анимация martin_banner_hit.",
+ "style": "martin",
+ "duration": 6,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 2,
+   "texture": "mote_ash",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.25,
+   "speed": 0.14,
+   "gravity": 0.04,
+   "size": [
+    0.2,
+    0.1
+   ],
+   "life": 14,
+   "color": "#6A4A30",
+   "blend": "translucent"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "duration": 4,
+   "size": 0.6,
+   "color": "@primary"
+  }
+ ]
+}

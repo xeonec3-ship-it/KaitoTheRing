@@ -1,0 +1,37 @@
+{
+ "comment": "«Узлы» — у Ирины (caster = Ирина, 30 тиков; анимация irina_knots, событие knots 0.9 с): нити уходят в землю волной r8. Узлы ставит код в 4–6 точках (fx irina_knot_trap в каждой).",
+ "style": "irina",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 14,
+   "at": "caster+0,0.05,0",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 8,
+   "thickness": 0.3,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "at": "caster+0,0.2,0",
+   "duration": 6,
+   "texture": "mote_thread",
+   "count": 24,
+   "rate": 5,
+   "area": 3,
+   "speed": 0.02,
+   "gravity": 0.01,
+   "spin": 20,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 16,
+   "color": "@primary"
+  }
+ ]
+}

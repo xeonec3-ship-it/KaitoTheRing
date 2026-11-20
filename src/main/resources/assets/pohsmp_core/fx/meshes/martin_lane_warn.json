@@ -1,0 +1,46 @@
+{
+ "comment": "T29: полоса атаки конницы на земле: от точки at вперёд по yaw на 40 бл., ширина 3 бл. Сгенерировано gen_martin_fx.py.",
+ "style": "martin_ghost",
+ "center": 0,
+ "formedAt": 4,
+ "collapse": {
+  "duration": 8,
+  "easing": "easeInCubic"
+ },
+ "parts": [
+  {
+   "type": "quad",
+   "texture": "martin_lane",
+   "blend": "additive",
+   "opacity": 0.9,
+   "doubleSided": true,
+   "color": "@primary",
+   "pulse": [
+    0.45,
+    10
+   ],
+   "corners": [
+    [
+     -1.5,
+     0.06,
+     40.0
+    ],
+    [
+     1.5,
+     0.06,
+     40.0
+    ],
+    [
+     1.5,
+     0.06,
+     0
+    ],
+    [
+     -1.5,
+     0.06,
+     0
+    ]
+   ]
+  }
+ ]
+}

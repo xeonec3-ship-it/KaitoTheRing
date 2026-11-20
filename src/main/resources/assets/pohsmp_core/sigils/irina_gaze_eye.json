@@ -1,0 +1,41 @@
+{
+ "comment": "T27 «Ревнивый взгляд»: око с нитью над головой смотревшего (метка-нить, замедление).",
+ "size": 0.36,
+ "color": "#C0201C",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "eye",
+   "type": "disc",
+   "texture": "irina_gaze_eye",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 1.0
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 14
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

@@ -1,0 +1,77 @@
+{
+ "comment": "Блок-сдача (событие block = 0.2 с анимации martin_block_yield; caster = Мартин, yaw — к ударившему): удар игрока принят на щит — лязг, сноп искр, звон-волна, короткая засветка; в мире замирание 3 тика (код, по желанию).",
+ "style": "martin",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+-0.6,3,2.4",
+   "duration": 10,
+   "size": 2.4,
+   "rays": 12,
+   "color": "#FFFFFF",
+   "screen": 0.12,
+   "ring": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-0.6,3,2.4",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 60,
+   "rate": 20,
+   "spread": 0.5,
+   "speed": 0.36,
+   "gravity": 0.03,
+   "size": [
+    0.2,
+    0.02
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "comment": "сноп искр от щита"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-0.6,3,2.4",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 20,
+   "rate": 10,
+   "spread": 0.3,
+   "speed": 0.5,
+   "gravity": 0.04,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+-0.6,3,2.4",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 2.6,
+   "rim": 0.8,
+   "color": "@primary",
+   "comment": "звон"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 6,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "color": "@primary"
+  }
+ ]
+}

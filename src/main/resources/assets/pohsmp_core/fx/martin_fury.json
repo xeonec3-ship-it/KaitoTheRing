@@ -1,0 +1,41 @@
+{
+ "comment": "Фаза 3 «Последний полководец» (caster = Мартин, follow, до Fx.stop): золотой ореол и искры с клинка.",
+ "style": "martin",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.16,
+   "pulse": [
+    0.25,
+    14
+   ],
+   "color": "@primary",
+   "motes": 18,
+   "texture": "spark_soft"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "follow": true,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 0.3,
+   "area": 1.4,
+   "speed": 0.01,
+   "gravity": -0.002,
+   "size": [
+    0.5,
+    0.9
+   ],
+   "life": 30,
+   "color": "#8A8070",
+   "blend": "translucent"
+  }
+ ]
+}

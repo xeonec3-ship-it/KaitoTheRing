@@ -1,0 +1,302 @@
+{
+ "comment": "Волна раскалённого металла веером вперёд (фаза 1): caster = Арис, yaw — направление; 5 гребней по линии 10 бл. с шагом 2 тика (код наносит урон по полосе ширины 3 бл.). Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0,-2",
+   "duration": 60,
+   "texture": "aris_molten_floor",
+   "radius": 1.4,
+   "glow": 1.0,
+   "fadeOut": 40,
+   "color": "@secondary",
+   "brightness": 1.2
+  },
+  {
+   "type": "decal",
+   "delay": 2,
+   "at": "caster+0,0,-4",
+   "duration": 60,
+   "texture": "aris_molten_floor",
+   "radius": 1.5999999999999999,
+   "glow": 1.0,
+   "fadeOut": 40,
+   "color": "@secondary",
+   "brightness": 1.2
+  },
+  {
+   "type": "decal",
+   "delay": 4,
+   "at": "caster+0,0,-6",
+   "duration": 60,
+   "texture": "aris_molten_floor",
+   "radius": 1.7999999999999998,
+   "glow": 1.0,
+   "fadeOut": 40,
+   "color": "@secondary",
+   "brightness": 1.2
+  },
+  {
+   "type": "decal",
+   "delay": 6,
+   "at": "caster+0,0,-8",
+   "duration": 60,
+   "texture": "aris_molten_floor",
+   "radius": 2.0,
+   "glow": 1.0,
+   "fadeOut": 40,
+   "color": "@secondary",
+   "brightness": 1.2
+  },
+  {
+   "type": "decal",
+   "delay": 8,
+   "at": "caster+0,0,-10",
+   "duration": 60,
+   "texture": "aris_molten_floor",
+   "radius": 2.2,
+   "glow": 1.0,
+   "fadeOut": 40,
+   "color": "@secondary",
+   "brightness": 1.2
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster+0,0,-2",
+   "duration": 14,
+   "radius": [
+    0.2,
+    1.2
+   ],
+   "count": 8,
+   "height": 1.4,
+   "grow": 4,
+   "width": [
+    0.3,
+    0.6
+   ],
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "flicker": 0.6,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 2,
+   "at": "caster+0,0,-4",
+   "duration": 14,
+   "radius": [
+    0.2,
+    1.2
+   ],
+   "count": 8,
+   "height": 1.4,
+   "grow": 4,
+   "width": [
+    0.3,
+    0.6
+   ],
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "flicker": 0.6,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 4,
+   "at": "caster+0,0,-6",
+   "duration": 14,
+   "radius": [
+    0.2,
+    1.2
+   ],
+   "count": 8,
+   "height": 1.4,
+   "grow": 4,
+   "width": [
+    0.3,
+    0.6
+   ],
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "flicker": 0.6,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 6,
+   "at": "caster+0,0,-8",
+   "duration": 14,
+   "radius": [
+    0.2,
+    1.2
+   ],
+   "count": 8,
+   "height": 1.4,
+   "grow": 4,
+   "width": [
+    0.3,
+    0.6
+   ],
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "flicker": 0.6,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 8,
+   "at": "caster+0,0,-10",
+   "duration": 14,
+   "radius": [
+    0.2,
+    1.2
+   ],
+   "count": 8,
+   "height": 1.4,
+   "grow": 4,
+   "width": [
+    0.3,
+    0.6
+   ],
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "flicker": 0.6,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,-2",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,0.3,-4",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.3,-6",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,0.3,-8",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 8,
+   "at": "caster+0,0.3,-10",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  }
+ ]
+}

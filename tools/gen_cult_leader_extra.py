@@ -120,6 +120,8 @@ def boss_anims():
         'right_leg': {'rotation': ch((0, Z), (1.0, [20, 0, 0], IQ), (1.7, [5, 0, 0], IO), (2.4, Z, IO))},
         'left_leg': {'rotation': ch((0, Z), (1.0, [-25, 0, 0], IQ), (1.7, [-5, 0, 0], IO), (2.4, Z, IO))},
     }, [(0.7, 'pull_done'), (1.0, 'impale'), (1.7, 'flame'), (2.2, 'kill')])
+    import gen_cult_leader_spells4 as S4                       # «+4 заклинания» (Огненный серп, Пепельный след, Клеймо, Столпы)
+    an.update(S4.anims())
     return an
 
 
@@ -560,5 +562,8 @@ def run(mod, fxmod, args):
     lang_sounds()
     sheet_bars(bars)
     sheet_special_fx()
+    import gen_cult_leader_spells4 as S4
+    S4.run(M, FX, args)
     if '--shots' in args:
         shots_anims(args)
+        S4.shots(args[args.index('--three') + 1] if '--three' in args else None)

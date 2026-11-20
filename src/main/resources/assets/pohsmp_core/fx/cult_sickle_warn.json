@@ -1,0 +1,262 @@
+{
+ "comment": "«Огненный серп»: дуга-предупреждение на земле 1 с (caster = босс, yaw — взгляд). Путь косы-бумеранга в осях взгляда: z = 6·(1 − cos 2πs), x = 4·sin 2πs, s 0…1 (12 бл. вперёд, справа туда, слева обратно); бросок — событие throw (1.0 с).",
+ "style": "cult_leader",
+ "duration": 26,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+1.37,0,0.36",
+   "duration": 24,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+2.57,0,1.4",
+   "duration": 24,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 1,
+   "at": "caster+3.46,0,3",
+   "duration": 23,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 1,
+   "at": "caster+3.94,0,4.96",
+   "duration": 23,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 2,
+   "at": "caster+3.94,0,7.04",
+   "duration": 22,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 2,
+   "at": "caster+3.46,0,9",
+   "duration": 22,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 3,
+   "at": "caster+2.57,0,10.6",
+   "duration": 21,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 3,
+   "at": "caster+1.37,0,11.64",
+   "duration": 21,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 4,
+   "at": "caster+0,0,12",
+   "duration": 20,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 4,
+   "at": "caster+-1.37,0,11.64",
+   "duration": 20,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 5,
+   "at": "caster+-2.57,0,10.6",
+   "duration": 19,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 5,
+   "at": "caster+-3.46,0,9",
+   "duration": 19,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 6,
+   "at": "caster+-3.94,0,7.04",
+   "duration": 18,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 6,
+   "at": "caster+-3.94,0,4.96",
+   "duration": 18,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 7,
+   "at": "caster+-3.46,0,3",
+   "duration": 17,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 7,
+   "at": "caster+-2.57,0,1.4",
+   "duration": 17,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 8,
+   "at": "caster+-1.37,0,0.36",
+   "duration": 16,
+   "texture": "glow",
+   "radius": 0.9,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

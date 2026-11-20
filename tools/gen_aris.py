@@ -59,9 +59,9 @@ def write_json(rel, obj, compact=False, indent=1):
 
 
 # ================================================================== палитра Арис (рампы тонов; рисуем как пиксель-арт ванили)
-# Эталон — модель Главы Культа (T26): 1 тексель = 1/16 блока (= 1 ед. модели), ручная светотень по текселям без шума и сглаживания.
-# Текстура хранится ×4 (4 пикселя на ед., как у cult_leader 512×512), но каждый тексель 1×1 ед. закрашен одним цветом
-# (класс PixelModel: материал вызывается в центрах текселей). Кайма, ремни, камни, обручи — объёмные бруски, не рисунок.
+# Эталон — модель Главы Культа (T26): текстура ×4 (атлас 128 ед. → 512 px, 4 px на ед.), ручная пиксельная светотень и фактура
+# металла/ткани (фаски, потёртости, царапины, гравировка, заклёпки, переплетение) без шума и сглаживания; кайма, ремни, камни,
+# обручи — объёмные бруски поверх каркаса мага Iron's.
 def ramp(*hs):
     return np.array([hex2(h) for h in hs])
 
@@ -78,44 +78,61 @@ TEAL_DEAD = ramp('#101a1d', '#172428', '#1e3034', '#273c40', '#314a4e', '#3c5a5e
 
 V = {'variant': 'base'}           # текущий вариант покраски
 FACE_L = {'up': 0.16, 'north': 0.0, 'south': -0.03, 'east': -0.07, 'west': -0.07, 'down': -0.22}
+PX = 4                            # пикселей текстуры на единицу UV (×4, как у эталона cult_leader 512×512)
 
 
 def pick(r, v):
-    """Тон рампы r по значению v ∈ [0, 1]."""
+    """Тон рампы r по значению v ∈ [0, 1] (ступеньками — пиксель-арт без сглаживания)."""
     i = np.clip(np.floor(np.asarray(v) * (len(r) - 0.001)), 0, len(r) - 1).astype(int)
     return r[i]
 
 
-def thash(ctx, seed=0):
-    """Детерминированное «случайное» число на тексель (по его центру в мире) — для редких ручных крапин."""
-    q = np.floor(ctx.P * 2.0 + 0.5).astype(np.int64)
-    h = (q[:, 0] * 73856093) ^ (q[:, 1] * 19349663) ^ (q[:, 2] * 83492791) ^ (seed * 2654435761 + hash(ctx.face) % 977)
+def _h(a, b, c, seed):
+    h = (a.astype(np.int64) * 73856093) ^ (b.astype(np.int64) * 19349663) ^ (c.astype(np.int64) * 83492791) ^ (seed * 2654435761)
     h = h & 0xFFFFFFFF
     h = ((h ^ (h >> 15)) * 2246822519) & 0xFFFFFFFF
     h = h ^ (h >> 13)
     return (h & 0xFFFF) / 65536.0
 
 
+def phash(ctx, seed=0, cell=1):
+    """«Случайное» число на пиксель (cell = 1) или на клетку cell×cell пикселей грани — для ручных крапин и царапин."""
+    fid = {'north': 1, 'south': 2, 'east': 3, 'west': 4, 'up': 5, 'down': 6}[ctx.face]
+    cid = int(abs(ctx.cube.frm[0] * 131 + ctx.cube.frm[1] * 17 + ctx.cube.frm[2] * 7 + ctx.cube.to[0] * 3 + ctx.cube.to[1]) * 64) & 0xFFFF
+    return _h(ctx.i // cell + cid * 7, ctx.j // cell + fid * 131, np.full(ctx.n, cid), seed)
+
+
 def rows(ctx):
-    """Номер текселя по ширине/высоте грани и их число: (i, j, nw, nh); j = 0 — верхний ряд (у боковых граней)."""
+    """Пиксель грани и размеры грани в пикселях: (i, j, nw, nh); j = 0 — верхний ряд (у боковых граней)."""
     return ctx.i, ctx.j, ctx.nw, ctx.nh
 
 
-def shade(ctx, base, edge=True, speck=0.06, seed=0):
-    """Ручная светотень ванили: грань по направлению, верхний ряд — блик (фаска), нижний — тень, кант по краю, редкие крапины."""
+def shade(ctx, base, edge=True, speck=0.035, seed=0, engrave=False, scratches=True):
+    """Ручная светотень металла на ×4: грань по направлению; верхняя кромка — блик в 1 px + полутон во 2-м ряду (фаска),
+    нижняя — тень в 1 px, боковые — кант; потёртости (тёмные крапины), короткие светлые царапины по диагонали,
+    гравировка — тонкая тёмная линия в 3 px от края (у крупных пластин)."""
     i, j, nw, nh = rows(ctx)
     v = base + FACE_L[ctx.face] + 0 * ctx.s
+    side = ctx.face in ('north', 'south', 'east', 'west')
+    big = (nw >= 8) & (nh >= 6)
     if edge:
-        side = ctx.face in ('north', 'south', 'east', 'west')
-        top = (j == 0) & (nh > 1)
-        bot = (j == nh - 1) & (nh > 1)
-        lr = ((i == 0) | (i == nw - 1)) & (nw > 2)
         if side:
-            v = v + top * 0.12 - bot * 0.14 - lr * 0.06
+            v = v + (j == 0) * 0.16 + ((j == 1) & (nh > 4)) * 0.07 - (j == nh - 1) * 0.16 - ((j == nh - 2) & (nh > 4)) * 0.05
+            v = v - ((i == 0) | (i == nw - 1)) * 0.08
         else:
-            v = v - (((i == 0) | (i == nw - 1) | (j == 0) | (j == nh - 1)) & (nw > 2) & (nh > 2)) * 0.07
-    h = thash(ctx, seed)
-    v = v - (h < speck) * 0.09 + (h > 1 - speck * 0.6) * 0.07
+            v = v - ((i == 0) | (i == nw - 1) | (j == 0) | (j == nh - 1)) * 0.08
+    if engrave and big:
+        d = np.minimum(np.minimum(i, nw - 1 - i), np.minimum(j, nh - 1 - j))
+        v = v - (d == 3) * 0.12 + (d == 4) * 0.04
+    # потёртости: редкие тёмные пиксели, чаще у краёв
+    h = phash(ctx, seed)
+    nearedge = np.minimum(np.minimum(i, nw - 1 - i), np.minimum(j, nh - 1 - j)) < 3
+    v = v - (h < speck * (1.0 + 1.5 * nearedge)) * 0.1
+    # царапины: в клетке 6×6 px иногда — диагональный штрих в 3–4 px светлым тоном
+    if scratches and big:
+        c = phash(ctx, seed + 5, cell=6)
+        di = (i % 6) - (j % 6) * np.where(c > 0.5, 1, -1) - np.where(c > 0.5, 0, 5)
+        v = v + ((c < 0.16) & (np.abs(di) < 0.5) & ((j % 6) < 4)) * 0.11
     return v
 
 
@@ -140,52 +157,69 @@ def teal_glow(ctx, v=0.7):
 
 
 def steel_rgb(ctx, v, dark=False):
-    """Сталь; в варианте mythic — раскалена: края текселей-кантов почти белые, середина — оранжевый жар (и светится)."""
+    """Сталь; в варианте mythic — раскалена: кромки бело-жёлтые и светятся, середина — тёмная с вишнёвым жаром."""
     r = DARK if dark else STEEL
     rgb = pick(r, v)
     if V['variant'] != 'mythic':
         return rgb, no_glow(ctx.n)
     i, j, nw, nh = rows(ctx)
-    edge = (((i == 0) | (i == nw - 1) | (j == 0) | (j == nh - 1)) & (nw > 3) & (nh > 2)).astype(float)
-    # кромки (кант) — бело-жёлтый накал и светятся; середина пластины — тёмная сталь с вишнёвым отливом
+    d = np.minimum(np.minimum(i, nw - 1 - i), np.minimum(j, nh - 1 - j))
+    edge = ((d < 2) & (nw > 10) & (nh > 6)).astype(float)
     heat = np.clip(0.3 + 0.45 * edge + (v - 0.5) * 0.5, 0, 1)
     hot = pick(HOT, heat)
-    rgb = np.where(edge[:, None] > 0.5, hot, rgb * 0.7 + pick(HOT, 0.3 + (v - 0.5) * 0.4) * 0.3)
-    g = np.where(edge[:, None] > 0.5, hot * 0.45, 0.0)
+    mid = pick(HOT, 0.32 + (v - 0.5) * 0.5)                      # середина пластины — вишнёво-оранжевый жар, слабо светится
+    rgb = np.where(edge[:, None] > 0.5, hot, rgb * 0.35 + mid * 0.65)
+    g = np.where(edge[:, None] > 0.5, hot * 0.45, mid * 0.22)
     return rgb, g
 
 
 # ---------------------------------------------------------------- материалы
-def m_plate(base=0.55, dark=False, rivets=False, seed=0):
+def m_plate(base=0.55, dark=False, rivets=False, seed=0, engrave=True):
     def fn(ctx):
-        v = shade(ctx, base, seed=seed)
+        v = shade(ctx, base, seed=seed, engrave=engrave)
         rgb, g = steel_rgb(ctx, v, dark)
         if rivets and ctx.face in ('north', 'south', 'east', 'west'):
             i, j, nw, nh = rows(ctx)
-            riv = ((i == 1) | (i == nw - 2)) & (j == 1) & (nw > 4) & (nh > 2)
-            rgb = np.where(riv[:, None], pick(STEEL, 0.95 + 0 * v), rgb)
+            # заклёпки 2×2 px в углах (светлый верх-лево, тёмная тень снизу-справа)
+            for ci in (2, nw - 4):
+                for cj in (2, nh - 4):
+                    on = (i >= ci) & (i < ci + 2) & (j >= cj) & (j < cj + 2) & (nw > 12) & (nh > 8)
+                    hl = on & (i == ci) & (j == cj)
+                    sh = (i == ci + 2) & (j >= cj) & (j <= cj + 2) | (j == cj + 2) & (i >= ci) & (i <= ci + 2)
+                    sh = sh & (nw > 12) & (nh > 8)
+                    rgb = np.where(sh[:, None], rgb * 0.6, rgb)
+                    rgb = np.where(on[:, None], pick(STEEL, 0.82 + 0 * ctx.s), rgb)
+                    rgb = np.where(hl[:, None], pick(STEEL, 0.99 + 0 * ctx.s), rgb)
         return rgb, 1.0, g
     return fn
 
 
 def m_chain(ctx):
-    """Поддоспешник-кольчуга: шахматка тёмных колец по текселям."""
+    """Кольчуга: кольца 4×4 px рядами со сдвигом (светлое кольцо, тёмная середина)."""
     i, j, nw, nh = rows(ctx)
-    ring = ((i + j) % 2 == 0)
-    v = 0.3 + ring * 0.25 + FACE_L[ctx.face]
+    ii = (i + 2 * ((j // 4) % 2)) % 4
+    jj = j % 4
+    ring = ((ii == 0) | (ii == 3) | (jj == 0) | (jj == 3)) & ~(((ii == 0) | (ii == 3)) & ((jj == 0) | (jj == 3)))
+    v = 0.18 + ring * 0.38 + (ring & (jj == 0)) * 0.12 + FACE_L[ctx.face]
     return pick(DARK, v), 1.0, no_glow(ctx.n)
 
 
 def m_trim(ctx):
     i, j, nw, nh = rows(ctx)
-    v = 0.5 + FACE_L[ctx.face] * 0.8 + ((j == 0) & (nh > 1)) * 0.12 - ((j == nh - 1) & (nh > 1)) * 0.12
+    v = 0.5 + FACE_L[ctx.face] * 0.8 + ((j == 0) & (nh > 1)) * 0.16 - ((j == nh - 1) & (nh > 1)) * 0.14
+    v = v + ((i % 4) == 0) * -0.06                                         # насечка на кайме
     rgb, g = teal_glow(ctx, v)
     return rgb, 1.0, g
 
 
 def m_stone(ctx):
+    """Белый камень: огранка — светлые верх/лево, тёмные низ/право, блик 2×2 px, тонкая трещинка."""
     i, j, nw, nh = rows(ctx)
-    v = 0.55 + FACE_L[ctx.face] * 1.2 + ((i == 0) | (j == 0)) * 0.18 - ((i == nw - 1) | (j == nh - 1)) * 0.2
+    d = np.minimum(np.minimum(i, nw - 1 - i), np.minimum(j, nh - 1 - j))
+    v = 0.55 + FACE_L[ctx.face] * 1.2
+    v = v + ((d < 2) & ((i < j) | (i + j < nw))) * 0.14 - ((d < 2) & ~((i < j) | (i + j < nw))) * 0.2
+    v = v + ((i >= 2) & (i < 4) & (j >= 2) & (j < 4)) * 0.3
+    v = v - ((i - j) == (nw // 2) ) * ((j > 3) & (j < nh - 2)) * 0.15
     rgb = pick(STONE, v)
     g = no_glow(ctx.n)
     if V['variant'] == 'mythic':
@@ -194,17 +228,20 @@ def m_stone(ctx):
 
 
 def m_horn(ctx):
-    """Рог: у основания — сталь, выше — бирюза, светится к кончику; кольца-сегменты по 1.5 ед."""
+    """Рог: у основания — сталь, выше — бирюза, светится к кончику; кольца-наросты каждые 1.5 ед. и светлая жилка."""
     y = ctx.P[:, 1]
+    i, j, nw, nh = rows(ctx)
     k = np.clip((y - 34.0) / 10.0, 0, 1)
-    seg = (np.floor(y / 1.5) % 2) * 0.07
-    steel, _ = steel_rgb(ctx, shade(ctx, 0.5, seed=21) + seg)
+    ringd = np.abs(((y / 1.5) % 1) - 0.5)
+    seg = (ringd > 0.4) * -0.1 + (ringd < 0.12) * 0.05
+    streak = (i == nw // 3) * 0.1
+    steel, _ = steel_rgb(ctx, shade(ctx, 0.5, seed=21, scratches=False) + seg)
     va = V['variant']
     n = ctx.n
     lo = {'base': 0.05, 'dim': 0.5, 'mythic': 0.0, 'spent': 0.05}[va]
     blend = (k > lo)[:, None]
     t = np.clip((k - lo) / (1 - lo + 1e-6), 0, 1)
-    tv = 0.34 + 0.36 * t + seg + FACE_L[ctx.face] * 0.6
+    tv = 0.34 + 0.36 * t + seg + streak + FACE_L[ctx.face] * 0.6
     if va == 'spent':
         rgb = np.where(blend, pick(TEAL_DEAD, tv - 0.1), steel)
         return rgb, 1.0, no_glow(n)
@@ -220,49 +257,74 @@ def m_horn(ctx):
 
 
 def m_visor(ctx):
-    """Чёрная прорезь визора; в глубине — два бирюзовых глаза (светятся, гаснут при сдаче)."""
-    x = ctx.P[:, 0]
-    rgb = pick(DARK, 0.0 + 0 * x)
+    """Тёмная прорезь визора; в глубине — два тусклых глаза 4×2 px (владелец 20.11): бой — бирюза, dim — слабее,
+    spent — погасли вместе с рогами, mythic — белые. Глаза светятся (glowmask)."""
+    i, j, nw, nh = rows(ctx)
+    rgb = pick(DARK, 0.02 + (j == 0) * 0.25 + 0 * ctx.s)
     g = no_glow(ctx.n)
-    if False:
-        eye = (np.abs(np.abs(x) - 1.5) < 0.5)
-        ec = pick(TEAL, (0.62 if V['variant'] != 'dim' else 0.36) + 0 * x)
-        rgb = np.where(eye[:, None], ec, rgb)
-        g = np.where(eye[:, None], ec * (0.8 if V['variant'] != 'dim' else 0.3), g)
+    va = V['variant']
+    if ctx.face == 'north' and va != 'spent':
+        x = ctx.P[:, 0]
+        eye = (np.abs(np.abs(x) - 1.5) < 0.5) & (j >= 1) & (j <= 2)
+        core = eye & (np.abs(np.abs(x) - 1.5) < 0.25)
+        if va == 'mythic':
+            ec, ek = np.tile(hex2('#FFFFFF'), (ctx.n, 1)), 0.85
+            edge_c = np.tile(hex2('#FFF0D2'), (ctx.n, 1))
+        else:
+            ec = pick(TEAL, (0.55 if va == 'base' else 0.3) + 0 * x)
+            edge_c = pick(TEAL, (0.4 if va == 'base' else 0.18) + 0 * x)
+            ek = 0.6 if va == 'base' else 0.25
+        rgb = np.where(eye[:, None], np.where(core[:, None], ec, edge_c), rgb)
+        g = np.where(eye[:, None], np.where(core[:, None], ec, edge_c) * ek, g)
     return rgb, 1.0, g
 
 
 def m_grille(ctx):
-    """Забрало: сталь с рядами отверстий (каждый второй тексель — тёмный)."""
-    v = shade(ctx, 0.56, seed=33)
+    """Забрало: сталь с прорезями-щелями для дыхания (вертикальные щели 1×4 px через 3 px)."""
+    v = shade(ctx, 0.62, seed=33, scratches=False)
     rgb, g = steel_rgb(ctx, v)
     if ctx.face == 'north':
         i, j, nw, nh = rows(ctx)
-        hole = (i % 2 == 1) & (j >= 1) & (j <= 2) & (i > 0) & (i < nw - 1) & (np.abs(ctx.P[:, 0]) > 0.8)
-        rgb = np.where(hole[:, None], pick(STEEL, 0.15 + 0 * v), rgb)
+        slot = ((i % 3) == 1) & (j >= 3) & (j <= 9) & (i > 2) & (i < nw - 3) & (np.abs(ctx.P[:, 0]) > 0.8)
+        rgb = np.where(slot[:, None], pick(DARK, 0.1 + 0 * v), rgb)
     return rgb, 1.0, g
 
 
 def m_ribbon(fringe=False):
+    """Ткань лент: переплетение (шахматка нитей 1 px), складки — полосы тени каждые 3 ед., светлая вышитая кайма по краям."""
     def fn(ctx):
         i, j, nw, nh = rows(ctx)
-        v = 0.66 + FACE_L[ctx.face] * 0.8 + ((i == 0) | (i == nw - 1)) * -0.16 + ((j % 4) == 0) * 0.08
+        weave = ((i + j) % 2) * 0.05
+        fold = (np.floor(ctx.P[:, 1] / 3.0) % 2) * -0.06 + ((ctx.P[:, 1] % 3.0) < 0.3) * -0.08
+        v = 0.66 + FACE_L[ctx.face] * 0.8 + weave + fold
+        v = v - ((i == 0) | (i == nw - 1)) * 0.2
+        border = ((i == 1) | (i == nw - 2)) & (nw > 6)
+        v = v + border * 0.18
         rgb = pick(PURP, v)
         a = np.ones(ctx.n)
         if fringe and ctx.face in ('north', 'south', 'east', 'west'):
-            a = np.where((j >= nh - 2) & (i % 2 == 1) & (nh > 3), 0.0, 1.0)
+            ln = 3 + (phash(ctx, 3, cell=1) * 0).astype(int)
+            a = np.where((j >= nh - 4) & (i % 2 == 1) & (nh > 8), 0.0, 1.0)
+            a = np.where((j >= nh - 2) & (i % 4 == 2) & (nh > 8), 0.0, a)
         return rgb, a, no_glow(ctx.n)
     return fn
 
 
 def m_hair(ctx):
+    """Серебряные волосы: пряди по столбцам пикселей, блики полосами, тёмные проборы."""
     i, j, nw, nh = rows(ctx)
-    v = 0.6 + FACE_L[ctx.face] * 0.9 + (i % 2 == 1) * -0.12 + ((j % 3) == 0) * 0.06 - ((i == 0) | (i == nw - 1)) * 0.1
+    strand = ((i + (j // 6)) % 4)
+    v = 0.6 + FACE_L[ctx.face] * 0.9 + (strand == 0) * -0.16 + (strand == 2) * 0.06
+    v = v + (((j + 2 * (i % 3)) % 10) < 2) * 0.1 - ((i == 0) | (i == nw - 1)) * 0.1
     return pick(HAIR, v), 1.0, no_glow(ctx.n)
 
 
 def m_leather(ctx):
-    v = shade(ctx, 0.5, speck=0.1, seed=71)
+    """Кожа пояса: строчка по краям (пунктир светлее), потёртости."""
+    i, j, nw, nh = rows(ctx)
+    v = shade(ctx, 0.5, speck=0.08, seed=71, scratches=False)
+    stitch = ((j == 1) | (j == nh - 2)) & (i % 3 == 0) & (nh > 4)
+    v = v + stitch * 0.3
     return pick(LEATH, v), 1.0, no_glow(ctx.n)
 
 
@@ -270,23 +332,29 @@ def m_h(kind):
     """Материалы молота: hk — ударная плоскость, hd — тёмная сталь бойков, hs/hs2 — серая сталь обручей, hsh — древко,
     hg — бирюзовые светящиеся вставки, hw — лиловая обмотка, hst — белый камень."""
     def fn(ctx):
-        if kind == 'hk':
-            rgb, g = steel_rgb(ctx, shade(ctx, 0.25, seed=101), True)
+        i, j, nw, nh = rows(ctx)
+        if kind == 'hk':                          # ударная плоскость: следы ударов — концентрические вмятины
+            v = shade(ctx, 0.3, seed=101, scratches=False)
+            cx, cy = (i - nw / 2) / max(1, nw), (j - nh / 2) / max(1, nh)
+            r = np.sqrt(cx * cx + cy * cy)
+            v = v + (np.abs(r - 0.28) < 0.04) * 0.12 + (np.abs(r - 0.12) < 0.04) * 0.08
+            rgb, g = steel_rgb(ctx, v, True)
             return rgb, 1.0, g
         if kind == 'hd':
-            rgb, g = steel_rgb(ctx, shade(ctx, 0.62, seed=103), True)
+            rgb, g = steel_rgb(ctx, shade(ctx, 0.62, seed=103, engrave=True), True)
             return rgb, 1.0, g
         if kind in ('hs', 'hs2'):
-            rgb, g = steel_rgb(ctx, shade(ctx, 0.5 if kind == 'hs' else 0.66, seed=107))
+            rgb, g = steel_rgb(ctx, shade(ctx, 0.5 if kind == 'hs' else 0.66, seed=107, engrave=(kind == 'hs')))
             return rgb, 1.0, g
-        if kind == 'hsh':
-            rgb, g = steel_rgb(ctx, shade(ctx, 0.45, edge=False, seed=109), True)
+        if kind == 'hsh':                         # воронёное древко: продольные блики
+            v = 0.45 + FACE_L[ctx.face] + ((i % 3) == 1) * 0.08 - (phash(ctx, 109) < 0.06) * 0.1
+            rgb, g = steel_rgb(ctx, v, True)
             return rgb, 1.0, g
         if kind == 'hg':
             return m_trim(ctx)
-        if kind == 'hw':
-            i, j, nw, nh = rows(ctx)
-            v = 0.58 + FACE_L[ctx.face] * 0.8 - (j == nh - 1) * 0.18
+        if kind == 'hw':                          # обмотка: косые витки кожаного шнура
+            band = ((i + j) % 4)
+            v = 0.62 + FACE_L[ctx.face] * 0.8 + (band == 0) * -0.22 + (band == 1) * 0.08 - (j == nh - 1) * 0.18
             return pick(PURP, v), 1.0, no_glow(ctx.n)
         if kind == 'hst':
             return m_stone(ctx)
@@ -305,7 +373,8 @@ MATS = {
 
 
 class PixelModel(Model):
-    """Model с покраской по текселям 1×1 ед.: материал получает центры текселей (ctx.i, ctx.j, ctx.nw, ctx.nh)."""
+    """Model с покраской попиксельно на ×4 (как эталон): материал получает номер пикселя грани (ctx.i, ctx.j)
+    и размер грани в пикселях (ctx.nw, ctx.nh) — для ручных кромок, заклёпок, гравировки, ткани."""
 
     def paint(self, base_img=None):
         from nightmare_geo import Ctx, face_point
@@ -319,16 +388,12 @@ class PixelModel(Model):
                 M, o = self.cube_xf(bn, c)
                 fn = self.materials[c.mat]
                 for f, (x, y, pw, ph) in c.px.items():
-                    fw, fh = face_size(c, f)
-                    nw, nh = max(1, int(round(fw))), max(1, int(round(fh)))
                     ss, tt = np.meshgrid((np.arange(pw) + 0.5) / pw, (np.arange(ph) + 0.5) / ph)
-                    ii = np.minimum(np.floor(ss.ravel() * nw), nw - 1)
-                    jj = np.minimum(np.floor(tt.ravel() * nh), nh - 1)
-                    s2, t2 = (ii + 0.5) / nw, (jj + 0.5) / nh
-                    P, nrm = face_point(c, f, s2, t2)
+                    P, nrm = face_point(c, f, ss.ravel(), tt.ravel())
                     Pw = P @ M.T + o
-                    ctx = Ctx(Pw, np.tile(M @ nrm, (len(Pw), 1)), s2, t2, f, c, bn, P)
-                    ctx.i, ctx.j, ctx.nw, ctx.nh = ii.astype(int), jj.astype(int), nw, nh
+                    ctx = Ctx(Pw, np.tile(M @ nrm, (len(Pw), 1)), ss.ravel(), tt.ravel(), f, c, bn, P)
+                    ii, jj = np.meshgrid(np.arange(pw), np.arange(ph))
+                    ctx.i, ctx.j, ctx.nw, ctx.nh = ii.ravel(), jj.ravel(), pw, ph
                     rgb, a, g = fn(ctx)
                     a = np.broadcast_to(np.asarray(a, float), (len(Pw),))
                     img[y:y + ph, x:x + pw, :3] = np.clip(rgb, 0, 1).reshape(ph, pw, 3)
@@ -590,8 +655,8 @@ def build_model():
             m.bone('leftItem', 'bipedHandLeft', (-6, 12, 0))
     m.bone('hammer', 'right_forearm', FIST_R)
     add_hammer(m, 'hammer', lambda p: FIST_R + ham_local(p))
-    m.bone('hammer_ground', 'root', HG_PIVOT)
-    add_hammer(m, 'hammer_ground', lambda p: HG_PIVOT + hg_local(p))
+    m.bone('hammer_ground', 'root', HG_PIVOT, rot=HG_REST)
+    add_hammer(m, 'hammer_ground', lambda p: HG_PIVOT + hg_offset(p))
 
     # ---------------- ноги
     for sx, nm, side in ((1, 'right', 'Right'), (-1, 'left', 'Left')):
@@ -627,9 +692,19 @@ HG_TOP = 32.7            # верх короны (ед. предмета) — к
 HG_SINK = 0.5            # чуть вдавлен в землю
 
 
-def hg_local(p):
-    x, y, z = p
-    return (x * HAM_S, (HG_TOP - y) * HAM_S - HG_SINK, z * HAM_S)
+HG_REST = (-90, 0, 0)    # поворот кости в покое: рукоять (локальная −z к голове) смотрит вниз — молот стоит головой вниз
+
+
+def hg_offset(p):
+    """Точка предмета → смещение от пивота в локальных координатах кости hammer_ground (та же раскладка, что у hammer;
+    корона головы — в пивоте, т. е. на земле)."""
+    a = np.array(ham_local(p)) - np.array(ham_local((0, HG_TOP, 0)))
+    return a + np.array([0.0, 0.0, -HG_SINK])
+
+
+def hg_world_rest(p):
+    """Где точка предмета у hammer_ground в покое (стоит головой вниз)."""
+    return HG_PIVOT + euler(HG_REST) @ hg_offset(p)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,81 @@
+{
+ "comment": "Знамя стоит (caster = знамя, follow, до Fx.stop): золотое кольцо r8 на земле пульсирует, вверх летят искры; солдаты в r8 сильнее (код) и получают martin_banner_buff.",
+ "style": "martin",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "texture": "martin_banner_ring",
+   "radius": 8,
+   "glow": 0.25,
+   "pulse": 30,
+   "grow": 16,
+   "color": "@primary",
+   "brightness": 0.8
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "radius": [
+    7.8,
+    8.0
+   ],
+   "count": 48,
+   "height": 1.2,
+   "grow": 16,
+   "width": [
+    0.06,
+    0.12
+   ],
+   "brightness": [
+    0.3,
+    0.55
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.3,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.4,
+   "area": 8,
+   "speed": 0.02,
+   "gravity": -0.012,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 40,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3.3,0",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.3,
+   "spread": 0.4,
+   "speed": 0.01,
+   "gravity": -0.008,
+   "size": [
+    0.2,
+    0.03
+   ],
+   "life": 30,
+   "color": "@secondary",
+   "glow": 0.6,
+   "comment": "блики у навершия"
+  }
+ ]
+}

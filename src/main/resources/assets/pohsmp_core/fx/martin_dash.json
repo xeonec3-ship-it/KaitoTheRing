@@ -1,0 +1,47 @@
+{
+ "comment": "Рывок щитом (события dash → hit анимации martin_shield_bash; caster = Мартин, follow, 16 тиков): след, пыль, удар.",
+ "style": "martin",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+-0.9,2,1.4",
+   "follow": true,
+   "duration": 12,
+   "width": 1.2,
+   "length": 8,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "follow": true,
+   "duration": 10,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 3,
+   "area": 0.8,
+   "speed": 0.04,
+   "gravity": -0.002,
+   "size": [
+    0.5,
+    1.0
+   ],
+   "life": 20,
+   "color": "#8A8070",
+   "blend": "translucent"
+  },
+  {
+   "type": "flash",
+   "delay": 6,
+   "at": "caster+-0.8,2,2",
+   "duration": 6,
+   "size": 1.6,
+   "color": "@secondary",
+   "ring": true,
+   "comment": "hit"
+  }
+ ]
+}

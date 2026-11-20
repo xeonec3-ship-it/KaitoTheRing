@@ -1,0 +1,77 @@
+{
+ "comment": "Переход 33% → «Последний полководец» (caster = Мартин; анимация martin_phase3 3.2 с: kneel 0.8, spin 1.4, roar 2.0). Все солдаты рассеиваются (martin_soldier_vanish на каждом в 0–0.8 с), знамя гаснет; на roar — золотой взрыв, затем martin_fury.",
+ "style": "martin",
+ "duration": 64,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 24,
+   "thickness": 2.0,
+   "followTerrain": true,
+   "color": "#8FD8F0",
+   "reverse": true,
+   "comment": "войско уходит: волна сходится к нему"
+  },
+  {
+   "type": "vortex",
+   "delay": 16,
+   "at": "caster",
+   "duration": 24,
+   "radius": 3.0,
+   "height": 6,
+   "arms": 3,
+   "speed": -10,
+   "texture": "spark_soft",
+   "color": "@primary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "comment": "оборот с мечом"
+  },
+  {
+   "type": "flash",
+   "delay": 40,
+   "at": "caster+0,5.8,0",
+   "duration": 16,
+   "size": 5.0,
+   "rays": 12,
+   "color": "@secondary",
+   "screen": 0.2,
+   "ring": true,
+   "comment": "roar"
+  },
+  {
+   "type": "wave",
+   "delay": 40,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 20,
+   "thickness": 2.6,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 64,
+   "radius": 40,
+   "color": "#3A2A08",
+   "strength": 0.3,
+   "in": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

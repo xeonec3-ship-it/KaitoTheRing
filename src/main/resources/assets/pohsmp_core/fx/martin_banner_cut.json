@@ -1,0 +1,67 @@
+{
+ "comment": "Знамя срублено (caster = основание; 40 тиков, анимация martin_banner_cut): треск, щепки, золото гаснет, кольцо сходится к древку. На 0 — Fx.stop martin_banner_aura и всех martin_banner_buff; сущность убрать через 2 с.",
+ "style": "martin",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.25,0",
+   "duration": 10,
+   "size": 1.8,
+   "color": "@secondary",
+   "ring": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.25,0",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 30,
+   "rate": 8,
+   "spread": 0.4,
+   "speed": 0.2,
+   "gravity": 0.04,
+   "size": [
+    0.25,
+    0.1
+   ],
+   "life": 22,
+   "color": "#6A4A30",
+   "blend": "translucent",
+   "comment": "щепки"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 18,
+   "shape": "ring",
+   "radius": 8,
+   "thickness": 1.0,
+   "followTerrain": true,
+   "color": "@primary",
+   "reverse": true
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,2.5,0",
+   "duration": 30,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.8,
+   "spread": 1.2,
+   "speed": 0.01,
+   "gravity": 0.01,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 20,
+   "color": "@primary",
+   "comment": "золото гаснет, осыпается"
+  }
+ ]
+}

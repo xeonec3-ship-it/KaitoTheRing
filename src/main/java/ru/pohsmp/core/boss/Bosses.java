@@ -74,6 +74,7 @@ public final class Bosses {
         ru.pohsmp.core.boss.aris.Aris.register();   // T28
         ru.pohsmp.core.boss.martin.Martin.register();     // T29
         ru.pohsmp.core.boss.ereb.Ereb.register();         // T30
+        ru.pohsmp.core.boss.erebhand.ErebHand.register(); // T31
         ENTITIES.register(modBus);
         ITEMS.register(modBus);
         EFFECTS.register(modBus);

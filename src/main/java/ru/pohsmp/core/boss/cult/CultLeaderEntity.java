@@ -194,9 +194,20 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
         setSpawnPos(position());
     }
 
+    /** Melee attacks every melee_interval_min..max ticks (Tyros 10-30), x mult (the fury of phase 3: 0.75). */
+    void meleeInterval(double mult) {
+        if (attackGoal == null) return;
+        int min = Math.max(1, (int) Math.round(BossConfig.get(BossConfig.CL_MELEE_MIN) * mult));
+        attackGoal.setMeleeAttackInverval(min, Math.max(min, (int) Math.round(BossConfig.get(BossConfig.CL_MELEE_MAX) * mult)));
+    }
+
     @Override
     public void onBossIntro() {
         if (!(level() instanceof ServerLevel sl)) return;
+        BossConfig.PerBoss cfg = BossConfig.of(CultLeader.ID);
+        var atk = getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+        if (cfg != null && atk != null) atk.setBaseValue(BossConfig.get(cfg.attack) + BossConfig.get(BossConfig.CL_SCYTHE));   // + the scythe
+        meleeInterval(1);
         core.lock(CultMath.INTRO + 2, true, true);
         double r = BossConfig.get(BossConfig.INTRO_RADIUS);
         List<ServerPlayer> who = core.scene("cult_leader.intro", CultMath.INTRO, BossNet.SCENE_LOCK_INPUT | BossNet.SCENE_BARS | BossNet.SCENE_NO_HUD,
@@ -304,7 +315,7 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
                 .at(CultMath.REPLICA_DELAY + CultMath.REPLICA_CRUSH, () -> breakReplica(caster))
                 .at(CultMath.REPLICA_DELAY + CultMath.REPLICA_SPEAK, () -> {
                     long now = sl.getGameTime();
-                    if (now - lastTaunt >= CultMath.REPLICA_TAUNT_COOLDOWN) {
+                    if (now - lastTaunt >= BossConfig.get(BossConfig.CL_TAUNT_COOLDOWN) * 20L) {
                         lastTaunt = now;
                         core.say("ui.pohsmp_core.cult_leader.replica_taunt", 32, 60, 4.2);
                     }

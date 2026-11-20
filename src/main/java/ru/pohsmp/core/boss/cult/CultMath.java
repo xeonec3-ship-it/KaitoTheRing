@@ -16,7 +16,7 @@ public final class CultMath {
     public static final int FF = 120, FF_PLANT = 18, FF_SIGIL = 32, FF_WARN = 60, FF_PILLAR = 80, FF_RING_END = 120, FF_TITLE = 10, FF_TITLE_HOLD = 50;
     public static final int ASH = 120, ASH_TITLE = 6, ASH_TITLE_HOLD = 40, ASH_GONE = 24, ASH_REFORM = 60, ASH_SLASH_ANIM = 80, ASH_SLASH = 90;
     public static final double ASH_BEFORE = 5.0, ASH_LINE = 56;
-    public static final int REPLICA_DELAY = 40, REPLICA_ANIM = 52, REPLICA_CRUSH = 18, REPLICA_SHATTER = 30, REPLICA_SPEAK = 38, REPLICA_TAUNT_COOLDOWN = 400;
+    public static final int REPLICA_DELAY = 40, REPLICA_ANIM = 52, REPLICA_CRUSH = 18, REPLICA_SHATTER = 30, REPLICA_SPEAK = 38;
     public static final int FINISHER = 48, FINISHER_KILL = 44, FINISHER_CAM_FROM = 6, FINISHER_CAM = 40;
     public static final double FINISHER_DIST = 3.0, FINISHER_LIFT = 2.3;
     public static final int SICKLE = 44, SICKLE_THROW = 20, SICKLE_CATCH = 36, SICKLE_FLIGHT = SICKLE_CATCH - SICKLE_THROW;

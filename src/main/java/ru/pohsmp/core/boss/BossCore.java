@@ -58,7 +58,8 @@ public final class BossCore {
     private boolean lockInvulnerable, aiOff;
     private boolean barVisible, pulse, musicOn;
     private int look;
-    private final Map<UUID, Float> damageBy = new HashMap<>();
+    /** Damage dealt to the boss by each player: (game time, amount), the last top_damage_window_seconds kept. */
+    private final Map<UUID, Deque<double[]>> damageBy = new HashMap<>();
     private final List<BossTimeline> scripts = new ArrayList<>();
     private long nextFinisher;
 
@@ -93,32 +94,53 @@ public final class BossCore {
         return finale || dead;
     }
 
-    private static final UUID DMG_ID = UUID.fromString("8f1a3c0e-6b2d-4f8e-9a51-2c7d0b3e1a01"), SPD_ID = UUID.fromString("8f1a3c0e-6b2d-4f8e-9a51-2c7d0b3e1a02"),
-            POWER_ID = UUID.fromString("8f1a3c0e-6b2d-4f8e-9a51-2c7d0b3e1a03");
-
+    /** Body from [<boss>] (absolute values), health x players (N in arena_radius + count_radius_extra, at most max_counted_players). */
     private void applyConfig(ServerLevel sl) {
         BossConfig.PerBoss cfg = BossConfig.of(def.id);
         if (cfg == null) return;
-        int players = playersNear(BossConfig.get(BossConfig.SCALE_RADIUS)).size();
-        double mult = BossMath.healthMultiplier(players, BossConfig.get(BossConfig.HP_PER_PLAYER), BossConfig.get(BossConfig.HP_PER_PLAYER_SQ),
-                BossConfig.get(BossConfig.HP_MAX_MULT));
-        AttributeInstance hp = mob.getAttribute(Attributes.MAX_HEALTH);
-        if (hp != null) {
-            hp.setBaseValue(BossConfig.get(cfg.health) * mult);
-            mob.setHealth(mob.getMaxHealth());
-        }
-        double dmg = BossConfig.get(cfg.damage) - 1, spd = BossConfig.get(cfg.speed) - 1;
-        mod(mob.getAttribute(Attributes.ATTACK_DAMAGE), DMG_ID, "boss_damage", dmg);
-        mod(mob.getAttribute(Attributes.MOVEMENT_SPEED), SPD_ID, "boss_speed", spd);
-        var power = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("irons_spellbooks", "spell_power"));
-        if (power != null) mod(mob.getAttribute(power), POWER_ID, "boss_power", dmg);
-        PohCore.LOG.info("[boss] {} spawned: {} players near, health x{} = {}", def.id, players, mult, mob.getMaxHealth());
+        int players = Math.min(playersNear(arenaRadius() + BossConfig.get(BossConfig.COUNT_RADIUS_EXTRA)).stream()
+                .filter(p -> !p.isCreative()).toList().size(), BossConfig.get(BossConfig.MAX_COUNTED));
+        double mult = BossMath.healthMultiplier(players, BossConfig.get(BossConfig.HP_PER_PLAYER), BossConfig.get(BossConfig.HP_PER_PLAYER_SQ), 0);
+        playerMult = mult;
+        base(Attributes.MAX_HEALTH, BossConfig.get(cfg.hp) * mult);
+        mob.setHealth(mob.getMaxHealth());
+        base(Attributes.ARMOR, BossConfig.get(cfg.armor));
+        base(Attributes.ARMOR_TOUGHNESS, BossConfig.get(cfg.toughness));
+        base(Attributes.KNOCKBACK_RESISTANCE, BossConfig.get(cfg.knockback));
+        base(Attributes.MOVEMENT_SPEED, BossConfig.get(cfg.speed));
+        base(Attributes.ATTACK_DAMAGE, BossConfig.get(cfg.attack));
+        irons("spell_power", BossConfig.get(cfg.spellPower));
+        irons("spell_resist", BossConfig.get(cfg.spellResist));
+        irons("fire_magic_resist", BossConfig.get(cfg.fireResist));
+        irons("ice_magic_resist", BossConfig.get(cfg.iceResist));
+        irons("holy_magic_resist", BossConfig.get(cfg.holyResist));
+        irons("blood_magic_resist", BossConfig.get(cfg.bloodResist));
+        irons("eldritch_magic_resist", BossConfig.get(cfg.eldritchResist));
+        PohCore.LOG.info("[boss] {} spawned: {} players, health x{} = {}", def.id, players, mult, mob.getMaxHealth());
     }
 
-    private static void mod(AttributeInstance a, UUID id, String name, double v) {
-        if (a == null) return;
-        a.removeModifier(id);
-        if (v != 0) a.addPermanentModifier(new AttributeModifier(id, name, v, AttributeModifier.Operation.MULTIPLY_TOTAL));
+    private double playerMult = 1;
+
+    /** The health multiplier the fight began with (summons scale with it). */
+    public double playerMultiplier() {
+        return playerMult;
+    }
+
+    /** arena_radius of [<boss>] (or the fight radius). */
+    public double arenaRadius() {
+        BossConfig.PerBoss cfg = BossConfig.of(def.id);
+        return cfg != null ? BossConfig.get(cfg.arena) : def.fightRadius;
+    }
+
+    private void base(net.minecraft.world.entity.ai.attributes.Attribute a, double v) {
+        AttributeInstance i = mob.getAttribute(a);
+        if (i != null && v >= 0) i.setBaseValue(v);
+    }
+
+    private void irons(String id, double v) {
+        if (v < 0) return;
+        var a = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("irons_spellbooks", id));
+        if (a != null) base(a, v);
     }
 
     public Vec3 arena() {
@@ -174,15 +196,28 @@ public final class BossCore {
         if (mob.level().isClientSide) return amount;
         if (finale || (lockTicks > 0 || aiOff) && lockInvulnerable) return 0;
         if (def.finale != BossDef.Finale.DEATH) amount = BossMath.clipToFloor(mob.getHealth(), amount, (float) (def.finaleAt * mob.getMaxHealth()));
-        if (amount > 0 && src.getEntity() instanceof Player p) damageBy.merge(p.getUUID(), amount, Float::sum);
+        if (amount > 0 && src.getEntity() instanceof Player p)
+            damageBy.computeIfAbsent(p.getUUID(), k -> new ArrayDeque<>()).add(new double[] {mob.level().getGameTime(), amount});
         return amount;
     }
 
     /** The player who dealt the boss the most damage and is still in the fight (alive, within reach); else the nearest. */
     public ServerPlayer strongestEnemy() {
-        List<ServerPlayer> near = playersNear(def.fightRadius + 16);
-        return near.stream().max(Comparator.comparingDouble((ServerPlayer p) -> damageBy.getOrDefault(p.getUUID(), 0f))
+        List<ServerPlayer> near = playersNear(arenaRadius() + 16);
+        near.removeIf(Player::isCreative);
+        return near.stream().max(Comparator.comparingDouble((ServerPlayer p) -> recentDamage(p.getUUID()))
                 .thenComparingDouble(p -> -p.distanceToSqr(mob))).orElse(null);
+    }
+
+    /** Damage this player dealt to the boss in the last top_damage_window_seconds. */
+    public double recentDamage(UUID player) {
+        Deque<double[]> d = damageBy.get(player);
+        if (d == null) return 0;
+        long from = mob.level().getGameTime() - BossConfig.get(BossConfig.TOP_DAMAGE_WINDOW) * 20L;
+        while (!d.isEmpty() && d.peekFirst()[0] < from) d.pollFirst();
+        double sum = 0;
+        for (double[] e : d) sum += e[1];
+        return sum;
     }
 
     // ---------------------------------------------------------------- locks
@@ -444,6 +479,23 @@ public final class BossCore {
         ResourceKey<DamageType> k = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, def.id + "_finisher"));
         var reg = sl.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE);
         return reg.getHolder(k).map(h -> new DamageSource(h, mob)).orElseGet(() -> sl.damageSources().mobAttack(mob));
+    }
+
+    private DamageSource source(String type) {
+        ServerLevel sl = (ServerLevel) mob.level();
+        ResourceKey<DamageType> k = ResourceKey.create(Registries.DAMAGE_TYPE, new ResourceLocation(PohCore.MODID, type));
+        return sl.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(k).map(h -> new DamageSource(h, mob))
+                .orElseGet(() -> sl.damageSources().mobAttack(mob));
+    }
+
+    /** The bosses' own attacks (pohsmp_core:boss_attack): not scaled by the world's difficulty, armour counts (balance 1.2). */
+    public DamageSource attackDamage() {
+        return source("boss_attack");
+    }
+
+    /** Mechanics (walls, snapped threads...: pohsmp_core:boss_mechanic): through armour and enchantments, a share of the victim's health. */
+    public DamageSource mechanicDamage() {
+        return source("boss_mechanic");
     }
 
     // ---------------------------------------------------------------- save

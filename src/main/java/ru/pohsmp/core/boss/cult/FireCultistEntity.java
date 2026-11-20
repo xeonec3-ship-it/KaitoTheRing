@@ -36,6 +36,21 @@ public class FireCultistEntity extends PyromancerEntity {
         for (EquipmentSlot s : EquipmentSlot.values()) setDropChance(s, 0);
     }
 
+    /** Its leader, health (x the boss's player multiplier), armour, spell power ([cult_leader] cultist_*). */
+    void setup(UUID leader, double hp, double armor, double power) {
+        this.leader = leader;
+        set(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH, hp);
+        set(net.minecraft.world.entity.ai.attributes.Attributes.ARMOR, armor);
+        var sp = net.minecraftforge.registries.ForgeRegistries.ATTRIBUTES.getValue(new net.minecraft.resources.ResourceLocation("irons_spellbooks", "spell_power"));
+        if (sp != null) set(sp, power);
+        setHealth(getMaxHealth());
+    }
+
+    private void set(net.minecraft.world.entity.ai.attributes.Attribute a, double v) {
+        var i = getAttribute(a);
+        if (i != null) i.setBaseValue(v);
+    }
+
     @Override
     public void tick() {
         super.tick();

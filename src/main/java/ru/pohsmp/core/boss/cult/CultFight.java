@@ -14,17 +14,22 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import ru.pohsmp.core.boss.BossConfig;
 import ru.pohsmp.core.boss.BossCore;
+import ru.pohsmp.core.boss.BossMath;
 import ru.pohsmp.core.boss.BossNet;
 import ru.pohsmp.core.boss.BossTimeline;
 import ru.pohsmp.core.fx.Fx;
@@ -34,8 +39,11 @@ import ru.pohsmp.core.fx.Fx;
  * seal 2 s before), phase 3 «Истинное пламя» (the wall of fire on the arena edge, fire cultists, the soul form as fury), the specials
  * «Первое Пламя» and «Пепел Меллисто» (scenes for everyone in the fight, the fight is not frozen), the four new attacks («Огненный
  * серп», «Пепельный след», «Клеймо культа», «Столпы пламени»). Every strong attack has a visible warning; no beams from him to anyone.
+ * Numbers: [cult_leader] of pohsmp_core-bosses-server.toml (docs/specs/balance_bosses.md).
  */
 public final class CultFight {
+    private static final java.util.UUID FURY_ID = java.util.UUID.fromString("4c1d7e3a-2f6b-4a91-8d0e-7b5c3a9e1f02");
+
     private final CultLeaderEntity boss;
     private final BossCore core;
 
@@ -46,9 +54,20 @@ public final class CultFight {
     private final Map<UUID, Double> wallDist = new HashMap<>();
     private final Map<UUID, Long> wallHit = new HashMap<>();
     private final List<UUID> cultists = new ArrayList<>();
-    private int spellIn = 100;
-    private final List<int[]> trails = new ArrayList<>();
-    private final List<Vec3[]> trailLines = new ArrayList<>();
+    private int waveIn = -1;
+    /** Own cooldowns of the four attacks (ticks left) and the common gap. */
+    private final Map<String, Integer> cooldown = new HashMap<>();
+    private int gcd = 100;
+
+    /** A strip of burning ground: segment a-b, half width, damage every `every` ticks, ticks left. */
+    private static final class Burn {
+        Vec3 a, b;
+        double half;
+        float damage;
+        int every, left;
+    }
+
+    private final List<Burn> burns = new ArrayList<>();
 
     CultFight(CultLeaderEntity boss) {
         this.boss = boss;
@@ -63,20 +82,23 @@ public final class CultFight {
         return core.arena();
     }
 
-    private static double cfg(net.minecraftforge.common.ForgeConfigSpec.DoubleValue v) {
+    private static double cfg(ForgeConfigSpec.DoubleValue v) {
         return BossConfig.get(v);
     }
 
-    private static int cfg(net.minecraftforge.common.ForgeConfigSpec.IntValue v) {
+    private static int cfg(ForgeConfigSpec.IntValue v) {
         return BossConfig.get(v);
-    }
-
-    private DamageSource fire() {
-        return sl().damageSources().mobAttack(boss);
     }
 
     private static Component ui(String key, Object... args) {
         return Component.translatable("ui.pohsmp_core.cult_leader." + key, args).withStyle(s -> s.withColor(CultLeader.COLOR));
+    }
+
+    /** His own hit (pohsmp_core:boss_attack, x fury in phase 3), with fire. */
+    private void hit(LivingEntity e, double dmg, int burnSeconds) {
+        double m = core.phase() >= 2 ? cfg(BossConfig.CL_FURY_DAMAGE) : 1;
+        e.hurt(core.attackDamage(), (float) (dmg * m));
+        if (burnSeconds > 0) e.setSecondsOnFire(burnSeconds);
     }
 
     // ---------------------------------------------------------------- tick
@@ -95,11 +117,15 @@ public final class CultFight {
             core.sound("cult_leader.verdict_end", 2, 1);
         }
         if (firewallFx > 0) firewall(sl);
-        tickTrails(sl);
-        if (--spellIn <= 0) {
-            if (castSpell(sl)) spellIn = cfg(BossConfig.CL_SPELL_COOLDOWN) * 20;
-            else spellIn = 20;
+        tickBurns(sl);
+        if (waveIn > 0 && --waveIn == 0) {
+            cultists.removeIf(u -> !(sl.getEntity(u) instanceof LivingEntity c && c.isAlive()));
+            if (cultists.isEmpty()) summonCultists(sl);
         }
+        cooldown.replaceAll((k, v) -> Math.max(0, v - 1));
+        if (gcd > 0) gcd--;
+        else if (castSpell(sl)) gcd = cfg(BossConfig.ABILITY_GCD) * 20;
+        else gcd = 10;
     }
 
     // ---------------------------------------------------------------- phases
@@ -111,24 +137,28 @@ public final class CultFight {
             core.sound("cult_leader.phase", 3, 1);
             verdictIn = 100;
         }
-        if (to >= 1) core.actionbar(core.def.fightRadius, ui("phase2"));
+        if (to == 1) core.actionbar(core.arenaRadius() + 8, ui("phase2"));
         if (to == 2) phase3(sl);
     }
 
     private void phase3(ServerLevel sl) {
         verdictIn = -1;
-        core.actionbar(core.def.fightRadius, ui("phase3"));
+        core.actionbar(core.arenaRadius() + 8, ui("phase3"));
         core.sound("cult_leader.phase", 4, 0.9f);
         Fx.play(sl, Fx.fx("cult_leader_phase3").caster(boss).at(boss.position()).yaw(boss.getYRot()));
         core.play(new BossTimeline("phase3", 40)
                 .at(30, () -> {
                     firewallFx = Fx.play(sl, Fx.fx("cult_leader_firewall").at(arena()).yaw(0));
                     core.sound(arena(), "cult_leader.firewall", 4, 1);
-                    core.actionbar(core.def.fightRadius, ui("firewall"));
+                    core.actionbar(core.arenaRadius() + 8, ui("firewall"));
                 })
                 .at(36, () -> summonCultists(sl)));
         if (!boss.isSoulMode()) boss.setSoulMode(true);   // the soul form of Tyros as fury
         furyFx = Fx.play(sl, Fx.fx("cult_leader_fury").caster(boss).at(boss.position()).attach(boss));
+        var atk = boss.getAttribute(Attributes.ATTACK_DAMAGE);
+        if (atk != null && atk.getModifier(FURY_ID) == null)
+            atk.addPermanentModifier(new AttributeModifier(FURY_ID, "cult_fury", cfg(BossConfig.CL_FURY_DAMAGE) - 1, AttributeModifier.Operation.MULTIPLY_TOTAL));
+        boss.meleeInterval(cfg(BossConfig.CL_FURY_INTERVAL));
     }
 
     // ---------------------------------------------------------------- «Приговор Меллисто»
@@ -168,7 +198,7 @@ public final class CultFight {
         return e.position().distanceToSqr(verdictAt) <= r * r;
     }
 
-    /** A cast tried under the verdict: it goes out in ash in the hand. */
+    /** A cast tried under the verdict: it goes out in ash in the hand (no mana, no cooldown). */
     void fizzle(ServerPlayer p) {
         Fx.play(sl(), Fx.fx("cult_leader_verdict_fizzle").caster(p).at(p.position()));
         p.displayClientMessage(ui("verdict_blocked"), true);
@@ -176,8 +206,9 @@ public final class CultFight {
 
     // ---------------------------------------------------------------- phase 3: the wall of fire, the cultists
 
+    /** Crossing the wall: a share of the player's max health through armour, fire, a push back inside. */
     private void firewall(ServerLevel sl) {
-        double r = cfg(BossConfig.CL_ARENA_RADIUS);
+        double r = core.arenaRadius();
         Vec3 c = arena();
         long now = sl.getGameTime();
         for (LivingEntity e : sl.getEntitiesOfClass(LivingEntity.class, new AABB(c, c).inflate(r + 4, 12, r + 4))) {
@@ -187,16 +218,24 @@ public final class CultFight {
             if (before == null || !CultMath.wallCrossed(before, d, r)) continue;
             if (now - wallHit.getOrDefault(e.getUUID(), Long.MIN_VALUE / 2) < 10) continue;
             wallHit.put(e.getUUID(), now);
-            e.hurt(fire(), (float) cfg(BossConfig.CL_FIREWALL_DAMAGE));
+            e.hurt(core.mechanicDamage(), (float) (e.getMaxHealth() * cfg(BossConfig.CL_FIREWALL_SHARE)));
+            e.setSecondsOnFire(cfg(BossConfig.CL_FIREWALL_BURN));
+            Vec3 in = c.subtract(e.position()).multiply(1, 0, 1);
+            if (in.lengthSqr() > 1e-4) {
+                e.push(in.normalize().x * cfg(BossConfig.CL_FIREWALL_PUSH), 0.3, in.normalize().z * cfg(BossConfig.CL_FIREWALL_PUSH));
+                e.hurtMarked = true;
+            }
             Fx.play(sl, Fx.fx("cult_leader_firewall_burn").caster(e).at(e.position()));
         }
     }
 
     private void summonCultists(ServerLevel sl) {
-        int min = cfg(BossConfig.CL_CULTISTS_MIN), max = Math.max(min, cfg(BossConfig.CL_CULTISTS_MAX));
-        int n = min + boss.getRandom().nextInt(max - min + 1);
+        int players = core.fighters().size();
+        int n = players <= 2 ? cfg(BossConfig.CL_CULTISTS_SMALL) : players <= 4 ? cfg(BossConfig.CL_CULTISTS_MID) : cfg(BossConfig.CL_CULTISTS_BIG);
+        int wave = cfg(BossConfig.CL_CULTIST_WAVE);
+        waveIn = wave > 0 && waveIn < 0 ? wave * 20 : -2;   // one more wave at most
         if (n <= 0) return;
-        core.actionbar(core.def.fightRadius, ui("summon"));
+        core.actionbar(core.arenaRadius() + 8, ui("summon"));
         core.sound("cult_leader.summon", 3, 1);
         for (int i = 0; i < n; i++) {
             double a = boss.getYRot() * Mth.DEG_TO_RAD + Math.PI * 2 * i / n, d = 6 + boss.getRandom().nextDouble() * 4;
@@ -208,7 +247,8 @@ public final class CultFight {
                 if (c == null) return;
                 c.moveTo(p.x, p.y, p.z, boss.getYRot(), 0);
                 c.finalizeSpawn(sl, sl.getCurrentDifficultyAt(c.blockPosition()), MobSpawnType.MOB_SUMMONED, null, null);
-                c.leader = boss.getUUID();
+                c.setup(boss.getUUID(), cfg(BossConfig.CL_CULTIST_HP) * core.playerMultiplier(), cfg(BossConfig.CL_CULTIST_ARMOR),
+                        cfg(BossConfig.CL_CULTIST_POWER));
                 sl.addFreshEntity(c);
                 cultists.add(c.getUUID());
             }));
@@ -220,7 +260,7 @@ public final class CultFight {
         return Math.abs(y - p.y) <= 6 ? new Vec3(p.x, y, p.z) : p;
     }
 
-    /** Death: the wall goes out, the fury aura stops, the cultists go with him. */
+    /** Death 2.6 s: the wall goes out, the fury aura stops. */
     void stopFires(ServerLevel sl) {
         if (firewallFx > 0) Fx.stop(sl, firewallFx, "");
         if (furyFx > 0) Fx.stop(sl, furyFx, "");
@@ -230,20 +270,21 @@ public final class CultFight {
     void onDeath(ServerLevel sl) {
         verdictAt = null;
         verdictIn = -1;
+        waveIn = -2;
+        burns.clear();
         if (furyFx > 0) Fx.stop(sl, furyFx, "");
         furyFx = -1;
         if (vortexFx > 0) Fx.stop(sl, vortexFx, "");   // died while ash: seen again, the whirl stops
         vortexFx = -1;
         if ((core.look() & BossNet.LOOK_HIDDEN) != 0) core.lookFlag(BossNet.LOOK_HIDDEN, false);
-        if (boss.getMainHandItem().isEmpty())   // died with the sickle in the air
-            boss.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(CultLeader.SCYTHE.get()));
+        if (boss.getMainHandItem().isEmpty()) boss.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(CultLeader.SCYTHE.get()));   // the sickle was in the air
         for (UUID u : cultists) if (sl.getEntity(u) instanceof LivingEntity c && c.isAlive()) c.kill();
         cultists.clear();
     }
 
     // ---------------------------------------------------------------- specials
 
-    /** Returns false while it cannot start (another scene is on): the core asks again next tick. */
+    /** Returns false while it cannot start (another scene / attack is on): the core asks again next tick. */
     boolean special(String id) {
         if (core.inScene() || core.locked() || boss.isStanceBroken() || boss.isHalfHealthAttacking()) return false;
         if (id.equals("first_flame")) firstFlame(sl());
@@ -264,11 +305,11 @@ public final class CultFight {
         core.play(new BossTimeline("scene:first_flame", CultMath.FF)
                 .at(0, () -> core.sound("cult_leader.first_flame", 4, 1))
                 .at(CultMath.FF_TITLE, () -> core.title(who, "cult_first_flame", CultMath.FF_TITLE_HOLD, null))
-                .at(CultMath.FF_WARN, () -> core.actionbar(core.def.fightRadius, ui("first_flame_warn")))
+                .at(CultMath.FF_WARN, () -> core.actionbar(core.arenaRadius() + 8, ui("first_flame_warn")))
                 .at(CultMath.FF_PILLAR, () -> {
                     core.sound(p, "cult_leader.first_flame_impact", 5, 1);
-                    for (LivingEntity e : targets(sl, p, 3.2))
-                        if (Math.abs(e.getY() - p.y) < 6) e.hurt(fire(), (float) cfg(BossConfig.CL_PILLAR_DAMAGE));
+                    for (LivingEntity e : targets(sl, p, cfg(BossConfig.CL_FF_PILLAR_RADIUS)))
+                        if (Math.abs(e.getY() - p.y) < 6) hit(e, cfg(BossConfig.CL_FF_PILLAR_DAMAGE), 4);
                 })
                 .during(CultMath.FF_PILLAR, CultMath.FF_RING_END, t -> {
                     double r = CultMath.ringRadius(t);
@@ -277,8 +318,7 @@ public final class CultFight {
                         double d = Math.sqrt(e.distanceToSqr(p.x, e.getY(), p.z));
                         if (CultMath.ringHits(d, r, e.getY() - ground(sl, e.position()).y)) {
                             ringHit.add(e.getUUID());
-                            e.hurt(fire(), (float) cfg(BossConfig.CL_FIRST_FLAME_DAMAGE));
-                            e.setSecondsOnFire(3);
+                            hit(e, cfg(BossConfig.CL_FF_RING_DAMAGE), 3);
                         }
                     }
                 })
@@ -289,7 +329,7 @@ public final class CultFight {
 
     /**
      * «Пепел Меллисто» (≈6 s): he burns into an ash whirl (invisible, invulnerable), rushes over the arena, gathers 5 blocks before the
-     * strongest enemy (by damage dealt to him) and cuts the whole arena along a straight line shown 1.5 s before.
+     * strongest enemy (most damage to him in 30 s) and cuts the whole arena along a straight line shown 1.5 s before; the line burns 10 s.
      */
     private void ash(ServerLevel sl) {
         core.lock(CultMath.ASH, true, false);
@@ -300,13 +340,12 @@ public final class CultFight {
         core.sound("cult_leader.ash", 4, 1);
         List<ServerPlayer> who = core.scene("cult_leader.ash", CultMath.ASH, BossNet.SCENE_BARS, cfg(BossConfig.SCENE_RADIUS), boss.position(), boss.getYRot(), -1);
         Vec3[] path = new Vec3[3];   // from, to, direction of the cut
-        int[] vortex = {-1};
         core.play(new BossTimeline("scene:ash", CultMath.ASH)
                 .at(CultMath.ASH_TITLE, () -> core.title(who, "cult_ash", CultMath.ASH_TITLE_HOLD, null))
                 .at(CultMath.ASH_GONE, () -> {
                     core.lock(CultMath.ASH_REFORM - CultMath.ASH_GONE, true, true);   // invulnerable while he is ash
                     core.lookFlag(BossNet.LOOK_HIDDEN, true);
-                    vortex[0] = vortexFx = Fx.play(sl, Fx.fx("cult_ash_vortex").caster(boss).at(boss.position()).attach(boss));
+                    vortexFx = Fx.play(sl, Fx.fx("cult_ash_vortex").caster(boss).at(boss.position()).attach(boss));
                     ServerPlayer enemy = core.strongestEnemy();
                     Vec3 from = boss.position();
                     Vec3 tp = enemy != null ? enemy.position() : arena();
@@ -315,11 +354,11 @@ public final class CultFight {
                     path[0] = from;
                     path[1] = ground(sl, tp.subtract(dir.scale(CultMath.ASH_BEFORE)));
                     path[2] = dir;
-                    core.actionbar(core.def.fightRadius, ui("ash_warn"));
+                    core.actionbar(core.arenaRadius() + 8, ui("ash_warn"));
                 })
                 .during(CultMath.ASH_GONE + 1, CultMath.ASH_REFORM, t -> {
                     if (path[0] == null) return;
-                    double k = ru.pohsmp.core.boss.BossMath.sine((t - CultMath.ASH_GONE) / (double) (CultMath.ASH_REFORM - CultMath.ASH_GONE));
+                    double k = BossMath.sine((t - CultMath.ASH_GONE) / (double) (CultMath.ASH_REFORM - CultMath.ASH_GONE));
                     Vec3 p = path[0].lerp(path[1], k);
                     float yaw = (float) (Mth.atan2(path[2].z, path[2].x) * Mth.RAD_TO_DEG) - 90;
                     boss.moveTo(p.x, p.y, p.z, yaw, 0);
@@ -327,7 +366,7 @@ public final class CultFight {
                     boss.setYBodyRot(yaw);
                 })
                 .at(CultMath.ASH_REFORM, () -> {
-                    if (vortex[0] > 0) Fx.stop(sl, vortex[0], "");
+                    if (vortexFx > 0) Fx.stop(sl, vortexFx, "");
                     vortexFx = -1;
                     core.lookFlag(BossNet.LOOK_HIDDEN, false);
                     boss.serverTriggerAnimation("cult_leader_ash_reform");
@@ -340,12 +379,11 @@ public final class CultFight {
                     Vec3 b = a.add(dir.scale(CultMath.ASH_LINE));
                     core.sound("cult_leader.ash_slash", 5, 1);
                     Fx.play(sl, Fx.fx("cult_ash_slash").at(a).yaw(boss.getYRot()));
-                    double half = cfg(BossConfig.CL_ASH_SLASH_WIDTH) / 2 + 0.3;
+                    double half = cfg(BossConfig.CL_ASH_WIDTH) / 2 + 0.3;
                     for (LivingEntity e : targets(sl, a.lerp(b, 0.5), CultMath.ASH_LINE / 2 + 2))
-                        if (CultMath.toSegment(e.getX(), e.getZ(), a.x, a.z, b.x, b.z) <= half && Math.abs(e.getY() - a.y) < 4) {
-                            e.hurt(fire(), (float) cfg(BossConfig.CL_ASH_SLASH_DAMAGE));
-                            e.setSecondsOnFire(4);
-                        }
+                        if (CultMath.toSegment(e.getX(), e.getZ(), a.x, a.z, b.x, b.z) <= half && Math.abs(e.getY() - a.y) < 4)
+                            hit(e, cfg(BossConfig.CL_ASH_DAMAGE), 4);
+                    burn(a, b, cfg(BossConfig.CL_ASH_WIDTH) / 2, cfg(BossConfig.CL_ASH_BURN), 10, 200);   // the trace burns 10 s
                 }));
     }
 
@@ -356,13 +394,35 @@ public final class CultFight {
         if (t == null || !t.isAlive() || core.locked() || core.inScene() || boss.isAnimating() || boss.isCasting() || boss.isStanceBroken()
                 || boss.isHalfHealthAttacking() || boss.isSpawning()) return false;
         double d = boss.distanceTo(t);
-        List<Runnable> can = new ArrayList<>();
-        if (d < 14) can.add(() -> sickle(sl, t));
-        if (d > 4 && d < 14) can.add(() -> ashTrail(sl, t));
-        can.add(() -> brand(sl, t));
-        can.add(() -> pillars(sl));
-        can.get(boss.getRandom().nextInt(can.size())).run();
+        List<String> can = new ArrayList<>();
+        if (d < 14 && ready("sickle")) can.add("sickle");
+        if (d > 4 && d < 14 && ready("ash_trail")) can.add("ash_trail");
+        if (ready("brand")) can.add("brand");
+        if (ready("pillars")) can.add("pillars");
+        if (can.isEmpty()) return false;
+        switch (can.get(boss.getRandom().nextInt(can.size()))) {
+            case "sickle" -> {
+                sickle(sl, t);
+                cooldown.put("sickle", cfg(BossConfig.CL_SICKLE_COOLDOWN) * 20);
+            }
+            case "ash_trail" -> {
+                ashTrail(sl, t);
+                cooldown.put("ash_trail", cfg(BossConfig.CL_DASH_COOLDOWN) * 20);
+            }
+            case "brand" -> {
+                brand(sl, t);
+                cooldown.put("brand", cfg(BossConfig.CL_BRAND_COOLDOWN) * 20);
+            }
+            default -> {
+                pillars(sl);
+                cooldown.put("pillars", cfg(BossConfig.CL_PILLARS_COOLDOWN) * 20);
+            }
+        }
         return true;
+    }
+
+    private boolean ready(String id) {
+        return cooldown.getOrDefault(id, 0) <= 0;
     }
 
     private float yawTo(Vec3 p) {
@@ -386,11 +446,11 @@ public final class CultFight {
         core.actionbar(20, ui("sickle"));
         CultSickleEntity[] s = {null};
         int[] spin = {-1};
-        Set<UUID> hit = new HashSet<>();
+        Set<UUID> hitOut = new HashSet<>(), hitBack = new HashSet<>();   // up to two touches: out and back
         Vec3 fwd = Vec3.directionFromRotation(0, yaw), right = new Vec3(-fwd.z, 0, fwd.x);
         core.play(new BossTimeline("spell:sickle", CultMath.SICKLE)
                 .at(CultMath.SICKLE_THROW, () -> {
-                    boss.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, net.minecraft.world.item.ItemStack.EMPTY);
+                    boss.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
                     s[0] = CultLeader.SICKLE.get().create(sl);
                     if (s[0] == null) return;
                     s[0].moveTo(o.x, o.y + 2.0, o.z, yaw, 0);
@@ -399,19 +459,19 @@ public final class CultFight {
                 })
                 .during(CultMath.SICKLE_THROW + 1, CultMath.SICKLE_CATCH - 1, k -> {
                     if (s[0] == null) return;
-                    double[] xy = CultMath.sicklePath((k - CultMath.SICKLE_THROW) / (double) CultMath.SICKLE_FLIGHT);
+                    double u = (k - CultMath.SICKLE_THROW) / (double) CultMath.SICKLE_FLIGHT;
+                    double[] xy = CultMath.sicklePath(u);
                     Vec3 p = o.add(right.scale(xy[0])).add(fwd.scale(xy[1])).add(0, 2.0, 0);
                     s[0].moveTo(p.x, p.y, p.z, s[0].getYRot() + 40, 0);
-                    for (LivingEntity e : targets(sl, p, 1.8))
-                        if (hit.add(e.getUUID())) {
-                            e.hurt(fire(), (float) cfg(BossConfig.CL_SICKLE_DAMAGE));
-                            e.setSecondsOnFire(3);
-                        }
+                    Set<UUID> hit = u < 0.5 ? hitOut : hitBack;
+                    for (LivingEntity e : targets(sl, p, 1.6))
+                        if (Math.abs(e.getY() + e.getBbHeight() / 2 - p.y) < 2 && hit.add(e.getUUID()))
+                            hit(e, cfg(BossConfig.CL_SICKLE_DAMAGE), cfg(BossConfig.CL_SICKLE_BURN));
                 })
                 .at(CultMath.SICKLE_CATCH, () -> {
                     if (s[0] != null) s[0].discard();
                     if (spin[0] > 0) Fx.stop(sl, spin[0], "");
-                    boss.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(CultLeader.SCYTHE.get()));
+                    boss.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(CultLeader.SCYTHE.get()));
                     Fx.play(sl, Fx.fx("cult_sickle_catch").caster(boss).at(boss.position()));
                 }));
     }
@@ -431,75 +491,88 @@ public final class CultFight {
         boss.serverTriggerAnimation("cult_leader_ash_trail_dash");
         Fx.play(sl, Fx.fx("cult_ash_trail_warn").at(o).yaw(yaw).scale(dist / CultMath.TRAIL_LEN));
         core.actionbar(20, ui("ash_trail"));
-        Set<UUID> hit = new HashSet<>();
+        Set<UUID> hitSet = new HashSet<>();
         core.play(new BossTimeline("spell:ash_trail", CultMath.TRAIL)
                 .at(CultMath.TRAIL_DASH, () -> {
                     Fx.play(sl, Fx.fx("cult_ash_trail_dash").caster(boss).at(o).yaw(yaw).attach(boss));
                     Fx.play(sl, Fx.fx("cult_ash_trail").at(o).yaw(yaw).scale(dist / CultMath.TRAIL_LEN));
-                    trails.add(new int[] {CultMath.TRAIL_BURN});
-                    trailLines.add(new Vec3[] {o, end});
+                    burn(o, end, cfg(BossConfig.CL_TRAIL_WIDTH) / 2, cfg(BossConfig.CL_TRAIL_DAMAGE), cfg(BossConfig.CL_TRAIL_INTERVAL),
+                            cfg(BossConfig.CL_TRAIL_SECONDS) * 20);
                 })
                 .during(CultMath.TRAIL_DASH + 1, CultMath.TRAIL_DASH + CultMath.TRAIL_DASH_TICKS, k -> {
                     Vec3 p = o.lerp(end, (k - CultMath.TRAIL_DASH) / (double) CultMath.TRAIL_DASH_TICKS);
                     boss.moveTo(p.x, p.y, p.z, yaw, 0);
                     for (LivingEntity e : targets(sl, p, 1.6))
-                        if (hit.add(e.getUUID())) e.hurt(fire(), (float) cfg(BossConfig.CL_TRAIL_DAMAGE) * 2);
+                        if (hitSet.add(e.getUUID())) hit(e, cfg(BossConfig.CL_DASH_DAMAGE), 2);
                 }));
     }
 
-    private void tickTrails(ServerLevel sl) {
-        for (int i = 0; i < trails.size(); i++) {
-            int left = --trails.get(i)[0];
-            Vec3[] l = trailLines.get(i);
-            if (left % 20 == 0) {
-                double half = cfg(BossConfig.CL_TRAIL_WIDTH) / 2;
-                for (LivingEntity e : targets(sl, l[0].lerp(l[1], 0.5), CultMath.TRAIL_LEN / 2 + 2))
-                    if (CultMath.toSegment(e.getX(), e.getZ(), l[0].x, l[0].z, l[1].x, l[1].z) <= half && Math.abs(e.getY() - l[0].y) < 2)
-                        e.hurt(fire(), (float) cfg(BossConfig.CL_TRAIL_DAMAGE));
-            }
-            if (left <= 0) {
-                trails.remove(i);
-                trailLines.remove(i--);
-            }
+    private void burn(Vec3 a, Vec3 b, double half, double damage, int every, int ticks) {
+        Burn x = new Burn();
+        x.a = a;
+        x.b = b;
+        x.half = half;
+        x.damage = (float) damage;
+        x.every = Math.max(1, every);
+        x.left = ticks;
+        burns.add(x);
+    }
+
+    private void tickBurns(ServerLevel sl) {
+        for (int i = 0; i < burns.size(); i++) {
+            Burn x = burns.get(i);
+            if (--x.left % x.every == 0)
+                for (LivingEntity e : targets(sl, x.a.lerp(x.b, 0.5), x.a.distanceTo(x.b) / 2 + 2))
+                    if (CultMath.toSegment(e.getX(), e.getZ(), x.a.x, x.a.z, x.b.x, x.b.z) <= x.half && Math.abs(e.getY() - x.a.y) < 2)
+                        e.hurt(core.attackDamage(), x.damage);
+            if (x.left <= 0) burns.remove(i--);
         }
     }
 
-    /** «Клеймо культа»: a brand on a player; 3 s later it bursts r3 (the others: run from the branded one). */
+    /** «Клеймо культа»: a brand on a player (two from phase 2 when 4+ fight); 3 s later it bursts r3 — run from the branded one. */
     private void brand(ServerLevel sl, LivingEntity t) {
-        List<ServerPlayer> fighters = core.fighters();
-        LivingEntity mark = fighters.isEmpty() ? t : fighters.get(boss.getRandom().nextInt(fighters.size()));
-        face(yawTo(mark.position()));
+        List<ServerPlayer> fighters = new ArrayList<>(core.fighters());
+        int n = core.phase() >= 1 && fighters.size() >= 4 ? cfg(BossConfig.CL_BRAND_TARGETS_BIG) : 1;
+        List<LivingEntity> marks = new ArrayList<>();
+        java.util.Collections.shuffle(fighters, new java.util.Random(boss.getRandom().nextLong()));
+        for (int i = 0; i < Math.min(n, fighters.size()); i++) marks.add(fighters.get(i));
+        if (marks.isEmpty()) marks.add(t);
+        face(yawTo(marks.get(0).position()));
         core.lock(CultMath.BRAND, true, false);
         boss.serverTriggerAnimation("cult_leader_brand");
         int delay = cfg(BossConfig.CL_BRAND_DELAY) * 20;
         core.play(new BossTimeline("spell:brand", CultMath.BRAND_AT + delay + 1)
                 .at(CultMath.BRAND_AT, () -> {
-                    if (!mark.isAlive()) return;
-                    mark.addEffect(new MobEffectInstance(CultLeader.BRAND.get(), delay, 0, false, true, true));
-                    Fx.play(sl, Fx.fx("cult_brand").caster(mark).at(mark.position()).attach(mark).duration(delay));
-                    if (mark instanceof ServerPlayer sp) sp.displayClientMessage(ui("brand_warn"), true);
+                    for (LivingEntity mark : marks) {
+                        if (!mark.isAlive()) continue;
+                        mark.addEffect(new MobEffectInstance(CultLeader.BRAND.get(), delay, 0, false, true, true));
+                        Fx.play(sl, Fx.fx("cult_brand").caster(mark).at(mark.position()).attach(mark).duration(delay));
+                        if (mark instanceof ServerPlayer sp) sp.displayClientMessage(ui("brand_warn"), true);
+                    }
                     core.actionbar(20, ui("brand"));
                 })
                 .at(CultMath.BRAND_AT + delay, () -> {
-                    if (!mark.isAlive() || mark.level() != sl) return;
-                    Vec3 c = mark.position();
-                    Fx.play(sl, Fx.fx("cult_brand_explode").at(c));
-                    double r = cfg(BossConfig.CL_BRAND_RADIUS);
-                    for (LivingEntity e : targets(sl, c, r)) e.hurt(fire(), (float) cfg(BossConfig.CL_BRAND_DAMAGE));
-                    sl.playSound(null, c.x, c.y, c.z, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE, net.minecraft.sounds.SoundSource.HOSTILE, 2, 1.2f);
+                    for (LivingEntity mark : marks) {
+                        if (!mark.isAlive() || mark.level() != sl) continue;
+                        Vec3 c = mark.position();
+                        Fx.play(sl, Fx.fx("cult_brand_explode").at(c));
+                        for (LivingEntity e : targets(sl, c, cfg(BossConfig.CL_BRAND_RADIUS))) hit(e, cfg(BossConfig.CL_BRAND_DAMAGE), 0);
+                        sl.playSound(null, c.x, c.y, c.z, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE, net.minecraft.sounds.SoundSource.HOSTILE, 2, 1.2f);
+                    }
                 }));
     }
 
-    /** «Столпы пламени»: 5 pillars of fire around the players, warning circles 1.5 s before. */
+    /** «Столпы пламени»: 5 (phase 3: 7) pillars of fire around the players, warning circles 1.5 s before; a toss up. */
     private void pillars(ServerLevel sl) {
         List<ServerPlayer> fighters = core.fighters();
         if (fighters.isEmpty()) return;
+        int count = core.phase() >= 2 ? cfg(BossConfig.CL_PILLARS_COUNT_P3) : cfg(BossConfig.CL_PILLARS_COUNT);
         core.lock(CultMath.PILLARS, true, false);
         boss.serverTriggerAnimation("cult_leader_pillars");
         List<Vec3> at = new ArrayList<>();
         core.play(new BossTimeline("spell:pillars", CultMath.PILLARS)
                 .at(CultMath.PILLARS_MARK, () -> {
-                    for (int i = 0; i < CultMath.PILLARS_COUNT; i++) {
+                    for (int i = 0; i < count; i++) {
                         ServerPlayer p = fighters.get(i % fighters.size());
                         double a = boss.getRandom().nextDouble() * Math.PI * 2, d = i < fighters.size() ? 0.3 : 1.5 + boss.getRandom().nextDouble() * 2;
                         Vec3 q = ground(sl, p.position().add(Math.cos(a) * d, 0, Math.sin(a) * d));
@@ -509,16 +582,17 @@ public final class CultFight {
                     core.actionbar(20, ui("pillars"));
                 })
                 .at(CultMath.PILLARS_ERUPT, () -> {
-                    Set<UUID> hit = new HashSet<>();
+                    Set<UUID> hitSet = new HashSet<>();
                     for (Vec3 q : at) {
                         Fx.play(sl, Fx.fx("cult_pillar").at(q));
                         for (LivingEntity e : targets(sl, q, CultMath.PILLAR_R + 0.5))
-                            if (e.getY() >= q.y - 1 && e.getY() <= q.y + CultMath.PILLAR_H && hit.add(e.getUUID())) {
-                                e.hurt(fire(), (float) cfg(BossConfig.CL_PILLARS_DAMAGE));
-                                e.setSecondsOnFire(3);
+                            if (e.getY() >= q.y - 1 && e.getY() <= q.y + CultMath.PILLAR_H && hitSet.add(e.getUUID())) {
+                                hit(e, cfg(BossConfig.CL_PILLARS_DAMAGE), 3);
+                                e.push(0, 0.6, 0);
+                                e.hurtMarked = true;
                             }
                     }
-                    core.sound(at.get(0), "cult_leader.first_flame_impact", 2, 1.3f);
+                    if (!at.isEmpty()) core.sound(at.get(0), "cult_leader.first_flame_impact", 2, 1.3f);
                 }));
     }
 
@@ -539,7 +613,7 @@ public final class CultFight {
     public static final class Events {
         private Events() {}
 
-        /** «Приговор Меллисто»: no one but him casts in the ring while it lasts (players; the cast goes out in ash). */
+        /** «Приговор Меллисто»: no one but him casts in the ring while it lasts (players: Iron's spells and scrolls; it goes out in ash). */
         @SubscribeEvent
         public static void onCast(SpellPreCastEvent e) {
             if (!(e.getEntity() instanceof ServerPlayer p)) return;

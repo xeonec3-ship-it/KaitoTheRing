@@ -111,7 +111,7 @@ def bossbars():
 
 TITLES = {'': ('Эреб, Длань Лжи', 'Глава Культа Меллисто', 'Ereb, the Hand of Lies', 'Head of the Cult of Mellisto'),
           'hand_of_lies': ('Длань Лжи', None, 'The Hand of Lies', None),
-          'mask_fall': ('Падение маски', None, 'The Fall of the Mask', None),
+          'mask_fall': ('Падение маски', None, 'The Mask Falls', None),
           'full_reveal': ('Сон Бабочки: Полное Раскрытие', None, 'Butterfly Dream: Full Revelation', None)}
 
 
@@ -137,7 +137,7 @@ LANG = {
                                         '"The Hand" — it grabs. Strike the hand to free your ally.'),
     'ui.pohsmp_core.ereb_hand.phase3': ('«Глава Культа» — маска трескается.', '"Head of the Cult" — the mask cracks.'),
     'ui.pohsmp_core.ereb_hand.hand_of_lies': ('Длань Лжи', 'The Hand of Lies'),
-    'ui.pohsmp_core.ereb_hand.mask_fall': ('Падение маски', 'The Fall of the Mask'),
+    'ui.pohsmp_core.ereb_hand.mask_fall': ('Падение маски', 'The Mask Falls'),
     'ui.pohsmp_core.ereb_hand.full_reveal': ('Сон Бабочки: Полное Раскрытие', 'Butterfly Dream: Full Revelation'),
     'ui.pohsmp_core.ereb_hand.vanish': ('Эреб рассыпался бабочками. Бой окончен.', 'Ereb scattered into butterflies. The battle is over.'),
     'death.attack.pohsmp_core.ereb_hand_finisher': ('%1$s раздавлен Дланью Лжи', '%1$s was crushed by the Hand of Lies'),

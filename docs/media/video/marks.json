@@ -50,72 +50,76 @@
   ]
  },
  "t26_special": {
-  "dur": 24.3,
+  "dur": 34.4,
   "marks": [
    [
     0.0,
-    "«Приговор Меллисто» — каст (`charge_raised_hand`)"
+    "«Приговор Меллисто» (`charge_raised_hand`)"
    ],
    [
-    2.3,
+    3.3,
     "«Первое Пламя» (`cult_leader_first_flame`)"
    ],
    [
-    8.6,
-    "«Пепел Меллисто»: рассыпается в пепел (`cult_leader_ash_dissolve`)"
-   ],
-   [
-    9.8,
-    "«Пепел Меллисто»: вихрь (босс скрыт, fx нет) "
-   ],
-   [
     10.6,
-    "«Пепел Меллисто»: сборка (`cult_leader_ash_reform`)"
+    "«Пепел Меллисто»: рассыпается (`cult_leader_ash_dissolve`)"
    ],
    [
-    11.6,
+    11.8,
+    "«Пепел Меллисто»: вихрь (босс скрыт, fx cult_ash_vortex), сжато до 0.8 с"
+   ],
+   [
+    12.6,
+    "«Пепел Меллисто»: собирается, линия разреза (`cult_leader_ash_reform`)"
+   ],
+   [
+    13.9,
     "«Пепел Меллисто»: разрез через арену (`cult_leader_ash_slash`)"
    ],
    [
-    13.4,
-    "Ломает «Дезинтеграцию: Реплику» (`cult_leader_replica_break`)"
+    16.1,
+    "Ломает «Дезинтеграцию: Реплику» (fx disintegration_replica 2 с, затем `cult_leader_replica_break` + fx)"
    ],
    [
-    16.3,
+    18.6,
+    "Ломает «Реплику»: «Эта фальшивка на меня не сработает» (`cult_leader_replica_break`)"
+   ],
+   [
+    21.5,
     "Новое: «Огненный серп» (`cult_leader_sickle_throw`)"
    ],
    [
-    18.8,
+    24.2,
     "Новое: «Пепельный след» (`cult_leader_ash_trail_dash`)"
    ],
    [
-    20.5,
+    26.9,
     "Новое: «Клеймо культа» (`cult_leader_brand`)"
    ],
    [
-    22.0,
+    31.2,
     "Новое: «Столпы пламени» (`cult_leader_pillars`)"
    ]
   ]
  },
  "t26_finale": {
-  "dur": 31.5,
+  "dur": 32.0,
   "marks": [
    [
     0.0,
-    "Появление (`fire_boss_spawn`, 8.75 с; 0–1.5 с босс скрыт, как в игре)"
+    "Появление (`fire_boss_spawn` + fx cult_leader_intro, 8.75 с; 0–1.5 с босс скрыт)"
    ],
    [
     9.0,
-    "Переход в облик души (`fire_boss_half_health_attack`, 11.8 с) → облик души ×2.0125"
+    "Переход в облик души (`fire_boss_half_health_attack`, 11.8 с; в конце fx cult_leader_phase3 и стена огня r28) → облик ×2.0125"
    ],
    [
-    22.9,
-    "Смерть (`fire_boss_death`, первые 3.5 с — длина ролика) + затемнение"
+    23.3,
+    "Смерть (`fire_boss_death` + fx cult_leader_death, ролик 3.5 с) + затемнение"
    ],
    [
-    27.8,
-    "Добивание (`cult_leader_finisher` + жертва `pohsmp_cult_finisher_victim`)"
+    28.2,
+    "Добивание (`cult_leader_finisher` + жертва `pohsmp_cult_finisher_victim` на косе + fx cult_leader_finisher)"
    ]
   ]
  },
@@ -129,7 +133,7 @@
   ]
  },
  "t27_combat": {
-  "dur": 13.4,
+  "dur": 16.3,
   "marks": [
    [
     0.0,
@@ -156,61 +160,61 @@
     "«Предмет ревности» — метка (`irina_mark`)"
    ],
    [
-    8.7,
+    9.5,
     "Связать пары (фаза 2) (`irina_bind`)"
    ],
    [
-    10.6,
+    12.2,
     "Хлёст нитей (фаза 3) (`irina_whip`)"
    ],
    [
-    11.9,
+    14.1,
     "Кража эффектов (`irina_steal`)"
    ]
   ]
  },
  "t27_special": {
-  "dur": 28.8,
+  "dur": 32.4,
   "marks": [
    [
     0.0,
     "«Чужое счастье» (`irina_others_happiness`)"
    ],
    [
-    6.3,
+    6.7,
     "«Только мой» (`irina_only_mine`)"
    ],
    [
-    12.8,
-    "«Только мой»: кокон разорван (`irina_only_mine_broken`)"
+    13.2,
+    "«Только мой»: кокон разорван (вариант) (`irina_only_mine_broken`)"
    ],
    [
-    14.3,
+    15.1,
     "Переход в фазу 2 (`irina_phase2`)"
    ],
    [
-    17.1,
+    17.9,
     "Переход в фазу 3 (`irina_phase3`)"
    ],
    [
-    20.4,
+    21.2,
     "Новое: «Ревнивый взгляд» (`irina_gaze`)"
    ],
    [
-    21.9,
+    23.9,
     "Новое: «Узлы» (`irina_knots`)"
    ],
    [
-    23.8,
+    26.8,
     "Новое: «Подмена любимого» (`irina_swap`)"
    ],
    [
-    25.5,
+    29.1,
     "Новое: «Марионетка» (`irina_puppet`)"
    ],
    [
-    26.8,
-    "Новое: «Марионетка» — удержание (цикл) (`irina_puppet_hold`)"
+    30.4,
+    "Новое: «Марионетка» — удержание (`irina_puppet_hold`)"
    ]
   ]
  },
@@ -219,15 +223,15 @@
   "marks": [
    [
     0.0,
-    "Появление (`irina_spawn` + ткань `irina_cloth_spawn`, 7 с)"
+    "Появление (`irina_spawn` + `irina_cloth_spawn` + fx irina_intro, 7 с)"
    ],
    [
     8.1,
-    "Добивание (`irina_finisher` + жертва, поза `pohsmp_cult_finisher_victim`)"
+    "Добивание (`irina_finisher` + жертва + fx irina_finisher)"
    ],
    [
     12.4,
-    "Смерть (`irina_death` + `irina_cloth_death`, 5 с; на `gone` 5.0 сущность убирается)"
+    "Смерть (`irina_death` + `irina_cloth_death` + fx irina_death, 5 с)"
    ]
   ]
  },
@@ -241,7 +245,7 @@
   ]
  },
  "t28_combat": {
-  "dur": 7.9,
+  "dur": 14.2,
   "marks": [
    [
     0.0,
@@ -252,17 +256,21 @@
     "Удар молотом по земле (`animation.aris.slam`)"
    ],
    [
-    4.6,
+    5.2,
     "Горизонтальный размах (`animation.aris.swing`)"
    ],
    [
-    6.3,
-    "Каст: наковальня / клинки / перековка (`animation.aris.cast`)"
+    7.7,
+    "Каст: наковальня (`animation.aris.cast`)"
+   ],
+   [
+    11.2,
+    "Каст: клинки (`animation.aris.cast`)"
    ]
   ]
  },
  "t28_special": {
-  "dur": 22.4,
+  "dur": 30.9,
   "marks": [
    [
     0.0,
@@ -277,23 +285,23 @@
     "Особое: «Горн» (`animation.aris.forge`)"
    ],
    [
-    9.9,
+    11.9,
     "Особое: «Последний удар молота» (`animation.aris.last_blow`)"
    ],
    [
-    15.2,
+    17.2,
     "Новое: «Раскалённая заготовка» (`animation.aris.billet`)"
    ],
    [
-    16.9,
+    22.1,
     "Новое: «Цепи кузни» (`animation.aris.chains`)"
    ],
    [
-    18.8,
+    25.2,
     "Новое: «Закалка» (`animation.aris.quench`)"
    ],
    [
-    20.9,
+    28.5,
     "Новое: «Мехи» (`animation.aris.bellows`)"
    ]
   ]
@@ -303,11 +311,11 @@
   "marks": [
    [
     0.0,
-    "Появление (`spawn`, 9 с; текстура spent → dim 4.5 → aris 6.0)"
+    "Появление (`spawn` + fx aris_intro, 9 с; текстура spent → dim 4.5 → aris 6.0)"
    ],
    [
     9.5,
-    "Сдача (`surrender`, 5 с: на колено 1.2, рога/глаза гаснут 2.0–2.6, молот падает 3.2, фраза 3.6)"
+    "Сдача (`surrender` + fx aris_surrender, 5 с: на колено 1.2, рога/глаза гаснут 2.0–2.6, молот падает 3.2, фраза 3.6)"
    ],
    [
     15.7,

@@ -6,7 +6,7 @@
   {
    "type": "trail",
    "delay": 0,
-   "at": "caster+-0.45,1.3,0.1",
+   "at": "caster+-0.55,1.6,0.6",
    "duration": 22,
    "width": 0.07,
    "length": 14,
@@ -133,11 +133,11 @@
   {
    "type": "flash",
    "delay": 10,
-   "at": "caster+-0.45,2.95,0.15",
+   "at": "caster+-0.55,2.03,0.74",
    "duration": 8,
    "size": 0.9,
    "color": "@primary",
-   "comment": "поднятая ладонь"
+   "comment": "поднятая ладонь (кисть в 0.5 с, проверка 20.11)"
   },
   {
    "type": "flash",
@@ -152,7 +152,7 @@
   {
    "type": "flash",
    "delay": 20,
-   "at": "caster+-0.3,1.6,0.6",
+   "at": "caster+-0.11,1.11,0.78",
    "duration": 6,
    "size": 0.8,
    "color": "#FFE0E6"
@@ -303,7 +303,7 @@
   {
    "type": "sprites",
    "delay": 30,
-   "at": "caster+-0.5,1.45,0.15",
+   "at": "caster+-0.97,0.97,0.4",
    "duration": 10,
    "texture": "mote_thread",
    "count": 18,
@@ -322,7 +322,7 @@
   {
    "type": "sprites",
    "delay": 30,
-   "at": "caster+0.5,1.45,0.15",
+   "at": "caster+0.69,0.89,0.6",
    "duration": 10,
    "texture": "mote_thread",
    "count": 18,
@@ -341,7 +341,7 @@
   {
    "type": "flash",
    "delay": 40,
-   "at": "caster+-0.5,1.45,0.15",
+   "at": "caster+-0.9,0.92,0.45",
    "duration": 6,
    "size": 0.6,
    "color": "@secondary"
@@ -349,7 +349,7 @@
   {
    "type": "flash",
    "delay": 40,
-   "at": "caster+0.5,1.45,0.15",
+   "at": "caster+0.68,0.9,0.6",
    "duration": 6,
    "size": 0.6,
    "color": "@secondary"

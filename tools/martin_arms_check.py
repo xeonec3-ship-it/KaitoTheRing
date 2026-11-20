@@ -10,11 +10,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import martin_render as MR  # noqa: E402
 
 MOMENTS = [('martin_walk', 0.4, 'шаг'), ('martin_swing', 0.55, 'размах: замах'), ('martin_swing', 0.75, 'размах: удар'),
-           ('martin_overhead', 0.7, 'сверху: замах'), ('martin_overhead', 0.95, 'сверху: удар'), ('martin_thrust', 0.6, 'выпад'),
-           ('martin_shield_bash', 0.75, 'рывок щитом'), ('martin_command', 0.85, 'приказ'), ('martin_cavalry', 1.0, '«Конница»: к небу'),
-           ('martin_volley', 1.2, 'залп: «пли!»'), ('martin_duel', 0.9, 'дуэль'), ('martin_warcry', 0.62, 'клич'),
-           ('martin_phase3', 1.6, 'фаза 3: выдернул меч'), ('martin_spawn', 5.0, 'появление: салют'), ('martin_npc_idle', 1.0, 'NPC'),
-           ('martin_replica_break', 0.9, 'Реплика')]
+           ('martin_overhead', 0.7, 'сверху: замах'), ('martin_overhead', 1.0, 'сверху: удар'), ('martin_thrust', 0.65, 'выпад'),
+           ('martin_shield_bash', 0.75, 'рывок щитом'), ('martin_command', 1.0, 'приказ'), ('martin_cavalry', 1.0, '«Конница»: к небу'),
+           ('martin_cavalry', 2.2, '«Конница»: взмах'), ('martin_volley', 1.2, 'залп: «пли!»'), ('martin_duel', 0.9, 'дуэль'),
+           ('martin_warcry', 0.62, 'клич'), ('martin_phase3', 2.2, 'фаза 3: меч над головой'), ('martin_spawn', 5.0, 'появление: салют'),
+           ('martin_replica_break', 0.95, 'Реплика')]
 
 
 def main(args):
@@ -27,9 +27,9 @@ def main(args):
     cells = []
     for a, t, lab in MOMENTS:
         an['before:' + a] = before[a]
-        cells.append(dict(model='martin', anim='before:' + a, t=t, yaw=yaw, label='ДО · ' + lab, sub='%s %.2f с' % (a, t)))
-        cells.append(dict(model='martin', anim=a, t=t, yaw=yaw, label='ПОСЛЕ · ' + lab, sub='%s %.2f с' % (a, t)))
-    MR.shoot(MR.page(d, {'cols': 8, 'cells': cells}, three), out, (2400, 1200))
+        cells.append(dict(model='martin', anim='before:' + a, t=t, yaw=yaw, dist=3.2, label='ДО · ' + lab, sub='%s %.2f с' % (a, t)))
+        cells.append(dict(model='martin', anim=a, t=t, yaw=yaw, dist=3.2, label='ПОСЛЕ · ' + lab, sub='%s %.2f с' % (a, t)))
+    MR.shoot(MR.page(d, {'cols': 8, 'cells': cells}, three), out, (2560, 1440))
 
 
 if __name__ == '__main__':

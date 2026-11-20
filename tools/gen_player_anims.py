@@ -1034,6 +1034,29 @@ def cult_finisher_victim():
         hold=True)
 
 
+def martin_finisher_victim():
+    """T29, добивание Мартином (2.5 с = анимация босса martin_finisher; события impale 0.4, raise 0.8, throw 1.7, slam 2.0, kill 2.3).
+    Высоту и место даёт код (MartinMath.finisherHold): 0–0.4 жертву тянет на выпад (скована), 0.4 — пронзена двуручником спереди:
+    складывается; 0.8–1.7 висит на клинке над его головой, руки и ноги повисают; 1.7–2.0 сброшена ударом вниз — раскинуло;
+    2.0 — удар о землю: рухнула на колени, корпус вперёд; 2.3 — смерть. Без петли."""
+    held = pose('held')
+    pierce = pose('stand', rightArm=_fk(pitch=-28, roll=22, bend=-34), leftArm=mirror(_fk(pitch=-28, roll=22, bend=-34)),
+                  torso=_TO(pitch=30, bend=14), head=_HL(pitch=34), body={'y': 0.45},
+                  rightLeg=_TO(pitch=12, roll=3, bend=24), leftLeg=_TO(pitch=4, roll=-3, bend=30))
+    hang = pose('stand', rightArm=_fk(pitch=8, roll=10, bend=-12), leftArm=mirror(_fk(pitch=8, roll=10, bend=-12)),
+                torso=_TO(pitch=22, bend=10), head=_HL(pitch=42), body={'y': 0.45},
+                rightLeg=_TO(pitch=6, roll=4, bend=18), leftLeg=_TO(pitch=-2, roll=-4, bend=22))
+    flung = pose('stand', rightArm=_fk(pitch=-60, roll=80, bend=-16), leftArm=mirror(_fk(pitch=-60, roll=80, bend=-16)),
+                 torso=_TO(pitch=-12, bend=-4), head=_HL(pitch=-30), body={'y': 0.3},
+                 rightLeg=_TO(pitch=-24, roll=6, bend=20), leftLeg=_TO(pitch=14, roll=-6, bend=26))
+    slam = pose('stand', rightArm=_fk(pitch=-24, roll=14, bend=-20), leftArm=mirror(_fk(pitch=-24, roll=14, bend=-20)),
+                torso=_TO(pitch=48, bend=18), head=_HL(pitch=36), body={'y': -0.36}, **KNEEL_LEGS)
+    return compose('pohsmp_martin_finisher_victim', 2.5, [
+        {'pose': held, 't': 0}, {'pose': held, 't': 0.32}, {'pose': pierce, 't': 0.45, 'ease': 'easeOutQuart'},
+        {'pose': hang, 't': 1.0}, {'pose': hang, 't': 1.7}, {'pose': flung, 't': 1.85, 'ease': 'easeOutCubic'},
+        {'pose': slam, 't': 2.02, 'ease': 'easeInQuad'}, {'pose': slam, 't': 2.5}], hold=True)
+
+
 # ---------------------------------------------------------------- позы T05 и T20 (дополнение библиотеки)
 # «Падение звезды» — без посоха (руки пустые, как у других заклинаний с роликом); жесты T20 — с посохом в правой руке
 # (у этих поз есть rightItem — докрутка посоха в кисти, чтобы он смотрел куда нужно).
@@ -1845,7 +1868,7 @@ _BL = (lambda: blessing_cast()[0],
 
 
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
-         scarlet_cut_cast, finger_snap, held_target, cult_finisher_victim, star_fall_cast, star_fall_finish,
+         scarlet_cut_cast, finger_snap, held_target, cult_finisher_victim, martin_finisher_victim, star_fall_cast, star_fall_finish,
          silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish,
          *_SS, *_BL, *_T22, *_T24, *_T23, *_T25]
 

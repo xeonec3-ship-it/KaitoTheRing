@@ -915,5 +915,6 @@
   "ui.pohsmp_core.ereb_hand.mask_fall": "Падение маски",
   "ui.pohsmp_core.ereb_hand.full_reveal": "Сон Бабочки: Полное Раскрытие",
   "ui.pohsmp_core.ereb_hand.vanish": "Эреб рассыпался бабочками. Бой окончен.",
-  "death.attack.pohsmp_core.ereb_hand_finisher": "%1$s раздавлен Дланью Лжи"
+  "death.attack.pohsmp_core.ereb_hand_finisher": "%1$s раздавлен Дланью Лжи",
+  "death.attack.pohsmp_core.martin_finisher": "%1$s пал от меча Мартина, Последнего Полководца"
 }

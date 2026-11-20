@@ -915,5 +915,6 @@
   "ui.pohsmp_core.ereb_hand.mask_fall": "The Mask Falls",
   "ui.pohsmp_core.ereb_hand.full_reveal": "Butterfly Dream: Full Revelation",
   "ui.pohsmp_core.ereb_hand.vanish": "Ereb scattered into butterflies. The battle is over.",
-  "death.attack.pohsmp_core.ereb_hand_finisher": "%1$s was crushed by the Hand of Lies"
+  "death.attack.pohsmp_core.ereb_hand_finisher": "%1$s was crushed by the Hand of Lies",
+  "death.attack.pohsmp_core.martin_finisher": "%1$s fell to the sword of Martin, the Last Warlord"
 }

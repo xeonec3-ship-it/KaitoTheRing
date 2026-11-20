@@ -1,0 +1,39 @@
+{
+ "comment": "«Пепельный след»: шлейф пепла за боссом во время рывка (caster = босс, follow, 0.4 с).",
+ "style": "cult_leader",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "follow": true,
+   "duration": 8,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 6,
+   "spread": 0.7,
+   "speed": 0.02,
+   "spin": 60,
+   "size": [
+    0.4,
+    0.12
+   ],
+   "life": 20,
+   "color": "#1A0E0C",
+   "blend": "translucent"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 8,
+   "target": "caster",
+   "thickness": 0.25,
+   "color": "@primary",
+   "motes": 20,
+   "ring": false
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "comment": "«Столпы пламени»: круг-предупреждение 1.5 с (caster = точка столба, на земле). Код ставит 5 штук вокруг игроков (событие mark анимации), столб — через 30 тиков (событие erupt).",
+ "style": "cult_leader",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 30,
+   "texture": "cult_fire_ring",
+   "radius": 1.6,
+   "grow": 6,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@primary"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 30,
+   "texture": "higher_cracks",
+   "radius": 1.4,
+   "grow": 30,
+   "glow": 0.4,
+   "color": "#C8320C"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 30,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.6,
+   "area": 1.4,
+   "speed": 0.01,
+   "gravity": -0.02,
+   "size": [
+    0.25,
+    0.04
+   ],
+   "life": 14,
+   "color": "@secondary"
+  }
+ ]
+}

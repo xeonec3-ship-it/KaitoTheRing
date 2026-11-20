@@ -137,6 +137,10 @@ def build():
     an['ereb_cast_illusion'] = anim(1.4, [
         (0, STAND), (0.45, CAST, IO), (0.7, mod(CAST, left_arm=[-174, 0, -32], head=[-8, -12, 0]), IO),
         (0.78, mod(CAST, left_arm=[-160, 0, -40]), OQ), (1.0, CAST), (1.4, STAND, IO)], [(0.75, 'cast')])
+    # магия руками — стеклянные осколки (1.2 с): правая (с рапирой) отведена, левая ладонь вперёд, стекло собирается, release 0.55
+    gather = mod(STAND, body=[0, 18, 0], head=[0, -16, 0], left_arm=[-70, 30, -10], right_arm=[-6, 10, 18], right_leg=[-8, 0, 4], left_leg=[10, 0, -4])
+    throw = mod(gather, body=[6, -14, 0], body_pos=[0, -0.6, -1.5], head=[-4, 12, 0], left_arm=[-92, -12, 0], right_arm=[10, 10, 24])
+    an['ereb_shard_cast'] = anim(1.2, [(0, STAND), (0.4, gather, IO), (0.55, throw, OQ), (0.8, throw), (1.2, STAND, IO)], [(0.55, 'release')])
     # смена облика (1.0 с): ладонь проводит по лицу (swap 0.5) — «Чужое лицо», переход в фазу 2
     face = mod(STAND, left_arm=[-128, 42, 0], head=[6, 8, 0], torso=[3, 0, 0])
     an['ereb_disguise'] = anim(1.0, [(0, STAND), (0.35, face, IO), (0.5, mod(face, left_arm=[-108, 10, -24], head=[-4, 0, 0]), IO),
@@ -165,9 +169,9 @@ def build():
     # 1.4–2.8 смотрит на неё, 3.2 поднимает руку — каст «Сна бабочки» (cast), 3.2–4.6 держит, 5.0 рассыпается бабочками (vanish)
     up = mod(PALM, left_arm=[-160, 18, -6], head=[-22, -6, 0], torso=[-6, 0, 0], body=[-4, 0, 0])
     an['ereb_finale'] = anim(6.5, [(0, STAND), (0.3, mod(STAND, head=[-6, 2, 0]), IO), (1.2, PALM, IO), (1.4, mod(PALM, left_arm=[-66, 30, 4]), OC),
-                                   (2.8, mod(PALM, head=[14, 8, 0])), (3.2, up, OQ), (4.6, up), (5.0, mod(up, body_scale=[1.03, 1.03, 1.03])),
+                                   (2.2, mod(PALM, head=[14, 8, 0]), IO), (2.5, mod(PALM, head=[-4, -6, 0]), IO), (2.9, mod(PALM, head=[-4, -6, 0])), (3.2, up, OQ), (4.6, up), (5.0, mod(up, body_scale=[1.03, 1.03, 1.03])),
                                    (6.5, mod(up, body_scale=[1.03, 1.03, 1.03]))],
-                                  [(0.3, 'smile'), (1.4, 'butterfly'), (3.2, 'cast'), (5.0, 'vanish')])
+                                  [(0.3, 'smile'), (1.4, 'butterfly'), (2.4, 'speak'), (3.2, 'cast'), (5.0, 'vanish')])
     return an
 
 

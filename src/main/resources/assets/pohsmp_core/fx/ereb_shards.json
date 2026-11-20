@@ -1,0 +1,68 @@
+{
+ "comment": "Магия руками — «стеклянные осколки» (анимация ereb_shard_cast, событие release 0.55 с = 11 тик): caster = Эреб. В ладони собирается стекло (0–11), на release — вспышка и веер осколков конусом вперёд (сами снаряды — сущности кода; этот fx — только вылет из ладони, без линии до цели). Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 22,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.25,1.35,0.6",
+   "duration": 10,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 1,
+   "spread": 0.35,
+   "speed": -0.03,
+   "gravity": 0.0,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 8,
+   "color": "#E8FAFF",
+   "comment": "стекло стягивается к ладони"
+  },
+  {
+   "type": "flash",
+   "delay": 2,
+   "at": "caster+0.25,1.35,0.6",
+   "duration": 9,
+   "size": 0.45,
+   "color": "#E8FAFF",
+   "brightness": 0.8
+  },
+  {
+   "type": "flash",
+   "delay": 11,
+   "at": "caster+0.25,1.35,0.7",
+   "duration": 6,
+   "size": 1.0,
+   "rays": 6,
+   "color": "#FFFFFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "sprites",
+   "delay": 11,
+   "at": "caster+0.25,1.35,0.7",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 14,
+   "rate": 7,
+   "spread": 0.1,
+   "speed": 0.35,
+   "cone": 40,
+   "gravity": 0.004,
+   "spin": 200,
+   "tumble": true,
+   "size": [
+    0.2,
+    0.08
+   ],
+   "life": 10,
+   "color": "#E8FAFF"
+  }
+ ]
+}

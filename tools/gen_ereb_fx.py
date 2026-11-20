@@ -117,6 +117,15 @@ def effects():
         E('sprites', 0, 'caster+0.1,1.35,2.2', duration=1, texture='spark_soft', count=5, rate=5, spread=0.15, speed=0.06, gravity=0.01,
           size=[0.1, 0.02], life=7, color=GOLD),
     ])
+    fx('ereb_shards', 'Магия руками — «стеклянные осколки» (анимация ereb_shard_cast, событие release 0.55 с = 11 тик): caster = Эреб. '
+       'В ладони собирается стекло (0–11), на release — вспышка и веер осколков конусом вперёд (сами снаряды — сущности кода; '
+       'этот fx — только вылет из ладони, без линии до цели).', 22, [
+        glass(0, 'caster+0.25,1.35,0.6', 10, rate=1, dur=10, spread=0.35, speed=-0.03, gravity=0.0, life=8, comment='стекло стягивается к ладони'),
+        E('flash', 2, 'caster+0.25,1.35,0.6', duration=9, size=0.45, color=GLASS_HI, brightness=0.8),
+        E('flash', 11, 'caster+0.25,1.35,0.7', duration=6, size=1.0, rays=6, color=WHITE, brightness=1.1),
+        E('sprites', 11, 'caster+0.25,1.35,0.7', duration=2, texture='mote_glass', count=14, rate=7, spread=0.1, speed=0.35, cone=40,
+          gravity=0.004, spin=200, tumble=True, size=[0.2, 0.08], life=10, color=GLASS_HI),
+    ])
     fx('ereb_parry', 'Парирование (событие parry 0.15 с анимации ereb_parry): caster = Эреб. Искры и звон у гарды.', 10, [
         E('flash', 0, 'caster+0.2,1.7,0.6', duration=6, size=0.7, rays=6, color=GOLD_HI, brightness=1.2),
         E('sprites', 0, 'caster+0.2,1.7,0.6', duration=1, texture='spark_soft', count=10, rate=10, spread=0.25, speed=0.12, gravity=0.02,
@@ -162,7 +171,7 @@ def effects():
        '0.3 с (smile) — код меняет текстуру на ereb_smile; 1.4 с (butterfly, тик 28) — из ладони вырастает стеклянная бабочка '
        '(модель illusion_butterfly T22, ×0.24), трепещет у ладони; 3.2 с (cast, тик 64) — он поднимает её, она вспархивает со вспышкой: '
        'код начинает «Сон бабочки» (ButterflyDreamSpell) с caster = ТОЧКА Эреба (не сущность — он исчезнет); '
-       '5.0 с (vanish, тик 100) — Эреб рассыпается бабочками (fx ereb_butterfly_dissolve — уже внутри этого fx; модель спрятать на 104).',
+       '2.4 с (speak, тик 48) — фраза «В любом случае, от вас мне больше нет пользы» (ui…ereb.vanish_line: чат r48 + субтитр); 5.0 с (vanish, тик 100) — Эреб рассыпается бабочками (fx ereb_butterfly_dissolve — уже внутри этого fx; модель спрятать на 104).',
        T_FINALE + 10, [
         E('flash', 26, PALM, duration=10, size=0.6, color=GLASS_HI, brightness=0.9, comment='свет в ладони'),
         glass(26, PALM, 8, rate=4, dur=2, spread=0.15, speed=-0.02, gravity=0.0, life=6, comment='осколки складываются в бабочку'),
@@ -418,8 +427,7 @@ LANG = {
     'ui.pohsmp_core.ereb.finale': ('Эреб улыбается…', 'Ereb smiles…'),
     'ui.pohsmp_core.ereb.butterfly': ('Сон бабочки', 'The Butterfly Dream'),
     'ui.pohsmp_core.ereb.vanish': ('Эреб исчез. Бой окончен.', 'Ereb has vanished. The battle is over.'),
-    'ui.pohsmp_core.ereb.vanish_line': ('«Спите сладко. Когда проснётесь — меня уже не будет.»',
-                                        '"Sweet dreams. When you wake, I will be gone."'),
+    'ui.pohsmp_core.ereb.vanish_line': ('В любом случае, от вас мне больше нет пользы.', 'Either way, you are of no further use to me.'),
 }
 
 

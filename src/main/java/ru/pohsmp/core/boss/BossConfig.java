@@ -16,7 +16,8 @@ public final class BossConfig {
 
     // [bosses_common]
     public static final ForgeConfigSpec.DoubleValue HP_PER_PLAYER, HP_PER_PLAYER_SQ, COUNT_RADIUS_EXTRA, INTRO_RADIUS, SCENE_RADIUS;
-    public static final ForgeConfigSpec.IntValue MAX_COUNTED, FINISHER_COOLDOWN, ABILITY_GCD, TOP_DAMAGE_WINDOW;
+    public static final ForgeConfigSpec.IntValue MAX_COUNTED, FINISHER_COOLDOWN, ABILITY_GCD, TOP_DAMAGE_WINDOW, REPLICA_TAUNT_COOLDOWN, ENRAGE_MINUTES;
+    public static final ForgeConfigSpec.DoubleValue ENRAGE_STEP, ENRAGE_MAX;
     public static final ForgeConfigSpec.BooleanValue SCENES, SPECIALS;
 
     /** The body of a boss (absolute attribute values; a negative resist = leave the base class's own). */
@@ -57,8 +58,7 @@ public final class BossConfig {
             CL_ASH_BURN;
     public static final ForgeConfigSpec.IntValue CL_MELEE_MIN, CL_MELEE_MAX, CL_SICKLE_COOLDOWN, CL_SICKLE_BURN, CL_DASH_COOLDOWN, CL_TRAIL_INTERVAL,
             CL_TRAIL_SECONDS, CL_BRAND_DELAY, CL_BRAND_COOLDOWN, CL_BRAND_TARGETS_BIG, CL_PILLARS_COUNT, CL_PILLARS_COUNT_P3, CL_PILLARS_COOLDOWN,
-            CL_VERDICT_INTERVAL, CL_VERDICT_SECONDS, CL_FIREWALL_BURN, CL_CULTISTS_SMALL, CL_CULTISTS_MID, CL_CULTISTS_BIG, CL_CULTIST_WAVE,
-            CL_TAUNT_COOLDOWN;
+            CL_VERDICT_INTERVAL, CL_VERDICT_SECONDS, CL_FIREWALL_BURN, CL_CULTISTS_SMALL, CL_CULTISTS_MID, CL_CULTISTS_BIG, CL_CULTIST_WAVE;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -73,6 +73,12 @@ public final class BossConfig {
         FINISHER_COOLDOWN = b.comment("Finishing a player off with an animation: not more often than this").defineInRange("finisher_cooldown_seconds", 5, 0, 600);
         ABILITY_GCD = b.comment("At least this between two of the bosses' own attacks").defineInRange("ability_gcd_seconds", 3, 0, 60);
         TOP_DAMAGE_WINDOW = b.comment("«The strongest enemy» = most damage dealt to the boss in this window").defineInRange("top_damage_window_seconds", 30, 1, 3600);
+        REPLICA_TAUNT_COOLDOWN = b.comment("«Дезинтеграция: Реплика» never works on them; their phrase about it not more often than this")
+                .defineInRange("replica_taunt_cooldown", 20, 0, 3600);
+        ENRAGE_MINUTES = b.comment("A long fight: after this many minutes +enrage_step damage every minute, up to enrage_max (0 = off)")
+                .defineInRange("enrage_minutes", 14, 0, 600);
+        ENRAGE_STEP = b.defineInRange("enrage_step", 0.2, 0, 10);
+        ENRAGE_MAX = b.defineInRange("enrage_max", 2.0, 1, 100);
         SCENES = b.comment("Camera scenes on/off (the same timings without the camera)").define("scenes", true);
         SPECIALS = b.comment("Special spells (one per fight each) on/off").define("specials", true);
         b.pop();
@@ -124,7 +130,6 @@ public final class BossConfig {
         CL_ASH_DAMAGE = b.comment("«Пепел Меллисто»: the slash across the arena, its width, the burning trace (10 s)").defineInRange("ash_slash_damage", 70.0, 0, 1000);
         CL_ASH_WIDTH = b.defineInRange("ash_slash_width", 1.5, 0.2, 8);
         CL_ASH_BURN = b.defineInRange("ash_burn_damage", 4.0, 0, 1000);
-        CL_TAUNT_COOLDOWN = b.comment("«Эта фальшивка на меня не сработает»: not more often than this").defineInRange("replica_taunt_cooldown", 20, 0, 3600);
         b.pop();
 
         b.comment("T27 Irina, the Witch of Jealousy").push("irina");

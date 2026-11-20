@@ -1,16 +1,9 @@
 package ru.pohsmp.core.boss.cult;
 
-import io.redspace.ironsspellbooks.api.entity.IMagicEntity;
-import io.redspace.ironsspellbooks.api.magic.MagicData;
-import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
-import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
-import io.redspace.ironsspellbooks.api.spells.CastSource;
-import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.wizards.fire_boss.FireBossEntity;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -20,8 +13,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -29,12 +20,10 @@ import ru.pohsmp.core.boss.BossConfig;
 import ru.pohsmp.core.boss.BossCore;
 import ru.pohsmp.core.boss.BossDef;
 import ru.pohsmp.core.boss.BossNet;
+import ru.pohsmp.core.boss.BossReplica;
 import ru.pohsmp.core.boss.BossTimeline;
 import ru.pohsmp.core.boss.PohBoss;
 import ru.pohsmp.core.fx.Fx;
-import ru.pohsmp.core.spell.DisintegrationReplicaSpell;
-import ru.pohsmp.core.spell.NpcCast;
-import ru.pohsmp.core.spell.TargetPose;
 
 /**
  * T26 «Tyros, First Flamebearer» / «Глава Культа Меллисто». Iron's FireBossEntity as it is (moves, scythe combos, fireballs, stance
@@ -45,8 +34,6 @@ import ru.pohsmp.core.spell.TargetPose;
 public class CultLeaderEntity extends FireBossEntity implements PohBoss {
     private final BossCore core = new BossCore(this, CultLeader.DEF);
     final CultFight fight = new CultFight(this);
-    private LivingEntity replicaCaster;
-    private long lastTaunt = Long.MIN_VALUE / 2;
 
     public CultLeaderEntity(EntityType<? extends AbstractSpellCastingMob> type, Level level) {
         super(type, level);
@@ -142,7 +129,6 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
             core.tick();
             if (isAlive()) {
                 fight.tick(sl);
-                watchReplica(sl);
             }
         }
     }
@@ -297,53 +283,12 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
         return new Vec3(p.x, Mth.lerp(h[0], from.y, holdPoint.y) + h[1], p.z);
     }
 
-    // ---------------------------------------------------------------- «Дезинтеграция: Реплика»: he breaks it
+    // ---------------------------------------------------------------- «Дезинтеграция: Реплика» (framework BossReplica)
 
-    /** The hold of a Replica on him: let it begin (2 s), then break it (2.6 s animation), the caster loses the mana and gets the cooldown. */
-    private void watchReplica(ServerLevel sl) {
-        if (replicaCaster != null || !TargetPose.held(this) || core.inFinale()) return;
-        LivingEntity caster = replicaCasterOf(sl);
-        if (caster == null) return;   // the true Disintegration: as usual (owner did not say otherwise)
-        replicaCaster = caster;
-        core.play(new BossTimeline("replica", CultMath.REPLICA_DELAY + CultMath.REPLICA_ANIM)
-                .at(CultMath.REPLICA_DELAY, () -> {
-                    core.lock(CultMath.REPLICA_ANIM, true, false);
-                    serverTriggerAnimation("cult_leader_replica_break");
-                    Fx.play(sl, Fx.fx("cult_leader_replica_break").caster(this).at(position()).yaw(getYRot()));
-                    core.sound("cult_leader.replica_break", 3, 1);
-                })
-                .at(CultMath.REPLICA_DELAY + CultMath.REPLICA_CRUSH, () -> breakReplica(caster))
-                .at(CultMath.REPLICA_DELAY + CultMath.REPLICA_SPEAK, () -> {
-                    long now = sl.getGameTime();
-                    if (now - lastTaunt >= BossConfig.get(BossConfig.CL_TAUNT_COOLDOWN) * 20L) {
-                        lastTaunt = now;
-                        core.say("ui.pohsmp_core.cult_leader.replica_taunt", 32, 60, 4.2);
-                    }
-                })
-                .then(() -> replicaCaster = null));
-    }
-
-    private LivingEntity replicaCasterOf(ServerLevel sl) {
-        for (LivingEntity e : sl.getEntitiesOfClass(LivingEntity.class, getBoundingBox().inflate(64))) {
-            MagicData md = e instanceof Player ? MagicData.getPlayerMagicData(e) : e instanceof IMagicEntity m ? m.getMagicData() : null;
-            if (md == null || !md.isCasting() || !DisintegrationReplicaSpell.RID.toString().equals(md.getCastingSpellId())) continue;
-            if (md.getAdditionalCastData() instanceof TargetEntityCastData td && td.getTarget(sl) == this) return e;
-        }
-        return null;
-    }
-
-    /** The cast is stopped (its seals dissolve by themselves), mana spent and the cooldown set as if it had been cast. */
-    private void breakReplica(LivingEntity caster) {
-        if (!caster.isAlive()) return;
-        AbstractSpell spell = SpellRegistry.getSpell(DisintegrationReplicaSpell.RID);
-        MagicData md = caster instanceof Player ? MagicData.getPlayerMagicData(caster) : null;
-        int lvl = md != null ? Math.max(1, md.getCastingSpellLevel()) : 1;
-        NpcCast.cancelAny(caster);
-        if (caster instanceof ServerPlayer sp && md != null && spell != null && !sp.isCreative()) {
-            md.setMana(Math.max(0, md.getMana() - spell.getManaCost(lvl)));
-            io.redspace.ironsspellbooks.capabilities.magic.MagicManager mm = io.redspace.ironsspellbooks.IronsSpellbooks.MAGIC_MANAGER;
-            if (mm != null) mm.addCooldown(sp, spell, CastSource.SPELLBOOK);
-            sp.displayClientMessage(Component.translatable("ui.pohsmp_core.cult_leader.replica_taunt").withStyle(s -> s.withColor(CultLeader.COLOR)), true);
-        }
+    /** His break: cult_leader_replica_break (2.6 s, crush 0.9, speak 1.9), «Эта фальшивка на меня не сработает» on +4.2. */
+    @Override
+    public BossReplica.Reaction replicaReaction() {
+        return new BossReplica.Reaction("cult_leader_replica_break", "cult_leader_replica_break", "ui.pohsmp_core.cult_leader.replica_taunt",
+                CultMath.REPLICA_DELAY, CultMath.REPLICA_CRUSH, CultMath.REPLICA_SPEAK, CultMath.REPLICA_ANIM, 4.2);
     }
 }

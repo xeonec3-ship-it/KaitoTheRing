@@ -62,6 +62,9 @@ public final class BossCore {
     private final Map<UUID, Deque<double[]>> damageBy = new HashMap<>();
     private final List<BossTimeline> scripts = new ArrayList<>();
     private long nextFinisher;
+    private final BossReplica.State replica = new BossReplica.State();
+    private long fightStart = -1;
+    private int enrageStage;
 
     public BossCore(PohBoss boss, BossDef def) {
         this.boss = boss;
@@ -81,6 +84,7 @@ public final class BossCore {
     /** The fight begins (after the intro): the bar appears, music, AI on. */
     public void startFight() {
         started = true;
+        fightStart = mob.level().getGameTime();
         unlock();
         setBar(true);
         music(true);
@@ -165,6 +169,8 @@ public final class BossCore {
         }
         if (lockTicks > 0 && --lockTicks == 0) unlock();
         if (!started || dead) return;
+        BossReplica.tick(this, boss, replica);
+        enrage();
         float frac = healthFrac();
         if (!finale) {
             int p = BossMath.phaseOf(frac, def.phases);
@@ -184,6 +190,30 @@ public final class BossCore {
             if (def.finale != BossDef.Finale.DEATH && frac <= def.finaleAt + 1e-4) startFinale();
         }
         lastFrac = frac;
+    }
+
+    private static final UUID ENRAGE_DMG = UUID.fromString("8f1a3c0e-6b2d-4f8e-9a51-2c7d0b3e1a11"),
+            ENRAGE_POWER = UUID.fromString("8f1a3c0e-6b2d-4f8e-9a51-2c7d0b3e1a12");
+
+    /** A long fight (balance 1.3): after enrage_minutes, +enrage_step damage and spell power every minute, up to enrage_max. */
+    private void enrage() {
+        int after = BossConfig.get(BossConfig.ENRAGE_MINUTES);
+        if (after <= 0 || mob.tickCount % 20 != 0) return;
+        if (fightStart < 0) fightStart = mob.level().getGameTime();
+        long minutes = (mob.level().getGameTime() - fightStart) / 1200;
+        int stage = (int) Math.max(0, minutes - after + 1);
+        if (stage <= enrageStage) return;
+        enrageStage = stage;
+        double mult = Math.min(BossConfig.get(BossConfig.ENRAGE_MAX), 1 + stage * BossConfig.get(BossConfig.ENRAGE_STEP)) - 1;
+        enrageMod(mob.getAttribute(Attributes.ATTACK_DAMAGE), ENRAGE_DMG, mult);
+        var power = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("irons_spellbooks", "spell_power"));
+        if (power != null) enrageMod(mob.getAttribute(power), ENRAGE_POWER, mult);
+    }
+
+    private static void enrageMod(AttributeInstance a, UUID id, double v) {
+        if (a == null) return;
+        a.removeModifier(id);
+        if (v > 0) a.addPermanentModifier(new AttributeModifier(id, "boss_enrage", v, AttributeModifier.Operation.MULTIPLY_TOTAL));
     }
 
     // ---------------------------------------------------------------- damage (call from the entity's hurt)

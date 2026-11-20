@@ -45,6 +45,20 @@ public interface PohBoss {
         bossMob().setNoAi(!on);
     }
 
+    // ---------------------------------------------------------------- «Дезинтеграция: Реплика» (BossReplica, all five are immune)
+
+    /**
+     * How this boss breaks a Replica cast at it: animation + fx (<id>_replica_break), phrase ui.pohsmp_core.<id>.replica, timings.
+     * One line to change: {@code return BossReplica.Reaction.of("irina", 3.0);} or a new Reaction(...). null = no reaction (the
+     * Replica would work — do not, owner: none of the five).
+     */
+    default BossReplica.Reaction replicaReaction() {
+        return BossReplica.Reaction.of(bossCore().def.id, bossMob().getBbHeight() + 0.6);
+    }
+
+    /** The break animation has just started (extra fx, sounds of the boss's own). */
+    default void onReplicaBreak(net.minecraft.world.entity.LivingEntity caster) {}
+
     // ---------------------------------------------------------------- finisher (def.finisher)
 
     /** Finisher length in ticks (the victim dies at {@link #finisherKillTick()}). */

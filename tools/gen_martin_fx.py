@@ -438,6 +438,34 @@ def effects():
         E('wave', 0, at('caster', -0.6, 3.0, 2.4), duration=12, shape='sphere', radius=2.6, rim=0.8, color='@primary', comment='звон'),
         E('wave', 0, 'caster', duration=16, shape='ring', radius=6, thickness=0.8, followTerrain=True, color='@primary'),
     ])
+    fx('martin_finisher', 'Добивание (caster = Мартин, yaw — на жертву, target = жертва; 56 тиков ≈ анимация martin_finisher 2.5 с). '
+       '0–8 жертву тянет на выпад — золотая хватка; 8 (impale) — пронзает спереди: искры, вспышка; 16–34 поднимает на клинке над головой — '
+       'золотое свечение на жертве (follow); 34 (throw) — сброс ударом вниз; 40 (slam) — удар о землю у его ног: трещины, волна, пыль, '
+       'и призрачные солдаты бьют щитами о землю — бирюзовая волна от Мартина; 46 (kill) — смерть: золотые искры гаснут.', 56, [
+        E('aura', 0, 'target', duration=10, target='target', thickness=0.16, pulse=[0.25, 5], color='@primary', motes=10, follow=True,
+          comment='хватка: жертву тянет на клинок'),
+        E('flash', 8, at('target', 0, 1.2, 0), duration=6, size=1.4, rays=8, color='#FFFFFF', follow=True),
+        E('sprites', 8, at('target', 0, 1.2, 0), duration=3, texture='spark_soft', count=40, rate=14, spread=0.6, speed=0.26, gravity=0.03,
+          size=[0.16, 0.03], life=14, color='@secondary', follow=True, comment='искры от клинка'),
+        E('sprites', 8, at('target', 0, 1.1, 0), duration=2, texture='spark_soft', count=14, rate=8, spread=0.4, speed=0.18, gravity=0.04,
+          size=[0.12, 0.03], life=12, color='#9A1010', follow=True),
+        E('aura', 16, 'target', duration=20, target='target', thickness=0.12, pulse=[0.2, 8], color='@primary', motes=14, follow=True,
+          comment='поднят над головой'),
+        E('sprites', 16, at('target', 0, 1.0, 0), duration=18, texture='spark_soft', count=100000, rate=1.2, area=0.5, speed=0.02,
+          gravity=0.01, size=[0.12, 0.02], life=16, color='@primary', follow=True),
+        E('flash', 30, at('target', 0, 1.2, 0), duration=8, size=2.6, rays=10, screen=0.08, ring=True, color='@primary', follow=True,
+          comment='вскинул над головой'),
+        E('trail', 34, 'target', follow=True, duration=6, width=0.8, length=5, color='@primary', comment='сброс'),
+        E('decal', 40, 'target', texture='higher_cracks', radius=2.4, glow=0.3, fadeOut=14, duration=16, color='@primary'),
+        E('wave', 40, 'target', duration=12, shape='ring', radius=4.5, thickness=0.9, followTerrain=True, color='@primary'),
+        E('sprites', 40, at('target', 0, 0.2, 0), duration=4, texture='mote_ash', count=30, rate=10, area=1.2, speed=0.12, gravity=0.004,
+          size=[0.5, 1.0], life=24, color=DUST, blend='translucent'),
+        E('wave', 40, 'caster', duration=16, shape='ring', radius=9, thickness=1.0, followTerrain=True, color=GHOST,
+          comment='солдаты бьют щитами о землю (их анимация brace — код, fight.braceAll)'),
+        E('wave', 43, 'caster', duration=14, shape='ring', radius=7, thickness=0.7, followTerrain=True, color=GHOST_HOT),
+        E('sprites', 46, at('target', 0, 0.6, 0), duration=6, texture='spark_soft', count=24, rate=6, area=0.5, speed=0.03, gravity=-0.01,
+          size=[0.14, 0.02], life=26, color='@primary', comment='смерть'),
+    ])
     fx('martin_yield', 'Мартин опускает оружие (с события lower = 1.2 с; caster = Мартин, 80 тиков): строй и знамя гаснут, тьма уходит, '
        'мягкий золотой свет; на speak (2.4 с) — фраза ui.pohsmp_core.martin.yield.', 80, [
         E('aura', 0, 'caster', duration=70, target='caster', thickness=0.12, pulse=[0.15, 30], color='@primary', motes=10, out=ease(30)),
@@ -717,6 +745,7 @@ YIELD_RU = 'Хорошо, вы доказали свою силу...Я помо�
 YIELD_EN = 'Very well, you have proven your strength... I will help Erebus, if that is your request'
 LANG = {
     'entity.pohsmp_core.martin': ('Мартин, Последний Полководец', 'Martin, the Last Warlord'),
+    'death.attack.pohsmp_core.martin_finisher': ('%1$s пал от меча Мартина, Последнего Полководца', '%1$s fell to the sword of Martin, the Last Warlord'),
     'entity.pohsmp_core.martin_soldier': ('Призрачный солдат', 'Phantom Soldier'),
     'entity.pohsmp_core.martin_banner': ('Знамя Мартина', 'Martin\'s Banner'),
     'ui.pohsmp_core.martin.title': ('Мартин, Последний Полководец', 'Martin, the Last Warlord'),

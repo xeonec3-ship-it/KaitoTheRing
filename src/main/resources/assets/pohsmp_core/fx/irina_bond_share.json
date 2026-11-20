@@ -1,0 +1,34 @@
+{
+ "comment": "Фаза 2: урон делится — короткий отклик на ВТОРОМ игроке пары (caster = он, 10 тиков): нить вокруг вспыхивает.",
+ "style": "irina",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 10,
+   "width": 0.08,
+   "length": 6,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.8,
+    "speed": 16,
+    "rise": 0.2,
+    "risePeriod": 10
+   },
+   "color": "@core",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "size": 0.9,
+   "color": "@primary"
+  }
+ ]
+}

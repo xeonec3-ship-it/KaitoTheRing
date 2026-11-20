@@ -1,0 +1,72 @@
+{
+ "comment": "Метка «Предмет ревности» (caster = меченый игрок, follow, до Fx.stop). Слать всем. Над головой — сердце с оком; две красные нити кружат вокруг игрока (orbit), иногда срываются обрывки. Нити НЕ тянутся к Ирине.",
+ "style": "irina",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.4,0",
+   "follow": true,
+   "id": "irina_mark"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": -1,
+   "width": 0.06,
+   "length": 16,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.85,
+    "speed": 9,
+    "rise": 0.8,
+    "risePeriod": 46
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 10,
+   "at": "caster",
+   "duration": -1,
+   "width": 0.04,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 1,
+   "orbit": {
+    "radius": 1.1,
+    "speed": -6,
+    "rise": 0.5,
+    "risePeriod": 60
+   },
+   "color": "@secondary",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": -1,
+   "texture": "mote_thread",
+   "count": 100000,
+   "rate": 0.12,
+   "spread": 0.7,
+   "speed": 0.01,
+   "gravity": 0.004,
+   "spin": 8,
+   "size": [
+    0.18,
+    0.06
+   ],
+   "life": 30,
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

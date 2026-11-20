@@ -1,0 +1,25 @@
+{
+ "comment": "T27 Ирина, Ведьма Ревности: красные нити ревности, лиловая ткань, тьма капюшона; движение вьющееся, плавное, с «дыханием» (пульс сердца ревности).",
+ "palette": {
+  "primary": "#E3262F",
+  "secondary": "#B99BE0",
+  "core": "#FFE0E6",
+  "shadow": "#4E0610"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "rune_band",
+  "shards": "mote_thread",
+  "sigil": "irina_emblem"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.8,
+  "jitter": 0.05,
+  "easing": "easeInOutSine",
+  "pulse": {
+   "amp": 0.12,
+   "period": 16
+  }
+ }
+}

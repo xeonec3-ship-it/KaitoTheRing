@@ -1,0 +1,87 @@
+{
+ "comment": "«Только мой» — у Ирины (caster = Ирина, 124 тика = анимация irina_only_mine 6.2 с). 0.6 с (`reach`) — ладонь, нити вокруг неё собираются в клубок; 1.0 (`yank`) — жертву рывком переносит код (вспышка в обеих точках — irina_yank у жертвы); 1.6–5.4 — Ирина «обнимает» кокон, нити вокруг неё сжаты; 5.4 (`crush`) — вспышка.",
+ "style": "irina",
+ "duration": 124,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 124,
+   "radius": 32,
+   "color": "#3A0A1E",
+   "strength": 0.28,
+   "in": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 24,
+   "width": 0.08,
+   "length": 14,
+   "fade": 1.2,
+   "head": 0,
+   "count": 4,
+   "orbit": {
+    "radius": 1.8,
+    "speed": 16,
+    "rise": 1.4,
+    "risePeriod": 20
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 20,
+   "at": "caster+0,1.4,0",
+   "duration": 8,
+   "size": 1.8,
+   "ring": true,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "delay": 30,
+   "at": "caster+0,0.05,0",
+   "id": "irina_emblem"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,1.2,0",
+   "duration": 78,
+   "texture": "mote_heart",
+   "count": 40,
+   "rate": 0.5,
+   "spread": 1.2,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 30,
+   "color": "@primary",
+   "glow": 0.4,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 108,
+   "at": "caster+0,1.4,0",
+   "duration": 12,
+   "size": 2.6,
+   "rays": 8,
+   "color": "@primary"
+  }
+ ]
+}

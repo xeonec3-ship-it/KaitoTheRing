@@ -1,0 +1,113 @@
+{
+ "comment": "«Только мой» — кокон на жертве (caster = жертва, follow, 80 тиков = 4 с или до Fx.stop при разрыве). Нити плотно наматываются вокруг (orbit со сжатием), кольцо под ногами, красная оболочка; пульс как сердце. Жертва — в 2 бл. перед Ириной (кладёт код). Ни одной нити от Ирины к жертве.",
+ "style": "irina",
+ "duration": 80,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "follow": true,
+   "id": "irina_thread_ring",
+   "scale": 1.4
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 80,
+   "width": 0.09,
+   "length": 20,
+   "fade": 1.2,
+   "head": 0,
+   "count": 4,
+   "orbit": {
+    "radius": 0.75,
+    "speed": 22,
+    "rise": 1.0,
+    "risePeriod": 14
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 2,
+   "at": "caster",
+   "duration": 78,
+   "width": 0.08,
+   "length": 16,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 0.6,
+    "speed": -26,
+    "rise": 1.0,
+    "risePeriod": 11
+   },
+   "color": "@secondary",
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 4,
+   "at": "caster",
+   "duration": 76,
+   "width": 0.07,
+   "length": 14,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 0.5,
+    "speed": 30,
+    "rise": 1.1,
+    "risePeriod": 9
+   },
+   "color": "@shadow",
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 80,
+   "target": "caster",
+   "thickness": 0.3,
+   "pulse": [
+    0.35,
+    16
+   ],
+   "color": "@primary",
+   "motes": 20,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "column",
+   "delay": 0,
+   "at": "caster",
+   "duration": 80,
+   "radius": 0.62,
+   "height": 2.3,
+   "fill": 0.35,
+   "color": "@shadow",
+   "blend": "translucent",
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInSine"
+   }
+  }
+ ]
+}

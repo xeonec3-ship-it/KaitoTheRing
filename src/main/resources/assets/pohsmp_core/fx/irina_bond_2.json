@@ -1,0 +1,40 @@
+{
+ "comment": "Фаза 2 «Красные нити»: метка пары №2 (caster = игрок пары, follow, до Fx.stop). Обоим игрокам пары — один id (одинаковый знак над головой); кольцо петель под ногами, нить кружит вокруг. Линии между игроками НЕТ.",
+ "style": "irina",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.35,0",
+   "follow": true,
+   "id": "irina_knot_2"
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "follow": true,
+   "id": "irina_thread_ring"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": -1,
+   "width": 0.06,
+   "length": 18,
+   "fade": 1.2,
+   "head": 0,
+   "count": 1,
+   "orbit": {
+    "radius": 0.75,
+    "speed": -8,
+    "rise": 0.7,
+    "risePeriod": 52
+   },
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

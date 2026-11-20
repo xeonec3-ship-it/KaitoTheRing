@@ -1,0 +1,63 @@
+{
+ "comment": "T27 «Предмет ревности»: метка над головой меченого игрока — сердце, перемотанное нитью, с оком; медленно кружит, пульсирует как сердцебиение. Лежит над головой (ground), видна всем.",
+ "size": 0.5,
+ "color": "#E3262F",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.5,
+   "heightOffset": -0.01,
+   "color": "#9A0F1E",
+   "brightness": 0.5,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.3,
+    "period": 16
+   }
+  },
+  {
+   "id": "mark",
+   "type": "disc",
+   "texture": "irina_mark",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.2,
+   "appear": {
+    "delay": 0,
+    "duration": 12,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": -1.5
+   },
+   "pulse": {
+    "amp": 0.18,
+    "period": 16
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

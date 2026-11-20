@@ -1,0 +1,48 @@
+{
+ "comment": "Кокон разорван союзниками (caster = жертва, 24 тика): нити лопаются наружу, вспышка, кольцо.",
+ "style": "irina",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 2.6,
+   "rays": 10,
+   "screen": 0.1,
+   "ring": true,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 4,
+   "texture": "mote_thread",
+   "count": 60,
+   "rate": 15,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "spin": 40,
+   "size": [
+    0.32,
+    0.08
+   ],
+   "life": 22,
+   "color": "@primary",
+   "glow": 0.4
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 4,
+   "thickness": 0.4,
+   "color": "@primary"
+  }
+ ]
+}

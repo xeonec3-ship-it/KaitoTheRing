@@ -1,0 +1,50 @@
+{
+ "comment": "Фаза 3: хлёст нитей — предупреждение (caster = Ирина, 16 тиков = 0.8 с, затем irina_whip). Кольцо r1→7 по земле (зона удара r 1.5–7), нити вокруг поднимаются.",
+ "style": "irina",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 7,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "texture": "irina_thread_ring",
+   "radius": 7,
+   "grow": 14,
+   "glow": 0.4,
+   "color": "@primary",
+   "brightness": 0.6
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "width": 0.08,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 4,
+   "orbit": {
+    "radius": 2.0,
+    "speed": 18,
+    "rise": 0.4,
+    "risePeriod": 8,
+    "climb": 0.6
+   },
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

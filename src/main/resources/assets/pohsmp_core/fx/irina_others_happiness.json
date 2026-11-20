@@ -1,0 +1,175 @@
+{
+ "comment": "«Чужое счастье» (caster = Ирина, не follow; 120 тиков = анимация irina_others_happiness 6 с). 0–1.5 с — печать r24 прорисовывается, мир лиловеет; 1.4 (`spread`) — у всех игроков в r24 код снимает полезные эффекты и запускает irina_steal_lose; золотые искры поднимаются над ВСЕЙ печатью; 3.6 (`gather`) — искры закручиваются к Ирине воронкой r24 → 0 (со всех сторон, не от игроков); 5.2 (`absorb`) — вспышка, Ирина забирает эффекты себе.",
+ "style": "irina",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 120,
+   "radius": 32,
+   "color": "#2A1040",
+   "strength": 0.3,
+   "in": {
+    "duration": 24,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 24,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "irina_happiness"
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.08,0",
+   "id": "irina_emblem"
+  },
+  {
+   "type": "curtain",
+   "delay": 10,
+   "at": "caster",
+   "duration": 100,
+   "radius": [
+    1.2,
+    2.2
+   ],
+   "count": 14,
+   "height": 4.5,
+   "grow": 20,
+   "width": [
+    0.08,
+    0.16
+   ],
+   "brightness": [
+    0.6,
+    1.0
+   ],
+   "flicker": 0.3,
+   "texture": "beam_fade",
+   "color": "@primary",
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 28,
+   "at": "caster+0,0.3,0",
+   "duration": 44,
+   "texture": "mote_glee",
+   "count": 500,
+   "rate": 10,
+   "area": 24,
+   "speed": 0.0,
+   "gravity": -0.02,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.08
+   ],
+   "life": 40,
+   "color": "#FFE7A0",
+   "glow": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 28,
+   "at": "caster+0,0.3,0",
+   "duration": 44,
+   "texture": "mote_glee",
+   "count": 200,
+   "rate": 4,
+   "area": 24,
+   "speed": 0.0,
+   "gravity": -0.015,
+   "sway": 0.6,
+   "size": [
+    0.26,
+    0.06
+   ],
+   "life": 40,
+   "color": "#B8F0C8",
+   "glow": 0.6
+  },
+  {
+   "type": "vortex",
+   "delay": 72,
+   "at": "caster",
+   "duration": 34,
+   "radius": 24,
+   "height": 0,
+   "arms": 12,
+   "speed": 5,
+   "pull": 2.4,
+   "flow": -1,
+   "width": 0.12,
+   "particles": 240,
+   "life": 28,
+   "size": 0.3,
+   "texture": "mote_glee",
+   "color": "#FFE7A0",
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "trail",
+   "delay": 72,
+   "at": "caster",
+   "duration": 36,
+   "width": 0.09,
+   "length": 20,
+   "fade": 1.2,
+   "head": 0,
+   "count": 6,
+   "orbit": {
+    "radius": 3.0,
+    "speed": -14,
+    "rise": 2.0,
+    "risePeriod": 30,
+    "climb": -0.8
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 104,
+   "at": "caster+0,1.8,0",
+   "duration": 14,
+   "size": 4.5,
+   "rays": 12,
+   "screen": 0.3,
+   "ring": true,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "wave",
+   "delay": 104,
+   "at": "caster+0,0.2,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 10,
+   "thickness": 0.6,
+   "color": "@primary"
+  }
+ ]
+}

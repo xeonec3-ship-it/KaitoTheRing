@@ -1,0 +1,78 @@
+{
+ "comment": "Фаза 3: хлёст нитей по площади (caster = Ирина, 24 тика; событие анимации irina_whip `lash` = 0.45 с). Красные дуги-плети по кругу r 6–7 (три наклона), вспышка, обрывки. Урон r ≤ 7 — код.",
+ "style": "irina",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "slash",
+   "delay": 0,
+   "at": "caster+0,0.9,0",
+   "radius": 6.5,
+   "arc": 360,
+   "thickness": 0.22,
+   "bend": 1,
+   "secondary": 0.5,
+   "grow": 5,
+   "life": 12,
+   "tilt": 0,
+   "pitch": 0,
+   "color": "@primary"
+  },
+  {
+   "type": "slash",
+   "delay": 2,
+   "at": "caster+0,1.4,0",
+   "radius": 5.5,
+   "arc": 300,
+   "thickness": 0.16,
+   "bend": 1,
+   "secondary": 0.3,
+   "grow": 5,
+   "life": 10,
+   "tilt": 20,
+   "count": 3,
+   "interval": 2,
+   "tiltStep": -20,
+   "color": "@core"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 8,
+   "size": 2.4,
+   "ring": true,
+   "color": "@primary"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "texture": "slash_crack",
+   "radius": 6.5,
+   "glow": 0.3,
+   "fadeOut": 40,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "texture": "mote_thread",
+   "count": 50,
+   "rate": 10,
+   "spread": 2.5,
+   "speed": 0.25,
+   "gravity": 0.02,
+   "spin": 30,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 18,
+   "color": "@primary"
+  }
+ ]
+}

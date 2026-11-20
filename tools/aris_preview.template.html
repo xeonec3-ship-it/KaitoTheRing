@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Арис — превью</title>
+<style>
+  :root { --bg: #0b0d10; --fg: #e4eef0; --muted: #8aa0a6; --panel: #141a1e; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #ui { position: fixed; left: 12px; top: 12px; z-index: 2; background: var(--panel); padding: 10px 12px; border-radius: 8px;
+        border: 1px solid #22343a; max-width: calc(100vw - 48px); }
+  #ui select, #ui button, #ui input { background: #0c1114; color: var(--fg); border: 1px solid #2a4a50; border-radius: 4px; padding: 3px 6px; }
+  #ui label { color: var(--muted); margin-right: 6px; }
+  #ui .row { margin: 4px 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  canvas { display: block; }
+  .lab { position: fixed; z-index: 3; color: var(--fg); font: 600 15px system-ui, sans-serif; text-shadow: 0 0 4px #000, 0 0 2px #000; pointer-events: none; }
+  .lab small { display: block; font-weight: 400; color: #b8d0d4; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <div class="row"><label>Что</label><select id="model"></select><label>Анимация</label><select id="anim"></select>
+    <button id="play">⏸</button><input id="time" type="range" min="0" max="1" step="0.001" value="0" style="width:160px"></div>
+  <div class="row"><label>Текстура</label><select id="variant"><option value="base">бой</option><option value="dim">рога гаснут / NPC</option>
+    <option value="spent">рога погасли</option><option value="mythic">Мифический сплав</option></select>
+    <label><input type="checkbox" id="glow" checked> свечение</label><span id="tinfo"></span></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// Превью «Арис, Мифический Кузнец» (T28). Данные вставляет tools/aris_render.py (--html / --sheet).
+const DATA = /*DATA*/null;   // { models: {name: {geo, tex: {variant: png}, glow: {variant: png}, height}}, anims: {...}, items: {...}, meshes: {...} }
+const CELLS = /*CELLS*/null;
+
+function facePoint(f, x0, y0, z0, x1, y1, z1, s, t) {
+  switch (f) {
+    case 'north': return [x1 + (x0 - x1) * s, y1 + (y0 - y1) * t, z0];
+    case 'south': return [x0 + (x1 - x0) * s, y1 + (y0 - y1) * t, z1];
+    case 'east':  return [x1, y1 + (y0 - y1) * t, z1 + (z0 - z1) * s];
+    case 'west':  return [x0, y1 + (y0 - y1) * t, z0 + (z1 - z0) * s];
+    case 'up':    return [x1 + (x0 - x1) * s, y1, z1 + (z0 - z1) * t];
+    default:      return [x1 + (x0 - x1) * s, y0, z0 + (z1 - z0) * t];
+  }
+}
+const NORM = { north: [0, 0, -1], south: [0, 0, 1], east: [1, 0, 0], west: [-1, 0, 0], up: [0, 1, 0], down: [0, -1, 0] };
+const TEXC = {};
+function loadTex(src) {
+  if (TEXC[src]) return TEXC[src];
+  const t = TEXC[src] = new THREE.TextureLoader().load(src);
+  t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.generateMipmaps = false;
+  return t;
+}
+
+// ------------------------------------------------------------------ модель GeckoLib (per-face UV)
+function buildModel(entry, variant) {
+  const g = entry.geo['minecraft:geometry'][0];
+  const TW = g.description.texture_width, TH = g.description.texture_height;
+  const mat = new THREE.MeshLambertMaterial({ map: loadTex(entry.tex[variant] || entry.tex.base), alphaTest: 0.1, side: THREE.DoubleSide });
+  const gsrc = entry.glow && entry.glow[variant];
+  const gmat = gsrc ? new THREE.MeshBasicMaterial({ map: loadTex(gsrc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+                                                   side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 }) : null;
+  const bones = {}, root = new THREE.Group();
+  for (const b of g.bones) {
+    const grp = new THREE.Group();
+    grp.name = b.name;
+    const piv = [-b.pivot[0], b.pivot[1], b.pivot[2]];
+    const r = b.rotation || [0, 0, 0];
+    grp.userData = { piv, rest: [-r[0], -r[1], r[2]].map(v => v * Math.PI / 180), parent: b.parent };
+    bones[b.name] = grp;
+    for (const c of (b.cubes || [])) {
+      const faces = c.uv;
+      const inf = c.inflate || 0;
+      const x0 = -(c.origin[0] + c.size[0]) - inf, x1 = -c.origin[0] + inf;
+      const y0 = c.origin[1] - inf, y1 = c.origin[1] + c.size[1] + inf;
+      const z0 = c.origin[2] - inf, z1 = c.origin[2] + c.size[2] + inf;
+      const cp = c.pivot ? [-c.pivot[0], c.pivot[1], c.pivot[2]] : piv;
+      const pos = [], uv = [], nrm = [], idx = [];
+      for (const f in faces) {
+        const U = faces[f].uv, S = faces[f].uv_size, base = pos.length / 3;
+        for (const [s, t] of [[0, 0], [1, 0], [1, 1], [0, 1]]) {
+          const p = facePoint(f, x0, y0, z0, x1, y1, z1, s, t);
+          pos.push(p[0] - cp[0], p[1] - cp[1], p[2] - cp[2]);
+          uv.push((U[0] + s * S[0]) / TW, 1 - (U[1] + t * S[1]) / TH);
+          nrm.push(...NORM[f]);
+        }
+        idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
+      }
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+      geom.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+      geom.setIndex(idx);
+      const holder = new THREE.Group();
+      holder.position.set(cp[0] - piv[0], cp[1] - piv[1], cp[2] - piv[2]);
+      if (c.rotation) holder.rotation.set(-c.rotation[0] * Math.PI / 180, -c.rotation[1] * Math.PI / 180, c.rotation[2] * Math.PI / 180, 'ZYX');
+      holder.add(new THREE.Mesh(geom, mat));
+      if (gmat) { const gm = new THREE.Mesh(geom, gmat); gm.renderOrder = 2; gm.userData.glow = true; holder.add(gm); }
+      grp.add(holder);
+    }
+  }
+  for (const n in bones) {
+    const grp = bones[n], par = grp.userData.parent ? bones[grp.userData.parent] : null;
+    const pp = par ? par.userData.piv : [0, 0, 0];
+    grp.userData.base = [grp.userData.piv[0] - pp[0], grp.userData.piv[1] - pp[1], grp.userData.piv[2] - pp[2]];
+    (par || root).add(grp);
+  }
+  return { root, bones };
+}
+
+const EASE = {
+  linear: t => t, step: t => (t < 1 ? 0 : 1),
+  easeInSine: t => 1 - Math.cos(t * Math.PI / 2), easeOutSine: t => Math.sin(t * Math.PI / 2), easeInOutSine: t => -(Math.cos(Math.PI * t) - 1) / 2,
+  easeInQuad: t => t * t, easeOutQuad: t => 1 - (1 - t) * (1 - t), easeInOutQuad: t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
+  easeInCubic: t => t * t * t, easeOutCubic: t => 1 - Math.pow(1 - t, 3), easeInOutCubic: t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+};
+function chanAt(chan, t, def) {
+  const ks = Object.keys(chan), ts = ks.map(Number);
+  if (!ts.length) return def;
+  const get = i => { const v = chan[ks[i]]; return Array.isArray(v) ? { v } : { v: v.vector || v.post || v.pre, e: v.easing }; };
+  if (t <= ts[0]) return get(0).v;
+  if (t >= ts[ts.length - 1]) return get(ts.length - 1).v;
+  let i = 0; while (ts[i + 1] < t) i++;
+  const A = get(i), B = get(i + 1);
+  const k = (EASE[B.e] || EASE.linear)((t - ts[i]) / (ts[i + 1] - ts[i]));
+  return A.v.map((x, j) => x + (B.v[j] - x) * k);
+}
+function pose(model, anim, t, hide) {
+  for (const n in model.bones) {
+    const g = model.bones[n], u = g.userData;
+    let r = [0, 0, 0], p = [0, 0, 0], s = [1, 1, 1];
+    const bk = anim && anim.bones[n];
+    if (bk) {
+      if (bk.rotation) r = chanAt(bk.rotation, t, r);
+      if (bk.position) p = chanAt(bk.position, t, p);
+      if (bk.scale) s = chanAt(bk.scale, t, s);
+    }
+    g.position.set(u.base[0] - p[0], u.base[1] + p[1], u.base[2] + p[2]);
+    g.rotation.set(u.rest[0] - r[0] * Math.PI / 180, u.rest[1] - r[1] * Math.PI / 180, u.rest[2] + r[2] * Math.PI / 180, 'ZYX');
+    g.scale.set(Math.max(1e-4, s[0]), Math.max(1e-4, s[1]), Math.max(1e-4, s[2]));
+    if (hide && hide.includes(n)) g.scale.set(1e-4, 1e-4, 1e-4);
+  }
+}
+
+// ------------------------------------------------------------------ предмет (models/item, элементы-бруски) и меши fx (boxes)
+function buildItem(entry) {
+  const root = new THREE.Group(), pal = entry.pal;
+  for (const e of entry.elements) {
+    const f = e.from, t = e.to;
+    const uv = e.faces.north.uv, cell = [Math.floor(uv[0]), Math.floor(uv[1])];
+    const col = pal[cell[1] * 16 + cell[0]] || '#ff00ff';
+    const glow = entry.glowCells.includes(cell[1] * 16 + cell[0]);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(t[0] - f[0], t[1] - f[1], t[2] - f[2]),
+      glow ? new THREE.MeshBasicMaterial({ color: col }) : new THREE.MeshLambertMaterial({ color: col }));
+    const c = [(f[0] + t[0]) / 2, (f[1] + t[1]) / 2, (f[2] + t[2]) / 2];
+    if (e.rotation) {
+      const o = e.rotation.origin, p = new THREE.Group();
+      p.position.set(o[0] - 8, o[1] - 8, o[2] - 8);
+      p.rotation[e.rotation.axis] = e.rotation.angle * Math.PI / 180;
+      m.position.set(c[0] - o[0], c[1] - o[1], c[2] - o[2]); p.add(m); root.add(p);
+    } else { m.position.set(c[0] - 8, c[1] - 8, c[2] - 8); root.add(m); }
+  }
+  return root;
+}
+function buildMesh(entry, k) {
+  // fx/meshes: части boxes [x0,y0,z0,x1,y1,z1,тон,(поворот YXZ)] в блоках; k — 16 (в единицах модели)
+  const root = new THREE.Group();
+  for (const part of entry.parts) {
+    if (part.type !== 'boxes') continue;
+    for (const b of part.boxes) {
+      const tone = part.tones[b[6]], glow = (part.glowTones || []).includes(b[6]);
+      const col = tone.startsWith('#') ? tone : (entry.palette[tone.slice(1)] || '#ffffff');
+      const mat = glow ? new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false })
+                       : new THREE.MeshLambertMaterial({ color: col });
+      const m = new THREE.Mesh(new THREE.BoxGeometry((b[3] - b[0]) * k, (b[4] - b[1]) * k, (b[5] - b[2]) * k), mat);
+      m.position.set((b[0] + b[3]) / 2 * k, (b[1] + b[4]) / 2 * k, (b[2] + b[5]) / 2 * k);
+      if (b[7]) m.rotation.set(b[7][0] * Math.PI / 180, b[7][1] * Math.PI / 180, b[7][2] * Math.PI / 180, 'YXZ');
+      root.add(m);
+    }
+  }
+  return root;
+}
+
+// ------------------------------------------------------------------ сцена
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(window.devicePixelRatio || 1);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setScissorTest(true);
+document.body.appendChild(renderer.domElement);
+function groundTex(c) {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 64; const x = cv.getContext('2d');
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { x.fillStyle = (i + j) % 2 ? (c.g1 || '#33363a') : (c.g2 || '#2d3034'); x.fillRect(i * 16, j * 16, 16, 16); }
+  const gt = new THREE.CanvasTexture(cv); gt.magFilter = THREE.NearestFilter; gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(32, 32);
+  return gt;
+}
+function makeScene(c) {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(c.bg || 0x15191d);
+  scene.fog = new THREE.Fog(scene.background, 260, 900);
+  scene.add(new THREE.HemisphereLight(0xdde6ee, 0x20262a, (c.dim ?? 1) * 0.85));
+  const d = new THREE.DirectionalLight(0xffffff, (c.dim ?? 1) * 0.65); d.position.set(30, 60, -40); scene.add(d);
+  const d2 = new THREE.DirectionalLight(0x9fe8ff, (c.dim ?? 1) * 0.3); d2.position.set(-40, 20, 50); scene.add(d2);
+  if (c.ground !== false) {
+    const gr = new THREE.Mesh(new THREE.PlaneGeometry(512, 512), new THREE.MeshLambertMaterial({ map: groundTex(c) }));
+    gr.rotation.x = -Math.PI / 2; gr.position.y = -0.01; scene.add(gr);
+  }
+  return scene;
+}
+function cameraFor(h, view) {
+  const cam = new THREE.PerspectiveCamera(view.fov || 30, 1, 0.5, 4000);
+  const yaw = (view.yaw ?? 25) * Math.PI / 180, pitch = (view.pitch ?? 8) * Math.PI / 180;
+  const dist = (view.dist || 2.3) * h * (30 / (view.fov || 30));
+  const ty = view.ty ?? h * 0.55;
+  const tx = view.tx ?? 0, tz = view.tz ?? 0;
+  cam.position.set(tx + Math.sin(yaw) * Math.cos(pitch) * dist, ty + Math.sin(pitch) * dist, tz - Math.cos(yaw) * Math.cos(pitch) * dist);
+  cam.lookAt(tx, ty, tz);
+  return cam;
+}
+function setupCell(c) {
+  const group = new THREE.Group();
+  let h = 40;
+  if (c.model) {
+    const e = DATA.models[c.model]; h = e.height || 40;
+    const m = buildModel(e, c.variant || 'base');
+    pose(m, c.anim ? DATA.anims[c.anim] : null, c.t || 0, c.hide);
+    if (c.noGlow) m.root.traverse(o => { if (o.userData.glow) o.visible = false; });
+    group.add(m.root);
+  }
+  if (c.item) { const it = buildItem(DATA.items[c.item]); it.rotation.set(...(c.itemRot || [0, 0, 0]).map(v => v * Math.PI / 180)); it.scale.setScalar(c.itemScale || 1); group.add(it); h = c.h || 34; }
+  for (const ms of (c.meshes || [])) {
+    const mm = buildMesh(DATA.meshes[ms.id], 16 * (ms.scale || 1));
+    mm.position.set(...(ms.at || [0, 0, 0]).map(v => v * 16)); mm.rotation.y = (ms.yaw || 0) * Math.PI / 180;
+    if (ms.pitch) { const p = new THREE.Group(); p.add(mm); mm.rotation.x = ms.pitch * Math.PI / 180; group.add(p); } else group.add(mm);
+    h = c.h || Math.max(h, 40);
+  }
+  if (c.h) h = c.h;
+  return { group, h };
+}
+
+if (CELLS) {
+  const cols = CELLS.cols, rows = Math.ceil(CELLS.cells.length / cols);
+  const W = window.innerWidth, H = window.innerHeight, cw = W / cols, ch = H / rows;
+  const draw = () => {
+    CELLS.cells.forEach((c, i) => {
+      const { group, h } = setupCell(c);
+      const sc = makeScene(c); sc.add(group);
+      if (c.light) { const p = new THREE.PointLight(0x66f0f0, c.light, 160, 2); p.position.set(0, 30, -20); sc.add(p); }
+      const cam = cameraFor(h, c); cam.aspect = cw / ch; cam.updateProjectionMatrix();
+      const x = (i % cols) * cw, y = H - (Math.floor(i / cols) + 1) * ch;
+      renderer.setViewport(x, y, cw, ch); renderer.setScissor(x, y, cw, ch);
+      renderer.render(sc, cam);
+      if (c.label) {
+        const d = document.createElement('div'); d.className = 'lab';
+        d.style.left = (x + 8) + 'px'; d.style.top = (Math.floor(i / cols) * ch + 6) + 'px';
+        d.innerHTML = c.label + (c.sub ? '<small>' + c.sub + '</small>' : ''); document.body.appendChild(d);
+      }
+    });
+    document.getElementById('ui').style.display = 'none';
+    window.READY = true;
+  };
+  THREE.DefaultLoadingManager.onLoad = () => { if (!window.READY) setTimeout(draw, 50); };
+  for (const c of CELLS.cells) setupCell(c);
+  setTimeout(() => { if (!window.READY) draw(); }, 4000);
+} else {
+  const sel = document.getElementById('model'), asel = document.getElementById('anim'), vsel = document.getElementById('variant');
+  for (const n in DATA.models) sel.add(new Option(DATA.models[n].title || n, 'm:' + n));
+  for (const n in DATA.items) sel.add(new Option(DATA.items[n].title || n, 'i:' + n));
+  for (const n in DATA.meshes) sel.add(new Option('fx: ' + n, 'x:' + n));
+  asel.add(new Option('(покой)', ''));
+  for (const a of Object.keys(DATA.anims)) asel.add(new Option(a.replace('animation.aris.', ''), a));
+  let cur = null, curH = 40, scene, anim, t0 = performance.now(), playing = true, yaw = 25, pitch = 8, zoom = 1, tfix = 0;
+  const setModel = () => {
+    scene = makeScene({}); cur = null;
+    const [k, n] = sel.value.split(':');
+    if (k === 'm') { cur = buildModel(DATA.models[n], vsel.value); scene.add(cur.root); curH = DATA.models[n].height; }
+    else if (k === 'i') { const it = buildItem(DATA.items[n]); it.scale.setScalar(1.6); it.position.y = 26; scene.add(it); curH = 34; }
+    else { scene.add(buildMesh(DATA.meshes[n], 16)); curH = 50; }
+    if (cur && document.getElementById('glow').checked === false) cur.root.traverse(o => { if (o.userData.glow) o.visible = false; });
+    setAnim();
+  };
+  const setAnim = () => { anim = asel.value ? DATA.anims[asel.value] : null; t0 = performance.now(); };
+  sel.onchange = setModel; asel.onchange = setAnim; vsel.onchange = setModel;
+  document.getElementById('glow').onchange = setModel;
+  document.getElementById('play').onclick = e => { playing = !playing; e.target.textContent = playing ? '⏸' : '▶'; t0 = performance.now() - tfix * 1000; };
+  document.getElementById('time').oninput = e => { playing = false; document.getElementById('play').textContent = '▶'; tfix = e.target.value * (anim ? anim.animation_length : 1); };
+  let drag = null;
+  renderer.domElement.onpointerdown = e => drag = [e.clientX, e.clientY, yaw, pitch];
+  window.onpointerup = () => drag = null;
+  window.onpointermove = e => { if (drag) { yaw = drag[2] - (e.clientX - drag[0]) * 0.4; pitch = Math.max(-30, Math.min(80, drag[3] + (e.clientY - drag[1]) * 0.3)); } };
+  renderer.domElement.onwheel = e => { zoom *= Math.exp(e.deltaY * 0.001); e.preventDefault(); };
+  window.onresize = () => renderer.setSize(window.innerWidth, window.innerHeight);
+  setModel();
+  const loop = () => {
+    const W = window.innerWidth, H = window.innerHeight;
+    renderer.setViewport(0, 0, W, H); renderer.setScissor(0, 0, W, H);
+    let t = tfix;
+    if (anim && playing) {
+      const L = anim.animation_length, el = (performance.now() - t0) / 1000;
+      t = anim.loop === true ? el % L : Math.min(el % (L + 1.0), L);
+      tfix = t; document.getElementById('time').value = t / L;
+    }
+    if (cur) pose(cur, anim, t, anim ? null : ['hammer_ground']);
+    document.getElementById('tinfo').textContent = anim ? t.toFixed(2) + ' / ' + anim.animation_length + ' с' : '';
+    const cam = cameraFor(curH, { yaw, pitch, dist: 2.3 * zoom }); cam.aspect = W / H; cam.updateProjectionMatrix();
+    renderer.render(scene, cam);
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+</script>
+</body>
+</html>

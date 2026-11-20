@@ -623,10 +623,10 @@
   "subtitles.pohsmp_core.nightmare.cast_night": "A red moon rises",
   "subtitles.pohsmp_core.nightmare.cast_no_awakening": "The world drowns in ink",
   "subtitles.pohsmp_core.nightmare.thicken": "The nightmare thickens",
-  "entity.pohsmp_core.cult_leader": "Head of the Cult of Mellisto",
+  "entity.pohsmp_core.cult_leader": "Tyros, First Flamebearer",
   "entity.pohsmp_core.fire_cultist": "Fire Cultist",
-  "ui.pohsmp_core.cult_leader.title": "Head of the Cult of Mellisto",
-  "ui.pohsmp_core.cult_leader.subtitle": "The flame that passes judgement",
+  "ui.pohsmp_core.cult_leader.title": "Tyros, First Flamebearer",
+  "ui.pohsmp_core.cult_leader.subtitle": "Head of the Cult of Mellisto",
   "ui.pohsmp_core.cult_leader.verdict_warn": "The Cult Leader passes judgement…",
   "ui.pohsmp_core.cult_leader.verdict": "Mellisto's Verdict: magic is forbidden (%ss)",
   "ui.pohsmp_core.cult_leader.verdict_blocked": "Mellisto's Verdict forbids casting",
@@ -654,11 +654,12 @@
   "ui.pohsmp_core.cult_leader.ash": "Ashes of Mellisto",
   "ui.pohsmp_core.cult_leader.ash_warn": "A line of fire — get off it!",
   "ui.pohsmp_core.cult_leader.replica_taunt": "This forgery won't work on me",
-  "death.attack.pohsmp_core.cult_finisher": "%1$s was finished off by the Head of the Cult of Mellisto",
+  "death.attack.pohsmp_core.cult_finisher": "%1$s was finished off by Tyros, Head of the Cult of Mellisto",
   "subtitles.pohsmp_core.cult_leader.first_flame": "The First Flame unfolds",
   "subtitles.pohsmp_core.cult_leader.first_flame_impact": "Pillar of flame",
   "subtitles.pohsmp_core.cult_leader.ash": "Cult Leader turns to ash",
   "subtitles.pohsmp_core.cult_leader.ash_slash": "Fiery slash",
   "subtitles.pohsmp_core.cult_leader.replica_break": "Replica seals shattered",
-  "subtitles.pohsmp_core.cult_leader.finisher": "Scythe impales"
+  "subtitles.pohsmp_core.cult_leader.finisher": "Scythe impales",
+  "ui.pohsmp_core.cult_leader.epithet": "Head of the Cult of Mellisto"
 }

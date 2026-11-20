@@ -458,20 +458,29 @@ def bossbar():
 
 # ================================================================== титр
 def title(bar, name='cult_leader', texts=None):
+    """Титр. Владелец 20.11: имя — как в оригинале, без «Эхо» («Tyros, First Flamebearer»), ниже вторая строка — «Глава Культа Меллисто»
+    (en: «Head of the Cult of Mellisto»). texts: (lang, строка1, шрифт1[, строка2, шрифт2])."""
     gold = [M.hx(c) for c in ('#e8e895', '#d6af39', '#b9892e', '#9c5e2c')]
-    texts = texts or (('ru', 'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff'),     # имя — английское
-                      ('en', 'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff'))
-    for lang, text, font in texts:
+    texts = texts or (('ru', 'Tyros, First Flamebearer', 'CormorantGaramond-BoldItalic-latin.woff',
+                       'Глава Культа Меллисто', 'CormorantGaramond-BoldItalic-cyrillic.woff'),
+                      ('en', 'Tyros, First Flamebearer', 'CormorantGaramond-BoldItalic-latin.woff',
+                       'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff'))
+    for tt in texts:
+        lang, text, font = tt[:3]
+        sub = tt[3:5] if len(tt) > 3 else None
         S = 2
         Wd, Hd = 1024 * S, 192 * S
-        fnt = ImageFont.truetype(os.path.join(HERE, 'fonts', font), 92 * S)
-        if True:
-            fnt = ImageFont.truetype(os.path.join(HERE, 'fonts', font), 84 * S)
+        fnt = ImageFont.truetype(os.path.join(HERE, 'fonts', font), (84 if not sub else 70) * S)
         bb = fnt.getbbox(text)
         tw, th = bb[2] - bb[0], bb[3] - bb[1]
-        tx, ty = (Wd - tw) / 2 - bb[0], 18 * S - bb[1] + (96 * S - th) / 2
+        tx, ty = (Wd - tw) / 2 - bb[0], (18 if not sub else 6) * S - bb[1] + ((96 if not sub else 80) * S - th) / 2
         mask = Image.new('L', (Wd, Hd), 0)
         ImageDraw.Draw(mask).text((tx, ty), text, font=fnt, fill=255)
+        if sub:                                                             # вторая строка — мельче, под именем
+            f2 = ImageFont.truetype(os.path.join(HERE, 'fonts', sub[1]), 40 * S)
+            b2 = f2.getbbox(sub[0])
+            ImageDraw.Draw(mask).text(((Wd - (b2[2] - b2[0])) / 2 - b2[0], 96 * S - b2[1]), sub[0], font=f2, fill=255)
+            th = 96 * S + (b2[3] - b2[1]) - (ty + bb[1])
         m = np.asarray(mask, np.float32) / 255
         yy = np.linspace(0, 1, Hd)[:, None]
         t = np.clip((yy * Hd - (ty + bb[1])) / th, 0, 1)                # вертикальный градиент золота по высоте букв
@@ -499,7 +508,7 @@ def title(bar, name='cult_leader', texts=None):
         img = Image.fromarray(out_.clip(0, 255).astype(np.uint8), 'RGBA').resize((1024, 192), Image.LANCZOS)
         # орнамент под надписью: линия, сходящая на нет, и знак-око с полосы босса (×3, пиксельно)
         d = ImageDraw.Draw(img)
-        y = 150
+        y = 150 if not sub else 168
         for x in range(150, 874):
             k = 1 - abs(x - 512) / 362
             a_ = int(255 * min(1, k * 2.2))
@@ -508,7 +517,8 @@ def title(bar, name='cult_leader', texts=None):
             d.point((x, y - 1), fill=M.hx('#2b1111', int(a_ * 0.8)))
             d.point((x, y + 2), fill=M.hx('#2b1111', int(a_ * 0.8)))
         crop = bar.crop((84, 0, 108, 13)).resize((72, 39), Image.NEAREST)
-        img.alpha_composite(crop, (512 - 36, y - 22))
+        if not sub:
+            img.alpha_composite(crop, (512 - 36, y - 22))
         img.save(M.out('textures/gui/title/%s_%s.png' % (name, lang)))
 
 
@@ -528,10 +538,11 @@ def icon():
 
 # ================================================================== lang и звуки
 LANG = {
-    'entity.pohsmp_core.cult_leader': ('Head of the Cult of Mellisto', 'Head of the Cult of Mellisto'),     # владелец: имя на обоих языках — английское
+    'entity.pohsmp_core.cult_leader': ('Tyros, First Flamebearer', 'Tyros, First Flamebearer'),     # владелец 20.11: имя как в оригинале, без «Эхо»
     'entity.pohsmp_core.fire_cultist': ('Огненный культист', 'Fire Cultist'),
-    'ui.pohsmp_core.cult_leader.title': ('Head of the Cult of Mellisto', 'Head of the Cult of Mellisto'),
-    'ui.pohsmp_core.cult_leader.subtitle': ('Пламя, что выносит приговор', 'The flame that passes judgement'),
+    'ui.pohsmp_core.cult_leader.title': ('Tyros, First Flamebearer', 'Tyros, First Flamebearer'),
+    'ui.pohsmp_core.cult_leader.epithet': ('Глава Культа Меллисто', 'Head of the Cult of Mellisto'),     # нижняя строка (под именем, под полосой босса)
+    'ui.pohsmp_core.cult_leader.subtitle': ('Глава Культа Меллисто', 'Head of the Cult of Mellisto'),
     'ui.pohsmp_core.cult_leader.verdict_warn': ('Глава Культа выносит приговор…', 'The Cult Leader passes judgement…'),
     'ui.pohsmp_core.cult_leader.verdict': ('Приговор Меллисто: магия под запретом (%s с)', 'Mellisto\'s Verdict: magic is forbidden (%ss)'),
     'ui.pohsmp_core.cult_leader.verdict_blocked': ('Приговор Меллисто запрещает колдовать', 'Mellisto\'s Verdict forbids casting'),

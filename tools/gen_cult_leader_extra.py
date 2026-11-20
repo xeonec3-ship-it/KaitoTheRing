@@ -433,7 +433,7 @@ LANG = {
     'ui.pohsmp_core.cult_leader.ash': ('Пепел Меллисто', 'Ashes of Mellisto'),
     'ui.pohsmp_core.cult_leader.ash_warn': ('Огненная линия — уйдите с неё!', 'A line of fire — get off it!'),
     'ui.pohsmp_core.cult_leader.replica_taunt': ('Эта фальшивка на меня не сработает', 'This forgery won\'t work on me'),
-    'death.attack.pohsmp_core.cult_finisher': ('%1$s пал от косы Head of the Cult of Mellisto', '%1$s was finished off by the Head of the Cult of Mellisto'),
+    'death.attack.pohsmp_core.cult_finisher': ('%1$s пал от косы Тироса, Главы Культа Меллисто', '%1$s was finished off by Tyros, Head of the Cult of Mellisto'),
     'subtitles.pohsmp_core.cult_leader.first_flame': ('Раскрывается Первое Пламя', 'The First Flame unfolds'),
     'subtitles.pohsmp_core.cult_leader.first_flame_impact': ('Столб пламени', 'Pillar of flame'),
     'subtitles.pohsmp_core.cult_leader.ash': ('Глава Культа рассыпается пеплом', 'Cult Leader turns to ash'),

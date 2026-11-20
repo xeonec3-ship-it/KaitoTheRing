@@ -765,5 +765,12 @@
   "subtitles.pohsmp_core.irina.knots": "Threads sink into the ground",
   "subtitles.pohsmp_core.irina.snare": "Knot tightens",
   "subtitles.pohsmp_core.irina.swap": "Switch",
-  "subtitles.pohsmp_core.irina.puppet": "Puppet strings"
+  "subtitles.pohsmp_core.irina.puppet": "Puppet strings",
+  "ui.pohsmp_core.cult_leader.sickle": "Fiery Sickle",
+  "ui.pohsmp_core.cult_leader.ash_trail": "Ash Trail",
+  "ui.pohsmp_core.cult_leader.brand": "Cult Brand",
+  "ui.pohsmp_core.cult_leader.brand_warn": "You bear the Cult Brand — move away from allies!",
+  "ui.pohsmp_core.cult_leader.pillars": "Pillars of Flame",
+  "effect.pohsmp_core.cult_brand": "Cult Brand",
+  "effect.pohsmp_core.cult_brand.description": "In 3 s the brand explodes in flame (r3) — keep away from allies."
 }

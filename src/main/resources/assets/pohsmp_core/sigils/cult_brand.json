@@ -1,0 +1,62 @@
+{
+ "comment": "T26 «Клеймо культа»: клеймо над головой меченого (лежит над головой, раскалено; знак культа, кольцо).",
+ "size": 0.55,
+ "color": "#FF5A1E",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.2,
+   "heightOffset": -0.01,
+   "color": "#C8320C",
+   "brightness": 0.8,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.3,
+    "period": 10
+   }
+  },
+  {
+   "id": "mark",
+   "type": "disc",
+   "texture": "cult_emblem",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.3,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutBack",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 4
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 6
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 6,
+  "stagger": 2
+ }
+}

@@ -765,5 +765,12 @@
   "subtitles.pohsmp_core.irina.knots": "Нити уходят в землю",
   "subtitles.pohsmp_core.irina.snare": "Узел затягивается",
   "subtitles.pohsmp_core.irina.swap": "Подмена",
-  "subtitles.pohsmp_core.irina.puppet": "Нити марионетки"
+  "subtitles.pohsmp_core.irina.puppet": "Нити марионетки",
+  "ui.pohsmp_core.cult_leader.sickle": "Огненный серп",
+  "ui.pohsmp_core.cult_leader.ash_trail": "Пепельный след",
+  "ui.pohsmp_core.cult_leader.brand": "Клеймо культа",
+  "ui.pohsmp_core.cult_leader.brand_warn": "На вас Клеймо культа — отойдите от союзников!",
+  "ui.pohsmp_core.cult_leader.pillars": "Столпы пламени",
+  "effect.pohsmp_core.cult_brand": "Клеймо культа",
+  "effect.pohsmp_core.cult_brand.description": "Через 3 с клеймо взорвётся пламенем (r3) — держитесь подальше от союзников."
 }

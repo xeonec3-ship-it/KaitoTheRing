@@ -1,0 +1,51 @@
+{
+ "comment": "«Огненный серп»: огненный след летящей косы (caster = сущность-коса, follow, до Fx.stop). Саму косу рисует код: предмет cult_scythe, вращение ~40°/тик.",
+ "style": "cult_leader",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "width": 0.6,
+   "length": 8,
+   "fade": 1,
+   "color": "@primary"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.2,
+   "pulse": [
+    0.3,
+    4
+   ],
+   "color": "@secondary",
+   "motes": 12,
+   "ring": false
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 1.5,
+   "spread": 0.5,
+   "speed": 0.02,
+   "gravity": -0.02,
+   "size": [
+    0.4,
+    0.05
+   ],
+   "life": 12,
+   "color": "@secondary",
+   "glow": 0.6
+  }
+ ]
+}

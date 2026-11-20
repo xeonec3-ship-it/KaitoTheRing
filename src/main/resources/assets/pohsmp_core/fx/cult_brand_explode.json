@@ -1,0 +1,73 @@
+{
+ "comment": "«Клеймо культа»: взрыв r3 на месте меченого (caster = игрок).",
+ "style": "cult_leader",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "size": 3.2,
+   "rays": 8,
+   "screen": 0.15,
+   "ring": true,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 3.2,
+   "thickness": 1.0,
+   "followTerrain": true,
+   "color": "@primary"
+  },
+  {
+   "type": "column",
+   "delay": 0,
+   "at": "caster",
+   "duration": 10,
+   "radius": 1.2,
+   "height": 4,
+   "fill": 0.7,
+   "color": "@primary",
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.8,0",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 50,
+   "rate": 20,
+   "spread": 1.4,
+   "speed": 0.3,
+   "gravity": 0.01,
+   "size": [
+    0.6,
+    0.06
+   ],
+   "life": 20,
+   "color": "@primary",
+   "glow": 0.6
+  },
+  {
+   "type": "decal",
+   "delay": 2,
+   "at": "caster",
+   "duration": 22,
+   "texture": "glow",
+   "radius": 3,
+   "blend": "translucent",
+   "color": "#1A0E0C",
+   "fadeOut": 14
+  }
+ ]
+}

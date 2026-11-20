@@ -158,7 +158,7 @@ public final class Bestiary {
         /* driven by Illusions.onTick (TickHub) */
         public static void onTick(TickEvent.ServerTickEvent e) {
             if (e.phase != TickEvent.Phase.END) return;
-            if (alive++ % 1200 == 0) PohCore.LOG.info("[pohsmp] bestiary ticker alive: immersion now={}", Immersion.now());
+            if (alive++ == 0) PohCore.LOG.info("[pohsmp] bestiary ticker started: immersion now={}", Immersion.now());
             try {
                 tick(e.getServer());
             } catch (Throwable ex) {

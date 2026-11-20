@@ -157,8 +157,8 @@ public class MirrorLabyrinthSpell extends IllusionBase {
 
         /* driven by Illusions.onTick (TickHub) */
         public static void onTick(TickEvent.ServerTickEvent e) {
-            if (e.phase == TickEvent.Phase.END && alive++ % 1200 == 0)
-                ru.pohsmp.core.PohCore.LOG.info("[pohsmp] mirror_labyrinth ticker alive: {} labs, now={}", LABS.size(), Illusions.now());
+            if (e.phase == TickEvent.Phase.END && alive++ == 0)
+                ru.pohsmp.core.PohCore.LOG.info("[pohsmp] mirror_labyrinth ticker started: {} labs, now={}", LABS.size(), Illusions.now());
             if (e.phase != TickEvent.Phase.END || LABS.isEmpty()) return;
             try {
                 tick();

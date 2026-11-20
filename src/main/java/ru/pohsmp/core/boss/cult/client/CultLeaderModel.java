@@ -15,8 +15,8 @@ import software.bernie.geckolib.core.animation.AnimationState;
 
 /**
  * The Head of the Cult: geo/entity/cult_leader.geo.json (Tyros's bones and names, our cubes and the cape), our textures (the soul form
- * cult_leader_soul_mode), our animation file (all of Iron's casting animations under their names + cult_leader_*). The scythe arm
- * pose of Iron's FireBossModel, for our cult_scythe; the cape swings a little with the legs.
+ * cult_leader_soul_mode), our animation file (all of Iron's casting animations under their names + cult_leader_*). Outside animations
+ * the arm «carries» our cult_scythe (the animations begin and end in that pose); the cape swings a little with the legs.
  */
 public class CultLeaderModel extends AbstractSpellCastingMobModel {
     public static final ResourceLocation MODEL = new ResourceLocation(PohCore.MODID, "geo/entity/cult_leader.geo.json");
@@ -45,17 +45,18 @@ public class CultLeaderModel extends AbstractSpellCastingMobModel {
         if (entity instanceof CultLeaderEntity boss) {
             float pt = state.getPartialTick();
             Vector2f limb = getLimbSwing(entity, entity.walkAnimation, pt);
-            boss.isAnimatingDampener = entity.isAnimating() ? Mth.lerp(0.15f * pt, boss.isAnimatingDampener, 0) : Mth.lerp(0.05f * pt, boss.isAnimatingDampener, 1);
-            if (entity.getMainHandItem().is(CultLeader.SCYTHE.get())) {   // Iron's scythe hold (FireBossModel)
+            // Scythe hold outside animations (anim check T26-T30, 4.3): «carrying the scythe» - arm (-25, 10, 15), hand (0, -5.5, 96) in
+            // the animation axes = (25, -10, 15) / (0, 5.5, 96) here (GeckoLib flips X/Y once on load; pushRotation is in model axes).
+            // Every Head animation now starts and ends in this pose itself, so no damped blend: it would add the pose twice.
+            boolean anim = entity.isAnimating();
+            boss.isAnimatingDampener = anim ? 0 : 1;
+            if (!anim && entity.getMainHandItem().is(CultLeader.SCYTHE.get())) {
                 CoreGeoBone arm = getAnimationProcessor().getBone("right_arm"), hand = getAnimationProcessor().getBone("bipedHandRight");
                 if (arm != null && hand != null) {
-                    Vector3f armPose = new Vector3f(-30, -30, 10).mul(Mth.DEG_TO_RAD * boss.isAnimatingDampener);
-                    transformStack.pushRotation(arm, armPose);
-                    transformStack.pushRotation(hand, new Vector3f(-5, 0, -48).mul(Mth.DEG_TO_RAD * boss.isAnimatingDampener));
-                    if (!entity.isAnimating()) {
-                        float walk = Mth.cos(limb.y() * 0.6662f + Mth.PI) * 2f * limb.x() * 0.5f * -0.75f;
-                        transformStack.pushRotation(arm, walk, 0, 0);
-                    }
+                    transformStack.pushRotation(arm, new Vector3f(25, -10, 15).mul(Mth.DEG_TO_RAD));
+                    transformStack.pushRotation(hand, new Vector3f(0, 5.5f, 96).mul(Mth.DEG_TO_RAD));
+                    float walk = Mth.cos(limb.y() * 0.6662f + Mth.PI) * 2f * limb.x() * 0.5f * -0.75f;
+                    transformStack.pushRotation(arm, walk, 0, 0);
                 }
             }
             CoreGeoBone cape = getAnimationProcessor().getBone("cape");   // 6° + max(0, ±leg swing)·0.6 (the visual assistant's note)

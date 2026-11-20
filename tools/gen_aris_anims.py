@@ -10,6 +10,7 @@ T28 «Арис» — сборка: модель/текстуры (4 вариан
 """
 import json
 import math
+import zlib
 import os
 import sys
 
@@ -363,7 +364,7 @@ def secondary(rig, poses, times, loop, wind=0.0):
             # набедренники и задняя пластина
             for side in ('right', 'left'):
                 lr = np.asarray(pose.get(side + '_leg', {}).get('rot', (0, 0, 0)), float)
-                a = 0.85 * max(0.0, lr[0]) + 0.2 * min(0.0, lr[0])
+                a = min(32.0, 0.8 * max(0.0, lr[0])) + 0.2 * min(0.0, lr[0])     # юбка идёт за бедром, но свисает (на колене — не торчит)
                 pose['tasset_' + side[0]] = {'rot': (a, 0, (1 if side == 'right' else -1) * max(0.0, abs(lr[2]) * 0.6))}
             back = min(0.0, *(float(pose.get(s + '_leg', {}).get('rot', (0, 0, 0))[0]) for s in ('right', 'left')))
             pose['fauld_b'] = {'rot': (0.7 * back, 0, 0)}
@@ -384,7 +385,7 @@ def secondary(rig, poses, times, loop, wind=0.0):
                 if key in prev_tip:
                     vel = (world_piv - prev_tip[key]) / DT
                 prev_tip[key] = world_piv
-                sway = wind * np.array([math.sin(t * 2.1 + hash(bone) % 7), 0, 0.6 * math.cos(t * 1.7 + hash(bone) % 5)])
+                sway = wind * np.array([math.sin(t * 2.1 + zlib.crc32(bone.encode()) % 7), 0, 0.6 * math.cos(t * 1.7 + zlib.crc32(bone.encode()) % 5)])
                 desired = nrm(down * 9.0 - vel * 0.12 + sway)
                 # кость не уходит внутрь тела: ограничение по родителю (не дальше 75° от покоя)
                 par_rest_world = nrm(Mp @ rest_dir)

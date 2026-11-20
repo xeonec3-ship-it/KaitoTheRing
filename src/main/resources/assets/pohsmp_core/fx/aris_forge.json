@@ -1,0 +1,130 @@
+{
+ "comment": "Особое «Горн» (≈75% ХП, с роликом, бой не замораживается; анимация forge 4.0 с). caster = центр арены, не follow. 0–60 тиков (3 с) — ПРЕДУПРЕЖДЕНИЕ: обод горна r24 прорисовывается, пол краснеет, островки отмечены (код ставит fx aris_island в 4–6 точках сразу на 0 тике); 60 — пол вспыхивает (событие ignite анимации — на 3.3 с ≈ 66 тиков, ставить fx за 0.3 с до); 60–260 (10 с) — пол раскалён: урон кодом всем на земле вне островков r2.2; 260–300 — остывает. Всего 300. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 300,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "aris_forge"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 300,
+   "radius": 28,
+   "color": "#3A1004",
+   "strength": 0.34,
+   "in": {
+    "duration": 60,
+    "easing": "easeInSine"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 300,
+   "texture": "aris_molten_floor",
+   "radius": 24,
+   "grow": 60,
+   "glow": 0.3,
+   "fadeOut": 40,
+   "color": "#A8502A",
+   "brightness": 0.8,
+   "comment": "предупреждение: трещины расползаются"
+  },
+  {
+   "type": "flash",
+   "delay": 60,
+   "at": "caster+0,1,0",
+   "duration": 16,
+   "size": 7,
+   "rays": 14,
+   "screen": 0.2,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 60,
+   "at": "caster",
+   "duration": 24,
+   "shape": "ring",
+   "radius": 24,
+   "thickness": 2.6,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary"
+  },
+  {
+   "type": "decal",
+   "delay": 60,
+   "at": "caster",
+   "duration": 240,
+   "texture": "aris_molten_floor",
+   "radius": 24,
+   "glow": 1.2,
+   "fadeOut": 40,
+   "pulse": 24,
+   "color": "@secondary",
+   "brightness": 1.4,
+   "comment": "пол-горн раскалён"
+  },
+  {
+   "type": "curtain",
+   "delay": 60,
+   "at": "caster",
+   "duration": 200,
+   "radius": [
+    1,
+    24
+   ],
+   "count": 220,
+   "height": 0.9,
+   "grow": 10,
+   "width": [
+    0.2,
+    0.5
+   ],
+   "brightness": [
+    0.4,
+    0.8
+   ],
+   "flicker": 0.7,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "comment": "низкие языки над полом"
+  },
+  {
+   "type": "sprites",
+   "delay": 60,
+   "at": "caster+0,0.2,0",
+   "duration": 200,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 3.0,
+   "area": 24,
+   "speed": 0.02,
+   "gravity": -0.03,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 30,
+   "color": "@core",
+   "glow": 0.9,
+   "comment": "искры поднимаются от пола"
+  }
+ ]
+}

@@ -1,0 +1,204 @@
+{
+ "comment": "«Цепи кузни» на игроке (caster = скованный, follow; до Fx.stop: 4 с = 80 тиков или 3 удара союзников). Четыре цепи вырываются из земли в 1.6 бл. вокруг и тянутся к поясу; печать звеньев под ногами; звенья с раскалёнными стыками. Удар союзника по цепям — fx aris_chains_hit; разбиты/время вышло — Fx.stop + aris_chains_break. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "aris_chain_seal"
+  },
+  {
+   "type": "chains",
+   "delay": 2,
+   "at": "caster+1.6,0.05,0",
+   "to": "caster+0,0.8,0",
+   "follow": true,
+   "link": 0.2,
+   "sag": 0.15,
+   "tension": 0.85,
+   "grow": 6,
+   "rattle": 0.04,
+   "color": "#A9A9B4",
+   "comment": "цепь из земли к поясу скованного"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+1.6,0,0",
+   "texture": "higher_cracks",
+   "radius": 0.8,
+   "glow": 0.6,
+   "color": "@secondary",
+   "fadeOut": 10
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+1.6,0.1,0",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 8,
+   "rate": 2,
+   "spread": 0.3,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 40,
+   "size": [
+    0.4,
+    0.1
+   ],
+   "life": 18,
+   "color": "#60606C",
+   "blend": "translucent"
+  },
+  {
+   "type": "chains",
+   "delay": 3,
+   "at": "caster+-1.6,0.05,0",
+   "to": "caster+0,0.8,0",
+   "follow": true,
+   "link": 0.2,
+   "sag": 0.15,
+   "tension": 0.85,
+   "grow": 6,
+   "rattle": 0.04,
+   "color": "#A9A9B4",
+   "comment": "цепь из земли к поясу скованного"
+  },
+  {
+   "type": "decal",
+   "delay": 1,
+   "at": "caster+-1.6,0,0",
+   "texture": "higher_cracks",
+   "radius": 0.8,
+   "glow": 0.6,
+   "color": "@secondary",
+   "fadeOut": 10
+  },
+  {
+   "type": "sprites",
+   "delay": 3,
+   "at": "caster+-1.6,0.1,0",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 8,
+   "rate": 2,
+   "spread": 0.3,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 40,
+   "size": [
+    0.4,
+    0.1
+   ],
+   "life": 18,
+   "color": "#60606C",
+   "blend": "translucent"
+  },
+  {
+   "type": "chains",
+   "delay": 4,
+   "at": "caster+0,0.05,1.6",
+   "to": "caster+0,0.8,0",
+   "follow": true,
+   "link": 0.2,
+   "sag": 0.15,
+   "tension": 0.85,
+   "grow": 6,
+   "rattle": 0.04,
+   "color": "#A9A9B4",
+   "comment": "цепь из земли к поясу скованного"
+  },
+  {
+   "type": "decal",
+   "delay": 2,
+   "at": "caster+0,0,1.6",
+   "texture": "higher_cracks",
+   "radius": 0.8,
+   "glow": 0.6,
+   "color": "@secondary",
+   "fadeOut": 10
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,0.1,1.6",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 8,
+   "rate": 2,
+   "spread": 0.3,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 40,
+   "size": [
+    0.4,
+    0.1
+   ],
+   "life": 18,
+   "color": "#60606C",
+   "blend": "translucent"
+  },
+  {
+   "type": "chains",
+   "delay": 5,
+   "at": "caster+0,0.05,-1.6",
+   "to": "caster+0,0.8,0",
+   "follow": true,
+   "link": 0.2,
+   "sag": 0.15,
+   "tension": 0.85,
+   "grow": 6,
+   "rattle": 0.04,
+   "color": "#A9A9B4",
+   "comment": "цепь из земли к поясу скованного"
+  },
+  {
+   "type": "decal",
+   "delay": 3,
+   "at": "caster+0,0,-1.6",
+   "texture": "higher_cracks",
+   "radius": 0.8,
+   "glow": 0.6,
+   "color": "@secondary",
+   "fadeOut": 10
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "at": "caster+0,0.1,-1.6",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 8,
+   "rate": 2,
+   "spread": 0.3,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 40,
+   "size": [
+    0.4,
+    0.1
+   ],
+   "life": 18,
+   "color": "#60606C",
+   "blend": "translucent"
+  },
+  {
+   "type": "aura",
+   "delay": 4,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.1,
+   "pulse": [
+    0.2,
+    8
+   ],
+   "color": "#A9A9B4",
+   "motes": 8,
+   "comment": "скован"
+  }
+ ]
+}

@@ -1,0 +1,25 @@
+{
+ "comment": "T29 Мартин, Последний Полководец: золото герба и серебро лат, кровавый табард; движение тяжёлое, с ударами.",
+ "palette": {
+  "primary": "#E8B95A",
+  "secondary": "#FFF1C4",
+  "core": "#FFFFFF",
+  "shadow": "#4C0C14"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_holy_band",
+  "shards": "spark_soft",
+  "sigil": "martin_emblem"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.6,
+  "jitter": 0.1,
+  "easing": "easeOutCubic",
+  "pulse": {
+   "amp": 0.12,
+   "period": 12
+  }
+ }
+}

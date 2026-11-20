@@ -42,6 +42,12 @@ def data():
             glow[v] = b64(g)
     models = {'aris': {'geo': json.load(open(os.path.join(A, 'geo', 'entity', 'aris.geo.json'), encoding='utf-8')),
                        'tex': tex, 'glow': glow, 'height': 44, 'title': 'Арис, Мифический Кузнец'}}
+    CL = os.path.join(A, 'textures', 'entity', 'cult_leader')
+    if os.path.exists(os.path.join(CL, 'cult_leader.png')):
+        models['cult_leader'] = {'geo': json.load(open(os.path.join(A, 'geo', 'entity', 'cult_leader.geo.json'), encoding='utf-8')),
+                                 'tex': {'base': b64(os.path.join(CL, 'cult_leader.png'))},
+                                 'glow': {'base': b64(os.path.join(CL, 'cult_leader_glowmask.png'))}, 'height': 36,
+                                 'title': 'Глава Культа (эталон T26)'}
     anims = json.load(open(os.path.join(A, 'animations', 'entity', 'aris.animation.json'), encoding='utf-8'))['animations']
     items = {}
     ip = os.path.join(A, 'models', 'item', 'aris_hammer.json')

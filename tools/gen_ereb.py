@@ -87,11 +87,11 @@ PAL = {
     # тёмно-серое сукно (штаны и подбой полы — как на скине)
     'u': '#17181a', 'v': '#212325', 'V': '#2c2f31', 'W': '#3a3e40',
     # кожа (1 — тень … 5 — блик)
-    '1': '#d9a38b', '2': '#f0c2aa', '3': '#fad8c6', '4': '#ffe8db', '5': '#fff4ec',
+    '1': '#c88a72', '2': '#e6ae94', '3': '#f4cdb6', '4': '#fbe0cf', '5': '#fff0e6',
     # волосы — светлое золото: A — тень … F — блик
-    'A': '#c8a040', 'B': '#dcbb52', 'C': '#e8cc64', 'D': '#f0dc78', 'E': '#f8ea9c', 'F': '#fff8d4',
+    'A': '#b88a30', 'B': '#dcb048', 'C': '#efcd5c', 'D': '#f7de74', 'E': '#fdeb98', 'F': '#fff8d4',
     # глаза: w — белок, i — радужка (тёмная), j — радужка (светлая), k — блик/ресница, l — ресница (тень века), m — губы
-    'w': '#eef4f8', 'i': '#1d6e94', 'j': '#5cc8ec', 'k': '#c7f1ff', 'l': '#5e4420', 'm': '#c47f6c',
+    'w': '#e3ecf1', 'i': '#17506a', 'j': '#45b6d4', 'k': '#c7f1ff', 'l': '#5e4420', 'm': '#c47f6c',
     # белые перчатки
     'G': '#7e7a88', 'H': '#aeaab8', 'J': '#d8d5e0', 'K': '#f3f1f7',
 }
@@ -670,24 +670,20 @@ def paint_glow(at_img):
 
 
 def textures(geo):
-    """1:1 пиксель-арт → ×4 (как эталон: атлас 128 → 512) с ручной фактурой и узорами (gen_ereb_hires.py)."""
-    import gen_ereb_hires as H
     res = {}
     for nm, smile in (('ereb', False), ('ereb_smile', True)):
         at = Atlas()
         paint_skin(at, smile)
         paint_new(at)
-        big = H.hires(sys.modules[__name__], at.img, geo, smile)
-        big.save(out(TEX + nm + '.png'))
-        res[nm] = big
-        res[nm + '_1x'] = at.img
-    H.glow(sys.modules[__name__], res['ereb']).save(out(TEX + 'ereb_glowmask.png'))
+        at.img.save(out(TEX + nm + '.png'))
+        res[nm] = at.img
+    paint_glow(res['ereb']).save(out(TEX + 'ereb_glowmask.png'))
     return res
 
 
 # ================================================================== рапира — 3D-предмет из брусков
 RAP_PAL = {'k': '#0b0a0f', 'k1': '#17141c', 'k2': '#27222c', 'k3': '#3a3440',
-           'g0': '#704612', 'g1': '#a46a1c', 'g2': '#d0952a', 'g3': '#eab33c', 'g4': '#f8d260', 'g5': '#fff2b0',
+           'g0': '#5b3c10', 'g1': '#86591a', 'g2': '#b07c26', 'g3': '#d4a038', 'g4': '#ecc85c', 'g5': '#fff0a6',
            'c1': '#3d8fb5', 'c2': '#8fd8f2'}
 RAP_CELL = {k: (i % 16, i // 16) for i, k in enumerate(RAP_PAL)}
 
@@ -701,7 +697,7 @@ def rapier_elements():
         faces = {}
         for f in ALL6:
             u, v = RAP_CELL[(side or {}).get(f, col)]
-            faces[f] = {'uv': [u, v, u + 1, v + 1], 'texture': '#p'}
+            faces[f] = {'uv': [u + .25, v + .25, u + .75, v + .75], 'texture': '#p'}
         el.append({'from': [round(x0, 3), round(y0, 3), round(z0, 3)], 'to': [round(x1, 3), round(y1, 3), round(z1, 3)], 'faces': faces,
                    'rotation': {'angle': -45, 'axis': 'z', 'origin': [8, 8, 8]}})
 
@@ -759,20 +755,9 @@ def rapier_elements():
 
 
 def rapier():
-    pal = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
-    keys = list(RAP_PAL)
+    pal = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
     for k, (x, y) in RAP_CELL.items():
-        fam = [kk for kk in keys if kk[0] == k[0]]
-        i = fam.index(k)
-        lt, dk = RAP_PAL[fam[min(len(fam) - 1, i + 1)]], RAP_PAL[fam[max(0, i - 1)]]
-        for j in range(4):
-            for q in range(4):
-                c = RAP_PAL[k]
-                if j == 0 or (q == 0 and j < 3):
-                    c = lt                                      # блик сверху-слева
-                elif j == 3 or q == 3:
-                    c = dk                                      # тень снизу-справа
-                pal.putpixel((x * 4 + q, y * 4 + j), hx(c))
+        pal.putpixel((x, y), hx(RAP_PAL[k]))
     pal.save(out('textures/item/ereb_rapier_3d.png'))
     # плоская иконка (GUI, на земле, в рамке): рапира по диагонали, 16×16, ручной пиксель-арт
     icon = Atlas(16, 16)

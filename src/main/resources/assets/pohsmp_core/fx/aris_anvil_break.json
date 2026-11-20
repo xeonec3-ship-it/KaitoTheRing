@@ -1,0 +1,54 @@
+{
+ "comment": "Наковальня рассыпается (caster = её место): окалина, искры, вспышка. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.8,0",
+   "duration": 6,
+   "size": 1.6,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.8,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 40,
+   "rate": 10,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.8,0",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 30,
+   "rate": 8,
+   "spread": 0.9,
+   "speed": 0.12,
+   "gravity": 0.02,
+   "spin": 60,
+   "size": [
+    0.35,
+    0.12
+   ],
+   "life": 20,
+   "color": "#2A2A32",
+   "blend": "translucent"
+  }
+ ]
+}

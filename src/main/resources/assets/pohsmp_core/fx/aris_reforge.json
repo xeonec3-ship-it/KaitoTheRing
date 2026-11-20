@@ -1,0 +1,44 @@
+{
+ "comment": "Перековка (фаза 3): на игроке 10 с снижен урон оружия. caster = игрок, follow; метка над рукой с оружием, окалина сыплется с руки. Слать всем. 200 тиков. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster.hand+0,0.45,0",
+   "follow": true,
+   "id": "aris_reforge"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": 8,
+   "size": 1.0,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "follow": true,
+   "duration": 200,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 0.3,
+   "spread": 0.15,
+   "speed": 0.0,
+   "gravity": 0.02,
+   "spin": 60,
+   "size": [
+    0.1,
+    0.05
+   ],
+   "life": 16,
+   "color": "#2A2A32",
+   "blend": "translucent",
+   "comment": "окалина"
+  }
+ ]
+}

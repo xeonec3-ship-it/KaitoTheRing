@@ -1,0 +1,57 @@
+{
+ "comment": "Переход 66% → «Знамя» (caster = Мартин; анимация martin_phase2 3 с: plant 0.6, roar 1.4). Меч в землю, рёв: знамёнщики-солдаты отзываются; на 2.4 с код запускает martin_banner_plant/анимацию martin_banner_plant.",
+ "style": "martin",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 12,
+   "at": "caster+0,0,1.6",
+   "texture": "higher_cracks",
+   "radius": 2.0,
+   "glow": 0.4,
+   "fadeOut": 30,
+   "duration": 48,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 28,
+   "at": "caster+0,4.6,0",
+   "duration": 14,
+   "size": 3.2,
+   "rays": 10,
+   "color": "#C22A2C",
+   "screen": 0.1,
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 28,
+   "at": "caster",
+   "duration": 26,
+   "shape": "ring",
+   "radius": 16,
+   "thickness": 2.0,
+   "followTerrain": true,
+   "color": "#C22A2C"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "radius": 32,
+   "color": "#3A0A10",
+   "strength": 0.25,
+   "in": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

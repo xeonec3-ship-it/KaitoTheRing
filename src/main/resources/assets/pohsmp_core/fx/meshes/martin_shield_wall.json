@@ -1,0 +1,216 @@
+{
+ "comment": "T29 «Приказ стоять насмерть»: щит-барьер дугой 120° (r 2.4, высота 4.4) перед носителем (по yaw), follow. Масштаб элемента: 1 — Мартин, 0.5 — солдат. Сгенерировано gen_martin_fx.py.",
+ "style": "martin",
+ "center": 0,
+ "formedAt": 10,
+ "collapse": {
+  "duration": 12,
+  "easing": "easeInCubic"
+ },
+ "parts": [
+  {
+   "type": "quad",
+   "texture": "martin_barrier",
+   "blend": "additive",
+   "opacity": 0.5,
+   "doubleSided": true,
+   "color": "@secondary",
+   "pulse": [
+    0.25,
+    14
+   ],
+   "corners": [
+    [
+     -2.078,
+     4.4,
+     1.2
+    ],
+    [
+     -1.543,
+     4.4,
+     1.839
+    ],
+    [
+     -1.543,
+     0.0,
+     1.839
+    ],
+    [
+     -2.078,
+     0.0,
+     1.2
+    ]
+   ]
+  },
+  {
+   "type": "quad",
+   "texture": "martin_barrier",
+   "blend": "additive",
+   "opacity": 0.5,
+   "doubleSided": true,
+   "color": "@secondary",
+   "pulse": [
+    0.25,
+    14
+   ],
+   "corners": [
+    [
+     -1.543,
+     4.4,
+     1.839
+    ],
+    [
+     -0.821,
+     4.4,
+     2.255
+    ],
+    [
+     -0.821,
+     0.0,
+     2.255
+    ],
+    [
+     -1.543,
+     0.0,
+     1.839
+    ]
+   ]
+  },
+  {
+   "type": "quad",
+   "texture": "martin_barrier",
+   "blend": "additive",
+   "opacity": 0.5,
+   "doubleSided": true,
+   "color": "@secondary",
+   "pulse": [
+    0.25,
+    14
+   ],
+   "corners": [
+    [
+     -0.821,
+     4.4,
+     2.255
+    ],
+    [
+     0.0,
+     4.4,
+     2.4
+    ],
+    [
+     0.0,
+     0.0,
+     2.4
+    ],
+    [
+     -0.821,
+     0.0,
+     2.255
+    ]
+   ]
+  },
+  {
+   "type": "quad",
+   "texture": "martin_barrier",
+   "blend": "additive",
+   "opacity": 0.5,
+   "doubleSided": true,
+   "color": "@secondary",
+   "pulse": [
+    0.25,
+    14
+   ],
+   "corners": [
+    [
+     0.0,
+     4.4,
+     2.4
+    ],
+    [
+     0.821,
+     4.4,
+     2.255
+    ],
+    [
+     0.821,
+     0.0,
+     2.255
+    ],
+    [
+     0.0,
+     0.0,
+     2.4
+    ]
+   ]
+  },
+  {
+   "type": "quad",
+   "texture": "martin_barrier",
+   "blend": "additive",
+   "opacity": 0.5,
+   "doubleSided": true,
+   "color": "@secondary",
+   "pulse": [
+    0.25,
+    14
+   ],
+   "corners": [
+    [
+     0.821,
+     4.4,
+     2.255
+    ],
+    [
+     1.543,
+     4.4,
+     1.839
+    ],
+    [
+     1.543,
+     0.0,
+     1.839
+    ],
+    [
+     0.821,
+     0.0,
+     2.255
+    ]
+   ]
+  },
+  {
+   "type": "quad",
+   "texture": "martin_barrier",
+   "blend": "additive",
+   "opacity": 0.5,
+   "doubleSided": true,
+   "color": "@secondary",
+   "pulse": [
+    0.25,
+    14
+   ],
+   "corners": [
+    [
+     1.543,
+     4.4,
+     1.839
+    ],
+    [
+     2.078,
+     4.4,
+     1.2
+    ],
+    [
+     2.078,
+     0.0,
+     1.2
+    ],
+    [
+     1.543,
+     0.0,
+     1.839
+    ]
+   ]
+  }
+ ]
+}

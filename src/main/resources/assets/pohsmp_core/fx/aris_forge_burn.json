@@ -1,0 +1,34 @@
+{
+ "comment": "Игрок на раскалённом полу «Горна» (caster = игрок): вспышка жара у ног. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 6,
+   "size": 1.0,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 12,
+   "rate": 6,
+   "spread": 0.6,
+   "speed": 0.15,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 10,
+   "color": "@secondary",
+   "glow": 0.9
+  }
+ ]
+}

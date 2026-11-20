@@ -1,0 +1,197 @@
+{
+ "comment": "Одна полоса конницы: caster = начало полосы на земле (край арены), yaw = направление полосы. 0–40 тиков — ПРЕДУПРЕЖДЕНИЕ (полоса светится, шевроны «вперёд»); 40–66 — три всадника проносятся по полосе. Урон — код: всадник k (0, 1, 2) выходит на тике 40 + 2k и в тике t стоит в z = −4 − 3.2k + 52·(t − 40 − 2k)/28 бл. от начала по yaw; урон — если игрок в полосе (|x| < 1.5) и |z_игрока − z| < 1.5. Полос — 3–5, параллельно или веером через арену.",
+ "style": "martin_ghost",
+ "duration": 72,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "martin_lane_warn",
+   "duration": 62,
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "comment": "предупреждение: светится полоса 40×3 бл."
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,2",
+   "duration": 40,
+   "texture": "mote_wisp",
+   "count": 100000,
+   "rate": 0.5,
+   "spread": 1.0,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "size": [
+    1.0,
+    1.8
+   ],
+   "life": 40,
+   "color": "#8FD8F0",
+   "blend": "translucent",
+   "comment": "туман у начала полосы: оттуда выйдут всадники"
+  },
+  {
+   "type": "mesh",
+   "delay": 40,
+   "at": "caster",
+   "model": "martin_cavalry_rider",
+   "duration": 28,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       -0.8,
+       0,
+       -4.0
+      ]
+     ],
+     [
+      28,
+      [
+       -0.8,
+       0,
+       48.0
+      ],
+      "linear"
+     ]
+    ]
+   },
+   "comment": "всадник 1 несётся по полосе"
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "caster+-0.8,0.3,-4",
+   "duration": 26,
+   "travel": 52.0,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 3,
+   "spread": 0.8,
+   "speed": 0.03,
+   "gravity": -0.002,
+   "size": [
+    0.6,
+    1.2
+   ],
+   "life": 24,
+   "color": "#8A8070",
+   "blend": "translucent",
+   "comment": "пыль из-под копыт"
+  },
+  {
+   "type": "mesh",
+   "delay": 42,
+   "at": "caster",
+   "model": "martin_cavalry_rider",
+   "duration": 28,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0.9,
+       0,
+       -7.2
+      ]
+     ],
+     [
+      28,
+      [
+       0.9,
+       0,
+       44.8
+      ],
+      "linear"
+     ]
+    ]
+   },
+   "comment": "всадник 2 несётся по полосе"
+  },
+  {
+   "type": "sprites",
+   "delay": 42,
+   "at": "caster+0.9,0.3,-7.2",
+   "duration": 26,
+   "travel": 52.0,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 3,
+   "spread": 0.8,
+   "speed": 0.03,
+   "gravity": -0.002,
+   "size": [
+    0.6,
+    1.2
+   ],
+   "life": 24,
+   "color": "#8A8070",
+   "blend": "translucent",
+   "comment": "пыль из-под копыт"
+  },
+  {
+   "type": "mesh",
+   "delay": 44,
+   "at": "caster",
+   "model": "martin_cavalry_rider",
+   "duration": 28,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0.0,
+       0,
+       -10.4
+      ]
+     ],
+     [
+      28,
+      [
+       0.0,
+       0,
+       41.6
+      ],
+      "linear"
+     ]
+    ]
+   },
+   "comment": "всадник 3 несётся по полосе"
+  },
+  {
+   "type": "sprites",
+   "delay": 44,
+   "at": "caster+0,0.3,-10.4",
+   "duration": 26,
+   "travel": 52.0,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 3,
+   "spread": 0.8,
+   "speed": 0.03,
+   "gravity": -0.002,
+   "size": [
+    0.6,
+    1.2
+   ],
+   "life": 24,
+   "color": "#8A8070",
+   "blend": "translucent",
+   "comment": "пыль из-под копыт"
+  },
+  {
+   "type": "flash",
+   "delay": 40,
+   "at": "caster+0,1.2,0",
+   "duration": 8,
+   "size": 2.0,
+   "color": "@secondary"
+  }
+ ]
+}

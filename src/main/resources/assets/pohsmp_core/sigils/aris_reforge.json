@@ -1,0 +1,41 @@
+{
+ "comment": "T28 «Перековка»: метка над рукой игрока (оружие ослаблено 10 с) — перечёркнутый клинок под молотом. Сгенерировано tools/gen_aris.py.",
+ "size": 0.42,
+ "color": "#F4A852",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "mark",
+   "type": "disc",
+   "texture": "aris_reforge",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "grow",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 1.5
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 16
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

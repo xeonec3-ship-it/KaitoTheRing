@@ -1,0 +1,83 @@
+{
+ "comment": "Удар молотом по земле (фаза 1, событие impact анимации slam/forge, 0.75 с). caster = точка удара (голова молота: ≈1.25 бл. перед Арис по её взгляду), не follow. Волна раскалённого металла r8 бежит 1.1 с: урон кодом по кольцу |d − r(t)| < 0.7, r(t) = 8·t/22 тиков; перепрыгнуть можно (выше 1 бл.). Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.6,0",
+   "duration": 10,
+   "size": 2.6,
+   "rays": 10,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 8,
+   "thickness": 1.6,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary",
+   "comment": "волна раскалённого металла"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 120,
+   "texture": "aris_molten_floor",
+   "radius": 2.2,
+   "glow": 0.8,
+   "fadeOut": 80,
+   "color": "@secondary",
+   "brightness": 1.2,
+   "comment": "раскалённая вмятина остывает 4 с"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 60,
+   "rate": 15,
+   "spread": 0.6,
+   "speed": 0.45,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 22,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 6,
+   "texture": "mote_ash",
+   "count": 24,
+   "rate": 6,
+   "spread": 1.2,
+   "speed": 0.08,
+   "gravity": -0.004,
+   "spin": 40,
+   "size": [
+    0.6,
+    0.2
+   ],
+   "life": 30,
+   "color": "#60606C",
+   "blend": "translucent",
+   "comment": "пыль/окалина"
+  }
+ ]
+}

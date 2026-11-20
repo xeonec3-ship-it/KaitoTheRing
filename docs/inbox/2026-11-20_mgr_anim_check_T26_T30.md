@@ -21,6 +21,10 @@
   - ключи через ±180°.
 - **`tools/anim_check_render.py`** — кадры. Жёлтая стрелка — «вперёд», красная точка — остриё, синий брусок — жертва.
 - **`tools/anim_check_sheets.py`** — листы «до / после»: `docs/media/t26_anim_check.jpg`, `docs/media/t30_anim_check.jpg`.
+- **Двойной переворот знака (как у Ирины) — нет.** Генераторы (`ch()` в `gen_cult_leader_extra.py`, `anim()` в `gen_ereb_anims.py`, `anim_cloth.py`)
+  пишут значения в осях Blockbench/Iron's без инверсии. GeckoLib инвертирует X/Y один раз при загрузке (байткод `BakedAnimationsAdapter` /
+  `BakedModelFactory`), проверщик повторяет ровно это. Контроль — анимации Iron's: `charge_raised_hand` (рука −180) у нас поднимает руку вверх, как в игре.
+  Ткань (плащ, полы) — тот же расчёт: задняя уходит назад. Двойной переворот есть только в Java — плащ Главы (п. 4.1).
 - Всё исправлено **в генераторах**, файлы анимаций пересобраны из них:
   - `gen_cult_leader_extra.py`, `gen_cult_leader_spells4.py`, `gen_ereb_anims.py`;
   - общий пост-проход — **`tools/anim_cloth.py`**: ткань и хват в анимациях Iron's.
@@ -131,7 +135,7 @@
 - Расстояние: Эреб в 1.3 бл. за спиной жертвы. Ближе — его голова заходит в выгнутую жертву.
 
 ## 6. Ролики (перерендерены)
-- `docs/media/video/t26_combat.mp4`, `t26_special.mp4`, `t26_finale.mp4` — `tools/boss_video.py`;
+- `docs/media/video/t26_combat.mp4`, `t26_special.mp4`, `t26_finale.mp4` — `tools/boss_video.py` (после правки «коса не в земле» — ещё раз);
 - `docs/media/video/t30_combat.mp4`, `t30_spells.mp4`, `t30_finale.mp4` — `tools/boss_video_b.py`, в финале добавлено добивание;
 - turntable не менялись: в покое правок нет.
 

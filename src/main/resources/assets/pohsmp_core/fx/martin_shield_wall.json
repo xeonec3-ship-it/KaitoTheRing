@@ -1,0 +1,100 @@
+{
+ "comment": "Особое «Стена щитов» (caster = центр низа стены на краю арены за Мартином, yaw = к игрокам; запуск на событии slam = 1.0 с анимации martin_shield_wall). 0–20 тиков — стена встаёт из земли (мэш martin_shield_line, 24 бл. шириной, группы по 4 щита, просветы 1.6 бл. с центрами x = [-6.24, 0.32, 6.88]); 20–180 — идёт вперёд на 18 бл. (линейно). Код толкает игроков перед стеной: в тике t стена в z = 18·(t−20)/160, толчок, если 0 < z_игрока − z < 0.8 и игрок не в просвете; конец — стена рассыпается.",
+ "style": "martin_ghost",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "martin_shield_line",
+   "duration": 194,
+   "out": {
+    "duration": 14,
+    "easing": "easeInCubic"
+   },
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       -2.4,
+       0
+      ]
+     ],
+     [
+      20,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeOutCubic"
+     ],
+     [
+      180,
+      [
+       0,
+       0,
+       18.0
+      ],
+      "linear"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 180,
+   "travel": 18.0,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 3.0,
+   "area": 12.0,
+   "speed": 0.03,
+   "gravity": -0.002,
+   "size": [
+    0.6,
+    1.2
+   ],
+   "life": 26,
+   "color": "#8A8070",
+   "blend": "translucent",
+   "comment": "пыль у подножия"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 180,
+   "travel": 18.0,
+   "texture": "mote_wisp",
+   "count": 100000,
+   "rate": 1.2,
+   "area": 12.0,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "size": [
+    0.8,
+    1.4
+   ],
+   "life": 40,
+   "color": "#8FD8F0",
+   "blend": "translucent"
+  },
+  {
+   "type": "wave",
+   "delay": 18,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 12.0,
+   "thickness": 1.2,
+   "followTerrain": true,
+   "color": "@primary"
+  }
+ ]
+}

@@ -24,9 +24,9 @@ def ramp(*hs):
 
 
 # призрачная палитра: латы — холодное серебро с бирюзой, кайма — бледное «лунное золото», ткань — глубокая синь
-G_STEEL = ramp('#16303c', '#244a5a', '#3a6a7e', '#5c90a4', '#86b8c8', '#b4dce6', '#e4f8fc')
+G_STEEL = ramp('#0a1a24', '#1a3a4c', '#33627a', '#5a92aa', '#8cc0d2', '#c0e4ee', '#f2fcff')
 G_GOLD = ramp('#2c3c34', '#465c4c', '#6a8468', '#94ae8a', '#bed6ae', '#e0f0cc', '#f8fff0')
-G_RED = ramp('#0a1620', '#10222e', '#183244', '#22465c', '#2e5e78', '#447e98')
+G_RED = ramp('#060e16', '#0c1c2a', '#16304a', '#224a6a', '#30648a', '#4a86aa')
 G_BLACK = ramp('#060c12', '#0c1620', '#14202c', '#1c2c3a', '#283a4a')
 G_WHITE = ramp('#5a8496', '#80a8b8', '#a8ccd8', '#cce8f0', '#f0fcff')
 G_LEATHER = ramp('#0e1a22', '#162834', '#203846', '#2c4a5a', '#3a5e70')
@@ -61,8 +61,10 @@ def build_soldier():
     m.bone('body', None, (0, 12, 0))
     m.bone('torso', 'body', (0, 24, 0))
     m.box('torso', (-4.0, 12, -2.2), (4.0, 24, 2.2), 'red', base=2)
-    m.box('torso', (-3.4, 16.4, -2.8), (3.4, 23.8, 2.6), 'steel', deco='chest', base=3)
-    m.box('torso', (-2.6, 13.2, -2.7), (2.6, 16.6, 2.5), 'steel', lames=4)
+    m.box('torso', (-3.4, 16.4, -2.8), (3.4, 23.8, 2.6), 'steel', deco='chest', base=3, rivets=True)
+    m.box('torso', (-0.45, 16.6, -3.15), (0.45, 23.2, -2.75), 'steel', base=5)                     # рёберный кант
+    m.box('torso', (-3.6, 16.0, -2.9), (3.6, 16.6, 2.7), 'dark')                                    # стык кирасы и плакарта
+    m.box('torso', (-2.6, 13.2, -2.7), (2.6, 16.0, 2.5), 'steel', lames=3, base=3)
     m.box('torso', (-2.8, 23.0, -3.0), (2.8, 24.6, 2.6), 'gold', base=3)
     m.box('torso', (-4.2, 12.0, -2.6), (4.2, 13.3, 2.6), 'leather', deco='belt')
     m.box('torso', (-4.1, 10.6, -2.7), (4.1, 12.1, 2.6), 'steel', trim='b')
@@ -72,7 +74,7 @@ def build_soldier():
     m.box('cape', (-4.6, 9.0, 2.5), (4.6, 23.6, 3.1), 'cape', outer='south', edge_b=True)
     # шлем: топфхельм с гребнем-плюмажем
     m.bone('head', 'body', (0, 24, 0))
-    m.box('head', (-3.6, 24.2, -3.6), (3.6, 31.4, 3.6), 'steel', base=3)
+    m.box('head', (-3.6, 24.2, -3.6), (3.6, 31.4, 3.6), 'steel', base=3, rivets=True, trim='b')
     m.box('head', (-3.0, 27.6, -3.9), (-0.5, 28.4, -3.6), 'eye')
     m.box('head', (0.5, 27.6, -3.9), (3.0, 28.4, -3.6), 'eye')
     m.box('head', (-0.5, 24.6, -4.1), (0.5, 30.6, -3.6), 'gold', base=4)
@@ -85,9 +87,13 @@ def build_soldier():
         m.bone(arm, 'body', (X, 22, 0))
         m.box(arm, (X - 1.4, 16.6, -1.4), (X + 1.4, 22.4, 1.4), 'red', base=2)
         x0, x1 = sorted((X - side * 1.8, X + side * 2.6))
-        m.box(arm, (x0, 20.4, -2.4), (x1, 23.4, 2.4), 'steel', trim='b', base=4)
+        m.box(arm, (x0, 20.4, -2.4), (x1, 23.4, 2.4), 'steel', trim='b', base=4, rivets=True)
+        x0, x1 = sorted((X - side * 0.6, X + side * 2.8))
+        m.box(arm, (x0, 18.8, -2.1), (x1, 20.6, 2.1), 'steel', trim='b', base=3)                     # вторая лама наплечника
         m.bone(fore, arm, (X, 16.6, 0))
-        m.box(fore, (X - 1.5, 12.6, -1.5), (X + 1.5, 16.8, 1.5), 'steel', base=3)
+        m.box(fore, (X - 1.5, 12.6, -1.5), (X + 1.5, 16.0, 1.5), 'steel', base=3, lames=3)
+        m.box(fore, (X - 1.6, 16.0, -1.7), (X + 1.6, 17.6, 1.5), 'steel', base=5)                    # налокотник
+        m.box(fore, (X - 1.45, 15.6, -1.45), (X + 1.45, 16.2, 1.45), 'dark')                          # стык
         m.box(fore, (X - 1.7, 11.8, -1.7), (X + 1.7, 13.0, 1.7), 'gold', base=3)
         m.box(fore, (X - 1.3, 9.6, -1.3), (X + 1.3, 11.8, 1.3), 'leather', base=2)
     for side, sn in ((1, 'right'), (-1, 'left')):
@@ -95,9 +101,12 @@ def build_soldier():
         leg = sn + '_leg'
         m.bone(leg, 'body', (X, 12, 0))
         m.box(leg, (X - 1.9, 6.0, -1.9), (X + 1.9, 12.0, 1.9), 'red', base=2)
-        m.box(leg, (X - 2.0, 6.8, -2.1), (X + 2.0, 11.0, 1.9), 'steel', base=3)
+        m.box(leg, (X - 2.0, 6.8, -2.1), (X + 2.0, 11.0, 1.9), 'steel', base=3, trim='b', rivets=True)
+        m.box(leg, (X - 1.85, 5.0, -1.85), (X + 1.85, 6.8, 1.85), 'dark')                             # стык у колена
         m.box(leg, (X - 1.6, 5.0, -2.6), (X + 1.6, 7.2, -1.6), 'steel', base=4)
-        m.box(leg, (X - 1.9, 0.0, -2.8), (X + 1.9, 5.4, 1.9), 'steel', base=3, trim='t')
+        m.box(leg, (X - 1.9, 1.2, -2.2), (X + 1.9, 5.4, 1.9), 'steel', base=3, trim='t', lames=4)
+        m.box(leg, (X - 0.35, 1.4, -2.45), (X + 0.35, 5.2, -2.2), 'steel', base=5)                   # ребро поножей
+        m.box(leg, (X - 2.0, 0.0, -3.0), (X + 2.0, 1.2, 2.0), 'steel', base=2, trim='t')              # сабатон
     # меч (одноручный, клинок вдоль +y, шарнир в хвате) и башенный щит на левом предплечье
     m.bone('sword', 'right_forearm', (5.0, 11.0, -0.2), (-90, 0, 0))
     p = np.array([5.0, 11.0, -0.2]) - [0, SOL_GRIP_R, 0]

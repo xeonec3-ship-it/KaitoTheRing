@@ -867,5 +867,22 @@
   "subtitles.pohsmp_core.martin.soldier": "Phantom soldier rises",
   "subtitles.pohsmp_core.martin.soldier_vanish": "Phantom soldier fades",
   "subtitles.pohsmp_core.martin.phase": "Martin roars",
-  "subtitles.pohsmp_core.music.martin": "Music: Martin"
+  "subtitles.pohsmp_core.music.martin": "Music: Martin",
+  "ui.pohsmp_core.martin.shield_wall": "\"Shield Wall!\" — find the gaps in the line",
+  "ui.pohsmp_core.martin.volley": "\"Archers — loose!\"",
+  "ui.pohsmp_core.martin.volley_warn": "Arrows! Get off the red marks",
+  "ui.pohsmp_core.martin.duel": "Martin challenges %s to a duel!",
+  "ui.pohsmp_core.martin.duel_blocked": "Do not interfere in the duel",
+  "ui.pohsmp_core.martin.duel_end": "The duel is over",
+  "ui.pohsmp_core.martin.warcry": "\"War Cry!\" — spells are interrupted",
+  "ui.pohsmp_core.martin.warcry_interrupt": "Martin's war cry broke your spell",
+  "ui.pohsmp_core.martin.status.shield_wall": "Shield Wall",
+  "ui.pohsmp_core.martin.status.volley": "Archer Volley",
+  "ui.pohsmp_core.martin.status.duel": "Duel",
+  "ui.pohsmp_core.martin.status.warcry": "War Cry",
+  "subtitles.pohsmp_core.martin.shield_wall": "Shield wall advances",
+  "subtitles.pohsmp_core.martin.volley": "Phantom bows twang",
+  "subtitles.pohsmp_core.martin.arrow_hit": "Arrows strike the ground",
+  "subtitles.pohsmp_core.martin.duel": "A duel is declared",
+  "subtitles.pohsmp_core.martin.warcry": "Martin's war cry"
 }

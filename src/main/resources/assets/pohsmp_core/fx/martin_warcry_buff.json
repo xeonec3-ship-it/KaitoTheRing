@@ -1,0 +1,27 @@
+{
+ "comment": "Солдат под кличем (caster = солдат, follow, 120 тиков = 6 с): кроваво-золотой ореол.",
+ "style": "martin",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "duration": 120,
+   "thickness": 0.14,
+   "pulse": [
+    0.35,
+    8
+   ],
+   "color": "#C22A2C",
+   "motes": 10,
+   "ring": false,
+   "out": {
+    "duration": 14,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

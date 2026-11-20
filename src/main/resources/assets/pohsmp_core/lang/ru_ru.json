@@ -867,5 +867,22 @@
   "subtitles.pohsmp_core.martin.soldier": "Встаёт призрачный солдат",
   "subtitles.pohsmp_core.martin.soldier_vanish": "Призрачный солдат рассеивается",
   "subtitles.pohsmp_core.martin.phase": "Мартин ревёт",
-  "subtitles.pohsmp_core.music.martin": "Музыка: Мартин"
+  "subtitles.pohsmp_core.music.martin": "Музыка: Мартин",
+  "ui.pohsmp_core.martin.shield_wall": "«Стена щитов!» — ищите просветы в строю",
+  "ui.pohsmp_core.martin.volley": "«Лучники — залп!»",
+  "ui.pohsmp_core.martin.volley_warn": "Стрелы! Уйдите с красных меток",
+  "ui.pohsmp_core.martin.duel": "Мартин вызывает %s на дуэль!",
+  "ui.pohsmp_core.martin.duel_blocked": "Не вмешивайтесь в дуэль",
+  "ui.pohsmp_core.martin.duel_end": "Дуэль окончена",
+  "ui.pohsmp_core.martin.warcry": "«Боевой клич!» — заклинания сорваны",
+  "ui.pohsmp_core.martin.warcry_interrupt": "Клич Мартина сорвал ваше заклинание",
+  "ui.pohsmp_core.martin.status.shield_wall": "Стена щитов",
+  "ui.pohsmp_core.martin.status.volley": "Залп лучников",
+  "ui.pohsmp_core.martin.status.duel": "Дуэль",
+  "ui.pohsmp_core.martin.status.warcry": "Боевой клич",
+  "subtitles.pohsmp_core.martin.shield_wall": "Стена щитов надвигается",
+  "subtitles.pohsmp_core.martin.volley": "Призрачные луки звенят",
+  "subtitles.pohsmp_core.martin.arrow_hit": "Стрелы вонзаются в землю",
+  "subtitles.pohsmp_core.martin.duel": "Брошен вызов на дуэль",
+  "subtitles.pohsmp_core.martin.warcry": "Боевой клич Мартина"
 }

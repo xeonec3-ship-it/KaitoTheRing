@@ -20,8 +20,8 @@ CDN = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'
 MODELS = {   # имя -> (geo, текстура, glow, анимации, рост для камеры, масштаб в мире, прочее)
     'martin': dict(geo='martin', tex='martin/martin', anims='martin', height=66, scale=2, title='Мартин, Последний Полководец (×2)',
                    bg=0x231a1c, ironsHide='martin_'),
-    'martin_soldier': dict(geo='martin_soldier', tex='martin/martin_soldier', anims='martin_soldier', height=34, scale=1, opacity=0.78,
-                           emissive=0x203848, title='Призрачный солдат', bg=0x141c24),
+    'martin_soldier': dict(geo='martin_soldier', tex='martin/martin_soldier', anims='martin_soldier', height=34, scale=1, opacity=0.84,
+                           emissive=0x08121a, title='Призрачный солдат', bg=0x141c24),
     'martin_banner': dict(geo='martin_banner', tex='martin/martin_banner', anims='martin_banner', height=60, scale=1, title='Знамя Мартина',
                           bg=0x231a1c),
     'cult_leader': dict(geo='cult_leader', tex='cult_leader/cult_leader', anims='cult_leader', height=36, scale=1,

@@ -91,6 +91,8 @@
 - `animations/entity/martin_soldier.animation.json`.
 
 **Модель.** Обычный рост (×1), кости Iron's (+ `right_forearm`/`left_forearm`, `tabard_front`, `cape`, `sword`, `shield`).
+Латы читаются и в полупрозрачности: кираса с кантом и заклёпками, две ламы наплечника, налокотники, наколенники, поножи с ребром, сабатоны,
+тёмные стыки между пластинами, кайма табарда; палитра — призрачная бирюза с усиленным контрастом (ручная светотень ×4).
 - Щит всегда на левом предплечье, меч — кость.
 - **Призрачность — код:** `RenderType.entityTranslucent` и альфа вершин ≈ 0.65 (`getRenderColor`) плюс `AutoGlowingGeoLayer`.
 - Хитбокс 0.7 × 2.0.
@@ -138,7 +140,7 @@
 | `martin_banner_hit` / `martin_banner_cut` | 6 / 40 | caster = точка / основание | при срубе — `Fx.stop` ауры и всех бафов |
 | `martin_cavalry_cast` | 68 | caster = Мартин | особое: свет на меч; на `call` (20 тик) запустить полосы |
 | **`martin_cavalry_lane`** | 72 | **caster = начало полосы на земле (край арены), yaw = направление** | **0–40 — предупреждение** (полоса 40×3 бл. с шевронами, мэш `martin_lane_warn`); **40–62 — три всадника** (мэш `martin_cavalry_rider`) пролетают полосу. **Урон:** всадник k (k = 0,1,2; старт 40 + 2k) в тике t стоит в z = −4 − 3.2k + 52·(t − 40 − 2k)/28 бл. от начала по yaw; бьёт игрока, если \|x\| < 1.5 и \|z_игрока − z\| < 1.5. Полос 3–5, параллельно или веером |
-| `martin_hold_the_line` | 200 | caster = Мартин, follow | особое, с `wall`: щит-барьер дугой 120° r2.4 (мэш `martin_shield_wall`), 10 с; удары спереди → `martin_hold_deflect` (10) в точке удара |
+| `martin_hold_the_line` | 200 | caster = Мартин, follow | особое, с `wall`: **дуга только спереди** (100°, r3.2) из 6 призрачных башенных щитов — кармин в золотой кайме с гербом, как его щит; сзади открыто. Мэш `martin_shield_wall`, золотые искры по кромкам, 10 с. Удары спереди → `martin_hold_deflect` (10) в точке удара |
 | `martin_hold_soldier` | 200 | caster = солдат, follow | малый барьер (scale 0.5) |
 | `martin_slam` | 30 | caster = точка удара ≈ 4.5 бл. впереди | `hit` в `martin_overhead` |
 | `martin_swing_trail` | 10 | caster = Мартин | на `swing` (размах/выпад) |
@@ -151,7 +153,7 @@
 - `martin_cavalry_rider` — конь в летящем галопе + всадник с копьём и флажком, полупрозрачные бруски, едет по +z;
 - `martin_soldier_ghost` — солдат для ролика, собран из модели солдата;
 - `martin_lane_warn` — quad полосы;
-- `martin_shield_wall` — 6 quad дуги.
+- `martin_shield_wall` — дуга из 6 щитов-брусков (раньше была клетка из quad с штриховкой — убрана).
 
 **Рисунки** (`textures/sigil/`): `martin_emblem` (герб: корона над мечом, 12 щитов строя), `martin_banner_ring`, `martin_barrier`, `martin_lane`.
 

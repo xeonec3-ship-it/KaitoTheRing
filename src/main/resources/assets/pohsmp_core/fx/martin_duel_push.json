@@ -1,0 +1,26 @@
+{
+ "comment": "Чужой игрок толкнут кольцом дуэли (caster = точка касания на кольце, 10 тиков).",
+ "style": "martin",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 8,
+   "size": 1.4,
+   "color": "@secondary",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 1.2,
+   "rim": 0.8,
+   "color": "@primary"
+  }
+ ]
+}

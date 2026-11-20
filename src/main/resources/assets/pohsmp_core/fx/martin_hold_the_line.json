@@ -1,5 +1,5 @@
 {
- "comment": "Особое «Приказ стоять насмерть» (caster = Мартин, follow; 10 с = 200 тиков, запускать на событии wall = 1.1 с анимации martin_hold_the_line). Спереди — щит-барьер дугой 120° (мэш martin_shield_wall), под ногами полукруг-герб; спереди неуязвим (код), бить со спины. Конец — Fx.stop или по длительности; затем анимация martin_hold_end.",
+ "comment": "Особое «Приказ стоять насмерть» (caster = Мартин, follow; 10 с = 200 тиков, запускать на событии wall = 1.1 с анимации martin_hold_the_line). Спереди — щит-барьер дугой 120° (мэш martin_shield_wall), под ногами полукруг-герб; спереди неуязвим (код), бить со спины; дуга 100° из 6 щитов r3.2, сзади открыто. Конец — Fx.stop или по длительности; затем анимация martin_hold_end.",
  "style": "martin",
  "duration": 200,
  "elements": [
@@ -38,6 +38,86 @@
    }
   },
   {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-2.45,1.4,2.06",
+   "follow": true,
+   "duration": 200,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.25,
+   "spread": 1.4,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 26,
+   "color": "@secondary",
+   "comment": "золотые искры по кромкам щитов"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+-0.56,1.4,3.15",
+   "follow": true,
+   "duration": 200,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.25,
+   "spread": 1.4,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 26,
+   "color": "@secondary",
+   "comment": "золотые искры по кромкам щитов"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+1.6,1.4,2.77",
+   "follow": true,
+   "duration": 200,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.25,
+   "spread": 1.4,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 26,
+   "color": "@secondary",
+   "comment": "золотые искры по кромкам щитов"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+2.45,1.4,2.06",
+   "follow": true,
+   "duration": 200,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.25,
+   "spread": 1.4,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 26,
+   "color": "@secondary",
+   "comment": "золотые искры по кромкам щитов"
+  },
+  {
    "type": "decal",
    "delay": 0,
    "at": "caster",
@@ -49,25 +129,6 @@
    "color": "@primary",
    "duration": 200,
    "fadeOut": 12
-  },
-  {
-   "type": "sprites",
-   "delay": 0,
-   "at": "caster+0,0.2,2.2",
-   "follow": true,
-   "duration": 200,
-   "texture": "spark_soft",
-   "count": 100000,
-   "rate": 0.5,
-   "spread": 1.6,
-   "speed": 0.01,
-   "gravity": -0.01,
-   "size": [
-    0.14,
-    0.02
-   ],
-   "life": 30,
-   "color": "@secondary"
   }
  ]
 }

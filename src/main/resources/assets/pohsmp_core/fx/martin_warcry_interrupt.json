@@ -1,0 +1,33 @@
+{
+ "comment": "Каст игрока сорван кличем (caster = игрок): заклинание лопается в руке красными осколками.",
+ "style": "martin",
+ "duration": 14,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": 8,
+   "size": 1.0,
+   "color": "#C22A2C"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 6,
+   "spread": 0.3,
+   "speed": 0.14,
+   "gravity": 0.02,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 12,
+   "color": "#C22A2C"
+  }
+ ]
+}

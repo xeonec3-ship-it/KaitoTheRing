@@ -832,40 +832,34 @@ public final class ErebFight {
     }
 
     /**
-     * The finisher (the framework holds the victim, kills it at FIN_KILL with «%1$s поверил Эребу»): he vanishes in a glass ripple,
-     * comes out behind the victim's back, a rapier thrust; the victim breaks into glass and butterflies. Its camera: a short close-up
-     * on him from beside it.
+     * The finisher ereb_finisher (the framework holds the victim where it was struck and kills it at FIN_KILL with «%1$s поверил
+     * Эребу»): on `vanish` he is gone (invulnerable) and moved 1.3 blocks behind the victim, facing it; `appear`; the thrust on `stab`;
+     * the victim breaks into glass and butterflies (fx ereb_finisher, tick 38). Its camera: a close-up on him from beside it.
      */
     void finisher(ServerLevel sl, ServerPlayer victim) {
-        boolean own = ErebEntity.FINISHER_ANIM != null;
-        anim(own ? ErebEntity.FINISHER_ANIM : "ereb_vanish");
-        if (ru.pohsmp.core.fx.FxLib.fx("ereb_finisher") != null)
-            Fx.play(sl, Fx.fx("ereb_finisher").caster(boss).at(boss.position()).yaw(boss.getYRot()).target(victim));
-        else Fx.play(sl, Fx.fx("ereb_vanish").caster(boss).at(boss.position()).yaw(boss.getYRot()));
+        anim("ereb_finisher");
+        Fx.play(sl, Fx.fx("ereb_finisher").caster(boss).at(boss.position()).yaw(boss.getYRot()).target(victim));
         core.sound("ereb.vanish", 2, 1);
         play(new BossTimeline("finisher", ErebMath.FINISHER)
-                .at(ErebMath.FIN_GONE, () -> {
+                .at(ErebMath.FIN_VANISH, () -> {
                     hide(true);
                     hiddenLeft = 0;
-                })
-                .at(ErebMath.FIN_APPEAR, () -> {
-                    double[] p = ErebMath.behind(victim.getX(), victim.getZ(), victim.getYRot(), 1.1);
+                    invuln = ErebMath.FIN_APPEAR - ErebMath.FIN_VANISH + 1;
+                    double[] p = ErebMath.behind(victim.getX(), victim.getZ(), victim.getYRot(), ErebMath.FIN_BEHIND);
                     Vec3 to = free(sl, new Vec3(p[0], victim.getY(), p[1]));
                     float yaw = ErebMath.yawTo(to.x, to.z, victim.getX(), victim.getZ());
                     boss.moveTo(to.x, to.y, to.z, yaw, 0);
                     face(yaw);
+                    boss.getNavigation().stop();
+                })
+                .at(ErebMath.FIN_APPEAR, () -> {
                     hide(false);
-                    if (!own) anim("ereb_backstab");
-                    Fx.play(sl, Fx.fx("ereb_appear").caster(boss).at(to).yaw(yaw));
                     core.sound("ereb.appear", 2, 1);
                     core.sceneFor(victim, "ereb.finisher", ErebMath.FIN_CAM, BossNet.SCENE_LOCK_INPUT | BossNet.SCENE_NO_HUD, victim.position(),
                             victim.getYRot(), victim.getId());
                 })
-                .at(ErebMath.FIN_STAB, () -> thrustFx())
-                .at(ErebMath.FIN_KILL - 1, () -> {   // the victim breaks into glass and butterflies (it dies on the next tick)
-                    Fx.play(sl, Fx.fx("ereb_butterfly_dissolve").caster(victim).at(victim.position()).yaw(victim.getYRot()));
-                    core.sound(victim.position(), "ereb.dissolve", 2, 1.1f);
-                }));
+                .at(ErebMath.FIN_STAB, () -> core.sound("ereb.thrust", 2, 0.9f))
+                .at(ErebMath.FIN_KILL, () -> core.sound(victim.position(), "ereb.dissolve", 2, 1.1f)));
     }
 
     /** «Дезинтеграция: Реплика» broke in: the feint window closes. */

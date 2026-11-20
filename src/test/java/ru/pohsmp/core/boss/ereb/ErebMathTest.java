@@ -65,11 +65,13 @@ class ErebMathTest {
         assertEquals(event(a, "ereb_glass_rain", "fall", 0), ErebMath.RAIN_FALL);   // marks + 1.2 s
         assertEquals(event(a, "ereb_mirror_step_out", "gone", 0), ErebMath.STEP_GONE);
         assertEquals(12, ErebMath.STEP_WARN);   // the glint behind the player: 0.6 s (ТЗ)
-        // the finisher (ТЗ «Добивание»: 2–2.5 s): vanish → behind the victim → the thrust of ereb_backstab → death
-        assertEquals(event(a, "ereb_vanish", "gone", 0), ErebMath.FIN_GONE);
-        assertEquals(ErebMath.FIN_APPEAR + event(a, "ereb_backstab", "stab", 0), ErebMath.FIN_STAB);
-        assertTrue(ErebMath.FIN_STAB < ErebMath.FIN_KILL && ErebMath.FIN_KILL < ErebMath.FINISHER);
-        assertTrue(ErebMath.FINISHER >= 40 && ErebMath.FINISHER <= 50);
+        // the finisher ereb_finisher (ТЗ «Добивание», visual letter mgr_anim_check_T26_T30, section 5)
+        assertEquals(len(a, "ereb_finisher"), ErebMath.FINISHER);
+        assertEquals(event(a, "ereb_finisher", "vanish", 0), ErebMath.FIN_VANISH);
+        assertEquals(event(a, "ereb_finisher", "appear", 0), ErebMath.FIN_APPEAR);
+        assertEquals(event(a, "ereb_finisher", "stab", 0), ErebMath.FIN_STAB);
+        assertEquals(event(a, "ereb_finisher", "kill", 0), ErebMath.FIN_KILL);
+        assertEquals(1.3, ErebMath.FIN_BEHIND, 1e-9);
         assertEquals(len(a, "ereb_replica_break"), ErebMath.REPLICA_ANIM);
         assertEquals(event(a, "ereb_replica_break", "break", 0), ErebMath.REPLICA_BREAK);
         assertEquals(event(a, "ereb_replica_break", "speak", 0), ErebMath.REPLICA_SPEAK);

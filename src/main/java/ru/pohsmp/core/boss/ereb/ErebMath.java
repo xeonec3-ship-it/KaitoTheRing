@@ -44,11 +44,13 @@ public final class ErebMath {
     public static final int REPLICA_DELAY = 40, REPLICA_ANIM = 46, REPLICA_BREAK = 19, REPLICA_SPEAK = 31;
 
     /**
-     * The finisher (owner 20.11, ТЗ «Добивание»; 2.4 s): he vanishes in a ripple (gone 0.6 s), comes out behind the victim (0.8 s), the
-     * thrust in the back (0.45 s after: 1.25 s), the victim breaks into glass and butterflies and dies at 2.2 s; the victim's camera from
-     * his coming out for 1.2 s. Until the visual assistant's ereb_finisher exists, his part is ereb_vanish + ereb_backstab (same events).
+     * The finisher ereb_finisher (owner 20.11, ТЗ «Добивание»; 2.4 s; the visual letter mgr_anim_check_T26_T30, section 5): `vanish` 0.3 —
+     * hidden, invulnerable, moved 1.3 blocks behind the victim facing it; `appear` 0.7; `stab` 1.1; `kill` 1.9 — the victim breaks (fx
+     * ereb_finisher, tick 38) and dies. The victim's camera from `appear` to just after `kill`.
      */
-    public static final int FINISHER = 48, FIN_GONE = 12, FIN_APPEAR = 16, FIN_STAB = FIN_APPEAR + 9, FIN_KILL = 44, FIN_CAM = 24;
+    public static final int FINISHER = 48, FIN_VANISH = 6, FIN_APPEAR = 14, FIN_STAB = 22, FIN_KILL = 38, FIN_CAM = 28;
+    /** Ereb stands this far behind the victim (closer: his head enters the bent victim). */
+    public static final double FIN_BEHIND = 1.3;
 
     // ---------------------------------------------------------------- geometry (Minecraft yaw: forward = (-sin, cos))
 

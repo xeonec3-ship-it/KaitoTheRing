@@ -4,8 +4,6 @@ import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.Abstra
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMobModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import org.joml.Vector2f;
 import ru.pohsmp.core.PohCore;
 import ru.pohsmp.core.boss.ereb.ErebBody;
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
@@ -41,12 +39,18 @@ public class ErebModel extends AbstractSpellCastingMobModel {
     public void setCustomAnimations(AbstractSpellCastingMob entity, long instanceId, AnimationState<AbstractSpellCastingMob> state) {
         super.setCustomAnimations(entity, instanceId, state);
         if (Minecraft.getInstance().isPaused() || !(entity instanceof ErebBody b) || b.playingAction()) return;
-        Vector2f limb = getLimbSwing(entity, entity.walkAnimation, state.getPartialTick());
-        float right = Mth.cos(limb.y() * 0.6662f) * 1.4f * limb.x(), left = Mth.cos(limb.y() * 0.6662f + Mth.PI) * 1.4f * limb.x();
-        coat("coat_front_r", -3 * Mth.DEG_TO_RAD + Math.min(0, right) * 0.55f);
-        coat("coat_front_l", -3 * Mth.DEG_TO_RAD + Math.min(0, left) * 0.55f);
-        coat("coat_back_r", 5 * Mth.DEG_TO_RAD + Math.max(0, right) * 0.4f);
-        coat("coat_back_l", 5 * Mth.DEG_TO_RAD + Math.max(0, left) * 0.4f);
+        // GeckoLib axes (mgr_anim_check_T26_T30, 4.2): the back tails follow a leg going back (rotX < 0), the front ones only a leg
+        // going forward (rotX > 0) — never through it; their rest angles are in the model
+        float right = rot("right_leg"), left = rot("left_leg");
+        coat("coat_back_r", Math.min(0, right) * 0.4f);
+        coat("coat_back_l", Math.min(0, left) * 0.4f);
+        coat("coat_front_r", Math.max(0, right) * 0.55f);
+        coat("coat_front_l", Math.max(0, left) * 0.55f);
+    }
+
+    private float rot(String bone) {
+        CoreGeoBone b = getAnimationProcessor().getBone(bone);
+        return b == null ? 0 : b.getRotX();
     }
 
     private void coat(String bone, float rotX) {

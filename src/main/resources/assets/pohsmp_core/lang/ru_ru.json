@@ -725,5 +725,17 @@
   "ui.pohsmp_core.ereb.finale": "Эреб улыбается…",
   "ui.pohsmp_core.ereb.butterfly": "Сон бабочки",
   "ui.pohsmp_core.ereb.vanish": "Эреб исчез. Бой окончен.",
-  "ui.pohsmp_core.ereb.vanish_line": "В любом случае, от вас мне больше нет пользы."
+  "ui.pohsmp_core.ereb.farewell": "В любом случае, от вас мне больше нет пользы.",
+  "subtitles.pohsmp_core.ereb.glint": "Звенит стекло",
+  "subtitles.pohsmp_core.ereb.vanish": "Эреб исчезает",
+  "subtitles.pohsmp_core.ereb.appear": "Эреб появляется",
+  "subtitles.pohsmp_core.ereb.shards": "Стеклянные осколки",
+  "subtitles.pohsmp_core.ereb.thrust": "Укол рапирой",
+  "subtitles.pohsmp_core.ereb.parry": "Звон клинка",
+  "subtitles.pohsmp_core.ereb.cast": "Эреб колдует",
+  "subtitles.pohsmp_core.ereb.disguise": "Облик меняется",
+  "subtitles.pohsmp_core.ereb.phase": "Стекло трескается",
+  "subtitles.pohsmp_core.ereb.spawn": "Слетаются бабочки",
+  "subtitles.pohsmp_core.ereb.butterfly": "Стеклянная бабочка",
+  "subtitles.pohsmp_core.ereb.dissolve": "Эреб рассыпается бабочками"
 }

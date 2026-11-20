@@ -725,5 +725,17 @@
   "ui.pohsmp_core.ereb.finale": "Ereb smiles…",
   "ui.pohsmp_core.ereb.butterfly": "The Butterfly Dream",
   "ui.pohsmp_core.ereb.vanish": "Ereb has vanished. The battle is over.",
-  "ui.pohsmp_core.ereb.vanish_line": "Either way, you are of no further use to me."
+  "ui.pohsmp_core.ereb.farewell": "Either way, you are of no further use to me.",
+  "subtitles.pohsmp_core.ereb.glint": "Glass chimes",
+  "subtitles.pohsmp_core.ereb.vanish": "Ereb vanishes",
+  "subtitles.pohsmp_core.ereb.appear": "Ereb appears",
+  "subtitles.pohsmp_core.ereb.shards": "Glass shards",
+  "subtitles.pohsmp_core.ereb.thrust": "Rapier thrust",
+  "subtitles.pohsmp_core.ereb.parry": "Blade rings",
+  "subtitles.pohsmp_core.ereb.cast": "Ereb casts",
+  "subtitles.pohsmp_core.ereb.disguise": "A face changes",
+  "subtitles.pohsmp_core.ereb.phase": "Glass cracks",
+  "subtitles.pohsmp_core.ereb.spawn": "Butterflies gather",
+  "subtitles.pohsmp_core.ereb.butterfly": "Glass butterfly",
+  "subtitles.pohsmp_core.ereb.dissolve": "Ereb scatters into butterflies"
 }

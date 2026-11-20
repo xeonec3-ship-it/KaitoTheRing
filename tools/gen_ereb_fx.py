@@ -171,7 +171,7 @@ def effects():
        '0.3 с (smile) — код меняет текстуру на ereb_smile; 1.4 с (butterfly, тик 28) — из ладони вырастает стеклянная бабочка '
        '(модель illusion_butterfly T22, ×0.24), трепещет у ладони; 3.2 с (cast, тик 64) — он поднимает её, она вспархивает со вспышкой: '
        'код начинает «Сон бабочки» (ButterflyDreamSpell) с caster = ТОЧКА Эреба (не сущность — он исчезнет); '
-       '2.4 с (speak, тик 48) — фраза «В любом случае, от вас мне больше нет пользы» (ui…ereb.vanish_line: чат r48 + субтитр); 5.0 с (vanish, тик 100) — Эреб рассыпается бабочками (fx ereb_butterfly_dissolve — уже внутри этого fx; модель спрятать на 104).',
+       '2.4 с (speak, тик 48) — фраза «В любом случае, от вас мне больше нет пользы» (ui…ereb.farewell: чат r48 + субтитр); 5.0 с (vanish, тик 100) — Эреб рассыпается бабочками (fx ereb_butterfly_dissolve — уже внутри этого fx; модель спрятать на 104).',
        T_FINALE + 10, [
         E('flash', 26, PALM, duration=10, size=0.6, color=GLASS_HI, brightness=0.9, comment='свет в ладони'),
         glass(26, PALM, 8, rate=4, dur=2, spread=0.15, speed=-0.02, gravity=0.0, life=6, comment='осколки складываются в бабочку'),
@@ -427,11 +427,51 @@ LANG = {
     'ui.pohsmp_core.ereb.finale': ('Эреб улыбается…', 'Ereb smiles…'),
     'ui.pohsmp_core.ereb.butterfly': ('Сон бабочки', 'The Butterfly Dream'),
     'ui.pohsmp_core.ereb.vanish': ('Эреб исчез. Бой окончен.', 'Ereb has vanished. The battle is over.'),
-    'ui.pohsmp_core.ereb.vanish_line': ('В любом случае, от вас мне больше нет пользы.', 'Either way, you are of no further use to me.'),
+    'ui.pohsmp_core.ereb.farewell': ('В любом случае, от вас мне больше нет пользы.', 'Either way, you are of no further use to me.'),
 }
 
 
+def S_(name, pitch, volume):
+    return {'name': name, 'type': 'event', 'pitch': pitch, 'volume': volume}
+
+
+SOUNDS = {   # ванильные стекло и аметист с другим pitch (владелец 20.11: «стекло/аметист с pitch»); по 2–3 вариации
+    'ereb.glint': [S_('minecraft:block.amethyst_block.chime', 1.9, 0.9), S_('minecraft:block.amethyst_block.chime', 2.0, 0.8)],
+    'ereb.vanish': [S_('minecraft:block.glass.break', 1.5, 0.6), S_('minecraft:block.amethyst_cluster.break', 1.3, 0.8)],
+    'ereb.appear': [S_('minecraft:block.amethyst_cluster.place', 0.8, 0.9), S_('minecraft:block.amethyst_block.resonate', 1.4, 0.8)],
+    'ereb.shards': [S_('minecraft:block.glass.break', 1.8, 0.5), S_('minecraft:block.amethyst_cluster.hit', 1.6, 0.9),
+                    S_('minecraft:block.amethyst_cluster.hit', 1.9, 0.8)],
+    'ereb.thrust': [S_('minecraft:entity.player.attack.sweep', 1.7, 0.6), S_('minecraft:entity.player.attack.sweep', 1.9, 0.55)],
+    'ereb.parry': [S_('minecraft:block.anvil.place', 2.0, 0.25), S_('minecraft:block.amethyst_block.hit', 1.8, 0.8)],
+    'ereb.cast': [S_('minecraft:block.amethyst_block.chime', 1.4, 1.0), S_('minecraft:block.amethyst_block.chime', 1.6, 0.9)],
+    'ereb.disguise': [S_('minecraft:entity.illusioner.mirror_move', 1.1, 0.8), S_('minecraft:entity.illusioner.mirror_move', 0.95, 0.8)],
+    'ereb.phase': [S_('minecraft:block.glass.break', 0.6, 1.0), S_('minecraft:block.amethyst_block.resonate', 0.7, 1.0)],
+    'ereb.spawn': [S_('minecraft:block.amethyst_block.resonate', 0.6, 1.2), S_('minecraft:entity.illusioner.prepare_mirror', 0.8, 1.0)],
+    'ereb.butterfly': [S_('minecraft:block.amethyst_block.chime', 2.0, 0.7), S_('minecraft:block.amethyst_block.chime', 1.75, 0.7)],
+    'ereb.dissolve': [S_('minecraft:block.amethyst_cluster.break', 0.9, 1.0), S_('minecraft:block.glass.break', 0.8, 0.8)],
+}
+SUB = {'glint': ('Звенит стекло', 'Glass chimes'), 'vanish': ('Эреб исчезает', 'Ereb vanishes'), 'appear': ('Эреб появляется', 'Ereb appears'),
+       'shards': ('Стеклянные осколки', 'Glass shards'), 'thrust': ('Укол рапирой', 'Rapier thrust'), 'parry': ('Звон клинка', 'Blade rings'),
+       'cast': ('Эреб колдует', 'Ereb casts'), 'disguise': ('Облик меняется', 'A face changes'), 'phase': ('Стекло трескается', 'Glass cracks'),
+       'spawn': ('Слетаются бабочки', 'Butterflies gather'), 'butterfly': ('Стеклянная бабочка', 'Glass butterfly'),
+       'dissolve': ('Эреб рассыпается бабочками', 'Ereb scatters into butterflies')}
+
+
+def sounds():
+    p = os.path.join(M.A, 'sounds.json')
+    d = json.load(open(p, encoding='utf-8'))
+    for k, v in SOUNDS.items():
+        d[k] = {'subtitle': 'subtitles.pohsmp_core.' + k, 'sounds': v}
+    with open(p, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(d, f, ensure_ascii=False, indent=2)
+        f.write('\n')
+    M.WRITTEN.append('sounds.json (+%d событий)' % len(SOUNDS))
+
+
 def lang():
+    for k, v in SUB.items():
+        LANG['subtitles.pohsmp_core.ereb.' + k] = v
+
     for i, name in enumerate(('ru_ru', 'en_us')):
         p = os.path.join(M.A, 'lang', name + '.json')
         d = json.load(open(p, encoding='utf-8'))
@@ -493,7 +533,7 @@ def sheet_textures():
     img = Image.new('RGBA', (Wd, Hd), M.hx('#16151b'))
     d = ImageDraw.Draw(img)
     f1, f2 = font(24), font(18)
-    d.text((24, 14), 'T30 — текстуры Эреба 128×128 (1 тексель = 1/16 блока, ×5) и скин владельца', font=f1, fill=(240, 230, 210))
+    d.text((24, 14), 'T30 — текстуры Эреба ×4, как у эталона (атлас 128 → 512) и скин владельца', font=f1, fill=(240, 230, 210))
     T_ = os.path.join(M.A, 'textures', 'entity', 'ereb')
     for i, nm in enumerate(('ereb', 'ereb_smile', 'ereb_glowmask')):
         t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA')
@@ -503,7 +543,7 @@ def sheet_textures():
         d.text((24 + i * 500, 546), nm + '.png', font=f2, fill=(220, 210, 195))
     # лица крупно
     for i, nm in enumerate(('ereb', 'ereb_smile')):
-        t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA').crop((8, 8, 16, 16)).resize((160, 160), Image.NEAREST)
+        t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA').crop((32, 32, 64, 64)).resize((160, 160), Image.NEAREST)
         img.alpha_composite(t, (24 + i * 180, 590))
     d.text((24, 760), 'лицо: обычное / улыбка (финал)', font=f2, fill=(220, 210, 195))
     ref = Image.open(os.path.join(ROOT, 'docs', 'references', 't30', 'ereb_front.jpg')).convert('RGBA')
@@ -526,6 +566,7 @@ def run(mod, args):
     bars = bossbars()
     titles(bars)
     lang()
+    sounds()
     os.makedirs(MEDIA, exist_ok=True)
     sheet_ui(bars)
     sheet_textures()

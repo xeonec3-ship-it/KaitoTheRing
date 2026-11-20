@@ -318,7 +318,7 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         setTarget(null);
         int before = tex();
         play("surrender");
-        Fx.play(sl, Fx.fx("aris_surrender").caster(this).at(position()).yaw(getYRot()));
+        Fx.play(sl, Fx.fx("aris_surrender").at(position()).yaw(getYRot()));
         List<ServerPlayer> who = core.scene("aris.surrender", ArisMath.SURRENDER, BossNet.SCENE_LOCK_INPUT | BossNet.SCENE_BARS | BossNet.SCENE_NO_HUD,
                 48, position(), getYRot(), -1);
         core.play(new BossTimeline("scene:surrender", ArisMath.SURRENDER)

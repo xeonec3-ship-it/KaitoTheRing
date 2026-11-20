@@ -133,6 +133,11 @@ Lang, звуки, модели, fx, текстуры — уже в репози�
   **Ключа lang `death.attack.pohsmp_core.martin_finisher` ещё нет** — его добавляет помощник («%1$s пал от меча Мартина, Последнего Полководца»);
   без него в сообщении о смерти будет ключ.
 
+**После правки помощника (плащ, руки, меч, `martin_finisher`):** сверил события всех анимаций Мартина с тиками кода — совпадают;
+сдвинуты только звук/след взмаха (`swing` 0.62 с → тик 12, у удара сверху 0.82 с → тик 16; `MartinMath.SWING_SWING/OVERHEAD_SWING`).
+Поза жертвы — своя `irons_spellbooks:pohsmp_martin_finisher_victim` (`MartinEntity.finisherVictimAnim`). Тайминги `FINISHER_*` подтверждены
+анимацией (impale 8, raise 16, throw 34, slam 40, kill 46); lang `death.attack.pohsmp_core.martin_finisher` и fx уже есть.
+
 **Плащ:** процедурного покачивания плаща в коде Мартина нет — плащ двигают только анимации (правит помощник в `martin.animation.json`).
 
 ## 3. Решения, которые стоит проверить

@@ -898,5 +898,6 @@
   "message.pohsmp_core.no_imbue": "Эта магия не вкладывается в предметы",
   "entity.pohsmp_core.ereb_reflection": "Эреб, Первый Предатель",
   "entity.pohsmp_core.ereb_shard": "Стеклянный осколок",
-  "entity.pohsmp_core.ereb_dream_point": "Сон бабочки"
+  "entity.pohsmp_core.ereb_dream_point": "Сон бабочки",
+  "death.attack.pohsmp_core.ereb_finisher": "%1$s поверил Эребу"
 }

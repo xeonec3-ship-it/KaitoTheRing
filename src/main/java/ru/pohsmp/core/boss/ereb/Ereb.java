@@ -29,7 +29,7 @@ public final class Ereb {
             .leave(0.05)                   // «Сон бабочки» and gone
             .special("false_ally", 0.50)   // balance: false_ally_at
             .special("labyrinth", 0.20)    // balance: labyrinth_at
-            .finisher(false)
+            .finisher(true)                // owner 20.11: «всем боссам добивание» (ТЗ «Добивание»)
             .music("music.ereb")
             .title("ereb")
             .fightRadius(40)

@@ -65,6 +65,11 @@ class ErebMathTest {
         assertEquals(event(a, "ereb_glass_rain", "fall", 0), ErebMath.RAIN_FALL);   // marks + 1.2 s
         assertEquals(event(a, "ereb_mirror_step_out", "gone", 0), ErebMath.STEP_GONE);
         assertEquals(12, ErebMath.STEP_WARN);   // the glint behind the player: 0.6 s (ТЗ)
+        // the finisher (ТЗ «Добивание»: 2–2.5 s): vanish → behind the victim → the thrust of ereb_backstab → death
+        assertEquals(event(a, "ereb_vanish", "gone", 0), ErebMath.FIN_GONE);
+        assertEquals(ErebMath.FIN_APPEAR + event(a, "ereb_backstab", "stab", 0), ErebMath.FIN_STAB);
+        assertTrue(ErebMath.FIN_STAB < ErebMath.FIN_KILL && ErebMath.FIN_KILL < ErebMath.FINISHER);
+        assertTrue(ErebMath.FINISHER >= 40 && ErebMath.FINISHER <= 50);
         assertEquals(len(a, "ereb_replica_break"), ErebMath.REPLICA_ANIM);
         assertEquals(event(a, "ereb_replica_break", "break", 0), ErebMath.REPLICA_BREAK);
         assertEquals(event(a, "ereb_replica_break", "speak", 0), ErebMath.REPLICA_SPEAK);

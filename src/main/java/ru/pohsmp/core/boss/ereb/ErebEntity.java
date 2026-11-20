@@ -248,6 +248,33 @@ public class ErebEntity extends ErebBody implements PohBoss {
         fight.finale();
     }
 
+    // ---------------------------------------------------------------- finisher (owner 20.11, ТЗ «Добивание»; 2.4 s)
+
+    /** His part of the finisher: the visual assistant's ereb_finisher once it is in ereb.animation.json; till then vanish + backstab. */
+    static final String FINISHER_ANIM = null;
+
+    @Override
+    public int finisherTicks() {
+        return ErebMath.FINISHER;
+    }
+
+    @Override
+    public int finisherKillTick() {
+        return ErebMath.FIN_KILL;
+    }
+
+    @Override
+    public String finisherVictimAnim() {
+        return "irons_spellbooks:pohsmp_cult_finisher_victim";   // the shared pose (ТЗ: «общая или своя»)
+    }
+
+    /** The victim stays where it was struck (it is IN FRONT of him: he comes out behind its back). */
+    @Override
+    public void onFinisherStart(ServerPlayer victim) {
+        if (!(level() instanceof ServerLevel sl)) return;
+        fight.finisher(sl, victim);
+    }
+
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика»
 
     /** ereb_replica_break 2.3 s: snap 0.55, break 0.95, speak 1.55; «Прекрасная копия, увы не идеальная» over his head. */

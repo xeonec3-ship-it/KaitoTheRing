@@ -1,0 +1,29 @@
+{
+ "comment": "T31 «Полное Раскрытие», Длань бьёт (предупреждение, 30 тиков): caster = точка удара. На земле растёт тень ладони r4 и кольцо; через 30 тиков — ereb_hand_dream_slam. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 32,
+   "texture": "illusion_seal",
+   "radius": 4.0,
+   "grow": 26,
+   "glow": 0.3,
+   "color": "#D9CCFF",
+   "brightness": 0.6
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 4.0,
+   "color": "@primary",
+   "brightness": 0.6
+  }
+ ]
+}

@@ -1,0 +1,117 @@
+{
+ "comment": "T31 «Полное Раскрытие», удар Длани (40 тиков): caster = точка удара. Огромная ладонь падает с высоты (меш ×1.2) и бьёт плашмя: трещины стекла r4, кольцо, осколки; рука тает (урон во сне — ненастоящий, по ТЗ). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster+0,1.5,-2.5",
+   "model": "ereb_hand_giant_open",
+   "scale": 1.2,
+   "until": 24,
+   "move": {
+    "from": [
+     0,
+     16,
+     0
+    ],
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeInCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 6,
+   "at": "caster+0,0.5,0",
+   "duration": 8,
+   "size": 4.0,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.2
+  },
+  {
+   "type": "decal",
+   "delay": 6,
+   "at": "caster",
+   "duration": 34,
+   "texture": "higher_cracks",
+   "radius": 4.0,
+   "grow": 4,
+   "glow": 0.5,
+   "fadeOut": 24,
+   "color": "#D9CCFF"
+  },
+  {
+   "type": "wave",
+   "delay": 6,
+   "at": "caster+0,0.05,0",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 7.0,
+   "color": "@secondary",
+   "brightness": 0.8
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,0.5,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 40,
+   "spread": 2.5,
+   "speed": 0.2,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 22,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,2,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 16,
+   "rate": 16,
+   "spread": 2.0,
+   "speed": 0.06,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 30,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,2,0",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 8,
+   "rate": 8.0,
+   "spread": 2.0,
+   "speed": 0.06,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 30,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  }
+ ]
+}

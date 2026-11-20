@@ -1,0 +1,36 @@
+{
+ "comment": "T31 Отпустить (ereb_hand_grab_release, событие release 0.2 с): caster = отпущенный игрок. Корка лопается, стекло осыпается. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 14,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 18,
+   "rate": 18,
+   "spread": 0.6,
+   "speed": 0.1,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 14,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 5,
+   "size": 1.0,
+   "color": "#F4EEFF",
+   "brightness": 0.8
+  }
+ ]
+}

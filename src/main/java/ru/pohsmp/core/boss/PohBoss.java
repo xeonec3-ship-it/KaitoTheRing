@@ -40,6 +40,14 @@ public interface PohBoss {
         bossCore().endFinale();
     }
 
+    /**
+     * Leash (balance 1.3): it was kited farther than arena_radius + leash_extra from its spawn point and has just been put back there
+     * (+5% health, AI off for 1 s). Default: smoke where it was, fx <id>_appear (or portal sparks) and a sound where it is.
+     */
+    default void onBossLeash(Vec3 from) {
+        BossGuard.leashFx(bossCore(), from);
+    }
+
     /** Switch the boss's own AI off / on for scenes. Default: Mob.setNoAi. */
     default void setBossAi(boolean on) {
         bossMob().setNoAi(!on);

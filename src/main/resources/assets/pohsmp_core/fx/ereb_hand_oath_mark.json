@@ -1,0 +1,54 @@
+{
+ "comment": "T31 «Чужая клятва», метка (80 тиков = 4 с; ereb_hand_foreign_oath mark 0.6): caster = игрок с клятвой, follow. Над головой — знак двух колец с оком (багрянец), по телу — тонкая оболочка. Связь с союзником — только его меткой (ereb_hand_oath_bound), без нити. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 82,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.5,0",
+   "duration": 80,
+   "texture": "ereb_hand_oath_mark",
+   "count": 1,
+   "rate": 0.03,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    0.9,
+    0.9
+   ],
+   "life": 80,
+   "color": "#E0606A",
+   "glow": 0.4,
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "follow": true,
+   "duration": 80,
+   "thickness": 0.05,
+   "pulse": [
+    0.5,
+    10
+   ],
+   "motes": 4,
+   "texture": "spark_soft",
+   "ring": true,
+   "color": "#A3323B",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,2.5,0",
+   "duration": 8,
+   "size": 1.2,
+   "rays": 6,
+   "color": "#E0606A",
+   "follow": true
+  }
+ ]
+}

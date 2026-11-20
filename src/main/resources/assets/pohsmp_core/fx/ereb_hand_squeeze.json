@@ -1,0 +1,64 @@
+{
+ "comment": "T31 Сжатие (ereb_hand_squeeze, событие squeeze 0.35 с; добивание — squeeze 1.5 с): caster = схваченный игрок. Хруст стекла: трещины-печать на нём, багряно-золотые искры. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "id": "illusion_mirror_crack",
+   "scale": 0.3,
+   "until": 14,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 6,
+   "size": 1.0,
+   "rays": 4,
+   "color": "#E0606A",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 14,
+   "spread": 0.5,
+   "speed": 0.14,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#E0606A"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.5,
+   "speed": 0.12,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 14,
+   "color": "#F4EEFF"
+  }
+ ]
+}

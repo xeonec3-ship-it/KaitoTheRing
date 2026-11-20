@@ -1,0 +1,86 @@
+{
+ "comment": "T31 «Длань Лжи», ложная арена (6 с = 120 тиков): caster = пойманный игрок, follow; слать ТОЛЬКО ему. Мир в фиолетовом стекле, по краю зрения трещины зеркала, мерцание; союзники в это время рисуются кодом как враги (по ТЗ). В конце — звон и мир «бьётся». Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 124,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 120,
+   "radius": 64,
+   "color": "#3A2A66",
+   "strength": 0.4,
+   "in": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.5,0",
+   "duration": 120,
+   "texture": "mote_glass",
+   "count": 80,
+   "rate": 0.7,
+   "spread": 8,
+   "speed": 0.0,
+   "gravity": -0.002,
+   "size": [
+    0.16,
+    0.05
+   ],
+   "life": 40,
+   "color": "#F4EEFF",
+   "follow": true,
+   "wrap": 8
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster.eyes+0,0,1.2",
+   "id": "illusion_mirror_crack",
+   "scale": 0.8,
+   "until": 118,
+   "follow": true,
+   "comment": "трещины перед глазами"
+  },
+  {
+   "type": "flash",
+   "delay": 116,
+   "at": "caster.eyes+0,0,1",
+   "duration": 8,
+   "size": 3.0,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.0,
+   "screen": 0.5,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 116,
+   "at": "caster+0,1.6,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 30,
+   "rate": 30,
+   "spread": 1.5,
+   "speed": 0.15,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 20,
+   "color": "#F4EEFF"
+  }
+ ]
+}

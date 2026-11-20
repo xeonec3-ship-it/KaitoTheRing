@@ -1,0 +1,29 @@
+{
+ "comment": "T31 «Ложное пламя», метка круга (20 тиков = 1 с предупреждения; слать на ereb_hand_false_flame marks 0.6 в каждом из 5 кругов, и настоящих, и обманок — одинаково): caster = центр круга r2. Кольцо фиолетового стекла разгорается. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 22,
+   "texture": "ereb_hand_flame_ring",
+   "radius": 2.0,
+   "grow": 10,
+   "glow": 0.3,
+   "color": "#9A6BFF",
+   "brightness": 0.5
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 2.0,
+   "color": "#9A6BFF",
+   "brightness": 0.5
+  }
+ ]
+}

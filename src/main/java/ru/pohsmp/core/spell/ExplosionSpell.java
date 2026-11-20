@@ -164,7 +164,7 @@ public class ExplosionSpell extends PohSpell {
             if (d > R + e.getBbWidth() / 2) continue;
             double k = 1 - 0.5 * Math.min(1, d / R);
             e.invulnerableTime = 0;
-            io.redspace.ironsspellbooks.damage.DamageSources.applyDamage(e, (float) ((FLAT + e.getMaxHealth() * PCT) * k),
+            io.redspace.ironsspellbooks.damage.DamageSources.applyDamage(e, (float) ((FLAT + e.getMaxHealth() * PCT * ru.pohsmp.core.boss.BossGuard.percentMult(e)) * k),
                     io.redspace.ironsspellbooks.api.registry.SpellRegistry.getSpell("pohsmp_core:" + PATH).getDamageSource(caster));
             e.setSecondsOnFire(8);
             Vec3 away = e.position().subtract(c).multiply(1, 0, 1);

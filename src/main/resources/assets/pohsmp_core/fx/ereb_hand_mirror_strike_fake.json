@@ -1,0 +1,28 @@
+{
+ "comment": "T31 «Тысяча отражений», ложный удар (14 тиков): caster = зеркало. Лишь едва заметный стеклянный блик в стекле — отражение «замахнулось», но удара нет. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 14,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.6,0.2",
+   "duration": 6,
+   "size": 0.6,
+   "rays": 4,
+   "color": "#F4EEFF",
+   "brightness": 0.5
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1.4,0.1",
+   "duration": 8,
+   "shape": "sphere",
+   "radius": 0.8,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.3
+  }
+ ]
+}

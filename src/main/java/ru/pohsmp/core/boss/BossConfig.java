@@ -19,6 +19,15 @@ public final class BossConfig {
     public static final ForgeConfigSpec.IntValue MAX_COUNTED, FINISHER_COOLDOWN, ABILITY_GCD, TOP_DAMAGE_WINDOW, REPLICA_TAUNT_COOLDOWN, ENRAGE_MINUTES;
     public static final ForgeConfigSpec.DoubleValue ENRAGE_STEP, ENRAGE_MAX;
     public static final ForgeConfigSpec.BooleanValue SCENES, SPECIALS;
+    // [bosses_common] protection (balance 1.2 / 1.3, BossGuard)
+    public static final ForgeConfigSpec.IntValue RECOUNT_SECONDS, COUNT_DROP_DELAY, PILLAR_SECONDS, REGEN_DELAY, CC_IMMUNITY, FROZEN_HOUR_IMMUNITY;
+    public static final ForgeConfigSpec.DoubleValue HIT_CAP_SHARE, HIT_CAP_EXCESS, PERCENT_DAMAGE_MULT, COUNTDOWN_MAX_SHARE, BARRIER_PUSH_SHARE,
+            CC_MULT, CC_MAX_SECONDS, FROZEN_HOUR_SECONDS, SEAL_SECONDS, MIRROR_PRISON_SECONDS, MIRROR_PRISON_SELF, ILLUSION_DURATION_MULT,
+            OUTSIDE_ARENA_MULT, ARENA_MARGIN, MAX_DAMAGE_DISTANCE, NO_LOS_MULT, PILLAR_HEIGHT, PILLAR_MULT, LEASH_EXTRA, LEASH_HEAL,
+            REGEN_SHARE, DOT_MULT, HARMING_MULT;
+    public static final ForgeConfigSpec.BooleanValue SUMMONS_SCALE, DISPLACEMENT_IMMUNE, PHASE_CLAMP, WORLD_FIRE_IMMUNE, PROTECTION;
+    // [cult_leader] Raise Hell of Tyros's goals
+    public static final ForgeConfigSpec.IntValue CL_RAISE_HELL_LEVEL, CL_RAISE_HELL_MIN, CL_RAISE_HELL_MAX;
 
     /** The body of a boss (absolute attribute values; a negative resist = leave the base class's own). */
     public static final class PerBoss {
@@ -81,6 +90,56 @@ public final class BossConfig {
         ENRAGE_MAX = b.defineInRange("enrage_max", 2.0, 1, 100);
         SCENES = b.comment("Camera scenes on/off (the same timings without the camera)").define("scenes", true);
         SPECIALS = b.comment("Special spells (one per fight each) on/off").define("specials", true);
+
+        PROTECTION = b.comment("Protection against cheese and control (balance 1.2 / 1.3) on/off as a whole").define("protection", true);
+        RECOUNT_SECONDS = b.comment("N (players) is recounted this often: up at once, down only after count_drop_delay_seconds below; % health kept")
+                .defineInRange("recount_seconds", 5, 1, 600);
+        COUNT_DROP_DELAY = b.defineInRange("count_drop_delay_seconds", 60, 0, 3600);
+        SUMMONS_SCALE = b.comment("Summons get the same health multiplier (read by the bosses' own code)").define("summons_scale", true);
+        HIT_CAP_SHARE = b.comment("The big hit cut (as Tyros): the part of a hit above this share of max health goes x hit_cap_excess_mult; 0 = off")
+                .defineInRange("hit_cap_share", 0.025, 0, 1);
+        HIT_CAP_EXCESS = b.defineInRange("hit_cap_excess_mult", 0.3, 0, 1);
+        PERCENT_DAMAGE_MULT = b.comment("Our spells' «% of the target's max health» part on a boss: x this (before the hit cut)")
+                .defineInRange("percent_damage_mult", 0.1, 0, 1);
+        COUNTDOWN_MAX_SHARE = b.comment("«Обратный отсчёт»: its repeat never above this share of the boss's max health").defineInRange("countdown_max_share", 0.05, 0, 1);
+        BARRIER_PUSH_SHARE = b.comment("[barrier]: a boss pressed against a shell loses this share of max health per second (instead of bossPushDamagePct)")
+                .defineInRange("barrier_push_share", 0.01, 0, 1);
+        CC_MULT = b.comment("Control (stun, freeze, sleep, roots, «Фантомная ловушка», «Ледяные гробницы», «Ударная волна», «Колыбель»...): duration x,")
+                .defineInRange("cc_duration_mult", 0.25, 0, 1);
+        CC_MAX_SECONDS = b.comment("...never longer than this,").defineInRange("cc_max_seconds", 2.0, 0, 60);
+        CC_IMMUNITY = b.comment("...then immune to the same kind for this long").defineInRange("cc_immunity_seconds", 10, 0, 600);
+        FROZEN_HOUR_SECONDS = b.comment("«Застывший час»: the boss is frozen this long, then immune").defineInRange("frozen_hour_seconds", 1.5, 0, 60);
+        FROZEN_HOUR_IMMUNITY = b.defineInRange("frozen_hour_immunity_seconds", 30, 0, 3600);
+        DISPLACEMENT_IMMUNE = b.comment("Teleports, «Обмен», «Изгнание», «Метка ветра», pulls of «Сингулярность» / «Древо мира», knockback: no effect")
+                .define("displacement_immune", true);
+        SEAL_SECONDS = b.comment("«Печать» on a boss: its Iron's spells are sealed this long (the bosses' own attacks are not spells)")
+                .defineInRange("seal_seconds", 2.0, 0, 60);
+        MIRROR_PRISON_SECONDS = b.comment("«Зеркальная тюрьма» on a boss: this long; its hits on itself x mirror_prison_self_mult")
+                .defineInRange("mirror_prison_seconds", 1.0, 0, 60);
+        MIRROR_PRISON_SELF = b.defineInRange("mirror_prison_self_mult", 0.25, 0, 1);
+        ILLUSION_DURATION_MULT = b.comment("Illusions (T22) and nightmares (T25) on a boss last x this (Ereb: immune, his own illusion_immune)")
+                .defineInRange("illusion_duration_mult", 0.5, 0, 1);
+        PHASE_CLAMP = b.comment("Health never drops under the next phase threshold before the transition began").define("phase_clamp", true);
+        OUTSIDE_ARENA_MULT = b.comment("Attacker outside the arena (arena_radius + arena_margin from its centre): damage x this")
+                .defineInRange("outside_arena_mult", 0.2, 0, 1);
+        ARENA_MARGIN = b.defineInRange("arena_margin", 4.0, 0, 64);
+        MAX_DAMAGE_DISTANCE = b.comment("Attacker farther than this from the boss: no damage (0 = off)").defineInRange("max_damage_distance", 48.0, 0, 512);
+        NO_LOS_MULT = b.comment("No line of sight from the attacker's eyes (a projectile: from where it was launched) to the boss: damage x this")
+                .defineInRange("no_los_mult", 0.25, 0, 1);
+        PILLAR_HEIGHT = b.comment("«Столб»: a target this much above the boss's feet that it cannot reach for pillar_seconds: its damage x pillar_mult")
+                .defineInRange("pillar_height", 6.0, 1, 256);
+        PILLAR_SECONDS = b.defineInRange("pillar_seconds", 3, 0, 600);
+        PILLAR_MULT = b.defineInRange("pillar_mult", 0.25, 0, 1);
+        LEASH_EXTRA = b.comment("Leash: farther than arena_radius + this from the spawn point the boss goes back (+leash_heal_share of max health)")
+                .defineInRange("leash_extra", 8.0, 0, 256);
+        LEASH_HEAL = b.defineInRange("leash_heal_share", 0.05, 0, 1);
+        REGEN_DELAY = b.comment("No damage for this long: regen regen_share_per_second, never above the start of the current phase")
+                .defineInRange("regen_delay_seconds", 20, 0, 3600);
+        REGEN_SHARE = b.defineInRange("regen_share_per_second", 0.01, 0, 1);
+        DOT_MULT = b.comment("Poison, wither, bleeding on a boss: x this; instant damage: x harming_mult").defineInRange("dot_mult", 0.25, 0, 1);
+        HARMING_MULT = b.defineInRange("harming_mult", 0.25, 0, 1);
+        WORLD_FIRE_IMMUNE = b.comment("No damage from lava / fire blocks / burning (attacker-less fire); suffocation, falls, drowning: never")
+                .define("world_fire_immune", true);
         b.pop();
 
         b.comment("T26 Head of the Cult of Mellisto (Tyros, First Flamebearer)").push("cult_leader");
@@ -130,6 +189,9 @@ public final class BossConfig {
         CL_ASH_DAMAGE = b.comment("«Пепел Меллисто»: the slash across the arena, its width, the burning trace (10 s)").defineInRange("ash_slash_damage", 70.0, 0, 1000);
         CL_ASH_WIDTH = b.defineInRange("ash_slash_width", 1.5, 0.2, 8);
         CL_ASH_BURN = b.defineInRange("ash_burn_damage", 4.0, 0, 1000);
+        CL_RAISE_HELL_LEVEL = b.comment("Tyros's Raise Hell: level (Tyros 5), ticks between casts (Tyros 80-240)").defineInRange("raise_hell_level", 6, 1, 10);
+        CL_RAISE_HELL_MIN = b.defineInRange("raise_hell_cd_min", 60, 1, 6000);
+        CL_RAISE_HELL_MAX = b.defineInRange("raise_hell_cd_max", 180, 1, 6000);
         b.pop();
 
         b.comment("T27 Irina, the Witch of Jealousy").push("irina");
@@ -147,6 +209,10 @@ public final class BossConfig {
         b.comment("T30 Ereb, the First Traitor").push("ereb");
         PER.put("ereb", new PerBoss(b, new Body(4000, 10, 0, 1.0, 0.28, 10, 1.5, 1.3, -1, -1, 0.85, -1, 1.2, 24, 500)));
         ru.pohsmp.core.boss.ereb.ErebConfig.define(b);   // T30 mechanics keys
+        b.pop();
+        b.comment("T31 Ereb, the Hand of Lies (Head of the Cult of Mellisto) - DRAFT: [ereb] x1.3").push("ereb_hand");
+        PER.put("ereb_hand", new PerBoss(b, new Body(5200, 12, 0, 1.0, 0.28, 13, 1.5, 1.3, -1, -1, 0.85, -1, 1.2, 26, 0)));
+        ru.pohsmp.core.boss.erebhand.ErebHandConfig.define(b);   // T31 mechanics keys
         b.pop();
         SPEC = b.build();
     }

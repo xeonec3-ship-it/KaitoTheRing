@@ -1,0 +1,36 @@
+{
+ "comment": "T31 «Тысяча отражений», зеркало бьётся в конце (20 тиков): caster = зеркало. Вспышка, осколки. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 6,
+   "size": 1.8,
+   "rays": 6,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 26,
+   "rate": 26,
+   "spread": 0.8,
+   "speed": 0.14,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.22,
+    0.06
+   ],
+   "life": 18,
+   "color": "#F4EEFF"
+  }
+ ]
+}

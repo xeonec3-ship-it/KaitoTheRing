@@ -1568,5 +1568,20 @@
         "volume": 2.0
       }
     ]
-  }
+  },
+  "ereb_hand.slam": {"subtitle": "subtitles.pohsmp_core.ereb_hand.slam", "sounds": [{"name": "minecraft:block.glass.break", "type": "event", "pitch": 0.55, "volume": 1.0}, {"name": "minecraft:entity.iron_golem.damage", "type": "event", "pitch": 0.7, "volume": 0.7}]},
+  "ereb_hand.grab": {"subtitle": "subtitles.pohsmp_core.ereb_hand.grab", "sounds": [{"name": "minecraft:block.amethyst_cluster.place", "type": "event", "pitch": 0.7, "volume": 1.0}, {"name": "minecraft:block.glass.place", "type": "event", "pitch": 0.6, "volume": 0.9}]},
+  "ereb_hand.squeeze": {"subtitle": "subtitles.pohsmp_core.ereb_hand.squeeze", "sounds": [{"name": "minecraft:block.glass.break", "type": "event", "pitch": 1.3, "volume": 0.7}, {"name": "minecraft:block.amethyst_cluster.break", "type": "event", "pitch": 0.6, "volume": 0.9}]},
+  "ereb_hand.crack": {"subtitle": "subtitles.pohsmp_core.ereb_hand.crack", "sounds": [{"name": "minecraft:block.glass.break", "type": "event", "pitch": 0.75, "volume": 0.8}, {"name": "minecraft:block.amethyst_block.resonate", "type": "event", "pitch": 0.6, "volume": 1.0}]},
+  "ereb_hand.mask_shatter": {"subtitle": "subtitles.pohsmp_core.ereb_hand.mask_shatter", "sounds": [{"name": "minecraft:block.glass.break", "type": "event", "pitch": 0.9, "volume": 1.0}, {"name": "minecraft:block.amethyst_cluster.break", "type": "event", "pitch": 1.2, "volume": 1.0}]},
+  "ereb_hand.shard_ring": {"subtitle": "subtitles.pohsmp_core.ereb_hand.shard_ring", "sounds": [{"name": "minecraft:block.amethyst_block.chime", "type": "event", "pitch": 1.8, "volume": 0.9}, {"name": "minecraft:block.amethyst_block.chime", "type": "event", "pitch": 2.0, "volume": 0.8}]},
+  "ereb_hand.shard_break": {"subtitle": "subtitles.pohsmp_core.ereb_hand.shard_break", "sounds": [{"name": "minecraft:block.glass.break", "type": "event", "pitch": 1.6, "volume": 0.8}, {"name": "minecraft:block.amethyst_cluster.break", "type": "event", "pitch": 1.5, "volume": 0.8}]},
+  "ereb_hand.shard_burst": {"subtitle": "subtitles.pohsmp_core.ereb_hand.shard_burst", "sounds": [{"name": "minecraft:entity.generic.explode", "type": "event", "pitch": 1.4, "volume": 0.6}, {"name": "minecraft:block.glass.break", "type": "event", "pitch": 0.7, "volume": 1.0}]},
+  "ereb_hand.flame": {"subtitle": "subtitles.pohsmp_core.ereb_hand.flame", "sounds": [{"name": "minecraft:item.firecharge.use", "type": "event", "pitch": 0.7, "volume": 0.8}, {"name": "minecraft:block.amethyst_block.resonate", "type": "event", "pitch": 1.2, "volume": 0.7}]},
+  "ereb_hand.grip": {"subtitle": "subtitles.pohsmp_core.ereb_hand.grip", "sounds": [{"name": "minecraft:block.amethyst_cluster.break", "type": "event", "pitch": 0.5, "volume": 1.0}, {"name": "minecraft:entity.iron_golem.attack", "type": "event", "pitch": 0.8, "volume": 0.6}]},
+  "ereb_hand.oath": {"subtitle": "subtitles.pohsmp_core.ereb_hand.oath", "sounds": [{"name": "minecraft:block.amethyst_block.chime", "type": "event", "pitch": 0.8, "volume": 1.0}, {"name": "minecraft:entity.illusioner.cast_spell", "type": "event", "pitch": 0.8, "volume": 0.8}]},
+  "ereb_hand.mirror": {"subtitle": "subtitles.pohsmp_core.ereb_hand.mirror", "sounds": [{"name": "minecraft:entity.illusioner.mirror_move", "type": "event", "pitch": 0.8, "volume": 0.9}, {"name": "minecraft:block.amethyst_block.resonate", "type": "event", "pitch": 0.9, "volume": 0.8}]},
+  "ereb_hand.sky_hand": {"subtitle": "subtitles.pohsmp_core.ereb_hand.sky_hand", "sounds": [{"name": "minecraft:block.beacon.activate", "type": "event", "pitch": 0.5, "volume": 1.0}, {"name": "minecraft:block.amethyst_block.resonate", "type": "event", "pitch": 0.5, "volume": 1.0}]},
+  "ereb_hand.reveal": {"subtitle": "subtitles.pohsmp_core.ereb_hand.reveal", "sounds": [{"name": "minecraft:block.beacon.power_select", "type": "event", "pitch": 0.6, "volume": 1.0}, {"name": "minecraft:block.amethyst_block.resonate", "type": "event", "pitch": 0.55, "volume": 1.2}]},
+  "ereb_hand.dissolve": {"subtitle": "subtitles.pohsmp_core.ereb_hand.dissolve", "sounds": [{"name": "minecraft:block.amethyst_cluster.break", "type": "event", "pitch": 0.85, "volume": 1.0}, {"name": "minecraft:block.glass.break", "type": "event", "pitch": 0.75, "volume": 0.8}]}
 }

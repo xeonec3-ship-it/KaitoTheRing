@@ -1,0 +1,28 @@
+{
+ "comment": "T31 «Падение маски», удар по ЧУЖОМУ осколку (10 тиков): caster = осколок. Только звенит: рябь и блик, не бьётся. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 8,
+   "shape": "sphere",
+   "radius": 0.7,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "duration": 5,
+   "size": 0.7,
+   "rays": 4,
+   "color": "#F4EEFF",
+   "brightness": 0.9
+  }
+ ]
+}

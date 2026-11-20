@@ -74,6 +74,7 @@ public final class Bosses {
         ru.pohsmp.core.boss.aris.Aris.register();   // T28
         ru.pohsmp.core.boss.martin.Martin.register();     // T29
         ru.pohsmp.core.boss.ereb.Ereb.register();         // T30
+        ru.pohsmp.core.boss.erebhand.ErebHand.register(); // T31
         ENTITIES.register(modBus);
         ITEMS.register(modBus);
         EFFECTS.register(modBus);
@@ -83,6 +84,7 @@ public final class Bosses {
         MinecraftForge.EVENT_BUS.register(BossScenes.Events.class);
         MinecraftForge.EVENT_BUS.register(BossFinisher.Events.class);
         MinecraftForge.EVENT_BUS.register(BossCommands.class);
+        MinecraftForge.EVENT_BUS.register(BossGuard.Events.class);   // control / displacement / projectiles (balance 1.2, 1.3)
         ru.pohsmp.core.boss.cult.CultLeader.events();
         ru.pohsmp.core.boss.irina.Irina.events();         // T27
         ru.pohsmp.core.boss.aris.Aris.events();   // T28

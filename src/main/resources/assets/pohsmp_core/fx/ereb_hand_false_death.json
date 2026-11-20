@@ -1,0 +1,154 @@
+{
+ "comment": "T31 Ложная смерть (100 тиков = ereb_hand_false_death 5.0 с): caster = Эреб (не follow). 8 (stagger) — блик; 14 (hand_break) — призрачная рука трескается и осыпается стеклом; 32 (speak) — «А вы...стали сильнее» (ui…ereb_hand.defeat: чат r48 + субтитр); 52 (smile) — лёгкий поклон; 76 (vanish) — он распадается на множество бабочек: оболочка, вспышка, рой (модель скрыть на 78), бабочки улетают вверх и в стороны; сон рассыпается (код: игроки просыпаются, полоса исчезает). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 104,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster+0,1.4,0",
+   "duration": 5,
+   "size": 1.0,
+   "rays": 4,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "flash",
+   "delay": 14,
+   "at": "caster+0.97,2.0,-0.3",
+   "duration": 8,
+   "size": 2.0,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "at": "caster+0.97,2.0,-0.3",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 40,
+   "spread": 0.9,
+   "speed": 0.1,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 26,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "at": "caster+0.97,2.0,-0.3",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 12,
+   "rate": 12,
+   "spread": 0.6,
+   "speed": 0.08,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "aura",
+   "delay": 70,
+   "at": "caster",
+   "target": "caster",
+   "duration": 10,
+   "thickness": 0.08,
+   "pulse": [
+    0.6,
+    3
+   ],
+   "motes": 6,
+   "texture": "mote_butterfly",
+   "color": "#D9CCFF",
+   "brightness": 0.8,
+   "in": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 76,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 2.6,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "sprites",
+   "delay": 76,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "mote_butterfly",
+   "count": 90,
+   "rate": 45,
+   "spread": 0.5,
+   "speed": 0.12,
+   "gravity": -0.02,
+   "sway": 0.6,
+   "size": [
+    0.36,
+    0.16
+   ],
+   "life": 60,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 76,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "mote_butterfly_side",
+   "count": 45,
+   "rate": 22.5,
+   "spread": 0.5,
+   "speed": 0.12,
+   "gravity": -0.02,
+   "sway": 0.6,
+   "size": [
+    0.324,
+    0.16
+   ],
+   "life": 60,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "vortex",
+   "delay": 78,
+   "at": "caster+0,0.5,0",
+   "duration": 24,
+   "radius": 2.2,
+   "height": 4.0,
+   "arms": 4,
+   "speed": -8,
+   "pull": -0.4,
+   "texture": "mote_butterfly",
+   "particles": 40,
+   "life": 24,
+   "size": 0.32,
+   "color": "#D9CCFF"
+  }
+ ]
+}

@@ -1,0 +1,55 @@
+{
+ "comment": "T31 Хватка (ereb_hand_grab, событие grab 0.6 с; добивание — тот же fx на grab): caster = Эреб. Пальцы смыкаются у жертвы: звон стекла у ладони, золотые искры. Схваченного ставить в точку удержания (письмо). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 14,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0.5,1.83,1.34",
+   "duration": 6,
+   "size": 1.2,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.5,1.83,1.34",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 12,
+   "rate": 12,
+   "spread": 0.6,
+   "speed": 0.1,
+   "gravity": 0.01,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 12,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.5,1.83,1.34",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.3,
+   "speed": 0.1,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#E8B84A"
+  }
+ ]
+}

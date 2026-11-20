@@ -1,0 +1,46 @@
+{
+ "comment": "T31 Удержание (петля, пока игрок в руке; duration −1 — остановить при отпускании): caster = схваченный игрок, follow. По нему едва бежит стеклянная корка, с руки сыплются блёстки — союзникам видно, кого спасать. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "follow": true,
+   "duration": 100000,
+   "thickness": 0.05,
+   "pulse": [
+    0.5,
+    12
+   ],
+   "motes": 4,
+   "texture": "mote_glass",
+   "ring": false,
+   "color": "#D9CCFF",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 100000,
+   "texture": "mote_glass",
+   "count": 4,
+   "rate": 0.2,
+   "spread": 0.5,
+   "speed": 0.0,
+   "gravity": 0.01,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.12,
+    0.04
+   ],
+   "life": 16,
+   "color": "#F4EEFF",
+   "follow": true
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "comment": "T31 Каст (ereb_hand_cast, событие cast 0.75 с — щелчок «Длани»): caster = Эреб. Блик стекла и кольцо-рябь над поднятой перчаткой, рука над плечом вспыхивает золотыми швами. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 22,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 14,
+   "at": "caster-0.3,2.2,0.3",
+   "duration": 8,
+   "size": 0.8,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "wave",
+   "delay": 15,
+   "at": "caster-0.3,2.2,0.3",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 0.9,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 15,
+   "at": "caster+0.97,2.25,-0.34",
+   "duration": 8,
+   "size": 1.4,
+   "rays": 4,
+   "color": "#FFE7A0",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 15,
+   "at": "caster+0.97,2.25,-0.34",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.05,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0"
+  }
+ ]
+}

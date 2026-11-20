@@ -132,7 +132,7 @@ public class CountdownSpell extends HigherSpell {
 
     /** The hit that will come back: sum × damageMult, capped at maxRepeat of the target's max health. */
     private static double amount(Clock c) {
-        return Math.min(c.sum * ServerConfig.HIGHER_MULT.get(), ServerConfig.COUNTDOWN_MAX.get() * c.target.getMaxHealth());
+        return Math.min(c.sum * ServerConfig.HIGHER_MULT.get(), ru.pohsmp.core.boss.BossGuard.countdownShare(c.target, ServerConfig.COUNTDOWN_MAX.get()) * c.target.getMaxHealth());
     }
 
     /** Counter text: whole numbers from 10 up, one decimal below (4.5), never "-0". */

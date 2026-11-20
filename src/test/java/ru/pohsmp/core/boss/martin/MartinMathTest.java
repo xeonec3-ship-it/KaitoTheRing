@@ -21,6 +21,11 @@ class MartinMathTest {
         assertEquals(34, MartinMath.REPLICA_SPEAK);          // speak 1.7 s
         assertEquals(48, MartinMath.REPLICA_ANIM);           // 2.4 s
         assertEquals(15, MartinMath.SWING_HIT);              // hit 0.75 s
+        assertEquals(12, MartinMath.SWING_SWING);            // swing 0.62 s
+        assertEquals(16, MartinMath.OVERHEAD_SWING);         // swing 0.82 s
+        assertEquals(8, MartinMath.FINISHER_PIERCE);         // martin_finisher impale 0.4 s
+        assertEquals(40, MartinMath.FINISHER_SLAM);          // slam 2.0 s
+        assertEquals(46, MartinMath.FINISHER_KILL);          // kill 2.3 s
         assertEquals(19, MartinMath.OVERHEAD_HIT);           // hit 0.95 s
         assertEquals(20, MartinMath.WALL_SLAM);              // slam 1.0 s
         assertEquals(24, MartinMath.VOLLEY_LOOSE);           // loose 1.2 s

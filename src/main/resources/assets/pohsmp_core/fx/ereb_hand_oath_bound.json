@@ -1,0 +1,43 @@
+{
+ "comment": "T31 «Чужая клятва», союзник, на которого отражается урон (80 тиков): caster = ближайший союзник, follow. Тот же знак, меньше и стеклянный (кто из двоих «платит» — видно). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 82,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.4,0",
+   "duration": 80,
+   "texture": "ereb_hand_oath_mark",
+   "count": 1,
+   "rate": 0.03,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    0.6,
+    0.6
+   ],
+   "life": 80,
+   "color": "#F4EEFF",
+   "glow": 0.3,
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "follow": true,
+   "duration": 80,
+   "thickness": 0.04,
+   "pulse": [
+    0.4,
+    10
+   ],
+   "motes": 2,
+   "ring": false,
+   "color": "#D9CCFF",
+   "brightness": 0.4
+  }
+ ]
+}

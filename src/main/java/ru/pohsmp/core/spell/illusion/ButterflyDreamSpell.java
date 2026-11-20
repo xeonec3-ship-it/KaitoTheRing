@@ -278,8 +278,13 @@ public class ButterflyDreamSpell extends IllusionBase implements ru.pohsmp.core.
 
     /** The dream on every enemy player within r of the caster for `ticks` (T30: Эреб's finale gives its own radius and time). */
     private static void dream(ServerLevel sl, LivingEntity caster, double r, int ticks) {
+        dream(sl, caster, r, ticks, true);
+    }
+
+    /** hideCaster false (T31 «Полное Раскрытие»): the caster is not hidden from the dreamers — it fights them inside the dream. */
+    private static void dream(ServerLevel sl, LivingEntity caster, double r, int ticks, boolean hideCaster) {
         Dream d = new Dream(caster, sl, ++TAG, r);
-        d.hidden.add(caster);
+        if (hideCaster) d.hidden.add(caster);
         for (ServerPlayer p : sl.players())
             if (p != caster && !p.isSpectator() && p.distanceToSqr(caster) <= r * r && Illusions.ally(caster, p)) d.hidden.add(p);
         long now = Illusions.now();
@@ -309,6 +314,41 @@ public class ButterflyDreamSpell extends IllusionBase implements ru.pohsmp.core.
         if (d.victims.isEmpty()) d.wakeAll = now + ticks;
         sl.playSound(null, caster.getX(), caster.getY() + 1, caster.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 3f, 0.5f);
         DREAMS.add(d);
+    }
+
+    // ---------------------------------------------------------------- T31: «Сон Бабочки: Полное Раскрытие» (Эреб, Длань Лжи)
+
+    /**
+     * T31: the dream without the T22 cast (the boss plays its own cast scene): every enemy player within r of the caster dreams for
+     * up to `ticks`; the caster is NOT hidden — it is there and fights the dreamers in the dream (its hits are dream hits as usual:
+     * not real, a «death» wakes the dreamer elsewhere in the dream). Ended by {@link #wakeNow}.
+     */
+    public static void openDream(ServerLevel sl, LivingEntity caster, double r, int ticks) {
+        dream(sl, caster, r, ticks, false);
+    }
+
+    /** T31: every dream of this caster breaks now: the waking scene, then everyone wakes (about WAKE_SCENE ticks). */
+    public static void wakeNow(LivingEntity caster) {
+        long at = Illusions.now() + WAKE_SCENE + 2;
+        for (Dream d : DREAMS) {
+            if (d.caster != caster || d.wakeAll <= at) continue;
+            d.wakeAll = at;
+            d.woke = true;   // no player's waking animation (the caster is a mob)
+            for (var en : d.victims.entrySet()) en.setValue(Math.min(en.getValue(), at));
+        }
+    }
+
+    /** T31: the players dreaming a dream of this caster now. */
+    public static List<ServerPlayer> dreamers(LivingEntity caster) {
+        List<ServerPlayer> out = new ArrayList<>();
+        for (Dream d : DREAMS) {
+            if (d.caster != caster) continue;
+            for (UUID id : d.victims.keySet()) {
+                ServerPlayer v = player(d, id);
+                if (v != null) out.add(v);
+            }
+        }
+        return out;
     }
 
     private static ServerPlayer player(Dream d, UUID id) {

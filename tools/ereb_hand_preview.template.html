@@ -236,6 +236,42 @@ function addFx(scene, list) {
     }
   }
 }
+// меши fx/meshes (части boxes и quad) — как в превью Мартина: оси меша x вправо, y вверх, z вперёд (в кадре модели вперёд = −z three)
+function buildBoxes(name) {
+  const g = new THREE.Group(), m = DATA.meshes[name];
+  for (const part of m.parts) {
+    if (part.type === 'quad') {
+      const geo = new THREE.BufferGeometry(); const c = part.corners;
+      geo.setAttribute('position', new THREE.Float32BufferAttribute([].concat(...c).map(v => v * 16), 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute([0, 1, 1, 1, 1, 0, 0, 0], 2)); geo.setIndex([0, 1, 2, 0, 2, 3]);
+      const mt = new THREE.MeshBasicMaterial({ map: loadTex(DATA.tex[part.texture], true), color: part.color || 0xffffff, transparent: true, opacity: part.opacity ?? 1,
+        side: THREE.DoubleSide, depthWrite: false, blending: part.blend === 'additive' ? THREE.AdditiveBlending : THREE.NormalBlending });
+      g.add(new THREE.Mesh(geo, mt)); continue;
+    }
+    if (part.type !== 'boxes') continue;
+    const glow = new Set(part.glowTones || []);
+    const add = part.blend === 'additive';
+    const mats = part.tones.map((c, i) => (glow.has(i) || add)
+      ? new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: part.opacity, blending: THREE.AdditiveBlending, depthWrite: false })
+      : new THREE.MeshLambertMaterial({ color: c, transparent: part.opacity < 1, opacity: part.opacity, depthWrite: part.opacity >= 1 }));
+    for (const b of part.boxes) {
+      const geo = new THREE.BoxGeometry((b[3] - b[0]) * 16, (b[4] - b[1]) * 16, (b[5] - b[2]) * 16);
+      const mesh = new THREE.Mesh(geo, mats[b[6]]);
+      mesh.position.set((b[0] + b[3]) * 8, (b[1] + b[4]) * 8, (b[2] + b[5]) * 8);
+      if (b[7]) mesh.rotation.set(b[7][0] * Math.PI / 180, b[7][1] * Math.PI / 180, b[7][2] * Math.PI / 180, 'YXZ');
+      mesh.renderOrder = 4; g.add(mesh);
+    }
+  }
+  const outer = new THREE.Group(); g.scale.z = -1; outer.add(g);   // оси взгляда (z вперёд) → кадр модели (вперёд = −z)
+  return outer;
+}
+function addMeshes(sc, list) {
+  for (const x of (list || [])) {
+    const g = buildBoxes(x.mesh); g.position.set(x.pos[0] * 16, x.pos[1] * 16, -x.pos[2] * 16);
+    g.rotation.set((x.rx || 0) * Math.PI / 180, (x.ry || 0) * Math.PI / 180, (x.rz || 0) * Math.PI / 180, 'YXZ');
+    g.scale.setScalar(x.scale || 1); sc.add(g);
+  }
+}
 function billboard(scene, cam) { scene.traverse(o => { if (o.userData.bill) { o.quaternion.copy(cam.quaternion); o.rotateZ(o.userData.spin); } }); }
 
 // ------------------------------------------------------------------ сцена
@@ -290,6 +326,7 @@ function setup(c) {
   const m = buildModel(ee, c.soul);
   if (c.item === false) m.root.traverse(o => { if (o.userData.item) o.visible = false; });
   if (c.x) m.root.position.x = c.x;
+  if (c.y) m.root.position.y = c.y;
   if (c.hide) m.root.traverse(o => { if (o.isMesh) o.visible = false; });
   for (const hb of (c.hideBones || [])) if (m.bones[hb]) m.bones[hb].visible = false;
   const anim = c.anim ? DATA.anims[c.anim] : null;
@@ -306,11 +343,11 @@ if (CELLS) {
       const { e, m } = setup(c);
       const sc = makeScene(c); sc.add(m.root);
       for (const w of (c.with || [])) { const r = setup(Object.assign({}, w)); r.m.root.position.x = w.x || 0; r.m.root.position.z = w.z || 0;
-        r.m.root.rotation.y = (w.ry || 0) * Math.PI / 180; sc.add(r.m.root); }
+        r.m.root.rotation.y = (w.ry || 0) * Math.PI / 180; r.m.root.position.y = (w.y || 0); if (w.scale) r.m.root.scale.setScalar(w.scale); sc.add(r.m.root); }
       if (c.mry) m.root.rotation.y = c.mry * Math.PI / 180;
       if (c.light) { const p = new THREE.PointLight(0xff7a30, c.light, 120, 2); p.position.set(0, 30, -20); sc.add(p); }
       const cam = cameraFor(c.h ? { height: c.h } : e, c); cam.aspect = cw / ch; cam.updateProjectionMatrix();
-      addFx(sc, c.fx); billboard(sc, cam);
+      addMeshes(sc, c.meshes); addFx(sc, c.fx); billboard(sc, cam);
       const x = (i % cols) * cw, y = H - (Math.floor(i / cols) + 1) * ch;
       renderer.setViewport(x, y, cw, ch); renderer.setScissor(x, y, cw, ch);
       renderer.render(sc, cam);
@@ -324,6 +361,7 @@ if (CELLS) {
     window.READY = true;
   };
   THREE.DefaultLoadingManager.onLoad = () => { if (!window.READY) setTimeout(draw, 50); };
+  for (const k in (DATA.tex || {})) loadTex(DATA.tex[k], true);
   for (const c of CELLS.cells) { setup(c); for (const w of (c.with || [])) setup(w); for (const f of (c.fx || [])) loadTex(DATA.tex[f.tex], true); }
 } else {
   const sel = document.getElementById('model'), asel = document.getElementById('anim');

@@ -47,7 +47,7 @@ public class SwapSpell extends PohSpell {
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
         if (level instanceof ServerLevel sl) {
             LivingEntity t = HigherSpell.target(sl, md);
-            if (t != null && t.isAlive() && t != caster && t.level() == sl) {
+            if (t != null && t.isAlive() && t != caster && t.level() == sl && !ru.pohsmp.core.boss.BossGuard.immovable(t)) {   // cult bosses: not swapped
                 if (caster.isPassenger()) caster.stopRiding();
                 if (t.isPassenger()) t.stopRiding();
                 Vec3 a = caster.position(), b = t.position();

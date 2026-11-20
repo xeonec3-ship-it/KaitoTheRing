@@ -87,14 +87,14 @@ public class PhantomTrapSpell extends PohSpell {
                     }
                     held++;
                     if (held == 1) snare = ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx("phantom_trap_snare").at(c).target(prey).yaw(caster.getYRot()));
-                    if (!prey.isAlive() || held > hold) {
+                    if (!prey.isAlive() || held > hold || !ru.pohsmp.core.boss.BossGuard.holding(prey, "phantom_trap", hold)) {   // cult bosses: x0.25, <= 2 s
                         if (snare >= 0) ru.pohsmp.core.fx.Fx.stop(sl, snare, "");
                         return end();
                     }
                     HigherSpell.place(prey, c.x, c.y, c.z);
                     prey.setDeltaMovement(Vec3.ZERO);
                     if (prey instanceof Mob m) m.getNavigation().stop();
-                    if (held % 10 == 1) prey.addEffect(new MobEffectInstance(Reg.PARALYSIS.get(), 15, 0, false, false, false));
+                    if (held % 10 == 1 && !ru.pohsmp.core.boss.BossGuard.isBoss(prey)) prey.addEffect(new MobEffectInstance(Reg.PARALYSIS.get(), 15, 0, false, false, false));
                     return true;   // the chains are drawn by fx/phantom_trap_snare.json
                 }
             });

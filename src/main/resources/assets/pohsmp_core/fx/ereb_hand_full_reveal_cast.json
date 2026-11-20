@@ -1,0 +1,123 @@
+{
+ "comment": "T31 «Сон Бабочки: Полное Раскрытие», каст (80 тиков = ereb_hand_full_reveal 4.0 с): caster = Эреб. 16 (butterflies) — вокруг него поднимается рой бабочек; 28 (open) — рука над головой раскрывается, на ладони свет; 52 (cast) — белая вспышка на весь экран (screen 0.9), мир «раскрывается» — код начинает заклинание (мир сна ereb_hand_dream_world, игроки во сне). Титр «Сон Бабочки: Полное Раскрытие». Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 84,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "radius": 48,
+   "color": "#2A1E44",
+   "strength": 0.3,
+   "in": {
+    "duration": 16,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 16,
+   "at": "caster+0,1.0,0",
+   "duration": 36,
+   "texture": "mote_butterfly",
+   "count": 80,
+   "rate": 6,
+   "spread": 3.0,
+   "speed": 0.04,
+   "gravity": -0.02,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 40,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 16,
+   "at": "caster+0,1.0,0",
+   "duration": 36,
+   "texture": "mote_butterfly_side",
+   "count": 40,
+   "rate": 3.0,
+   "spread": 3.0,
+   "speed": 0.04,
+   "gravity": -0.02,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 40,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "vortex",
+   "delay": 16,
+   "at": "caster+0,0.2,0",
+   "duration": 36,
+   "radius": 3.2,
+   "height": 4.0,
+   "arms": 5,
+   "speed": 10,
+   "pull": 0.3,
+   "texture": "mote_butterfly",
+   "particles": 70,
+   "life": 26,
+   "size": 0.3,
+   "color": "#D9CCFF"
+  },
+  {
+   "type": "flash",
+   "delay": 28,
+   "at": "caster+0.7,3.4,0.2",
+   "duration": 24,
+   "size": 1.6,
+   "rays": 8,
+   "color": "#F4EEFF",
+   "brightness": 0.9,
+   "comment": "свет на раскрытой ладони"
+  },
+  {
+   "type": "flash",
+   "delay": 52,
+   "at": "caster+0,2,0",
+   "duration": 16,
+   "size": 8.0,
+   "rays": 12,
+   "color": "#FFFFFF",
+   "brightness": 1.5,
+   "screen": 0.9
+  },
+  {
+   "type": "wave",
+   "delay": 52,
+   "at": "caster+0,1,0",
+   "duration": 24,
+   "shape": "sphere",
+   "radius": 20,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "delay": 52,
+   "at": "caster+0,0.05,0",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 32,
+   "color": "@primary",
+   "brightness": 0.6
+  }
+ ]
+}

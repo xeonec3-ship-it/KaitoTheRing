@@ -156,7 +156,7 @@ public final class Marks {
             double moved = Math.min(6, p.distanceTo(m.last));
             m.last = p;
             if (moved > 0.15) {
-                m.spell.hit(m.caster, m.target, (float) (moved * m.a));
+                ru.pohsmp.core.boss.BossGuard.dot(() -> m.spell.hit(m.caster, m.target, (float) (moved * m.a)));   // bleeding: x dot_mult on cult bosses
                 DivineEvents.particle((ServerLevel) m.target.level(), BLOOD, p.x, p.y + 0.8, p.z, 4 + (int) (moved * 4), 0.3, 0);
                 DivineEvents.particle((ServerLevel) m.target.level(), ParticleTypes.DAMAGE_INDICATOR, p.x, p.y + 1, p.z, 1, 0.2, 0);
             } else if (m.target.tickCount % 20 == 0) {

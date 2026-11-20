@@ -65,6 +65,8 @@ public final class BossCore {
     private final BossReplica.State replica = new BossReplica.State();
     private long fightStart = -1;
     private int enrageStage;
+    /** Protection against cheese and control (BossGuard): windows, counted players, pillar watch. */
+    final BossGuard.State guard = new BossGuard.State();
 
     public BossCore(PohBoss boss, BossDef def) {
         this.boss = boss;
@@ -102,8 +104,9 @@ public final class BossCore {
     private void applyConfig(ServerLevel sl) {
         BossConfig.PerBoss cfg = BossConfig.of(def.id);
         if (cfg == null) return;
-        int players = Math.min(playersNear(arenaRadius() + BossConfig.get(BossConfig.COUNT_RADIUS_EXTRA)).stream()
-                .filter(p -> !p.isCreative()).toList().size(), BossConfig.get(BossConfig.MAX_COUNTED));
+        int players = Math.min(countPlayers(), BossConfig.get(BossConfig.MAX_COUNTED));
+        guard.count = new BossGuardMath.PlayerCount(players);
+        guard.nextRecount = sl.getGameTime() + BossConfig.get(BossConfig.RECOUNT_SECONDS) * 20L;
         double mult = BossMath.healthMultiplier(players, BossConfig.get(BossConfig.HP_PER_PLAYER), BossConfig.get(BossConfig.HP_PER_PLAYER_SQ), 0);
         playerMult = mult;
         base(Attributes.MAX_HEALTH, BossConfig.get(cfg.hp) * mult);
@@ -124,6 +127,46 @@ public final class BossCore {
     }
 
     private double playerMult = 1;
+
+    /** Players (survival / adventure) within arena_radius + count_radius_extra of the spawn point right now. */
+    public int countPlayers() {
+        return (int) playersNear(arenaRadius() + BossConfig.get(BossConfig.COUNT_RADIUS_EXTRA)).stream().filter(p -> !p.isCreative()).count();
+    }
+
+    /** The players counted for the health now (recounted every recount_seconds, balance 1.2). */
+    public int countedPlayers() {
+        return guard.count != null ? guard.count.get() : 1;
+    }
+
+    /** N changed: max health = hp x multiplier(N), the health fraction kept. */
+    void rescale(int players) {
+        BossConfig.PerBoss cfg = BossConfig.of(def.id);
+        if (cfg == null) return;
+        double mult = BossMath.healthMultiplier(players, BossConfig.get(BossConfig.HP_PER_PLAYER), BossConfig.get(BossConfig.HP_PER_PLAYER_SQ), 0);
+        float oldMax = mob.getMaxHealth(), h = mob.getHealth();
+        AttributeInstance i = mob.getAttribute(Attributes.MAX_HEALTH);
+        if (i == null) return;
+        // the base is the configured hp x mult; other modifiers (bosses' own) stay as they are
+        i.setBaseValue(BossConfig.get(cfg.hp) * mult);
+        playerMult = mult;
+        mob.setHealth(BossGuardMath.rescaleHealth(h, oldMax, mob.getMaxHealth()));
+        PohCore.LOG.info("[boss] {}: {} players now, health x{} = {} ({} → {})", def.id, players, mult, mob.getMaxHealth(), h, mob.getHealth());
+    }
+
+    /** True while this target is on a «столб» (high, unreachable for pillar_seconds): hit it only with ranged attacks. */
+    public boolean onPillar(Entity target) {
+        return target != null && guard.onPillar.contains(target.getUUID());
+    }
+
+    /** Game time the fight began (-1 before). */
+    public long fightStart() {
+        return fightStart;
+    }
+
+    /** The framework's locks keep its AI off now. */
+    public boolean aiLocked() {
+        return aiOff;
+    }
 
     /** The health multiplier the fight began with (summons scale with it). */
     public double playerMultiplier() {
@@ -169,6 +212,7 @@ public final class BossCore {
         }
         if (lockTicks > 0 && --lockTicks == 0) unlock();
         if (!started || dead) return;
+        BossGuard.tick(this, boss);
         BossReplica.tick(this, boss, replica);
         enrage();
         float frac = healthFrac();
@@ -225,7 +269,9 @@ public final class BossCore {
     public float filterDamage(DamageSource src, float amount) {
         if (mob.level().isClientSide) return amount;
         if (finale || (lockTicks > 0 || aiOff) && lockInvulnerable) return 0;
+        amount = BossGuard.filter(this, src, amount);
         if (def.finale != BossDef.Finale.DEATH) amount = BossMath.clipToFloor(mob.getHealth(), amount, (float) (def.finaleAt * mob.getMaxHealth()));
+        if (amount > 0) guard.lastDamage = mob.level().getGameTime();
         if (amount > 0 && src.getEntity() instanceof Player p)
             damageBy.computeIfAbsent(p.getUUID(), k -> new ArrayDeque<>()).add(new double[] {mob.level().getGameTime(), amount});
         return amount;
@@ -542,6 +588,7 @@ public final class BossCore {
         ListTag used = new ListTag();
         for (String s : usedSpecials) used.add(StringTag.valueOf(s));
         t.put("specials", used);
+        t.putInt("counted", countedPlayers());
         tag.put("pohsmp_boss", t);
     }
 
@@ -552,6 +599,8 @@ public final class BossCore {
         started = t.getBoolean("started");
         if (t.contains("ax")) arena = new Vec3(t.getDouble("ax"), t.getDouble("ay"), t.getDouble("az"));
         for (Tag s : t.getList("specials", Tag.TAG_STRING)) usedSpecials.add(s.getAsString());
+        guard.count = new BossGuardMath.PlayerCount(t.contains("counted") ? t.getInt("counted") : 1);
+        if (fightStart < 0) fightStart = mob.level().getGameTime();
         started = true;   // saved mid-intro: the scripts are gone, the fight just goes on
         barVisible = true;
         musicOn = true;

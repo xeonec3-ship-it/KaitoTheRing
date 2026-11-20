@@ -1,0 +1,66 @@
+{
+ "comment": "T31 Фаза 2 «Длань» (66%, ereb_hand_phase2, событие phase 0.8 с = 16 тик): caster = Эреб. Кулак руки бьёт в землю справа-впереди: трещины, кольцо r12, стекло в воздухе. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 46,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 16,
+   "at": "caster+0.3,0.3,1.0",
+   "duration": 8,
+   "size": 2.4,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "decal",
+   "delay": 16,
+   "at": "caster+0.3,0,1.0",
+   "duration": 40,
+   "texture": "higher_cracks",
+   "radius": 2.0,
+   "grow": 3,
+   "glow": 0.4,
+   "fadeOut": 30,
+   "color": "#D9CCFF"
+  },
+  {
+   "type": "wave",
+   "delay": 16,
+   "at": "caster+0,0.05,0",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 12,
+   "color": "@primary",
+   "brightness": 0.5
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,1.2,0",
+   "id": "illusion_mirror_crack",
+   "until": 34
+  },
+  {
+   "type": "sprites",
+   "delay": 16,
+   "at": "caster+0,2.2,0",
+   "duration": 6,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 10,
+   "spread": 2.0,
+   "speed": 0.04,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 30,
+   "color": "#F4EEFF"
+  }
+ ]
+}

@@ -43,6 +43,10 @@ def model_entry(name):
         if name == 'ereb_hand':
             e['item'] = rapier_entry()
         return e
+    if name == 'ereb_hand_giant':        # огромная рука: те же кости и атлас, что рука модели (масштаб — в ячейке/кадре)
+        return {'geo': json.load(open(os.path.join(A, 'geo', 'entity', 'ereb_hand_giant.geo.json'), encoding='utf-8')),
+                'tex': CR.b64(os.path.join(T, 'ereb_hand.png')), 'glow': CR.b64(os.path.join(T, 'ereb_hand_glowmask.png')), 'height': 16,
+                'title': 'Огромная рука'}
     if name == 'hand_rapier':
         return {'geo': {'minecraft:geometry': [{'description': {'texture_width': 16, 'texture_height': 16},
                                                 'bones': [{'name': 'bipedHandRight', 'pivot': [0, 0, 0]}]}]},
@@ -52,9 +56,18 @@ def model_entry(name):
     return ER.model_entry(name)
 
 
+def tex_b64(n):
+    for sub in ('sigil', 'fx'):
+        p = os.path.join(A, 'textures', sub, n + '.png')
+        if os.path.exists(p):
+            return CR.b64(p)
+    raise FileNotFoundError(n)
+
+
 def anims():
     an = json.load(open(os.path.join(A, 'animations', 'entity', 'ereb_hand.animation.json'), encoding='utf-8'))['animations']
     an.update({k: v for k, v in ER.anims().items() if k.startswith('ereb_')})
+    an.update(json.load(open(os.path.join(A, 'animations', 'entity', 'ereb_hand_giant.animation.json'), encoding='utf-8'))['animations'])
     return an
 
 
@@ -65,11 +78,17 @@ def page(models, cells=None, three=None):
     if cells is not None:
         need = {w.get('anim') for c in cells['cells'] for w in [c] + c.get('with', []) if w.get('anim')}
         an = {k: v for k, v in an.items() if k in need}
-    texs = {}
+    texs, meshes = {}, {}
     for c in (cells or {}).get('cells', []):
         for f in c.get('fx', []):
-            texs[f['tex']] = CR.b64(os.path.join(A, 'textures', 'sigil', f['tex'] + '.png'))
-    d = {'models': {n: model_entry(n) for n in models}, 'anims': an, 'tex': texs}
+            texs[f['tex']] = tex_b64(f['tex'])
+        for x in c.get('meshes', []):
+            mj = json.load(open(os.path.join(A, 'fx', 'meshes', x['mesh'] + '.json'), encoding='utf-8'))
+            meshes[x['mesh']] = mj
+            for part in mj['parts']:
+                if part['type'] == 'quad':
+                    texs[part['texture']] = tex_b64(part['texture'])
+    d = {'models': {n: model_entry(n) for n in models}, 'anims': an, 'tex': texs, 'meshes': meshes}
     html = html.replace('/*DATA*/null', json.dumps(d, ensure_ascii=False, separators=(',', ':')))
     html = html.replace('/*CELLS*/null', json.dumps(cells, ensure_ascii=False) if cells else 'null')
     if three:

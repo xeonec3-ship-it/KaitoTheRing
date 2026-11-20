@@ -1,0 +1,100 @@
+{
+ "comment": "T31 «Ложное пламя», НАСТОЯЩИЙ круг (жжёт; урон — код) (60 тиков = 3 с горения): caster = центр круга r2. Фиолетово-стеклянное пламя: языки (curtain), кольцо, искры стекла и золота. Отличие от обманки — тонкая золотая кромка с насечками по краю (ereb_hand_flame_rim, яркость 0.35). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 62,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "texture": "ereb_hand_flame_ring",
+   "radius": 2.0,
+   "glow": 0.5,
+   "fadeOut": 14,
+   "color": "#9A6BFF",
+   "brightness": 0.9,
+   "pulse": 12
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "count": 22,
+   "radius": [
+    0.4,
+    1.9
+   ],
+   "height": [
+    0.8,
+    1.8
+   ],
+   "grow": 6,
+   "width": [
+    0.25,
+    0.45
+   ],
+   "brightness": [
+    0.6,
+    1.0
+   ],
+   "texture": "cult_flame_tongue",
+   "flicker": 0.4,
+   "color": "#9A6BFF",
+   "out": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 58,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 0.8,
+   "area": 1.9,
+   "speed": 0.02,
+   "gravity": -0.02,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 20,
+   "color": "#E6C8FF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 58,
+   "texture": "spark_soft",
+   "count": 30,
+   "rate": 0.6,
+   "area": 1.8,
+   "speed": 0.02,
+   "gravity": -0.03,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 16,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "texture": "ereb_hand_flame_rim",
+   "radius": 2.05,
+   "glow": 0.15,
+   "fadeOut": 14,
+   "color": "#E8B84A",
+   "brightness": 0.35,
+   "comment": "подсказка: еле заметная золотая кромка — только у настоящих"
+  }
+ ]
+}

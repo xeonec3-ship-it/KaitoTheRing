@@ -212,6 +212,8 @@ def write(M):
            'comment': 'T30 Эреб: все анимации casting_animations.json Iron\'s (те же имена — их зовёт AbstractSpellCastingMob) + ereb_* (наши). '
                       'Сгенерировано tools/gen_ereb.py (tools/gen_ereb_anims.py) — правьте генератор.',
            'animations': {**src['animations'], **ours}}
+    import gen_replica_break as RB          # «Реплика»: ereb_replica_break (+ fx/печати в gen_ereb.py)
+    RB.add_anims('ereb', doc['animations'])
     with open(M.out('animations/entity/ereb.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
         f.write('\n')

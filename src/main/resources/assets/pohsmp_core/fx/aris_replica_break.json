@@ -1,0 +1,271 @@
+{
+ "comment": "T28 Арис ломает «Дезинтеграцию: Реплику» (caster = Арис, анимация animation.aris.replica_break 2.0 с). 2 — печать под ногами раскаляется; 13 (strike) — удар молотом как по заготовке: искры, звон, верхние печати тоже краснеют и плющатся (expand); 23 (break) — второй удар: код Fx.stop экземпляра Реплики, раскалённые печати раскалываются окалиной, рога вспыхивают.",
+ "style": "aris",
+ "duration": 48,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 2,
+   "at": "caster+0,0.06,0",
+   "id": "aris_replica_hot",
+   "scale": 4.5,
+   "until": 23,
+   "comment": "печать под ногами — заготовка: раскаляется"
+  },
+  {
+   "type": "flash",
+   "delay": 13,
+   "at": "caster+-0.25,0.12,1.35",
+   "duration": 10,
+   "size": 2.8,
+   "rays": 8,
+   "color": "#FFC060",
+   "comment": "strike: удар по печати-заготовке"
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "at": "caster+-0.25,0.12,1.35",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 110,
+   "rate": 60,
+   "spread": 0.5,
+   "speed": 0.42,
+   "gravity": 0.09,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 18,
+   "color": "#FFD27A",
+   "glow": 0.7,
+   "comment": "сноп искр"
+  },
+  {
+   "type": "wave",
+   "delay": 13,
+   "at": "caster+0,0.06,0",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 4.6,
+   "thickness": 0.6,
+   "followTerrain": true,
+   "color": "#FF7A1E"
+  },
+  {
+   "type": "sigil",
+   "delay": 14,
+   "at": "caster+0,2.42,0",
+   "id": "aris_replica_hot",
+   "scale": 3.4,
+   "until": 23
+  },
+  {
+   "type": "sigil",
+   "delay": 15,
+   "at": "caster+0,4.82,0",
+   "id": "aris_replica_hot",
+   "scale": 4.8,
+   "until": 23
+  },
+  {
+   "type": "flash",
+   "delay": 23,
+   "at": "caster+-0.25,0.12,1.35",
+   "duration": 12,
+   "size": 3.4,
+   "rays": 10,
+   "color": "#FFE2A0",
+   "comment": "break: второй удар — печати плющатся и лопаются"
+  },
+  {
+   "type": "sprites",
+   "delay": 23,
+   "at": "caster+-0.25,0.12,1.35",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 90,
+   "rate": 50,
+   "spread": 0.5,
+   "speed": 0.5,
+   "gravity": 0.1,
+   "size": [
+    0.18,
+    0.04
+   ],
+   "life": 20,
+   "color": "#FFD27A",
+   "glow": 0.7
+  },
+  {
+   "type": "flash",
+   "delay": 23,
+   "at": "caster+0,2.75,0",
+   "duration": 14,
+   "size": 1.9,
+   "rays": 6,
+   "color": "@primary",
+   "comment": "рога вспыхивают бирюзой"
+  },
+  {
+   "type": "sprites",
+   "delay": 23,
+   "at": "caster+0,2.8,0",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 36,
+   "rate": 8,
+   "spread": 0.45,
+   "speed": 0.06,
+   "gravity": -0.02,
+   "size": [
+    0.14,
+    0.03
+   ],
+   "life": 20,
+   "color": "@primary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 23,
+   "at": "caster+0,0.06,0",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 50,
+   "rate": 14,
+   "area": 4.5,
+   "speed": 0.03,
+   "gravity": 0.06,
+   "spin": 120,
+   "size": [
+    0.32,
+    0.14
+   ],
+   "life": 30,
+   "color": "#2A1E1C",
+   "blend": "translucent",
+   "comment": "окалина осыпается с печати field"
+  },
+  {
+   "type": "sprites",
+   "delay": 23,
+   "at": "caster+0,0.06,0",
+   "duration": 4,
+   "texture": "mote_flame",
+   "count": 34,
+   "rate": 10,
+   "area": 4.5,
+   "speed": 0.04,
+   "gravity": 0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 22,
+   "color": "#FF7A1E",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+0,2.42,0",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 50,
+   "rate": 14,
+   "area": 3.4,
+   "speed": 0.03,
+   "gravity": 0.06,
+   "spin": 120,
+   "size": [
+    0.32,
+    0.14
+   ],
+   "life": 30,
+   "color": "#2A1E1C",
+   "blend": "translucent",
+   "comment": "окалина осыпается с печати tier"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+0,2.42,0",
+   "duration": 4,
+   "texture": "mote_flame",
+   "count": 34,
+   "rate": 10,
+   "area": 3.4,
+   "speed": 0.04,
+   "gravity": 0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 22,
+   "color": "#FF7A1E",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 25,
+   "at": "caster+0,4.82,0",
+   "duration": 4,
+   "texture": "mote_ash",
+   "count": 50,
+   "rate": 14,
+   "area": 4.8,
+   "speed": 0.03,
+   "gravity": 0.06,
+   "spin": 120,
+   "size": [
+    0.32,
+    0.14
+   ],
+   "life": 30,
+   "color": "#2A1E1C",
+   "blend": "translucent",
+   "comment": "окалина осыпается с печати top"
+  },
+  {
+   "type": "sprites",
+   "delay": 25,
+   "at": "caster+0,4.82,0",
+   "duration": 4,
+   "texture": "mote_flame",
+   "count": 34,
+   "rate": 10,
+   "area": 4.8,
+   "speed": 0.04,
+   "gravity": 0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 22,
+   "color": "#FF7A1E",
+   "glow": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,0.2,0",
+   "duration": 10,
+   "texture": "mote_cloud",
+   "count": 14,
+   "rate": 2,
+   "area": 2.5,
+   "speed": 0.02,
+   "gravity": -0.01,
+   "size": [
+    0.6,
+    1.2
+   ],
+   "life": 30,
+   "color": "#4A403C",
+   "blend": "translucent",
+   "comment": "дымок над остывшей окалиной"
+  }
+ ]
+}

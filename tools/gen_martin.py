@@ -1251,6 +1251,8 @@ def build_all():
         m.glow.save(out('textures/entity/martin/martin_glowmask.png'), optimize=True)
     allan = iron_anims()
     allan.update({a.name: a.to_json() for a in an})
+    import gen_replica_break as RB          # «Реплика»: martin_replica_break (+ fx/печати в main)
+    RB.add_anims('martin', allan)
     write_json('animations/entity/martin.animation.json', {'format_version': '1.8.0', 'animations': allan}, compact=True)
     item_model()
     ncubes = sum(len(b.cubes) for b in m.bones.values())
@@ -1266,6 +1268,8 @@ def main(args):
     FX.run(sys.modules[__name__], args)
     import gen_martin_spells as SP
     SP.run(sys.modules[__name__], args)
+    import gen_replica_break as RB
+    RB.run_assets(('martin',))
 
 
 if __name__ == '__main__':

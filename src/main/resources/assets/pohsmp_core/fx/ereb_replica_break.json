@@ -1,0 +1,271 @@
+{
+ "comment": "T30 Эреб ломает «Дезинтеграцию: Реплику» (caster = Эреб, анимация ereb_replica_break 1.8 с). 11 (snap) — щелчок: печати Реплики становятся стеклом, по ним бежит рябь; 19 (break) — код Fx.stop экземпляра Реплики, стекло трескается и осыпается осколками и бабочками; 24–30 — поклон.",
+ "style": "ereb",
+ "duration": 44,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 11,
+   "at": "caster+-0.35,2.15,0.1",
+   "duration": 6,
+   "size": 0.8,
+   "rays": 4,
+   "color": "#FFFFFF",
+   "comment": "snap: щелчок пальцами"
+  },
+  {
+   "type": "sigil",
+   "delay": 11,
+   "at": "caster+0,0.06,0",
+   "id": "ereb_replica_glass",
+   "scale": 4.5,
+   "until": 19,
+   "comment": "печать field становится стеклом"
+  },
+  {
+   "type": "wave",
+   "delay": 12,
+   "at": "caster+0,0.06,0",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 4.5,
+   "thickness": 1.575,
+   "color": "#BFE6FF",
+   "comment": "рябь отражения"
+  },
+  {
+   "type": "sprites",
+   "delay": 19,
+   "at": "caster+0,0.06,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 46,
+   "rate": 18,
+   "area": 4.5,
+   "speed": 0.05,
+   "gravity": 0.06,
+   "spin": 200,
+   "tumble": true,
+   "size": [
+    0.24,
+    0.1
+   ],
+   "life": 30,
+   "color": "#BFE6FF",
+   "glow": 0.4,
+   "comment": "break: осыпается осколками"
+  },
+  {
+   "type": "sprites",
+   "delay": 19,
+   "at": "caster+0,0.06,0",
+   "duration": 6,
+   "texture": "mote_butterfly",
+   "count": 9,
+   "rate": 3,
+   "area": 3.8249999999999997,
+   "speed": 0.05,
+   "gravity": -0.015,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.3
+   ],
+   "life": 44,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,0.06,0",
+   "duration": 6,
+   "texture": "mote_butterfly_side",
+   "count": 4,
+   "rate": 2,
+   "area": 3.15,
+   "speed": 0.04,
+   "gravity": -0.015,
+   "sway": 0.6,
+   "size": [
+    0.3,
+    0.26
+   ],
+   "life": 40,
+   "color": "#E8B84A",
+   "glow": 0.45
+  },
+  {
+   "type": "sigil",
+   "delay": 12,
+   "at": "caster+0,2.42,0",
+   "id": "ereb_replica_glass",
+   "scale": 3.4,
+   "until": 19,
+   "comment": "печать tier становится стеклом"
+  },
+  {
+   "type": "wave",
+   "delay": 13,
+   "at": "caster+0,2.42,0",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 3.4,
+   "thickness": 1.19,
+   "color": "#BFE6FF",
+   "comment": "рябь отражения"
+  },
+  {
+   "type": "sprites",
+   "delay": 19,
+   "at": "caster+0,2.42,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 46,
+   "rate": 18,
+   "area": 3.4,
+   "speed": 0.05,
+   "gravity": 0.06,
+   "spin": 200,
+   "tumble": true,
+   "size": [
+    0.24,
+    0.1
+   ],
+   "life": 30,
+   "color": "#BFE6FF",
+   "glow": 0.4,
+   "comment": "break: осыпается осколками"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,2.42,0",
+   "duration": 6,
+   "texture": "mote_butterfly",
+   "count": 7,
+   "rate": 3,
+   "area": 2.8899999999999997,
+   "speed": 0.05,
+   "gravity": -0.015,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.3
+   ],
+   "life": 44,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "at": "caster+0,2.42,0",
+   "duration": 6,
+   "texture": "mote_butterfly_side",
+   "count": 4,
+   "rate": 2,
+   "area": 2.38,
+   "speed": 0.04,
+   "gravity": -0.015,
+   "sway": 0.6,
+   "size": [
+    0.3,
+    0.26
+   ],
+   "life": 40,
+   "color": "#E8B84A",
+   "glow": 0.45
+  },
+  {
+   "type": "sigil",
+   "delay": 13,
+   "at": "caster+0,4.82,0",
+   "id": "ereb_replica_glass",
+   "scale": 4.8,
+   "until": 19,
+   "comment": "печать top становится стеклом"
+  },
+  {
+   "type": "wave",
+   "delay": 14,
+   "at": "caster+0,4.82,0",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 4.8,
+   "thickness": 1.68,
+   "color": "#BFE6FF",
+   "comment": "рябь отражения"
+  },
+  {
+   "type": "sprites",
+   "delay": 19,
+   "at": "caster+0,4.82,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 46,
+   "rate": 18,
+   "area": 4.8,
+   "speed": 0.05,
+   "gravity": 0.06,
+   "spin": 200,
+   "tumble": true,
+   "size": [
+    0.24,
+    0.1
+   ],
+   "life": 30,
+   "color": "#BFE6FF",
+   "glow": 0.4,
+   "comment": "break: осыпается осколками"
+  },
+  {
+   "type": "sprites",
+   "delay": 21,
+   "at": "caster+0,4.82,0",
+   "duration": 6,
+   "texture": "mote_butterfly",
+   "count": 5,
+   "rate": 3,
+   "area": 4.08,
+   "speed": 0.05,
+   "gravity": -0.015,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.3
+   ],
+   "life": 44,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "at": "caster+0,4.82,0",
+   "duration": 6,
+   "texture": "mote_butterfly_side",
+   "count": 4,
+   "rate": 2,
+   "area": 3.36,
+   "speed": 0.04,
+   "gravity": -0.015,
+   "sway": 0.6,
+   "size": [
+    0.3,
+    0.26
+   ],
+   "life": 40,
+   "color": "#E8B84A",
+   "glow": 0.45
+  },
+  {
+   "type": "flash",
+   "delay": 19,
+   "at": "caster+0,2.42,0",
+   "duration": 10,
+   "size": 3.0,
+   "color": "#E8F6FF"
+  }
+ ]
+}

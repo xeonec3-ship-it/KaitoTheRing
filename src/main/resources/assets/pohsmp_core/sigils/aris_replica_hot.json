@@ -1,0 +1,75 @@
+{
+ "comment": "T28: печать «Реплики» как заготовка на наковальне: раскаляется, плющится (expand), раскалывается окалиной. Ставить на печати Реплики: +0.06 (scale 4.5), +2.42 (3.4), +4.82 (4.8).",
+ "size": 1.0,
+ "color": "#FF6A1E",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": 0.006,
+   "brightness": 0.55,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "hot",
+   "type": "disc",
+   "texture": "aris_replica_hot",
+   "radius": 1.0,
+   "heightOffset": 0.012,
+   "brightness": 1.5,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 6
+   }
+  }
+ ],
+ "expand": {
+  "scale": 1.14,
+  "delay": 2,
+  "duration": 8,
+  "easing": "easeOutBack"
+ },
+ "dissolve": {
+  "modes": [
+   "cracks"
+  ],
+  "duration": 26,
+  "cracks": {
+   "count": 10,
+   "rings": 2,
+   "irregular": 0.5,
+   "jag": 0.3,
+   "crackTime": 0.3,
+   "fallTime": 0.5,
+   "gap": 0.04,
+   "push": 0.18,
+   "pop": 0.15,
+   "fall": 1.6,
+   "tumble": 120,
+   "spin": 40,
+   "glow": 1.8,
+   "dust": 40,
+   "color": "#FF7A1E"
+  }
+ }
+}

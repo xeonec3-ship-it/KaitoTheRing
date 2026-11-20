@@ -1,0 +1,73 @@
+{
+ "comment": "T30: щелчок Эреба — печать «Реплики» становится стеклом с рябью отражения, потом трескается и осыпается. Ставить на печати Реплики: +0.06 (scale 4.5), +2.42 (3.4), +4.82 (4.8).",
+ "size": 1.0,
+ "color": "#BFE6FF",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": 0.006,
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "glass",
+   "type": "disc",
+   "texture": "ereb_replica_glass",
+   "radius": 1.0,
+   "heightOffset": 0.012,
+   "brightness": 1.35,
+   "appear": {
+    "delay": 0,
+    "duration": 5,
+    "easing": "easeOutBack",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   },
+   "rotation": {
+    "speed": 3
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 10
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "cracks"
+  ],
+  "duration": 28,
+  "cracks": {
+   "count": 11,
+   "rings": 2,
+   "irregular": 0.4,
+   "jag": 0.3,
+   "crackTime": 0.25,
+   "fallTime": 0.55,
+   "gap": 0.03,
+   "push": 0.25,
+   "pop": 0.3,
+   "fall": 1.4,
+   "tumble": 200,
+   "spin": 90,
+   "glow": 2.0,
+   "dust": 44,
+   "color": "#E8F6FF"
+  }
+ }
+}

@@ -966,6 +966,7 @@ def anims():
 
 # ================================================================== запись
 def main(args):
+    import gen_replica_break as RB          # «Реплика»: irina_replica_break + fx/печати (tools/gen_replica_break.py)
     m = build()
     m.pack()
     m.paint()
@@ -980,7 +981,7 @@ def main(args):
         m.glow.save(os.path.join(td, 'irina_glowmask.png'), optimize=True)
         WRITTEN.append('textures/entity/irina/irina_glowmask.png')
     write_json(os.path.join(A, 'animations', 'entity', 'irina.animation.json'),
-               {'format_version': '1.8.0', 'animations': {a.name: a.to_json() for a in an}}, compact=True)
+               {'format_version': '1.8.0', 'animations': RB.add_anims('irina', {a.name: a.to_json() for a in an})}, compact=True)
     WRITTEN.append('animations/entity/irina.animation.json')
     nc = sum(len(b.cubes) for b in m.bones.values())
     print('irina: bones %d, cubes %d, tex %s, anims %d' % (len(m.bones), nc, m.tex_px, len(an)))
@@ -989,6 +990,7 @@ def main(args):
     if '--no-fx' not in args:
         import gen_irina_fx
         gen_irina_fx.run(sys.modules[__name__], args)
+        RB.run_assets(('irina',))
     import irina_render
     if '--html' in args:
         irina_render.write_html()

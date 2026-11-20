@@ -1,0 +1,115 @@
+{
+ "comment": "T26 «Первое Пламя»: огромная печать над центром арены (sky, r22). Прорисовывается 1.6–3.0 с ролика, держится до падения столба (4.0 с), затем гаснет. Сгенерировано tools/gen_cult_leader.py.",
+ "size": 22,
+ "color": "#FF7A1E",
+ "orientation": "sky",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#C8320C",
+   "brightness": 0.5,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.15,
+    "period": 20
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "cult_first_flame",
+   "radius": 1.0,
+   "heightOffset": 0.01,
+   "appear": {
+    "delay": 0,
+    "duration": 28,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw",
+     "twist"
+    ],
+    "twist": 60,
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 0.6,
+    "boost": 4
+   }
+  },
+  {
+   "id": "name",
+   "type": "text",
+   "radius": 0.985,
+   "heightOffset": 0.02,
+   "color": "#FFD24A",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 10,
+    "duration": 24,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -0.4
+   },
+   "text": "ПЕРВОЕ ПЛАМЯ ✦ ОГОНЬ ДО НАЧАЛА ✦ ",
+   "font": "cyrillic",
+   "size": 0.04,
+   "repeat": 4,
+   "side": "outer"
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.08,
+   "heightOffset": 0.03,
+   "color": "#FFD24A",
+   "brightness": 1.1,
+   "count": 8,
+   "arcLength": 30,
+   "width": 0.012,
+   "appear": {
+    "delay": 20,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 1.5
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFD24A",
+  "size": 1.1,
+  "duration": 16,
+  "sparks": 160
+ },
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 24,
+  "stagger": 2
+ }
+}

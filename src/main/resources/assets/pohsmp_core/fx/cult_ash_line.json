@@ -1,0 +1,62 @@
+{
+ "comment": "«Пепел Меллисто», 3.0–4.5 с: огненная линия на земле — траектория разреза (caster = босс, yaw = направление удара). Горит 1.5 с (30 тиков) до удара, пульсирует; длина 56 бл. (через всю арену), ширина зоны урона — код (предл. 1.5 бл.).",
+ "style": "cult_leader",
+ "duration": 34,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0,28",
+   "duration": 34,
+   "shape": "crack",
+   "length": 56,
+   "width": 1.4,
+   "grow": 8,
+   "branches": 10,
+   "pulse": 0.6,
+   "yaw": 90,
+   "glow": 0.6,
+   "color": "@primary",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,14",
+   "duration": 30,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 1.2,
+   "area": 2,
+   "speed": 0.01,
+   "gravity": -0.02,
+   "size": [
+    0.3,
+    0.05
+   ],
+   "life": 20,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,40",
+   "duration": 30,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 1.2,
+   "area": 2,
+   "speed": 0.01,
+   "gravity": -0.02,
+   "size": [
+    0.3,
+    0.05
+   ],
+   "life": 20,
+   "color": "@secondary"
+  }
+ ]
+}

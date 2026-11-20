@@ -9,6 +9,7 @@ import json
 import math
 import os
 import random
+import sys
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -456,10 +457,11 @@ def bossbar():
 
 
 # ================================================================== титр
-def title(bar):
+def title(bar, name='cult_leader', texts=None):
     gold = [M.hx(c) for c in ('#e8e895', '#d6af39', '#b9892e', '#9c5e2c')]
-    for lang, text, font in (('ru', 'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff'),     # имя — английское
-                             ('en', 'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff')):
+    texts = texts or (('ru', 'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff'),     # имя — английское
+                      ('en', 'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff'))
+    for lang, text, font in texts:
         S = 2
         Wd, Hd = 1024 * S, 192 * S
         fnt = ImageFont.truetype(os.path.join(HERE, 'fonts', font), 92 * S)
@@ -507,7 +509,7 @@ def title(bar):
             d.point((x, y + 2), fill=M.hx('#2b1111', int(a_ * 0.8)))
         crop = bar.crop((84, 0, 108, 13)).resize((72, 39), Image.NEAREST)
         img.alpha_composite(crop, (512 - 36, y - 22))
-        img.save(M.out('textures/gui/title/cult_leader_%s.png' % lang))
+        img.save(M.out('textures/gui/title/%s_%s.png' % (name, lang)))
 
 
 # ================================================================== иконка эффекта (18×18)
@@ -823,6 +825,8 @@ def run(mod, args):
     sheet_fx()
     sheet_ui(bar)
     sheet_textures()
+    import gen_cult_leader_extra as X
+    X.run(M, sys.modules[__name__], args)
     if '--shots' in args:
         shots(args)
     if '--html' in args:

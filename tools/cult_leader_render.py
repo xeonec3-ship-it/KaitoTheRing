@@ -43,7 +43,9 @@ def pil_b64(img):
 
 
 def iron_anims(names=None):
-    an = jar_json('assets/irons_spellbooks/animations/casting_animations.json')['animations']
+    ours = os.path.join(A, 'animations', 'entity', 'cult_leader.animation.json')     # наш файл = анимации Iron's + cult_leader_*
+    an = (json.load(open(ours, encoding='utf-8')) if os.path.exists(ours)
+          else jar_json('assets/irons_spellbooks/animations/casting_animations.json'))['animations']
     return {k: v for k, v in an.items() if names is None or k in names}
 
 

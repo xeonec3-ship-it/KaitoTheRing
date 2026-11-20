@@ -1,0 +1,149 @@
+{
+ "comment": "Босс ломает «Дезинтеграцию: Реплику» (caster = босс, анимация cult_leader_replica_break, 52 тика). 10 — трещины бегут по печатям Реплики; 18 (crush) — верхние печати (+4.8, +2.4) лопаются: код Fx.stop(экземпляр Реплики), здесь — осколки; 30 (shatter) — разрез косой снизу вверх: остатки поля и венца рассыпаются, осколки падают. Цвет — Реплики.",
+ "style": "cult_leader",
+ "duration": 56,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,4.82,0",
+   "id": "cult_replica_cracks",
+   "scale": 1.0
+  },
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,2.42,0",
+   "id": "cult_replica_cracks",
+   "scale": 0.72
+  },
+  {
+   "type": "sigil",
+   "delay": 14,
+   "at": "caster+0,0.06,0",
+   "id": "cult_replica_cracks",
+   "scale": 0.95
+  },
+  {
+   "type": "flash",
+   "delay": 18,
+   "at": "caster+0,4.8,0",
+   "duration": 8,
+   "size": 2.2,
+   "color": "#FF1934"
+  },
+  {
+   "type": "sprites",
+   "delay": 18,
+   "at": "caster+0,4.8,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 60,
+   "rate": 20,
+   "area": 1.4,
+   "speed": 0.18,
+   "gravity": 0.03,
+   "spin": 90,
+   "size": [
+    0.22,
+    0.06
+   ],
+   "life": 26,
+   "color": "#FF1934",
+   "glow": 0.6,
+   "comment": "осколки верхней печати"
+  },
+  {
+   "type": "sprites",
+   "delay": 19,
+   "at": "caster+0,2.4,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 40,
+   "rate": 14,
+   "area": 1.0,
+   "speed": 0.15,
+   "gravity": 0.03,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 24,
+   "color": "#FF1934",
+   "glow": 0.6
+  },
+  {
+   "type": "slash",
+   "delay": 30,
+   "at": "caster+0.4,2.6,0.8",
+   "radius": 2.6,
+   "arc": 150,
+   "thickness": 0.4,
+   "bend": 1,
+   "tilt": 70,
+   "grow": 4,
+   "life": 10,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0,6.5,0",
+   "duration": 10,
+   "size": 3.2,
+   "rays": 10,
+   "color": "#FF1934"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,6.5,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 90,
+   "rate": 24,
+   "spread": 2.2,
+   "speed": 0.2,
+   "gravity": 0.04,
+   "spin": 120,
+   "size": [
+    0.26,
+    0.06
+   ],
+   "life": 34,
+   "color": "#FF1934",
+   "glow": 0.6,
+   "comment": "венец и апекс рассыпаются"
+  },
+  {
+   "type": "wave",
+   "delay": 30,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 4,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "color": "#FF1934"
+  },
+  {
+   "type": "sprites",
+   "delay": 32,
+   "at": "caster+0,0.2,0",
+   "duration": 6,
+   "texture": "mote_ash",
+   "count": 24,
+   "rate": 6,
+   "area": 1.2,
+   "speed": 0.03,
+   "gravity": -0.01,
+   "size": [
+    0.25,
+    0.08
+   ],
+   "life": 30,
+   "color": "#62514E",
+   "blend": "translucent"
+  }
+ ]
+}

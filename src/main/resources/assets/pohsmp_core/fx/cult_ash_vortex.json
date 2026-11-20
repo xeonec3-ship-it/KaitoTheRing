@@ -1,0 +1,52 @@
+{
+ "comment": "«Пепел Меллисто», 1.2–3.0 с: пепельный вихрь проносится по арене (caster = невидимый босс, follow; до Fx.stop).",
+ "style": "cult_leader",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "radius": 1.8,
+   "height": 4.2,
+   "arms": 4,
+   "speed": 14,
+   "texture": "mote_ash",
+   "color": "#1A0E0C"
+  },
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "radius": 1.2,
+   "height": 3.4,
+   "arms": 3,
+   "speed": -10,
+   "texture": "mote_flame",
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "follow": true,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 3,
+   "spread": 1.2,
+   "speed": 0.02,
+   "gravity": -0.01,
+   "spin": 50,
+   "size": [
+    0.3,
+    0.1
+   ],
+   "life": 40,
+   "color": "#62514E",
+   "blend": "translucent",
+   "comment": "шлейф пепла за вихрем"
+  }
+ ]
+}

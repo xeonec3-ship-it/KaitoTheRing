@@ -648,5 +648,17 @@
   "subtitles.pohsmp_core.cult_leader.firewall": "Wall of fire ignites",
   "subtitles.pohsmp_core.cult_leader.firewall_loop": "Wall of fire roars",
   "subtitles.pohsmp_core.cult_leader.summon": "Cultist summoned",
-  "subtitles.pohsmp_core.music.cult_leader": "Music: Cult Leader"
+  "subtitles.pohsmp_core.music.cult_leader": "Music: Cult Leader",
+  "ui.pohsmp_core.cult_leader.first_flame": "The First Flame",
+  "ui.pohsmp_core.cult_leader.first_flame_warn": "The ground cracks — jump the ring of fire!",
+  "ui.pohsmp_core.cult_leader.ash": "Ashes of Mellisto",
+  "ui.pohsmp_core.cult_leader.ash_warn": "A line of fire — get off it!",
+  "ui.pohsmp_core.cult_leader.replica_taunt": "This forgery won't work on me",
+  "death.attack.pohsmp_core.cult_finisher": "%1$s was finished off by the Head of the Cult of Mellisto",
+  "subtitles.pohsmp_core.cult_leader.first_flame": "The First Flame unfolds",
+  "subtitles.pohsmp_core.cult_leader.first_flame_impact": "Pillar of flame",
+  "subtitles.pohsmp_core.cult_leader.ash": "Cult Leader turns to ash",
+  "subtitles.pohsmp_core.cult_leader.ash_slash": "Fiery slash",
+  "subtitles.pohsmp_core.cult_leader.replica_break": "Replica seals shattered",
+  "subtitles.pohsmp_core.cult_leader.finisher": "Scythe impales"
 }

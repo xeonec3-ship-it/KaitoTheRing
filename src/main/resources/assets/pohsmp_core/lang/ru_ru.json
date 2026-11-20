@@ -648,5 +648,17 @@
   "subtitles.pohsmp_core.cult_leader.firewall": "Вспыхивает стена огня",
   "subtitles.pohsmp_core.cult_leader.firewall_loop": "Ревёт стена огня",
   "subtitles.pohsmp_core.cult_leader.summon": "Культист призван",
-  "subtitles.pohsmp_core.music.cult_leader": "Музыка: Глава Культа"
+  "subtitles.pohsmp_core.music.cult_leader": "Музыка: Глава Культа",
+  "ui.pohsmp_core.cult_leader.first_flame": "Первое Пламя",
+  "ui.pohsmp_core.cult_leader.first_flame_warn": "Земля трескается — перепрыгните кольцо огня!",
+  "ui.pohsmp_core.cult_leader.ash": "Пепел Меллисто",
+  "ui.pohsmp_core.cult_leader.ash_warn": "Огненная линия — уйдите с неё!",
+  "ui.pohsmp_core.cult_leader.replica_taunt": "Эта фальшивка на меня не сработает",
+  "death.attack.pohsmp_core.cult_finisher": "%1$s пал от косы Head of the Cult of Mellisto",
+  "subtitles.pohsmp_core.cult_leader.first_flame": "Раскрывается Первое Пламя",
+  "subtitles.pohsmp_core.cult_leader.first_flame_impact": "Столб пламени",
+  "subtitles.pohsmp_core.cult_leader.ash": "Глава Культа рассыпается пеплом",
+  "subtitles.pohsmp_core.cult_leader.ash_slash": "Огненный разрез",
+  "subtitles.pohsmp_core.cult_leader.replica_break": "Печати Реплики разбиты",
+  "subtitles.pohsmp_core.cult_leader.finisher": "Коса пронзает"
 }

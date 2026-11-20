@@ -1,0 +1,84 @@
+{
+ "comment": "«Пепел Меллисто», 0–1.2 с: босс сгорает в пепел (с анимацией cult_leader_ash_dissolve; caster = босс).",
+ "style": "cult_leader",
+ "duration": 34,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 10,
+   "size": 2.6,
+   "color": "@secondary"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 24,
+   "target": "caster",
+   "thickness": 0.3,
+   "pulse": [
+    0.4,
+    4
+   ],
+   "color": "@primary",
+   "motes": 40,
+   "follow": true
+  },
+  {
+   "type": "vortex",
+   "delay": 4,
+   "at": "caster",
+   "duration": 26,
+   "radius": 1.6,
+   "height": 4,
+   "arms": 3,
+   "speed": 10,
+   "texture": "mote_ash",
+   "color": "#1A0E0C",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,1.2,0",
+   "duration": 18,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 6,
+   "spread": 0.9,
+   "speed": 0.06,
+   "gravity": -0.02,
+   "spin": 60,
+   "size": [
+    0.4,
+    0.12
+   ],
+   "life": 36,
+   "color": "#1A0E0C",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,1.2,0",
+   "duration": 18,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 3,
+   "spread": 0.9,
+   "speed": 0.08,
+   "gravity": -0.02,
+   "size": [
+    0.3,
+    0.04
+   ],
+   "life": 20,
+   "color": "@primary"
+  }
+ ]
+}

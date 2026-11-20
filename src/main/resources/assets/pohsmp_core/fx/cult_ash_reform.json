@@ -1,0 +1,49 @@
+{
+ "comment": "«Пепел Меллисто», 3.0–4.0 с: пепел стягивается в фигуру перед сильнейшим врагом (caster = босс, анимация cult_leader_ash_reform).",
+ "style": "cult_leader",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster",
+   "duration": 18,
+   "radius": 2.4,
+   "height": 4,
+   "arms": 4,
+   "speed": -16,
+   "pull": 1.0,
+   "texture": "mote_ash",
+   "color": "#1A0E0C",
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 14,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 4,
+   "spread": 2.4,
+   "speed": -0.08,
+   "size": [
+    0.3,
+    0.05
+   ],
+   "life": 14,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 18,
+   "at": "caster+0,1.4,0",
+   "duration": 8,
+   "size": 2.2,
+   "color": "@secondary"
+  }
+ ]
+}

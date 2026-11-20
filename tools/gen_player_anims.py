@@ -1014,6 +1014,26 @@ def held_target():
     return a
 
 
+def cult_finisher_victim():
+    """T26, добивание Главой Культа (2.4 с = анимация босса cult_leader_finisher): 0–0.7 жертву тянет к боссу (скована, как held),
+    1.0 — пронзена косой: складывается пополам; 1.0–1.7 её поднимают (высоту даёт код), руки и ноги повисают; 1.7 — вспышка пламени:
+    выгибается назад; 2.2 — обмякла (смерть). Без петли."""
+    held = pose('held')
+    pierce = pose('stand', rightArm=_fk(pitch=-28, roll=22, bend=-34), leftArm=mirror(_fk(pitch=-28, roll=22, bend=-34)),
+                  torso=_TO(pitch=30, bend=14), head=_HL(pitch=34), body={'y': 0.45},
+                  rightLeg=_TO(pitch=12, roll=3, bend=24), leftLeg=_TO(pitch=4, roll=-3, bend=30))
+    hang = pose('stand', rightArm=_fk(pitch=8, roll=10, bend=-12), leftArm=mirror(_fk(pitch=8, roll=10, bend=-12)),
+                torso=_TO(pitch=22, bend=10), head=_HL(pitch=42), body={'y': 0.45},
+                rightLeg=_TO(pitch=6, roll=4, bend=18), leftLeg=_TO(pitch=-2, roll=-4, bend=22))
+    arch = pose('stand', rightArm=_fk(pitch=-10, roll=70, bend=-20), leftArm=mirror(_fk(pitch=-10, roll=70, bend=-20)),
+                torso=_TO(pitch=-14, bend=-6), head=_HL(pitch=-40), body={'y': 0.45},
+                rightLeg=_TO(pitch=-6, roll=4, bend=10), leftLeg=_TO(pitch=-10, roll=-4, bend=14))
+    return compose('pohsmp_cult_finisher_victim', 2.4, [
+        {'pose': held, 't': 0}, {'pose': held, 't': 0.9}, {'pose': pierce, 't': 1.05, 'ease': 'easeOutQuart'},
+        {'pose': hang, 't': 1.6}, {'pose': arch, 't': 1.8, 'ease': 'easeOutCubic'}, {'pose': hang, 't': 2.25, 'ease': 'easeInOutSine'}],
+        hold=True)
+
+
 # ---------------------------------------------------------------- позы T05 и T20 (дополнение библиотеки)
 # «Падение звезды» — без посоха (руки пустые, как у других заклинаний с роликом); жесты T20 — с посохом в правой руке
 # (у этих поз есть rightItem — докрутка посоха в кисти, чтобы он смотрел куда нужно).
@@ -1825,7 +1845,7 @@ _BL = (lambda: blessing_cast()[0],
 
 
 ANIMS = [downfall_cast, downfall_finish, *_MW, *_SD, *_TB, *_SC, *_CA, coven_ritual, *_DI, lambda: silent_gate_cast()[0], silent_gate_wait, silent_gate_command, silent_gate_finish,
-         scarlet_cut_cast, finger_snap, held_target, star_fall_cast, star_fall_finish,
+         scarlet_cut_cast, finger_snap, held_target, cult_finisher_victim, star_fall_cast, star_fall_finish,
          silent_volley_cast, silent_volley_finish, sage_barrier_cast, sage_barrier_finish, worgan_flame_cast, worgan_flame_finish,
          *_SS, *_BL, *_T22, *_T24, *_T23, *_T25]
 

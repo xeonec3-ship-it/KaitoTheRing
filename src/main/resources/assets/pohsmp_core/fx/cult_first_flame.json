@@ -1,0 +1,209 @@
+{
+ "comment": "«Первое Пламя» (фаза 2, раз за бой). caster = босс, point:center = центр арены (точка появления). 0.9 с (18) — коса в землю: трещины и вспышка у босса; 1.6 с (32) — над центром на +26 раскрывается печать; 2.0–4.0 с (40–80) — ПРЕДУПРЕЖДЕНИЕ: центр трескается, кольцо подсвечено, с печати сыплются искры; 4.0 с (80) — столб пламени в центр, от него по земле бежит кольцо огня 3→28 бл. за 2 с (80–120; урон — код: |d − r(t)| < 0.8 и игрок ниже 1 бл. над землёй, r(t) = 3 + 25·(t − 80)/40). Бой не замораживается.",
+ "style": "cult_leader",
+ "duration": 130,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 34,
+   "target": "caster",
+   "thickness": 0.22,
+   "pulse": [
+    0.3,
+    8
+   ],
+   "color": "@primary",
+   "motes": 30,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 18,
+   "at": "caster+0.6,0.2,1.2",
+   "duration": 8,
+   "size": 1.6,
+   "color": "@secondary",
+   "comment": "коса входит в землю"
+  },
+  {
+   "type": "decal",
+   "delay": 18,
+   "at": "caster+0.6,0,1.2",
+   "duration": 110,
+   "texture": "higher_cracks",
+   "radius": 3,
+   "grow": 10,
+   "glow": 0.5,
+   "fadeOut": 30,
+   "color": "#C8320C"
+  },
+  {
+   "type": "sigil",
+   "delay": 32,
+   "at": "point:center+0,26,0",
+   "id": "cult_first_flame"
+  },
+  {
+   "type": "tint",
+   "delay": 30,
+   "at": "point:center",
+   "duration": 100,
+   "radius": 44,
+   "color": "#5A1406",
+   "strength": 0.32,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "point:center+0,24,0",
+   "duration": 40,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 2.0,
+   "area": 18,
+   "speed": 0.0,
+   "gravity": 0.03,
+   "size": [
+    0.35,
+    0.08
+   ],
+   "life": 34,
+   "color": "@secondary",
+   "glow": 0.6,
+   "comment": "с печати сыплются искры (предупреждение)"
+  },
+  {
+   "type": "decal",
+   "delay": 40,
+   "at": "point:center",
+   "duration": 90,
+   "texture": "higher_cracks",
+   "radius": 8,
+   "grow": 40,
+   "glow": 0.6,
+   "pulse": 10,
+   "fadeOut": 30,
+   "color": "#FF7A1E",
+   "comment": "центр арены трескается"
+  },
+  {
+   "type": "decal",
+   "delay": 40,
+   "at": "point:center",
+   "duration": 40,
+   "texture": "cult_fire_ring",
+   "radius": 3.4,
+   "glow": 0.6,
+   "pulse": 8,
+   "color": "@secondary",
+   "comment": "кольцо подсвечено там, откуда оно побежит"
+  },
+  {
+   "type": "wave",
+   "delay": 40,
+   "at": "point:center",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 28,
+   "thickness": 0.6,
+   "reverse": true,
+   "followTerrain": true,
+   "color": "@primary",
+   "brightness": 0.5
+  },
+  {
+   "type": "wave",
+   "delay": 60,
+   "at": "point:center",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 28,
+   "thickness": 0.6,
+   "reverse": true,
+   "followTerrain": true,
+   "color": "@primary",
+   "brightness": 0.6
+  },
+  {
+   "type": "column",
+   "delay": 80,
+   "at": "point:center",
+   "duration": 24,
+   "radius": 3.0,
+   "height": 26,
+   "fill": 0.8,
+   "color": "@secondary",
+   "out": {
+    "duration": 12,
+    "easing": "easeInSine"
+   },
+   "comment": "СТОЛБ"
+  },
+  {
+   "type": "flash",
+   "delay": 80,
+   "at": "point:center+0,2,0",
+   "duration": 16,
+   "size": 8,
+   "rays": 14,
+   "screen": 0.35,
+   "ring": true,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 80,
+   "at": "point:center",
+   "duration": 40,
+   "shape": "ring",
+   "radius": 28,
+   "thickness": 1.2,
+   "texture": "cult_fire_ring",
+   "spin": 0.5,
+   "followTerrain": true,
+   "color": "@primary",
+   "brightness": 1.2,
+   "comment": "кольцо огня по земле: 3 → 28 бл. за 40 тиков (перепрыгнуть)"
+  },
+  {
+   "type": "sprites",
+   "delay": 80,
+   "at": "point:center+0,1,0",
+   "duration": 8,
+   "texture": "mote_flame",
+   "count": 160,
+   "rate": 20,
+   "spread": 3,
+   "speed": 0.4,
+   "gravity": 0.01,
+   "size": [
+    0.8,
+    0.1
+   ],
+   "life": 30,
+   "color": "@primary",
+   "glow": 0.7
+  },
+  {
+   "type": "decal",
+   "delay": 82,
+   "at": "point:center",
+   "duration": 48,
+   "texture": "glow",
+   "radius": 6,
+   "blend": "translucent",
+   "color": "#1A0E0C",
+   "fadeOut": 30
+  }
+ ]
+}

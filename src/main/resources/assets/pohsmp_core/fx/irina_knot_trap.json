@@ -1,0 +1,32 @@
+{
+ "comment": "«Узлы» — ловушка (caster = точка на земле, −1 до Fx.stop; срабатывание или конец — код). Узел на земле ВИДЕН, пульсирует, над ним колышутся хвосты нитей.",
+ "style": "irina",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "irina_knot_trap"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,0.15,0",
+   "duration": -1,
+   "width": 0.04,
+   "length": 8,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 0.45,
+    "speed": 6,
+    "rise": 0.15,
+    "risePeriod": 24
+   },
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

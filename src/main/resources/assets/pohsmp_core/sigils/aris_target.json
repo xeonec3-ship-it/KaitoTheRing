@@ -1,0 +1,88 @@
+{
+ "comment": "T28 «Последний удар молота»: прицел r14 в центре арены — прорисовывается 3.5 с (предупреждение), клинья сходятся к центру. Сгенерировано tools/gen_aris.py.",
+ "size": 14,
+ "color": "#3CD6E0",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.02,
+   "color": "#0F6470",
+   "brightness": 0.5,
+   "appear": {
+    "delay": 0,
+    "duration": 70,
+    "easing": "easeInSine",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.2,
+    "period": 10
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "aris_target",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 60,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -0.6
+   }
+  },
+  {
+   "id": "arcs",
+   "type": "arcs",
+   "texture": "arc_strip",
+   "radius": 1.04,
+   "heightOffset": 0.02,
+   "color": "#C8FBFC",
+   "brightness": 1.1,
+   "count": 8,
+   "arcLength": 30,
+   "width": 0.012,
+   "appear": {
+    "delay": 30,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "assemble",
+     "fade"
+    ]
+   },
+   "rotation": {
+    "speed": 2.0
+   }
+  }
+ ],
+ "formedFlash": {
+  "color": "#C8FBFC",
+  "size": 1.1,
+  "duration": 12,
+  "sparks": 100
+ },
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 16,
+  "stagger": 2
+ }
+}

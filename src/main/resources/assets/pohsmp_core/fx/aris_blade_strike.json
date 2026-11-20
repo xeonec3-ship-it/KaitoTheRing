@@ -1,0 +1,34 @@
+{
+ "comment": "Клинок бьёт игрока (caster = точка попадания): короткая вспышка, искры. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "duration": 6,
+   "size": 1.0,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 20,
+   "rate": 10,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 10,
+   "color": "@primary",
+   "glow": 0.9
+  }
+ ]
+}

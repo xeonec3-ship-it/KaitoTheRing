@@ -1,0 +1,37 @@
+{
+ "comment": "«Обманная брешь» (1.5 с = 30 тиков, окно open 0.3 … close 1.8 анимации ereb_feint): caster = Эреб, follow. Он «открыт», но по силуэту едва заметно бежит стеклянный отблеск — подсказка внимательным, что это ловушка. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 32,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "follow": true,
+   "duration": 30,
+   "thickness": 0.04,
+   "pulse": [
+    0.5,
+    10
+   ],
+   "motes": 2,
+   "texture": "mote_glass",
+   "ring": false,
+   "color": "#BFE6FF",
+   "brightness": 0.35
+  },
+  {
+   "type": "flash",
+   "delay": 2,
+   "at": "caster+0,1.6,0.3",
+   "follow": true,
+   "duration": 5,
+   "size": 0.35,
+   "rays": 4,
+   "color": "#E8FAFF",
+   "brightness": 0.8,
+   "comment": "короткий блик на груди"
+  }
+ ]
+}

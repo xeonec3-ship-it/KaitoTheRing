@@ -105,9 +105,13 @@ def rows(ctx):
 
 
 def pick(tones, idx):
-    idx = np.clip(np.asarray(idx), 0, len(tones) - 1)
+    """Тон по индексу; дробный индекс квантуется до половин — промежуточный тон = середина соседних (мягкий переход целыми пикселями)."""
+    f = np.clip(np.round(np.asarray(idx, float) * 2) / 2, 0, len(tones) - 1)
     T = np.array(tones)
-    return T[idx]
+    lo = np.floor(f).astype(int)
+    hi = np.minimum(lo + 1, len(tones) - 1)
+    k = (f - lo)[..., None]
+    return T[lo] * (1 - k) + T[hi] * k
 
 
 T_HAT = [hex2('#7C7986'), hex2('#625F6C'), hex2('#4E4B58'), hex2('#3A3743')]
@@ -131,32 +135,79 @@ def ihash(*a):
     return h
 
 
+K4 = 4    # пикселей на единицу UV (эталон Главы Культа: 512 px на атлас 128)
+
+
+def pxy(ctx):
+    """Пиксельные столбец/ряд внутри грани (при ×4) и мировые координаты на сетке 1/4 ед. (для непрерывных узоров)."""
+    w, h = face_size(ctx.cube, ctx.face)
+    pc = np.floor(ctx.s * w * K4).astype(int)
+    pr = np.floor(ctx.t * h * K4).astype(int)
+    q = np.floor(ctx.P * K4 + 4096).astype(np.int64)
+    return pc, pr, q
+
+
+def phash(q, seed=0):
+    h = (q[:, 0] * 73856093) ^ (q[:, 1] * 19349663) ^ (q[:, 2] * 83492791) ^ (seed * 2654435761)
+    h = h & 0xFFFFFFFF
+    h = ((h ^ (h >> 13)) * 1274126177) & 0xFFFFFFFF
+    return (h & 0xFFFF) / 65536.0
+
+
+def weave(ctx, kind, seed=0):
+    """Фактура ткани (поправка тона, ≤ 0.5): только МЕСТАМИ (пятнами по низкочастотной маске) и слабее — как на ткани эталона.
+    twill — саржа: диагональный рубчик; satin — лента: продольная нить; knit — вязь. felt (фетр) — без штриховки: только пятна."""
+    pc, pr, q = pxy(ctx)
+    d = np.zeros(ctx.n)
+    side = np.abs(ctx.N[:, 1]) < 0.5
+    patch = fbm(ctx.P, 0.28, 700 + seed, 2) > 0.56                         # где фактура видна
+    if kind == 'twill':
+        u = q[:, 0] + q[:, 2]
+        d += 0.5 * ((((u + q[:, 1]) % 4) == 0) & patch)
+    elif kind == 'satin':
+        d -= 0.5 * ((pc % 3 == 1) & side & patch)
+    elif kind == 'knit':
+        d += 0.5 * (((((q[:, 0] + q[:, 2]) // 2 + q[:, 1]) % 3) == 0) & ((q[:, 1] // 2) % 2 == 0) & patch)
+    return d
+
+
 def fold_columns(ctx, i, step=3, phase=0):
-    """Складки «рукой»: на боковых гранях тёмный столбик складки начинается/кончается в своём ряду (длина разная), рядом —
-    светлый блик складки; без сплошной решётки."""
+    """Складки «рукой» при ×4: тёмная складка 2 px, рядом блик 1 px; каждая складка начинается на своей высоте и сходит на нет
+    (верхний конец — 1 px). Шаг — step единиц."""
     up = ctx.N[:, 1] > 0.5
     dn = ctx.N[:, 1] < -0.5
     side = ~(up | dn)
     u = np.where(np.abs(ctx.N[:, 0]) > 0.5, ctx.P[:, 2], ctx.P[:, 0])
-    col = np.floor(u + 64 + phase).astype(int)
-    yy = np.floor(ctx.P[:, 1] + 64).astype(int)
-    hsh = np.array([ihash(c, 7) for c in col]) if len(col) < 0 else (col * 2654435761 + 977) & 0xFFFF
-    top = 64 + 14 + (hsh % 23)                                                 # где складка начинается (в мировой высоте)
-    is_fold = side & (col % step == 0) & (yy < top)
-    i[is_fold] = np.maximum(i[is_fold], 2)
-    lit = side & (col % step == 1) & (yy < top - 1) & (yy % 3 != 0) & (i == 1)
-    i[lit] = 0
+    c4 = np.floor((u + 64 + phase) * K4).astype(int)
+    per = step * K4
+    k = c4 // per
+    m_ = c4 % per
+    hsh = (k * 2654435761 + 977) & 0xFFFF
+    top = (14 + (hsh % 23)) * K4                                          # верх складки (в 1/4 ед. мировой высоты)
+    yy = np.floor((ctx.P[:, 1] + 64) * K4).astype(int)
+    rel = (64 * K4 + top) - yy                                            # >0 — ниже верха складки
+    core = side & (rel > 0) & (m_ == 0)
+    soft = side & (rel > 4) & ((m_ == 1) | (m_ == per - 1))                 # полутон по бокам складки — мягкий переход
+    fade = side & (rel > 0) & (rel <= 4) & (m_ == 0)                        # верх складки сходит на нет
+    lit = side & (rel > 3) & (m_ == 2)
+    i = i.astype(float)
+    i[soft] = np.maximum(i[soft], 1.5)
+    i[core] = np.maximum(i[core], 2.0)
+    i[fade] = np.minimum(i[fade], 1.5)
+    i[lit & (i == 1)] = 0.5
     return i
 
 
-def shade(ctx, tones, folds=True, rim=True, fold_step=3, fold_phase=0, blotch=0.0, seed=0):
+def shade(ctx, tones, folds=True, rim=True, fold_step=3, fold_phase=0, blotch=0.0, seed=0, tex=None):
     """tones: [блик, основной, полутень, тень]. Пиксельная светотень: верх/низ граней, контурные края, складки разной длины,
     крупные пятна-потёртости целыми тонами (blotch) — как на ткани Главы Культа."""
     n = ctx.n
-    i = np.ones(n, int)
+    i = np.ones(n, float)
     if blotch:
-        b = fbm(ctx.P, 0.2, 300 + seed, 2)
-        i = i + (b > 0.72 - 0.04 * blotch).astype(int)                              # редкие крупные потёртости (сдержанно, как ткань эталона)
+        b1 = fbm(ctx.P, 0.18, 300 + seed, 3)                                       # крупные пятна
+        b2 = fbm(ctx.P, 0.55, 340 + seed, 2)                                       # мелкие
+        i = i.astype(float) + 0.5 * (b1 > 0.62) + 0.5 * (b1 > 0.7) * blotch + 0.5 * ((b2 > 0.74) & (b1 > 0.45)) \
+            - 0.5 * ((b1 < 0.3) & (b2 < 0.45))                                     # потёртости светлее
     up = ctx.N[:, 1] > 0.5
     dn = ctx.N[:, 1] < -0.5
     side = ~(up | dn)
@@ -170,6 +221,11 @@ def shade(ctx, tones, folds=True, rim=True, fold_step=3, fold_phase=0, blotch=0.
         i[side & (r1 == 0) & (h >= 3)] = 3                          # нижний ряд — глубокая тень (низ складок)
         i[side & (r1 == 1) & (h >= 6)] = np.maximum(i[side & (r1 == 1) & (h >= 6)], 2)
         i[side & ((c0 == 0) | (c1 == 0)) & (w >= 3) & (r0 > 0)] = np.maximum(i[side & ((c0 == 0) | (c1 == 0)) & (w >= 3) & (r0 > 0)], 2)
+    if tex:
+        i = i + weave(ctx, tex, seed)
+    if rim:                                                              # 1 px контур по краю грани (чёткость, как у эталона)
+        e = edge_dist(ctx)
+        i = np.where(side & (e < 1.0 / K4), np.maximum(i, 2), i)
     return pick(tones, np.clip(i, 0, 3))
 
 
@@ -179,15 +235,20 @@ def trims(ctx, c, info, tones, accent):
     if ctx.face in ('up', 'down'):
         return c
     r0, r1, c0, c1, w, h = rows(ctx)
+    pc, pr, q = pxy(ctx)
+    prb = np.floor((1 - ctx.t) * h * K4).astype(int)                    # ряд пикселей снизу
     if info.get('hem') and h >= 3:
         c = np.where(((r1 == 1))[:, None], pick(accent, np.full(ctx.n, 1)), c)
-        c = np.where(((r1 == 2) & (h >= 5) & (c0 % 2 == 0))[:, None], pick(accent, np.full(ctx.n, 2)), c)    # пунктир строчки над каймой
+        c = np.where(((prb == 4) | (prb == 7))[:, None], pick(accent, np.full(ctx.n, 3)), c)                # края каймы
+        st = (prb == 9) & ((q[:, 0] + q[:, 2]) % 3 != 0)                                                  # строчка над каймой
+        c = np.where(st[:, None], pick(accent, np.full(ctx.n, 0)), c)
     if info.get('trim') and h >= 2:
         c = np.where(((r0 == 0) | (r1 == 0))[:, None], pick(accent, np.full(ctx.n, 0)), c)
     if info.get('seam') and ctx.face in ('north', 'south') and w >= 4:
-        mid = np.abs(c0 - c1) <= 0
-        c = np.where((mid & (r0 > 0))[:, None], pick(tones, np.full(ctx.n, 3)), c)
-        st = (np.abs(c0 - c1) == 2) & (r0 % 2 == 1)
+        W = int(round(w * K4))
+        mid = (pc == W // 2) & (pr > 2)
+        c = np.where(mid[:, None], pick(tones, np.full(ctx.n, 3)), c)
+        st = ((pc == W // 2 - 2) | (pc == W // 2 + 2)) & (pr % 3 != 0) & (pr > 2)                      # строчка по обе стороны шва
         c = np.where(st[:, None], pick(tones, np.full(ctx.n, 0)), c)
     return c
 
@@ -203,12 +264,12 @@ def no_glow(n):
 
 def mat_hat(ctx):
     info = ctx.cube.info
-    c = shade(ctx, T_HAT, folds=not info.get('brim'), fold_step=3, blotch=0.8, seed=1)
+    c = shade(ctx, T_HAT, folds=not info.get('brim'), fold_step=3, blotch=1.0, seed=1)
     if info.get('band'):                                            # лиловая лента: 2 тёмные полосы и светлый кант (референс)
         y0, y1 = ctx.cube.frm[1], ctx.cube.to[1]
         r = np.floor(ctx.L[:, 1] - y0).astype(int)
         H = int(round(y1 - y0))
-        c = shade(ctx, T_LIL, folds=True, blotch=0.4, seed=11)
+        c = shade(ctx, T_LIL, folds=True, blotch=0.4, seed=11, tex='satin')
         if ctx.face not in ('up', 'down'):
             c = np.where(((r == 1) | ((r == H - 2) & (H >= 3)))[:, None], pick(T_LIL, np.full(ctx.n, 3)), c)
             c = np.where((r == H - 1)[:, None], pick(T_PALE, np.full(ctx.n, 1)), c)
@@ -244,7 +305,7 @@ def hood_hole(L):
 
 def mat_hood(ctx):
     info = ctx.cube.info
-    c = shade(ctx, T_BLU, fold_step=3, blotch=0.7, seed=2)
+    c = shade(ctx, T_BLU, fold_step=3, blotch=0.7, seed=2, tex='twill')
     c = trims(ctx, c, info, T_BLU, T_BLU)
     a = 1.0
     if ctx.face in ('south', 'east', 'west') and ctx.cube.info.get('shell'):
@@ -290,12 +351,12 @@ def mat_skin(ctx):
 def mat_lilac(ctx):
     info = ctx.cube.info
     tones = T_PALE if info.get('pale') else T_LIL
-    c = shade(ctx, tones, fold_step=3, blotch=0.6, seed=3)
+    c = shade(ctx, tones, fold_step=3, blotch=0.6, seed=3, tex='twill')
     if info.get('cuff') and not info.get('pale') and ctx.face not in ('up', 'down'):
         # раструб: две поперечные полосы темнее (как на референсе) + строчка
         yy = np.floor(ctx.P[:, 1] + 64).astype(int)
         band = (yy % 5 == 0) | (yy % 5 == 1)
-        c = np.where(band[:, None], shade(ctx, T_LIL2, fold_step=3, blotch=0.5, seed=4), c)
+        c = np.where(band[:, None], shade(ctx, T_LIL2, fold_step=3, blotch=0.5, seed=4, tex='twill'), c)
     if info.get('pale') and ctx.face not in ('up', 'down'):
         r0, r1, c0, c1, w, h = rows(ctx)
         c = np.where(((r0 == 0) & (c0 % 2 == 0))[:, None], pick(T_LIL, np.full(ctx.n, 2)), c)      # строчка каймы
@@ -307,13 +368,13 @@ def mat_lilac(ctx):
 
 
 def mat_gg(ctx):
-    c = shade(ctx, T_GG, fold_step=3, fold_phase=1, blotch=0.9, seed=5)
+    c = shade(ctx, T_GG, fold_step=3, fold_phase=1, blotch=0.9, seed=5, tex='knit')
     c = trims(ctx, c, ctx.cube.info, T_GG, T_LIL)
     return c, 1.0, None
 
 
 def mat_boot(ctx):
-    c = shade(ctx, T_LIL if ctx.cube.info.get('cuff') else T_BOOT, folds=False, blotch=0.4, seed=8)
+    c = shade(ctx, T_LIL if ctx.cube.info.get('cuff') else T_BOOT, folds=False, blotch=0.6, seed=8)
     return c, 1.0, None
 
 
@@ -343,9 +404,13 @@ def mat_ribbon(ctx):
     else:
         i = np.where(r0 < 2, 0, 1)
     i = np.where(ctx.N[:, 1] > 0.5, 0, np.where(ctx.N[:, 1] < -0.5, 3, i))
+    pc, pr, q = pxy(ctx)
+    W = int(round(w * K4))
     if w >= 2 and ctx.face in ('north', 'south'):
-        i = np.where((c0 == 0) | (c1 == 0), 3, i)                                      # тёмная кайма по краю
-    c = pick(tones, i)
+        i = i + weave(ctx, 'satin', 9)
+        i = np.where((pc <= 0) | (pc >= W - 1), 3, i)                                   # тёмная кайма по краю (1 px)
+        i = np.where(((pc == 1) | (pc == W - 2)) & (pr % 3 != 1), 0, i)                  # строчка вдоль каймы
+    c = pick(tones, np.clip(i, 0, 3))
     return c, ribbon_alpha(ctx), None
 
 
@@ -364,7 +429,7 @@ def mat_dark(ctx):
 
 # ================================================================== построение
 def build():
-    m = IModel('irina', density=1, tex_w=128)
+    m = IModel('irina', density=4, tex_w=128)          # ×4, как эталон (атлас 128 ед. → 512 px)
     m.materials.update(hat=mat_hat, cross=mat_cross, hood=mat_hood, void=mat_void, skin=mat_skin, lilac=mat_lilac,
                        gg=mat_gg, boot=mat_boot, ribbon=mat_ribbon, thread=mat_thread, gold=mat_gold, dark=mat_dark)
     HIP, SH, NECK = 14.0, 25.0, 27.0
@@ -823,6 +888,52 @@ def anims():
                             'right_leg': {'rot': [-80 * knee + 40 * fall, 0, 0]}, 'left_leg': {'rot': [-80 * knee + 30 * fall, 0, 0]}})
     a = mk('irina_death', 5.0, death, events={0.0: 'hit', 1.6: 'knees', 2.4: 'hat', 3.4: 'fall', 4.2: 'unravel', 5.0: 'gone'})
     a.loop = 'hold'
+
+    # ---------------- +4 заклинания (владелец 20.11)
+    def gaze(t):
+        # «Ревнивый взгляд»: приподнимает поля шляпы пальцами — из тьмы капюшона «смотрит» (событие gaze — метка смотрящим)
+        e = env(t, 0.0, 0.35, 0.8, 1.2)
+        p = idle_pose(t)
+        return pose_mix(p, {'left_arm': {'rot': [-150 * e, 20 * e, -10 * e]}, 'head': {'rot': [-10 * e, 8 * e, 0]},
+                            'hat': {'rot': [-12 * e, 0, 0]}, 'torso': {'rot': [-4 * e, 10 * e, 0]}})
+    mk('irina_gaze', 1.2, gaze, dt=0.025, events={0.5: 'gaze'})
+
+    def knots(t):
+        # «Узлы»: приседает, ладонь к земле, ведёт рукой по дуге — узлы прорастают (событие knots)
+        d = env(t, 0.0, 0.45, 1.1, 1.6)
+        sweep = env(t, 0.5, 1.0)
+        p = idle_pose(t)
+        return pose_mix(p, {'body': {'pos': [0, -3.0 * d, 0]}, 'torso': {'rot': [26 * d, -20 * d + 40 * sweep * d, 0]},
+                            'head': {'rot': [16 * d, 0, 0]}, 'left_arm': {'rot': [-40 * d, -30 * d + 60 * sweep * d, -10 * d]},
+                            'right_leg': {'rot': [-30 * d, 0, 0]}, 'left_leg': {'rot': [20 * d, 0, 0]}})
+    mk('irina_knots', 1.6, knots, dt=0.025, events={0.9: 'knots'})
+
+    def swap(t):
+        # «Подмена любимого»: руки скрещены, резкий разворот кистей — двое меняются местами (событие swap)
+        c = env(t, 0.0, 0.5, 0.7, 0.8)
+        o = env(t, 0.75, 0.9, 1.05, 1.4)
+        p = idle_pose(t)
+        return pose_mix(p, {'right_arm': {'rot': [-80 * c - 40 * o, -45 * c + 50 * o, -20 * c + 60 * o]},
+                            'left_arm': {'rot': [-80 * c - 40 * o, 45 * c - 50 * o, 20 * c - 60 * o]},
+                            'body': {'rot': [0, 20 * c - 40 * o, 0]}, 'head': {'rot': [6 * c, 0, 14 * o]}})
+    mk('irina_swap', 1.4, swap, dt=0.025, events={0.8: 'swap'})
+
+    def puppet(t):
+        # «Марионетка»: руки поднимаются, пальцы «дёргают нити» (событие puppet — захват), дальше — irina_puppet_hold
+        u = env(t, 0.0, 0.6)
+        jerk = env(t, 0.65, 0.75, 0.8, 1.0)
+        p = idle_pose(t)
+        return pose_mix(p, {'right_arm': {'rot': [-120 * u - 10 * jerk, 0, 30 * u]}, 'left_arm': {'rot': [-120 * u - 10 * jerk, 0, -30 * u]},
+                            'head': {'rot': [-10 * u, 0, 8 * u]}, 'torso': {'rot': [-6 * u + 6 * jerk, 0, 0]}})
+    mk('irina_puppet', 1.0, puppet, dt=0.025, events={0.7: 'puppet'})
+
+    def puppet_hold(t):
+        # держит марионетку 3 с (loop 1 с): руки над собой поочерёдно подёргивают «крестовину»
+        ph = t / 1.0 * TAU
+        p = idle_pose(t)
+        return pose_mix(p, {'right_arm': {'rot': [-128 + 8 * math.sin(ph), 0, 30]}, 'left_arm': {'rot': [-128 + 8 * math.sin(ph + math.pi), 0, -30]},
+                            'head': {'rot': [-10, 0, 8 + 3 * math.sin(ph)]}, 'body': {'rot': [0, 4 * math.sin(ph), 0]}})
+    mk('irina_puppet_hold', 1.0, puppet_hold, loop=True)
 
     # ---------------- контроллер «ткань и нити» (ленты, рукава, волосы, кончик шляпы, нити)
     mk('irina_cloth_idle', 4.0, lambda t: cloth_pose(t, per=4.0), loop=True)

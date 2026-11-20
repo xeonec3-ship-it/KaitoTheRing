@@ -1,0 +1,41 @@
+{
+ "comment": "«Мехи», предупреждение (0–0.8 с анимации bellows; caster = Арис, yaw — направление, не follow, 16 тиков): конус 60° длиной 8 бл. на земле (decal aris_cone, вершина у Арис, раскрывается вперёд) наливается жаром, по краям — искры. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "texture": "aris_cone",
+   "radius": 8,
+   "yaw": 0,
+   "glow": 0.8,
+   "color": "@secondary",
+   "brightness": 1.0,
+   "grow": 10,
+   "pulse": 6,
+   "comment": "вершина — в центре картинки, раскрытие — вперёд по yaw"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,-4",
+   "duration": 16,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 1.5,
+   "area": 3,
+   "speed": 0.02,
+   "gravity": -0.02,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "@secondary",
+   "glow": 0.9
+  }
+ ]
+}

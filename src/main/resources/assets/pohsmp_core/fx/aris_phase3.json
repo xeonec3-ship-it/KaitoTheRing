@@ -1,0 +1,84 @@
+{
+ "comment": "Переход в фазу 3 «Мифический сплав» (33% ХП, анимация phase3, событие ignite 1.6 с): caster = Арис, follow. 0–1.6 с — сжимается, жар нарастает (искры к ней); 1.6 с — вспышка, броня раскаляется добела (код: текстура → aris_mythic), волна. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 70,
+ "elements": [
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster",
+   "duration": 32,
+   "radius": 2.4,
+   "height": 2.6,
+   "arms": 4,
+   "speed": -8,
+   "flow": -1,
+   "texture": "mote_flame",
+   "color": "@secondary",
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "comment": "жар стягивается к ней"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 70,
+   "radius": 30,
+   "color": "#3A1406",
+   "strength": 0.3,
+   "in": {
+    "duration": 24,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 32,
+   "at": "caster+0,1.6,0",
+   "duration": 14,
+   "size": 5.0,
+   "rays": 12,
+   "screen": 0.25,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 32,
+   "at": "caster",
+   "duration": 26,
+   "shape": "ring",
+   "radius": 24,
+   "thickness": 2.2,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 32,
+   "at": "caster+0,1.2,0",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 90,
+   "rate": 15,
+   "spread": 0.6,
+   "speed": 0.5,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 24,
+   "color": "@secondary",
+   "glow": 0.9
+  }
+ ]
+}

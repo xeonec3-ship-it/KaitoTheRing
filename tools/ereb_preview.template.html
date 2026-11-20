@@ -255,8 +255,9 @@ function makeScene(c) {
   scene.background = new THREE.Color(c.bg || (c.neutral ? 0x23262c : 0x1c1210));
   scene.fog = new THREE.Fog(scene.background, 200, 700);
   if (c.neutral) {   // дневной свет (белый), как в мире днём: для сравнения цветов со скином владельца
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x404040, (c.dim ?? 1) * 0.85));
-    const d = new THREE.DirectionalLight(0xffffff, (c.dim ?? 1) * 0.6); d.position.set(30, 60, -40); scene.add(d);
+    // как свет сущностей Minecraft днём: лицевые грани ≈ 1.0, боковые ≈ 0.7, верх ярче
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8a8a, (c.dim ?? 1) * 0.95));
+    const d = new THREE.DirectionalLight(0xffffff, (c.dim ?? 1) * 0.45); d.position.set(20, 50, -60); scene.add(d);
   } else {
   scene.add(new THREE.HemisphereLight(0xd8c8c0, 0x281410, (c.dim ?? 1) * 0.8));
   const d = new THREE.DirectionalLight(0xfff0e0, (c.dim ?? 1) * 0.7); d.position.set(30, 60, -40); scene.add(d);

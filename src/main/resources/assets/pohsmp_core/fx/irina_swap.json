@@ -1,0 +1,57 @@
+{
+ "comment": "«Подмена любимого» — у КАЖДОГО из двух игроков (caster = игрок в точке ДО обмена, 20 тиков; второй вызов — после, в новой точке): рябь нитей, вспышка. Обмен местами — код; без линии между ними.",
+ "style": "irina",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 1.2,
+   "reverse": true,
+   "rim": 1.0,
+   "color": "@primary"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 14,
+   "width": 0.05,
+   "length": 8,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 0.7,
+    "speed": 28,
+    "rise": 0.9,
+    "risePeriod": 8
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "size": 1.4,
+   "ring": true,
+   "color": "@core"
+  },
+  {
+   "type": "wave",
+   "delay": 10,
+   "at": "caster+0,0.1,0",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 2.2,
+   "thickness": 0.2,
+   "texture": "irina_thread_ring",
+   "color": "@primary"
+  }
+ ]
+}

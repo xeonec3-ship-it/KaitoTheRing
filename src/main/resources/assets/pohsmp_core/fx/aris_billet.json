@@ -1,0 +1,165 @@
+{
+ "comment": "«Раскалённая заготовка» лежит (caster = слиток, follow, 60 тиков): меш слитка, жаркий круг r3 на земле (ВИДНО зону взрыва), пульс-кольца r3 учащаются (0/20/36/46/52/56/58), марево и искры. На 60 тике код взрывает: урон r3 + fx aris_billet_explode. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "aris_billet",
+   "follow": true
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "texture": "glow",
+   "radius": 3,
+   "follow": true,
+   "glow": 0.6,
+   "pulse": 10,
+   "color": "@secondary",
+   "brightness": 0.6,
+   "comment": "зона r3"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 60,
+   "texture": "aris_molten_floor",
+   "radius": 1.2,
+   "follow": true,
+   "glow": 1.0,
+   "color": "@secondary",
+   "grow": 40
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 3,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@secondary",
+   "brightness": 0.5
+  },
+  {
+   "type": "wave",
+   "delay": 20,
+   "at": "caster",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 3,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "wave",
+   "delay": 36,
+   "at": "caster",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 3,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@secondary",
+   "brightness": 0.86
+  },
+  {
+   "type": "wave",
+   "delay": 46,
+   "at": "caster",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 3,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@secondary",
+   "brightness": 0.96
+  },
+  {
+   "type": "wave",
+   "delay": 52,
+   "at": "caster",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 3,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@secondary",
+   "brightness": 1.02
+  },
+  {
+   "type": "wave",
+   "delay": 56,
+   "at": "caster",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 3,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@secondary",
+   "brightness": 1.06
+  },
+  {
+   "type": "wave",
+   "delay": 58,
+   "at": "caster",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 3,
+   "thickness": 0.35,
+   "followTerrain": true,
+   "color": "@secondary",
+   "brightness": 1.08
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.25,0",
+   "follow": true,
+   "duration": 60,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.5,
+   "spread": 0.2,
+   "speed": 0.03,
+   "gravity": 0.02,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 12,
+   "color": "@core",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "follow": true,
+   "duration": 60,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 0.2,
+   "spread": 0.2,
+   "speed": 0.0,
+   "gravity": -0.01,
+   "size": [
+    0.4,
+    0.15
+   ],
+   "life": 24,
+   "color": "#5A4A44",
+   "blend": "translucent",
+   "comment": "дымок"
+  }
+ ]
+}

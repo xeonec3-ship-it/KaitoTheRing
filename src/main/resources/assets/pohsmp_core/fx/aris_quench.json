@@ -1,0 +1,109 @@
+{
+ "comment": "«Закалка» (событие splash 0.8 с анимации quench; caster = Арис, НЕ follow — облако стоит на месте, 100 тиков = 5 с): всплеск воды над ней, шипение — пар клубами r5; мир в облаке серый (tint saturation). Код: урон по Арис ×0.6, пока она в r5; у игроков в облаке — туман (эффект aris_steamed / FogRenderer). Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 100,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,2.8,0",
+   "duration": 4,
+   "texture": "glow",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.05,
+   "gravity": 0.04,
+   "size": [
+    0.5,
+    0.1
+   ],
+   "life": 14,
+   "color": "#9FD8F0",
+   "blend": "translucent",
+   "comment": "вода окатывает"
+  },
+  {
+   "type": "flash",
+   "delay": 2,
+   "at": "caster+0,1.4,0",
+   "duration": 8,
+   "size": 2.4,
+   "color": "#E8F6FA"
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,1,0",
+   "duration": 80,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 3.0,
+   "area": 4.5,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "spin": 20,
+   "size": [
+    2.2,
+    1.0
+   ],
+   "life": 50,
+   "color": "#D8E4E8",
+   "blend": "translucent",
+   "comment": "клубы пара r5"
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,0.3,0",
+   "duration": 80,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 1.5,
+   "area": 5.0,
+   "speed": 0.0,
+   "gravity": -0.002,
+   "size": [
+    3.0,
+    1.5
+   ],
+   "life": 60,
+   "color": "#B8C8CC",
+   "blend": "translucent",
+   "comment": "стелется по земле"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100,
+   "radius": 5,
+   "color": "#C8D4D8",
+   "strength": 0.35,
+   "saturation": 0.5,
+   "in": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "aura",
+   "delay": 2,
+   "at": "caster",
+   "duration": 90,
+   "follow": false,
+   "target": "caster",
+   "thickness": 0.12,
+   "pulse": [
+    0.2,
+    10
+   ],
+   "color": "#E8F6FA",
+   "motes": 10
+  }
+ ]
+}

@@ -52,7 +52,7 @@ def carry(bob=0.0):
 
 def planted():
     """Молот стоит головой вниз (как кость hammer_ground в покое): хват в мире, d вниз, боёк вдоль x."""
-    g = np.array(G.HG_PIVOT) + np.array(G.hg_local((0, G.HAM_GRIP, 0)))
+    g = G.hg_world_rest((0, G.HAM_GRIP, 0))
     return (g, (0, -1, 0), (1, 0, 0))
 
 
@@ -118,7 +118,7 @@ def swing(rig):
     gd = guard()
     k = [
         K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
-        K(0.45, 'io', **S(ham=((10.0, 18.0, 4.0), (0.55, 0.25, 0.8), (0.75, 0, -0.6)), lh=1, body=(0, -38, 0), torso=(0, -14, 0), head=(0, 30, 0),
+        K(0.45, 'io', **S(ham=((7.0, 18.0, 1.0), (0.55, 0.25, 0.8), (0.75, 0, -0.6)), lh=1, body=(0, -38, 0), torso=(0, -14, 0), head=(0, 30, 0),
                            right_leg=(-12, 0, 12), left_leg=(18, 0, -8), right_shin=(-10, 0, 0), left_shin=(-10, 0, 0), bpos=(0, -1.2, 0),
                            rpole=(0.6, -0.6, 0.5), lpole=(-0.3, -0.7, 0.6))),
         K(0.62, 'in3', **S(ham=((2.0, 16.0, -9.5), (-0.15, 0.08, -0.99), (-1, 0, 0)), lh=1, body=(-6, 6, 0), torso=(0, 6, 0), head=(0, -4, 0),
@@ -149,7 +149,7 @@ def forge(rig):
     """Особое «Горн» (4.0 с): три ритмичных удара по земле (1.0, 1.8, 2.6 — strike), на 3.3 — кулак к небу (ignite)."""
     gd = guard()
     d_imp = (0.0, -0.5, -0.86)
-    hit = lambda y: (AN.ham_from_strike((1.0, y, -18.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    hit = lambda y: (AN.ham_from_strike((1.0, y, -16.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
     up = ((2.0, 25.0, -3.0), (0.0, 0.85, -0.5), (0, 0.5, -0.86))
     low = dict(body=(-18, 0, 0), torso=(-6, 0, 0), head=(12, 0, 0), bpos=(0, -2.2, -0.6), right_leg=(-8, 0, 10), left_leg=(40, 0, -8),
                right_shin=(-20, 0, 0), left_shin=(-40, 0, 0))
@@ -176,7 +176,7 @@ def last_blow(rig):
     удар 4.0 (blow) — глубокий присед, молот в земле; 4.0–5.0 держит."""
     gd = guard()
     wide = dict(right_leg=(-14, 0, 16), left_leg=(18, 0, -16), right_shin=(-12, 0, 0), left_shin=(-18, 0, 0))
-    over = ((1.0, 33.0, 2.5), (0.0, 0.25, 0.97), (0, 1, 0))
+    over = ((1.0, 31.0, 1.5), (0.0, 0.25, 0.97), (0, 1, 0))
     d_imp = (0.0, -0.3, -0.95)
     imp = (AN.ham_from_strike((0.5, 0.0, -21.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
     k = [K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
@@ -332,8 +332,8 @@ def npc_stand(rig):
 def npc_sit(rig):
     """Мирный NPC: сидит на голове лежащего молота (молот на земле под ней), локоть на колене, голова чуть набок."""
     # куда положить hammer_ground, чтобы центр головы оказался под ней (0, 3.4, 1.0); рукоять уходит вправо-вперёд
-    R = AN.euler((95, 60, 0))
-    head_rest = np.array(G.hg_local((0, G.HAM_HEAD, 0)))
+    R = AN.euler((G.HG_REST[0] + 95, 60, 0))
+    head_rest = G.hg_offset((0, G.HAM_HEAD, 0))
     want = np.array([0.0, 3.4, 1.0])
     pos = want - (np.array(G.HG_PIVOT) + R @ head_rest)
     hg = {'rot': (95, 60, 0), 'pos': tuple(pos)}
@@ -347,7 +347,70 @@ def npc_sit(rig):
     return AN.bake(rig, 'npc_sit', 4.0, k, loop=True, ground=None, wind=0.25)
 
 
-ALL = (idle, walk, slam, swing, cast, forge, last_blow, phase2, phase3, spawn, surrender, npc_stand, npc_sit)
+# ================================================================== +4 заклинания (владелец 20.11)
+def billet(rig):
+    """«Раскалённая заготовка» (1.4 с): молот на плече, левой рукой из-за бедра бросает слиток снизу вперёд (throw 0.7)."""
+    k = [
+        K(0.0, **S(ham=carry(), **GUARD_LEGS)),
+        K(0.45, 'io', **S(ham=carry(-0.4), larm=(-40, 0, -24), lfore=(30, 0, 0), torso=(4, -16, 0), head=(-4, 10, 0), body=(0, -10, 0),
+                           right_leg=(-12, 0, 7), left_leg=(10, 0, -6), right_shin=(-10, 0, 0), left_shin=(-6, 0, 0))),
+        K(0.7, 'out3', **S(ham=carry(0.3), larm=(96, 0, -12), lfore=(10, 0, 0), torso=(-6, 14, 0), head=(-2, -8, 0), body=(-8, 10, 0),
+                            bpos=(0, -0.8, -0.6), right_leg=(-18, 0, 7), left_leg=(30, 0, -6), right_shin=(-12, 0, 0), left_shin=(-26, 0, 0))),
+        K(1.4, 'io', **S(ham=carry(), **GUARD_LEGS)),
+    ]
+    return AN.bake(rig, 'billet', 1.4, k, loop=False, ground='feet', events={0.7: 'throw'})
+
+
+def chains(rig):
+    """«Цепи кузни» (1.6 с): бьёт навершием молота в землю, левый кулак рывком вверх — цепи вырываются из земли (chains 0.8)."""
+    d_dn = (0.15, -0.95, -0.25)
+    pomm = ((7.0, 14.0, -5.0), (0.15, 0.95, 0.25), (1, 0, 0))            # молот головой вверх, навершие у земли
+    hitp = ((6.5, 11.5, -4.5), (0.12, 0.97, 0.2), (1, 0, 0))
+    k = [
+        K(0.0, **S(ham=carry(), **GUARD_LEGS)),
+        K(0.5, 'io', **S(ham=pomm, larm=(40, 0, -20), lfore=(80, 0, 0), body=(6, 0, 0), torso=(6, 0, 0), head=(6, 0, 0),
+                          right_leg=(-8, 0, 8), left_leg=(14, 0, -8), right_shin=(-6, 0, 0), left_shin=(-12, 0, 0))),
+        K(0.8, 'in3', **S(ham=hitp, larm=(150, 0, -30), lfore=(30, 0, 0), body=(-10, 0, 0), torso=(-4, 0, 0), head=(14, 0, 0), bpos=(0, -2.0, -0.3),
+                           right_leg=(-8, 0, 10), left_leg=(30, 0, -8), right_shin=(-20, 0, 0), left_shin=(-32, 0, 0))),
+        K(1.1, 'out', **S(ham=hitp, larm=(140, 0, -26), lfore=(40, 0, 0), body=(-8, 0, 0), torso=(-2, 0, 0), head=(10, 0, 0), bpos=(0, -1.8, -0.3),
+                           right_leg=(-8, 0, 10), left_leg=(28, 0, -8), right_shin=(-18, 0, 0), left_shin=(-28, 0, 0))),
+        K(1.6, 'io', **S(ham=carry(), **GUARD_LEGS)),
+    ]
+    return AN.bake(rig, 'chains', 1.6, k, loop=False, ground='feet', events={0.8: 'chains'})
+
+
+def quench(rig):
+    """«Закалка» (1.8 с): молот в землю, левая ладонь над головой — вода окатывает её (splash 0.8), пар; голова чуть вниз."""
+    rg = rest_ground()
+    k = [
+        K(0.0, **S(ham=guard(), lh=1, **GUARD_LEGS)),
+        K(0.45, 'io', **S(ham=rg, larm=(176, 0, -6), lfore=(40, 0, 0), head=(16, 0, 0), torso=(8, 0, 0))),
+        K(0.8, 'out', **S(ham=rg, larm=(168, 0, -10), lfore=(70, 0, 0), head=(-20, 0, 0), torso=(-10, 0, 0), body=(-6, 0, 0), bpos=(0, -0.8, 0),
+                           right_shin=(-10, 0, 0), left_shin=(-10, 0, 0))),
+        K(1.3, 'io', **S(ham=rg, larm=(30, 0, -36), lfore=(40, 0, 0), head=(-8, 0, 0), torso=(-4, 0, 0))),
+        K(1.8, 'io', **S(ham=guard(), lh=1, **GUARD_LEGS)),
+    ]
+    return AN.bake(rig, 'quench', 1.8, k, loop=False, ground='feet', events={0.8: 'splash'})
+
+
+def bellows(rig):
+    """«Мехи» (1.5 с): 0–0.8 замах молотом низко назад (предупреждение-конус), 0.8 (gust) — мощный взмах снизу-вперёд, порыв жара."""
+    low = ((7.0, 10.0, 6.0), (0.25, -0.35, 0.9), (0, -1, 0))
+    up = ((1.5, 24.0, -8.0), (0.0, 0.75, -0.66), (0, 0.66, 0.75))
+    wide = dict(right_leg=(-16, 0, 14), left_leg=(28, 0, -12), right_shin=(-14, 0, 0), left_shin=(-30, 0, 0))
+    k = [
+        K(0.0, **S(ham=guard(), lh=1, **GUARD_LEGS)),
+        K(0.6, 'io', **S(ham=low, lh=0.25, larm=(-30, 0, -40), lfore=(30, 0, 0), body=(-14, -20, 0), torso=(-6, -10, 0), head=(14, 22, 0), bpos=(0, -2.4, 0.4), rpole=(0.8, -0.5, 0.3),
+                          lpole=(-0.2, -0.8, 0.5), **wide)),
+        K(0.8, 'in3', **S(ham=up, lh=1, body=(6, 8, 0), torso=(8, 4, 0), head=(4, -6, 0), bpos=(0, -1.0, -1.0), rpole=(0.8, -0.3, 0.4), **wide)),
+        K(1.0, 'out', **S(ham=((1.5, 25.0, -7.5), (0.0, 0.8, -0.6), (0, 0.6, 0.8)), lh=1, body=(8, 8, 0), torso=(8, 4, 0), head=(6, -6, 0),
+                           bpos=(0, -0.8, -1.0), **wide)),
+        K(1.5, 'io', **S(ham=guard(), lh=1, **GUARD_LEGS)),
+    ]
+    return AN.bake(rig, 'bellows', 1.5, k, loop=False, ground='feet', events={0.0: 'warn', 0.8: 'gust'})
+
+
+ALL = (idle, walk, slam, swing, cast, forge, last_blow, phase2, phase3, spawn, surrender, npc_stand, npc_sit, billet, chains, quench, bellows)
 
 
 def all_anims(rig):

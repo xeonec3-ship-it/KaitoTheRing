@@ -1,0 +1,316 @@
+{
+ "comment": "Ролик появления 9.0 с (180 тиков = анимация animation.aris.spawn). caster = точка появления, yaw — взгляд Арис. 0–2 с: земля трескается, расплав набухает, трижды бьёт невидимый молот (вспышки на 0.6/1.2/1.8 с); 2.0–4.5 с — Арис поднимается из озера расплава на колене, опираясь на молот (анимация); 6.0 с — рога загораются (код: текстура aris_dim → aris); 7.0 с — удар молотом: волна r14, вспышка; 7.5 с — знак Арис под ней + титр; 9.0 с — полоса босса. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 180,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 180,
+   "radius": 40,
+   "color": "#2A140C",
+   "strength": 0.28,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 150,
+   "texture": "higher_cracks",
+   "radius": 5,
+   "grow": 30,
+   "glow": 0.8,
+   "fadeOut": 40,
+   "color": "@secondary",
+   "brightness": 1.2,
+   "comment": "трещины с жаром"
+  },
+  {
+   "type": "decal",
+   "delay": 20,
+   "at": "caster",
+   "duration": 120,
+   "texture": "aris_molten_floor",
+   "radius": 3.4,
+   "grow": 20,
+   "glow": 1.0,
+   "fadeOut": 50,
+   "color": "@secondary",
+   "brightness": 1.3,
+   "comment": "озеро расплава"
+  },
+  {
+   "type": "column",
+   "delay": 40,
+   "at": "caster",
+   "duration": 60,
+   "radius": 1.6,
+   "height": 3.5,
+   "fill": 0.35,
+   "color": "@secondary",
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,0.1,0",
+   "duration": 110,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.8,
+   "area": 2.6,
+   "speed": 0.03,
+   "gravity": -0.02,
+   "size": [
+    0.35,
+    0.05
+   ],
+   "life": 24,
+   "color": "@secondary",
+   "glow": 0.7,
+   "comment": "пузыри и брызги расплава"
+  },
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "caster+0,0.3,0",
+   "duration": 8,
+   "size": 2.0,
+   "color": "@core"
+  },
+  {
+   "type": "flash",
+   "delay": 24,
+   "at": "caster+0,0.3,0",
+   "duration": 8,
+   "size": 2.0,
+   "color": "@core"
+  },
+  {
+   "type": "flash",
+   "delay": 36,
+   "at": "caster+0,0.3,0",
+   "duration": 8,
+   "size": 2.0,
+   "color": "@core"
+  },
+  {
+   "type": "wave",
+   "delay": 12,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 4,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 24,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 4,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "color": "@secondary"
+  },
+  {
+   "type": "wave",
+   "delay": 36,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 4,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+0,0.3,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 30,
+   "rate": 7,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+0,0.3,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 30,
+   "rate": 7,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 36,
+   "at": "caster+0,0.3,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 30,
+   "rate": 7,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sigil",
+   "delay": 90,
+   "at": "caster+0,0.04,0",
+   "id": "aris_emblem",
+   "comment": "знак под ней, когда встаёт на колено"
+  },
+  {
+   "type": "aura",
+   "delay": 120,
+   "at": "caster",
+   "duration": 20,
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.18,
+   "pulse": [
+    0.3,
+    6
+   ],
+   "color": "@primary",
+   "motes": 20,
+   "comment": "6.0 с: рога и кайма вспыхивают"
+  },
+  {
+   "type": "flash",
+   "delay": 140,
+   "at": "caster+0.1,0,-1.2+0,0.6,0",
+   "duration": 10,
+   "size": 3.6399999999999997,
+   "rays": 10,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 140,
+   "at": "caster+0.1,0,-1.2",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 14,
+   "thickness": 2.2399999999999998,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary",
+   "comment": "волна раскалённого металла"
+  },
+  {
+   "type": "decal",
+   "delay": 140,
+   "at": "caster+0.1,0,-1.2",
+   "duration": 120,
+   "texture": "aris_molten_floor",
+   "radius": 3.08,
+   "glow": 0.8,
+   "fadeOut": 80,
+   "color": "@secondary",
+   "brightness": 1.2,
+   "comment": "раскалённая вмятина остывает 4 с"
+  },
+  {
+   "type": "sprites",
+   "delay": 140,
+   "at": "caster+0.1,0,-1.2+0,0.3,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 84,
+   "rate": 21,
+   "spread": 0.6,
+   "speed": 0.63,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 22,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 140,
+   "at": "caster+0.1,0,-1.2+0,0.2,0",
+   "duration": 6,
+   "texture": "mote_ash",
+   "count": 33,
+   "rate": 6,
+   "spread": 1.68,
+   "speed": 0.08,
+   "gravity": -0.004,
+   "spin": 40,
+   "size": [
+    0.6,
+    0.2
+   ],
+   "life": 30,
+   "color": "#60606C",
+   "blend": "translucent",
+   "comment": "пыль/окалина"
+  },
+  {
+   "type": "flash",
+   "delay": 140,
+   "at": "caster+0,2,0",
+   "duration": 12,
+   "size": 4.0,
+   "rays": 12,
+   "screen": 0.15,
+   "color": "@primary"
+  },
+  {
+   "type": "sigil",
+   "delay": 150,
+   "at": "caster+0,0.05,0",
+   "id": "aris_emblem",
+   "comment": "7.5 с — титр"
+  }
+ ]
+}

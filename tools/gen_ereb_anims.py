@@ -164,6 +164,36 @@ def build():
     an['ereb_spawn'] = anim(5.0, [(0, mod(STAND, body_scale=[0.9, 0.9, 0.9])), (2.2, mod(STAND, body_scale=[0.9, 0.9, 0.9])),
                                   (2.5, STAND, OC), (3.0, BOW, IO), (3.5, BOW), (3.9, SALUTE, IO), (4.5, SALUTE), (5.0, STAND, IO)],
                                  [(2.2, 'form'), (2.6, 'bow'), (3.9, 'salute'), (5.0, 'ready')])
+    # ---------------------------------------------------------------- +4 заклинания (владелец 20.11)
+    # «Танец клинков» (4.4 с): 4 укола; перед каждым — шаг сквозь стеклянную рябь (blink: код переносит к следующему игроку)
+    keys, tl = [(0, GUARD)], []
+    for i in range(4):
+        t0 = i * 1.1
+        tilt = (-14, 10, -4, 18)[i]
+        hit = mod(LUNGE, right_arm=[-90 + tilt, 40 + (i % 2) * 6, 0], body=[10, -42 + (i % 2) * 8, 0])
+        keys += [(t0 + 0.12, mod(GUARD, body_pos=[0, -1.8, 2], body_scale=[0.97, 1.02, 0.97]), IO), (t0 + 0.3, mod(GUARD, body_pos=[0, -1.6, 1.5]), OC),
+                 (t0 + 0.55, hit, OQ), (t0 + 0.8, hit), (t0 + 1.1, GUARD, IO)]
+        tl += [(t0 + 0.05, 'blink'), (t0 + 0.55, 'hit')]
+    an['ereb_blade_dance'] = anim(4.4, keys, tl)
+    # «Обманная брешь» (2.4 с): нарочно открывается — руки в стороны, рапира опущена, грудь открыта (open 0.3 … close 1.8)
+    opn = mod(STAND, body=[-4, 0, 0], head=[-8, 0, 0], right_arm=[-10, 20, 38], bipedHandRight=[70, 0, 0], left_arm=[-10, -20, -38],
+              torso=[-4, 0, 0], right_leg=[-6, 0, 4], left_leg=[6, 0, -4])
+    an['ereb_feint'] = anim(2.4, [(0, GUARD), (0.3, opn, OC), (1.05, mod(opn, head=[-6, 6, 0]), IO), (1.8, opn, IO), (2.4, GUARD, IO)],
+                            [(0.3, 'open'), (1.8, 'close')])
+    # контратака (0.9 с): кто ударил в окно — мгновенное парирование и укол (parry 0.1, hit 0.45)
+    an['ereb_feint_counter'] = anim(0.9, [(0, opn), (0.1, PARRY, 'easeOutQuart'), (0.45, LUNGE, OQ), (0.9, GUARD, IO)],
+                                    [(0.1, 'parry'), (0.45, 'hit')])
+    # «Стеклянный дождь» (1.6 с): рапира и левая ладонь к небу (marks 0.4 — метки на земле), опускает руку (fall 1.6 = марки + 1.2 с)
+    sky = mod(STAND, head=[-30, 0, 0], torso=[-6, 0, 0], right_arm=[-172, 6, -6], bipedHandRight=[-30, 0, 0], left_arm=[-160, -10, -24])
+    an['ereb_glass_rain'] = anim(1.6, [(0, STAND), (0.4, sky, OC), (1.2, mod(sky, head=[-34, 6, 0])),
+                                       (1.6, mod(STAND, right_arm=[-60, 20, 10], bipedHandRight=[80, 0, 0], head=[6, 0, 0]), IQ)],
+                                 [(0.4, 'marks'), (1.6, 'fall')])
+    # «Шаг сквозь отражение»: уход (0.7 с, gone 0.5) — шаг назад в рябь; выход (0.8 с, appear 0) — из-за спины, сразу в стойку
+    an['ereb_mirror_step_out'] = anim(0.7, [(0, STAND), (0.3, mod(STAND, body_pos=[0, 0, 2.5], head=[8, 10, 0], left_arm=[-60, 20, -10]), IO),
+                                            (0.5, mod(STAND, body_pos=[0, 0, 3.5], body_scale=[0.96, 1.04, 0.96]), IO), (0.7, mod(STAND, body_pos=[0, 0, 3.5]))],
+                                      [(0.5, 'gone')])
+    an['ereb_mirror_step_in'] = anim(0.8, [(0, mod(GUARD, body_scale=[0.96, 1.04, 0.96], body_pos=[0, -0.5, -2])), (0.35, GUARD, OC), (0.8, GUARD)],
+                                     [(0.0, 'appear')])
     # ---------------------------------------------------------------- финал (6.5 с): «Сон бабочки» и исчезновение
     # 0.3 улыбка (smile: текстура ereb_smile), 0.8–1.4 подносит ладонь, 1.4 из ладони — стеклянная бабочка (butterfly),
     # 1.4–2.8 смотрит на неё, 3.2 поднимает руку — каст «Сна бабочки» (cast), 3.2–4.6 держит, 5.0 рассыпается бабочками (vanish)

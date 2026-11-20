@@ -1,0 +1,55 @@
+{
+ "comment": "Клинок сбит (caster = место): разлетается осколками стали и бирюзы. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "duration": 8,
+   "size": 1.4,
+   "color": "#C8FBFC"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 3,
+   "texture": "mote_ash",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.4,
+   "speed": 0.18,
+   "gravity": 0.03,
+   "spin": 120,
+   "size": [
+    0.25,
+    0.1
+   ],
+   "life": 22,
+   "color": "#A9A9B4",
+   "blend": "translucent",
+   "comment": "осколки стали"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 30,
+   "rate": 10,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 16,
+   "color": "@primary",
+   "glow": 0.9
+  }
+ ]
+}

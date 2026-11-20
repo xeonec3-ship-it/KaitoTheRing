@@ -1,0 +1,25 @@
+{
+ "comment": "T28 Арис, Мифический Кузнец: кузня — бирюзовое свечение рогов и каймы, раскалённый металл (вишнёвый → бело-жёлтый), искры, сталь. Движение тяжёлое, ударное: короткие вспышки, волны по земле. Сгенерировано tools/gen_aris.py.",
+ "palette": {
+  "primary": "#3CD6E0",
+  "secondary": "#F4A852",
+  "core": "#FFF6E2",
+  "shadow": "#2A2A32"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "chain_band",
+  "shards": "mote_flame",
+  "sigil": "aris_emblem"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.8,
+  "jitter": 0.15,
+  "easing": "easeOutCubic",
+  "pulse": {
+   "amp": 0.12,
+   "period": 10
+  }
+ }
+}

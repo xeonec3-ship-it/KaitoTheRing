@@ -8,8 +8,8 @@
    "delay": 0,
    "at": "caster",
    "duration": 18,
-   "radius": 2.4,
-   "height": 4,
+   "radius": 3.4,
+   "height": 6.8,
    "arms": 4,
    "speed": -16,
    "pull": 1.0,
@@ -23,12 +23,12 @@
   {
    "type": "sprites",
    "delay": 0,
-   "at": "caster+0,1.2,0",
+   "at": "caster+0,2.1,0",
    "duration": 14,
    "texture": "mote_flame",
    "count": 100000,
    "rate": 4,
-   "spread": 2.4,
+   "spread": 3.2,
    "speed": -0.08,
    "size": [
     0.3,
@@ -40,9 +40,9 @@
   {
    "type": "flash",
    "delay": 18,
-   "at": "caster+0,1.4,0",
+   "at": "caster+0,2.4,0",
    "duration": 8,
-   "size": 2.2,
+   "size": 3.0,
    "color": "@secondary"
   }
  ]

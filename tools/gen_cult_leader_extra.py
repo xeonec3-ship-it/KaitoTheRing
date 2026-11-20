@@ -216,8 +216,8 @@ def effects():
        'от него по земле бежит кольцо огня 3→28 бл. за 2 с (80–120; урон — код: |d − r(t)| < 0.8 и игрок ниже 1 бл. над землёй, '
        'r(t) = 3 + 25·(t − 80)/40). Бой не замораживается.', 130, [
         E('aura', 0, 'caster', duration=34, target='caster', thickness=0.22, pulse=[0.3, 8], color='@primary', motes=30, follow=True),
-        E('flash', 18, at('caster', 0.6, 0.2, 1.2), duration=8, size=1.6, color='@secondary', comment='коса входит в землю'),
-        E('decal', 18, at('caster', 0.6, 0, 1.2), duration=110, texture='higher_cracks', radius=3, grow=10, glow=0.5, fadeOut=30, color=FX.FIRE_DEEP),
+        E('flash', 18, at('caster', 1.05, 0.2, 2.1), duration=8, size=1.6, color='@secondary', comment='коса входит в землю'),
+        E('decal', 18, at('caster', 1.05, 0, 2.1), duration=110, texture='higher_cracks', radius=4, grow=10, glow=0.5, fadeOut=30, color=FX.FIRE_DEEP),
         E('sigil', 32, at(C_, 0, 26, 0), id='cult_first_flame'),
         E('tint', 30, C_, duration=100, radius=44, color='#5A1406', strength=0.32, **{'in': ease(30), 'out': ease(30)}),
         E('sprites', 40, at(C_, 0, 24, 0), duration=40, texture='mote_flame', count=100000, rate=2.0, area=18, speed=0.0, gravity=0.03,
@@ -238,25 +238,25 @@ def effects():
     ])
     # ---------------------------------------------------------------- «Пепел Меллисто»
     fx('cult_ash_dissolve', '«Пепел Меллисто», 0–1.2 с: босс сгорает в пепел (с анимацией cult_leader_ash_dissolve; caster = босс).', 34, [
-        E('flash', 0, at('caster', 0, 1.6, 0), duration=10, size=2.6, color='@secondary'),
+        E('flash', 0, at('caster', 0, 2.8, 0), duration=10, size=3.4, color='@secondary'),
         E('aura', 0, 'caster', duration=24, target='caster', thickness=0.3, pulse=[0.4, 4], color='@primary', motes=40, follow=True),
-        E('vortex', 4, 'caster', duration=26, radius=1.6, height=4, arms=3, speed=10, texture='mote_ash', color=FX.SOOT, out=ease(8)),
-        E('sprites', 6, at('caster', 0, 1.2, 0), duration=18, texture='mote_ash', count=100000, rate=6, spread=0.9, speed=0.06, gravity=-0.02,
+        E('vortex', 4, 'caster', duration=26, radius=2.6, height=6.5, arms=3, speed=10, texture='mote_ash', color=FX.SOOT, out=ease(8)),
+        E('sprites', 6, at('caster', 0, 2.1, 0), duration=18, texture='mote_ash', count=100000, rate=6, spread=1.5, speed=0.06, gravity=-0.02,
           spin=60, size=[0.4, 0.12], life=36, color=FX.SOOT, blend='translucent'),
-        E('sprites', 6, at('caster', 0, 1.2, 0), duration=18, texture='mote_flame', count=100000, rate=3, spread=0.9, speed=0.08, gravity=-0.02,
+        E('sprites', 6, at('caster', 0, 2.1, 0), duration=18, texture='mote_flame', count=100000, rate=3, spread=1.5, speed=0.08, gravity=-0.02,
           size=[0.3, 0.04], life=20, color='@primary'),
     ])
     fx('cult_ash_vortex', '«Пепел Меллисто», 1.2–3.0 с: пепельный вихрь проносится по арене (caster = невидимый босс, follow; до Fx.stop).', -1, [
-        E('vortex', 0, 'caster', follow=True, radius=1.8, height=4.2, arms=4, speed=14, texture='mote_ash', color=FX.SOOT),
-        E('vortex', 0, 'caster', follow=True, radius=1.2, height=3.4, arms=3, speed=-10, texture='mote_flame', color='@primary'),
+        E('vortex', 0, 'caster', follow=True, radius=2.8, height=6.8, arms=4, speed=14, texture='mote_ash', color=FX.SOOT),
+        E('vortex', 0, 'caster', follow=True, radius=1.9, height=5.6, arms=3, speed=-10, texture='mote_flame', color='@primary'),
         E('sprites', 0, at('caster', 0, 0.3, 0), follow=True, texture='mote_ash', count=100000, rate=3, spread=1.2, speed=0.02, gravity=-0.01,
           spin=50, size=[0.3, 0.1], life=40, color=FX.ASH, blend='translucent', comment='шлейф пепла за вихрем'),
     ])
     fx('cult_ash_reform', '«Пепел Меллисто», 3.0–4.0 с: пепел стягивается в фигуру перед сильнейшим врагом (caster = босс, анимация cult_leader_ash_reform).', 24, [
-        E('vortex', 0, 'caster', duration=18, radius=2.4, height=4, arms=4, speed=-16, pull=1.0, texture='mote_ash', color=FX.SOOT, out=ease(4)),
-        E('sprites', 0, at('caster', 0, 1.2, 0), duration=14, texture='mote_flame', count=100000, rate=4, spread=2.4, speed=-0.08, size=[0.3, 0.05],
+        E('vortex', 0, 'caster', duration=18, radius=3.4, height=6.8, arms=4, speed=-16, pull=1.0, texture='mote_ash', color=FX.SOOT, out=ease(4)),
+        E('sprites', 0, at('caster', 0, 2.1, 0), duration=14, texture='mote_flame', count=100000, rate=4, spread=3.2, speed=-0.08, size=[0.3, 0.05],
           life=14, color='@primary'),
-        E('flash', 18, at('caster', 0, 1.4, 0), duration=8, size=2.2, color='@secondary'),
+        E('flash', 18, at('caster', 0, 2.4, 0), duration=8, size=3.0, color='@secondary'),
     ])
     fx('cult_ash_line', '«Пепел Меллисто», 3.0–4.5 с: огненная линия на земле — траектория разреза (caster = босс, yaw = направление удара). '
        'Горит 1.5 с (30 тиков) до удара, пульсирует; длина 56 бл. (через всю арену), ширина зоны урона — код (предл. 1.5 бл.).', 34, [
@@ -267,9 +267,9 @@ def effects():
         E('sprites', 0, at('caster', 0, 0.1, 40), duration=30, texture='mote_flame', count=100000, rate=1.2, area=2, speed=0.01, gravity=-0.02,
           size=[0.3, 0.05], life=20, color='@secondary'),
     ])
-    slash = [E('slash', 0, at('caster', 0, 1.2, 1.5), radius=3.6, arc=170, thickness=0.55, bend=1, secondary=0.6, tilt=0, grow=4, life=12,
+    slash = [E('slash', 0, at('caster', 0, 2.1, 2.6), radius=6.3, arc=170, thickness=0.55, bend=1, secondary=0.6, tilt=0, grow=4, life=12,
                color='@secondary', comment='взмах косой (удар 4.5 с)'),
-             E('flash', 0, at('caster', 0, 1.2, 2), duration=10, size=3, rays=8, screen=0.2, color='@secondary'),
+             E('flash', 0, at('caster', 0, 2.1, 3.5), duration=10, size=4, rays=8, screen=0.2, color='@secondary'),
              E('decal', 2, at('caster', 0, 0, 28), duration=200, shape='crack', length=56, width=1.2, grow=10, branches=14, yaw=90,
                blend='translucent', color=FX.SOOT, fadeOut=80, comment='выжженный след разреза')]
     for k in range(14):                                                  # огонь вырывается по линии, волной от босса
@@ -291,7 +291,7 @@ def effects():
           spin=90, size=[0.22, 0.06], life=26, color=REPLICA, glow=0.6, comment='осколки верхней печати'),
         E('sprites', 19, at('caster', 0, 2.4, 0), duration=3, texture='spark_soft', count=40, rate=14, area=1.0, speed=0.15, gravity=0.03,
           size=[0.2, 0.05], life=24, color=REPLICA, glow=0.6),
-        E('slash', 30, at('caster', 0.4, 2.6, 0.8), radius=2.6, arc=150, thickness=0.4, bend=1, tilt=70, grow=4, life=10, color='@secondary'),
+        E('slash', 30, at('caster', 0.7, 4.0, 1.4), radius=4.5, arc=150, thickness=0.4, bend=1, tilt=70, grow=4, life=10, color='@secondary'),
         E('flash', 30, at('caster', 0, 6.5, 0), duration=10, size=3.2, rays=10, color=REPLICA),
         E('sprites', 30, at('caster', 0, 6.5, 0), duration=4, texture='spark_soft', count=90, rate=24, spread=2.2, speed=0.2, gravity=0.04,
           spin=120, size=[0.26, 0.06], life=34, color=REPLICA, glow=0.6, comment='венец и апекс рассыпаются'),
@@ -545,6 +545,26 @@ def shots_anims(args):
     R.shoot(html, os.path.join(MEDIA, 't26_special_anims.jpg'), (1800, 1080))
 
 
+def shots_scale(three=None):
+    """Рост ×1.75 (как Тирос Iron's): Глава рядом с игроком и с оригинальным Тиросом; облик души ×2.0125; добивание — высота подъёма."""
+    import cult_leader_render as R
+    base = {'yaw': 0, 'pitch': 6, 'fov': 30, 'ground': True}
+    cells = [
+        dict(base, model='cult_leader', scale=1.75, x=0, label='×1.75: игрок · Глава · Тирос Iron\'s',
+             sub='Глава ≈ 3.7 бл. (хитбокс 1.49×3.68), игрок 1.8 бл.', dist=7.0, ty=32,
+             models=[{'model': 'steve', 'x': 3.2}, {'model': 'tyros', 'scale': 1.75, 'x': -3.6}]),
+        dict(base, model='cult_leader', scale=2.0125, soul=True, x=0, yaw=20, label='облик души ×2.0125', sub='≈ 4.2 бл.', dist=4.6, ty=36,
+             models=[{'model': 'steve', 'x': 2.4}]),
+        dict(base, model='cult_leader', anim='cult_leader_finisher', t=1.8, scale=1.75, yaw=70, label='добивание, 1.8 с',
+             sub='жертва в 3.0 бл. перед ним, поднята на +2.3', dist=5.2, ty=42,
+             models=[{'model': 'steve', 'z': -3.0, 'y': 2.3, 'ry': 180}]),
+    ]
+    cells[0].update(dist=4.4, ty=30)
+    cells[2].update(yaw=100, pitch=4, dist=7.5, ty=40)
+    R.sheet(os.path.join(MEDIA, 't26_scale.jpg'), {'cols': 1, 'cells': cells[:1]}, three, (1800, 900))
+    R.sheet(os.path.join(MEDIA, 't26_scale_soul_finisher.jpg'), {'cols': 2, 'cells': cells[1:]}, three, (1600, 900))
+
+
 def run(mod, fxmod, args):
     global M, FX
     M, FX = mod, fxmod
@@ -566,4 +586,5 @@ def run(mod, fxmod, args):
     S4.run(M, FX, args)
     if '--shots' in args:
         shots_anims(args)
+        shots_scale(args[args.index('--three') + 1] if '--three' in args else None)
         S4.shots(args[args.index('--three') + 1] if '--three' in args else None)

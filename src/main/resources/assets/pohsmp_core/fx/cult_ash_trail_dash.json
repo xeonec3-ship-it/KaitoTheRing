@@ -6,13 +6,13 @@
   {
    "type": "sprites",
    "delay": 0,
-   "at": "caster+0,1,0",
+   "at": "caster+0,1.75,0",
    "follow": true,
    "duration": 8,
    "texture": "mote_ash",
    "count": 100000,
    "rate": 6,
-   "spread": 0.7,
+   "spread": 1.2,
    "speed": 0.02,
    "spin": 60,
    "size": [

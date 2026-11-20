@@ -111,7 +111,7 @@ def effects():
     fx('cult_ash_trail', '«Пепельный след»: горящая полоса 4 с за рывком (caster = точка начала рывка, yaw — направление, 12 бл., ширина ~1.6). '
        'Огонь не ставится; урон в полосе — код.', 80, burn)
     fx('cult_ash_trail_dash', '«Пепельный след»: шлейф пепла за боссом во время рывка (caster = босс, follow, 0.4 с).', 10, [
-        E('sprites', 0, at('caster', 0, 1.0, 0), follow=True, duration=8, texture='mote_ash', count=100000, rate=6, spread=0.7, speed=0.02,
+        E('sprites', 0, at('caster', 0, 1.75, 0), follow=True, duration=8, texture='mote_ash', count=100000, rate=6, spread=1.2, speed=0.02,
           spin=60, size=[0.4, 0.12], life=20, color=FX.SOOT, blend='translucent'),
         E('aura', 0, 'caster', follow=True, duration=8, target='caster', thickness=0.25, color='@primary', motes=20, ring=False),
     ])

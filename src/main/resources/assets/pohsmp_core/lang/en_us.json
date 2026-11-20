@@ -894,5 +894,6 @@
   "ui.pohsmp_core.boss.unknown": "Boss %s is not implemented yet (or unknown)",
   "ui.pohsmp_core.boss.spawned": "Boss summoned: %s",
   "message.pohsmp_core.no_inscribe": "This magic cannot be written down",
-  "message.pohsmp_core.no_imbue": "This magic cannot be imbued into items"
+  "message.pohsmp_core.no_imbue": "This magic cannot be imbued into items",
+  "death.attack.pohsmp_core.ereb_finisher": "%1$s trusted Ereb"
 }

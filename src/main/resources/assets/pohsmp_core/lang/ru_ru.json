@@ -894,5 +894,6 @@
   "ui.pohsmp_core.boss.unknown": "Босс %s ещё не сделан (или неизвестен)",
   "ui.pohsmp_core.boss.spawned": "Вызван босс: %s",
   "message.pohsmp_core.no_inscribe": "Эта магия не поддаётся записи",
-  "message.pohsmp_core.no_imbue": "Эта магия не вкладывается в предметы"
+  "message.pohsmp_core.no_imbue": "Эта магия не вкладывается в предметы",
+  "death.attack.pohsmp_core.ereb_finisher": "%1$s поверил Эребу"
 }

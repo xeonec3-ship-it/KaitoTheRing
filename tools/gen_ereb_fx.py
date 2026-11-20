@@ -227,6 +227,35 @@ def effects():
         *butterflies(64, RAISED, 10, 10, 2, spread=0.3, speed=0.09, gravity=-0.02, life=30),
         *dissolve_elements(100),
     ])
+    # ---------------------------------------------------------------- добивание (владелец 20.11; ТЗ T30 «Добивание»)
+    fx('ereb_finisher', 'Добивание (48 тиков = анимация ereb_finisher 2.4 с): caster = Эреб на ИСХОДНОЙ точке (не follow), target = жертва. '
+       '0–6 — оболочка-стекло, рябь; 6 (vanish) — Эреб растворяется (код прячет модель, на 14 ставит его в 1.3 бл. за спиной жертвы лицом к ней); '
+       '14 (appear) — за спиной жертвы трескается воздух, вспышка; 22 (stab) — укол в спину: золотой блик и стекло на груди жертвы (остриё выходит '
+       'спереди); 22–38 — по жертве бежит стеклянная корка; 38 (kill) — жертва рассыпается стеклом и бабочками (код прячет её, смерть). '
+       'Без лучей и нитей.', 56, [
+        E('aura', 0, 'caster', target='caster', duration=6, thickness=0.06, pulse=[0.5, 3], motes=0, color=GLASS, brightness=0.6,
+          **{'in': ease(2), 'out': ease(3)}),
+        E('wave', 0, 'caster+0,1,0', duration=8, shape='sphere', radius=1.2, rim=1.0, color='@secondary', brightness=0.5, comment='стеклянная рябь'),
+        glass(5, 'caster+0,1.0,0', 18, dur=3, spread=0.55, speed=0.05, gravity=0.004, life=16),
+        *butterflies(5, 'caster+0,1.2,0', 6, 3, 2, spread=0.4, speed=0.06, gravity=-0.01, life=24, side=False),
+        E('flash', 6, 'caster+0,1.0,0', duration=6, size=1.2, color=GLASS_HI, brightness=0.8, comment='vanish'),
+        E('flash', 12, 'target+0,1.45,0', follow=True, duration=5, size=0.7, anamorphic=1.8, rays=4, color=GLASS_HI, brightness=1.2,
+          comment='блик за миг до появления'),
+        E('wave', 14, 'target+0,1,0', follow=True, duration=7, shape='sphere', radius=1.3, rim=1.0, color='@secondary', brightness=0.5,
+          comment='appear: воздух трескается за спиной'),
+        glass(14, 'target+0,1.1,0', 10, spread=0.9, speed=-0.05, gravity=0.0, life=8, follow=True),
+        E('flash', 22, 'target+0,1.3,0', follow=True, duration=6, size=0.8, anamorphic=1.3, rays=4, color=GOLD_HI, brightness=1.2, comment='stab'),
+        E('sprites', 22, 'target+0,1.3,0', follow=True, duration=2, texture='spark_soft', count=10, rate=5, spread=0.2, speed=0.08,
+          gravity=0.01, size=[0.1, 0.02], life=8, color=GOLD),
+        glass(22, 'target+0,1.3,0', 8, spread=0.25, speed=0.06, gravity=0.01, life=14, follow=True),
+        E('aura', 24, 'target', target='target', duration=16, thickness=0.08, pulse=[0.4, 4], motes=8, texture='mote_glass', color=GLASS_HI,
+          brightness=0.7, **{'in': ease(10, 'easeInCubic'), 'out': ease(4)}, comment='стеклянная корка'),
+        E('flash', 38, 'target+0,1.0,0', duration=10, size=2.0, rays=6, color=WHITE, brightness=1.0, comment='kill'),
+        glass(38, 'target+0,1.0,0', 30, rate=15, dur=2, spread=0.55, speed=0.08, gravity=0.014, life=24),
+        *butterflies(38, 'target+0,0.6,0', 22, 11, 2, spread=0.4, speed=0.07, gravity=-0.012, life=44, size=(0.34, 0.16)),
+        *butterflies(39, 'target+0,1.4,0', 18, 9, 2, spread=0.35, speed=0.09, gravity=-0.015, life=44, size=(0.32, 0.14)),
+        E('wave', 39, 'target+0,0.05,0', duration=16, shape='ring', radius=3.5, color='@secondary', brightness=0.4),
+    ])
     fx('ereb_butterfly_dissolve', 'Исчезновение бабочками (3 с = 60 тиков): caster = Эреб. Оболочка-стекло, тело рассыпается роем стеклянных '
        'и золотых бабочек снизу вверх, они улетают вверх и в стороны; на 4 тике код прячет модель (в финале — внутри ereb_finale, тик 100). '
        'Можно и отдельно (если финал прерван).', 64, dissolve_elements(0))
@@ -455,6 +484,7 @@ def titles(bars):
 
 # ================================================================== lang
 LANG = {
+    'death.attack.pohsmp_core.ereb_finisher': ('%1$s поверил Эребу', '%1$s trusted Ereb'),
     'entity.pohsmp_core.ereb': ('Эреб, Первый Предатель', 'Ereb, the First Traitor'),
     'item.pohsmp_core.ereb_rapier': ('Рапира Эреба', 'Ereb\'s Rapier'),
     'ui.pohsmp_core.ereb.title': ('Эреб, Первый Предатель', 'Ereb, the First Traitor'),

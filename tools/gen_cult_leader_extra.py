@@ -47,6 +47,9 @@ def A(length, bones, timeline=None):
 
 Z = [0, 0, 0]
 ONE = [1, 1, 1]
+# «несёт косу» (проверка анимаций 20.11, tools/anim_check.py): правая рука чуть вперёд, кисть повёрнута — древко наискось
+# снизу-сзади вверх-вперёд, лезвие над плечом. Без ключей кисти коса при опущенной руке лежит лезвием в земле.
+CARRY_ARM, CARRY_HAND = [-35, 10, 15], [8.7, -5.5, 96.4]
 IO, OC, IQ = 'easeInOutSine', 'easeOutCubic', 'easeInQuart'
 
 
@@ -91,8 +94,12 @@ def boss_anims():
                  'position': ch((0, windup['body'][1]), (0.42, [0, -3.5, 1], IO), (0.6, [0, -2, -7], 'easeOutQuart'), (1.5, Z, IO))},
         'torso': {'rotation': ch((0, windup['torso']), (0.42, [0, 40, 0], IO), (0.6, [5, -55, 0], 'easeOutQuart'), (1.0, [0, -45, 0], IO), (1.5, Z, IO))},
         'head': {'rotation': ch((0, windup['head']), (0.6, [5, 25, 0], 'easeOutQuart'), (1.5, Z, IO))},
-        'right_arm': {'rotation': ch((0, windup['right_arm']), (0.42, [-35, 35, 88], IO), (0.6, [-80, -40, -10], 'easeOutQuart'),
-                                     (1.0, [-70, -35, -5], IO), (1.5, Z, IO))},
+        # коса (проверка 20.11): на slash лезвие идёт ПЕРЕД боссом справа налево низко над землёй — разрез вдоль линии вперёд
+        # (раньше коса стояла вертикально над головой, лезвие в ноге/в земле)
+        'right_arm': {'rotation': ch((0, windup['right_arm']), (0.42, [-62.5, 38.3, 55], IO), (0.5, [-66, 27, 5], 'easeOutQuart'),
+                                     (0.6, [-61, -1, -5.6], 'easeOutQuart'), (1.0, [-70, -35, -5], IO), (1.5, Z, IO))},
+        'bipedHandRight': {'rotation': ch((0, Z), (0.42, [-7, 45.6, -45], IO), (0.5, [15.6, 55, -45.7], 'easeOutQuart'),
+                                          (0.6, [16.3, 56.7, -49.6], 'easeOutQuart'), (1.0, [16.3, 56.7, -58], IO), (1.5, Z, IO))},
         'left_arm': {'rotation': ch((0, windup['left_arm']), (0.6, [20, 0, -40], 'easeOutQuart'), (1.5, Z, IO))},
         'right_leg': {'rotation': ch((0, windup['right_leg']), (0.6, [-35, 0, 5], 'easeOutQuart'), (1.5, Z, IO))},
         'left_leg': {'rotation': ch((0, windup['left_leg']), (0.6, [30, 0, -5], 'easeOutQuart'), (1.5, Z, IO))},
@@ -105,8 +112,12 @@ def boss_anims():
                                 (2.4, [5, 0, 10]), (2.6, Z, IO))},
         'left_arm': {'rotation': ch((0, Z), (0.4, [-150, -10, 10], OC), (0.7, [-156, -10, 15], IO), (0.9, [-70, 0, -15], IQ), (1.2, [-40, 0, -10], IO),
                                     (1.9, [-30, 0, -45], IO), (2.3, [-25, 0, -40]), (2.6, Z, IO))},
-        'right_arm': {'rotation': ch((0, Z), (0.9, [0, 0, 5]), (1.2, [-20, 40, 70], IO), (1.5, [-170, -30, -20], 'easeOutQuart'), (2.0, [-90, 0, 10], IO),
-                                     (2.6, Z, IO))},
+        # коса (проверка 20.11): несёт её до 0.9, 1.2 — лезвие внизу справа впереди, 1.5 (shatter) — взмах снизу вверх ПЕРЕД собой
+        # к печатям над головой (раньше лезвие уходило за спину)
+        'right_arm': {'rotation': ch((0, Z), (0.3, CARRY_ARM, IO), (0.9, CARRY_ARM), (1.2, [-50.2, -13.2, 83.9], IO),
+                                     (1.5, [-143.7, -13.5, -1.7], 'easeOutQuart'), (2.0, [-77.9, 1.5, 6.3], IO), (2.6, Z, IO))},
+        'bipedHandRight': {'rotation': ch((0, Z), (0.3, CARRY_HAND, IO), (0.9, CARRY_HAND), (1.2, [-20.1, -54.6, -3], IO),
+                                          (1.5, [27.6, 0.7, 1.8], 'easeOutQuart'), (2.0, [12.1, 3.5, 0.8], IO), (2.6, Z, IO))},
     }, [(0.9, 'crush'), (1.5, 'shatter'), (1.9, 'speak')])
     # Добивание (2.4 с): 0–0.7 тянет жертву левой рукой, 1.0 пронзает косой (impale), 1.0–1.7 поднимает, 1.7 вспышка, 2.2 смерть
     an['cult_leader_finisher'] = A(2.4, {
@@ -115,8 +126,12 @@ def boss_anims():
         'torso': {'rotation': ch((0, Z), (0.7, [0, 25, 0], IO), (1.0, [10, -10, 0], IQ), (1.7, [-12, 0, 0], IO), (2.4, Z, IO))},
         'head': {'rotation': ch((0, Z), (0.3, [10, 0, 0], IO), (1.0, [5, 0, 0]), (1.7, [-25, 0, 0], IO), (2.2, [-25, 0, 0]), (2.4, Z, IO))},
         'left_arm': {'rotation': ch((0, Z), (0.3, [-90, 10, -5], OC), (0.7, [-55, 20, -20], IO), (1.0, [-45, 0, -12], IO), (2.4, Z, IO))},
-        'right_arm': {'rotation': ch((0, Z), (0.7, [-30, 10, 60], IO), (1.0, [-95, -10, 5], IQ), (1.7, [-155, -5, 5], 'easeInOutQuad'),
-                                     (2.1, [-150, 0, 5]), (2.4, [-60, 0, 0], IO))},
+        # коса (проверка 20.11, tools/anim_check.py): остриё — в груди жертвы перед боссом: 1.0 — 3.0 бл. вперёд на высоте груди,
+        # 1.0–1.7 — поднимает её на +2.3 бл. (как код двигает жертву), держит до kill; раньше на 1.7–2.2 коса уходила за голову
+        'right_arm': {'rotation': ch((0, Z), (0.7, [-30, 10, 60], IO), (1.0, [-86, -2.5, 1], IQ), (1.35, [-108, 4.4, -2.2], 'easeInOutQuad'),
+                                     (1.7, [-117, 2, -3], 'easeInOutQuad'), (2.2, [-124, 0, -2]), (2.4, [-40, 0, 15], IO))},
+        'bipedHandRight': {'rotation': ch((0, Z), (0.7, Z), (1.0, [36, 14, -10], IQ), (1.35, [49.5, 23, -14], 'easeInOutQuad'),
+                                          (1.7, [45, 22, -11], 'easeInOutQuad'), (2.2, [48, 19.4, -7.5]), (2.4, Z, IO))},
         'right_leg': {'rotation': ch((0, Z), (1.0, [20, 0, 0], IQ), (1.7, [5, 0, 0], IO), (2.4, Z, IO))},
         'left_leg': {'rotation': ch((0, Z), (1.0, [-25, 0, 0], IQ), (1.7, [-5, 0, 0], IO), (2.4, Z, IO))},
     }, [(0.7, 'pull_done'), (1.0, 'impale'), (1.7, 'flame'), (2.2, 'kill')])
@@ -132,6 +147,15 @@ def write_anims():
            'comment': 'T26: все анимации casting_animations.json Iron\'s (те же имена — их зовёт логика FireBoss) + cult_leader_* (наши). '
                       'Сгенерировано tools/gen_cult_leader.py — правьте генератор.',
            'animations': {**src['animations'], **ours}}
+    # проверка анимаций 20.11 (tools/anim_check.py): явные ключи костей у наших анимаций; плащ (cape) — назад и мимо ног во всех
+    import anim_cloth
+    anim_cloth.explicit(out['animations'], list(ours), ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg',
+                                                        'bipedHandRight'))
+    anim_cloth.bake('cult_leader', out['animations'])
+    # коса в анимациях Iron's, что играют на боссе (удары FireBoss, касты): не в землю и не сквозь тело/ноги
+    import anim_check
+    for _ in range(2):                       # второй проход — добирает кадры на плавных переходах первого
+        anim_cloth.weapon('cult_leader', out['animations'], [n for n in anim_check.PLAYS['cult_leader'] if n in src['animations']])
     with open(M.out('animations/entity/cult_leader.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
     return ours

@@ -74,9 +74,9 @@ def sigil_data():
     return data
 
 
-def victim_anim():
-    """PlayerAnimator-эмоция pohsmp_cult_finisher_victim → ключи GeckoLib для каркаса abstract_casting_mob (Стив-жертва)."""
-    p = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'irons_spellbooks', 'player_animation', 'pohsmp_cult_finisher_victim.json')
+def victim_anim(name='pohsmp_cult_finisher_victim'):
+    """PlayerAnimator-эмоция (жертва добивания) → ключи GeckoLib для каркаса abstract_casting_mob (Стив-жертва)."""
+    p = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'irons_spellbooks', 'player_animation', name + '.json')
     em = json.load(open(p, encoding='utf-8'))['emote']
     parts = {'rightArm': 'right_arm', 'leftArm': 'left_arm', 'head': 'head', 'rightLeg': 'right_leg', 'leftLeg': 'left_leg', 'torso': 'body'}
     keys = {}

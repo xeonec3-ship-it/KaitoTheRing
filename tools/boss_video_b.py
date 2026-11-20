@@ -219,7 +219,9 @@ def build_page(kind, three, texs, preload):
         meshes = ['martin_cavalry_rider', 'martin_shield_wall', 'martin_shield_line', 'martin_archer_ghost', 'martin_arrow', 'martin_soldier_ghost']
         html = MR.page(d, None, three, meshes, [])
     else:
-        html = ER.page(['ereb', 'pyromancer'], None, three)
+        html = ER.page(['ereb', 'pyromancer', 'steve'], None, three)
+        import boss_video as BV                      # жертва добивания Эреба: эмоция PlayerAnimator → ключи для каркаса Стива
+        html = html.replace('"anims":{', '"anims":{"ereb_victim":%s,' % json.dumps(BV.victim_anim('pohsmp_ereb_finisher_victim')), 1)
     i = html.index('if (CELLS) {')
     j = html.rindex('</script>')
     drv = open(os.path.join(HERE, 'boss_video_b_driver.js'), encoding='utf-8').read()
@@ -1186,12 +1188,47 @@ def ereb_finale():
                 'cap': 'Финал', 'sub': 'ereb_finale · улыбка (0.3 с) → бабочка из ладони (1.4) → фраза (2.4) → каст «Сна бабочки» (3.2) → рассыпается (5.0)',
                 'speech': {'text': SPEECH, 'op': sp} if sp > 0 else None, 'fade': max(1 - lin(t, 0, 0.4), 0.6 * lin(t, 7.0, 7.4))}
     c.seg(7.4, finale)
+    # ---------------------------------------------------------------- добивание (ereb_finisher 2.4 с + жертва pohsmp_ereb_finisher_victim)
+    VZ = -2.0                                     # жертва в 2 бл. перед Эребом, спиной к нему; он появляется в 1.3 бл. за её спиной
+    E0, E1 = 0.6, VZ + 1.3
+
+    def finisher(t):
+        ta = max(0.0, min(t - 0.4, 2.4))
+        appear = ta >= 0.7
+        ez = E1 if appear else E0
+        op = 1.0 if ta < 0.2 else (1 - lin(ta, 0.2, 0.3) if ta < 0.7 else lin(ta, 0.7, 0.8))
+        o = e_obj('ereb_finisher', ta, pos=[0, 0, ez], op=op)
+        vop = 1 - lin(ta, 1.9, 2.05)
+        vic = dict(model='steve', anim='ereb_victim', t=ta, pos=[0, 0, VZ], ry=0, op=vop, scale=0.94)
+        chest = [0, 1.3, VZ]
+        spr = []
+        spr += shards([0, 1.0, E0], ta - 0.25, 18, 431, speed=1.0, life=0.7, spread=(0.6, 1.0, 0.6))
+        spr += bfly_burst([0, 1.2, E0], ta - 0.25, 6, 432, speed=1.0, life=1.0)
+        u = ta - 0.3
+        if 0 <= u < 0.3:
+            spr.append(glow([0, 1.0, E0], 1.4 * (1 - u / 0.3) + 0.2, GLASS_HI, 0.6 * (1 - u / 0.3)))
+        u = ta - 0.6
+        if 0 <= u < 0.3:
+            spr.append(glow([0, 1.45, E1], 0.9 * (1 - u / 0.3) + 0.2, GLASS_HI, 0.7 * (1 - u / 0.3)))
+        spr += glint(chest, ta - 1.1, 0.8, GOLD_HI, 0.35)
+        spr += shards(chest, ta - 1.1, 8, 433, speed=0.8, life=0.6, spread=(0.3, 0.3, 0.3))
+        u = ta - 1.9
+        if 0 <= u < 0.5:
+            spr.append(glow([0, 1.0, VZ], 2.0 * (1 - u / 0.5) + 0.3, WHITE, 0.6 * (1 - u / 0.5)))
+        spr += shards([0, 1.0, VZ], u, 30, 434, speed=1.6, life=0.9, spread=(0.6, 1.1, 0.6))
+        spr += bfly_burst([0, 0.9, VZ], u, 22, 435, speed=1.6, life=1.4)
+        cam = camkeys([(0, 62, 8, 6.4, (0, 1.1, -0.8)), (1.4, 70, 8, 5.4, (0, 1.2, -1.2)), (3.4, 74, 10, 5.8, (0, 1.1, -1.2))], t)
+        return {'objs': [o, vic], 'sprites': spr, 'cam': cam, 'groundSize': 96,
+                'cap': 'Добивание', 'sub': 'ereb_finisher · исчезает в ряби (0.3 с) → за спиной жертвы (0.7) → укол в спину (1.1) → жертва рассыпается стеклом и бабочками (1.9)',
+                'fade': max(1 - lin(t, 0, 0.4), lin(t, 3.0, 3.4))}
+    c.seg(3.4, finisher)
     return c
 
 
 E_TEX = ['glow', 'mote_glass', 'mote_butterfly', 'mote_butterfly_side', 'illusion_seal', 'wave_ring',
          'title:ereb_ru', 'title:ereb_false_ally_ru']
-E_PRE = [{'model': 'ereb'}, {'model': 'ereb', 'key': 'ereb_smile', 'smile': True}, {'model': 'ereb', 'key': 'ereb2'}, {'model': 'pyromancer'}]
+E_PRE = [{'model': 'ereb'}, {'model': 'ereb', 'key': 'ereb_smile', 'smile': True}, {'model': 'ereb', 'key': 'ereb2'}, {'model': 'pyromancer'},
+         {'model': 'steve'}]
 
 CLIPS = {
     't29_turntable': ('martin', martin_turntable), 't29_combat': ('martin', martin_combat), 't29_spells': ('martin', martin_spells),

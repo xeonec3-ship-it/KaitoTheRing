@@ -620,6 +620,48 @@ def effects():
         E('wave', 64, at(F, 0.8, 0, 0.37), duration=12, shape='ring', radius=2.5, thickness=0.4, followTerrain=True, color=STEEL_L),
         E('tint', 0, F, duration=100, radius=30, color='#0A1416', strength=0.18, **{'in': ease(40), 'out': ease(40)}),
     ])
+    # ---------------------------------------------------------------- добивание (владелец 20.11; ТЗ T28 «Добивание»)
+    HIT = at(F, -0.05, 0.3, 1.45)                 # низ бойка в момент slam: спина лежащей жертвы (таз — 1.9 бл. перед Арис)
+    HORNS = [at(F, sx * 0.33, 2.82, 0.13) for sx in (-1, 1)]       # концы рогов в момент удара (она в приседе)
+    fx('aris_finisher', 'Добивание (48 тиков = анимация animation.aris.finisher 2.4 с): caster = Арис (не follow, yaw — на жертву), '
+       'target = жертва (её таз в holdPoint, 1.9 бл. перед Арис, голова к Арис; поза irons_spellbooks:pohsmp_aris_finisher_victim). 0–14 (pull) — '
+       'жар и бирюзовые цепи тянут жертву и прижимают к земле; 14 (windup) — замах; 30 (slam) — молот бьёт в спину, как по заготовке '
+       'на наковальне: вспышка, сноп искр, раскалённое пятно, рога и кайма вспыхивают; 30–44 — жар и окалина; 44 (kill) — смерть: '
+       'последний сноп искр и пар.', 60, [
+        E('tint', 0, F, duration=56, radius=12, color='#2A140C', strength=0.22, **{'in': ease(8), 'out': ease(12, 'easeInSine')}),
+        E('aura', 0, 'target', duration=30, target='target', follow=True, thickness=0.16, pulse=[0.3, 5], color='@primary', motes=14,
+          comment='бирюзовая хватка: жертву тянет и прижимает'),
+        E('decal', 0, at(F, 0, 0.02, 1.6), duration=58, texture='aris_molten_floor', radius=1.2, grow=14, glow=0.9, fadeOut=14,
+          color='@secondary', brightness=1.0, comment='«наковальня»: земля под жертвой раскаляется'),
+        E('sprites', 2, at(F, -0.3, 1.5, 0.4), duration=12, texture='spark_soft', count=24, rate=2, spread=0.2, speed=0.12, gravity=0.0,
+          size=[0.1, 0.02], life=10, color='@primary', glow=0.9, comment='с левой ладони к жертве'),
+        E('sprites', 14, at(F, 0.45, 2.3, -0.2), duration=14, texture='spark_soft', count=20, rate=2, spread=0.4, speed=0.03, gravity=0.02,
+          size=[0.14, 0.02], life=16, color='@secondary', glow=0.9, comment='windup: искры с поднятого молота'),
+        # slam
+        E('flash', 30, HIT, duration=10, size=3.2, rays=12, screen=0.06, color='@core', ring=True),
+        E('wave', 30, at(F, 0, 0, 1.5), duration=14, shape='ring', radius=3.2, thickness=0.8, followTerrain=True, texture='aris_molten_ring',
+          color='@secondary', comment='короткое кольцо жара (без урона)'),
+        E('sprites', 30, HIT, duration=4, texture='spark_soft', count=110, rate=28, spread=0.5, speed=0.5, gravity=0.035, size=[0.18, 0.02],
+          life=22, color='@secondary', glow=1.0, comment='сноп искр, как из-под молота на наковальне'),
+        E('sprites', 30, HIT, duration=3, texture='spark_soft', count=40, rate=14, spread=0.3, speed=0.3, gravity=0.03, size=[0.12, 0.02],
+          life=14, color='@core', glow=1.0),
+        E('column', 30, at(F, 0, 0, 1.5), duration=10, radius=0.9, height=1.6, fill=0.3, color='@secondary', out=ease(8),
+          comment='выброс жара'),
+        *[E('flash', 30, h, duration=12, size=0.9, rays=6, color='@primary', brightness=1.3, comment='рога вспыхивают') for h in HORNS],
+        E('aura', 30, F, duration=16, follow=True, target='caster', thickness=0.2, pulse=[0.5, 4], color='@primary', motes=24,
+          comment='рога и кайма брони вспыхивают на ударе'),
+        # жар на жертве, окалина
+        E('sprites', 32, at(F, 0, 0.3, 1.55), duration=12, texture='mote_flame', count=36, rate=3, spread=0.5, speed=0.03, gravity=-0.02,
+          size=[0.45, 0.05], life=20, color='@secondary', glow=0.7, comment='жар поднимается со спины'),
+        E('sprites', 32, at(F, 0, 0.2, 1.55), duration=10, texture='mote_ash', count=16, rate=2, spread=0.6, speed=0.04, gravity=-0.004,
+          spin=40, size=[0.5, 0.15], life=26, color=STEEL, blend='translucent', comment='окалина'),
+        # kill
+        E('flash', 44, HIT, duration=8, size=1.8, rays=8, color='@secondary'),
+        E('sprites', 44, HIT, duration=3, texture='spark_soft', count=50, rate=18, spread=0.5, speed=0.3, gravity=0.03, size=[0.14, 0.02],
+          life=16, color='@secondary', glow=0.9),
+        E('sprites', 44, at(F, 0, 0.3, 1.55), duration=8, texture='mote_ash', count=24, rate=3, spread=0.5, speed=0.03, gravity=-0.01,
+          size=[0.6, 0.2], life=34, color='#9AA8AC', blend='translucent', comment='пар/дым'),
+    ])
 
 
 # ================================================================== полоса здоровья (192×36, формат tyros_bossbar: 0–17 пустая, 18–35 полная)

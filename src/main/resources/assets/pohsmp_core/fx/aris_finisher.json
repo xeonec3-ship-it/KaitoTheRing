@@ -1,0 +1,299 @@
+{
+ "comment": "Добивание (48 тиков = анимация animation.aris.finisher 2.4 с): caster = Арис (не follow, yaw — на жертву), target = жертва (её таз в holdPoint, 1.9 бл. перед Арис, голова к Арис; поза irons_spellbooks:pohsmp_aris_finisher_victim). 0–14 (pull) — жар и бирюзовые цепи тянут жертву и прижимают к земле; 14 (windup) — замах; 30 (slam) — молот бьёт в спину, как по заготовке на наковальне: вспышка, сноп искр, раскалённое пятно, рога и кайма вспыхивают; 30–44 — жар и окалина; 44 (kill) — смерть: последний сноп искр и пар. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 56,
+   "radius": 12,
+   "color": "#2A140C",
+   "strength": 0.22,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 12,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "target",
+   "duration": 30,
+   "target": "target",
+   "follow": true,
+   "thickness": 0.16,
+   "pulse": [
+    0.3,
+    5
+   ],
+   "color": "@primary",
+   "motes": 14,
+   "comment": "бирюзовая хватка: жертву тянет и прижимает"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0.02,1.6",
+   "duration": 58,
+   "texture": "aris_molten_floor",
+   "radius": 1.2,
+   "grow": 14,
+   "glow": 0.9,
+   "fadeOut": 14,
+   "color": "@secondary",
+   "brightness": 1.0,
+   "comment": "«наковальня»: земля под жертвой раскаляется"
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+-0.3,1.5,0.4",
+   "duration": 12,
+   "texture": "spark_soft",
+   "count": 24,
+   "rate": 2,
+   "spread": 0.2,
+   "speed": 0.12,
+   "gravity": 0.0,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 10,
+   "color": "@primary",
+   "glow": 0.9,
+   "comment": "с левой ладони к жертве"
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "at": "caster+0.45,2.3,-0.2",
+   "duration": 14,
+   "texture": "spark_soft",
+   "count": 20,
+   "rate": 2,
+   "spread": 0.4,
+   "speed": 0.03,
+   "gravity": 0.02,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "glow": 0.9,
+   "comment": "windup: искры с поднятого молота"
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+-0.05,0.3,1.45",
+   "duration": 10,
+   "size": 3.2,
+   "rays": 12,
+   "screen": 0.06,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 30,
+   "at": "caster+0,0,1.5",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 3.2,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary",
+   "comment": "короткое кольцо жара (без урона)"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-0.05,0.3,1.45",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 110,
+   "rate": 28,
+   "spread": 0.5,
+   "speed": 0.5,
+   "gravity": 0.035,
+   "size": [
+    0.18,
+    0.02
+   ],
+   "life": 22,
+   "color": "@secondary",
+   "glow": 1.0,
+   "comment": "сноп искр, как из-под молота на наковальне"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-0.05,0.3,1.45",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 40,
+   "rate": 14,
+   "spread": 0.3,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 14,
+   "color": "@core",
+   "glow": 1.0
+  },
+  {
+   "type": "column",
+   "delay": 30,
+   "at": "caster+0,0,1.5",
+   "duration": 10,
+   "radius": 0.9,
+   "height": 1.6,
+   "fill": 0.3,
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "comment": "выброс жара"
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+-0.33,2.82,0.13",
+   "duration": 12,
+   "size": 0.9,
+   "rays": 6,
+   "color": "@primary",
+   "brightness": 1.3,
+   "comment": "рога вспыхивают"
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0.33,2.82,0.13",
+   "duration": 12,
+   "size": 0.9,
+   "rays": 6,
+   "color": "@primary",
+   "brightness": 1.3,
+   "comment": "рога вспыхивают"
+  },
+  {
+   "type": "aura",
+   "delay": 30,
+   "at": "caster",
+   "duration": 16,
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.2,
+   "pulse": [
+    0.5,
+    4
+   ],
+   "color": "@primary",
+   "motes": 24,
+   "comment": "рога и кайма брони вспыхивают на ударе"
+  },
+  {
+   "type": "sprites",
+   "delay": 32,
+   "at": "caster+0,0.3,1.55",
+   "duration": 12,
+   "texture": "mote_flame",
+   "count": 36,
+   "rate": 3,
+   "spread": 0.5,
+   "speed": 0.03,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.05
+   ],
+   "life": 20,
+   "color": "@secondary",
+   "glow": 0.7,
+   "comment": "жар поднимается со спины"
+  },
+  {
+   "type": "sprites",
+   "delay": 32,
+   "at": "caster+0,0.2,1.55",
+   "duration": 10,
+   "texture": "mote_ash",
+   "count": 16,
+   "rate": 2,
+   "spread": 0.6,
+   "speed": 0.04,
+   "gravity": -0.004,
+   "spin": 40,
+   "size": [
+    0.5,
+    0.15
+   ],
+   "life": 26,
+   "color": "#60606C",
+   "blend": "translucent",
+   "comment": "окалина"
+  },
+  {
+   "type": "flash",
+   "delay": 44,
+   "at": "caster+-0.05,0.3,1.45",
+   "duration": 8,
+   "size": 1.8,
+   "rays": 8,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 44,
+   "at": "caster+-0.05,0.3,1.45",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 50,
+   "rate": 18,
+   "spread": 0.5,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 44,
+   "at": "caster+0,0.3,1.55",
+   "duration": 8,
+   "texture": "mote_ash",
+   "count": 24,
+   "rate": 3,
+   "spread": 0.5,
+   "speed": 0.03,
+   "gravity": -0.01,
+   "size": [
+    0.6,
+    0.2
+   ],
+   "life": 34,
+   "color": "#9AA8AC",
+   "blend": "translucent",
+   "comment": "пар/дым"
+  }
+ ]
+}

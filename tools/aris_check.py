@@ -23,7 +23,7 @@ A = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core'
 # моменты удара: (анимация, время, что проверяем) — 'head' голова молота перед ней; 'hand' левая рука (бросок/каст) перед ней
 HITS = [('slam', 0.75, 'head'), ('swing', 0.62, 'head'), ('forge', 1.0, 'head'), ('forge', 1.8, 'head'), ('forge', 2.6, 'head'),
         ('last_blow', 4.0, 'head'), ('phase2', 1.0, 'head'), ('spawn', 7.0, 'head'), ('bellows', 0.8, 'head'),
-        ('chains', 0.8, 'pommel'), ('billet', 0.7, 'lhand'), ('cast', 0.8, 'lhand')]
+        ('chains', 0.8, 'pommel'), ('billet', 0.7, 'lhand'), ('cast', 0.8, 'lhand'), ('finisher', 1.5, 'head'), ('finisher', 2.2, 'head')]
 BODY = {'torso', 'head', 'body', 'right_leg', 'left_leg', 'right_shin', 'left_shin', 'right_arm', 'left_arm', 'hair1', 'hair2', 'fauld_b',
         'tasset_r', 'tasset_l'}
 

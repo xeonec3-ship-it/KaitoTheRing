@@ -448,7 +448,79 @@ def bellows(rig):
     return AN.bake(rig, 'bellows', 1.5, k, loop=False, ground='feet', events={0.0: 'warn', 0.8: 'gust'})
 
 
-ALL = (idle, walk, slam, swing, cast, forge, last_blow, phase2, phase3, spawn, surrender, npc_stand, npc_sit, billet, chains, quench, bellows)
+# ---------------------------------------------------------------- добивание (владелец 20.11; ТЗ T28 «Добивание»)
+# Жертва лежит ничком ПЕРЕД ней: таз в FIN_DIST бл. по взгляду, голова к ней (жертва повёрнута лицом к Арис), спина — «заготовка».
+FIN_DIST = 1.9                                   # = ArisMath.FINISHER_DIST (было 1.6: голова жертвы упиралась в её колени)
+FIN_HIT = (0.6, 2.0, -FIN_DIST * 16 + 10.0)      # точка удара (ед. модели, −z — вперёд): низ бойка ложится на середину спины лежащей жертвы (≈4.3 над землёй)
+FIN_EVENTS = {0.0: 'pull', 0.7: 'windup', 1.5: 'slam', 2.2: 'kill'}
+
+
+def finisher(rig):
+    """Добивание (2.4 с = 48 тиков): 0–0.7 (pull) — левая ладонь к жертве: жар и цепи тянут её и прижимают к земле; 0.7 (windup) —
+    замах из-за правого плеча (как slam); 1.5 (slam) — молот сверху в спину жертвы, как по заготовке на наковальне: глубокий присед,
+    искры, рога вспыхивают; 1.6–2.2 — давит всем весом; 2.2 (kill) — смерть; 2.4 — отпускает давление (держит последний кадр)."""
+    gd = guard()
+    d_imp = (0.0, -0.5, -0.87)
+    f_imp = (0, -1, 0)
+    rg = rest_ground()                                                     # 0–0.7: голова молота на земле у правой ноги (как idle)
+    hit = lambda dy: (AN.ham_from_strike((FIN_HIT[0], FIN_HIT[1] + dy, FIN_HIT[2]), d_imp, f_imp), d_imp, f_imp)
+    reach = dict(larm=(78, 0, -6), lfore=(8, 0, 0), body=(-6, 8, 0), torso=(-4, 4, 0), head=(-14, -6, 0), bpos=(0, -0.6, -0.4),
+                 right_leg=(-10, 0, 8), left_leg=(22, 0, -6), right_shin=(-6, 0, 0), left_shin=(-16, 0, 0))
+    push = dict(reach, larm=(52, 0, -6), lfore=(14, 0, 0), body=(-10, 8, 0), head=(-20, -6, 0), bpos=(0, -1.2, -0.6))
+    LEAN, HX, BZ = -20, 18, 1.0                                           # наклон корпуса, голова (назад), сдвиг тела назад (рукоять мимо шлема)
+    low = dict(body=(LEAN, 0, 0), torso=(-6, 0, 0), head=(HX, 0, 0), bpos=(0, -3.4, BZ), right_leg=(-6, 0, 10), left_leg=(40, 0, -8),
+               right_shin=(-26, 0, 0), left_shin=(-46, 0, 0), rpole=(0.8, -0.4, 0.3), lpole=(-0.8, -0.4, 0.3))
+    k = [
+        K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
+        K(0.18, 'io', **S(ham=((11.0, 15.0, -7.0), (0.55, -0.35, -0.76), (0.2, -0.9, 0.3)), lh=0.4, rpole=(0.9, -0.2, 0.4),
+                           **dict(reach, larm=(40, 0, -10)))),
+        K(0.35, 'io', **S(ham=rg, lh=0.0, rpole=(0.9, -0.2, 0.4), **reach)),
+        K(0.7, 'io', **S(ham=rg, lh=0.0, rpole=(0.9, -0.2, 0.4), **push)),
+        K(0.9, 'io', **S(ham=RAISE, lh=0.6, body=(4, -6, 0), torso=(4, -3, 0), head=(-4, 8, 0), rpole=(0.9, -0.2, 0.3),
+                          lpole=(-0.7, -0.4, 0.5), **GUARD_LEGS)),
+        K(1.2, 'io', **S(ham=windup(), lh=0.45, **dict(WINDUP, head=(-2, 16, 0)))),
+        K(1.38, 'in', **S(ham=FWD_UP, lh=1, body=(-8, 0, 0), torso=(-4, 0, 0), head=(8, 0, 0), bpos=(0, -0.5, -0.5), right_leg=(-18, 0, 8),
+                           left_leg=(30, 0, -6), right_shin=(-10, 0, 0), left_shin=(-24, 0, 0), rpole=(0.9, -0.2, 0.3), lpole=(-0.9, -0.2, 0.3))),
+        K(1.5, 'in3', **S(ham=hit(0.0), lh=1, **low)),
+        K(1.62, 'out', **S(ham=hit(0.9), lh=1, **dict(low, bpos=(0, -3.2, BZ), head=(HX + 2, 0, 0)))),
+        K(1.85, 'io', **S(ham=hit(-0.5), lh=1, **dict(low, body=(LEAN - 2, 0, 0), bpos=(0, -3.6, BZ - 0.1)))),
+        K(2.2, 'io', **S(ham=hit(-0.6), lh=1, **dict(low, body=(LEAN - 2, 0, 0), bpos=(0, -3.6, BZ - 0.1), head=(HX + 2, 0, 0)))),
+        K(2.4, 'io', **S(ham=hit(0.3), lh=1, **dict(low, body=(LEAN - 1, 0, 0), head=(HX, 0, 0)))),
+    ]
+    return AN.bake(rig, 'finisher', 2.4, k, loop='hold', ground='feet', events=FIN_EVENTS)
+
+
+def victim_emote():
+    """Поза жертвы добивания Арис (PlayerAnimator irons_spellbooks:pohsmp_aris_finisher_victim, 48 тиков, держит последний кадр).
+    Жертва повёрнута ЛИЦОМ к Арис (код: yaw жертвы на неё), таз — в точке holdPoint (1.9 бл. перед ней).
+    0–14 (pull) — скована, её тянет (как held); 14–24 — прижата к земле: на коленях, ладони в землю, голова поднята к ней;
+    27–30 — удар молотом в спину (slam 30): распластана ничком, руки в стороны, лицом в сторону; 30–34 — отдача; 44 (kill) — обмякла."""
+    P = lambda p, y=0.0, r=0.0, b=None: {'pitch': p, 'yaw': y, 'roll': r, **({} if b is None else {'bend': b})}
+    held = dict(rightArm=P(-12, 0, 118, -4), leftArm=P(-12, 0, -118, -4), torso=P(-12, 0, 0, -6), head=P(-38, 0, 0),
+                rightLeg=P(8, 0, 4, 14), leftLeg=P(-4, 0, -4, 8), body={'y': 0.45})
+    down = dict(rightArm=P(-62, 0, 14, -10), leftArm=P(-62, 0, -14, -10), torso=P(58, 0, 0, 10), head=P(-52, 0, 0),
+                rightLeg=P(-6, 0, 4, 88), leftLeg=P(-6, 0, -4, 88), body={'y': -0.36})
+    brace = dict(rightArm=P(-70, 0, 18, -14), leftArm=P(-70, 0, -18, -14), torso=P(66, 0, 0, 12), head=P(-58, 0, 0),
+                 rightLeg=P(-4, 0, 4, 90), leftLeg=P(-4, 0, -4, 90), body={'y': -0.4})
+    flat = dict(rightArm=P(-96, 0, 74, -6), leftArm=P(-96, 0, -74, -6), torso=P(90, 0, 0, 0), head=P(-6, 62, 0),
+                rightLeg=P(90, 0, 6, 4), leftLeg=P(90, 0, -6, 4), body={'y': -0.62})
+    squash = dict(flat, rightArm=P(-100, 0, 82, -10), leftArm=P(-100, 0, -82, -10), head=P(-2, 66, 0), body={'y': -0.66},
+                  rightLeg=P(88, 0, 8, 10), leftLeg=P(88, 0, -8, 10))
+    limp = dict(flat, rightArm=P(-94, 0, 70, -2), leftArm=P(-94, 0, -70, -2), head=P(-4, 70, 0), body={'y': -0.63},
+                rightLeg=P(90, 0, 5, 2), leftLeg=P(90, 0, -5, 2))
+    seq = [(0, held, 'easeInOutSine'), (12, held, 'easeInOutSine'), (18, down, 'easeInQuad'), (24, brace, 'easeInOutSine'),
+           (27, brace, 'easeInOutSine'), (30, squash, 'easeInQuad'), (34, flat, 'easeOutCubic'), (40, flat, 'easeInOutSine'),
+           (44, limp, 'easeInOutSine'), (48, limp, 'easeInOutSine')]
+    moves = []
+    for tick, p, ease in seq:
+        for part, v in p.items():
+            moves.append({'tick': tick, 'easing': ease, part: dict(v)})
+    return {'version': 3, 'name': 'pohsmp_aris_finisher_victim', 'author': 'pohsmp_core',
+            'emote': {'beginTick': 0, 'endTick': 48, 'stopTick': 48, 'degrees': True, 'easeBeforeKeyframe': True, 'moves': moves}}
+
+
+ALL = (idle, walk, slam, swing, cast, forge, last_blow, phase2, phase3, spawn, surrender, npc_stand, npc_sit, billet, chains, quench, bellows,
+       finisher)
 
 
 def all_anims(rig):

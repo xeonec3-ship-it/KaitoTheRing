@@ -13,9 +13,11 @@ const fs = require('fs');
   pg.on('pageerror', e => errs.push(e.message));
   pg.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
   await pg.goto('file://' + job.html);
-  await pg.waitForFunction('window.READY === true && window.VID', null, { timeout: 240000 });
+  await pg.waitForFunction('window.VID && typeof FxRun !== "undefined"', null, { timeout: 240000 });
   await pg.evaluate(() => VID.init());
-  await pg.waitForTimeout(1500);                       // текстуры
+  await pg.waitForTimeout(2500);                       // текстуры
+  if (process.env.VID_DEBUG) console.log(await pg.evaluate(() => JSON.stringify({ cw: cv.width, ch: cv.height, cs: [cv.clientWidth, cv.clientHeight],
+    st: [stage.clientWidth, stage.clientHeight], vp: renderer.getViewport(new THREE.Vector4()).toArray(), ar: cam.aspect })));
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(job.fps), '-c:v', 'mjpeg', '-i', '-',
     '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', String(job.crf || 20), '-pix_fmt', 'yuv420p', '-r', String(job.fps),
     '-movflags', '+faststart', job.out], { stdio: ['pipe', 'inherit', 'inherit'] });

@@ -73,6 +73,7 @@ public final class Bosses {
         ru.pohsmp.core.boss.irina.Irina.register();       // T27
         ru.pohsmp.core.boss.aris.Aris.register();   // T28
         ru.pohsmp.core.boss.martin.Martin.register();     // T29
+        ru.pohsmp.core.boss.ereb.Ereb.register();         // T30
         ENTITIES.register(modBus);
         ITEMS.register(modBus);
         EFFECTS.register(modBus);
@@ -86,6 +87,7 @@ public final class Bosses {
         ru.pohsmp.core.boss.irina.Irina.events();         // T27
         ru.pohsmp.core.boss.aris.Aris.events();   // T28
         ru.pohsmp.core.boss.martin.Martin.events();       // T29
+        ru.pohsmp.core.boss.ereb.Ereb.events();
         if (FMLEnvironment.dist.isClient()) ru.pohsmp.core.boss.client.BossClient.init(modBus);
     }
 

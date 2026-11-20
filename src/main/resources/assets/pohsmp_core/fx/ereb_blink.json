@@ -1,0 +1,71 @@
+{
+ "comment": "«Танец клинков» / «Шаг сквозь отражение»: стеклянная рябь в точке ухода и в точке выхода (0.4 с). caster = точка (не follow). Танец: на каждом blink слать в старой точке и в новой (4 раза за 4.4 с). Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 8,
+   "shape": "sphere",
+   "radius": 0.9,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.6
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 6,
+   "thickness": 0.06,
+   "pulse": [
+    0.6,
+    2
+   ],
+   "motes": 0,
+   "ring": false,
+   "color": "#E8FAFF",
+   "brightness": 0.6,
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 5,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.45,
+   "speed": 0.05,
+   "gravity": 0.006,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 10,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 4,
+   "size": 0.8,
+   "color": "#FFFFFF",
+   "brightness": 0.7
+  }
+ ]
+}

@@ -1,0 +1,54 @@
+{
+ "comment": "«Клеймо культа» на игроке (caster = игрок, follow, 60 тиков = 3 с, слать всем): клеймо над головой, по земле — кольцо r3 (зона взрыва — союзникам видно, куда не стоять), пульс учащается к 40 тику. На 60 — код: взрыв r3 и cult_brand_explode.",
+ "style": "cult_leader",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.5,0",
+   "follow": true,
+   "id": "cult_brand"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 40,
+   "texture": "cult_fire_ring",
+   "radius": 3.0,
+   "glow": 0.5,
+   "pulse": 12,
+   "color": "@primary"
+  },
+  {
+   "type": "decal",
+   "delay": 40,
+   "at": "caster",
+   "follow": true,
+   "duration": 20,
+   "texture": "cult_fire_ring",
+   "radius": 3.0,
+   "glow": 0.8,
+   "pulse": 4,
+   "color": "@secondary"
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "duration": 60,
+   "target": "caster",
+   "thickness": 0.15,
+   "pulse": [
+    0.3,
+    10
+   ],
+   "color": "@primary",
+   "motes": 8,
+   "ring": false
+  }
+ ]
+}

@@ -166,12 +166,56 @@ def effects():
             glass(16, 'caster+0,2.2,0', 40, rate=10, dur=6, spread=2.0, speed=0.04, gravity=0.02, life=30),
             *([E('tint', 16, 'caster', duration=40, radius=32, color='#101420', strength=0.35, **{'in': ease(6), 'out': ease(20)})] if n == 3 else []),
         ])
+    # ---------------------------------------------------------------- +4 заклинания (владелец 20.11)
+    fx('ereb_blink', '«Танец клинков» / «Шаг сквозь отражение»: стеклянная рябь в точке ухода и в точке выхода (0.4 с). caster = точка '
+       '(не follow). Танец: на каждом blink слать в старой точке и в новой (4 раза за 4.4 с).', 10, [
+        E('wave', 0, 'caster+0,1,0', duration=8, shape='sphere', radius=0.9, rim=1.0, color='@secondary', brightness=0.6),
+        E('aura', 0, 'caster', target='caster', duration=6, thickness=0.06, pulse=[0.6, 2], motes=0, ring=False, color=GLASS_HI,
+          brightness=0.6, **{'in': ease(1), 'out': ease(5)}),
+        glass(0, 'caster+0,1,0', 8, spread=0.45, speed=0.05, gravity=0.006, life=10),
+        E('flash', 0, 'caster+0,1.1,0', duration=4, size=0.8, color=WHITE, brightness=0.7),
+    ])
+    fx('ereb_feint_open', '«Обманная брешь» (1.5 с = 30 тиков, окно open 0.3 … close 1.8 анимации ereb_feint): caster = Эреб, follow. '
+       'Он «открыт», но по силуэту едва заметно бежит стеклянный отблеск — подсказка внимательным, что это ловушка.', 32, [
+        E('aura', 0, 'caster', target='caster', follow=True, duration=30, thickness=0.04, pulse=[0.5, 10], motes=2, texture='mote_glass',
+          ring=False, color=GLASS, brightness=0.35),
+        E('flash', 2, 'caster+0,1.6,0.3', follow=True, duration=5, size=0.35, rays=4, color=GLASS_HI, brightness=0.8, comment='короткий блик на груди'),
+    ])
+    fx('ereb_feint_counter', '«Обманная брешь», контратака (анимация ereb_feint_counter: parry 0.1, hit 0.45): caster = Эреб, target = кто ударил. '
+       'Звон и трещина «зеркала» перед ним на parry, блик на острие на hit (ereb_thrust).', 12, [
+        E('flash', 2, 'caster+0.2,1.6,0.6', duration=6, size=0.8, rays=6, color=GOLD_HI, brightness=1.2),
+        E('sigil', 2, 'caster+0,1.3,0.7', id='illusion_mirror_crack', scale=0.25, until=12),
+        glass(2, 'caster+0.2,1.5,0.7', 8, spread=0.3, speed=0.08, gravity=0.012, life=12),
+    ])
+    fx('ereb_glass_rain_mark', '«Стеклянный дождь», метка (1.2 с = 24 тика): caster = точка на земле (метка; их несколько). Кольцо-рябь r1.3 '
+       'сжимается и пульсирует, над ней в небе (+12) блестит осколок; на 16–24 тике осколки уже видны падающими. Удар — ereb_glass_rain_hit на 24.', 24, [
+        E('wave', 0, 'caster+0,0.05,0', duration=24, shape='ring', radius=1.3, color='@secondary', brightness=0.6),
+        E('wave', 8, 'caster+0,0.05,0', duration=16, shape='ring', radius=1.0, color='@primary', brightness=0.5),
+        E('sprites', 0, 'caster+0,0.1,0', duration=24, texture='mote_glass', count=12, rate=0.5, area=1.1, speed=0.0, gravity=-0.002,
+          size=[0.12, 0.05], life=14, color=GLASS_HI, comment='искры стекла на метке'),
+        E('flash', 0, 'caster+0,12,0', duration=24, size=0.6, rays=4, color=GLASS_HI, brightness=0.8, comment='блик в небе над меткой'),
+        E('sprites', 14, 'caster+0,9,0', duration=8, texture='mote_glass', count=6, rate=1, spread=0.6, speed=0.0, gravity=0.12,
+          spin=200, tumble=True, size=[0.5, 0.4], life=10, color=GLASS_HI, comment='падающие осколки зеркала'),
+    ])
+    fx('ereb_glass_rain_hit', '«Стеклянный дождь», удар осколка (0.6 с): caster = метка. Осколок зеркала разбивается о землю: вспышка, брызги стекла, '
+       'трещины на земле r1.2 (гаснут за 2 с). Урон — код, в радиусе метки.', 40, [
+        E('flash', 0, 'caster+0,0.4,0', duration=6, size=1.6, rays=6, color=WHITE, brightness=1.1),
+        glass(0, 'caster+0,0.3,0', 22, spread=0.9, speed=0.16, gravity=0.03, life=18, size=(0.2, 0.06)),
+        E('decal', 0, 'caster', duration=40, texture='higher_cracks', radius=1.2, grow=4, glow=0.4, fadeOut=30, color=GLASS, brightness=0.8),
+        E('wave', 0, 'caster+0,0.05,0', duration=10, shape='ring', radius=2.0, color='@secondary', brightness=0.5),
+    ])
+    fx('ereb_mirror_step_warn', '«Шаг сквозь отражение», предупреждение (0.6 с = 12 тиков): caster = игрок, за спиной которого он появится. '
+       'Блик стекла за спиной — как у «Ложного союзника», короче. Через 12 тиков — ereb_blink в точке выхода + анимация ereb_mirror_step_in.', 12, [
+        E('flash', 0, 'caster+0,1.45,-0.9', follow=True, duration=7, size=0.9, anamorphic=1.8, rays=4, color=GLASS_HI, brightness=1.3),
+        E('wave', 0, 'caster+0,1.45,-0.9', follow=True, duration=8, shape='sphere', radius=0.55, rim=1.0, color='@secondary', brightness=0.6),
+        glass(1, 'caster+0,1.45,-0.9', 3, spread=0.25, speed=0.03, gravity=0.004, life=10),
+    ])
     # ---------------------------------------------------------------- финал: «Сон бабочки» и исчезновение
     fx('ereb_finale', 'Финал (6.5 с = 130 тиков = анимация ereb_finale; при 5% ХП). caster = Эреб (не follow: он стоит). '
        '0.3 с (smile) — код меняет текстуру на ereb_smile; 1.4 с (butterfly, тик 28) — из ладони вырастает стеклянная бабочка '
        '(модель illusion_butterfly T22, ×0.24), трепещет у ладони; 3.2 с (cast, тик 64) — он поднимает её, она вспархивает со вспышкой: '
        'код начинает «Сон бабочки» (ButterflyDreamSpell) с caster = ТОЧКА Эреба (не сущность — он исчезнет); '
-       '2.4 с (speak, тик 48) — фраза «В любом случае, от вас мне больше нет пользы» (ui…ereb.vanish_line: чат r48 + субтитр); 5.0 с (vanish, тик 100) — Эреб рассыпается бабочками (fx ereb_butterfly_dissolve — уже внутри этого fx; модель спрятать на 104).',
+       '2.4 с (speak, тик 48) — фраза «В любом случае, от вас мне больше нет пользы» (ui…ereb.farewell: чат r48 + субтитр); 5.0 с (vanish, тик 100) — Эреб рассыпается бабочками (fx ereb_butterfly_dissolve — уже внутри этого fx; модель спрятать на 104).',
        T_FINALE + 10, [
         E('flash', 26, PALM, duration=10, size=0.6, color=GLASS_HI, brightness=0.9, comment='свет в ладони'),
         glass(26, PALM, 8, rate=4, dur=2, spread=0.15, speed=-0.02, gravity=0.0, life=6, comment='осколки складываются в бабочку'),
@@ -424,14 +468,61 @@ LANG = {
     'ui.pohsmp_core.ereb.labyrinth': ('Зеркальный лабиринт', 'The Mirror Labyrinth'),
     'ui.pohsmp_core.ereb.betrayal_hint': ('Союзники выглядят как Эреб — присмотрись к отблеску стекла.',
                                           'Your allies look like Ereb — watch for the glint of glass.'),
+    'ui.pohsmp_core.ereb.blade_dance': ('«Танец клинков»', '"Dance of Blades"'),
+    'ui.pohsmp_core.ereb.feint': ('«Обманная брешь»', '"False Opening"'),
+    'ui.pohsmp_core.ereb.feint_counter': ('Эреб парирует — это была ловушка!', 'Ereb parries — it was a trap!'),
+    'ui.pohsmp_core.ereb.glass_rain': ('«Стеклянный дождь» — уходите с меток!', '"Glass Rain" — get off the marks!'),
+    'ui.pohsmp_core.ereb.mirror_step': ('«Шаг сквозь отражение»', '"Step Through the Reflection"'),
     'ui.pohsmp_core.ereb.finale': ('Эреб улыбается…', 'Ereb smiles…'),
     'ui.pohsmp_core.ereb.butterfly': ('Сон бабочки', 'The Butterfly Dream'),
     'ui.pohsmp_core.ereb.vanish': ('Эреб исчез. Бой окончен.', 'Ereb has vanished. The battle is over.'),
-    'ui.pohsmp_core.ereb.vanish_line': ('В любом случае, от вас мне больше нет пользы.', 'Either way, you are of no further use to me.'),
+    'ui.pohsmp_core.ereb.farewell': ('В любом случае, от вас мне больше нет пользы.', 'Either way, you are of no further use to me.'),
 }
 
 
+def S_(name, pitch, volume):
+    return {'name': name, 'type': 'event', 'pitch': pitch, 'volume': volume}
+
+
+SOUNDS = {   # ванильные стекло и аметист с другим pitch (владелец 20.11: «стекло/аметист с pitch»); по 2–3 вариации
+    'ereb.glint': [S_('minecraft:block.amethyst_block.chime', 1.9, 0.9), S_('minecraft:block.amethyst_block.chime', 2.0, 0.8)],
+    'ereb.vanish': [S_('minecraft:block.glass.break', 1.5, 0.6), S_('minecraft:block.amethyst_cluster.break', 1.3, 0.8)],
+    'ereb.appear': [S_('minecraft:block.amethyst_cluster.place', 0.8, 0.9), S_('minecraft:block.amethyst_block.resonate', 1.4, 0.8)],
+    'ereb.shards': [S_('minecraft:block.glass.break', 1.8, 0.5), S_('minecraft:block.amethyst_cluster.hit', 1.6, 0.9),
+                    S_('minecraft:block.amethyst_cluster.hit', 1.9, 0.8)],
+    'ereb.thrust': [S_('minecraft:entity.player.attack.sweep', 1.7, 0.6), S_('minecraft:entity.player.attack.sweep', 1.9, 0.55)],
+    'ereb.parry': [S_('minecraft:block.anvil.place', 2.0, 0.25), S_('minecraft:block.amethyst_block.hit', 1.8, 0.8)],
+    'ereb.cast': [S_('minecraft:block.amethyst_block.chime', 1.4, 1.0), S_('minecraft:block.amethyst_block.chime', 1.6, 0.9)],
+    'ereb.disguise': [S_('minecraft:entity.illusioner.mirror_move', 1.1, 0.8), S_('minecraft:entity.illusioner.mirror_move', 0.95, 0.8)],
+    'ereb.phase': [S_('minecraft:block.glass.break', 0.6, 1.0), S_('minecraft:block.amethyst_block.resonate', 0.7, 1.0)],
+    'ereb.spawn': [S_('minecraft:block.amethyst_block.resonate', 0.6, 1.2), S_('minecraft:entity.illusioner.prepare_mirror', 0.8, 1.0)],
+    'ereb.butterfly': [S_('minecraft:block.amethyst_block.chime', 2.0, 0.7), S_('minecraft:block.amethyst_block.chime', 1.75, 0.7)],
+    'ereb.rain': [S_('minecraft:block.glass.break', 1.1, 1.0), S_('minecraft:block.glass.break', 0.9, 1.0), S_('minecraft:block.amethyst_cluster.break', 0.7, 1.0)],
+    'ereb.dissolve': [S_('minecraft:block.amethyst_cluster.break', 0.9, 1.0), S_('minecraft:block.glass.break', 0.8, 0.8)],
+}
+SUB = {'glint': ('Звенит стекло', 'Glass chimes'), 'vanish': ('Эреб исчезает', 'Ereb vanishes'), 'appear': ('Эреб появляется', 'Ereb appears'),
+       'shards': ('Стеклянные осколки', 'Glass shards'), 'thrust': ('Укол рапирой', 'Rapier thrust'), 'parry': ('Звон клинка', 'Blade rings'),
+       'cast': ('Эреб колдует', 'Ereb casts'), 'disguise': ('Облик меняется', 'A face changes'), 'phase': ('Стекло трескается', 'Glass cracks'),
+       'spawn': ('Слетаются бабочки', 'Butterflies gather'), 'butterfly': ('Стеклянная бабочка', 'Glass butterfly'),
+       'rain': ('Падают осколки зеркал', 'Mirror shards fall'),
+       'dissolve': ('Эреб рассыпается бабочками', 'Ereb scatters into butterflies')}
+
+
+def sounds():
+    p = os.path.join(M.A, 'sounds.json')
+    d = json.load(open(p, encoding='utf-8'))
+    for k, v in SOUNDS.items():
+        d[k] = {'subtitle': 'subtitles.pohsmp_core.' + k, 'sounds': v}
+    with open(p, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(d, f, ensure_ascii=False, indent=2)
+        f.write('\n')
+    M.WRITTEN.append('sounds.json (+%d событий)' % len(SOUNDS))
+
+
 def lang():
+    for k, v in SUB.items():
+        LANG['subtitles.pohsmp_core.ereb.' + k] = v
+
     for i, name in enumerate(('ru_ru', 'en_us')):
         p = os.path.join(M.A, 'lang', name + '.json')
         d = json.load(open(p, encoding='utf-8'))
@@ -493,7 +584,7 @@ def sheet_textures():
     img = Image.new('RGBA', (Wd, Hd), M.hx('#16151b'))
     d = ImageDraw.Draw(img)
     f1, f2 = font(24), font(18)
-    d.text((24, 14), 'T30 — текстуры Эреба 128×128 (1 тексель = 1/16 блока, ×5) и скин владельца', font=f1, fill=(240, 230, 210))
+    d.text((24, 14), 'T30 — текстуры Эреба ×4, как у эталона (атлас 128 → 512) и скин владельца', font=f1, fill=(240, 230, 210))
     T_ = os.path.join(M.A, 'textures', 'entity', 'ereb')
     for i, nm in enumerate(('ereb', 'ereb_smile', 'ereb_glowmask')):
         t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA')
@@ -503,7 +594,7 @@ def sheet_textures():
         d.text((24 + i * 500, 546), nm + '.png', font=f2, fill=(220, 210, 195))
     # лица крупно
     for i, nm in enumerate(('ereb', 'ereb_smile')):
-        t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA').crop((8, 8, 16, 16)).resize((160, 160), Image.NEAREST)
+        t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA').crop((32, 32, 64, 64)).resize((160, 160), Image.NEAREST)
         img.alpha_composite(t, (24 + i * 180, 590))
     d.text((24, 760), 'лицо: обычное / улыбка (финал)', font=f2, fill=(220, 210, 195))
     ref = Image.open(os.path.join(ROOT, 'docs', 'references', 't30', 'ereb_front.jpg')).convert('RGBA')
@@ -526,6 +617,7 @@ def run(mod, args):
     bars = bossbars()
     titles(bars)
     lang()
+    sounds()
     os.makedirs(MEDIA, exist_ok=True)
     sheet_ui(bars)
     sheet_textures()

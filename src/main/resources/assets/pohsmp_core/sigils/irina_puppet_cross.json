@@ -1,0 +1,39 @@
+{
+ "comment": "T27 «Марионетка»: крестовина над головой игрока-марионетки (нити свисают к нему, к Ирине — нет).",
+ "size": 0.5,
+ "color": "#C0201C",
+ "orientation": "facing",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "cross",
+   "type": "disc",
+   "texture": "irina_puppet_cross",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeOutBack",
+    "modes": [
+     "unfold",
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 10
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "collapse",
+   "fade"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

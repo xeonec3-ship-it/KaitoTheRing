@@ -150,3 +150,31 @@
 - позы с косой: в превью коса — условный силуэт, в игре её рисует Iron's;
 - плащ при беге (может пересекать ноги — тогда качать кость `cape`);
 - пульс полосы фазы 2.
+
+## 7. «+4 заклинания» (дополнение 20.11; генератор `tools/gen_cult_leader_spells4.py`)
+Обычные приёмы без ролика, у каждого видимое предупреждение, лучей к цели нет. Имя, облик души, цвета косы — не трогал.
+Отдельный запуск — `python3 tools/gen_cult_leader_spells4.py`. Он дописывает только эти анимации, fx, печать, иконку и lang.
+При полной перегенерации (`tools/gen_cult_leader.py`) скрипт вызывается сам.
+
+**Анимации** (в `animations/entity/cult_leader.animation.json`, события — ключи `timeline`):
+| имя | длина | события (с) | что делать коду |
+|---|---|---|---|
+| `cult_leader_sickle_throw` | 2.2 | `warn` 0, **`throw` 1.0**, **`catch` 1.8** | 0 — fx `cult_sickle_warn` (дуга 1 с). На `throw` скрыть косу в руке и пустить сущность-косу (рисовать предмет **`cult_scythe`**, вращение ~40°/тик) по петле из письма + fx `cult_sickle_spin` (follow) до возврата. На `catch` вернуть косу в руку, `Fx.stop` следа, fx `cult_sickle_catch` |
+| `cult_leader_ash_trail_dash` | 1.4 | `warn` 0, **`dash` 0.5**, `stop` 0.9 | 0 — fx `cult_ash_trail_warn` (линия 12 бл., 0.5 с). На `dash` — рывок 12 бл. за 0.4 с (сквозь игроков) + `cult_ash_trail_dash` (follow) и `cult_ash_trail` в точке начала (yaw тот же; 4 с полоса, урон в ней — код, ширина ~1.6). Другая длина рывка — `.scale(dist/12)` |
+| `cult_leader_brand` | 1.2 | **`brand` 0.55** | на `brand` — эффект `pohsmp_core:cult_brand` (иконка `mob_effect/cult_brand.png`) и fx `cult_brand` на игроке (follow, всем). Через 60 тиков — урон r3 + `cult_brand_explode`; меченому — `brand_warn` |
+| `cult_leader_pillars` | 2.3 | **`mark` 0.3**, **`erupt` 1.8** | на `mark` — 5 точек вокруг игроков, в каждой `cult_pillar_warn` (круг r1.6, 1.5 с). На `erupt` — `cult_pillar` в тех же точках (столб r1.4 × 9), урон |
+
+**Путь «Огненного серпа»** — в осях взгляда босса в момент броска, s = 0…1 за ~0.8 с:
+z = 6·(1 − cos 2πs) (вперёд, до 12 бл.), x = 4·sin 2πs (вправо на пути туда, влево на обратном).
+Дуга-предупреждение `cult_sickle_warn` нарисована по этой же кривой.
+
+**fx** (стиль `cult_leader`): `cult_sickle_warn` 26, `cult_sickle_spin` −1, `cult_sickle_catch` 8, `cult_ash_trail_warn` 12,
+`cult_ash_trail` 80, `cult_ash_trail_dash` 10, `cult_brand` 60, `cult_brand_explode` 24, `cult_pillar_warn` 30, `cult_pillar` 30.
+Печать `sigils/cult_brand` (над головой меченого).
+
+**lang:**
+- названия приёмов: `ui.pohsmp_core.cult_leader.sickle`, `ash_trail`, `brand`, `pillars`;
+- предупреждение меченому: `ui.pohsmp_core.cult_leader.brand_warn`;
+- статус: `effect.pohsmp_core.cult_brand` и `.description`.
+
+Кадры поз — `docs/media/t26_spells4_anims.jpg`.

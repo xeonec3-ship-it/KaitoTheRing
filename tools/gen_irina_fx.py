@@ -259,7 +259,41 @@ def tex_motes():
         save_mask(im, name, size=128)
 
 
+def tex_extra():
+    """+4 заклинания: узел-ловушка (видимый на земле), око с нитью («Ревнивый взгляд»), крестовина марионетки."""
+    S = 1024
+    im = Image.new('L', (S, S), 0)
+    d = ImageDraw.Draw(im)
+    thread_line(d, loop_ring(512, 512, 330, 7, 90), 26)                  # узел: петли, туго стянутые к центру
+    thread_line(d, loop_ring(512, 512, 200, 5, 70, phase=0.6), 20)
+    d.ellipse([452, 452, 572, 572], fill=255)
+    for a in range(6):                                                   # хвосты-«щупальца» узла
+        b = a * math.pi / 3 + 0.3
+        pts = [(512 + (420 + t * 6) * math.cos(b + 0.15 * math.sin(t / 3)), 512 + (420 + t * 6) * math.sin(b + 0.15 * math.sin(t / 3)))
+               for t in range(0, 12)]
+        thread_line(d, pts, 14)
+    save_mask(im, 'irina_knot_trap')
+    im = Image.new('L', (S, S), 0)
+    d = ImageDraw.Draw(im)
+    eye = [(512 + 300 * math.cos(t), 512 - 150 * math.sin(t)) for t in np.linspace(0, math.pi, 50)] + \
+          [(512 + 300 * math.cos(t), 512 + 150 * math.sin(t)) for t in np.linspace(math.pi, 2 * math.pi, 50)]
+    d.line(eye + [eye[0]], fill=255, width=34, joint='curve')
+    d.ellipse([412, 412, 612, 612], fill=255)
+    d.ellipse([480, 440, 544, 584], fill=0)
+    pts = [(200 + t * 6, 760 + 40 * math.sin(t / 10)) for t in range(0, 105)]
+    thread_line(d, pts, 16)
+    save_mask(im, 'irina_gaze_eye')
+    im = Image.new('L', (S, S), 0)
+    d = ImageDraw.Draw(im)
+    d.rectangle([200, 470, 824, 554], fill=255)                          # крестовина марионетки
+    d.rectangle([470, 230, 554, 794], fill=255)
+    for (x, y) in ((212, 554), (812, 554), (512, 794), (512, 554)):
+        thread_line(d, [(x, y), (x + 6, y + 120), (x - 4, y + 200)], 12)
+    save_mask(im, 'irina_puppet_cross')
+
+
 def textures():
+    tex_extra()
     tex_mark()
     tex_knots()
     tex_thread_ring()
@@ -280,7 +314,23 @@ def sigil(id, comment, size, color, orientation, layers, hold=-1, flash=None, di
     write('sigils/%s.json' % id, o)
 
 
+def sigils_extra():
+    sigil('irina_knot_trap', 'T27 «Узлы»: нитяной узел-ловушка на земле (r 0.9), ВИДЕН всем; пульсирует; наступил — опутан (код).',
+          0.9, RED, 'ground', [
+              L('glow', 'disc', 'glow', 1.3, -0.01, ap(0, 10, 'fade'), color=RED_DD, br=0.5, pulse=(0.3, 24)),
+              L('knot', 'disc', 'irina_knot_trap', 1.0, 0.0, ap(0, 16, 'draw', startAngle=90), rot=0.8, br=1.1, pulse=(0.15, 24)),
+          ], dissolve=('shatter', 'fade'), ddur=10)
+    sigil('irina_gaze_eye', 'T27 «Ревнивый взгляд»: око с нитью над головой смотревшего (метка-нить, замедление).', 0.36, RED, 'ground', [
+        L('eye', 'disc', 'irina_gaze_eye', 1.0, 0.0, ap(0, 8, 'grow', 'fade', easing='easeOutBack'), rot=1.0, br=1.1, pulse=(0.2, 14)),
+    ], dissolve=('fade',), ddur=8)
+    sigil('irina_puppet_cross', 'T27 «Марионетка»: крестовина над головой игрока-марионетки (нити свисают к нему, к Ирине — нет).',
+          0.5, RED, 'facing', [
+              L('cross', 'disc', 'irina_puppet_cross', 1.0, 0.0, ap(0, 10, 'unfold', 'fade', easing='easeOutBack'), br=1.1, pulse=(0.12, 10)),
+          ], dissolve=('collapse', 'fade'), ddur=8)
+
+
 def sigils():
+    sigils_extra()
     sigil('irina_mark', 'T27 «Предмет ревности»: метка над головой меченого игрока — сердце, перемотанное нитью, с оком; медленно кружит, '
                         'пульсирует как сердцебиение. Лежит над головой (ground), видна всем.', 0.5, RED, 'ground', [
         L('glow', 'disc', 'glow', 1.5, -0.01, ap(0, 10, 'fade'), color=RED_D, br=0.5, pulse=(0.3, 16)),
@@ -485,6 +535,53 @@ def effects():
         E('flash', 104, 'caster+0,1.8,0', duration=14, size=4.5, rays=12, screen=0.3, ring=True, color=HAPPY),
         E('wave', 104, 'caster+0,0.2,0', duration=20, shape='ring', radius=10, thickness=0.6, color='@primary'),
     ])
+    # ---- +4 заклинания (владелец 20.11)
+    fx('irina_gaze_cast', '«Ревнивый взгляд» — у Ирины (caster = Ирина, 24 тика; анимация irina_gaze, событие gaze 0.5 с): из тьмы капюшона '
+                          'вспыхивают два красных огонька, по полям шляпы бежит нить. Метку смотревшим ставит код (кто смотрел на неё > 2 с).', 24, [
+        E('flash', 8, 'caster+0,2.1,-0.3', duration=10, size=0.7, color='@primary'),
+        orbit_threads('caster+0,2.3,0', 0, 24, 1.3, 2, 16, rise=0.1, period=10, width=0.05, length=10),
+    ])
+    fx('irina_gaze_mark', '«Ревнивый взгляд» — метка-нить на смотревшем (caster = игрок, follow, 80 тиков = 4 с замедления): око над головой, '
+                          'нить обвивает ноги (низкая орбита). Без линии к Ирине.', 80, [
+        E('sigil', 0, 'caster+0,2.3,0', follow=True, id='irina_gaze_eye'),
+        orbit_threads('caster+0,0.3,0', 0, 80, 0.55, 2, 10, rise=0.15, period=20, width=0.05, length=12),
+    ])
+    fx('irina_knots_cast', '«Узлы» — у Ирины (caster = Ирина, 30 тиков; анимация irina_knots, событие knots 0.9 с): нити уходят в землю '
+                           'волной r8. Узлы ставит код в 4–6 точках (fx irina_knot_trap в каждой).', 30, [
+        E('wave', 14, 'caster+0,0.05,0', duration=16, shape='ring', radius=8, thickness=0.3, followTerrain=True, color='@primary'),
+        E('sprites', 14, 'caster+0,0.2,0', duration=6, texture='mote_thread', count=24, rate=5, area=3, speed=0.02, gravity=0.01, spin=20,
+          size=[0.24, 0.06], life=16, color='@primary'),
+    ])
+    fx('irina_knot_trap', '«Узлы» — ловушка (caster = точка на земле, −1 до Fx.stop; срабатывание или конец — код). Узел на земле ВИДЕН, '
+                          'пульсирует, над ним колышутся хвосты нитей.', -1, [
+        E('sigil', 0, 'caster+0,0.04,0', id='irina_knot_trap'),
+        orbit_threads('caster+0,0.15,0', 0, -1, 0.45, 3, 6, rise=0.15, period=24, width=0.04, length=8),
+    ])
+    fx('irina_knot_snare', '«Узлы» — наступил: опутан 2 с (caster = игрок, follow, 40 тиков). Узел захлопывается, нити обвивают ноги и корпус.', 40, [
+        E('flash', 0, 'caster+0,0.3,0', duration=6, size=1.0, color='@primary'),
+        orbit_threads('caster+0,0.3,0', 0, 40, 0.5, 4, 22, rise=0.5, period=10, width=0.06, length=10, climb=0.4),
+        E('aura', 0, 'caster', duration=40, target='caster', thickness=0.12, pulse=[0.3, 8], color='@primary', motes=8, follow=True),
+    ])
+    fx('irina_swap', '«Подмена любимого» — у КАЖДОГО из двух игроков (caster = игрок в точке ДО обмена, 20 тиков; второй вызов — после, '
+                     'в новой точке): рябь нитей, вспышка. Обмен местами — код; без линии между ними.', 20, [
+        E('wave', 0, 'caster+0,1,0', duration=10, shape='sphere', radius=1.2, reverse=True, rim=1.0, color='@primary'),
+        orbit_threads('caster', 0, 14, 0.7, 3, 28, rise=0.9, period=8, width=0.05, length=8),
+        E('flash', 8, 'caster+0,1,0', duration=10, size=1.4, ring=True, color='@core'),
+        E('wave', 10, 'caster+0,0.1,0', duration=12, shape='ring', radius=2.2, thickness=0.2, texture='irina_thread_ring', color='@primary'),
+    ])
+    fx('irina_puppet', '«Марионетка» — на игроке (caster = игрок, follow, 60 тиков = 3 с или до Fx.stop при уроне по боссу): '
+                       'крестовина над головой, нити обвивают тело на трёх высотах. Нитей к Ирине НЕТ — шаги к ней делает код.', 60, [
+        E('sigil', 0, 'caster+0,2.6,0', follow=True, id='irina_puppet_cross'),
+        orbit_threads('caster+0,0.4,0', 0, 60, 0.5, 2, 14, rise=0.1, period=14, width=0.05, length=10),
+        orbit_threads('caster+0,1.0,0', 0, 60, 0.45, 2, -16, rise=0.1, period=12, width=0.05, length=10),
+        orbit_threads('caster+0,1.5,0', 0, 60, 0.4, 2, 18, rise=0.1, period=10, width=0.05, length=10),
+    ])
+    fx('irina_puppet_break', '«Марионетка» снята (урон по боссу / конец; caster = игрок, 16 тиков): нити лопаются, крестовина рассыпается.', 16, [
+        E('flash', 0, 'caster+0,1.2,0', duration=8, size=1.4, color='@core'),
+        E('sprites', 0, 'caster+0,1.2,0', duration=4, texture='mote_thread', count=24, rate=8, spread=0.4, speed=0.2, gravity=0.02, spin=30,
+          size=[0.26, 0.06], life=16, color='@primary'),
+    ])
+
     # ---- переходы фаз, появление, смерть, добивание
     fx('irina_phase2', 'Переход в фазу 2 (66%, caster = Ирина, 50 тиков = анимация irina_phase2 2.5 с; если «Чужое счастье» не играет): '
                        'шляпа надвинута — знак под ней; 1.45 с (`burst`) нити разлетаются кольцом r12.', 50, [
@@ -784,7 +881,29 @@ def icons():
         for k in range(3):
             y = S * (0.3 + 0.2 * k)
             d.line([S * 0.18, y + S * 0.12, S * 0.82, y - S * 0.12], fill=_c(RED), width=int(S * 0.07))
-    for name, fn in (('irina_jealousy_mark', mark), ('irina_thread_bond', bond), ('irina_stolen_happiness', stolen)):
+    def gaze(d, S):
+        d.ellipse([S * 0.05, S * 0.05, S * 0.95, S * 0.95], fill=_c('#24102E'), outline=_c(LIL), width=int(S * 0.07))
+        d.ellipse([S * 0.18, S * 0.36, S * 0.82, S * 0.64], fill=_c('#E8D8F0'))
+        d.ellipse([S * 0.4, S * 0.36, S * 0.6, S * 0.64], fill=_c(RED))
+        d.line([S * 0.15, S * 0.78, S * 0.85, S * 0.72], fill=_c(RED), width=int(S * 0.06))
+
+    def snared(d, S):
+        d.ellipse([S * 0.05, S * 0.05, S * 0.95, S * 0.95], fill=_c('#24102E'), outline=_c(LIL), width=int(S * 0.07))
+        for k in range(3):
+            y = S * (0.32 + 0.18 * k)
+            d.arc([S * 0.2, y - S * 0.1, S * 0.8, y + S * 0.1], 0, 360, fill=_c(RED), width=int(S * 0.07))
+        d.ellipse([S * 0.42, S * 0.42, S * 0.58, S * 0.58], fill=_c(RED))
+
+    def puppet_ic(d, S):
+        d.ellipse([S * 0.05, S * 0.05, S * 0.95, S * 0.95], fill=_c('#24102E'), outline=_c(LIL), width=int(S * 0.07))
+        d.rectangle([S * 0.22, S * 0.24, S * 0.78, S * 0.32], fill=_c('#C8B0E6'))
+        d.rectangle([S * 0.46, S * 0.16, S * 0.54, S * 0.44], fill=_c('#C8B0E6'))
+        for x in (0.26, 0.5, 0.74):
+            d.line([S * x, S * 0.32, S * x, S * 0.62], fill=_c(RED), width=int(S * 0.05))
+        d.ellipse([S * 0.42, S * 0.58, S * 0.58, S * 0.72], fill=_c('#E8D8F0'))
+        d.line([S * 0.5, S * 0.72, S * 0.5, S * 0.84], fill=_c('#E8D8F0'), width=int(S * 0.06))
+    for name, fn in (('irina_jealousy_mark', mark), ('irina_thread_bond', bond), ('irina_stolen_happiness', stolen),
+                     ('irina_jealous_gaze', gaze), ('irina_snared', snared), ('irina_puppet', puppet_ic)):
         F._icon(18, fn, 'textures/mob_effect/%s.png' % name, k=8, crisp=True)
         WRITTEN.append('textures/mob_effect/%s.png' % name)
 
@@ -823,6 +942,30 @@ LANG = {
                                                    'Damage is shared with your partner; beyond 12 blocks the thread snaps and hurts you both.'),
     'effect.pohsmp_core.stolen_happiness': ('Украденное счастье', 'Stolen Happiness'),
     'effect.pohsmp_core.stolen_happiness.description': ('Ирина забрала ваши полезные эффекты себе.', 'Irina took your beneficial effects for herself.'),
+    'ui.pohsmp_core.irina.gaze': ('Не смотрите на неё — ревнивый взгляд замедляет!', 'Don\'t stare at her — the jealous gaze slows you!'),
+    'ui.pohsmp_core.irina.knots_warn': ('На земле узлы из нитей — не наступайте!', 'Thread knots on the ground — don\'t step on them!'),
+    'ui.pohsmp_core.irina.snared': ('Вы опутаны нитями!', 'You are snared by threads!'),
+    'ui.pohsmp_core.irina.swap': ('Подмена любимого: вы поменялись местами с %s', 'Beloved\'s Switch: you swapped places with %s'),
+    'ui.pohsmp_core.irina.puppet': ('%s — марионетка Ирины! Бейте её, чтобы оборвать нити', '%s is Irina\'s puppet! Hit her to cut the strings'),
+    'ui.pohsmp_core.irina.puppet_self': ('Вы — марионетка: ноги сами несут вас к Ирине…', 'You are a puppet: your feet carry you to Irina…'),
+    'ui.pohsmp_core.irina.puppet_break': ('Нити марионетки оборваны', 'The puppet strings are cut'),
+    'ui.pohsmp_core.irina.spell.gaze': ('Ревнивый взгляд', 'Jealous Gaze'),
+    'ui.pohsmp_core.irina.spell.knots': ('Узлы', 'Knots'),
+    'ui.pohsmp_core.irina.spell.swap': ('Подмена любимого', 'Beloved\'s Switch'),
+    'ui.pohsmp_core.irina.spell.puppet': ('Марионетка', 'Marionette'),
+    'effect.pohsmp_core.jealous_gaze': ('Ревнивый взгляд', 'Jealous Gaze'),
+    'effect.pohsmp_core.jealous_gaze.description': ('Вы смотрели на Ирину слишком долго: нить на ногах замедляет вас.',
+                                                    'You stared at Irina too long: a thread on your legs slows you.'),
+    'effect.pohsmp_core.thread_snare': ('Опутан', 'Snared'),
+    'effect.pohsmp_core.thread_snare.description': ('Узел из нитей держит вас на месте.', 'A thread knot holds you in place.'),
+    'effect.pohsmp_core.marionette': ('Марионетка', 'Marionette'),
+    'effect.pohsmp_core.marionette.description': ('Вы не управляете собой и идёте к Ирине; урон по ней обрывает нити.',
+                                                  'You lose control and walk toward Irina; damaging her cuts the strings.'),
+    'subtitles.pohsmp_core.irina.gaze': ('Ревнивый взгляд', 'Jealous gaze'),
+    'subtitles.pohsmp_core.irina.knots': ('Нити уходят в землю', 'Threads sink into the ground'),
+    'subtitles.pohsmp_core.irina.snare': ('Узел затягивается', 'Knot tightens'),
+    'subtitles.pohsmp_core.irina.swap': ('Подмена', 'Switch'),
+    'subtitles.pohsmp_core.irina.puppet': ('Нити марионетки', 'Puppet strings'),
     'death.attack.pohsmp_core.irina_finisher': ('%1$s теперь только её — Ирины, Ведьмы Ревности', '%1$s now belongs to Irina, Witch of Jealousy alone'),
     'death.attack.pohsmp_core.irina_threads': ('%1$s разорван красными нитями', '%1$s was torn apart by red threads'),
     'death.attack.pohsmp_core.irina_cocoon': ('%1$s задушен коконом ревности', '%1$s was smothered in a cocoon of jealousy'),
@@ -868,6 +1011,11 @@ SOUNDS = {
     'irina.phase': [S_('irons_spellbooks:void_tentacles_start', pitch=1.3)],
     'irina.finisher': [S_('irons_spellbooks:skewer', pitch=1.1)],
     'irina.staff': [S_('irons_spellbooks:shadow_slash', pitch=1.2)],
+    'irina.gaze': [S_('irons_spellbooks:planar_sight_cast', pitch=1.3)],
+    'irina.knots': [S_('irons_spellbooks:root_start', pitch=1.3)],
+    'irina.snare': [S_('irons_spellbooks:root_emerge', pitch=1.4)],
+    'irina.swap': [S_('irons_spellbooks:abyssal_teleport', pitch=1.3)],
+    'irina.puppet': [S_('irons_spellbooks:charge_chains', pitch=1.6)],
 }
 
 
@@ -923,7 +1071,7 @@ def _paste(bg, im, xy):
 
 
 def sheet_fx():
-    W, H = 1800, 1000
+    W, H = 1800, 1440
     bg = Image.new('RGBA', (W, H), _c('#120C18'))
     d = ImageDraw.Draw(bg)
     cells = [('irina_mark', RED, 'Предмет ревности', 'метка над головой (fx irina_mark)'),
@@ -933,12 +1081,19 @@ def sheet_fx():
              ('irina_thread_ring', RED, 'Кольцо петель', 'под ногами: метка, пара, кокон'),
              ('irina_emblem', LIL_L, 'Знак 2 Ячейки', 'появление, фазы'),
              ('mote_thread', RED, 'Частицы', 'mote_thread / mote_heart / mote_glee')]
+    extra = [('irina_knot_trap', RED, '«Узлы»', 'ловушка на земле'), ('irina_gaze_eye', RED, '«Ревнивый взгляд»', 'метка над головой'),
+             ('irina_puppet_cross', RED, '«Марионетка»', 'крестовина над игроком')]
     for i, (n, c, lab, sub) in enumerate(cells):
         x, y = 40 + (i % 5) * 340, 40 + (i // 5) * 470
         _paste(bg, _tint(n, c, 300), (x, y))
         if n == 'mote_thread':
             _paste(bg, _tint('mote_heart', RED, 120), (x + 20, y + 170))
             _paste(bg, _tint('mote_glee', HAPPY, 120), (x + 160, y + 170))
+        d.text((x, y + 320), lab, font=_font(26), fill=_c('#EFE6F6'))
+        d.text((x, y + 356), sub, font=_font(18), fill=_c('#A596B8'))
+    for i, (n, c, lab, sub) in enumerate(extra):
+        x, y = 40 + i * 340, 980
+        _paste(bg, _tint(n, c, 300), (x, y))
         d.text((x, y + 320), lab, font=_font(26), fill=_c('#EFE6F6'))
         d.text((x, y + 356), sub, font=_font(18), fill=_c('#A596B8'))
     x, y = 40 + 4 * 340, 40 + 470
@@ -1007,7 +1162,8 @@ def sheet_ui(bars, threads):
     for i, n in enumerate(('irina_happiness_ru', 'irina_only_mine_ru', 'irina_happiness_en', 'irina_only_mine_en')):
         t = Image.open(os.path.join(A, 'textures', 'gui', 'title', n + '.png')).convert('RGBA').resize((640, 120), Image.LANCZOS)
         bg.alpha_composite(t, (40 + (i % 2) * 660, 690 + (i // 2) * 120))
-    for i, n in enumerate(('irina_jealousy_mark', 'irina_thread_bond', 'irina_stolen_happiness')):
+    for i, n in enumerate(('irina_jealousy_mark', 'irina_thread_bond', 'irina_stolen_happiness', 'irina_jealous_gaze', 'irina_snared',
+                           'irina_puppet')):
         ic = Image.open(os.path.join(A, 'textures', 'mob_effect', n + '.png')).convert('RGBA').resize((72, 72), Image.NEAREST)
         bg.alpha_composite(ic, (1150, 40 + i * 110))
         d.text((1150, 118 + i * 110), n.replace('irina_', ''), font=_font(14), fill=_c('#A596B8'))

@@ -1,0 +1,21 @@
+{
+ "comment": "«Пепельный след»: линия рывка 0.5 с (caster = босс, yaw — направление; длина 12 бл.).",
+ "style": "cult_leader",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0,6",
+   "duration": 12,
+   "shape": "crack",
+   "length": 12,
+   "width": 0.9,
+   "grow": 4,
+   "pulse": 0.6,
+   "yaw": 90,
+   "glow": 0.5,
+   "color": "@primary"
+  }
+ ]
+}

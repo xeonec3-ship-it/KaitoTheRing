@@ -884,5 +884,9 @@
   "subtitles.pohsmp_core.martin.volley": "Призрачные луки звенят",
   "subtitles.pohsmp_core.martin.arrow_hit": "Стрелы вонзаются в землю",
   "subtitles.pohsmp_core.martin.duel": "Брошен вызов на дуэль",
-  "subtitles.pohsmp_core.martin.warcry": "Боевой клич Мартина"
+  "subtitles.pohsmp_core.martin.warcry": "Боевой клич Мартина",
+  "item.pohsmp_core.cult_scythe": "Коса Главы Культа",
+  "entity.pohsmp_core.cult_sickle": "Огненный серп",
+  "ui.pohsmp_core.boss.unknown": "Босс %s ещё не сделан (или неизвестен)",
+  "ui.pohsmp_core.boss.spawned": "Вызван босс: %s"
 }

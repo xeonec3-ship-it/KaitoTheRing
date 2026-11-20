@@ -16,6 +16,9 @@ public interface PohBoss {
         return (Mob) this;
     }
 
+    /** Before the entity is added to the world by /pohsmp boss (positioned, finalizeSpawn done): spawn data for the clients. */
+    default void onBossPreSpawn() {}
+
     /** The intro: called once right after /pohsmp boss spawned it (arena = spawn point). Default: no scene, bar at once. */
     default void onBossIntro() {
         bossCore().startFight();

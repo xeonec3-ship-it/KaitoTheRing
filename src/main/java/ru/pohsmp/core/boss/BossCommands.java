@@ -75,6 +75,7 @@ public final class BossCommands {
         m.setYBodyRot(yaw);
         m.finalizeSpawn(sl, sl.getCurrentDifficultyAt(m.blockPosition()), MobSpawnType.COMMAND, null, null);
         m.setPersistenceRequired();
+        boss.onBossPreSpawn();
         sl.addFreshEntity(m);
         boss.bossCore().begin(sl, pos);
         c.getSource().sendSuccess(() -> Component.translatableWithFallback("ui.pohsmp_core.boss.spawned", "Вызван: %s", m.getDisplayName()), true);

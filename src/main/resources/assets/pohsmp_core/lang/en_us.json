@@ -884,5 +884,9 @@
   "subtitles.pohsmp_core.martin.volley": "Phantom bows twang",
   "subtitles.pohsmp_core.martin.arrow_hit": "Arrows strike the ground",
   "subtitles.pohsmp_core.martin.duel": "A duel is declared",
-  "subtitles.pohsmp_core.martin.warcry": "Martin's war cry"
+  "subtitles.pohsmp_core.martin.warcry": "Martin's war cry",
+  "item.pohsmp_core.cult_scythe": "Scythe of the Cult's Head",
+  "entity.pohsmp_core.cult_sickle": "Fiery Sickle",
+  "ui.pohsmp_core.boss.unknown": "Boss %s is not implemented yet (or unknown)",
+  "ui.pohsmp_core.boss.spawned": "Boss summoned: %s"
 }

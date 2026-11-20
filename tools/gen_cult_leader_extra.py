@@ -47,9 +47,12 @@ def A(length, bones, timeline=None):
 
 Z = [0, 0, 0]
 ONE = [1, 1, 1]
-# «несёт косу» (проверка анимаций 20.11, tools/anim_check.py): правая рука чуть вперёд, кисть повёрнута — древко наискось
-# снизу-сзади вверх-вперёд, лезвие над плечом. Без ключей кисти коса при опущенной руке лежит лезвием в земле.
-CARRY_ARM, CARRY_HAND = [-35, 10, 15], [8.7, -5.5, 96.4]
+# «несёт косу» = поза хвата вне анимаций (проверка анимаций 20.11, tools/anim_check.py): правая рука чуть вперёд, кисть повёрнута —
+# древко наискось снизу-сзади вверх-вперёд, лезвие над плечом, на 4.5 px над землёй, ничего не задевает. Этой же позой начинаются и
+# заканчиваются все анимации Главы; код держит её вне анимаций (письмо 2026-11-20_mgr_anim_check_T26_T30.md). Прежняя поза
+# FireBossModel (рука −30,−30,10 / кисть −5,0,−48 в осях GeckoLib) держит лезвие на 4.2 px в земле. Без ключей кисти коса при
+# опущенной руке лежит лезвием в земле.
+CARRY_ARM, CARRY_HAND = [-25, 10, 15], [0, -5.5, 96]
 IO, OC, IQ = 'easeInOutSine', 'easeOutCubic', 'easeInQuart'
 
 
@@ -152,10 +155,26 @@ def write_anims():
     anim_cloth.explicit(out['animations'], list(ours), ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg',
                                                         'bipedHandRight'))
     anim_cloth.bake('cult_leader', out['animations'])
-    # коса в анимациях Iron's, что играют на боссе (удары FireBoss, касты): не в землю и не сквозь тело/ноги
+    # коса: все анимации, что играют на боссе (наши + удары FireBoss и касты Iron's), начинаются и кончаются в позе хвата; в кадрах,
+    # где лезвие в земле или сквозь тело/ноги, — наименьший доворот кисти (три прохода: следующие добирают плавные переходы прежних)
     import anim_check
-    for _ in range(2):                       # второй проход — добирает кадры на плавных переходах первого
-        anim_cloth.weapon('cult_leader', out['animations'], [n for n in anim_check.PLAYS['cult_leader'] if n in src['animations']])
+    plays = list(ours) + [n for n in anim_check.PLAYS['cult_leader'] if n in src['animations']]
+    # fire_boss_spawn: на 6.42 с коса возникает в руке, влетая из точки сбоку-снизу (21, −6, 0) — лезвие проходило сквозь землю;
+    # влетает сбоку-сверху (10, 10, 0), время то же
+    out['animations']['fire_boss_spawn']['bones']['bipedHandRight']['position']['6.4167']['vector'] = [10, 10, 0]
+    # scythe_dagger_combo_1, удар на 3.1–3.2 с: Iron's опускает руку на 9 px к полу — лезвие уходило в землю на 15 px и сквозь
+    # выставленную правую ногу; рука опускается на 3 px, кисть на время удара приподнята на 8 px (тайминг удара тот же)
+    dc = out['animations']['scythe_dagger_combo_1']['bones']
+    dc['right_arm']['position']['3.125']['vector'] = [2, -3, -7]
+    dc['bipedHandRight']['position'] = {'0.0': {'vector': [0, 0, 0]}, '3.0': {'vector': [0, 0, 0]}, '3.125': {'vector': [0, 8, 0]},
+                                        '3.2': {'vector': [0, 8, 0]}, '3.325': {'vector': [0, 0, 0]}}
+    # cross_arms (руки скрещены на груди): на 0.25–0.3 с древко задевало выставленную ногу и пол — кисть приподнята на 6 px
+    out['animations']['cross_arms']['bones'].setdefault('bipedHandRight', {})['position'] = {
+        '0.0': {'vector': [0, 0, 0]}, '0.15': {'vector': [0, 6, 0]}, '0.45': {'vector': [0, 6, 0]}, '0.6': {'vector': [0, 0, 0]}}
+    anim_cloth.hold_edges(out['animations'], plays, CARRY_ARM, CARRY_HAND)
+    for _ in range(3):
+        # «Первое Пламя»: на plant (0.9–5.2 с) древко нарочно воткнуто в землю подтоком (лезвие вверху) — там землю не считаем
+        anim_cloth.weapon('cult_leader', out['animations'], plays, edge=0, allow_ground={'cult_leader_first_flame': (0.9, 5.2)})
     with open(M.out('animations/entity/cult_leader.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
     return ours

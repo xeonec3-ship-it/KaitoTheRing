@@ -286,7 +286,8 @@ def check(name, only=None, dt=0.1, verbose=False):
                     hit = M.inside(W, bp, ip, margin=0.6)
                     if hit.sum() >= 2:
                         issues.append((t, 'body', '%d точек оружия внутри %s' % (hit.sum(), bp)))
-                if ip[:, 1].min() < -0.5:
+                planted = an_name == 'cult_leader_first_flame' and 0.9 <= t <= 5.2      # подток древка воткнут в землю нарочно
+                if ip[:, 1].min() < -0.5 and not planted:
                     issues.append((t, 'ground', 'оружие ниже земли на %.1f px' % -ip[:, 1].min()))
                 # прокрутка в руке: ориентация предмета относительно кисти не меняется (жёстко), поэтому смотрим скорость оси предмета
                 ax = tip - grip

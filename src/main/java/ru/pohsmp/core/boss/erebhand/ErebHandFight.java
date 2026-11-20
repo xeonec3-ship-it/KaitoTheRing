@@ -75,7 +75,9 @@ public final class ErebHandFight {
     private final Map<UUID, ErebHandShard> shards = new LinkedHashMap<>();
     private final Map<Integer, Integer> shardFx = new HashMap<>();
     private final Map<UUID, Integer> arrows = new HashMap<>();
-    private int maskT = -1, maskLeft;
+    private int maskT = -1, maskLeft, maskCount;
+    /** Each shard keeps its place in the circle when others break. */
+    private final Map<UUID, Integer> shardIndex = new HashMap<>();
     private boolean maskReturnDue;
     // «Чужая клятва»
     private ServerPlayer oathVictim, oathAlly;
@@ -527,7 +529,7 @@ public final class ErebHandFight {
                 e.push(in.normalize().x * push, 0.3, in.normalize().z * push);
                 e.hurtMarked = true;
             }
-            Fx.play(sl, Fx.fx("ereb_hand_oath_reflect").caster(e).at(e.position()));
+            Fx.play(sl, Fx.fx("cult_leader_firewall_burn").style("ereb_hand").caster(e).at(e.position()));
         }
     }
 
@@ -710,6 +712,8 @@ public final class ErebHandFight {
                     core.sound("ereb_hand.mask_shatter", 3, 1);
                     List<ServerPlayer> now = fighters();
                     int n = now.size();
+                    maskCount = n;
+                    shardIndex.clear();
                     for (int i = 0; i < n; i++) {
                         ServerPlayer p = now.get(i);
                         ErebHandShard s = ErebHand.SHARD.get().create(sl);
@@ -720,6 +724,7 @@ public final class ErebHandFight {
                         s.fight = this;
                         sl.addFreshEntity(s);
                         shards.put(p.getUUID(), s);
+                        shardIndex.put(p.getUUID(), i);
                         shardFx.put(s.getId(), Fx.play(sl, Fx.fx("ereb_hand_mask_shard").caster(s).at(at).attach(s)));
                         arrows.put(p.getUUID(), Fx.play(sl, Fx.fx("ereb_hand_mask_arrow").caster(p).at(arrowPos(p)).only(p)));
                         p.displayClientMessage(ui("mask_fall_hint"), true);
@@ -744,10 +749,9 @@ public final class ErebHandFight {
     private void tickMask(ServerLevel sl) {
         if (maskT < 0) return;
         maskT++;
-        int i = 0, n = shards.size();
         for (var en : new ArrayList<>(shards.entrySet())) {
             ErebHandShard s = en.getValue();
-            Vec3 at = shardPos(i++, Math.max(n, 1), maskT);
+            Vec3 at = shardPos(shardIndex.getOrDefault(en.getKey(), 0), Math.max(maskCount, 1), maskT);
             s.moveTo(at.x, at.y, at.z, s.getYRot() + 2, 0);
             Integer ar = arrows.get(en.getKey());
             ServerPlayer p = sl.getServer().getPlayerList().getPlayer(en.getKey());

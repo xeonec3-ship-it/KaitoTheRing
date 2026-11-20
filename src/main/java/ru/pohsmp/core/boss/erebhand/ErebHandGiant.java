@@ -119,6 +119,12 @@ public class ErebHandGiant extends Entity implements GeoEntity {
         return false;
     }
 
+    /** It is drawn ×scale: the frustum must see the whole hand, not its 1-block box. */
+    @Override
+    public net.minecraft.world.phys.AABB getBoundingBoxForCulling() {
+        return getBoundingBox().inflate(2.5 * scale());
+    }
+
     @Override
     public boolean shouldRenderAtSqrDistance(double d) {
         return d < 128 * 128;

@@ -42,6 +42,7 @@ public final class BossClient {
         e.enqueueWork(ru.pohsmp.core.boss.aris.client.ArisClient::setup);   // T28: camera plans, NPC look, steam fog
         e.enqueueWork(ru.pohsmp.core.boss.martin.client.MartinClient::setup);     // T29: camera plans, NPC look, status icons
         e.enqueueWork(ru.pohsmp.core.boss.ereb.client.ErebClient::setup);         // T30: camera plans, «Предательство»
+        e.enqueueWork(ru.pohsmp.core.boss.erebhand.client.ErebHandClient::setup); // T31: camera plans, the false arena
     }
 
     private static void renderers(EntityRenderersEvent.RegisterRenderers e) {
@@ -51,6 +52,7 @@ public final class BossClient {
         ru.pohsmp.core.boss.aris.client.ArisClient.renderers(e);   // T28
         ru.pohsmp.core.boss.martin.client.MartinClient.renderers(e);   // T29
         ru.pohsmp.core.boss.ereb.client.ErebClient.renderers(e);
+        ru.pohsmp.core.boss.erebhand.client.ErebHandClient.renderers(e);   // T31
     }
 
     public static void handle(BossNet.Msg m) {

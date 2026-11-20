@@ -1,0 +1,74 @@
+{
+ "comment": "T31 «Рой лжи», каст (32 тика = ereb_hand_swarm_of_lies 1.6 с): caster = Эреб. 6 (gather) — в сложенной чашей призрачной руке кружат бабочки; 15 (release) — рука раскрывается, вспышка: код выпускает 12 бабочек-снарядов (6 ложных, 6 настоящих). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 32,
+ "elements": [
+  {
+   "type": "vortex",
+   "delay": 6,
+   "at": "caster+0.5,1.9,0.45",
+   "duration": 9,
+   "radius": 0.5,
+   "height": 0.4,
+   "arms": 3,
+   "speed": 16,
+   "pull": 0.4,
+   "texture": "mote_butterfly",
+   "particles": 16,
+   "life": 9,
+   "size": 0.22,
+   "color": "#D9CCFF",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 15,
+   "at": "caster+0.72,2.45,0.6",
+   "duration": 6,
+   "size": 1.4,
+   "rays": 8,
+   "color": "#F4EEFF",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 15,
+   "at": "caster+0.72,2.45,0.6",
+   "duration": 1,
+   "texture": "mote_butterfly",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.4,
+   "speed": 0.12,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 16,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 15,
+   "at": "caster+0.72,2.45,0.6",
+   "duration": 1,
+   "texture": "mote_butterfly_side",
+   "count": 4,
+   "rate": 4.0,
+   "spread": 0.4,
+   "speed": 0.12,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 16,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  }
+ ]
+}

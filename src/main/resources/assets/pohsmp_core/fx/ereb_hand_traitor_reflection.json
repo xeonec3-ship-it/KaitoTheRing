@@ -1,0 +1,45 @@
+{
+ "comment": "T31 «Отражение-предатель», каст (40 тиков = ereb_hand_traitor_reflection 2.0 с): caster = Эреб. 10 (mirror) — блик на «Длани», указывающей на игрока (зеркало у игрока — ereb_hand_traitor_mirror); 24 (emerge) — призрачная рука сжимает отражение: звон, золотые искры у ладони. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 10,
+   "at": "caster-0.25,1.35,0.6",
+   "duration": 6,
+   "size": 0.8,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 0.9
+  },
+  {
+   "type": "flash",
+   "delay": 24,
+   "at": "caster+0.5,1.95,0.6",
+   "duration": 6,
+   "size": 1.0,
+   "rays": 6,
+   "color": "#FFE7A0",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+0.5,1.95,0.6",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.3,
+   "speed": 0.08,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0"
+  }
+ ]
+}

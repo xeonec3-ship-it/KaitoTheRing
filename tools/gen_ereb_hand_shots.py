@@ -232,3 +232,134 @@ def shots_fx(M, args):
         if c.get('label') == 'появление':
             c['op'] = 1
     sh('t31_finale.jpg', cells, 5, (2400, 1000))
+    shots_spells2(M, args)
+
+
+# ================================================================== вторая партия (владелец 20.11): +4 заклинания и «Ложный рассвет»
+SHADOW = '#000000'
+
+
+def shadow(x, z, r=0.5, op=0.55):
+    """тень под ногами (в кадрах её нет — рисуем пятном, чтобы было видно: у двойника «Ложного отступления» её НЕТ)"""
+    return dict(ground('glow', (x, 0, z), r, SHADOW, op), add=False)
+
+
+GOLD = '#E8B84A'
+_FK = {}
+
+
+def fkp(anim, t, bone, local):
+    """точка кости по прямой кинематике → координаты кадра (x — вправо от Эреба, y — вверх, z — вперёд), блоки"""
+    import json
+    import ereb_hand_fk as F
+    if not _FK:
+        _FK['an'] = json.load(open(os.path.join(F.A, 'animations', 'entity', 'ereb_hand.animation.json'), encoding='utf-8'))['animations']
+        _FK['m'] = F.Model()
+    m = _FK['m']
+    p = m.point(m.world(F.sample(_FK['an'][anim], t)), bone, local)
+    return (-p[0] / 16, p[1] / 16, -p[2] / 16)
+
+
+def gauntlet(anim, t):
+    return fkp(anim, t, 'left_arm', [6, 11.5, 0])
+
+
+def palm(anim, t):
+    return fkp(anim, t, 'ghost_palm', [-15.5, 35.5, 4.25])
+
+
+def bfly(at, real, size=0.5, seed=1):
+    o = [sp('mote_butterfly', at, 1, (0, 0, 0), (size, size), GL, 0.85, seed, spin=0)]
+    if real:
+        o.append(dict(sp('ereb_hand_butterfly_rim', at, 1, (0, 0, 0), (size * 1.02, size * 1.02), GOLD, 1.0, seed, spin=0), add=False))
+    return o
+
+
+def orb(at, s=1.0):
+    return [*flash(at, 0.9 * s, FL, 0.9), sp('cult_flame_tongue', at, 7, (0.15, 0.15, 0.15), (0.35 * s, 0.55 * s), FL, 0.8, 61, spin=0.05),
+            sp('spark_soft', at, 8, (0.25, 0.25, 0.25), (0.06, 0.12), GO, 0.9, 62), *flash(at, 0.35 * s, GO, 0.9)]
+
+
+def shots_spells2(M, args):
+    three = args[args.index('--three') + 1] if '--three' in args else None
+    sh = lambda name, cells, cols, size: R.sheet(os.path.join(MEDIA, name), {'cols': cols, 'cells': cells}, three, size)
+    B = dict(N, model='ereb_hand', pitch=8, dist=4.0, ty=22)
+    path = [(0.05 + 0.02 * k, 1.5 - 0.02 * k, 1.0 + 0.35 * k) for k in range(7)]
+    trail = [sp('glow', p, 1, (0, 0, 0), (0.5 - 0.04 * i, 0.5 - 0.04 * i), FL, 0.35, 70 + i, spin=0) for i, p in enumerate(path)]
+    copy_ = dict(model='traitor', anim='instant_slash', t=0.25, op=0.6)
+    cells = [
+        # «Пламя-подменыш»
+        dict(B, anim='ereb_hand_changeling_flame', t=0.45, yaw=35, pitch=6, dist=3.6, ty=26, label='«Пламя-подменыш»: шар в «Длани»',
+             sub='charge 0.2 — огонь в поднятой «Длани»', fx=orb(gauntlet('ereb_hand_changeling_flame', 0.45))),
+        dict(N, model='steve', hide=True, yaw=95, pitch=12, dist=6.8, ty=22, h=34, label='бросок → подмена → союзник',
+             sub='throw 0.65; золотое мерцание, затем бабочка — в союзника',
+             fx=[*[dict(f, at=[f['at'][0], f['at'][1], f['at'][2] - 3.2]) for f in trail], *orb((0.15, 1.4, 0.1), 0.9),
+                 *flash((0.2, 1.35, 1.0), 1.3, GO, 0.8), gls((0.3, 1.35, 1.3), 10, (0.3, 0.3, 0.3), 63),
+                 *bfly((1.1, 1.3, 2.2), True, 0.6), *flash((1.1, 1.3, 2.2), 0.7, FL, 0.4)],
+             **{'with': [dict(model='ereb_hand', anim='ereb_hand_changeling_flame', t=0.9, z=3.2 * 16), steve(0, 4.0), steve(2.0, 3.4, 200)]}),
+        # «Ложное отступление»
+        dict(B, anim='ereb_hand_false_retreat', t=0.45, yaw=80, pitch=6, dist=4.6, ty=22, label='«Ложное отступление»: прыжок назад',
+             sub='leap 0.25 — отскок ≈4 бл. (код); land 0.65 — двойник',
+             fx=[shadow(0, 0), gls((0, 0.3, 0.3), 10, (0.5, 0.2, 0.5), 64), *bfl((0, 0.6, 0.5), 3, (0.4, 0.3, 0.4))]),
+        dict(N, model='ereb_hand', anim='ereb_hand_false_retreat_open', t=0.5, yaw=-95, pitch=10, dist=8.5, ty=24,
+             label='двойник без тени → удар в спину', sub='двойник «открыт», тени нет; настоящий бьёт в спину (hit 0.35)',
+             fx=[shadow(0.2, 2.2), shadow(0.6, 4.0, 0.6), *flash((0.45, 1.3, 3.9), 1.6, GH, 0.5), gls((0.5, 1.2, 3.8), 14, (0.5, 0.8, 0.5), 65),
+                 *flash((0.25, 1.4, 2.4), 0.6, GO, 0.9)],
+             **{'with': [steve(0.2, 2.2, 180), dict(model='ereb_hand', anim='ereb_hand_false_retreat_strike', t=0.35, x=-0.6 * 16, z=-4.0 * 16 - 0,
+                                                   ry=180)]}),
+        # «Отражение-предатель»
+        dict(N, model='steve', hide=True, yaw=125, pitch=10, dist=6.6, ty=22, h=34, label='«Отражение-предатель»: из зеркала',
+             sub='mirror 0.5 — зеркало; emerge 1.2 — копия игрока выходит',
+             meshes=[dict(mesh='ereb_hand_mirror', pos=[0.4, 0, 2.6], ry=180, scale=0.8)],
+             fx=[*flash((0.4, 1.3, 2.4), 1.8, GH, 0.5), gls((0.4, 1.2, 2.1), 14, (0.5, 0.9, 0.3), 66),
+                 *flash((lambda p: (p[0], p[1], p[2] - 2.8))(palm('ereb_hand_traitor_reflection', 1.2)), 0.8, GO, 0.8)],
+             **{'with': [dict(model='ereb_hand', anim='ereb_hand_traitor_reflection', t=1.2, z=2.8 * 16), steve(-0.2, 3.8, 180),
+                         dict(copy_, x=0.4 * 16, z=-1.8 * 16, ry=180, t=0.0, anim=None)]}),
+    ]
+    cells += [
+        dict(N, model='traitor', anim='instant_slash', t=0.25, op=0.6, yaw=150, pitch=6, dist=5.0, ty=20, h=34,
+             label='копия бьёт союзников (6 с)', sub='скин игрока + стекло traitor_glass.png, его меч',
+             fx=[gls((0, 1.2, 0), 18, (0.4, 0.9, 0.4), 67), *flash((0.2, 1.3, 1.4), 0.8, GO, 0.7)],
+             **{'with': [steve(0.3, 1.8, 180), steve(-1.8, -0.6, 30)]}),
+        dict(N, model='traitor', op=0.55, yaw=20, pitch=8, dist=4.4, ty=20, h=34, label='разбита / взрыв',
+             sub='оригинал — 1 удар, другие — 3; 6 с — взрыв r3',
+             fx=[*flash((0, 1.0, 0), 2.0, GH, 0.6), gls((0, 1.0, 0), 34, (0.6, 0.9, 0.6), 68), *bfl((0, 1.2, 0), 6, (0.6, 0.6, 0.6)),
+                 ground('wave_ring', (0, 0, 0), 3.0, GO, 0.8), ground('higher_cracks', (0, 0, 0), 3.0, GL, 0.6)]),
+        # «Рой лжи»
+        dict(B, anim='ereb_hand_swarm_of_lies', t=0.5, yaw=-30, pitch=4, dist=2.8, ty=24, label='«Рой лжи»: бабочки в «чаше»',
+             sub='gather 0.3 — в сложенной призрачной руке кружат бабочки',
+             fx=[*bfl(palm('ereb_hand_swarm_of_lies', 0.5), 6, (0.2, 0.15, 0.2)), *flash(palm('ereb_hand_swarm_of_lies', 0.5), 0.35, GH, 0.4)]),
+        dict(B, anim='ereb_hand_swarm_of_lies', t=0.8, yaw=160, pitch=22, dist=8.5, ty=20, label='выпуск: 12 бабочек',
+             sub='release 0.75 — 6 ложных и 6 настоящих',
+             fx=[*flash(palm('ereb_hand_swarm_of_lies', 0.8), 1.4, GH, 0.6)] + [x for i in range(12) for x in bfly(
+                 (-3.2 + 0.58 * i, 1.4 + 0.5 * math.sin(i * 1.7), 2.4 + 1.2 * abs(math.sin(i * 0.9)) + 0.25 * i), i % 2 == 0, 0.5, 80 + i)],
+             **{'with': [steve(-2.5, 7.0), steve(2.8, 7.5)]}),
+        dict(N, model='steve', hide=True, yaw=0, pitch=0, dist=0.75, ty=26, h=34, bg=VIOLET, label='ложная и настоящая',
+             sub='слева настоящая — золотая кромка; справа ложная',
+             fx=[*bfly((-0.45, 1.65, 0), False, 0.75, 91), *bfly((0.45, 1.65, 0), True, 0.75, 92),
+                 sp('spark_soft', (0.45, 1.65, 0), 6, (0.3, 0.3, 0.1), (0.04, 0.08), GO, 0.9, 93)]),
+    ]
+    sh('t31_spells2.jpg', cells, 5, (2500, 1100))
+    # ---------------------------------------------------------------- «Ложный рассвет»
+    DAWN = 0x3a2c38
+    orbit_ = [x for i in range(10) for x in bfly((1.8 * math.cos(i * 0.63), 0.6 + 0.22 * (i % 5), 1.8 * math.sin(i * 0.63)), False, 0.32, 100 + i)]
+    dawn = [ground('dawn_sunrise', (0, 0, 0), 5.0, GO, 0.5), *flash((0, 6, -18), 14, '#FFD9A0', 0.35)]
+    cells = [
+        dict(N, model='ereb_hand', anim='ereb_hand_false_dawn', t=0.3, variant='mended', yaw=25, pitch=4, dist=3.4, ty=24, label='«Ложный рассвет» (33%)',
+             sub='шатается (0–0.25 с)'),
+        dict(N, model='ereb_hand', anim='ereb_hand_false_dawn', t=2.0, variant='mended', yaw=25, pitch=8, dist=4.0, ty=18, bg=DAWN,
+             label='на колене (kneel 0.5)', sub='полоса скрыта, небо светлеет, фанфара «победы»; 4 с неуязвим', fx=dawn + orbit_),
+        dict(N, model='ereb_hand', anim='ereb_hand_false_dawn', t=2.0, variant='mended', yaw=-90, pitch=2, dist=3.4, ty=16, bg=DAWN,
+             label='колено сбоку', sub='колено и носок над землёй, накидка и полы — назад', fx=[shadow(0, 0, 0.7)]),
+        dict(N, model='ereb_hand', anim='ereb_hand_false_dawn', t=2.5, variant='mended', yaw=200, pitch=30, dist=12, ty=20, bg=DAWN,
+             label='подсказка: бабочки НЕ улетают', sub='кружат вокруг него все 4 с (у настоящего поражения — разлетаются)',
+             fx=dawn + orbit_, **{'with': [steve(-3, 6), steve(3.5, 7), steve(0.5, 9)]}),
+        dict(N, model='ereb_hand', anim='ereb_hand_false_dawn', t=4.75, variant='mended', yaw=25, pitch=4, dist=3.6, ty=24,
+             label='встаёт (rise 4.5)', sub='бабочки стягиваются к нему', fx=[*bfl((0, 1.2, 0), 10, (1.0, 0.8, 1.0))]),
+        dict(N, model='ereb_hand', anim='ereb_hand_false_dawn', t=5.05, variant='mended', yaw=200, pitch=30, dist=9, ty=20,
+             label='волна (wave 5.0)', sub='≤6 бл. — 60% ХП (багряное r6), дальше — 20%; потом маска трескается',
+             fx=[*flash((0, 1.6, 0), 4.0, WH, 0.6), ground('wave_ring', (0, 0, 0), 6, CR_, 0.9), ground('wave_ring', (0, 0, 0), 11, GO, 0.8),
+                 gls((0, 1.2, 0), 40, (3, 1, 3), 110), *bfl((0, 1.4, 0), 12, (2.5, 1, 2.5))],
+             **{'with': [steve(-3, 4), steve(3.5, 8.5), steve(0.5, 10)]}),
+    ]
+    sh('t31_false_dawn.jpg', cells, 3, (1800, 1100))

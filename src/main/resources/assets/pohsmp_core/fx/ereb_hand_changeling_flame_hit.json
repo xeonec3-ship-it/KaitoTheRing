@@ -1,0 +1,55 @@
+{
+ "comment": "T31 «Пламя-подменыш», попадание (16 тиков): caster = поражённый (союзник рядом с целью или сама цель). Вспышка фиолетового огня, стекло, бабочка рассыпается. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 6,
+   "size": 1.6,
+   "rays": 6,
+   "color": "#E6C8FF",
+   "brightness": 1.1
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "cult_flame_tongue",
+   "count": 16,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.06,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.1
+   ],
+   "life": 12,
+   "color": "#9A6BFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 16,
+   "rate": 16,
+   "spread": 0.5,
+   "speed": 0.12,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 14,
+   "color": "#F4EEFF"
+  }
+ ]
+}

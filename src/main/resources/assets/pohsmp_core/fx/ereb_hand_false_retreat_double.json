@@ -1,0 +1,25 @@
+{
+ "comment": "T31 «Ложное отступление», двойник (40 тиков = 2 с; код стопит раньше, если его раскрыли): caster = двойник, follow. Почти незаметно: редкий блик стекла на силуэте. ТЕНИ НЕТ (код: shadowRadius = 0 у двойника) — это главная подсказка. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.3,0",
+   "duration": 40,
+   "texture": "glint4",
+   "count": 4,
+   "rate": 0.1,
+   "spread": 0.5,
+   "speed": 0,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 8,
+   "color": "#FFFFFF",
+   "follow": true
+  }
+ ]
+}

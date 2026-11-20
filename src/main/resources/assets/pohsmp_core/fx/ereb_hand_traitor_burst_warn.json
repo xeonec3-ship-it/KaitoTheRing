@@ -1,0 +1,42 @@
+{
+ "comment": "T31 «Отражение-предатель», копия вот-вот взорвётся (20 тиков = последняя 1 с из 6): caster = копия, follow. По копии бегут золотые трещины, на земле — кольцо r3 (зона урона). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "id": "illusion_mirror_crack",
+   "scale": 0.4,
+   "until": 20,
+   "follow": true
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "texture": "ereb_hand_flame_rim",
+   "radius": 3.0,
+   "grow": 6,
+   "glow": 0.4,
+   "color": "#E8B84A",
+   "brightness": 0.8,
+   "pulse": 5,
+   "follow": true
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 3.0,
+   "color": "#E8B84A",
+   "brightness": 0.5,
+   "reverse": true,
+   "follow": true
+  }
+ ]
+}

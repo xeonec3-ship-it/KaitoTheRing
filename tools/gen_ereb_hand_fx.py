@@ -199,7 +199,67 @@ def tex_shard_glass():
     _save(img, 'ereb_hand_shard_glass')
 
 
+def tex_butterfly_rim():
+    """Золотая кромка крыльев НАСТОЯЩЕЙ бабочки «Роя лжи»: контур силуэта mote_butterfly (тот же размер — кладётся поверх)."""
+    src = Image.open(os.path.join(M.A, 'textures', 'sigil', 'mote_butterfly.png')).convert('RGBA')
+    a = src.getchannel('A')
+    inner = a.filter(ImageFilter.MinFilter(15))
+    rim = np.clip(np.asarray(a, np.float32) - np.asarray(inner, np.float32), 0, 255)
+    rim = np.clip(rim * 1.6, 0, 255).astype(np.uint8)
+    _save(_mask_to_rgba(Image.fromarray(rim).filter(ImageFilter.GaussianBlur(0.6))), 'ereb_hand_butterfly_rim')
+
+
+# грани скина игрока 64×64 (внутренний и внешний слой): (u, v, w, h, d) — как у ванильного PlayerModel
+SKIN_BOXES = [(0, 0, 8, 8, 8), (32, 0, 8, 8, 8), (16, 16, 8, 12, 4), (16, 32, 8, 12, 4), (40, 16, 4, 12, 4), (40, 32, 4, 12, 4),
+              (32, 48, 4, 12, 4), (48, 48, 4, 12, 4), (0, 16, 4, 12, 4), (0, 32, 4, 12, 4), (16, 48, 4, 12, 4), (0, 48, 4, 12, 4)]
+
+
+def tex_traitor_glass():
+    """«Отражение-предатель»: стеклянный оверлей поверх скина игрока (UV 64×64 ванильного PlayerModel, оба слоя). Код рисует копию
+    моделью игрока с его скином полупрозрачно (entityTranslucent, альфа ≈0.55) и вторым проходом — этот оверлей: бледно-фиолетовое стекло,
+    светлые кромки граней, золотые трещины, диагональный блик. Глоумаска — трещины."""
+    W = 64
+    col = np.zeros((W, W, 4), np.float32)
+    glow = np.zeros((W, W, 4), np.float32)
+    rng = random.Random(3131)
+    glass_rgb = np.array([217, 204, 255], np.float32)
+    edge_rgb = np.array([246, 240, 255], np.float32)
+    gold = np.array([248, 210, 96], np.float32)
+
+    def face(x0, y0, w, h):
+        for y in range(y0, y0 + h):
+            for x in range(x0, x0 + w):
+                e = x in (x0, x0 + w - 1) or y in (y0, y0 + h - 1)
+                k = (x - x0 + (y - y0)) / max(1, w + h)
+                streak = 1.0 if abs(k - 0.42) < 0.07 else 0.0
+                if e:
+                    col[y, x] = [*edge_rgb, 120]
+                else:
+                    col[y, x] = [*(glass_rgb + streak * 30), 40 + 70 * streak]
+        # трещина: ломаная от края грани внутрь
+        if w * h >= 16 and rng.random() < 0.8:
+            x, y = x0 + rng.randrange(w), y0
+            for _ in range(h + w // 2):
+                if not (x0 <= x < x0 + w and y0 <= y < y0 + h):
+                    break
+                col[y, x] = [*gold, 235]
+                glow[y, x] = [*gold, 255]
+                y += 1
+                x += rng.choice((-1, 0, 0, 1))
+    for u, v, w, h, d in SKIN_BOXES:
+        face(u + d, v, w, d)                      # верх
+        face(u + d + w, v, w, d)                  # низ
+        face(u, v + d, d, h)                      # правый бок
+        face(u + d, v + d, w, h)                  # перед
+        face(u + d + w, v + d, d, h)              # левый бок
+        face(u + 2 * d + w, v + d, w, h)          # зад
+    Image.fromarray(col.astype(np.uint8), 'RGBA').save(M.out('textures/entity/ereb_hand/traitor_glass.png'))
+    Image.fromarray(glow.astype(np.uint8), 'RGBA').save(M.out('textures/entity/ereb_hand/traitor_glass_glowmask.png'))
+
+
 def textures():
+    tex_butterfly_rim()
+    tex_traitor_glass()
     tex_flame_ring()
     tex_flame_rim()
     tex_grip_cone()
@@ -663,6 +723,203 @@ def effects():
     ])
 
 
+# ================================================================== вторая партия (владелец 20.11): +4 заклинания и «Ложный рассвет»
+def effects2():
+    G_WIND, G_THROW = 'caster-0.4,2.45,0.05', 'caster-0.1,1.35,0.7'          # «Длань» в замахе над головой / в броске (FK)
+    # ---------------------------------------------------------------- «Пламя-подменыш»
+    fx('ereb_hand_changeling_flame', '«Пламя-подменыш», каст (32 тика = ereb_hand_changeling_flame 1.6 с): caster = Эреб. 4 (charge) — в поднятой '
+       '«Длани» собирается фиолетово-золотой огненный шар; 13 (throw) — бросок: вспышка у «Длани», снаряд летит (сам шар — '
+       'ereb_hand_changeling_flame_orb на снаряде).', 32, [
+        E('flash', 4, G_WIND, duration=9, size=0.9, rays=6, color=FLAME_HI, brightness=0.9, follow=True),
+        E('vortex', 4, G_WIND, duration=9, radius=0.7, height=0, arms=3, speed=18, pull=0.6, texture='spark_soft', particles=18, life=8, size=0.12,
+          color=FLAME, follow=True),
+        E('sprites', 4, G_WIND, duration=9, texture='cult_flame_tongue', count=10, rate=1.2, spread=0.15, speed=0.01, gravity=-0.02,
+          size=[0.4, 0.15], life=8, color=FLAME, glow=0.4, follow=True),
+        E('flash', 13, G_THROW, duration=6, size=1.2, rays=6, anamorphic=1.0, color=FLAME_HI, brightness=1.1),
+        sparks(13, G_THROW, 10, color=GOLD_HI, spread=0.3, speed=0.12),
+    ])
+    fx('ereb_hand_changeling_flame_orb', '«Пламя-подменыш», огненный шар (duration −1, код стопит на подмене): caster = снаряд, follow. Фиолетовое '
+       'пламя со стеклянными искрами, золотое ядро, след.', -1, [
+        E('sprites', 0, 'caster', duration=100000, texture='glow', count=1, rate=0.2, spread=0, speed=0, size=[0.9, 0.9], life=6, color=FLAME,
+          glow=0.6, follow=True),
+        E('sprites', 0, 'caster', duration=100000, texture='cult_flame_tongue', count=600, rate=2, spread=0.25, speed=0.01, gravity=-0.03,
+          size=[0.45, 0.1], life=7, color=FLAME_HI),
+        E('trail', 0, 'caster', duration=100000, width=0.35, length=8, fade=1.0, color=FLAME, follow=True),
+        E('sprites', 0, 'caster', duration=100000, texture='spark_soft', count=300, rate=1, spread=0.2, speed=0.02, gravity=0.01,
+          size=[0.1, 0.02], life=8, color=GOLD_HI),
+    ])
+    fx('ereb_hand_changeling_flame_warn', '«Пламя-подменыш», ПОДСКАЗКА (10 тиков = 0.5 с до подмены): caster = снаряд, follow. Шар мерцает золотом '
+       '(3 вспышки), по краю — золотые искры.', 10, [
+        E('flash', 0, 'caster', duration=3, size=1.1, rays=4, color=GOLD_HI, brightness=1.1, follow=True),
+        E('flash', 4, 'caster', duration=3, size=1.1, rays=4, color=GOLD_HI, brightness=1.1, follow=True),
+        E('flash', 8, 'caster', duration=2, size=1.2, rays=4, color=GOLD_HI, brightness=1.2, follow=True),
+        sparks(0, 'caster', 8, color=GOLD_HI, spread=0.3, speed=0.06, follow=True),
+    ])
+    fx('ereb_hand_changeling_flame_swap', '«Пламя-подменыш», подмена на полпути (12 тиков): caster = точка подмены. Пламя схлопывается в стекло: '
+       'кольцо-рябь, осколки, пара бабочек — дальше летит бабочка (ereb_hand_changeling_flame_butterfly) к союзнику цели.', 12, [
+        E('flash', 0, 'caster', duration=5, size=1.4, rays=6, color=GLASS_HI, brightness=1.1),
+        E('wave', 0, 'caster', duration=8, shape='sphere', radius=1.0, rim=1.0, color='@secondary', brightness=0.7),
+        glass(0, 'caster', 14, spread=0.4, speed=0.1, gravity=0.02, life=12),
+        *butterflies(0, 'caster', 3, 3, 1, spread=0.3, speed=0.06, life=16),
+    ])
+    fx('ereb_hand_changeling_flame_butterfly', '«Пламя-подменыш», стеклянная бабочка-снаряд (duration −1, код стопит при попадании): caster = снаряд, '
+       'follow. Крупная стеклянная бабочка с золотой кромкой (это настоящий удар), фиолетовый след с угольками.', -1, [
+        E('sprites', 0, 'caster', duration=100000, texture='mote_butterfly', count=1, rate=0.2, spread=0, speed=0, size=[0.7, 0.7], life=6,
+          color=GLASS, glow=0.5, follow=True),
+        E('sprites', 0, 'caster', duration=100000, texture='ereb_hand_butterfly_rim', count=1, rate=0.2, spread=0, speed=0, size=[0.7, 0.7], life=6,
+          color=GOLD, glow=0.3, follow=True),
+        E('trail', 0, 'caster', duration=100000, width=0.25, length=8, fade=1.0, color=FLAME, follow=True),
+        E('sprites', 0, 'caster', duration=100000, texture='cult_flame_tongue', count=300, rate=1, spread=0.15, speed=0.0, gravity=-0.02,
+          size=[0.25, 0.05], life=6, color=FLAME),
+    ])
+    fx('ereb_hand_changeling_flame_hit', '«Пламя-подменыш», попадание (16 тиков): caster = поражённый (союзник рядом с целью или сама цель). '
+       'Вспышка фиолетового огня, стекло, бабочка рассыпается.', 16, [
+        E('flash', 0, 'caster+0,1.1,0', duration=6, size=1.6, rays=6, color=FLAME_HI, brightness=1.1),
+        E('sprites', 0, 'caster+0,1.0,0', duration=4, texture='cult_flame_tongue', count=16, rate=4, spread=0.5, speed=0.06, gravity=-0.03,
+          size=[0.5, 0.1], life=12, color=FLAME),
+        glass(0, 'caster+0,1.1,0', 16, spread=0.5, speed=0.12, gravity=0.03, life=14),
+    ])
+    # ---------------------------------------------------------------- «Ложное отступление»
+    fx('ereb_hand_false_retreat', '«Ложное отступление» (26 тиков = ereb_hand_false_retreat 1.3 с): caster = Эреб на месте прыжка. 5 (leap) — '
+       'от ног взлетают стеклянные бабочки и пыль; 13 (land) — на точке приземления (point:land, или caster, если код шлёт его там) тихая '
+       'стеклянная рябь: тут настоящий исчезает, остаётся ДВОЙНИК. Подмену видно только по рябью и по отсутствию тени.', 26, [
+        glass(5, 'caster+0,0.2,0', 10, spread=0.6, speed=0.06, gravity=0.02, life=12),
+        *butterflies(5, 'caster+0,0.6,0', 4, 4, 1, spread=0.4, speed=0.06, life=20),
+        E('wave', 13, 'point:land+0,1,0', duration=8, shape='sphere', radius=1.3, rim=0.8, color='@secondary', brightness=0.35),
+        E('flash', 13, 'point:land+0,1.6,0', duration=4, size=0.6, rays=4, color=GLASS_HI, brightness=0.5),
+    ])
+    fx('ereb_hand_false_retreat_double', '«Ложное отступление», двойник (40 тиков = 2 с; код стопит раньше, если его раскрыли): caster = двойник, '
+       'follow. Почти незаметно: редкий блик стекла на силуэте. ТЕНИ НЕТ (код: shadowRadius = 0 у двойника) — это главная подсказка.', 40, [
+        E('sprites', 0, 'caster+0,1.3,0', duration=40, texture='glint4', count=4, rate=0.1, spread=0.5, speed=0, size=[0.3, 0.08], life=8,
+          color=WHITE, follow=True),
+    ])
+    fx('ereb_hand_false_retreat_vanish', '«Ложное отступление», двойник рассыпается (20 тиков): caster = двойник. Стекло и бабочки уносит вверх; '
+       'шлётся, когда настоящий бьёт, или через 2 с, когда настоящий появляется на месте двойника.', 20, [
+        E('flash', 0, 'caster+0,1.2,0', duration=5, size=1.6, rays=6, color=GLASS_HI),
+        glass(0, 'caster+0,1.2,0', 24, spread=0.6, speed=0.08, gravity=-0.01, life=16),
+        *butterflies(0, 'caster+0,1.2,0', 14, 14, 1, spread=0.5, speed=0.08, life=24),
+    ])
+    fx('ereb_hand_false_retreat_strike', '«Ложное отступление», удар в спину (24 тика = ereb_hand_false_retreat_strike, hit 0.35 с = 7 тик): '
+       'caster = настоящий Эреб (появляется за спиной цели), target = цель. 0 (appear) — из воздуха проступает стекло, вспышка; 7 (hit) — '
+       'золотой блик у цели (урон — код). Без линии до цели.', 24, [
+        E('wave', 0, 'caster+0,1.2,0', duration=6, shape='sphere', radius=1.4, rim=1.0, color='@secondary', brightness=0.6),
+        E('flash', 0, 'caster+0,1.3,0', duration=4, size=1.4, rays=6, color=GLASS_HI),
+        glass(0, 'caster+0,1.2,0', 16, spread=0.6, speed=-0.1, gravity=0.0, life=6),
+        E('flash', 7, 'target+0,1.3,0', duration=6, size=0.7, rays=4, anamorphic=1.2, color=GOLD_HI, brightness=1.2),
+        sparks(7, 'target+0,1.3,0', 10),
+    ])
+    # ---------------------------------------------------------------- «Отражение-предатель»
+    fx('ereb_hand_traitor_reflection', '«Отражение-предатель», каст (40 тиков = ereb_hand_traitor_reflection 2.0 с): caster = Эреб. 10 (mirror) — '
+       'блик на «Длани», указывающей на игрока (зеркало у игрока — ereb_hand_traitor_mirror); 24 (emerge) — призрачная рука сжимает '
+       'отражение: звон, золотые искры у ладони.', 40, [
+        E('flash', 10, 'caster-0.25,1.35,0.6', duration=6, size=0.8, rays=6, color=GLASS_HI, brightness=0.9),
+        E('flash', 24, 'caster+0.5,1.95,0.6', duration=6, size=1.0, rays=6, color=GOLD_HI, brightness=1.0),
+        sparks(24, 'caster+0.5,1.95,0.6', 10, color=GOLD_HI, spread=0.3, speed=0.08),
+    ])
+    fx('ereb_hand_traitor_mirror', '«Отражение-предатель», зеркало (40 тиков): caster = точка в 1.5 бл. перед игроком-«оригиналом», yaw — к игроку. '
+       '0 — зеркало встаёт из земли (меш ereb_hand_mirror), в стекле — блики; 14 (= emerge каста) — стекло идёт рябью, из зеркала шагает '
+       'копия (сущность — код); 30 — зеркало трескается и рассыпается.', 40, [
+        E('mesh', 0, 'caster', model='ereb_hand_mirror', scale=0.8, appear='rise', until=30),
+        E('decal', 0, 'caster', duration=34, texture='illusion_seal', radius=1.2, glow=0.2, color=GLASS, brightness=0.4),
+        E('wave', 14, 'caster+0,1.2,0.1', duration=10, shape='sphere', radius=1.3, rim=1.0, color='@secondary', brightness=0.8),
+        E('flash', 14, 'caster+0,1.2,0.2', duration=6, size=1.6, rays=6, color=GLASS_HI),
+        E('flash', 30, 'caster+0,1.2,0', duration=6, size=1.6, rays=6, color=WHITE),
+        glass(30, 'caster+0,1.2,0', 24, spread=0.7, speed=0.12, gravity=0.03, life=16, size=(0.22, 0.06)),
+    ])
+    fx('ereb_hand_traitor_copy', '«Отражение-предатель», копия (120 тиков = 6 с; код стопит раньше, если разбита): caster = копия, follow. '
+       'Модель игрока с его скином полупрозрачно + стеклянный оверлей textures/entity/ereb_hand/traitor_glass.png (код). Здесь — блеск '
+       'стекла по силуэту, осыпающаяся стеклянная пыль, кольцо под ногами.', 120, [
+        E('aura', 0, 'caster', target='caster', follow=True, duration=120, thickness=0.05, pulse=[0.4, 14], motes=3, texture='mote_glass',
+          ring=True, color=GLASS, brightness=0.5),
+        E('sprites', 0, 'caster+0,1.4,0', duration=120, texture='glint4', count=12, rate=0.1, spread=0.5, speed=0, size=[0.3, 0.08], life=8,
+          color=WHITE, follow=True),
+        E('sprites', 0, 'caster+0,1.0,0', duration=120, texture='mote_glass', count=40, rate=0.35, spread=0.4, speed=0.0, gravity=0.01,
+          size=[0.1, 0.03], life=16, color=GLASS_HI),
+    ])
+    fx('ereb_hand_traitor_hit', '«Отражение-предатель», удар по копии (8 тиков; оригиналу хватает 1, остальным — 3): caster = копия. Звон, '
+       'на копии трещина, отлетает стекло.', 8, [
+        E('flash', 0, 'caster+0,1.2,0', duration=4, size=0.8, rays=4, color=GLASS_HI),
+        E('sigil', 0, 'caster+0,1.1,0', id='illusion_mirror_crack', scale=0.3, until=8, follow=True),
+        glass(0, 'caster+0,1.2,0', 8, spread=0.3, speed=0.1, gravity=0.03, life=10),
+    ])
+    fx('ereb_hand_traitor_shatter', '«Отражение-предатель», копия разбита (20 тиков): caster = копия. Она лопается стеклом и бабочками (модель '
+       'убрать на 0).', 20, [
+        E('flash', 0, 'caster+0,1.0,0', duration=6, size=2.0, rays=8, color=WHITE),
+        glass(0, 'caster+0,1.0,0', 40, spread=0.5, speed=0.16, gravity=0.03, life=20, size=(0.24, 0.07)),
+        *butterflies(0, 'caster+0,1.2,0', 8, 8, 1, spread=0.4, speed=0.08, life=24),
+    ])
+    fx('ereb_hand_traitor_burst_warn', '«Отражение-предатель», копия вот-вот взорвётся (20 тиков = последняя 1 с из 6): caster = копия, follow. '
+       'По копии бегут золотые трещины, на земле — кольцо r3 (зона урона).', 20, [
+        E('sigil', 0, 'caster+0,1.0,0', id='illusion_mirror_crack', scale=0.4, until=20, follow=True),
+        E('decal', 0, 'caster', duration=20, texture='ereb_hand_flame_rim', radius=3.0, grow=6, glow=0.4, color=GOLD, brightness=0.8, pulse=5,
+          follow=True),
+        E('wave', 0, 'caster+0,0.05,0', duration=20, shape='ring', radius=3.0, color=GOLD, brightness=0.5, reverse=True, follow=True),
+    ])
+    fx('ereb_hand_traitor_burst', '«Отражение-предатель», взрыв осколками (24 тика; урон по площади r3 — код): caster = копия. Вспышка, кольцо r3, '
+       'осколки стекла веером.', 24, [
+        E('flash', 0, 'caster+0,1.0,0', duration=8, size=3.0, rays=8, color=WHITE, brightness=1.3),
+        E('wave', 0, 'caster+0,0.05,0', duration=10, shape='ring', radius=3.0, color='@secondary', brightness=0.9),
+        glass(0, 'caster+0,1.0,0', 60, spread=0.6, speed=0.3, gravity=0.03, life=18, size=(0.26, 0.08)),
+        sparks(0, 'caster+0,1.0,0', 16, color=GOLD_HI, spread=0.6, speed=0.2),
+        E('decal', 0, 'caster', duration=24, texture='higher_cracks', radius=3.0, grow=3, glow=0.4, fadeOut=16, color=GLASS),
+    ])
+    # ---------------------------------------------------------------- «Рой лжи»
+    CUP, REL = 'caster+0.5,1.9,0.45', 'caster+0.72,2.45,0.6'
+    fx('ereb_hand_swarm_of_lies', '«Рой лжи», каст (32 тика = ereb_hand_swarm_of_lies 1.6 с): caster = Эреб. 6 (gather) — в сложенной чашей '
+       'призрачной руке кружат бабочки; 15 (release) — рука раскрывается, вспышка: код выпускает 12 бабочек-снарядов (6 ложных, 6 настоящих).', 32, [
+        E('vortex', 6, CUP, duration=9, radius=0.5, height=0.4, arms=3, speed=16, pull=0.4, texture='mote_butterfly', particles=16, life=9, size=0.22,
+          color=GLASS, follow=True),
+        E('flash', 15, REL, duration=6, size=1.4, rays=8, color=GLASS_HI, brightness=1.0),
+        *butterflies(15, REL, 8, 8, 1, spread=0.4, speed=0.12, gravity=-0.01, life=16),
+    ])
+    for real in (True, False):
+        els = [E('sprites', 0, 'caster', duration=100000, texture='mote_butterfly', count=1, rate=0.2, spread=0, speed=0, size=[0.55, 0.55], life=6,
+                 color=GLASS, glow=0.4, follow=True),
+               E('sprites', 0, 'caster', duration=100000, texture='mote_glass', count=200, rate=0.5, spread=0.1, speed=0, gravity=0.01,
+                 size=[0.08, 0.02], life=10, color=GLASS_HI)]
+        if real:
+            els += [E('sprites', 0, 'caster', duration=100000, texture='ereb_hand_butterfly_rim', count=1, rate=0.2, spread=0, speed=0,
+                      size=[0.55, 0.55], life=6, color=GOLD, glow=0.25, follow=True,
+                      comment='подсказка: золото по краю крыльев только у настоящих'),
+                    E('sprites', 0, 'caster', duration=100000, texture='spark_soft', count=200, rate=0.4, spread=0.12, speed=0, gravity=0.01,
+                      size=[0.07, 0.02], life=8, color=GOLD_HI)]
+        fx('ereb_hand_swarm_' + ('true' if real else 'false'), '«Рой лжи», ' + ('НАСТОЯЩАЯ бабочка (урон и слепота 1 с — код; тихо звенит — '
+           'звук ereb_hand.swarm_chime раз в 10 тиков)' if real else 'ЛОЖНАЯ бабочка (проходит насквозь)') +
+           ' (duration −1, код стопит): caster = снаряд, follow. Стеклянная бабочка с тонким следом стеклянной пыли' +
+           ('; по краю крыльев — золотая кромка (ereb_hand_butterfly_rim) и золотые искры в следе.' if real else ', без золота.'), -1, els)
+    fx('ereb_hand_swarm_hit', '«Рой лжи», настоящая бабочка попала (12 тиков): caster = игрок. Золотая вспышка у лица, стекло (слепота 1 с — код).', 12, [
+        E('flash', 0, 'caster.eyes', duration=6, size=1.2, rays=6, color=GOLD_HI, brightness=1.2),
+        glass(0, 'caster.eyes', 10, spread=0.3, speed=0.08, gravity=0.02, life=10),
+    ])
+    fx('ereb_hand_swarm_pass', '«Рой лжи», ложная бабочка прошла насквозь (8 тиков): caster = точка прохода. Бабочка тает рябью, без вспышки.', 8, [
+        E('wave', 0, 'caster', duration=6, shape='sphere', radius=0.5, rim=0.8, color='@secondary', brightness=0.3),
+        glass(0, 'caster', 6, spread=0.2, speed=0.04, gravity=-0.01, life=8),
+    ])
+    # ---------------------------------------------------------------- мифическое «Ложный рассвет»
+    fx('ereb_hand_false_dawn', '«Ложный рассвет» (120 тиков = ereb_hand_false_dawn 6.0 с; 33%, раз за бой): caster = Эреб (не follow). '
+       '10 (kneel) — он на колене: небо светлеет (тёплый рассветный тон на арену, свет восходящего солнца), «победная» фанфара '
+       '(ereb_hand.false_victory), полоса скрыта (код), титра нет; бабочки вокруг него КРУЖАТ И НЕ УЛЕТАЮТ (подсказка: у настоящего поражения '
+       'улетают); 90 (rise) — встаёт: рассвет гаснет, бабочки стягиваются к нему; 100 (wave) — волна по арене (≤6 бл. — 60% макс. ХП, '
+       'дальше — 20%; урон — код): вспышка, кольцо до 24 бл., внутреннее золотое кольцо r6 (граница сильного урона).', 120, [
+        E('tint', 10, 'caster', duration=90, radius=48, color='#FFD9A0', strength=0.32, **{'in': ease(24), 'out': ease(10)}),
+        E('decal', 10, 'caster', duration=90, texture='dawn_sunrise', radius=6.0, grow=30, glow=0.4, color=GOLD_HI, brightness=0.6, fadeOut=12),
+        E('curtain', 10, 'caster', duration=90, count=28, radius=[20, 24], height=[8, 14], grow=40, width=[0.8, 1.4], brightness=[0.2, 0.4],
+          texture='beam_fade', flicker=0.15, color=GOLD_HI, comment='свет рассвета по краю арены'),
+        E('vortex', 10, 'caster+0,0.3,0', duration=80, radius=2.0, height=2.6, arms=4, speed=3, pull=0.0, texture='mote_butterfly', particles=40,
+          life=80, size=0.3, color=GLASS, comment='бабочки кружат вокруг и НЕ улетают'),
+        E('sprites', 10, 'caster+0,1.2,0', duration=80, texture='mote_butterfly_side', count=24, rate=0.3, spread=1.6, speed=0.0, gravity=0.0,
+          sway=0.6, size=[0.26, 0.2], life=80, color=GOLD_HI, glow=0.3),
+        E('vortex', 90, 'caster+0,0.5,0', duration=10, radius=2.4, height=2.4, arms=4, speed=14, pull=0.8, texture='mote_butterfly', particles=40,
+          life=10, size=0.3, color=GLASS, comment='встаёт: бабочки стягиваются к нему'),
+        E('flash', 100, 'caster+0,1.6,0', duration=10, size=5.0, rays=12, color=WHITE, brightness=1.4, screen=0.5),
+        E('wave', 100, 'caster+0,0.05,0', duration=18, shape='ring', radius=24, color=GOLD_HI, brightness=0.9),
+        E('wave', 100, 'caster+0,0.05,0', duration=8, shape='ring', radius=6, color=CRIMSON_HI, brightness=0.9),
+        E('wave', 100, 'caster+0,1,0', duration=14, shape='sphere', radius=8, rim=1.0, color='@secondary', brightness=0.5),
+        glass(100, 'caster+0,1.2,0', 50, spread=1.0, speed=0.3, gravity=0.02, life=18, size=(0.24, 0.07)),
+        *butterflies(100, 'caster+0,1.4,0', 24, 24, 1, spread=0.8, speed=0.2, life=24),
+    ])
+
+
 # ================================================================== звуки и субтитры
 def S_(name, pitch, volume):
     return {'name': name, 'type': 'event', 'pitch': pitch, 'volume': volume}
@@ -684,6 +941,14 @@ SOUNDS = {   # ванильные стекло и аметист с другим
     'ereb_hand.sky_hand': [S_('minecraft:block.beacon.activate', 0.5, 1.0), S_('minecraft:block.amethyst_block.resonate', 0.5, 1.0)],
     'ereb_hand.reveal': [S_('minecraft:block.beacon.power_select', 0.6, 1.0), S_('minecraft:block.amethyst_block.resonate', 0.55, 1.2)],
     'ereb_hand.dissolve': [S_('minecraft:block.amethyst_cluster.break', 0.85, 1.0), S_('minecraft:block.glass.break', 0.75, 0.8)],
+    # вторая партия
+    'ereb_hand.changeling': [S_('minecraft:item.firecharge.use', 0.9, 0.9), S_('minecraft:block.amethyst_block.chime', 1.4, 0.8)],
+    'ereb_hand.retreat': [S_('minecraft:entity.illusioner.mirror_move', 1.1, 0.8), S_('minecraft:block.amethyst_block.step', 0.8, 0.8)],
+    'ereb_hand.reflection': [S_('minecraft:entity.illusioner.prepare_mirror', 0.9, 1.0), S_('minecraft:block.amethyst_block.resonate', 1.1, 0.9)],
+    'ereb_hand.swarm': [S_('minecraft:block.amethyst_cluster.place', 1.3, 0.9), S_('minecraft:entity.allay.item_thrown', 0.9, 0.8)],
+    'ereb_hand.swarm_chime': [S_('minecraft:block.amethyst_block.chime', 2.0, 0.35), S_('minecraft:block.amethyst_block.chime', 1.8, 0.35)],
+    'ereb_hand.false_victory': [S_('minecraft:ui.toast.challenge_complete', 1.0, 0.9)],
+    'ereb_hand.dawn_wave': [S_('minecraft:block.beacon.deactivate', 0.6, 1.0), S_('minecraft:block.glass.break', 0.5, 1.0)],
 }
 SUB = {'slam': ('Длань бьёт о землю', 'The Hand strikes the ground'), 'grab': ('Стеклянные пальцы смыкаются', 'Glass fingers close'),
        'squeeze': ('Хрустит стекло', 'Glass crunches'), 'crack': ('Маска трескается', 'The mask cracks'),
@@ -692,7 +957,11 @@ SUB = {'slam': ('Длань бьёт о землю', 'The Hand strikes the groun
        'flame': ('Вспыхивает ложное пламя', 'False flame ignites'), 'grip': ('Стеклянная хватка', 'Glass grip'),
        'oath': ('Звучит чужая клятва', 'A borrowed oath rings'), 'mirror': ('Встают зеркала', 'Mirrors rise'),
        'sky_hand': ('Рука опускается с неба', 'A hand descends from the sky'), 'reveal': ('Сон раскрывается', 'The dream unfolds'),
-       'dissolve': ('Эреб рассыпается бабочками', 'Ereb scatters into butterflies')}
+       'dissolve': ('Эреб рассыпается бабочками', 'Ereb scatters into butterflies'),
+       'changeling': ('Пламя оборачивается бабочкой', 'The flame turns into a butterfly'), 'retreat': ('Эреб отступает', 'Ereb falls back'),
+       'reflection': ('Отражение выходит из зеркала', 'A reflection steps out of the mirror'), 'swarm': ('Взлетает рой бабочек', 'A swarm takes wing'),
+       'swarm_chime': ('Тихо звенит бабочка', 'A butterfly chimes softly'), 'false_victory': ('Звучит победа', 'Victory sounds'),
+       'dawn_wave': ('Ложный рассвет бьёт волной', 'The false dawn strikes')}
 
 
 def sounds_lang():
@@ -717,7 +986,17 @@ def sounds_lang():
                   'ui.pohsmp_core.ereb_hand.foreign_oath': ('«Чужая клятва» — ваш урон по Эребу ранит союзника', '"Borrowed Oath" — your damage to Ereb hurts an ally'),
                   'ui.pohsmp_core.ereb_hand.thousand_reflections': ('«Тысяча отражений»', '"A Thousand Reflections"'),
                   'ui.pohsmp_core.ereb_hand.mask_fall_hint': ('Разбей СВОЙ осколок маски!', 'Break YOUR shard of the mask!'),
-                  'ui.pohsmp_core.ereb_hand.false_arena': ('Мир лжёт тебе…', 'The world lies to you…')})
+                  'ui.pohsmp_core.ereb_hand.false_arena': ('Мир лжёт тебе…', 'The world lies to you…'),
+                  # вторая партия: названия приёмов и подсказки
+                  'ui.pohsmp_core.ereb_hand.spell.changeling_flame': ('Пламя-подменыш', 'Changeling Flame'),
+                  'ui.pohsmp_core.ereb_hand.spell.false_retreat': ('Ложное отступление', 'False Retreat'),
+                  'ui.pohsmp_core.ereb_hand.spell.traitor_reflection': ('Отражение-предатель', 'Traitor Reflection'),
+                  'ui.pohsmp_core.ereb_hand.spell.swarm_of_lies': ('Рой лжи', 'Swarm of Lies'),
+                  'ui.pohsmp_core.ereb_hand.spell.false_dawn': ('Ложный рассвет', 'False Dawn'),
+                  'ui.pohsmp_core.ereb_hand.changeling_flame': ('«Пламя-подменыш» — шар мерцает золотом, прежде чем стать бабочкой', '"Changeling Flame" — the fireball flickers gold before it turns'),
+                  'ui.pohsmp_core.ereb_hand.false_retreat': ('«Ложное отступление» — у двойника нет тени', '"False Retreat" — the double casts no shadow'),
+                  'ui.pohsmp_core.ereb_hand.traitor_reflection': ('«Отражение-предатель» — разбей свою копию!', '"Traitor Reflection" — break your own copy!'),
+                  'ui.pohsmp_core.ereb_hand.swarm_of_lies': ('«Рой лжи» — настоящие звенят и горят золотом по краю', '"Swarm of Lies" — the real ones chime and glow gold at the edges')})
     for i, name in enumerate(('ru_ru', 'en_us')):
         p = os.path.join(M.A, 'lang', name + '.json')
         d = json.load(open(p, encoding='utf-8'))
@@ -737,4 +1016,5 @@ def run(mod):
     textures()
     meshes()
     effects()
+    effects2()
     sounds_lang()

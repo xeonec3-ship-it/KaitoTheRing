@@ -1,0 +1,74 @@
+{
+ "comment": "T31 «Пламя-подменыш», стеклянная бабочка-снаряд (duration −1, код стопит при попадании): caster = снаряд, follow. Крупная стеклянная бабочка с золотой кромкой (это настоящий удар), фиолетовый след с угольками. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "mote_butterfly",
+   "count": 1,
+   "rate": 0.2,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    0.7,
+    0.7
+   ],
+   "life": 6,
+   "color": "#D9CCFF",
+   "glow": 0.5,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "ereb_hand_butterfly_rim",
+   "count": 1,
+   "rate": 0.2,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    0.7,
+    0.7
+   ],
+   "life": 6,
+   "color": "#E8B84A",
+   "glow": 0.3,
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "width": 0.25,
+   "length": 8,
+   "fade": 1.0,
+   "color": "#9A6BFF",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "cult_flame_tongue",
+   "count": 300,
+   "rate": 1,
+   "spread": 0.15,
+   "speed": 0.0,
+   "gravity": -0.02,
+   "size": [
+    0.25,
+    0.05
+   ],
+   "life": 6,
+   "color": "#9A6BFF"
+  }
+ ]
+}

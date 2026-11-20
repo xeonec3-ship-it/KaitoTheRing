@@ -940,5 +940,21 @@
   "ui.pohsmp_core.ereb_hand.false_arena": "Мир лжёт тебе…",
   "entity.pohsmp_core.ereb_hand_reflection": "Эреб, Длань Лжи",
   "entity.pohsmp_core.ereb_hand_giant": "Длань Лжи",
-  "entity.pohsmp_core.ereb_hand_mask_shard": "Осколок маски"
+  "entity.pohsmp_core.ereb_hand_mask_shard": "Осколок маски",
+  "subtitles.pohsmp_core.ereb_hand.changeling": "Пламя оборачивается бабочкой",
+  "subtitles.pohsmp_core.ereb_hand.retreat": "Эреб отступает",
+  "subtitles.pohsmp_core.ereb_hand.reflection": "Отражение выходит из зеркала",
+  "subtitles.pohsmp_core.ereb_hand.swarm": "Взлетает рой бабочек",
+  "subtitles.pohsmp_core.ereb_hand.swarm_chime": "Тихо звенит бабочка",
+  "subtitles.pohsmp_core.ereb_hand.false_victory": "Звучит победа",
+  "subtitles.pohsmp_core.ereb_hand.dawn_wave": "Ложный рассвет бьёт волной",
+  "ui.pohsmp_core.ereb_hand.spell.changeling_flame": "Пламя-подменыш",
+  "ui.pohsmp_core.ereb_hand.spell.false_retreat": "Ложное отступление",
+  "ui.pohsmp_core.ereb_hand.spell.traitor_reflection": "Отражение-предатель",
+  "ui.pohsmp_core.ereb_hand.spell.swarm_of_lies": "Рой лжи",
+  "ui.pohsmp_core.ereb_hand.spell.false_dawn": "Ложный рассвет",
+  "ui.pohsmp_core.ereb_hand.changeling_flame": "«Пламя-подменыш» — шар мерцает золотом, прежде чем стать бабочкой",
+  "ui.pohsmp_core.ereb_hand.false_retreat": "«Ложное отступление» — у двойника нет тени",
+  "ui.pohsmp_core.ereb_hand.traitor_reflection": "«Отражение-предатель» — разбей свою копию!",
+  "ui.pohsmp_core.ereb_hand.swarm_of_lies": "«Рой лжи» — настоящие звенят и горят золотом по краю"
 }

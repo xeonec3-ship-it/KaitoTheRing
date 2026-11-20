@@ -1,0 +1,61 @@
+{
+ "comment": "T31 «Отражение-предатель», копия (120 тиков = 6 с; код стопит раньше, если разбита): caster = копия, follow. Модель игрока с его скином полупрозрачно + стеклянный оверлей textures/entity/ereb_hand/traitor_glass.png (код). Здесь — блеск стекла по силуэту, осыпающаяся стеклянная пыль, кольцо под ногами. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "follow": true,
+   "duration": 120,
+   "thickness": 0.05,
+   "pulse": [
+    0.4,
+    14
+   ],
+   "motes": 3,
+   "texture": "mote_glass",
+   "ring": true,
+   "color": "#D9CCFF",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 120,
+   "texture": "glint4",
+   "count": 12,
+   "rate": 0.1,
+   "spread": 0.5,
+   "speed": 0,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 8,
+   "color": "#FFFFFF",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 120,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 0.35,
+   "spread": 0.4,
+   "speed": 0.0,
+   "gravity": 0.01,
+   "size": [
+    0.1,
+    0.03
+   ],
+   "life": 16,
+   "color": "#F4EEFF"
+  }
+ ]
+}

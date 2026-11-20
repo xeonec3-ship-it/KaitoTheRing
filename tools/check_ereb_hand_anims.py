@@ -6,7 +6,9 @@
   3) рука и рапира не проходят сквозь тело (точки брусков ghost_* и клинка внутри брусков тела, головы, рук, ног);
   4) накидка не входит в ноги и тело (ткань назад/вниз);
   5) без выворотов: пределы поворота рук, кисти, головы;
-  6) удары ВПЕРЁД: на событиях hit — острие перед Эребом, slam/grab — ладонь перед ним.
+  6) удары ВПЕРЁД: на событиях hit — острие перед Эребом, slam/grab — ладонь перед ним; касты второй партии (throw, mirror) — «Длань»
+     перед ним, выпуск (release, mirror) — ладонь призрачной руки перед ним;
+  7) ничего не в земле: тело, накидка, полы, рука (y ≥ −0.6 ед.; удар slam — ладонь до −1.5); рука не входит в маску.
 Запуск: python3 tools/check_ereb_hand_anims.py [--quiet]. Код выхода 1 — есть ошибки.
 """
 import json
@@ -99,7 +101,8 @@ def main():
                     r0 = prev[1].get(bn, ([0, 0, 0],))[0]
                     st = max(st, max(abs(r[i] - r0[i]) for i in range(3)) * (0.1 / max(dt, 1e-3)))
                 worst_step = max(worst_step, st)
-                fast = any(abs(t - te) <= 0.25 and ev in ('hit', 'slam', 'phase', 'crack', 'tear', 'squeeze', 'grab', 'stagger', 'snap', 'break', 'release', 'shatter', 'grip')
+                fast = any(abs(t - te) <= 0.25 and ev in ('hit', 'slam', 'phase', 'crack', 'tear', 'squeeze', 'grab', 'stagger', 'snap', 'break', 'release', 'shatter', 'grip',
+                                                          'throw', 'leap', 'land', 'kneel', 'wave', 'emerge')
                            for te, ev in events.items())
                 if st > (STEP_HIT if fast else STEP_MAX):
                     errors.append('%s t=%.2f: рывок %.0f° за 0.1 с' % (name, t, st))
@@ -121,6 +124,20 @@ def main():
                         hit_parts.add('%s→%s' % (gb, sb))
                 if hit_parts:
                     errors.append('%s t=%.2f: рука в теле: %s' % (name, t, ', '.join(sorted(hit_parts))))
+                hm = model.hits(model.solids(W, ('mask',), 0.0), [p for gb in AN.GHOST for p in model.points(W, gb, 3)])
+                if hm:
+                    errors.append('%s t=%.2f: рука в маске' % (name, t))
+            # 7) земля (вторая партия, AN.SPELLS2): ничего не ниже y = −0.6 ед. (у старых анимаций допущено принятое «приседание» —
+            #    ступни на 1–2 ед. в земле при опущенном корпусе, их не трогаем)
+            low = []
+            for bn in ('torso', 'head', 'right_arm', 'left_arm', 'cape', 'cape_mid', 'cape_low', 'coat_front_r', 'coat_front_l', 'coat_back_r',
+                       'coat_back_l', 'right_leg', 'left_leg') + (tuple(AN.GHOST) if gscale > 0.15 else ()):
+                if name in AN.SPELLS2 and bn in model.bones and model.cubes(bn):
+                    y = min(p[1] for p in model.points(W, bn, 2))
+                    if y < -0.6:
+                        low.append('%s %.1f' % (bn, y))
+            if low:
+                errors.append('%s t=%.2f: в земле: %s' % (name, t, ', '.join(low)))
             # рапира сквозь тело (клинок от гарды к острию; правая рука держит — её не считаем)
             blade = F.rapier_points(W, model, 10)[2:]
             hit_parts = model.hits(model.solids(W, ('torso', 'head', 'mask', 'left_arm', 'right_leg', 'left_leg', 'cape', 'cape_mid', 'cape_low'), 0.0), blade)
@@ -140,6 +157,16 @@ def main():
                 if tip[2] > -12:
                     errors.append('%s t=%.2f: удар не вперёд (острие z=%.1f)' % (name, t, tip[2]))
                 notes.append('%s %s %.2f: острие (x %.1f, y %.1f, z %.1f)' % (name, ev, t, *tip))
+            if ev in ('throw', 'mirror'):
+                lh = model.point(W, 'left_arm', [6, 12.5, 0])
+                if lh[2] > -6:
+                    errors.append('%s t=%.2f: «Длань» не вперёд (z=%.1f)' % (name, t, lh[2]))
+                notes.append('%s %s %.2f: «Длань» (x %.1f, y %.1f, z %.1f)' % (name, ev, t, *lh))
+            if ev in ('release', 'mirror', 'emerge', 'wave') and name.endswith(('swarm_of_lies', 'traitor_reflection', 'false_dawn')):
+                pc = model.point(W, 'ghost_palm', [-15.5, 35.5, 4.25])
+                if ev in ('release', 'mirror') and pc[2] > -8:
+                    errors.append('%s t=%.2f: ладонь не впереди (z=%.1f)' % (name, t, pc[2]))
+                notes.append('%s %s %.2f: ладонь (x %.1f, y %.1f, z %.1f)' % (name, ev, t, *pc))
             if ev in ('slam', 'grab', 'squeeze', 'snap'):
                 pc = model.point(W, 'ghost_palm', [-15.5, 35.5, 4.25])
                 if ev in ('slam', 'grab') and pc[2] > -10:

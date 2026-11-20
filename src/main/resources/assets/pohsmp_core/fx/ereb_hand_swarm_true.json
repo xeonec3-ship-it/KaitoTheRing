@@ -1,0 +1,82 @@
+{
+ "comment": "T31 «Рой лжи», НАСТОЯЩАЯ бабочка (урон и слепота 1 с — код; тихо звенит — звук ereb_hand.swarm_chime раз в 10 тиков) (duration −1, код стопит): caster = снаряд, follow. Стеклянная бабочка с тонким следом стеклянной пыли; по краю крыльев — золотая кромка (ereb_hand_butterfly_rim) и золотые искры в следе. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "mote_butterfly",
+   "count": 1,
+   "rate": 0.2,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    0.55,
+    0.55
+   ],
+   "life": 6,
+   "color": "#D9CCFF",
+   "glow": 0.4,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "mote_glass",
+   "count": 200,
+   "rate": 0.5,
+   "spread": 0.1,
+   "speed": 0,
+   "gravity": 0.01,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 10,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "ereb_hand_butterfly_rim",
+   "count": 1,
+   "rate": 0.2,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    0.55,
+    0.55
+   ],
+   "life": 6,
+   "color": "#E8B84A",
+   "glow": 0.25,
+   "follow": true,
+   "comment": "подсказка: золото по краю крыльев только у настоящих"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "spark_soft",
+   "count": 200,
+   "rate": 0.4,
+   "spread": 0.12,
+   "speed": 0,
+   "gravity": 0.01,
+   "size": [
+    0.07,
+    0.02
+   ],
+   "life": 8,
+   "color": "#FFE7A0"
+  }
+ ]
+}

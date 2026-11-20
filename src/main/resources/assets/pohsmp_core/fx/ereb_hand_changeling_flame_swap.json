@@ -1,0 +1,88 @@
+{
+ "comment": "T31 «Пламя-подменыш», подмена на полпути (12 тиков): caster = точка подмены. Пламя схлопывается в стекло: кольцо-рябь, осколки, пара бабочек — дальше летит бабочка (ereb_hand_changeling_flame_butterfly) к союзнику цели. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "duration": 5,
+   "size": 1.4,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 8,
+   "shape": "sphere",
+   "radius": 1.0,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 14,
+   "rate": 14,
+   "spread": 0.4,
+   "speed": 0.1,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 12,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 1,
+   "texture": "mote_butterfly",
+   "count": 3,
+   "rate": 3,
+   "spread": 0.3,
+   "speed": 0.06,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 16,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 1,
+   "texture": "mote_butterfly_side",
+   "count": 1,
+   "rate": 1.5,
+   "spread": 0.3,
+   "speed": 0.06,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 16,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  }
+ ]
+}

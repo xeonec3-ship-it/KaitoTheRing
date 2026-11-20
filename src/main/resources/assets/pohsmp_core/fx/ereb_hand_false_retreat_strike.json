@@ -1,0 +1,76 @@
+{
+ "comment": "T31 «Ложное отступление», удар в спину (24 тика = ereb_hand_false_retreat_strike, hit 0.35 с = 7 тик): caster = настоящий Эреб (появляется за спиной цели), target = цель. 0 (appear) — из воздуха проступает стекло, вспышка; 7 (hit) — золотой блик у цели (урон — код). Без линии до цели. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 6,
+   "shape": "sphere",
+   "radius": 1.4,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.3,0",
+   "duration": 4,
+   "size": 1.4,
+   "rays": 6,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 16,
+   "rate": 16,
+   "spread": 0.6,
+   "speed": -0.1,
+   "gravity": 0.0,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 6,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "flash",
+   "delay": 7,
+   "at": "target+0,1.3,0",
+   "duration": 6,
+   "size": 0.7,
+   "rays": 4,
+   "anamorphic": 1.2,
+   "color": "#FFE7A0",
+   "brightness": 1.2
+  },
+  {
+   "type": "sprites",
+   "delay": 7,
+   "at": "target+0,1.3,0",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.3,
+   "speed": 0.1,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#E8B84A"
+  }
+ ]
+}

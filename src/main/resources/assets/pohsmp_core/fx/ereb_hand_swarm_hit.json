@@ -1,0 +1,37 @@
+{
+ "comment": "T31 «Рой лжи», настоящая бабочка попала (12 тиков): caster = игрок. Золотая вспышка у лица, стекло (слепота 1 с — код). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster.eyes",
+   "duration": 6,
+   "size": 1.2,
+   "rays": 6,
+   "color": "#FFE7A0",
+   "brightness": 1.2
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.eyes",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.3,
+   "speed": 0.08,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 10,
+   "color": "#F4EEFF"
+  }
+ ]
+}

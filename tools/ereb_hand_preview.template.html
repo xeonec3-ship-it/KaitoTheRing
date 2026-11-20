@@ -332,6 +332,8 @@ function setup(c) {
   const anim = c.anim ? DATA.anims[c.anim] : null;
   pose(m, anim, c.t || 0); flameFrame(m, Math.floor((c.t || 0) * 20));
   if (c.noGlow) m.root.traverse(o => { if (o.userData.glow) o.visible = false; });
+  if (c.op != null && c.op < 1) m.root.traverse(o => { if (o.isMesh && o.material) { o.material = o.material.clone(); o.material.transparent = true;
+    o.material.opacity *= c.op; o.material.alphaTest = Math.min(o.material.alphaTest || 0, 0.02); o.material.depthWrite = false; } });
   return { e, m };
 }
 

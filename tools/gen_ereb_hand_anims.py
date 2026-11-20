@@ -333,15 +333,123 @@ def build():
     pre_r = full(EA.mod(GUARD, body_pos=[0, -1.8, 2], right_arm=[-70, 40, 10], bipedHandRight=[70, 0, 0]), HG_back)
     an['ereb_hand_reflection_strike'] = anim(1.0, [(0, pre_r), (0.45, lunge, OQ), (0.7, lunge), (1.0, guard, IO)],
                                              [(0.0, 'appear'), (0.45, 'hit'), (0.9, 'gone')])
+    an.update(build_spells2(pre_r, lunge, guard))
     return an
 
+
+def build_spells2(pre_r, lunge, guard):
+    """Вторая партия (владелец 20.11): «Пламя-подменыш», «Ложное отступление», «Отражение-предатель», «Рой лжи» и мифическое
+    «Ложный рассвет». Касты — «Длань» (левая рука) и призрачная рука строго ВПЕРЁД (x < 0 у руки, z < 0 у призрачной руки);
+    накидка и полы — назад; ничего не уходит в землю (проверка check_ereb_hand_anims.py)."""
+    an = {}
+    # ---------------------------------------------------------------- «Пламя-подменыш» (1.6 с): в «Длани» над головой собирается огненный шар
+    # (charge 0.2 — fx шара в кулаке), бросок вперёд (throw 0.65 — снаряд вылетает из «Длани»), призрачная рука хитро «переворачивает»
+    # ладонь (подмена шара на бабочку делает код на полпути, подсказка — мерцание золотом за 0.5 с до неё)
+    cf_wind = full(EA.mod(STAND, left_arm=[-152, 8, -22], bipedHandLeft=Z3, torso=[-6, 0, 0], head=[-10, -8, 0], body=[0, -14, 0], cape=[6, 0, 0]),
+                   hand(pos=(1, 3, 3), rot=(10, -20, -4), curl=0.5, thumb=0.4))
+    cf_throw = full(EA.mod(STAND, left_arm=[-84, 14, -4], torso=[6, 0, 0], head=[4, -10, 0], body=[0, 12, 0], body_pos=[0, 0, -0.5],
+                           cape=[16, 0, 0]),
+                    hand(pos=(3, -2, -10), rot=(40, -8, 0), curl=0.0, spread=1.0, thumb=0.0))
+    cf_follow = full(EA.mod(STAND, left_arm=[-70, 14, -8], torso=[4, 0, 0], head=[2, -8, 0], body=[0, 10, 0], cape=[12, 0, 0]),
+                     hand(pos=(3, -1, -9), rot=(36, -8, 0), curl=0.05, spread=0.9, thumb=0.0))
+    cf_flip = full(EA.mod(STAND, left_arm=[-40, 8, -10], head=[0, -4, 0], body=[0, 4, 0], cape=[8, 0, 0]),
+                   hand(pos=(2, 0, -6), rot=(24, -14, -4), curl=0.15, spread=0.5, thumb=0.1, wrist=(0, 0, -22)))
+    an['ereb_hand_changeling_flame'] = anim(1.6, [(0, IDLE0), (0.4, cf_wind, IO), (0.52, cf_wind), (0.65, cf_throw, OQ), (0.9, cf_follow, IO),
+                                                  (1.15, cf_flip, IO), (1.6, IDLE0, IO)],
+                                            [(0.2, 'charge'), (0.65, 'throw')])
+    # ---------------------------------------------------------------- «Ложное отступление» (1.3 с): присед (0–0.25), прыжок назад (leap 0.25 —
+    # код даёт скорость назад ≈4 бл.), приземление (land 0.65 — код ставит ДВОЙНИКА без тени на точку приземления, настоящего прячет на 2 с),
+    # двойник «открывается»: руки опущены и разведены, подбородок вверх → петля ereb_hand_false_retreat_open
+    fr_crouch = full(EA.mod(GUARD, body_pos=[0, 0.9, 0], torso=[10, 0, 0], head=[-8, 0, 0], right_leg=[-12, 0, 2], left_leg=[10, 0, -2], cape=[12, 0, 0]),
+                     hand(pos=(1, -1, 0), rot=(20, -14, -4), curl=0.4, thumb=0.3))
+    fr_air = full(EA.mod(GUARD, body_pos=[0, 3.0, 2.0], torso=[-8, 0, 0], head=[8, 0, 0], right_leg=[-34, 0, 4], left_leg=[-8, 0, -4],
+                         left_arm=[-120, -6, -40], cape=[6, 0, 0]),
+                  hand(pos=(1, 3, 2), rot=(6, -18, -6), curl=0.2, spread=0.6, thumb=0.1))
+    fr_land = full(EA.mod(GUARD, body_pos=[0, 0.9, 0], torso=[12, 0, 0], head=[-8, 0, 0], right_leg=[-12, 0, 2], left_leg=[10, 0, -2],
+                          left_arm=[-30, 0, -36], cape=[14, 0, 0]),
+                   hand(pos=(1, -1, 1), rot=(22, -14, -4), curl=0.3, thumb=0.2))
+    OPEN_B = EA.mod(STAND, left_arm=[-18, 0, -38], right_arm=[-22, 10, 36], bipedHandRight=[30, 0, 0], head=[-10, 0, 0], torso=[-4, 0, 0],
+                    cape=[5, 0, 0])
+    OPEN_H = hand(pos=(1, -1, 2), rot=(-6, -20, -6), curl=0.0, spread=0.7, thumb=0.0)
+    OPEN = full(OPEN_B, OPEN_H)
+    an['ereb_hand_false_retreat'] = anim(1.3, [(0, IDLE0), (0.25, fr_crouch, IO), (0.45, fr_air, OC), (0.6, lerp(fr_air, fr_land, 0.6), IC),
+                                               (0.7, fr_land, OQ), (1.1, lerp(fr_land, OPEN, 0.85), IO), (1.3, OPEN, IO)],
+                                         [(0.25, 'leap'), (0.65, 'land')])
+    open2 = full(EA.mod(OPEN_B, head=[-12, 4, 0], torso=[-5, 0, 0], body_pos=[0, 0.2, 0]),
+                 hand(pos=(1, -0.4, 2), rot=(-8, -20, -6), curl=0.05, spread=0.8, thumb=0.0))
+    an['ereb_hand_false_retreat_open'] = anim(2.0, [(0, OPEN), (1.0, open2, IO), (2.0, OPEN, IO)], loop=True)
+    # настоящий появляется за спиной того, кто подошёл к двойнику (appear 0 — уже в замахе, как отражение), удар в спину (hit 0.35)
+    def up(p, dy):                                     # корпус выше на dy ед.: ступни и полы не уходят в землю
+        q = dict(p)
+        q['body_pos'] = [p['body_pos'][0], p['body_pos'][1] + dy, p['body_pos'][2]]
+        return q
+    an['ereb_hand_false_retreat_strike'] = anim(1.4, [(0, up(pre_r, 1.7)), (0.35, up(lunge, 0.3), OQ), (0.6, up(lunge, 0.3)), (0.95, up(guard, 1.4), IO),
+                                                      (1.4, IDLE0, IO)],
+                                                [(0.0, 'appear'), (0.35, 'hit')])
+    # ---------------------------------------------------------------- «Отражение-предатель» (2.0 с): «Длань» указывает на игрока — у него встаёт
+    # зеркало (mirror 0.5), призрачная рука тянется в зеркало, хватает отражение и вытягивает (emerge 1.2 — из зеркала выходит стеклянная
+    # копия игрока), рапира «посылает» копию вперёд
+    tr_point = full(EA.mod(STAND, left_arm=[-88, 18, -8], head=[2, -6, 0], torso=[3, 0, 0], body=[0, -6, 0], cape=[8, 0, 0]),
+                    hand(pos=(6, -4, -18), rot=(12, -4, 4), curl=0.0, spread=1.0, thumb=0.0))
+    tr_reach = full(EA.mod(STAND, left_arm=[-92, 18, -8], head=[4, -6, 0], torso=[4, 0, 0], body=[0, -6, 0], body_pos=[0, 0, -0.4], cape=[10, 0, 0]),
+                    hand(pos=(7, -5, -21), rot=(10, -2, 4), curl=0.1, spread=0.9, thumb=0.0))
+    tr_pull = full(EA.mod(STAND, left_arm=[-52, 12, -18], head=[-4, -4, 0], torso=[-4, 0, 0], body=[0, -2, 0], body_pos=[0, 0, 0.6], cape=[4, 0, 0]),
+                   hand(pos=(4, -1, -8), rot=(20, -10, 2), curl=0.9, thumb=0.85))
+    tr_send = full(EA.mod(STAND, right_arm=[-84, 20, 6], bipedHandRight=[60, 0, 0], left_arm=[-30, 10, -20], head=[2, 0, 0], cape=[8, 0, 0]),
+                   hand(pos=(3, 1, -4), rot=(18, -16, -2), curl=0.1, spread=0.7, thumb=0.0))
+    an['ereb_hand_traitor_reflection'] = anim(2.0, [(0, IDLE0), (0.5, tr_point, IO), (0.95, tr_reach, IO), (1.2, tr_pull, OQ), (1.4, tr_pull),
+                                                    (1.65, tr_send, IO), (2.0, IDLE0, IO)],
+                                              [(0.5, 'mirror'), (1.2, 'emerge')])
+    # ---------------------------------------------------------------- «Рой лжи» (1.6 с): призрачная рука сложена «чашей» перед грудью —
+    # в ней собираются бабочки (gather 0.3), рука раскрывается вперёд-вверх и выпускает 12 бабочек (release 0.75), «Длань» отводит их взмахом
+    sw_cup = full(EA.mod(STAND, left_arm=[-54, 22, -6], head=[6, 0, 0], torso=[3, 0, 0], cape=[6, 0, 0]),
+                  hand(pos=(4, -9, -14), rot=(46, -10, -2), curl=0.72, thumb=0.6))
+    sw_open = full(EA.mod(STAND, left_arm=[-112, 0, -40], head=[-6, 0, 0], torso=[-3, 0, 0], body=[0, 4, 0], cape=[10, 0, 0]),
+                   hand(pos=(4, 4, -14), rot=(8, -6, 4), curl=0.0, spread=1.3, thumb=0.0))
+    sw_hold = full(EA.mod(STAND, left_arm=[-100, 0, -46], head=[-4, 0, 0], torso=[-2, 0, 0], body=[0, 4, 0], cape=[8, 0, 0]),
+                   hand(pos=(4, 4, -13), rot=(10, -6, 4), curl=0.05, spread=1.2, thumb=0.0))
+    an['ereb_hand_swarm_of_lies'] = anim(1.6, [(0, IDLE0), (0.35, sw_cup, IO), (0.6, sw_cup), (0.75, sw_open, OQ), (1.05, sw_hold, IO),
+                                               (1.6, IDLE0, IO)],
+                                         [(0.3, 'gather'), (0.75, 'release')])
+    # ---------------------------------------------------------------- мифическое «Ложный рассвет» (33%, 6.0 с): шатается, падает на одно колено
+    # (kneel 0.5: полоса скрыта, небо светлеет, «победная» фанфара; 4 с неуязвим), тяжело дышит (бабочки вокруг НЕ улетают), встаёт
+    # (rise 4.5), волна по арене (wave 5.0: ≤6 бл. — 60% макс. ХП, дальше — 20%), стойка → затем код играет ereb_hand_phase3 (маска трескается)
+    fd_stag = full(EA.mod(STAND, body=[2, 0, -4], body_pos=[0, 0, 1.2], head=[14, -6, 0], torso=[6, 0, 0], right_arm=[-6, 12, 16],
+                          bipedHandRight=[20, 0, 0], left_arm=[-30, -6, -20], right_leg=[-8, 0, 4], left_leg=[8, 0, -4], cape=[4, 0, 0]),
+                   hand(pos=(0, -2, 2), rot=(30, -18, -10), curl=0.6, thumb=0.5))
+
+    def kneel_b(br, by=-4.5):
+        return EA.mod(STAND, body_pos=[0, by, 0], body=[0, 0, 0], torso=[10 + 2 * br, 0, 0], head=[22 - 3 * br, 4, 0],
+                      right_leg=[-64, 0, 3], left_leg=[62, 0, -3], right_arm=[-44, 14, 10], bipedHandRight=[64, 0, 0],
+                      left_arm=[-44, 26, 8], bipedHandLeft=Z3, coat_front_r=[-70, 0, 4], coat_front_l=[-45, 0, -4],
+                      coat_back_r=[75, 0, 2], coat_back_l=[78, 0, -2], cape=[30 + 2 * br, 0, 0])
+    KH = hand(pos=(0, -4, 3), rot=(36, -18, -10), curl=0.55, thumb=0.45)
+    fd_kneel = full(kneel_b(0), KH)
+    fd_kneel2 = full(kneel_b(1), hand(pos=(0, -3.4, 3), rot=(34, -18, -8), curl=0.5, thumb=0.45))
+    fd_up = full(EA.mod(STAND, body_pos=[0, 0, 0], torso=[4, 0, 0], head=[-6, 0, 0], right_leg=[-14, 0, 2], left_leg=[12, 0, -2],
+                        right_arm=[-30, 12, 20], bipedHandRight=[40, 0, 0], left_arm=[-40, 0, -30], cape=[10, 0, 0]),
+                 hand(pos=(2, 4, 1), rot=(4, -22, 0), curl=0.3, spread=0.6, thumb=0.2))
+    WAVE_B = EA.mod(STAND, body_pos=[0, 0.4, 0], torso=[-6, 0, 0], head=[-14, 0, 0], left_arm=[-150, 0, -40], right_arm=[-60, 0, 70],
+                    bipedHandRight=[30, 0, 0], cape=[14, 0, 0])
+    fd_wave = full(WAVE_B, hand(pos=(6, 9, -7), rot=(-20, -30, 14), curl=0.0, spread=1.3, thumb=0.0))
+    fd_wave2 = full(EA.mod(WAVE_B, left_arm=[-140, 0, -44], head=[-10, 0, 0]), hand(pos=(6, 8, -6), rot=(-16, -30, 12), curl=0.05, spread=1.2, thumb=0.0))
+    an['ereb_hand_false_dawn'] = anim(6.0, [(0, IDLE0), (0.25, fd_stag, OQ), (0.38, full(kneel_b(0, -1.0), KH), IO), (0.5, fd_kneel, IC), (1.5, fd_kneel2, IO), (2.5, fd_kneel, IO),
+                                            (3.5, fd_kneel2, IO), (4.5, fd_kneel, IO), (4.65, full(kneel_b(0, -1.8), KH), IO), (4.85, fd_up, OC), (5.0, fd_wave, OQ), (5.5, fd_wave2, IO),
+                                            (6.0, IDLE0, IO)],
+                                      [(0.5, 'kneel'), (4.5, 'rise'), (5.0, 'wave')])
+    return an
+
+
+SPELLS2 = ('ereb_hand_changeling_flame', 'ereb_hand_false_retreat', 'ereb_hand_false_retreat_open', 'ereb_hand_false_retreat_strike',
+           'ereb_hand_traitor_reflection', 'ereb_hand_swarm_of_lies', 'ereb_hand_false_dawn')
 
 # что за чем играет (для проверки стыков): анимация → (откуда приходит, куда уходит); None — поза покоя IDLE0
 CHAIN = {'ereb_hand_grab': (None, 'ereb_hand_grab_hold'), 'ereb_hand_grab_hold': ('ereb_hand_grab', 'ereb_hand_squeeze'),
          'ereb_hand_squeeze': ('ereb_hand_grab_hold', 'ereb_hand_grab_hold'), 'ereb_hand_grab_release': ('ereb_hand_grab_hold', None),
          'ereb_hand_spawn': ('hidden', None), 'ereb_hand_false_death': (None, 'hidden'), 'ereb_hand_mask_fall': (None, 'maskless'),
          'ereb_hand_mask_return': ('maskless', None), 'ereb_hand_hand_of_lies': (None, None),
-         'ereb_hand_reflection_strike': ('hidden', 'hidden')}
+         'ereb_hand_reflection_strike': ('hidden', 'hidden'),
+         'ereb_hand_false_retreat': (None, 'ereb_hand_false_retreat_open'), 'ereb_hand_false_retreat_strike': ('hidden', None)}
 
 
 def build_giant():

@@ -1,0 +1,84 @@
+{
+ "comment": "T31 «Пламя-подменыш», каст (32 тика = ereb_hand_changeling_flame 1.6 с): caster = Эреб. 4 (charge) — в поднятой «Длани» собирается фиолетово-золотой огненный шар; 13 (throw) — бросок: вспышка у «Длани», снаряд летит (сам шар — ereb_hand_changeling_flame_orb на снаряде). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 32,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 4,
+   "at": "caster-0.4,2.45,0.05",
+   "duration": 9,
+   "size": 0.9,
+   "rays": 6,
+   "color": "#E6C8FF",
+   "brightness": 0.9,
+   "follow": true
+  },
+  {
+   "type": "vortex",
+   "delay": 4,
+   "at": "caster-0.4,2.45,0.05",
+   "duration": 9,
+   "radius": 0.7,
+   "height": 0,
+   "arms": 3,
+   "speed": 18,
+   "pull": 0.6,
+   "texture": "spark_soft",
+   "particles": 18,
+   "life": 8,
+   "size": 0.12,
+   "color": "#9A6BFF",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster-0.4,2.45,0.05",
+   "duration": 9,
+   "texture": "cult_flame_tongue",
+   "count": 10,
+   "rate": 1.2,
+   "spread": 0.15,
+   "speed": 0.01,
+   "gravity": -0.02,
+   "size": [
+    0.4,
+    0.15
+   ],
+   "life": 8,
+   "color": "#9A6BFF",
+   "glow": 0.4,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 13,
+   "at": "caster-0.1,1.35,0.7",
+   "duration": 6,
+   "size": 1.2,
+   "rays": 6,
+   "anamorphic": 1.0,
+   "color": "#E6C8FF",
+   "brightness": 1.1
+  },
+  {
+   "type": "sprites",
+   "delay": 13,
+   "at": "caster-0.1,1.35,0.7",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.3,
+   "speed": 0.12,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0"
+  }
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "comment": "T31 «Отражение-предатель», копия разбита (20 тиков): caster = копия. Она лопается стеклом и бабочками (модель убрать на 0). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 6,
+   "size": 2.0,
+   "rays": 8,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 40,
+   "spread": 0.5,
+   "speed": 0.16,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.24,
+    0.07
+   ],
+   "life": 20,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 1,
+   "texture": "mote_butterfly",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.4,
+   "speed": 0.08,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 24,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 1,
+   "texture": "mote_butterfly_side",
+   "count": 4,
+   "rate": 4.0,
+   "spread": 0.4,
+   "speed": 0.08,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 24,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  }
+ ]
+}

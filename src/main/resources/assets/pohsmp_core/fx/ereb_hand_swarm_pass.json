@@ -1,0 +1,38 @@
+{
+ "comment": "T31 «Рой лжи», ложная бабочка прошла насквозь (8 тиков): caster = точка прохода. Бабочка тает рябью, без вспышки. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 8,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 6,
+   "shape": "sphere",
+   "radius": 0.5,
+   "rim": 0.8,
+   "color": "@secondary",
+   "brightness": 0.3
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 6,
+   "rate": 6,
+   "spread": 0.2,
+   "speed": 0.04,
+   "gravity": -0.01,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 8,
+   "color": "#F4EEFF"
+  }
+ ]
+}

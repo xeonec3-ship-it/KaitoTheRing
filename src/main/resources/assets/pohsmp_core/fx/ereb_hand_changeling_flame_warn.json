@@ -1,0 +1,59 @@
+{
+ "comment": "T31 «Пламя-подменыш», ПОДСКАЗКА (10 тиков = 0.5 с до подмены): caster = снаряд, follow. Шар мерцает золотом (3 вспышки), по краю — золотые искры. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster",
+   "duration": 3,
+   "size": 1.1,
+   "rays": 4,
+   "color": "#FFE7A0",
+   "brightness": 1.1,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 4,
+   "at": "caster",
+   "duration": 3,
+   "size": 1.1,
+   "rays": 4,
+   "color": "#FFE7A0",
+   "brightness": 1.1,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster",
+   "duration": 2,
+   "size": 1.2,
+   "rays": 4,
+   "color": "#FFE7A0",
+   "brightness": 1.2,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.3,
+   "speed": 0.06,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0",
+   "follow": true
+  }
+ ]
+}

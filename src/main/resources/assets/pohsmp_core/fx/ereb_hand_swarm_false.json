@@ -1,0 +1,44 @@
+{
+ "comment": "T31 «Рой лжи», ЛОЖНАЯ бабочка (проходит насквозь) (duration −1, код стопит): caster = снаряд, follow. Стеклянная бабочка с тонким следом стеклянной пыли, без золота. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "mote_butterfly",
+   "count": 1,
+   "rate": 0.2,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    0.55,
+    0.55
+   ],
+   "life": 6,
+   "color": "#D9CCFF",
+   "glow": 0.4,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "mote_glass",
+   "count": 200,
+   "rate": 0.5,
+   "spread": 0.1,
+   "speed": 0,
+   "gravity": 0.01,
+   "size": [
+    0.08,
+    0.02
+   ],
+   "life": 10,
+   "color": "#F4EEFF"
+  }
+ ]
+}

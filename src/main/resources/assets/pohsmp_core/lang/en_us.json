@@ -940,5 +940,21 @@
   "ui.pohsmp_core.ereb_hand.false_arena": "The world lies to you…",
   "entity.pohsmp_core.ereb_hand_reflection": "Ereb, the Hand of Lies",
   "entity.pohsmp_core.ereb_hand_giant": "Hand of Lies",
-  "entity.pohsmp_core.ereb_hand_mask_shard": "Mask Shard"
+  "entity.pohsmp_core.ereb_hand_mask_shard": "Mask Shard",
+  "subtitles.pohsmp_core.ereb_hand.changeling": "The flame turns into a butterfly",
+  "subtitles.pohsmp_core.ereb_hand.retreat": "Ereb falls back",
+  "subtitles.pohsmp_core.ereb_hand.reflection": "A reflection steps out of the mirror",
+  "subtitles.pohsmp_core.ereb_hand.swarm": "A swarm takes wing",
+  "subtitles.pohsmp_core.ereb_hand.swarm_chime": "A butterfly chimes softly",
+  "subtitles.pohsmp_core.ereb_hand.false_victory": "Victory sounds",
+  "subtitles.pohsmp_core.ereb_hand.dawn_wave": "The false dawn strikes",
+  "ui.pohsmp_core.ereb_hand.spell.changeling_flame": "Changeling Flame",
+  "ui.pohsmp_core.ereb_hand.spell.false_retreat": "False Retreat",
+  "ui.pohsmp_core.ereb_hand.spell.traitor_reflection": "Traitor Reflection",
+  "ui.pohsmp_core.ereb_hand.spell.swarm_of_lies": "Swarm of Lies",
+  "ui.pohsmp_core.ereb_hand.spell.false_dawn": "False Dawn",
+  "ui.pohsmp_core.ereb_hand.changeling_flame": "\"Changeling Flame\" — the fireball flickers gold before it turns",
+  "ui.pohsmp_core.ereb_hand.false_retreat": "\"False Retreat\" — the double casts no shadow",
+  "ui.pohsmp_core.ereb_hand.traitor_reflection": "\"Traitor Reflection\" — break your own copy!",
+  "ui.pohsmp_core.ereb_hand.swarm_of_lies": "\"Swarm of Lies\" — the real ones chime and glow gold at the edges"
 }

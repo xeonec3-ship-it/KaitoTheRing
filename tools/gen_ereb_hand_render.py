@@ -53,6 +53,21 @@ def model_entry(name):
                 'tex': CR.b64(os.path.join(A, 'textures', 'item', 'ereb_hand_rapier_3d.png')), 'height': 16,
                 'item': dict(rapier_entry(), display={'rotation': [0, 0, 0], 'translation': [0, 0, 0], 'scale': [1, 1, 1]}, fix=[0, 0, 0],
                              off=[0, 0, 0])}
+    if name == 'traitor':                # «Отражение-предатель»: модель игрока со скином + стеклянный оверлей traitor_glass.png, меч игрока
+        from PIL import Image
+        skin = CR.steve_skin().convert('RGBA')
+        ov = Image.open(os.path.join(T, 'traitor_glass.png')).convert('RGBA')
+        e = CR.model_entry('steve')
+        e['tex'] = CR.pil_b64(Image.alpha_composite(skin, ov))
+        e['title'] = 'стеклянная копия игрока'
+        r = 'rotation'
+        rot = {'angle': -45, 'axis': 'z', 'origin': [8, 8, 8]}
+        sword = [([7.5, 0, 7.5], [8.5, 1, 8.5], '#E8B84A'), ([7.6, 1, 7.6], [8.4, 5, 8.4], '#7A6AB8'), ([5.4, 5, 7.6], [10.6, 6, 8.4], '#E8B84A'),
+                 ([7.25, 6, 7.75], [8.75, 17, 8.25], '#D9E2FF'), ([7.6, 17, 7.75], [8.4, 18.6, 8.25], '#F4F6FF')]
+        it = rapier_entry()
+        it['els'] = [[a, b, c, dict(rot)] for a, b, c in sword]
+        e['item'] = it
+        return e
     return ER.model_entry(name)
 
 

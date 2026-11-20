@@ -1,0 +1,88 @@
+{
+ "comment": "T31 «Ложное отступление» (26 тиков = ereb_hand_false_retreat 1.3 с): caster = Эреб на месте прыжка. 5 (leap) — от ног взлетают стеклянные бабочки и пыль; 13 (land) — на точке приземления (point:land, или caster, если код шлёт его там) тихая стеклянная рябь: тут настоящий исчезает, остаётся ДВОЙНИК. Подмену видно только по рябью и по отсутствию тени. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 26,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 5,
+   "at": "caster+0,0.2,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.6,
+   "speed": 0.06,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 12,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "at": "caster+0,0.6,0",
+   "duration": 1,
+   "texture": "mote_butterfly",
+   "count": 4,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.06,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 20,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 5,
+   "at": "caster+0,0.6,0",
+   "duration": 1,
+   "texture": "mote_butterfly_side",
+   "count": 2,
+   "rate": 2.0,
+   "spread": 0.4,
+   "speed": 0.06,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 20,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "wave",
+   "delay": 13,
+   "at": "point:land+0,1,0",
+   "duration": 8,
+   "shape": "sphere",
+   "radius": 1.3,
+   "rim": 0.8,
+   "color": "@secondary",
+   "brightness": 0.35
+  },
+  {
+   "type": "flash",
+   "delay": 13,
+   "at": "point:land+0,1.6,0",
+   "duration": 4,
+   "size": 0.6,
+   "rays": 4,
+   "color": "#F4EEFF",
+   "brightness": 0.5
+  }
+ ]
+}

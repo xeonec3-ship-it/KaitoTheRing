@@ -1,0 +1,76 @@
+{
+ "comment": "T31 «Отражение-предатель», зеркало (40 тиков): caster = точка в 1.5 бл. перед игроком-«оригиналом», yaw — к игроку. 0 — зеркало встаёт из земли (меш ereb_hand_mirror), в стекле — блики; 14 (= emerge каста) — стекло идёт рябью, из зеркала шагает копия (сущность — код); 30 — зеркало трескается и рассыпается. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ereb_hand_mirror",
+   "scale": 0.8,
+   "appear": "rise",
+   "until": 30
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 34,
+   "texture": "illusion_seal",
+   "radius": 1.2,
+   "glow": 0.2,
+   "color": "#D9CCFF",
+   "brightness": 0.4
+  },
+  {
+   "type": "wave",
+   "delay": 14,
+   "at": "caster+0,1.2,0.1",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 1.3,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.8
+  },
+  {
+   "type": "flash",
+   "delay": 14,
+   "at": "caster+0,1.2,0.2",
+   "duration": 6,
+   "size": 1.6,
+   "rays": 6,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0,1.2,0",
+   "duration": 6,
+   "size": 1.6,
+   "rays": 6,
+   "color": "#FFFFFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 24,
+   "rate": 24,
+   "spread": 0.7,
+   "speed": 0.12,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.22,
+    0.06
+   ],
+   "life": 16,
+   "color": "#F4EEFF"
+  }
+ ]
+}

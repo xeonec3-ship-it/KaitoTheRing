@@ -6,7 +6,7 @@ tools/boss_video_b_driver.js, только страница — шаблон T31
 Эффекты в роликах условные (спрайты textures/sigil|fx и меши fx/meshes T31, движение — по таблицам письма), как на кадрах docs/media/t31_*.jpg;
 в игре их рисует движок fx.
 
-  python3 tools/boss_video_t31.py [--three путь/three.min.js] [t31_turntable t31_combat t31_spells t31_special t31_finale]
+  python3 tools/boss_video_t31.py [--three путь/three.min.js] [t31_turntable t31_combat t31_spells t31_special t31_finale t31_spells2]
 Координаты кадра — как у драйвера (кадр модели three.js): x — вправо от Эреба, y — вверх, ВПЕРЁД = −z (Эреб стоит в начале, смотрит в −z).
 """
 import json
@@ -30,14 +30,14 @@ HAND = [0.97, 2.25, 0.34]         # рука над правым плечом (�
 FACE = [0.15, 1.75, -0.33]
 HOLD = [0.5, 1.25, -1.45]           # ноги схваченного: рука держит его за торс, поднят на 1.25 бл.
 SLAM = [0.6, 0.05, -0.9]
-TEXS = ['glow', 'mote_glass', 'mote_butterfly', 'spark_soft', 'wave_ring', 'illusion_seal', 'higher_cracks', 'ereb_hand_flame_ring',
+TEXS = ['glow', 'mote_butterfly', 'ereb_hand_butterfly_rim', 'dawn_sunrise', 'mote_glass', 'mote_butterfly', 'spark_soft', 'wave_ring', 'illusion_seal', 'higher_cracks', 'ereb_hand_flame_ring',
         'ereb_hand_flame_rim', 'ereb_hand_grip_cone', 'ereb_hand_oath_mark', 'ereb_hand_mirror_floor', 'cult_flame_tongue', 'aura_shell',
         'cult_emblem', 'title:ereb_hand_ru', 'title:ereb_hand_hand_of_lies_ru', 'title:ereb_hand_mask_fall_ru', 'title:ereb_hand_full_reveal_ru']
 MESHES = ['ereb_hand_giant_open', 'ereb_hand_giant_fist', 'ereb_hand_mask_shard', 'ereb_hand_mask_arrow', 'ereb_hand_mirror']
 
 
 def build_page(kind, three, texs, preload):
-    html = HR.page(['ereb_hand', 'ereb_hand_giant', 'steve'], {'cols': 1, 'cells': [{'model': 'ereb_hand', 'meshes': [{'mesh': m, 'pos': [0, 0, 0]} for m in MESHES]}]},
+    html = HR.page(['ereb_hand', 'ereb_hand_giant', 'steve', 'traitor'], {'cols': 1, 'cells': [{'model': 'ereb_hand', 'meshes': [{'mesh': m, 'pos': [0, 0, 0]} for m in MESHES]}]},
                    three)
     # варианты текстуры — отдельными моделями (драйвер берёт модель по имени)
     d0 = HR.model_entry('ereb_hand')
@@ -479,13 +479,231 @@ def finale():
     return c
 
 
-CLIPS = {'t31_turntable': turntable, 't31_combat': combat, 't31_spells': spells, 't31_special': special, 't31_finale': finale}
+# ================================================================== вторая партия (владелец 20.11): +4 заклинания и «Ложный рассвет»
+GOLD = '#E8B84A'
+_FK = {}
+
+
+def vfk(anim, t, bone, local):
+    """точка кости (прямая кинематика) в кадре ролика: x — вправо от Эреба, y — вверх, вперёд = −z"""
+    import ereb_hand_fk as F
+    if not _FK:
+        _FK['an'] = json.load(open(os.path.join(F.A, 'animations', 'entity', 'ereb_hand.animation.json'), encoding='utf-8'))['animations']
+        _FK['m'] = F.Model()
+    m = _FK['m']
+    p = m.point(m.world(F.sample(_FK['an'][anim], t)), bone, local)
+    return [-p[0] / 16, p[1] / 16, p[2] / 16]
+
+
+def gnt(anim, t):
+    return vfk(anim, t, 'left_arm', [6, 11.5, 0])
+
+
+def plm(anim, t):
+    return vfk(anim, t, 'ghost_palm', [-15.5, 35.5, 4.25])
+
+
+def shd(x, z, r=0.5, op=0.5):
+    return dict(decal('glow', [x, 0.02, z], r, '#000000', op), add=False)
+
+
+def bfly1(at, real, t, size=0.45, ph=0.0):
+    w = size * (0.35 + 0.65 * abs(math.cos(t * 15 + ph)))
+    o = [{'tex': 'mote_butterfly', 'at': list(at), 'h': size, 'w': w, 'color': GL, 'op': 0.9}]
+    if real:
+        o.append({'tex': 'ereb_hand_butterfly_rim', 'at': list(at), 'h': size * 1.02, 'w': w * 1.02, 'color': GOLD, 'op': 1.0, 'add': False})
+    return o
+
+
+def orb_s(at, k=1.0):
+    return [glow(at, 0.9 * k, FL, 0.9), glow(at, 0.35 * k, GO, 0.9),
+            *[{'tex': 'cult_flame_tongue', 'at': [at[0] + 0.12 * math.cos(i * 2.1), at[1] + 0.1, at[2] + 0.12 * math.sin(i * 2.1)], 'w': 0.35 * k,
+               'h': 0.55 * k, 'color': FL, 'op': 0.7} for i in range(4)]]
+
+
+def mixp(a, b, k):
+    return [a[i] + (b[i] - a[i]) * k for i in range(3)]
+
+
+def spells2():
+    c = Clip('t31_spells2', TAG)
+    title = lambda txt, t, L: {'text': txt, 'op': tenv(t, 0.1, L)}
+    # ---------------------------------------------------------------- «Пламя-подменыш»
+    P, AL = [0.0, 0, -7.0], [2.3, 0, -6.4]
+
+    def flame(t):
+        A = 'ereb_hand_changeling_flame'
+        objs = [E(A, min(t, 1.6)), ST(P, 180, key='p'), ST(AL, 160, key='a')]
+        s = [shd(0, 0, 0.6), shd(*P[::2]), shd(*AL[::2])]
+        if 0.2 <= t < 0.65:
+            g = gnt(A, t)
+            s += orb_s(g, lin(t, 0.2, 0.45))
+        G0 = gnt(A, 0.65)
+        MID = [0.1, 1.35, -3.4]
+        HIT = [AL[0], 1.2, AL[2]]
+        if 0.65 <= t < 1.25:
+            k = (t - 0.65) / 0.6
+            q = mixp(G0, MID, k)
+            s += orb_s(q)
+            for j in range(1, 6):
+                s.append(glow(mixp(G0, MID, max(0, k - 0.05 * j)), 0.5 - 0.06 * j, FL, 0.35))
+            if t > 0.75:                                    # подсказка: мерцание золотом за 0.5 с до подмены
+                s.append(glow(q, 1.1, GO, 0.8 * abs(math.sin((t - 0.75) * 19))))
+        s += flash(MID, t - 1.25, 1.5, GH) + gls(MID, t - 1.25, 14, 901, speed=1.2)
+        if 1.25 <= t < 1.75:
+            q = mixp(MID, HIT, (t - 1.25) / 0.5)
+            s += bfly1(q, True, t, 0.6)
+            s.append(glow(q, 0.5, FL, 0.4))
+        s += flash(HIT, t - 1.75, 1.6, FL) + gls(HIT, t - 1.75, 16, 902, speed=1.4)
+        return {'objs': objs, 'sprites': s, 'cam': camkeys([(0, 130, 14, 9.5, (0.6, 1.1, -3.2)), (3.0, 115, 16, 10, (0.8, 1.1, -3.4))], t),
+                'groundSize': 96, 'cap': '«Пламя-подменыш»', 'title': title('«Пламя-подменыш»', t, 2.6),
+                'sub': 'charge 0.2 · throw 0.65 · за 0.5 с до подмены шар мерцает золотом · на полпути — бабочка в союзника цели'}
+    c.seg(3.0, flame)
+    # ---------------------------------------------------------------- «Ложное отступление»
+    P0 = [0.4, 0, -6.0]
+
+    def retreat(t):
+        objs, s = [], []
+        back = 3.2 * ease(lin(t, 0.25, 0.65))
+        lift = 0.6 * math.sin(math.pi * lin(t, 0.25, 0.65))
+        D = [0, 0, back]
+        if t < 1.3:
+            objs.append(E('ereb_hand_false_retreat', t, pos=[0, lift, back]))
+        else:
+            objs.append(E('ereb_hand_false_retreat_open', (t - 1.3) % 2.0, pos=D, op=1 - lin(t, 3.55, 3.7), key='double'))
+        if t < 0.65:
+            s.append(shd(0, back, 0.6))                      # настоящий — с тенью; после land 0.65 — двойник БЕЗ тени
+        s += gls([0, 0.3, 0], t - 0.25, 10, 911, speed=1.0) + bfl([0, 0.6, 0], t - 0.25, 4, 912)
+        if 0.65 <= t < 1.0:
+            s.append(glow([0, 1.2, back], 2.0 * (t - 0.65) / 0.35, GH, 0.25 * (1 - (t - 0.65) / 0.35)))
+        # игрок подходит к двойнику ближе 3 бл. — настоящий проступает за его спиной (appear) и бьёт (hit 0.35)
+        k = ease(lin(t, 1.0, 3.0))
+        pl = [P0[0], 0, P0[2] + (back - 2.2 - P0[2]) * k]
+        objs.append(ST(pl, 180, key='pl'))
+        s.append(shd(pl[0], pl[2]))
+        if t >= 3.0:
+            u = t - 3.0
+            R_ = [pl[0] - 0.2, 0, pl[2] - 1.3]
+            objs.append(E('ereb_hand_false_retreat_strike', min(u, 1.4), pos=R_, ry=180, key='real'))
+            s.append(shd(R_[0], R_[2], 0.6))
+            s += flash([R_[0], 1.3, R_[2]], u, 1.6, GH) + gls([R_[0], 1.2, R_[2]], u, 14, 913, speed=-1.0, life=0.3)
+            s += flash([pl[0], 1.35, pl[2]], u - 0.35, 0.8, GO, 0.3)
+            s += flash([0, 1.2, back], u - 0.55, 1.8, GH) + bfl([0, 1.2, back], u - 0.55, 14, 914)
+        cam = camkeys([(0, 95, 12, 10, (0.2, 1.1, -0.5)), (4.6, 80, 14, 10.5, (0.2, 1.1, -0.5))], t)
+        return {'objs': objs, 'sprites': s, 'cam': cam, 'groundSize': 96, 'cap': '«Ложное отступление»',
+                'title': title('«Ложное отступление»', t, 2.4),
+                'sub': 'leap 0.25 · land 0.65 — двойник (без тени!) · подошёл ближе 3 бл. — удар в спину (hit 0.35)'}
+    c.seg(4.6, retreat)
+    # ---------------------------------------------------------------- «Отражение-предатель»
+    PL, ALY, MR = [0.2, 0, -6.6], [-2.0, 0, -5.2], [1.3, 0, -4.8]
+
+    def traitor(t):
+        A = 'ereb_hand_traitor_reflection'
+        objs = [E(A, min(t, 2.0)), ST(PL, 180, key='pl'), ST(ALY, 210, key='al')]
+        s = [shd(0, 0, 0.6), shd(*PL[::2]), shd(*ALY[::2])]
+        ms = []
+        if t >= 0.5:
+            k = ease(lin(t, 0.5, 0.9))
+            alive = t < 3.9
+            ms.append({'mesh': 'ereb_hand_mirror', 'key': 'tm', 'pos': [MR[0], -2.8 * (1 - k), MR[2]], 'ry': 0, 'scale': 0.8,
+                       'op': k * (1 - lin(t, 2.0, 2.3))})
+            s += flash([MR[0], 1.2, MR[2] + 0.1], t - 1.2, 1.8, GH) + flash([MR[0], 1.2, MR[2]], t - 2.0, 1.8) + gls([MR[0], 1.2, MR[2]], t - 2.0, 20, 921)
+            if t >= 1.2 and alive:
+                w = t - 1.2
+                q = mixp([MR[0], 0, MR[2] + 0.2], [ALY[0] + 0.9, 0, ALY[2] + 0.2], ease(lin(w, 0.3, 1.2)))
+                an = 'instant_slash' if w > 1.3 else None
+                objs.append({'model': 'traitor', 'anim': an, 't': (w - 1.3) % 1.0 if an else 0, 'pos': q, 'ry': 260 if w > 0.4 else 0,
+                             'key': 'copy', 'op': 0.6 * min(1, w * 3)})
+                s.append(shd(q[0], q[2], 0.45, 0.25))
+                s += [glow([q[0], 1.0, q[2]], 1.6, GL, 0.15)] + flash([ALY[0], 1.3, ALY[2]], w - 1.55, 0.8, GO, 0.3)
+            if t >= 3.9:                                     # оригинал разбил копию одним ударом
+                cq = [ALY[0] + 0.9, 1.0, ALY[2] + 0.2]
+                s += flash(cq, t - 3.9, 2.2) + gls(cq, t - 3.9, 36, 922, speed=2.0) + bfl(cq, t - 3.9, 8, 923)
+        if 0.9 <= t < 1.4:
+            s.append(glow(plm(A, min(t, 1.2)), 0.6, GO, 0.7))
+        return {'objs': objs, 'sprites': s, 'meshes': ms, 'cam': camkeys([(0, 145, 14, 10.5, (0, 1.1, -3.2)), (4.6, 125, 16, 11, (-0.3, 1.1, -3.6))], t),
+                'groundSize': 96, 'cap': '«Отражение-предатель»', 'title': title('«Отражение-предатель»', t, 2.4),
+                'sub': 'mirror 0.5 · emerge 1.2 — стеклянная копия игрока (его скин + стекло) 6 с бьёт его союзников · оригинал разбивает с 1 удара'}
+    c.seg(4.6, traitor)
+    # ---------------------------------------------------------------- «Рой лжи»
+    TG = [[-2.6, 0, -6.5], [0.4, 0, -7.4], [3.0, 0, -6.2]]
+
+    def swarm(t):
+        A = 'ereb_hand_swarm_of_lies'
+        objs = [E(A, min(t, 1.6))] + [ST(p, 180, key='s%d' % i) for i, p in enumerate(TG)]
+        s = [shd(0, 0, 0.6)] + [shd(p[0], p[2]) for p in TG]
+        if 0.3 <= t < 0.75:
+            cp = plm(A, t)
+            for i in range(6):
+                a = t * 9 + i
+                s += bfly1([cp[0] + 0.25 * math.cos(a), cp[1] + 0.1 * math.sin(a * 1.3), cp[2] + 0.25 * math.sin(a)], False, t, 0.22, i)
+        R0 = plm(A, 0.75)
+        s += flash(R0, t - 0.75, 1.4, GH)
+        for i in range(12):
+            real = i % 2 == 0
+            tg = TG[i % 3]
+            dst = [tg[0] + 0.3 * math.sin(i), 1.5, tg[2]] if real else [tg[0] + 0.4 * math.cos(i), 1.3, tg[2] - 3.0]
+            u = (t - 0.75 - 0.04 * i) / 1.4
+            if 0 <= u < 1:
+                arc = [R0[0] + (dst[0] - R0[0]) * u + 1.2 * math.sin(i * 1.7) * math.sin(math.pi * u),
+                       R0[1] + (dst[1] - R0[1]) * u + 0.8 * math.sin(math.pi * u), R0[2] + (dst[2] - R0[2]) * u]
+                s += bfly1(arc, real, t, 0.42, i)
+                if not real and abs(arc[2] - tg[2]) < 0.4:   # ложная проходит сквозь игрока: рябь
+                    s.append(glow([tg[0], 1.3, tg[2]], 0.8, GL, 0.3))
+            if real:
+                s += flash([dst[0], 1.6, dst[2]], t - 0.75 - 0.04 * i - 1.4, 0.9, GO, 0.3)
+        return {'objs': objs, 'sprites': s, 'cam': camkeys([(0, 160, 18, 10.5, (0.2, 1.3, -3.2)), (3.4, 185, 20, 11, (0.2, 1.3, -3.4))], t),
+                'groundSize': 96, 'cap': '«Рой лжи»', 'title': title('«Рой лжи»', t, 2.4),
+                'sub': 'gather 0.3 · release 0.75 — 12 бабочек: 6 ложных (сквозь), 6 настоящих — золото по краю крыльев, урон и слепота 1 с'}
+    c.seg(3.4, swarm)
+    # ---------------------------------------------------------------- мифическое «Ложный рассвет» (титра нет — по ТЗ)
+    PLS = [[-3.2, 0, -4.2], [3.4, 0, -8.5], [0.6, 0, -10.0]]
+
+    def dawn(t):
+        A = 'ereb_hand_false_dawn'
+        objs = [E(A, min(t, 6.0), model='ereb_hand_mended')] + [ST(p, 180, key='d%d' % i) for i, p in enumerate(PLS)]
+        s = [shd(0, 0, 0.7)] + [shd(p[0], p[2]) for p in PLS]
+        dk = pulse(t, 0.5, 1.2, 2.6, 0.6)
+        if dk > 0:
+            s.append(decal('dawn_sunrise', [0, 0.03, 0], 5.5, GO, 0.5 * dk))
+            s.append(glow([0, 6, -30], 30, '#FFD9A0', 0.35 * dk))
+        if 0.5 <= t < 4.6:                                    # бабочки кружат вокруг и НЕ улетают
+            s += swarm_dawn(t)
+        if 4.5 <= t < 5.0:
+            s += VB.butterflies([0, 1.2, 0], t, 18, 2.2 * (1 - lin(t, 4.5, 5.0)) + 0.3, 1.6, 931)
+        u = t - 5.0
+        s += flash([0, 1.6, 0], u, 5.0, WH, 0.4) + gls([0, 1.2, 0], u, 40, 932, speed=4.0) + bfl([0, 1.4, 0], u, 16, 933, speed=3.0)
+        if 0 <= u < 1.0:
+            s.append(decal('wave_ring', [0, 0.03, 0], 1 + 23 * u, GO, 0.8 * (1 - u)))
+            s.append(decal('wave_ring', [0, 0.04, 0], 1 + 5 * min(1, u / 0.4), CRM, 0.9 * (1 - u)))
+        for i, p in enumerate(PLS):
+            near = math.hypot(p[0], p[2]) <= 6
+            s += flash([p[0], 1.2, p[2]], u - 0.05 - 0.035 * math.hypot(p[0], p[2]), 1.4 if near else 0.9, CRM if near else GO, 0.4)
+        cam = camkeys([(0, 25, 6, 6.0, (0, 1.2, 0)), (2.2, 40, 10, 7.0, (0, 1.0, 0)), (4.4, 200, 24, 14, (0, 1.0, -3)), (6.6, 210, 28, 16, (0, 1.0, -3))], t)
+        return {'objs': objs, 'sprites': s, 'cam': cam, 'groundSize': 96, 'bg': 0x3a2c38 if dk > 0.3 else None,
+                'tint': ['#FFD9A0', 0.22 * dk], 'cap': 'Мифическое: «Ложный рассвет» (33%)',
+                'sub': ('kneel 0.5 — на колене: полоса скрыта, небо светлеет, фанфара «победы»; 4 с неуязвим; бабочки НЕ улетают' if t < 4.5 else
+                        'rise 4.5 · wave 5.0 — ≤6 бл. 60% макс. ХП, дальше 20%; затем маска трескается (ereb_hand_phase3)')}
+    c.seg(6.6, dawn)
+    return c
+
+
+def swarm_dawn(t):
+    out = []
+    for i in range(14):
+        a = t * 0.9 + i * 0.45
+        r = 1.6 + 0.4 * math.sin(i * 1.3)
+        out += bfly1([r * math.cos(a), 0.5 + 0.25 * (i % 5) + 0.1 * math.sin(t * 2 + i), r * math.sin(a)], False, t, 0.3, i)
+    return out
+
+
+CLIPS = {'t31_turntable': turntable, 't31_combat': combat, 't31_spells': spells, 't31_special': special, 't31_finale': finale, 't31_spells2': spells2}
 
 
 def main(args):
     three = args[args.index('--three') + 1] if '--three' in args else None
     names = [a for a in args if a in CLIPS] or list(CLIPS)
-    pre = [{'model': m} for m in ('ereb_hand', 'ereb_hand_mended', 'ereb_hand_cracked', 'ereb_reflection', 'steve')] + \
+    pre = [{'model': m} for m in ('ereb_hand', 'ereb_hand_mended', 'ereb_hand_cracked', 'ereb_reflection', 'steve', 'traitor')] + \
         [{'model': 'ereb_hand_giant', 'key': k} for k in ('giant', 'slam')]
     for n in names:
         clip = CLIPS[n]()

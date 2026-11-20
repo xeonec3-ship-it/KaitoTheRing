@@ -1,0 +1,221 @@
+{
+ "comment": "T31 «Ложный рассвет» (120 тиков = ereb_hand_false_dawn 6.0 с; 33%, раз за бой): caster = Эреб (не follow). 10 (kneel) — он на колене: небо светлеет (тёплый рассветный тон на арену, свет восходящего солнца), «победная» фанфара (ereb_hand.false_victory), полоса скрыта (код), титра нет; бабочки вокруг него КРУЖАТ И НЕ УЛЕТАЮТ (подсказка: у настоящего поражения улетают); 90 (rise) — встаёт: рассвет гаснет, бабочки стягиваются к нему; 100 (wave) — волна по арене (≤6 бл. — 60% макс. ХП, дальше — 20%; урон — код): вспышка, кольцо до 24 бл., внутреннее золотое кольцо r6 (граница сильного урона). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 10,
+   "at": "caster",
+   "duration": 90,
+   "radius": 48,
+   "color": "#FFD9A0",
+   "strength": 0.32,
+   "in": {
+    "duration": 24,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 10,
+   "at": "caster",
+   "duration": 90,
+   "texture": "dawn_sunrise",
+   "radius": 6.0,
+   "grow": 30,
+   "glow": 0.4,
+   "color": "#FFE7A0",
+   "brightness": 0.6,
+   "fadeOut": 12
+  },
+  {
+   "type": "curtain",
+   "delay": 10,
+   "at": "caster",
+   "duration": 90,
+   "count": 28,
+   "radius": [
+    20,
+    24
+   ],
+   "height": [
+    8,
+    14
+   ],
+   "grow": 40,
+   "width": [
+    0.8,
+    1.4
+   ],
+   "brightness": [
+    0.2,
+    0.4
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.15,
+   "color": "#FFE7A0",
+   "comment": "свет рассвета по краю арены"
+  },
+  {
+   "type": "vortex",
+   "delay": 10,
+   "at": "caster+0,0.3,0",
+   "duration": 80,
+   "radius": 2.0,
+   "height": 2.6,
+   "arms": 4,
+   "speed": 3,
+   "pull": 0.0,
+   "texture": "mote_butterfly",
+   "particles": 40,
+   "life": 80,
+   "size": 0.3,
+   "color": "#D9CCFF",
+   "comment": "бабочки кружат вокруг и НЕ улетают"
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,1.2,0",
+   "duration": 80,
+   "texture": "mote_butterfly_side",
+   "count": 24,
+   "rate": 0.3,
+   "spread": 1.6,
+   "speed": 0.0,
+   "gravity": 0.0,
+   "sway": 0.6,
+   "size": [
+    0.26,
+    0.2
+   ],
+   "life": 80,
+   "color": "#FFE7A0",
+   "glow": 0.3
+  },
+  {
+   "type": "vortex",
+   "delay": 90,
+   "at": "caster+0,0.5,0",
+   "duration": 10,
+   "radius": 2.4,
+   "height": 2.4,
+   "arms": 4,
+   "speed": 14,
+   "pull": 0.8,
+   "texture": "mote_butterfly",
+   "particles": 40,
+   "life": 10,
+   "size": 0.3,
+   "color": "#D9CCFF",
+   "comment": "встаёт: бабочки стягиваются к нему"
+  },
+  {
+   "type": "flash",
+   "delay": 100,
+   "at": "caster+0,1.6,0",
+   "duration": 10,
+   "size": 5.0,
+   "rays": 12,
+   "color": "#FFFFFF",
+   "brightness": 1.4,
+   "screen": 0.5
+  },
+  {
+   "type": "wave",
+   "delay": 100,
+   "at": "caster+0,0.05,0",
+   "duration": 18,
+   "shape": "ring",
+   "radius": 24,
+   "color": "#FFE7A0",
+   "brightness": 0.9
+  },
+  {
+   "type": "wave",
+   "delay": 100,
+   "at": "caster+0,0.05,0",
+   "duration": 8,
+   "shape": "ring",
+   "radius": 6,
+   "color": "#E0606A",
+   "brightness": 0.9
+  },
+  {
+   "type": "wave",
+   "delay": 100,
+   "at": "caster+0,1,0",
+   "duration": 14,
+   "shape": "sphere",
+   "radius": 8,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 100,
+   "at": "caster+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 50,
+   "rate": 50,
+   "spread": 1.0,
+   "speed": 0.3,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.24,
+    0.07
+   ],
+   "life": 18,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 100,
+   "at": "caster+0,1.4,0",
+   "duration": 1,
+   "texture": "mote_butterfly",
+   "count": 24,
+   "rate": 24,
+   "spread": 0.8,
+   "speed": 0.2,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 24,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 100,
+   "at": "caster+0,1.4,0",
+   "duration": 1,
+   "texture": "mote_butterfly_side",
+   "count": 12,
+   "rate": 12.0,
+   "spread": 0.8,
+   "speed": 0.2,
+   "gravity": -0.008,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 24,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  }
+ ]
+}

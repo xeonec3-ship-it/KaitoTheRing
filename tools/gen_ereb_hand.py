@@ -68,11 +68,13 @@ PAL.update({
     # багрянец Культа (камзол, накидка): L — глубокая тень … Q — блик
     'L': '#1e070c', 'M': '#3a0d16', 'N': '#5c1420', 'O': '#7e1f2b', 'P': '#a3323b', 'Q': '#c95560',
     # призрачное стекло руки (холодное, чуть лиловое): f … n
-    'f': '#28316a', 'g': '#4a64b8', 'h': '#8eaeee', 'n': '#e6efff',
+    'f': '#8a7fb8', 'g': '#bdb3e4', 'h': '#e2dcf7', 'n': '#fbf9ff',
+    # маска — бледное «фарфоровое» белое золото (отдельно от светлых волос), кайма — тёмное золото: R … X
+    'R': '#8f8068', 'S': '#bfb294', 'T': '#ddd2b6', 'U': '#efe8d4', 'X': '#fdfaf0',
 })
 E.PAL.update({k: v for k, v in PAL.items() if k not in E.PAL})      # E.Atlas красит по E.PAL (новые буквы не пересекаются с T30)
 FAM = {}
-for fam, ramp in (('black', 'abcde'), ('crimson', 'LMNOPQ'), ('gold', 'opqrst'), ('glass', 'xyzZ'), ('ghost', 'fghn'),
+for fam, ramp in (('black', 'abcde'), ('crimson', 'LMNOPQ'), ('gold', 'opqrst'), ('glass', 'xyzZ'), ('ghost', 'fghn'), ('porcelain', 'RSTUX'),
                   ('grey', 'uvVW'), ('hair', 'ABCDEF'), ('skin', '12345'), ('glove', 'GHJK')):
     for i, ch in enumerate(ramp):
         FAM[hx(PAL[ch])[:3]] = (fam, i, ramp)
@@ -200,8 +202,8 @@ COAT_BONES = E.COAT_BONES
 WAIST = E.WAIST
 # призрачная рука: (кость, родитель, ось) — ось и бруски в «покое»: ладонь вертикально над правым плечом, ладонью вперёд
 GW = (-15.5, 30.0, 5.5)          # запястье
-FINGERS = (('index', -12.1, 41.0, (4.5, 3.25, 2.75)), ('middle', -14.4, 41.25, (5.0, 3.5, 3.0)),
-           ('ring', -16.6, 41.0, (4.5, 3.25, 2.75)), ('pinky', -18.8, 40.25, (3.5, 2.5, 2.25)))
+FINGERS = (('index', -12.4, 40.0, (5.0, 4.0, 3.5)), ('middle', -14.5, 40.25, (5.5, 4.5, 3.75)),
+           ('ring', -16.5, 40.0, (5.0, 4.0, 3.5)), ('pinky', -18.3, 39.25, (4.0, 3.25, 2.75)))
 GHOST_BONES = ['ghost_hand', 'ghost_wrist', 'ghost_palm'] + ['ghost_%s_%d' % (f[0], k) for f in FINGERS for k in (1, 2, 3)] + \
               ['ghost_thumb_1', 'ghost_thumb_2']
 
@@ -276,10 +278,14 @@ def build_model():
     add('torso', cube(al, 'torso', 'belt', [-4.5, 12.5, -2.5], [9.0, 1.5, 5.0], ('north', 'south', 'east', 'west')))
     add('torso', cube(al, 'torso', 'buckle', [-1.25, 12.25, -2.85], [2.5, 2.0, 0.5]))
     # ---------------------------------------------------------------- накидка Главы Культа (кость cape, ось у плеч сзади)
-    cape = {'name': 'cape', 'parent': 'torso', 'pivot': [0, 23.0, 3.25], 'rotation': [5, 0, 0], 'cubes': [
-        cube(al, 'cape', 'cape', [-5.25, 4.5, 3.0], [10.5, 18.5, 0.5], ('north', 'south', 'east', 'west', 'down')),
-        cube(al, 'cape', 'cape_roll', [-5.5, 22.0, 2.6], [11.0, 1.4, 1.4], ('north', 'south', 'east', 'west', 'up', 'down')),
-    ]}
+    # три кости по высоте (cape → cape_mid → cape_low): ткань гнётся волной, а не доской
+    cape = [{'name': 'cape', 'parent': 'torso', 'pivot': [0, 23.0, 3.25], 'rotation': [5, 0, 0], 'cubes': [
+                cube(al, 'cape', 'cape', [-5.25, 16.5, 3.0], [10.5, 6.5, 0.5], ('north', 'south', 'east', 'west')),
+                cube(al, 'cape', 'cape_roll', [-5.5, 22.0, 2.6], [11.0, 1.4, 1.4], ('north', 'south', 'east', 'west', 'up', 'down'))]},
+            {'name': 'cape_mid', 'parent': 'cape', 'pivot': [0, 16.5, 3.25], 'cubes': [
+                cube(al, 'cape_mid', 'cape_mid', [-5.25, 10.5, 3.0], [10.5, 6.15, 0.5], ('north', 'south', 'east', 'west'))]},
+            {'name': 'cape_low', 'parent': 'cape_mid', 'pivot': [0, 10.5, 3.25], 'cubes': [
+                cube(al, 'cape_low', 'cape_low', [-5.25, 4.5, 3.0], [10.5, 6.15, 0.5], ('north', 'south', 'east', 'west', 'down'))]}]
     # ---------------------------------------------------------------- плечи
     for arm, s, nm in (('right_arm', -1, 'r'), ('left_arm', 1, 'l')):
         xo = -8.6 if s < 0 else 3.6
@@ -321,30 +327,38 @@ def build_model():
     # ---------------------------------------------------------------- призрачная рука (дочь body): стекло, отдельные кости
     gx, gy, gz = GW
     D = 0.5                                           # плотность атласа стекла: 2 пикселя картинки на единицу (крупно и прозрачно)
+    # запястье не обрублено: под ним тают осколки (кость ghost_hand), к правому плечу тянется шлейф искр (ghost_trail, дочь body)
+    shards = [(0.6, -1.6, 0.4, 1.3, 25), (-0.8, -3.0, -0.3, 1.0, -20), (0.9, -4.4, 0.6, 0.8, 40), (-0.4, -5.6, -0.2, 0.6, 10),
+              (0.5, -6.6, 0.4, 0.45, -35)]
     ghost = [{'name': 'ghost_hand', 'parent': 'body', 'pivot': [gx, gy, gz], 'cubes': [
-                 cube(al, 'ghost_hand', 'ghost_mist', [gx - 2.0, gy - 5.5, gz - 1.6], [4.0, 5.0, 3.2],
-                      ('north', 'south', 'east', 'west'), density=D)]},
+                 cube(al, 'ghost_hand', 'ghost_shard_%d' % i, [gx + dx - sz / 2, gy + dy - sz / 2, gz + dz - sz / 2], [sz, sz, sz],
+                      ('north', 'south', 'east', 'west', 'up'), pivot=[gx + dx, gy + dy, gz + dz], rotation=[rr, 45, rr / 2], density=1.0)
+                 for i, (dx, dy, dz, sz, rr) in enumerate(shards)]},
              {'name': 'ghost_wrist', 'parent': 'ghost_hand', 'pivot': [gx, gy, gz], 'cubes': [
-                 cube(al, 'ghost_wrist', 'ghost_wrist', [gx - 2.5, gy - 0.75, gz - 1.9], [5.0, 2.25, 3.8], density=D)]},
+                 cube(al, 'ghost_wrist', 'ghost_wrist', [gx - 2.0, gy - 0.5, gz - 1.5], [4.0, 1.75, 3.0], density=D)]},
              {'name': 'ghost_palm', 'parent': 'ghost_wrist', 'pivot': [gx, gy + 1.25, gz], 'cubes': [
-                 cube(al, 'ghost_palm', 'ghost_palm', [gx - 4.5, gy + 1.0, gz - 1.5], [9.0, 10.0, 3.0], density=D),
-                 cube(al, 'ghost_palm', 'ghost_thenar', [gx + 2.25, gy + 1.25, gz - 2.0], [2.5, 5.0, 3.4], density=D)]}]
+                 cube(al, 'ghost_palm', 'ghost_palm', [gx - 4.0, gy + 1.0, gz - 1.25], [8.0, 9.25, 2.5], density=D),
+                 cube(al, 'ghost_palm', 'ghost_thenar', [gx + 2.0, gy + 1.25, gz - 1.6], [2.0, 4.5, 2.9], density=D)]}]
     for fname, cx, by, lens in FINGERS:
         par, y0 = 'ghost_palm', by
         for k, ln in enumerate(lens, 1):
-            wdt, dep = (2.0, 2.5) if k == 1 else ((1.8, 2.25) if k == 2 else (1.6, 2.0))
+            wdt, dep = (1.7, 2.0) if k == 1 else ((1.5, 1.8) if k == 2 else (1.3, 1.6))
             nm = 'ghost_%s_%d' % (fname, k)
             ghost.append({'name': nm, 'parent': par, 'pivot': [cx, y0, gz], 'rotation': [6 if k > 1 else 3, 0, 0], 'cubes': [
                 cube(al, nm, nm, [cx - wdt / 2, y0, gz - dep / 2], [wdt, ln + (0.15 if k < 3 else 0), dep],
-                     ('north', 'south', 'east', 'west', 'up') if k == 3 else ('north', 'south', 'east', 'west'), density=D)]})
+                     ('north', 'south', 'east', 'west', 'up') if k == 3 else ('north', 'south', 'east', 'west'), density=D if k < 3 else 1.0)]})
             par, y0 = nm, y0 + ln
-    tx, ty = gx + 4.5, gy + 3.0                       # большой палец — от края ладони к телу (+x), вверх
+    tx, ty = gx + 4.0, gy + 3.0                       # большой палец — от края ладони к телу (+x), вверх
     ghost.append({'name': 'ghost_thumb_1', 'parent': 'ghost_palm', 'pivot': [tx, ty, gz], 'rotation': [0, 0, -42], 'cubes': [
-        cube(al, 'ghost_thumb_1', 'ghost_thumb_1', [tx, ty - 1.2, gz - 1.25], [3.5, 2.4, 2.5], ('north', 'south', 'up', 'down', 'east'), density=D)]})
+        cube(al, 'ghost_thumb_1', 'ghost_thumb_1', [tx, ty - 1.0, gz - 1.0], [3.5, 2.0, 2.0], ('north', 'south', 'up', 'down', 'east'), density=D)]})
     ghost.append({'name': 'ghost_thumb_2', 'parent': 'ghost_thumb_1', 'pivot': [tx + 3.5, ty, gz], 'rotation': [0, 0, -12], 'cubes': [
-        cube(al, 'ghost_thumb_2', 'ghost_thumb_2', [tx + 3.5, ty - 1.05, gz - 1.1], [2.75, 2.1, 2.2], ('north', 'south', 'up', 'down', 'east'),
-             density=D)]})
-    g['bones'][ib:ib] = coat + [cape]
+        cube(al, 'ghost_thumb_2', 'ghost_thumb_2', [tx + 3.5, ty - 0.85, gz - 0.85], [3.25, 1.7, 1.7], ('north', 'south', 'up', 'down', 'east'))]})
+    trail = [((-8.0, 25.4, 1.6), 0.5), ((-9.6, 26.4, 2.4), 0.6), ((-11.2, 27.3, 3.3), 0.7), ((-12.8, 28.2, 4.2), 0.55),
+             ((-10.4, 27.6, 1.8), 0.4), ((-12.2, 26.6, 3.9), 0.35)]
+    ghost.append({'name': 'ghost_trail', 'parent': 'body', 'pivot': [-7.5, 25.0, 1.5], 'cubes': [
+        cube(al, 'ghost_trail', 'ghost_spark_%d' % i, [x - sz / 2, y - sz / 2, z - sz / 2], [sz, sz, sz], ('north', 'south', 'east', 'west'),
+             pivot=[x, y, z], rotation=[30 * i, 45, 15 * i]) for i, ((x, y, z), sz) in enumerate(trail)]})
+    g['bones'][ib:ib] = coat + cape
     ih = g['bones'].index(bones['armorBipedHead'])
     g['bones'][ih:ih] = [mask]
     g['bones'] += ghost
@@ -436,7 +450,7 @@ def paint_new(at):
                 at.art(x, y, ['ts', 'rq'][:h] if w == 2 else ['tsr', 'sOq'][:h])
             elif f in ('down', 'east', 'west'):
                 at.fill(x, y, w, h, 'q')
-        elif name == 'cape' or name == 'cape_roll':
+        elif name in ('cape', 'cape_roll', 'cape_mid', 'cape_low'):
             paint_cape(at, name, f, x, y, w, h)
         elif name.startswith('epaulet'):
             at.fill(x, y, w, h, 'N')
@@ -525,16 +539,19 @@ def paint_cape(at, name, f, x, y, w, h):
     if f == 'north':                                   # изнанка (к спине)
         for i in range(w):
             at.fill(x + i, y, 1, h, 'M' if i % 3 else 'L')
-        at.fill(x, y + h - 1, w, 1, 'q')
+        if name == 'cape_low':
+            at.fill(x, y + h - 1, w, 1, 'q')
         return
     folds = 'POONMNO'
     for i in range(w):
         at.fill(x + i, y, 1, h, folds[i % len(folds)])
-    at.fill(x, y, w, 1, 'P')
+    if name == 'cape':
+        at.fill(x, y, w, 1, 'P')
     at.fill(x, y, 1, h, 'r')
     at.fill(x + w - 1, y, 1, h, 'q')
-    at.fill(x, y + h - 2, w, 1, 's')
-    at.fill(x, y + h - 1, w, 1, 'q')
+    if name == 'cape_low':
+        at.fill(x, y + h - 2, w, 1, 's')
+        at.fill(x, y + h - 1, w, 1, 'q')
 
 
 def paint_gauntlet(at, name, f, x, y, w, h):
@@ -764,7 +781,7 @@ MASK_CRACKS = {
 def paint_mask(img, glow, rects, variant):
     X0, Y0, X1, Y1, *_ = face_of(rects, 'mask', 'north')
     w, h = X1 - X0, Y1 - Y0                               # ≈ 19×22: столбец 0 — край у правого виска (−x), h-1 — низ (скула)
-    gold = ['o', 'p', 'q', 'r', 's']
+    gold = ['R', 'S', 'T', 'U', 'X']                     # бледное белое золото («фарфор»), чтобы маска читалась отдельно от волос
     for y in range(h):
         for x in range(w):
             # объём маски: выпуклая, свет сверху-слева, тень к низу и к краю у носа
@@ -779,7 +796,9 @@ def paint_mask(img, glow, rects, variant):
         for x in range(w - cut, w):
             img[Y0 + y, X0 + x] = (0, 0, 0, 0)
         if w - cut - 1 >= 0:
-            img[Y0 + y, X0 + w - cut - 1] = C('p')
+            img[Y0 + y, X0 + w - cut - 1] = C('o')
+        img[Y0 + y, X0] = C('p')                              # тёмная золотая кайма у виска
+    img[Y0, X0:X1] = C('q')                                   # и по верху
     for x in range(w):
         lift = int(max(0, (x - w * 0.15)) / w * 4)              # нижний край — дуга
         for y in range(h - lift, h):
@@ -794,7 +813,9 @@ def paint_mask(img, glow, rects, variant):
                 continue
             img[Y0 + y, X0 + x] = (0, 0, 0, 0)
     _line(img, [(X0 + ex, Y0 + ey - 1), (X0 + ex + ew - 1, Y0 + ey - 1)], C('a'))     # тёмная кромка над прорезью
-    _line(img, [(X0 + ex + 1, Y0 + ey + eh), (X0 + ex + ew - 2, Y0 + ey + eh)], C('t'))   # блик под прорезью
+    _line(img, [(X0 + ex - 1, Y0 + ey), (X0 + ex - 1, Y0 + ey + eh - 1)], C('p'))         # золотая кайма прорези
+    _line(img, [(X0 + ex + ew, Y0 + ey), (X0 + ex + ew, Y0 + ey + eh - 1)], C('p'))
+    _line(img, [(X0 + ex + 1, Y0 + ey + eh), (X0 + ex + ew - 2, Y0 + ey + eh)], C('q'))
     # золотая слеза-капля под прорезью (знак лжеца)
     for (dx, dy, ch) in ((4, 1, 's'), (4, 2, 'r'), (3, 2, 'q'), (4, 3, 'q'), (4, 4, 'p')):
         img[Y0 + ey + eh + dy, X0 + ex + dx] = C(ch)
@@ -805,8 +826,8 @@ def paint_mask(img, glow, rects, variant):
         P = [(X0 + px, Y0 + py) for (px, py) in pts]
         light = [(X0 + px + 1, Y0 + py) for (px, py) in pts]
         if variant != 'cracked':
-            _line(img, light, C('t'), (X0, Y0, X1, Y1))
-        _line(img, P, C('a' if variant != 'mended' else 'O'), (X0, Y0, X1, Y1))
+            _line(img, light, C('X'), (X0, Y0, X1, Y1))
+        _line(img, P, C('o' if variant == 'base' else ('O' if variant == 'mended' else 'a')), (X0, Y0, X1, Y1))
         if glow is not None and variant == 'cracked':
             _line(glow, P, C('r'), (X0, Y0, X1, Y1))           # фаза 3: в трещинах тлеет золото
     if variant == 'cracked':
@@ -825,7 +846,7 @@ def paint_mask(img, glow, rects, variant):
             a0, b0, a1, b1 = r[:4]
             for y in range(b0, b1):
                 for x in range(a0, a1):
-                    img[y, x] = C('s' if y == b0 else ('r' if (y - b0) < (b1 - b0) * 0.6 else 'q'))
+                    img[y, x] = C('q' if y == b0 or x in (a0, a1 - 1) else ('U' if (y - b0) < (b1 - b0) * 0.6 else 'S'))
             if variant == 'cracked' and nm == 'mask_brow' and face == 'north':
                 _line(img, [(a0 + 1, b0), (a0 + 3, b0 + 3), (a0 + 2, b1 - 1)], C('a'))
                 if glow is not None:
@@ -834,12 +855,27 @@ def paint_mask(img, glow, rects, variant):
 
 # ---------------------------------------------------------------- накидка: знак культа на спине, фестоны подола
 def paint_cape_hi(img, glow, rects):
-    X0, Y0, X1, Y1, *_ = face_of(rects, 'cape', 'south')
-    w, h = X1 - X0, Y1 - Y0
-    paint_emblem(img, X0 + (w - 28) // 2, Y0 + 14, 2, glow)
+    # знак рисуется на «склеенном» холсте из трёх кусков накидки и раскладывается по их граням south
+    segs = [face_of(rects, n, 'south') for n in ('cape', 'cape_mid', 'cape_low')]
+    W = segs[0][2] - segs[0][0]
+    H = sum(r[3] - r[1] for r in segs)
+    canvas = np.zeros((H, W, 4), np.uint8)
+    cglow = np.zeros_like(canvas)
+    yy = 0
+    for r in segs:
+        canvas[yy:yy + r[3] - r[1]] = img[r[1]:r[3], r[0]:r[2]]
+        yy += r[3] - r[1]
+    paint_emblem(canvas, (W - 28) // 2, 14, 2, cglow)
+    yy = 0
+    for r in segs:
+        hh = r[3] - r[1]
+        img[r[1]:r[3], r[0]:r[2]] = canvas[yy:yy + hh]
+        m = cglow[yy:yy + hh, :, 3] > 0
+        glow[r[1]:r[3], r[0]:r[2]][m] = cglow[yy:yy + hh][m]
+        yy += hh
     # фестоны (зубцы) по подолу: V-вырезы, кромка золотом
     for face in ('south', 'north'):
-        X0, Y0, X1, Y1, *_ = face_of(rects, 'cape', face)
+        X0, Y0, X1, Y1, *_ = face_of(rects, 'cape_low', face)
         w, h = X1 - X0, Y1 - Y0
         for x in range(w):
             k = x % 8
@@ -878,7 +914,7 @@ def paint_gauntlet_hi(img, glow, rects):
 
 
 # ---------------------------------------------------------------- призрачная рука: прозрачность, золотые швы фаланг, трещины
-GHOST_A, GHOST_RIM, GHOST_CRACK = 150, 205, 255
+GHOST_A, GHOST_RIM, GHOST_CRACK = 125, 190, 255
 
 
 def paint_ghost_hi(img, glow, rects):
@@ -895,16 +931,36 @@ def paint_ghost_hi(img, glow, rects):
                 fam = FAM.get(c, ('', 0))
                 rim = min(x - X0, y - Y0, X1 - 1 - x, Y1 - 1 - y) == 0
                 a = GHOST_RIM if rim else GHOST_A
-                if name == 'ghost_mist':                              # «туман» запястья тает книзу
-                    a = int(GHOST_A * max(0.0, 1 - (y - Y0) / h) ** 1.4)
+                if name.startswith('ghost_shard_') or name.startswith('ghost_spark_'):   # осколки тают — чем дальше, тем прозрачнее
+                    a = int(200 - 28 * int(name[-1]))
                 img[y, x, 3] = a
-                gl = {'f': 0, 'g': 1, 'h': 2, 'n': 3}.get('fghn'[fam[1]] if fam[0] == 'ghost' else 'f', 0)
-                glow[y, x] = (*C('fghn'[min(3, gl + (1 if rim else 0))])[:3], 255 if a > 40 else 0)
+                g0 = (54, 46, 92) if not rim else (96, 86, 150)
+                glow[y, x] = (*g0, 255)
         # золотой шов у основания каждой фаланги (стекло собрано золотом) и трещины на ладони
-        if face in ('north', 'south', 'east', 'west') and (name.startswith('ghost_') and name[-1:].isdigit()):
+        if face in ('north', 'south', 'east', 'west') and name.startswith(('ghost_index', 'ghost_middle', 'ghost_ring', 'ghost_pinky', 'ghost_thumb')):
             for x in range(X0, X1):
-                img[Y0, x] = C('s', GHOST_CRACK)
-                glow[Y0, x] = C('r')
+                img[Y1 - 1, x] = C('r', GHOST_CRACK)               # золотой шов сустава
+                glow[Y1 - 1, x] = C('p')
+            tip = name.endswith('_3') or name == 'ghost_thumb_2'
+            if tip:                                                 # золотые кончики пальцев — продолжение «Длани»
+                th = max(2, (Y1 - Y0) * 2 // 5) if not name.startswith('ghost_thumb') else 0
+                if name == 'ghost_thumb_2':
+                    for y in range(Y0, Y1):
+                        for x in range(X1 - max(2, (X1 - X0) * 2 // 5), X1):
+                            img[y, x] = C('s' if y == Y0 else 'r', 255)
+                            glow[y, x] = C('q')
+                for y in range(Y0, Y0 + th):
+                    for x in range(X0, X1):
+                        img[y, x] = C('t' if y == Y0 else ('s' if y < Y0 + th // 2 else 'r'), 255)
+                        glow[y, x] = C('q')
+        if face == 'up' and name.endswith('_3'):
+            img[Y0:Y1, X0:X1] = C('s')
+            glow[Y0:Y1, X0:X1] = C('q')
+        if name == 'ghost_palm' and face in ('north', 'south'):    # золотые прожилки по ладони — к пальцам
+            for k, x0 in enumerate((4, 8, 12)):
+                pts = [(X0 + x0, Y1 - 2), (X0 + x0 + (k - 1), Y0 + h // 2), (X0 + x0 + (k - 1) * 2, Y0 + 1)]
+                _line(img, pts, C('r', 220), (X0, Y0, X1, Y1))
+                _line(glow, pts, C('p'), (X0, Y0, X1, Y1))
         if name == 'ghost_palm' and face in ('north', 'south'):
             for _ in range(3):
                 x, y = X0 + rng.randrange(2, w - 2), Y0 + rng.randrange(1, h // 2)
@@ -916,10 +972,14 @@ def paint_ghost_hi(img, glow, rects):
                 _line(img, pts, C('s', GHOST_CRACK), (X0, Y0, X1, Y1))
                 _line(glow, pts, C('s'), (X0, Y0, X1, Y1))
         if name == 'ghost_wrist' and face in ('north', 'south', 'east', 'west'):
-            yy = Y0 + h // 2
+            for y in range(Y0 + h // 2, Y1):                         # низ запястья рассыпается: редеет к краю
+                for x in range(X0, X1):
+                    if (x * 3 + y * 5) % 4 < (y - Y0 - h // 2):
+                        img[y, x, 3] = 0
+                        glow[y, x, 3] = 0
             for x in range(X0, X1):
-                img[yy, x] = C('r', GHOST_CRACK)
-                glow[yy, x] = C('q')
+                img[Y0, x] = C('r', GHOST_CRACK)
+                glow[Y0, x] = C('q')
 
 
 def textures(geo):

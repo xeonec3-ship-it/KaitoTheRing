@@ -10,6 +10,7 @@ T28 «Арис» — сборка: модель/текстуры (4 вариан
 """
 import json
 import math
+import zlib
 import os
 import sys
 
@@ -384,7 +385,7 @@ def secondary(rig, poses, times, loop, wind=0.0):
                 if key in prev_tip:
                     vel = (world_piv - prev_tip[key]) / DT
                 prev_tip[key] = world_piv
-                sway = wind * np.array([math.sin(t * 2.1 + hash(bone) % 7), 0, 0.6 * math.cos(t * 1.7 + hash(bone) % 5)])
+                sway = wind * np.array([math.sin(t * 2.1 + zlib.crc32(bone.encode()) % 7), 0, 0.6 * math.cos(t * 1.7 + zlib.crc32(bone.encode()) % 5)])
                 desired = nrm(down * 9.0 - vel * 0.12 + sway)
                 # кость не уходит внутрь тела: ограничение по родителю (не дальше 75° от покоя)
                 par_rest_world = nrm(Mp @ rest_dir)

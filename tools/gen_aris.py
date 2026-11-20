@@ -98,7 +98,7 @@ def _h(a, b, c, seed):
 def phash(ctx, seed=0, cell=1):
     """«Случайное» число на пиксель (cell = 1) или на клетку cell×cell пикселей грани — для ручных крапин и царапин."""
     fid = {'north': 1, 'south': 2, 'east': 3, 'west': 4, 'up': 5, 'down': 6}[ctx.face]
-    cid = (id(ctx.cube) >> 4) & 0xFFFF
+    cid = int(abs(ctx.cube.frm[0] * 131 + ctx.cube.frm[1] * 17 + ctx.cube.frm[2] * 7 + ctx.cube.to[0] * 3 + ctx.cube.to[1]) * 64) & 0xFFFF
     return _h(ctx.i // cell + cid * 7, ctx.j // cell + fid * 131, np.full(ctx.n, cid), seed)
 
 

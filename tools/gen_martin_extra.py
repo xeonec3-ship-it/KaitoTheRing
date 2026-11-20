@@ -143,7 +143,7 @@ def soldier_anims(m):
 
     def base(t, k=1.0):
         o = {k2: {'rot': list(np.array(v['rot']) * k)} for k2, v in SHIELD_FWD.items()}
-        o['cape'] = {'rot': [-(6 + 2 * math.sin(TAU * t / 2.4)), 0, 0]}      # X < 0 — низ назад (правка 20.11: был вперёд)
+        o['cape'] = {'rot': [6 + 2 * math.sin(TAU * t / 2.4), 0, 0]}      # по Blockbench: X > 0 — низ назад (перевод — M.bb_in в Grip)
         o['tabard_front'] = {'rot': [-1.5 * math.sin(TAU * t / 2.4), 0, 0]}
         return o
 
@@ -188,7 +188,7 @@ def soldier_anims(m):
         o = {'body': {'pos': [0, -2.2 + 0.1 * br, 0]}, 'torso': {'rot': [16 + br, 14, 0]}, 'head': {'rot': [-12, -10, 0]},
              'left_arm': {'rot': [-64, -30, 0]}, 'left_forearm': {'rot': [-10, 0, 0]}, 'shield': {'rot': [4, 44, 0]},
              'right_leg': {'rot': [16, 0, 8]}, 'left_leg': {'rot': [-34, 0, -8]},
-             'cape': {'rot': [-(12 + 2 * br), 0, 0]}, 'tabard_front': {'rot': [-6, 0, 0]}}
+             'cape': {'rot': [12 + 2 * br, 0, 0]}, 'tabard_front': {'rot': [-6, 0, 0]}}
         g(o, (3.0, 18.5, -2.5), (0.05, 0.75, -0.66), left=0)
         return o
     A('brace', 1.6, True).sample(brace, 0.1)

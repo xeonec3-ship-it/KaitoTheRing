@@ -18,9 +18,10 @@ const fs = require('fs');
   await pg.waitForTimeout(2500);                       // текстуры
   if (process.env.VID_DEBUG) console.log(await pg.evaluate(() => JSON.stringify({ cw: cv.width, ch: cv.height, cs: [cv.clientWidth, cv.clientHeight],
     st: [stage.clientWidth, stage.clientHeight], vp: renderer.getViewport(new THREE.Vector4()).toArray(), ar: cam.aspect })));
+  const tmpOut = require('path').join(require('os').tmpdir(), 'boss_video_' + process.pid + '.mp4');   // в репозиторий — только готовый файл
   const ff = spawn('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'image2pipe', '-framerate', String(job.fps), '-c:v', 'mjpeg', '-i', '-',
     '-an', '-c:v', 'libx264', '-preset', 'slow', '-crf', String(job.crf || 20), '-pix_fmt', 'yuv420p', '-r', String(job.fps),
-    '-movflags', '+faststart', job.out], { stdio: ['pipe', 'inherit', 'inherit'] });
+    '-movflags', '+faststart', tmpOut], { stdio: ['pipe', 'inherit', 'inherit'] });
   const done = new Promise(r => ff.on('close', r));
   const t0 = Date.now();
   for (let i = 0; i < job.frames.length; i++) {
@@ -31,6 +32,7 @@ const fs = require('fs');
   }
   ff.stdin.end();
   const code = await done;
+  if (!code) { fs.copyFileSync(tmpOut, job.out); fs.unlinkSync(tmpOut); }
   if (errs.length) console.log('page errors:', JSON.stringify(errs.slice(0, 5)));
   console.log(`  ${job.out.split('/').pop()}: ${job.frames.length} кадров, ffmpeg ${code}`);
   await b.close();

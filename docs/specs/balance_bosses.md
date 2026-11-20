@@ -371,6 +371,15 @@
 | «Чужая клятва» | 4 с: ½ урона по Эребу — ближайшему союзнику (не больше 30 за удар); 20 с | `foreign_oath_seconds`, `foreign_oath_share`, `foreign_oath_max_hit`, `foreign_oath_cooldown` |
 | «Тысяча отражений» | 6 зеркал, 2 настоящих удара по **40**; 18 с | `thousand_mirrors`, `thousand_real`, `thousand_damage`, `thousand_cooldown` |
 
+### Приёмы «+4» вторая партия и мифическое (владелец 20.11; ⚠ черновик программиста)
+| приём | значение | ключи |
+|---|---|---|
+| «Пламя-подменыш» | на полпути — бабочка в союзника цели (6 бл.): **28**; 12 с | `changeling_flame_damage`, `changeling_flame_cooldown` |
+| «Ложное отступление» | 2 с невидим, удар в спину **36**; 20 с | `false_retreat_damage`, `false_retreat_cooldown` |
+| «Отражение-предатель» | копия 6 с, удар **14** раз в 1 с; оригинал — 1 удар, другие — 3; не разбита — взрыв r3 **30**; 24 с | `traitor_reflection_damage`, `_seconds`, `_hits_original`, `_hits_others`, `_burst_damage`, `_burst_radius`, `_cooldown` |
+| «Рой лжи» | 12 бабочек, 6 настоящих: **10** + слепота 1 с; 16 с | `swarm_of_lies_count`, `_real`, `_damage`, `_blind_ticks`, `_cooldown` |
+| «Ложный рассвет» (33%, раз) | неуязвим 4 с, волна: ближе 6 бл. — **60%** макс. ХП, остальным **20%** (`boss_mechanic`, ТЗ) | `false_dawn_near_radius`, `false_dawn_near_share`, `false_dawn_far_share` |
+
 ## 7. Сводка
 
 | босс | ХП (N1 → N4 → N6) | броня | эфф. время N4 ⚠ | самый сильный удар (до брони → незериту) |

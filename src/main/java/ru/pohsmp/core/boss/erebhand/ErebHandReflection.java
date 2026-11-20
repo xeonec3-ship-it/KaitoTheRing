@@ -22,7 +22,7 @@ import ru.pohsmp.core.fx.Fx;
  * Not saved, no loot; gone with him.
  */
 public class ErebHandReflection extends ErebHandBody {
-    public enum Kind { DOUBLE, STRIKE }
+    public enum Kind { DOUBLE, STRIKE, DECOY }
 
     private Kind kind = Kind.DOUBLE;
     private ErebHandEntity owner;
@@ -48,6 +48,10 @@ public class ErebHandReflection extends ErebHandBody {
             setNoAi(true);
             setGhost(true);
         }
+        if (kind == Kind.DECOY) {   // «Ложное отступление»: stands «opened up», no shadow (the hint)
+            setNoAi(true);
+            setNoShadow(true);
+        }
     }
 
     public Kind kind() {
@@ -62,14 +66,14 @@ public class ErebHandReflection extends ErebHandBody {
         super.tick();
         if (!(level() instanceof ServerLevel sl)) return;
         if (owner == null || !owner.isAlive() || owner.bossCore().inFinale() || --life <= 0) {
-            if (kind == Kind.STRIKE) discard();
+            if (kind != Kind.DOUBLE) discard();
             else poof(sl);
             return;
         }
         setMask(owner.mask());
         setMaskOff(owner.maskOff());
         if (kind == Kind.STRIKE) strike(sl);
-        else walkAndStrike(sl);
+        else if (kind == Kind.DOUBLE) walkAndStrike(sl);
     }
 
     /** STRIKE: out of the glass already in the lunge; the thrust on REFL_HIT. */
@@ -143,6 +147,11 @@ public class ErebHandReflection extends ErebHandBody {
     public boolean hurt(DamageSource src, float amount) {
         if (!(level() instanceof ServerLevel sl) || kind == Kind.STRIKE) return false;
         if (!(src.getEntity() instanceof Player)) return false;
+        if (kind == Kind.DECOY) {
+            level().broadcastDamageEvent(this, src);
+            owner.fight.decoyStruck(sl, (Player) src.getEntity());
+            return true;
+        }
         if (invulnerableTime > 10) return false;
         invulnerableTime = 20;
         level().broadcastDamageEvent(this, src);   // the hurt flash and sound, like a real one

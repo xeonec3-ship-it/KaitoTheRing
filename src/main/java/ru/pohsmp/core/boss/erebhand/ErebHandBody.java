@@ -36,6 +36,8 @@ public abstract class ErebHandBody extends AbstractSpellCastingMob implements IA
     private static final EntityDataAccessor<Boolean> MASK_OFF = SynchedEntityData.defineId(ErebHandBody.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HAND_ONLY = SynchedEntityData.defineId(ErebHandBody.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> GHOST = SynchedEntityData.defineId(ErebHandBody.class, EntityDataSerializers.BOOLEAN);
+    /** «Ложное отступление»: the double casts no shadow (the hint). */
+    private static final EntityDataAccessor<Boolean> NO_SHADOW = SynchedEntityData.defineId(ErebHandBody.class, EntityDataSerializers.BOOLEAN);
     /** «Длань Лжи»: this player sees the false arena (its allies drawn as him) while it is set. */
     private static final EntityDataAccessor<Optional<UUID>> FALSE_ARENA = SynchedEntityData.defineId(ErebHandBody.class, EntityDataSerializers.OPTIONAL_UUID);
 
@@ -50,6 +52,7 @@ public abstract class ErebHandBody extends AbstractSpellCastingMob implements IA
         entityData.define(MASK_OFF, false);
         entityData.define(HAND_ONLY, false);
         entityData.define(GHOST, false);
+        entityData.define(NO_SHADOW, false);
         entityData.define(FALSE_ARENA, Optional.empty());
     }
 
@@ -85,6 +88,14 @@ public abstract class ErebHandBody extends AbstractSpellCastingMob implements IA
 
     public void setGhost(boolean on) {
         entityData.set(GHOST, on);
+    }
+
+    public boolean noShadow() {
+        return entityData.get(NO_SHADOW);
+    }
+
+    public void setNoShadow(boolean on) {
+        entityData.set(NO_SHADOW, on);
     }
 
     public UUID falseArena() {

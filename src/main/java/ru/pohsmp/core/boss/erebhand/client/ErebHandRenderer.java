@@ -34,7 +34,10 @@ public class ErebHandRenderer extends AbstractSpellCastingMobRenderer {
 
     @Override
     public void render(AbstractSpellCastingMob e, float yaw, float pt, PoseStack ps, MultiBufferSource buf, int light) {
-        if (e instanceof ErebHandEntity && BossClient.look(e.getId(), BossNet.LOOK_HIDDEN)) return;
+        boolean hidden = e instanceof ErebHandEntity && BossClient.look(e.getId(), BossNet.LOOK_HIDDEN);
+        // the dispatcher draws the shadow after render(): none while he is unseen, none under the double of «Ложное отступление»
+        shadowRadius = hidden || e instanceof ErebHandBody b && b.noShadow() ? 0 : 0.55f;
+        if (hidden) return;
         super.render(e, yaw, pt, ps, buf, light);
     }
 

@@ -940,5 +940,7 @@
   "ui.pohsmp_core.ereb_hand.false_arena": "Мир лжёт тебе…",
   "entity.pohsmp_core.ereb_hand_reflection": "Эреб, Длань Лжи",
   "entity.pohsmp_core.ereb_hand_giant": "Длань Лжи",
-  "entity.pohsmp_core.ereb_hand_mask_shard": "Осколок маски"
+  "entity.pohsmp_core.ereb_hand_mask_shard": "Осколок маски",
+  "entity.pohsmp_core.ereb_hand_traitor": "Отражение-предатель",
+  "ui.pohsmp_core.ereb_hand.traitor_hint": "Твоё отражение предало тебя — разбей его одним ударом!"
 }

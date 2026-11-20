@@ -150,7 +150,7 @@ public final class ErebClient {
                     return Shot.of(c.orbit(v, 120, 2.2 + 1.8 * sine(k), 1.9), c.b.add(0, 1.6, 0));
                 });
 
-        // the finisher, only the victim's camera (1.2 s from his coming out): on his head from beside the victim, a tremble on the thrust
+        // the finisher, only the victim's camera (from his coming out to just after the kill): on his head from beside the victim, a tremble on the thrust
         BossCam.plan("ereb.finisher", ErebMath.FIN_CAM)
                 .shot(0, (k, t, c) -> {
                     Vec3 v = c.extra != null ? c.extra.getPosition(c.pt) : c.focus;

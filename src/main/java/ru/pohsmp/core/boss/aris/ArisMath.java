@@ -45,7 +45,7 @@ public final class ArisMath {
     public static final double SWING_REACH = 3.6;
     public static final int SLAM = 32, SLAM_IMPACT = 15, SLAM_WAVE = 22;
     /** The hammer head touches the ground this far before her (slam / forge / last_blow). */
-    public static final double SLAM_FWD = 1.25, FORGE_FWD = 1.0, LAST_FWD = 1.3;
+    public static final double SLAM_FWD = 1.35, FORGE_FWD = 1.2, LAST_FWD = 1.45;   // visual letter «Правка направлений» 20.11
     public static final double SLAM_RADIUS = 8, SLAM_BAND = 0.7, JUMP_CLEAR = 1.0;
 
     /** Radius of the molten ring t ticks after the impact (0..8 over 22 ticks). */

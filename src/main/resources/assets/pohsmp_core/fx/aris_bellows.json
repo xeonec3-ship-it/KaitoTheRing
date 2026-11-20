@@ -1,0 +1,82 @@
+{
+ "comment": "«Мехи», порыв (событие gust 0.8 с; caster = Арис, yaw — направление, 24 тика): поток горячего воздуха и искр по конусу 8 бл. (sprites по path), марево, вспышка у молота. Код: всем в конусе — отброс и поджог. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.4,-1.5",
+   "duration": 8,
+   "size": 2.2,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,-1",
+   "duration": 10,
+   "texture": "mote_flame",
+   "count": 120,
+   "rate": 12,
+   "path": [
+    "caster+0,1.2,-1",
+    "caster+0,1,-4.5",
+    "caster+0,0.8,-8.5"
+   ],
+   "width": 3.6,
+   "size": [
+    0.6,
+    0.1
+   ],
+   "life": 12,
+   "color": "@secondary",
+   "glow": 0.8,
+   "comment": "поток жара конусом"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,-1",
+   "duration": 10,
+   "texture": "spark_soft",
+   "count": 90,
+   "rate": 9,
+   "path": [
+    "caster+0,1.4,-1",
+    "caster+0,1.2,-5",
+    "caster+0,1,-9"
+   ],
+   "width": 4.2,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 10,
+   "color": "@core",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,1,-1",
+   "duration": 10,
+   "texture": "mote_ash",
+   "count": 40,
+   "rate": 4,
+   "path": [
+    "caster+0,1,-1",
+    "caster+0,1,-8"
+   ],
+   "width": 3.0,
+   "size": [
+    1.2,
+    0.4
+   ],
+   "life": 16,
+   "color": "#6A5048",
+   "blend": "translucent",
+   "comment": "марево/дым"
+  }
+ ]
+}

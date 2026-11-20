@@ -927,6 +927,205 @@ def lang_sounds():
         f.write('\n')
 
 
+# ================================================================== +4 заклинания (владелец 20.11): заготовка, цепи, закалка, мехи
+def tex_cone():
+    """Конус-предупреждение «Мехов» (decal): клин 60° — вершина в центре картинки, раскрывается к верхнему краю (= вперёд по yaw);
+    кромки ярче, внутри — штриховка-«потоки» к вершине."""
+    n = 512
+    im, d, c = canvas(n)
+    W = n * S4
+    half = math.radians(30)
+    apex = (c, c)
+    R = c * 0.98
+    pts = [apex] + [(c + R * math.sin(a), c - R * math.cos(a)) for a in np.linspace(-half, half, 40)]
+    d.polygon(pts, fill=70)
+    d.line([apex, pts[1]], fill=255, width=16)
+    d.line([apex, pts[-1]], fill=255, width=16)
+    d.line(pts[1:], fill=255, width=16)
+    for k in range(1, 6):
+        r = R * k / 6
+        arc = [(c + r * math.sin(a), c - r * math.cos(a)) for a in np.linspace(-half, half, 24)]
+        d.line(arc, fill=170, width=8)
+    save_sigil(im, 'aris_cone')
+
+
+def tex_chain_seal():
+    """Печать «Цепей кузни» под скованным: кольцо из звеньев и четыре скобы-якоря."""
+    im, d, c = canvas(256)
+    for k in range(20):
+        a = 2 * math.pi * k / 20
+        x, y = c + c * 0.8 * math.cos(a), c + c * 0.8 * math.sin(a)
+        r1, r2 = c * 0.11, c * 0.06
+        if k % 2:
+            d.ellipse([x - r1, y - r2, x + r1, y + r2], outline=255, width=14)
+        else:
+            d.ellipse([x - r2, y - r1, x + r2, y + r1], outline=255, width=14)
+    for k in range(4):
+        a = 2 * math.pi * k / 4 + math.pi / 4
+        x, y = c + c * 0.45 * math.cos(a), c + c * 0.45 * math.sin(a)
+        d.rectangle([x - c * 0.08, y - c * 0.08, x + c * 0.08, y + c * 0.08], outline=255, width=14)
+    save_sigil(im, 'aris_chain_seal', 256)
+
+
+def mesh_billet():
+    """Раскалённый слиток-заготовка 0.6×0.22×0.3 бл.: тело светится (бело-жёлтая сердцевина, оранжевые грани), окалина-пятна."""
+    b = [bx(-0.3, 0, -0.15, 0.3, 0.2, 0.15, 1), bx(-0.27, 0.2, -0.12, 0.27, 0.23, 0.12, 2)]
+    sc = [bx(-0.18, 0.229, -0.05, -0.08, 0.235, 0.04, 0), bx(0.1, 0.229, 0.02, 0.2, 0.235, 0.1, 0), bx(-0.31, 0.05, -0.08, -0.299, 0.12, 0.0, 0)]
+    tones = ['#3A2420', MOLTEN, MOLTEN_HI]
+    mesh('aris_billet', 'T28 «Раскалённая заготовка»: слиток 0.6×0.22×0.3 бл., светится; окалина тёмными пятнами. Точка (0,0,0) — низ.',
+         [{'type': 'boxes', 'tones': tones, 'glowTones': [1, 2], 'blend': 'additive', 'opacity': 1.0, 'shade': True, 'boxes': b,
+           'appear': {'delay': 0, 'duration': 4, 'easing': 'easeOutCubic', 'reveal': 'down', 'front': 0.1}, 'bounds': [0, 0.25]},
+          {'type': 'boxes', 'tones': tones, 'glowTones': [], 'blend': 'translucent', 'opacity': 1.0, 'shade': True, 'boxes': sc,
+           'appear': {'delay': 0, 'duration': 4, 'easing': 'easeOutCubic', 'reveal': 'down', 'front': 0.1}, 'bounds': [0, 0.25]}],
+         formed=4, collapse=4)
+
+
+def spells4():
+    tex_cone()
+    tex_chain_seal()
+    mesh_billet()
+    F = 'caster'
+
+    def sparks(t, p, n=20, spd=0.3, life=14, dur=3, col='@secondary'):
+        return E('sprites', t, p, duration=dur, texture='spark_soft', count=n, rate=max(1, n // dur), spread=0.5, speed=spd, gravity=0.03,
+                 size=[0.14, 0.02], life=life, color=col, glow=0.9)
+    # ---------------------------------------------------------------- 1. Раскалённая заготовка
+    fx('aris_billet_throw', '«Раскалённая заготовка», бросок (событие throw 0.7 с анимации billet): caster = Арис (левая рука). '
+       'Вспышка и искры из руки; сам слиток в полёте — снаряд кода с fx aris_billet (follow).', 12, [
+        E('flash', 0, 'caster.hand', duration=6, size=0.9, color='@secondary'), sparks(0, 'caster.hand', 14, 0.2, 10, 2)])
+    pulse = []
+    for t in (0, 20, 36, 46, 52, 56, 58):                                  # пульс жара учащается к взрыву (3 с = 60 тиков)
+        pulse.append(E('wave', t, F, duration=10, shape='ring', radius=3, thickness=0.35, followTerrain=True, color='@secondary',
+                       brightness=0.5 + t / 100))
+    fx('aris_billet', '«Раскалённая заготовка» лежит (caster = слиток, follow, 60 тиков): меш слитка, жаркий круг r3 на земле '
+       '(ВИДНО зону взрыва), пульс-кольца r3 учащаются (0/20/36/46/52/56/58), марево и искры. На 60 тике код взрывает: '
+       'урон r3 + fx aris_billet_explode.', 60, [
+        E('mesh', 0, F, model='aris_billet', follow=True),
+        E('decal', 0, F, duration=60, texture='glow', radius=3, follow=True, glow=0.6, pulse=10, color='@secondary', brightness=0.6,
+          comment='зона r3'),
+        E('decal', 0, F, duration=60, texture='aris_molten_floor', radius=1.2, follow=True, glow=1.0, color='@secondary', grow=40),
+        *pulse,
+        E('sprites', 0, at(F, 0, 0.25, 0), follow=True, duration=60, texture='spark_soft', count=100000, rate=0.5, spread=0.2, speed=0.03,
+          gravity=0.02, size=[0.1, 0.02], life=12, color='@core', glow=0.9),
+        E('sprites', 0, at(F, 0, 0.3, 0), follow=True, duration=60, texture='mote_ash', count=100000, rate=0.2, spread=0.2, speed=0.0,
+          gravity=-0.01, size=[0.4, 0.15], life=24, color='#5A4A44', blend='translucent', comment='дымок'),
+    ])
+    fx('aris_billet_explode', 'Слиток взрывается (caster = место): вспышка, огненный шар r3, брызги металла, обожжённое пятно.', 40, [
+        E('flash', 0, at(F, 0, 0.5, 0), duration=12, size=3.4, rays=10, screen=0.08, color='@core', ring=True),
+        E('wave', 0, F, duration=10, shape='sphere', radius=3, thickness=0.6, color='@secondary'),
+        E('wave', 0, F, duration=14, shape='ring', radius=3.5, thickness=0.8, followTerrain=True, texture='aris_molten_ring', color='@secondary'),
+        E('sprites', 0, at(F, 0, 0.4, 0), duration=4, texture='mote_flame', count=50, rate=14, spread=1.2, speed=0.3, gravity=0.03,
+          size=[0.4, 0.05], life=18, color='@secondary', glow=0.8, comment='брызги металла'),
+        sparks(0, at(F, 0, 0.4, 0), 50, 0.5, 18, 4),
+        E('decal', 0, F, duration=40, texture='aris_molten_floor', radius=2.2, glow=0.7, fadeOut=30, color='@secondary'),
+    ])
+    # ---------------------------------------------------------------- 2. Цепи кузни
+    anchors = [(1.6, 0.0), (-1.6, 0.0), (0.0, 1.6), (0.0, -1.6)]
+    ch = []
+    for i, (x, z) in enumerate(anchors):
+        ch.append(E('chains', 2 + i, at(F, x, 0.05, z), to='caster+0,0.8,0', follow=True, link=0.2, sag=0.15, tension=0.85, grow=6,
+                    rattle=0.04, color=STEEL_L, comment='цепь из земли к поясу скованного'))
+        ch.append(E('decal', i, at(F, x, 0, z), texture='higher_cracks', radius=0.8, glow=0.6, color='@secondary', fadeOut=10))
+        ch.append(E('sprites', 2 + i, at(F, x, 0.1, z), duration=4, texture='mote_ash', count=8, rate=2, spread=0.3, speed=0.05, gravity=-0.003,
+                    spin=40, size=[0.4, 0.1], life=18, color=STEEL, blend='translucent'))
+    fx('aris_chains', '«Цепи кузни» на игроке (caster = скованный, follow; до Fx.stop: 4 с = 80 тиков или 3 удара союзников). '
+       'Четыре цепи вырываются из земли в 1.6 бл. вокруг и тянутся к поясу; печать звеньев под ногами; звенья с раскалёнными '
+       'стыками. Удар союзника по цепям — fx aris_chains_hit; разбиты/время вышло — Fx.stop + aris_chains_break.', -1, [
+        E('sigil', 0, at(F, 0, 0.05, 0), id='aris_chain_seal'), *ch,
+        E('aura', 4, F, follow=True, target='caster', thickness=0.1, pulse=[0.2, 8], color=STEEL_L, motes=8, comment='скован'),
+    ])
+    fx('aris_chains_hit', 'Удар союзника по цепям (caster = скованный): лязг — искры и вспышка у пояса; код считает 3 удара.', 10, [
+        E('flash', 0, at(F, 0, 0.8, 0), duration=5, size=0.9, color=STEEL_L), sparks(0, at(F, 0, 0.8, 0), 16, 0.3, 10, 2, '@core')])
+    fx('aris_chains_break', 'Цепи разбиты / время вышло (caster = освобождённый): звенья разлетаются и тают, печать гаснет.', 24, [
+        E('flash', 0, at(F, 0, 0.8, 0), duration=8, size=1.6, color=STEEL_L, ring=True),
+        E('sprites', 0, at(F, 0, 0.6, 0), duration=3, texture='mote_ash', count=30, rate=10, spread=1.0, speed=0.2, gravity=0.04, spin=120,
+          size=[0.22, 0.1], life=20, color=STEEL_L, blend='translucent', comment='звенья'),
+        sparks(0, at(F, 0, 0.6, 0), 24, 0.35, 14, 3)])
+    # ---------------------------------------------------------------- 3. Закалка
+    fx('aris_quench', '«Закалка» (событие splash 0.8 с анимации quench; caster = Арис, НЕ follow — облако стоит на месте, 100 тиков = 5 с): '
+       'всплеск воды над ней, шипение — пар клубами r5; мир в облаке серый (tint saturation). Код: урон по Арис ×0.6, пока она в r5; '
+       'у игроков в облаке — туман (эффект aris_steamed / FogRenderer).', 100, [
+        E('sprites', 0, at(F, 0, 2.8, 0), duration=4, texture='glow', count=24, rate=8, spread=0.6, speed=0.05, gravity=0.04,
+          size=[0.5, 0.1], life=14, color='#9FD8F0', blend='translucent', comment='вода окатывает'),
+        E('flash', 2, at(F, 0, 1.4, 0), duration=8, size=2.4, color='#E8F6FA'),
+        E('sprites', 2, at(F, 0, 1.0, 0), duration=80, texture='mote_ash', count=100000, rate=3.0, area=4.5, speed=0.01, gravity=-0.006,
+          spin=20, size=[2.2, 1.0], life=50, color='#D8E4E8', blend='translucent', comment='клубы пара r5'),
+        E('sprites', 2, at(F, 0, 0.3, 0), duration=80, texture='mote_ash', count=100000, rate=1.5, area=5.0, speed=0.0, gravity=-0.002,
+          size=[3.0, 1.5], life=60, color='#B8C8CC', blend='translucent', comment='стелется по земле'),
+        E('tint', 0, F, duration=100, radius=5, color='#C8D4D8', strength=0.35, saturation=0.5, **{'in': ease(10), 'out': ease(30)}),
+        E('aura', 2, F, duration=90, follow=False, target='caster', thickness=0.12, pulse=[0.2, 10], color='#E8F6FA', motes=10),
+    ])
+    # ---------------------------------------------------------------- 4. Мехи
+    fx('aris_bellows_warn', '«Мехи», предупреждение (0–0.8 с анимации bellows; caster = Арис, yaw — направление, не follow, 16 тиков): '
+       'конус 60° длиной 8 бл. на земле (decal aris_cone, вершина у Арис, раскрывается вперёд) наливается жаром, по краям — искры.', 16, [
+        E('decal', 0, F, duration=16, texture='aris_cone', radius=8, yaw=0, glow=0.8, color='@secondary', brightness=1.0, grow=10,
+          pulse=6, comment='вершина — в центре картинки, раскрытие — вперёд по yaw'),
+        E('sprites', 0, at(F, 0, 0.2, -4), duration=16, texture='spark_soft', count=100000, rate=1.5, area=3, speed=0.02, gravity=-0.02,
+          size=[0.12, 0.02], life=10, color='@secondary', glow=0.9),
+    ])
+    fx('aris_bellows', '«Мехи», порыв (событие gust 0.8 с; caster = Арис, yaw — направление, 24 тика): поток горячего воздуха и искр '
+       'по конусу 8 бл. (sprites по path), марево, вспышка у молота. Код: всем в конусе — отброс и поджог.', 24, [
+        E('flash', 0, at(F, 0, 1.4, -1.5), duration=8, size=2.2, color='@core'),
+        E('sprites', 0, at(F, 0, 1.2, -1.0), duration=10, texture='mote_flame', count=120, rate=12, path=[at(F, 0, 1.2, -1.0), at(F, 0, 1.0, -4.5),
+          at(F, 0, 0.8, -8.5)], width=3.6, size=[0.6, 0.1], life=12, color='@secondary', glow=0.8, comment='поток жара конусом'),
+        E('sprites', 0, at(F, 0, 1.2, -1.0), duration=10, texture='spark_soft', count=90, rate=9, path=[at(F, 0, 1.4, -1.0), at(F, 0, 1.2, -5.0),
+          at(F, 0, 1.0, -9.0)], width=4.2, size=[0.14, 0.02], life=10, color='@core', glow=0.9),
+        E('sprites', 2, at(F, 0, 1.0, -1.0), duration=10, texture='mote_ash', count=40, rate=4, path=[at(F, 0, 1.0, -1.0), at(F, 0, 1.0, -8.0)],
+          width=3.0, size=[1.2, 0.4], life=16, color='#6A5048', blend='translucent', comment='марево/дым'),
+    ])
+    fx('aris_bellows_burn', 'Игрока задел порыв «Мехов» (caster = игрок): вспышка жара, искры по ветру.', 12, [
+        E('flash', 0, at(F, 0, 1.0, 0), duration=6, size=1.2, color='@secondary'), sparks(0, at(F, 0, 1.0, 0), 14, 0.25, 10, 2)])
+    sigil('aris_chain_seal', 'T28 «Цепи кузни»: печать звеньев под скованным (r1.8).', 1.8, STEEL_L, [
+        L('ring', 'disc', 'aris_chain_seal', 1.0, 0.0, ap(0, 8, 'draw', startAngle=90), rot=-0.8, br=0.9)], dissolve=('shatter', 'fade'), ddur=10)
+
+
+def icons4():
+    def chained(d, S):
+        d.ellipse([S * .05, S * .05, S * .95, S * .95], fill=hx('#1C1C22'), outline=hx('#A9A9B4'), width=int(S * .08))
+        for k, (x, y) in enumerate(((.3, .3), (.42, .42), (.54, .54), (.66, .66))):
+            w = (.14, .08) if k % 2 else (.08, .14)
+            d.ellipse([S * (x - w[0]), S * (y - w[1]), S * (x + w[0]), S * (y + w[1])], outline=hx('#C6C6CE'), width=int(S * .06))
+        d.rectangle([S * .2, S * .72, S * .8, S * .8], fill=hx('#60606C'))
+        d.point((S * .5, S * .76), fill=hx('#F4A852'))
+
+    def steamed(d, S):
+        d.ellipse([S * .05, S * .05, S * .95, S * .95], fill=hx('#2A3438'), outline=hx('#9FD8F0'), width=int(S * .08))
+        for k, (x, y, r) in enumerate(((.38, .42, .16), (.6, .38, .14), (.5, .58, .2), (.32, .62, .12), (.68, .6, .13))):
+            d.ellipse([S * (x - r), S * (y - r), S * (x + r), S * (y + r)], fill=hx('#D8E4E8' if k % 2 else '#B8C8CC'))
+    return {'aris_chained': icon('aris_chained', chained), 'aris_steamed': icon('aris_steamed', steamed)}
+
+
+LANG.update({
+    'ui.pohsmp_core.aris.billet': ('Раскалённая заготовка — отойдите, сейчас взорвётся!', 'Red-hot Billet — get clear, it\'s about to blow!'),
+    'ui.pohsmp_core.aris.chains': ('Цепи кузни сковали %s — бейте по цепям!', 'Forge Chains bind %s — strike the chains!'),
+    'ui.pohsmp_core.aris.chains_self': ('Вас сковали цепи кузни', 'You are bound by the Forge Chains'),
+    'ui.pohsmp_core.aris.chains_break': ('Цепи разбиты', 'The chains shatter'),
+    'ui.pohsmp_core.aris.quench': ('Закалка: Арис окутана паром', 'Quench: Aris is wreathed in steam'),
+    'ui.pohsmp_core.aris.bellows_warn': ('Мехи! Уйдите с конуса жара', 'Bellows! Get out of the heat cone'),
+    'ui.pohsmp_core.aris.bellows': ('Мехи', 'Bellows'),
+    'effect.pohsmp_core.aris_chained': ('Скован', 'Chained'),
+    'effect.pohsmp_core.aris_chained.description': ('Цепи кузни держат на месте. Союзники могут разбить их тремя ударами.',
+                                                    'The Forge Chains hold you in place. Allies can break them with three strikes.'),
+    'effect.pohsmp_core.aris_steamed': ('В паре', 'Steamed'),
+    'effect.pohsmp_core.aris_steamed.description': ('Густой пар «Закалки»: видно лишь на пару блоков.', 'Thick steam from the Quench: you can barely see.'),
+    'entity.pohsmp_core.aris_billet': ('Раскалённая заготовка', 'Red-hot Billet'),
+    'subtitles.pohsmp_core.aris.billet': ('Шипит раскалённый слиток', 'Red-hot billet hisses'),
+    'subtitles.pohsmp_core.aris.billet_explode': ('Слиток взрывается', 'Billet explodes'),
+    'subtitles.pohsmp_core.aris.chains': ('Звенят цепи кузни', 'Forge chains rattle'),
+    'subtitles.pohsmp_core.aris.chains_break': ('Цепи разбиты', 'Chains shatter'),
+    'subtitles.pohsmp_core.aris.quench': ('Шипит пар', 'Steam hisses'),
+    'subtitles.pohsmp_core.aris.bellows': ('Ревут мехи', 'Bellows roar'),
+})
+SOUNDS.update({
+    'aris.billet': [S_('minecraft:block/lava/pop', pitch=1.2), S_('minecraft:block/fire/extinguish', pitch=1.6, volume=0.5)],
+    'aris.billet_explode': [S_('minecraft:random/explode1', pitch=1.2), S_('minecraft:random/explode2', pitch=1.2)],
+    'aris.chains': [S_('minecraft:block/chain/place', pitch=0.6, volume=1.3), S_('minecraft:block/chain/step1', pitch=0.5, volume=1.3)],
+    'aris.chains_break': [S_('minecraft:block/chain/break1', pitch=0.7), S_('minecraft:block/anvil/break', pitch=1.4)],
+    'aris.quench': [S_('minecraft:block/fire/extinguish', pitch=0.5, volume=1.5), S_('minecraft:block/lava/extinguish', pitch=0.6, volume=1.4)],
+    'aris.bellows': [S_('minecraft:item/firecharge/use', pitch=0.5, volume=1.4), S_('minecraft:entity/blaze/shoot', pitch=0.5)],
+})
+
+
 # ================================================================== обзорные листы (PIL)
 def _tint(name, color, size, bg=(14, 16, 20)):
     im = Image.open(os.path.join(G.A, 'textures', 'sigil', name + '.png')).convert('RGBA').resize(size, Image.LANCZOS)
@@ -971,16 +1170,17 @@ def sheet_ui(bars, ttl, icns):
     for i, (k, v) in enumerate(icns.items()):
         ic = v.resize((108, 108), Image.NEAREST)
         im.paste(ic, (40 + i * 400, y), ic)
-        f.draw(d, (160 + i * 400, y + 36), {'aris_reforged': 'Перековка', 'aris_scorched': 'Раскалённый пол'}[k], (220, 236, 240))
+        f.draw(d, (40 + i * 400 + 120, y + 36), {'aris_reforged': 'Перековка', 'aris_scorched': 'Раскалённый пол', 'aris_chained': 'Скован',
+                                                'aris_steamed': 'В паре'}[k], (220, 236, 240))
     im.save(os.path.join(MEDIA, 't28_ui.jpg'), quality=90)
 
 
 def sheet_sigils():
-    W, H = 1600, 520
+    W, H = 2100, 520
     im = Image.new('RGB', (W, H), (14, 16, 20))
     d = ImageDraw.Draw(im)
     f = MixFont(26)
-    items = [('aris_emblem', TEAL, 'знак Арис'), ('aris_forge_ring', MOLTEN, '«Горн» r24'), ('aris_target', TEAL, '«Последний удар» r14'),
+    items = [('aris_cone', MOLTEN, 'конус «Мехов»'), ('aris_chain_seal', STEEL_L, 'печать цепей'), ('aris_emblem', TEAL, 'знак Арис'), ('aris_forge_ring', MOLTEN, '«Горн» r24'), ('aris_target', TEAL, '«Последний удар» r14'),
              ('aris_island', TEAL, 'островок'), ('aris_reforge', MOLTEN, 'перековка'), ('aris_molten_floor', MOLTEN, 'пол-горн, вмятины')]
     for i, (n, c, lab) in enumerate(items):
         t = _tint(n, c, (240, 240))
@@ -1003,6 +1203,8 @@ def run(gmod, anmod, args, anims):
     bars = bossbars()
     ttl = titles()
     icns = icons()
+    spells4()
+    icns.update(icons4())
     lang_sounds()
     os.makedirs(MEDIA, exist_ok=True)
     sheet_ui(bars, ttl, icns)

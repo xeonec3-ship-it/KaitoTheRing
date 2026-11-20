@@ -62,6 +62,13 @@ def run(G, args):
         cell('surrender', 4.6, 35, 'сдача', sub='3.6 «Чёрт! Я сдаюсь…»', variant='spent'), cell('surrender', 4.6, 120, 'сдача', sub='сбоку', variant='spent'),
         cell('npc_stand', 0.5, 30, 'мирный NPC', sub='стоит у молота', variant='dim'), cell('npc_sit', 0.5, 35, 'мирный NPC', sub='сидит на молоте', variant='dim'),
     ]}, three)
+    R.sheet(M('t28_spells4.jpg'), {'cols': 4, 'cells': [
+        cell('billet', 0.45, 30, '«Раскалённая заготовка»', sub='замах'), cell('billet', 0.7, 30, '«Раскалённая заготовка»', sub='throw 0.7'),
+        cell('chains', 0.5, 40, '«Цепи кузни»', sub='замах навершием'), cell('chains', 0.85, 40, '«Цепи кузни»', sub='chains 0.8: кулак вверх'),
+        cell('quench', 0.5, 30, '«Закалка»', sub='ладонь над головой'), cell('quench', 0.85, 30, '«Закалка»', sub='splash 0.8'),
+        cell('bellows', 0.6, 60, '«Мехи»', sub='0–0.8 замах (конус-предупреждение)'), cell('bellows', 0.85, 60, '«Мехи»', sub='gust 0.8'),
+        {'meshes': [{'id': 'aris_billet', 'scale': 1}], 'h': 14, 'ty': 1.5, 'yaw': 30, 'pitch': 30, 'dist': 1.3, 'label': 'слиток (меш)', 'dim': 0.6},
+    ]}, three, size=(1600, 1250))
     R.sheet(M('t28_hammer.jpg'), {'cols': 3, 'cells': [
         {'item': 'aris_hammer', 'yaw': 0, 'pitch': 0, 'h': 34, 'ty': 13, 'label': 'Молот Арис', 'sub': 'спереди (models/item/aris_hammer.json)'},
         {'item': 'aris_hammer', 'yaw': 35, 'pitch': 12, 'h': 34, 'ty': 13, 'label': '3/4'},

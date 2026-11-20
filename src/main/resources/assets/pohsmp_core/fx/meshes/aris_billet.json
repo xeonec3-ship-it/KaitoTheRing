@@ -1,0 +1,110 @@
+{
+ "comment": "T28 «Раскалённая заготовка»: слиток 0.6×0.22×0.3 бл., светится; окалина тёмными пятнами. Точка (0,0,0) — низ. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "center": 0,
+ "formedAt": 4,
+ "collapse": {
+  "duration": 4,
+  "easing": "easeInCubic"
+ },
+ "parts": [
+  {
+   "type": "boxes",
+   "tones": [
+    "#3A2420",
+    "#F4A852",
+    "#FFD490"
+   ],
+   "glowTones": [
+    1,
+    2
+   ],
+   "blend": "additive",
+   "opacity": 1.0,
+   "shade": true,
+   "boxes": [
+    [
+     -0.3,
+     0,
+     -0.15,
+     0.3,
+     0.2,
+     0.15,
+     1
+    ],
+    [
+     -0.27,
+     0.2,
+     -0.12,
+     0.27,
+     0.23,
+     0.12,
+     2
+    ]
+   ],
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "reveal": "down",
+    "front": 0.1
+   },
+   "bounds": [
+    0,
+    0.25
+   ]
+  },
+  {
+   "type": "boxes",
+   "tones": [
+    "#3A2420",
+    "#F4A852",
+    "#FFD490"
+   ],
+   "glowTones": [],
+   "blend": "translucent",
+   "opacity": 1.0,
+   "shade": true,
+   "boxes": [
+    [
+     -0.18,
+     0.229,
+     -0.05,
+     -0.08,
+     0.235,
+     0.04,
+     0
+    ],
+    [
+     0.1,
+     0.229,
+     0.02,
+     0.2,
+     0.235,
+     0.1,
+     0
+    ],
+    [
+     -0.31,
+     0.05,
+     -0.08,
+     -0.299,
+     0.12,
+     0.0,
+     0
+    ]
+   ],
+   "appear": {
+    "delay": 0,
+    "duration": 4,
+    "easing": "easeOutCubic",
+    "reveal": "down",
+    "front": 0.1
+   },
+   "bounds": [
+    0,
+    0.25
+   ]
+  }
+ ]
+}

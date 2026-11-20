@@ -189,6 +189,23 @@
 - что `mesh.move.keys` у исполинского молота поддерживается. Если нет, он просто появится на месте удара;
 - лицо шлема без глаз (как на референсе). Если в бою не хватает выразительности, могу вернуть тусклые глаза в прорези.
 
-## Не сделано в этой сдаче
-Раздел ТЗ «+4 заклинания» (Раскалённая заготовка, Цепи кузни, Закалка, Мехи) появился в ветке, пока шла эта работа. Их визуала
-(fx, анимаций каста) здесь нет. Если нужно — скажите, сделаю отдельной сдачей в том же генераторе.
+## 10. «+4 заклинания» (вторая сдача, по ТЗ «+4 заклинания»)
+Всё в том же генераторе. Кадр — `docs/media/t28_spells4.jpg`, рисунки — `t28_sigils.jpg`, иконки — `t28_ui.jpg`.
+
+| заклинание | анимация (`animation.aris.*`) | fx | для кода |
+|---|---|---|---|
+| «Раскалённая заготовка» | `billet` 1.4 с, **`throw` 0.7** — бросок левой рукой снизу, молот на плече | `aris_billet_throw` (12, caster = Арис, вспышка из руки); **`aris_billet`** (60, caster = слиток, follow): меш `aris_billet`, **видимая зона r3** (жар на земле), пульс-кольца r3 учащаются к 3 с; **`aris_billet_explode`** (40) | слиток — снаряд/сущность кода; лёг — 60 тиков, на 60-м взрыв: урон r3 + `aris_billet_explode`; звук `aris.billet` пока лежит, `aris.billet_explode` |
+| «Цепи кузни» | `chains` 1.6 с, **`chains` 0.8** — удар навершием в землю, кулак вверх | **`aris_chains`** (−1, caster = игрок, follow): 4 цепи из земли в 1.6 бл. к поясу (`chains` с `grow`, `rattle`), печать `aris_chain_seal`; `aris_chains_hit` (удар союзника, 10); `aris_chains_break` (24) | держать до `Fx.stop`: 80 тиков **или** 3 удара союзников по скованному (каждый — `aris_chains_hit`); игрок обездвижен, эффект `aris_chained`; звуки `aris.chains` / `aris.chains_break` |
+| «Закалка» | `quench` 1.8 с, **`splash` 0.8** — молот в землю, ладонь над головой | **`aris_quench`** (100 = 5 с, caster = Арис, **не follow**): всплеск, клубы пара r5, мир в облаке серый (`tint` + `saturation`) | 5 с: урон по Арис ×0.6, пока она в r5 от точки; игрокам в r5 — эффект `aris_steamed` + туман (FogRenderer, видимость ~3 бл.); звук `aris.quench` |
+| «Мехи» | `bellows` 1.5 с, `warn` 0.0, **`gust` 0.8** — замах низко назад, взмах снизу вперёд | **`aris_bellows_warn`** (16, caster = Арис, yaw = направление): конус 60°×8 бл. (`decal` `aris_cone` с `yaw`, вершина у Арис); **`aris_bellows`** (24): поток жара и искр по конусу (`sprites` с `path`/`width`); `aris_bellows_burn` (12) на задетом | 0–0.8 предупреждение; в 0.8 всем в конусе (60°, 8 бл.) — отброс + поджог + `aris_bellows_burn`; звук `aris.bellows` |
+
+- Иконки статусов (`textures/mob_effect/`, 18×18): **`aris_chained`** (скован), **`aris_steamed`** (в паре).
+- Новые рисунки: `textures/sigil/aris_cone.png` (конус; вершина — центр картинки, раскрытие — к верхнему краю = вперёд по yaw), `aris_chain_seal.png`. Печать `sigils/aris_chain_seal.json`. Меш `fx/meshes/aris_billet.json`.
+- lang (+18 ключей):
+  - `ui.pohsmp_core.aris.billet`, `chains` (`%s` — ник), `chains_self`, `chains_break`, `quench`, `bellows_warn`, `bellows`;
+  - `effect.pohsmp_core.aris_chained` / `aris_steamed` (+ `.description`);
+  - `entity.pohsmp_core.aris_billet`;
+  - `subtitles.pohsmp_core.aris.billet|billet_explode|chains|chains_break|quench|bellows`.
+- Звуки (+6, ваниль: лава, цепи, тушение, огненный заряд): `aris.billet`, `billet_explode`, `chains`, `chains_break`, `quench`, `bellows`.
+- В `decal` используется `yaw` — так же, как у T26 (`cult_ash_line`). Если отрисовщик его не поддерживает, конус всегда будет смотреть на север: нужен поворот по yaw кастера.
+- Не проверено в игре: поза «Закалки» (ладонь над головой видна только сбоку), и что цепи с `follow` тянутся за скованным, если его толкают.

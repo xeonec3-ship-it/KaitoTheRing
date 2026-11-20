@@ -44,7 +44,7 @@ import ru.pohsmp.core.spell.PohSpell;
  * by itself ({@link Zone}). The spell's own seal is in its cast effect, so no school sign and no tier seal on top (ownSeal). Scroll-only:
  * no mana, no cooldown, never crafted or looted.
  */
-public abstract class MythicT23 extends PohSpell {
+public abstract class MythicT23 extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final int TAIL = 20;
     protected final int cast, scene;
     private final String path;

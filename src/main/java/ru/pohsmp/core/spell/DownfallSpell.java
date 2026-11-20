@@ -61,7 +61,7 @@ import ru.pohsmp.core.fx.Fx;
  * (up to 48 blocks) and for a minute sends everything that touches it to the Nether (x/8, z/8, a safe spot). No way back.
  * Price: mana 0, for 3 minutes no mana and no spells, max health -50%, slow and weak, darkness 10 s.
  */
-public class DownfallSpell extends PohSpell {
+public class DownfallSpell extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "downfall";
     public static final int CAST = 500, RIFT_TICKS = 1200, BACKLASH_TICKS = 3600;
     public static final double RANGE = 48, CUT_R = 64, RIFT_W = 1.8, RIFT_H = 5.2;

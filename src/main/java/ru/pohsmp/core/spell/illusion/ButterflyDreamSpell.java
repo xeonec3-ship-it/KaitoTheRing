@@ -56,7 +56,7 @@ import ru.pohsmp.core.spell.HigherSpell;
  * flowers blooming in its steps, and a cocoon of butterflies over it that everyone else sees. Every hit by the caster and its allies is not real: it takes illusory health only; at none left the victim «dies» in the dream and wakes up elsewhere in
  * it. The waking deals nothing - it was just a dream. Hits from outside the dream stay real.
  */
-public class ButterflyDreamSpell extends IllusionBase {
+public class ButterflyDreamSpell extends IllusionBase implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "butterfly_dream";
     private static final int CAST = 240, TAIL = 20, REVEAL = 20, WAKE_HIT = 8, WAKE_ANIM_LEAD = 5;
 

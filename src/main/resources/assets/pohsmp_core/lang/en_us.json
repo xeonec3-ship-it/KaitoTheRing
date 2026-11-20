@@ -884,5 +884,7 @@
   "subtitles.pohsmp_core.martin.volley": "Phantom bows twang",
   "subtitles.pohsmp_core.martin.arrow_hit": "Arrows strike the ground",
   "subtitles.pohsmp_core.martin.duel": "A duel is declared",
-  "subtitles.pohsmp_core.martin.warcry": "Martin's war cry"
+  "subtitles.pohsmp_core.martin.warcry": "Martin's war cry",
+  "message.pohsmp_core.no_inscribe": "This magic cannot be written down",
+  "message.pohsmp_core.no_imbue": "This magic cannot be imbued into items"
 }

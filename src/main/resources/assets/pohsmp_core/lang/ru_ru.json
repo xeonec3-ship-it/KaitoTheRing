@@ -884,5 +884,7 @@
   "subtitles.pohsmp_core.martin.volley": "Призрачные луки звенят",
   "subtitles.pohsmp_core.martin.arrow_hit": "Стрелы вонзаются в землю",
   "subtitles.pohsmp_core.martin.duel": "Брошен вызов на дуэль",
-  "subtitles.pohsmp_core.martin.warcry": "Боевой клич Мартина"
+  "subtitles.pohsmp_core.martin.warcry": "Боевой клич Мартина",
+  "message.pohsmp_core.no_inscribe": "Эта магия не поддаётся записи",
+  "message.pohsmp_core.no_imbue": "Эта магия не вкладывается в предметы"
 }

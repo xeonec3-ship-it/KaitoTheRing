@@ -536,8 +536,12 @@ class Tyros(Boss):
         dummy = lambda t: [steve(*tgt, id=1)]
         pil = [(tgt[0] + 2.4 * math.cos(a), 0, tgt[1] + 2.4 * math.sin(a)) for a in (0.3, 1.55, 2.8, 4.05, 5.3)]
 
-        def wide(t):
-            return {} if t < 1.3 else {'yaw': 40, 'pitch': 9, 'dist': 66 * B, 'tx': 0, 'ty': 15 * B, 'tz': -6 * B}
+        def wide(t):                                     # как в ТЗ: снизу вверх на печать (1.3–4.0), затем общий план с высоты
+            if t < 1.3:
+                return {}
+            if t < 4.0:
+                return {'yaw': 25, 'pitch': -32, 'dist': 34 * B, 'tx': 0, 'ty': 21 * B, 'tz': -9 * B}
+            return {'yaw': 35, 'pitch': 38, 'dist': 64 * B, 'tx': 0, 'ty': 1 * B, 'tz': -9 * B}
 
         def sickle(t, f):                                # коса-бумеранг: z = 6(1 − cos 2πs), x = 4 sin 2πs (из cult_sickle_warn)
             if 1.0 <= t < 1.8:
@@ -585,7 +589,8 @@ class Tyros(Boss):
             dict(anim='cult_leader_brand', dur=4.0, cap='Новое: «Клеймо культа»', sub='cult_leader_brand: клеймо на игроке 0.55, взрыв r3 через 3 с',
                  fx=[(0.55, 'cult_brand', {'c': (tgt[0], 0, tgt[1])}), (3.55, 'cult_brand_explode', {'c': (tgt[0], 0, tgt[1])})], others=dummy, **newv),
             dict(anim='cult_leader_pillars', dur=3.2, cap='Новое: «Столпы пламени»', sub='cult_leader_pillars: круги 0.3 (1.5 с), столбы 1.8',
-                 fx=[(0.3, 'cult_pillar_warn', {'c': p}) for p in pil] + [(1.8, 'cult_pillar', {'c': p}) for p in pil], others=dummy, **newv),
+                 fx=[(0.3, 'cult_pillar_warn', {'c': p}) for p in pil] + [(1.8, 'cult_pillar', {'c': p}) for p in pil], others=dummy,
+                 zoom=2.4, camkw={'dz': -60, 'dx': -30, 'pitch': 16}),
         ]
         self.blend_to(r, last, self.boss(items[0]['anim'], 0), zoom=1.5, others=dummy(0))
         self.sequence(r, items)
@@ -659,6 +664,7 @@ class Irina(Boss):
     h = 54
     idle = 'irina_idle'
     PA, PB = (-3.0, -5.5), (2.0, -6.5)                 # два игрока перед Ириной (блоки)
+    SIDE = {'dz': -50, 'yaw': 78, 'pitch': 12}         # сбоку: Ирина и игроки рядом в кадре
 
     def __init__(self):
         self.anims = json.load(open(os.path.join(A, 'animations', 'entity', 'irina.animation.json'), encoding='utf-8'))['animations']
@@ -678,7 +684,7 @@ class Irina(Boss):
     def combat(self):
         r = Reel(self.title + ' · бой')
         pa, pb = self.PA, self.PB
-        v = {'others': lambda t: self.pair(), 'zoom': 1.25, 'camkw': {'dz': -30}}
+        v = {'others': lambda t: self.pair(), 'zoom': 2.0, 'camkw': self.SIDE}
         items = [
             dict(anim='irina_staff_attack', cap='Удар крюком посоха сверху', **v),
             dict(anim='irina_staff_sweep', cap='Взмах посохом по кругу', **v),
@@ -703,7 +709,7 @@ class Irina(Boss):
         r = Reel(self.title + ' · особые и новые заклинания')
         pa, pb = self.PA, self.PB
         two = lambda t: self.pair()
-        v = {'others': two, 'zoom': 1.25, 'camkw': {'dz': -30}}
+        v = {'others': two, 'zoom': 2.0, 'camkw': self.SIDE}
         Z0, Z1 = -6.0, -1.8                              # жертва «Только мой»: рывком из 6 бл. к Ирине (1.0 с)
 
         def victim(t):
@@ -716,11 +722,11 @@ class Irina(Boss):
                  fx=[(0, 'irina_others_happiness', {})], others=two, zoom=1.25,
                  camf=lambda t: {} if t < 0.8 else {'yaw': 30, 'pitch': 24, 'dist': 52 * B, 'tx': 0, 'ty': 2 * B, 'tz': -2 * B}),
             dict(anim='irina_only_mine', cap='«Только мой»', sub='irina_only_mine: рывок 1.0, кокон 1.6–5.4 (fx irina_yank, irina_cocoon), раздавлен 5.4',
-                 kw={'cloth': 'irina_cloth_cocoon'}, others=victim, zoom=1.2, camkw={'dz': -20},
+                 kw={'cloth': 'irina_cloth_cocoon'}, others=victim, zoom=1.7, camkw={'dz': -30, 'yaw': 78, 'pitch': 10},
                  fx=[(0, 'irina_only_mine', {}), (1.0, 'irina_yank', {'c': (0, 0, Z0)}), (1.05, 'irina_yank', {'c': (0, 0, Z1)}),
                      (1.6, 'irina_cocoon', {'c': (0, 0, Z1)}), (5.4, 'irina_cocoon_crush', {'c': (0, 0, Z1)})]),
             dict(anim='irina_only_mine_broken', dur=1.6, cap='«Только мой»: кокон разорван (вариант)', sub='irina_only_mine_broken + fx irina_cocoon_break',
-                 fx=[(0, 'irina_cocoon_break', {'c': (0, 0, Z1)})], others=lambda t: [steve(pa[0], pa[1]), steve(0, Z1)], zoom=1.2, camkw={'dz': -20}),
+                 fx=[(0, 'irina_cocoon_break', {'c': (0, 0, Z1)})], others=lambda t: [steve(pa[0], pa[1]), steve(0, Z1)], zoom=1.7, camkw={'dz': -30, 'yaw': 78, 'pitch': 10}),
             dict(anim='irina_phase2', cap='Переход в фазу 2', sub='irina_phase2 + fx irina_phase2', fx=[(0, 'irina_phase2', {})], zoom=1.2),
             dict(anim='irina_phase3', cap='Переход в фазу 3', sub='irina_phase3 + fx irina_phase3', fx=[(0, 'irina_phase3', {})], zoom=1.2),
             dict(anim='irina_gaze', dur=2.4, cap='Новое: «Ревнивый взгляд»', sub='irina_gaze 0.5: око и нить на смотревших (fx irina_gaze_cast, irina_gaze_mark)',
@@ -728,10 +734,10 @@ class Irina(Boss):
             dict(anim='irina_knots', dur=2.6, cap='Новое: «Узлы»', sub='irina_knots 0.9: узлы-ловушки на земле (fx irina_knots_cast, irina_knot_trap)',
                  fx=[(0, 'irina_knots_cast', {})] + [(0.9 + 0.05 * i, 'irina_knot_trap', {'c': (x, 0, z), 'stop': 2.6, 'end': 2.7})
                                                       for i, (x, z) in enumerate(knots)],
-                 others=two, zoom=1.6, camkw={'dz': -50, 'pitch': 18}),
+                 others=two, zoom=2.6, camkw={'dz': -60, 'yaw': 70, 'pitch': 22}),
             dict(anim='irina_swap', dur=2.0, cap='Новое: «Подмена любимого»', sub='irina_swap 0.8: двое меняются местами (fx irina_swap в обеих точках)',
                  fx=[(0.8, 'irina_swap', {'c': (pa[0], 0, pa[1])}), (0.8, 'irina_swap', {'c': (pb[0], 0, pb[1])})],
-                 others=lambda t: self.pair(t, swap=0.8), zoom=1.25, camkw={'dz': -30}),
+                 others=lambda t: self.pair(t, swap=0.8), zoom=2.0, camkw=self.SIDE),
             dict(anim='irina_puppet', cap='Новое: «Марионетка»', sub='irina_puppet 0.7: крестовина и нити над игроком (fx irina_puppet)',
                  fx=[(0.7, 'irina_puppet', {'c': (pa[0], 0, pa[1])})], **v),
             dict(anim='irina_puppet_hold', dur=2.0, cap='Новое: «Марионетка» — удержание', sub='irina_puppet_hold (цикл)', **v),

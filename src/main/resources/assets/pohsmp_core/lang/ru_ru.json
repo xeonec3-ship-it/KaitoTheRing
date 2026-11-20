@@ -664,6 +664,7 @@
   "subtitles.pohsmp_core.cult_leader.ash": "Глава Культа рассыпается пеплом",
   "subtitles.pohsmp_core.cult_leader.ash_slash": "Огненный разрез",
   "subtitles.pohsmp_core.cult_leader.replica_break": "Печати Реплики разбиты",
+  "subtitles.pohsmp_core.irina.replica_break": "Печати Реплики рвутся нитями",
   "subtitles.pohsmp_core.cult_leader.finisher": "Коса пронзает",
   "ui.pohsmp_core.cult_leader.epithet": "Глава Культа Меллисто",
   "entity.pohsmp_core.irina": "Ирина, Ведьма Ревности",
@@ -696,6 +697,7 @@
   "effect.pohsmp_core.stolen_happiness": "Украденное счастье",
   "effect.pohsmp_core.stolen_happiness.description": "Ирина забрала ваши полезные эффекты себе.",
   "death.attack.pohsmp_core.irina_finisher": "%1$s теперь только её — Ирины, Ведьмы Ревности",
+  "death.attack.pohsmp_core.aris_finisher": "%1$s перекована Арис, Мифическим Кузнецом",
   "death.attack.pohsmp_core.irina_threads": "%1$s разорван красными нитями",
   "death.attack.pohsmp_core.irina_cocoon": "%1$s задушен коконом ревности",
   "subtitles.pohsmp_core.irina.spawn": "Нити расплетаются",
@@ -894,5 +896,9 @@
   "ui.pohsmp_core.boss.unknown": "Босс %s ещё не сделан (или неизвестен)",
   "ui.pohsmp_core.boss.spawned": "Вызван босс: %s",
   "message.pohsmp_core.no_inscribe": "Эта магия не поддаётся записи",
-  "message.pohsmp_core.no_imbue": "Эта магия не вкладывается в предметы"
+  "message.pohsmp_core.no_imbue": "Эта магия не вкладывается в предметы",
+  "entity.pohsmp_core.ereb_reflection": "Эреб, Первый Предатель",
+  "entity.pohsmp_core.ereb_shard": "Стеклянный осколок",
+  "entity.pohsmp_core.ereb_dream_point": "Сон бабочки",
+  "death.attack.pohsmp_core.ereb_finisher": "%1$s поверил Эребу"
 }

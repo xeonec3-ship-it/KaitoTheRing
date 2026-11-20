@@ -615,6 +615,21 @@ RIBS = ['rib_%02d' % k for k in range(20)]
 STAFF_HOLD = {'right_arm': [12, 0, 4]}           # поза хвата посоха: предплечье чуть вперёд
 
 
+def bb(pose):
+    """Позы ниже записаны в осях Blockbench / GeckoLib-JSON, как у Iron's (casting_animations.json): рука вперёд и вверх — x минус
+    (−90 — вперёд, −180 — над головой), торс вперёд — x плюс, свисающая ткань назад — x плюс; position x плюс — влево от неё.
+    Anim.to_json (nightmare_geo) пишет JSON как (−x, −y, z) от внутренних осей — переводим сюда, чтобы в файле оказались ровно эти числа.
+    (Проверка 20.11: до этого перевода X/Y уходили в файл с обратным знаком — касты и удары уходили за спину.)"""
+    for ch in pose.values():
+        if 'rot' in ch:
+            r = ch['rot']
+            ch['rot'] = [-r[0], -r[1], r[2]]
+        if 'pos' in ch:
+            q = ch['pos']
+            ch['pos'] = [-q[0], q[1], q[2]]
+    return pose
+
+
 def body_bones():
     return ['body', 'torso', 'head', 'hat', 'right_arm', 'left_arm', 'right_leg', 'left_leg']
 
@@ -634,7 +649,7 @@ def pose_mix(*poses):
 
 def idle_pose(t, per=4.0):
     br = math.sin(t * TAU / per)
-    return {'body': {'pos': [0, br * 0.25, 0]}, 'torso': {'rot': [br * 1.2, 0, 0]},
+    return {'body': {'pos': [0, br * 0.25, 0], 'rot': [0, 0, 0]}, 'torso': {'rot': [br * 1.2, 0, 0]},
             'head': {'rot': [-3 + br * 1.5, 6 * math.sin(t * TAU / (per * 2)), 4]}, 'hat': {'rot': [0, 0, 0]},
             'right_arm': {'rot': [4 + br * 2, 0, 9]}, 'left_arm': {'rot': [-36 - br * 2, 22, -4 - br * 2]},
             'right_leg': {'rot': [0, 0, 0]}, 'left_leg': {'rot': [0, 0, 0]}}
@@ -680,7 +695,7 @@ def anims():
 
     def mk(name, length, fn, loop=False, dt=0.05, events=None):
         a = Anim(name, length, loop=loop)
-        a.sample(fn, dt)
+        a.sample(lambda t: bb(fn(t)), dt)
         for tt, ev in (events or {}).items():
             a.instruction(tt, ev)
         out.append(a)

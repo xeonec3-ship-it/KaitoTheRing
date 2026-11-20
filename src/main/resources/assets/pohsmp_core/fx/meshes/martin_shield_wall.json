@@ -12,7 +12,7 @@
    "type": "quad",
    "texture": "martin_barrier",
    "blend": "additive",
-   "opacity": 0.75,
+   "opacity": 0.5,
    "doubleSided": true,
    "color": "@secondary",
    "pulse": [
@@ -46,7 +46,7 @@
    "type": "quad",
    "texture": "martin_barrier",
    "blend": "additive",
-   "opacity": 0.75,
+   "opacity": 0.5,
    "doubleSided": true,
    "color": "@secondary",
    "pulse": [
@@ -80,7 +80,7 @@
    "type": "quad",
    "texture": "martin_barrier",
    "blend": "additive",
-   "opacity": 0.75,
+   "opacity": 0.5,
    "doubleSided": true,
    "color": "@secondary",
    "pulse": [
@@ -114,7 +114,7 @@
    "type": "quad",
    "texture": "martin_barrier",
    "blend": "additive",
-   "opacity": 0.75,
+   "opacity": 0.5,
    "doubleSided": true,
    "color": "@secondary",
    "pulse": [
@@ -148,7 +148,7 @@
    "type": "quad",
    "texture": "martin_barrier",
    "blend": "additive",
-   "opacity": 0.75,
+   "opacity": 0.5,
    "doubleSided": true,
    "color": "@secondary",
    "pulse": [
@@ -182,7 +182,7 @@
    "type": "quad",
    "texture": "martin_barrier",
    "blend": "additive",
-   "opacity": 0.75,
+   "opacity": 0.5,
    "doubleSided": true,
    "color": "@secondary",
    "pulse": [

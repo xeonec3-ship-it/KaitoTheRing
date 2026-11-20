@@ -154,16 +154,8 @@ def mat_steel(ctx):
             g |= i >= pw - tw
     if trim and 'u' in trim and ctx.face == 'up':
         g |= (i == 0) | (j == 0) | (i == pw - 1) | (j == ph - 1)
-    lv = lv + handf(ctx, 0.32, 0.8, 11, 0.004) * (ctx.face != 'down')
-    fi, fj, fw, fh = _pix(ctx)
-    if ctx.face in SIDE and fh > 5:                                   # второй ряд светотени (полный размер текселя)
-        lv = lv + np.where(fj == 1, 0.5, 0) + np.where(fj == fh - 2, -0.5, 0)
+    lv = lv + handf(ctx, 0.32, 0.7, 11, 0.004) * (ctx.face != 'down')
     rgb = tone(R_STEEL, lv)
-    if info(ctx, 'fili') and ctx.face in SIDE and fw > 9 and fh > 9:  # золотая инкрустация: кант в 3 текселях от края + уголки
-        d = np.minimum(np.minimum(fi, fw - 1 - fi), np.minimum(fj, fh - 1 - fj))
-        line = d == 3
-        corner = (np.minimum(fi, fw - 1 - fi) <= 5) & (np.minimum(fj, fh - 1 - fj) <= 5) & (d >= 3)
-        rgb = np.where((line | (corner & ((fi + fj) % 2 == 0)))[:, None], tone(R_GOLD, np.where(fj < fh / 2, 4, 3)), rgb)
     if g.any():
         lg = np.where(j == ph - 1, 2, 4) if ctx.face in SIDE else np.full(ctx.n, 4)
         rgb = np.where(g[:, None], tone(R_GOLD, lg - (ctx.face == 'down') * 2), rgb)
@@ -1098,6 +1090,75 @@ def anims(m):
         g(o, np.asarray(DOWN[0]) * (1 - k) + np.asarray(LEAN[0]) * k, lerp_dir(DOWN[1], LEAN[1], k), left=k)
         return vis(o)
     A('to_npc', 1.2, 'hold').sample(to_npc, 0.04)
+
+    # ================================================================ +4 заклинания (владелец 20.11)
+    def shieldwall(t):
+        # «Стена щитов»: щит со спины — вверх и с размаху в землю (slam 1.0), меч поднят; затем стойка
+        up = float(track(t, [(0, 0), (0.6, 1, 'out'), (0.85, 1), (1.0, 0, 'in'), (1.6, 0), (2.0, -1)]))
+        k = float(track(t, [(0, 0), (0.3, 1), (1.6, 1), (2.0, 0)]))
+        dn = float(track(t, [(0, 0), (0.85, 0), (1.0, 1, 'in'), (1.6, 1), (2.0, 0)]))
+        o = {'body': {'pos': [0, -2.4 * dn, -0.6 * dn]}, 'torso': {'rot': [-8 * max(0, up) + 14 * dn, 0, 0]}, 'head': {'rot': [-8 * dn, 0, 0]},
+             'right_leg': {'rot': [-30 * dn, 0, 4]}, 'left_leg': {'rot': [22 * dn, 0, -4]}}
+        cape_follow(t, o, lag=8 * dn)
+        hand = np.array([-1.5, 22.0, -5.5]) * max(0, up) + np.array([-0.8, 12.6, -6.4]) * (1 - max(0, up))
+        if k > 0.01:
+            sf(o, hand, tilt=-16 * max(0, up) + 8 * (1 - max(0, up)), w=k)
+        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([5.0, 30.0, -2.0]) * k, lerp_dir(GUARD[1], (0.1, 0.9, -0.42), k), left=0)
+        return vis(o, shield_hand=0.15 < t < 1.9)
+    a = A('shield_wall', 2.0)
+    a.sample(shieldwall, 0.04)
+    a.instruction(0.15, 'shield_draw')
+    a.instruction(1.0, 'slam')
+
+    def volley(t):
+        # «Залп лучников»: меч к небу — «натянуть!» (draw 0.8), резкий взмах вперёд-вниз — «пли!» (loose 1.2)
+        k = float(track(t, [(0, 0), (0.8, 1, 'out'), (1.05, 1), (1.2, 2, 'in'), (1.7, 2), (2.2, 3)]))
+        P = [GUARD[0], (5.0, 33.0, -1.0), (4.0, 19.0, -11.0), GUARD[0]]
+        D = [GUARD[1], (0.0, 1.0, 0.1), (0.0, -0.35, -0.94), GUARD[1]]
+        i = min(2, int(k))
+        f = k - i
+        up = 1.0 if 1 <= k < 1.2 else (k if k < 1 else 0)
+        fw = float(track(t, [(0, 0), (1.05, 0), (1.2, 1, 'in'), (1.7, 1), (2.2, 0)]))
+        o = {'body': {'pos': [0, -1.0 * fw, -1.0 * fw]}, 'torso': {'rot': [-10 * up + 12 * fw, 0, 0]}, 'head': {'rot': [22 * up - 6 * fw, 0, 0]},
+             'left_arm': {'rot': [-30 * up, 0, -50 * up]}, 'left_forearm': {'rot': [-20, 0, 0]},
+             'right_leg': {'rot': [-22 * fw, 0, 0]}, 'left_leg': {'rot': [20 * fw, 0, 0]}}
+        cape_follow(t, o, lag=10 * fw, wind=4 * up)
+        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f, lerp_dir(D[i], D[i + 1], f), left=max(0, 1 - 3 * k) if k < 2.5 else (k - 2.5) * 2)
+        return vis(o)
+    a = A('volley', 2.2)
+    a.sample(volley, 0.04)
+    a.instruction(0.8, 'draw')
+    a.instruction(1.2, 'loose')
+
+    def duel(t):
+        # «Вызов на дуэль»: остриё меча на выбранного игрока одной рукой, левая — к груди (challenge 0.9), затем стойка
+        k = float(track(t, [(0, 0), (0.7, 1, 'out'), (1.5, 1), (2.0, 0)]))
+        p = float(track(t, [(0, 0), (0.7, 0), (0.9, 1, 'back'), (1.5, 1), (2.0, 0)]))
+        o = {'torso': {'rot': [-4 * k, -20 * k, 0]}, 'head': {'rot': [-4 * k, 14 * k, 0]},
+             'left_arm': {'rot': [-50 * k, 0, 30 * k]}, 'left_forearm': {'rot': [-80 * k, 0, 0]},
+             'right_leg': {'rot': [-14 * p, 0, 0]}, 'left_leg': {'rot': [12 * p, 0, 0]}}
+        cape_follow(t, o, lag=4 * p)
+        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([6.0, 21.0, -10.5 - 1.5 * p]) * k, lerp_dir(GUARD[1], (0.0, 0.05, -1.0), k),
+          left=max(0, 1 - 3 * k))
+        return vis(o)
+    a = A('duel', 2.0)
+    a.sample(duel, 0.04)
+    a.instruction(0.9, 'challenge')
+
+    def warcry(t):
+        # «Боевой клич»: вдох, корпус назад, руки в стороны, рёв (cry 0.6) — волна сбивает касты; затем стойка
+        k = float(track(t, [(0, 0), (0.5, 1, 'out'), (1.3, 1), (1.8, 0)]))
+        c = float(track(t, [(0, 0), (0.5, 0), (0.62, 1, 'back'), (1.3, 1), (1.8, 0)]))
+        sh = math.sin(t * 60) * c * 0.6
+        o = {'body': {'pos': [0, -1.0 * c, 0.6 * c]}, 'torso': {'rot': [-14 * c + 6 * (k - c), 0, sh]}, 'head': {'rot': [-30 * c, 0, sh * 2]},
+             'left_arm': {'rot': [-20 * k, 0, -70 * k]}, 'left_forearm': {'rot': [-30 * k, 0, 0]},
+             'right_leg': {'rot': [-12 * c, 0, 8 * c]}, 'left_leg': {'rot': [12 * c, 0, -8 * c]}}
+        cape_follow(t, o, lag=-4 * c, wind=8 * c)
+        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([9.5, 20.0, -2.0]) * k, lerp_dir(GUARD[1], (0.6, 0.6, -0.5), k), left=max(0, 1 - 3 * k))
+        return vis(o)
+    a = A('warcry', 1.8)
+    a.sample(warcry, 0.04)
+    a.instruction(0.6, 'cry')
     return an
 
 
@@ -1203,6 +1264,8 @@ def main(args):
     X.run(sys.modules[__name__], args)
     import gen_martin_fx as FX
     FX.run(sys.modules[__name__], args)
+    import gen_martin_spells as SP
+    SP.run(sys.modules[__name__], args)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,304 @@
+#!/usr/bin/env python3
+"""
+T31 «Эреб, Длань Лжи» — анимации GeckoLib (ereb_hand_*). Вызывается из tools/gen_ereb_hand.py (write(M)).
+Файл animations/entity/ereb_hand.animation.json = все casting_animations.json Iron's (те же имена: их зовёт AbstractSpellCastingMob)
++ ereb_hand_*. События — ключи timeline (GeckoLib CustomInstructionKeyframeEvent); коду можно заменить их таймерами (таблица в письме).
+
+Оси — как у T30 (tools/gen_ereb_anims.py): rotation x < 0 — рука вперёд-вверх; body y > 0 — поворот к своей правой стороне.
+Призрачная рука (ghost_*, дочь body): position x > 0 — к левому боку модели, y — вверх, z < 0 — ВПЕРЁД; rotation x > 0 — пальцы к ладони
+(«вперёд»), y < 0 — ладонь к середине тела, z > 0 — кисть наклоняется к голове. Фаланги: x > 0 — сгиб к ладони.
+Накидка (cape, ось у плеч сзади): x > 0 — подол назад. Маска (mask, дочь head): её срывают в «Падении маски».
+
+Правило: КАЖДЫЙ ключ — полная поза (все кости), поэтому промежуточные ключи не «проваливаются» к нулю; каждая анимация начинается и
+кончается позой покоя (IDLE0) или позой той анимации, из которой/в которую переходит (хватка → удержание → сжатие → отпустить).
+Проверка покадрово (0.1 с): python3 tools/check_ereb_hand_anims.py.
+"""
+import json
+import math
+
+import gen_ereb_anims as EA
+
+IO, OC, OQ, IQ, IC, OB = 'easeInOutSine', 'easeOutCubic', 'easeOutQuart', 'easeInQuart', 'easeInCubic', 'easeOutBack'
+LIN = 'linear'
+FINGERS = ('index', 'middle', 'ring', 'pinky')
+SPREAD = {'index': 7, 'middle': 2, 'ring': -3, 'pinky': -9}
+CURL = (58, 80, 62)                                    # кулак: сгиб фаланг 1–3
+BODY = ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg', 'bipedHandRight', 'bipedHandLeft',
+        'coat_front_r', 'coat_front_l', 'coat_back_r', 'coat_back_l', 'cape', 'mask')
+GHOST = ['ghost_hand', 'ghost_wrist', 'ghost_palm'] + ['ghost_%s_%d' % (f, k) for f in FINGERS for k in (1, 2, 3)] + ['ghost_thumb_1', 'ghost_thumb_2']
+Z3 = [0, 0, 0]
+ONE = [1, 1, 1]
+
+
+# ================================================================== позы
+def hand(pos=(0, 0, 0), rot=(14, -18, -6), curl=0.2, spread=0.0, thumb=0.15, wrist=(0, 0, 0), scale=1.0, ripple=0.0):
+    """Поза призрачной руки. curl 0 — раскрыта, 1 — кулак; spread — веер пальцев; thumb 0 — отведён, 1 — прижат к ладони;
+    ripple — сдвиг сгиба по пальцам (волна «перебирает пальцами»)."""
+    p = {'ghost_hand': list(rot), 'ghost_hand_pos': list(pos), 'ghost_hand_scale': [scale] * 3, 'ghost_wrist': list(wrist), 'ghost_palm': Z3}
+    for i, f in enumerate(FINGERS):
+        c = max(0.0, min(1.1, curl + ripple * math.sin(i * 1.3)))
+        for k in (1, 2, 3):
+            p['ghost_%s_%d' % (f, k)] = [round(c * CURL[k - 1] + (3 if k > 1 else 0), 2), 0, round(spread * SPREAD[f], 2) if k == 1 else 0]
+    p['ghost_thumb_1'] = [thumb * 18, thumb * 38, -thumb * 6]
+    p['ghost_thumb_2'] = [0, thumb * 34, 0]
+    return p
+
+
+# тело — позы T30 + новая левая рука (перчатка «Длани» видна: рука у бедра, а не за спиной), накидка
+STAND = EA.mod(EA.STAND, left_arm=[-10, -6, -8], bipedHandLeft=Z3, cape=[4, 0, 0])
+GUARD = EA.mod(EA.GUARD, cape=[12, 0, 0])
+LUNGE = EA.mod(EA.LUNGE, cape=[34, 0, 0])
+PARRY = EA.mod(EA.PARRY, cape=[14, 0, 0])
+CAST = EA.mod(EA.CAST, cape=[6, 0, 0], bipedHandRight=[44, 0, 0])
+BOW = EA.mod(EA.BOW, cape=[10, 0, 0], left_arm=[18, -12, 12], bipedHandRight=[44, 0, 0])
+SALUTE = EA.mod(EA.SALUTE, cape=[6, 0, 0])
+HOVER = hand()
+
+
+def full(body, gh=None, **kw):
+    """Полная поза: все кости тела (недостающие — 0) + рука + правки."""
+    p = {b: Z3 for b in BODY}
+    p.update({'body_pos': Z3, 'body_scale': ONE, 'mask_pos': Z3, 'mask_scale': ONE})
+    p.update(body)
+    p.update(gh if gh is not None else HOVER)
+    p.update(kw)
+    return p
+
+
+def lerp(a, b, k):
+    return EA.lerp_pose(a, b, k)
+
+
+def anim(length, keys, timeline=None, loop=False):
+    return EA.anim(length, keys, timeline, loop)
+
+
+def idle_pose(t):
+    """Поза покоя в момент t (петля 4 с): дыхание, перенос веса, рука парит (±0.6), пальцы медленно перебирают, накидка колышется."""
+    ph = math.sin(t * math.pi / 2)
+    ph2 = math.sin(t * math.pi / 2 + 1.1)
+    body = EA.mod(STAND, torso=[-1.5 * abs(ph), 0, 0], body_pos=[0, 0.12 * abs(ph), 0], head=[-3 + 1.5 * ph, 8 + 4 * ph, 0],
+                  coat_front_r=[-3, 0, 2 + 1.2 * ph], coat_front_l=[2, 0, -2 + 1.2 * ph], coat_back_r=[1.5 * ph, 0, 1.0 * ph],
+                  coat_back_l=[1.5 * ph, 0, 1.0 * ph], right_arm=[-14 + 2 * ph, 12, 7], cape=[4 + 1.5 * ph2, 0, 0.8 * ph])
+    gh = hand(pos=(0, 0.6 * ph2, 0), rot=(14 + 2 * ph, -18 + 3 * ph2, -6 + 2 * ph), curl=0.22 + 0.06 * ph2, ripple=0.08 * ph, thumb=0.15)
+    return full(body, gh)
+
+
+IDLE0 = idle_pose(0)
+
+
+def build():
+    an = {}
+    # ---------------------------------------------------------------- покой (4 с, петля)
+    an['ereb_hand_idle'] = anim(4.0, [(i * 0.5, idle_pose(i * 0.5), IO) for i in range(9)], loop=True)
+    # поза покоя (2 с, петля, без колыхания рук — для ожидания вне боя / заставки)
+    still = full(STAND, hand(pos=(0, -0.5, 0.5), rot=(18, -18, -6), curl=0.35, thumb=0.3))
+    an['ereb_hand_rest'] = anim(2.0, [(0, still), (1.0, full(EA.mod(STAND, torso=[-1, 0, 0]), hand(pos=(0, -0.2, 0.5), rot=(18, -18, -6),
+                                                                                                   curl=0.38, thumb=0.3)), IO), (2.0, still, IO)],
+                                loop=True)
+    # ---------------------------------------------------------------- шаг (1.2 с, петля): полы и накидка следуют за ногами
+    keys = []
+    for i in range(9):
+        t = i * 0.15
+        s = math.sin(i * math.pi / 4)
+        c = math.sin(i * math.pi / 4 - 0.6)
+        body = EA.mod(STAND, right_leg=[-26 * s, 0, 2], left_leg=[26 * s, 0, -2], body_pos=[0, -0.35 * abs(math.cos(i * math.pi / 4)), 0],
+                      right_arm=[-14 + 6 * s, 12, 7], bipedHandRight=[40, 0, 0], left_arm=[-10 - 8 * s, -6, -8], head=[-3, 4, 0], torso=[2, 0, 0],
+                      coat_front_r=[-6 - 14 * max(0, c), 0, 3], coat_front_l=[-6 - 14 * max(0, -c), 0, -3],
+                      coat_back_r=[6 + 10 * max(0, -c), 0, 2], coat_back_l=[6 + 10 * max(0, c), 0, -2], cape=[12 + 5 * abs(c), 0, 1.5 * s])
+        keys.append((t, full(body, hand(pos=(0, 0.5 * math.cos(i * math.pi / 4), 0.6), rot=(18, -18, -6 + 2 * s), curl=0.25)), LIN))
+    an['ereb_hand_walk'] = anim(1.2, keys, loop=True)
+    # ---------------------------------------------------------------- фехтование (позы T30; рука держится над плечом, чуть впереди)
+    HG = hand(pos=(1, -1, -2), rot=(24, -10, -4), curl=0.3, thumb=0.2)
+    HG_back = hand(pos=(1, 1, 1), rot=(8, -14, -6), curl=0.25)
+    guard = full(GUARD, HG)
+    an['ereb_hand_guard'] = anim(1.0, [(0, guard), (0.5, full(EA.mod(GUARD, body_pos=[0, -1.4, 0]), HG), IO), (1.0, guard, IO)], loop=True)
+    pre = full(EA.mod(GUARD, body_pos=[0, -1.8, 2], right_arm=[-70, 40, 10], bipedHandRight=[70, 0, 0]), HG_back)
+    lunge = full(LUNGE, hand(pos=(2, -2, 2), rot=(10, -6, -4), curl=0.4))
+    an['ereb_hand_lunge'] = anim(1.4, [(0, IDLE0), (0.2, lerp(IDLE0, guard, 0.7), IO), (0.35, pre, IO), (0.5, lunge, OQ), (0.75, lunge),
+                                       (1.05, guard, IO), (1.4, IDLE0, IO)], [(0.5, 'hit')])
+    a1 = full(EA.mod(LUNGE, right_arm=[-104, 36, 0], body_pos=[0, -2.6, -4], bipedHandRight=[92, 0, 0]), hand(pos=(2, -2, 2), rot=(10, -6, -4), curl=0.4))
+    a2 = full(EA.mod(LUNGE, right_arm=[-86, 44, 4], body_pos=[0, -3.0, -5]), hand(pos=(2, -2, 2), rot=(10, -6, -4), curl=0.45))
+    a3 = full(EA.mod(LUNGE, right_arm=[-72, 40, -6], bipedHandRight=[70, 0, 0], body=[22, -42, 0], body_pos=[0, -3.6, -6], cape=[40, 0, 0]),
+              hand(pos=(2, -3, 3), rot=(8, -6, -4), curl=0.5))
+    back = full(EA.mod(GUARD, body_pos=[0, -1.6, 1], right_arm=[-70, 36, 10]), HG_back)
+    an['ereb_hand_flurry'] = anim(2.1, [(0, IDLE0), (0.25, back, IO), (0.45, a1, OQ), (0.62, back, IO), (0.8, a2, OQ), (0.97, back, IO),
+                                        (1.15, a3, OQ), (1.4, a3), (1.75, guard, IO), (2.1, IDLE0, IO)],
+                                  [(0.45, 'hit'), (0.8, 'hit'), (1.15, 'hit')])
+    # ---------------------------------------------------------------- удар рукой по площади (1.8 с): замах вверх, удар ладонью о землю ВПЕРЕДИ
+    # (slam 0.8 — центр удара ≈ 1.6 бл. перед Эребом, см. письмо), рука лежит, возвращается
+    point = EA.mod(STAND, left_arm=[-70, 10, -10], head=[8, 0, 0], torso=[4, 0, 0], body=[4, 0, 0], bipedHandRight=[38, 0, 0])
+    wind = full(EA.mod(STAND, head=[-14, 10, 0], torso=[-6, 0, 0], left_arm=[-30, -6, -14], cape=[2, 0, 0]),
+                hand(pos=(3, 8, 3), rot=(-12, -14, 4), curl=0.0, spread=1.0, thumb=0.0))
+    over = full(EA.mod(point, cape=[10, 0, 0]), hand(pos=(6, 4, -12), rot=(48, -4, 8), curl=0.05, spread=0.8, thumb=0.0))
+    slam = full(EA.mod(point, body_pos=[0, -0.8, 0], cape=[12, 0, 0], left_arm=[-60, 10, -10]),
+                hand(pos=(6, -27.5, -15), rot=(90, 0, 4), curl=0.08, spread=0.7, thumb=0.0))
+    slam2 = full(EA.mod(point, body_pos=[0, -0.6, 0], cape=[10, 0, 0], left_arm=[-60, 10, -10]),
+                 hand(pos=(6, -26.5, -15), rot=(86, 0, 4), curl=0.15, spread=0.6, thumb=0.0))
+    lift = full(STAND, hand(pos=(1, -4, -13), rot=(40, -8, 0), curl=0.2, spread=0.3))
+    lift2 = full(STAND, hand(pos=(-2, 1, -5), rot=(24, -14, -4), curl=0.2, spread=0.2))
+    an['ereb_hand_slam'] = anim(1.8, [(0, IDLE0), (0.45, wind, IO), (0.62, over, IC), (0.8, slam, IQ), (0.95, slam2, OC), (1.15, slam2),
+                                      (1.4, lift, IO), (1.6, lift2, IO), (1.8, IDLE0, IO)], [(0.45, 'raise'), (0.8, 'slam')])
+    # ---------------------------------------------------------------- хватка: тянется вперёд (grab 0.6), держит, сжимает, отпускает
+    reach_b = EA.mod(STAND, left_arm=[-40, 6, -12], head=[4, 0, 0], torso=[3, 0, 0])
+    reach = full(reach_b, hand(pos=(7, -11, -25), rot=(8, -2, 4), curl=0.0, spread=1.0, thumb=0.0))
+    reach_pre = full(reach_b, hand(pos=(2, -8, -12), rot=(24, -6, 0), curl=0.0, spread=0.9, thumb=0.0))
+    HOLD_H = hand(pos=(7, -6, -24), rot=(4, -2, 4), curl=0.78, spread=0.0, thumb=0.8)
+    hold_b = EA.mod(STAND, left_arm=[-26, 4, -12], head=[-6, 0, 0], torso=[-2, 0, 0], cape=[5, 0, 0])
+    HOLD = full(hold_b, HOLD_H)
+    closed = full(reach_b, hand(pos=(7, -10, -25), rot=(6, -2, 4), curl=0.8, spread=0.0, thumb=0.8))
+    an['ereb_hand_grab'] = anim(1.2, [(0, IDLE0), (0.3, reach_pre, IO), (0.5, reach, OC), (0.62, closed, OQ), (0.9, lerp(closed, HOLD, 0.6), IO),
+                                      (1.2, HOLD, IO)], [(0.6, 'grab')])
+    hold2 = full(EA.mod(hold_b, head=[-4, 4, 0]), hand(pos=(7, -5.4, -24), rot=(4, -2, 6), curl=0.8, thumb=0.8))
+    an['ereb_hand_grab_hold'] = anim(2.0, [(0, HOLD), (1.0, hold2, IO), (2.0, HOLD, IO)], loop=True)
+    sq = full(EA.mod(hold_b, left_arm=[-60, 20, -30], bipedHandLeft=Z3, head=[-10, 6, 0], torso=[-4, 0, 0]),
+              hand(pos=(7, -5, -23), rot=(4, -2, 4), curl=1.0, thumb=1.0, wrist=(0, 0, 4)))
+    sq2 = full(EA.mod(hold_b, left_arm=[-62, 22, -32], head=[-10, 6, 0], torso=[-4, 0, 0]),
+               hand(pos=(7, -5, -23), rot=(4, -2, 4), curl=1.05, thumb=1.0, wrist=(0, 0, -3)))
+    an['ereb_hand_squeeze'] = anim(1.2, [(0, HOLD), (0.3, sq, IQ), (0.45, sq2, LIN), (0.6, sq, LIN), (0.8, sq), (1.2, HOLD, IO)], [(0.35, 'squeeze')])
+    opened = full(hold_b, hand(pos=(7, -7, -24), rot=(6, -2, 4), curl=0.0, spread=1.0, thumb=0.0))
+    an['ereb_hand_grab_release'] = anim(1.0, [(0, HOLD), (0.2, opened, OQ), (0.5, full(STAND, hand(pos=(1, -6, -12), rot=(30, -10, 0), curl=0.1, spread=0.5)), IO), (0.75, full(STAND, hand(pos=(-2, 0, -5), rot=(22, -14, -4), curl=0.2)), IO), (1.0, IDLE0, IO)], [(0.2, 'release')])
+    # ---------------------------------------------------------------- каст (1.4 с): «Длань» вверх, щелчок пальцами перчатки (cast 0.75);
+    # призрачная рука вторит жесту — раскрывается над плечом
+    cast_h = hand(pos=(3, 5, 1), rot=(-6, -22, 4), curl=0.0, spread=1.0, thumb=0.0)
+    an['ereb_hand_cast'] = anim(1.4, [(0, IDLE0), (0.45, full(CAST, cast_h), IO), (0.7, full(EA.mod(CAST, left_arm=[-174, 0, -32], head=[-8, -12, 0]),
+                                                                                          hand(pos=(3, 6, 1), rot=(-8, -22, 4), curl=0.0, spread=1.1, thumb=0.0)), IO),
+                                      (0.78, full(EA.mod(CAST, left_arm=[-160, 0, -40]), hand(pos=(3, 5, 1), rot=(-4, -22, 4), curl=0.3, spread=0.6)), OQ),
+                                      (1.0, full(CAST, cast_h)), (1.4, IDLE0, IO)], [(0.75, 'cast')])
+    # ---------------------------------------------------------------- появление (5.5 с): собирается из стекла и бабочек — сначала рука
+    # (form_hand 0.6), потом он (form 1.8: модель видна); поклон (bow 2.6), рука раскрывается к игрокам, салют рапирой (salute 3.4),
+    # «Вот мы и снова встретились» (speak 4.3), стойка (ready 5.5)
+    h0 = hand(pos=(0, 6, 0), rot=(14, -18, -6), curl=0.0, spread=0.6, thumb=0.0, scale=0.02)
+    hf = hand(pos=(0, 4, 0), rot=(10, -18, -6), curl=0.0, spread=0.8, thumb=0.0, scale=1.0)
+    small = EA.mod(STAND, body_scale=[0.9, 0.9, 0.9])
+    bow = full(BOW, hand(pos=(0, -2, 2), rot=(30, -18, -6), curl=0.35, thumb=0.3))
+    sal = full(SALUTE, hand(pos=(2, 2, -1), rot=(18, -26, -2), curl=0.1, spread=0.5, thumb=0.1))
+    speak = full(EA.mod(STAND, head=[-4, 4, 0], left_arm=[-34, 20, -26], bipedHandLeft=Z3),
+                 hand(pos=(-1, 1, -8), rot=(30, -26, -4), curl=0.05, spread=0.6, thumb=0.0))
+    speak2 = full(EA.mod(STAND, head=[-6, 2, 0], left_arm=[-30, 18, -24]), hand(pos=(-1, 0.5, -8), rot=(28, -26, -4), curl=0.1, spread=0.5))
+    an['ereb_hand_spawn'] = anim(5.5, [(0, full(small, h0)), (0.6, full(small, h0)), (1.4, full(small, hf), OC), (1.8, full(small, hf)),
+                                       (2.2, full(STAND, hf), OC), (2.6, bow, IO), (3.0, bow), (3.4, sal, IO), (3.9, sal), (4.3, speak, IO),
+                                       (5.0, speak2, IO), (5.5, IDLE0, IO)],
+                                 [(0.6, 'form_hand'), (1.8, 'form'), (2.6, 'bow'), (3.4, 'salute'), (4.3, 'speak'), (5.5, 'ready')])
+    # ---------------------------------------------------------------- переход в фазу 2 (66%, 1.6 с): рука сжимается в кулак и бьёт в землю рядом
+    fist_up = full(EA.mod(SALUTE, head=[-10, 0, 0]), hand(pos=(2, 7, 2), rot=(-8, -14, 0), curl=1.0, thumb=1.0))
+    fist_dn = full(EA.mod(SALUTE, body_pos=[0, -0.6, 0], head=[10, 6, 0], cape=[10, 0, 0], right_arm=[-80, 30, 0], bipedHandRight=[-20, 0, 0]), hand(pos=(-1, -21, -15), rot=(46, -10, -4), curl=1.0, thumb=1.0))
+    an['ereb_hand_phase2'] = anim(1.6, [(0, IDLE0), (0.45, fist_up, IO), (0.6, fist_up), (0.8, fist_dn, IC), (1.0, fist_dn), (1.25, full(STAND, hand(pos=(-3, -8, -10), rot=(34, -12, -6), curl=0.6, thumb=0.5)), IO), (1.6, IDLE0, IO)],
+                                  [(0.8, 'phase')])
+    # ---------------------------------------------------------------- переход в фазу 3 (33%, 2.0 с): ладонь «Длани» к маске (0.6), маска
+    # трескается (crack 0.9: текстура → ereb_hand_cracked), голова дёргается, рука вздрагивает и раскрывается
+    face = full(EA.mod(STAND, left_arm=[-128, 42, 0], head=[6, 8, 0], torso=[3, 0, 0]), hand(pos=(0, 1, 1), rot=(16, -18, -6), curl=0.6, thumb=0.5))
+    jerk = full(EA.mod(STAND, left_arm=[-100, 20, -20], head=[-16, -10, 6], torso=[-6, 0, 0], body_pos=[0, 0, 1]),
+                hand(pos=(1, 4, 2), rot=(-6, -24, -4), curl=0.0, spread=1.2, thumb=0.0))
+    an['ereb_hand_phase3'] = anim(2.0, [(0, IDLE0), (0.6, face, IO), (0.85, face), (0.95, jerk, OQ), (1.3, jerk), (2.0, IDLE0, IO)],
+                                  [(0.9, 'crack')])
+    # ---------------------------------------------------------------- «Длань Лжи» (66%, особая, 3.0 с): «Длань» к небу, рука улетает вверх
+    # (rise 0.3; gone 0.9 — рука уменьшилась до нуля), descend 1.2 — код: огромная рука опускается с неба (fx), держит позу,
+    # return 2.4 — рука возвращается над плечом
+    sky_b = EA.mod(STAND, left_arm=[-172, 6, -10], head=[-28, 0, 0], torso=[-6, 0, 0], right_arm=[-10, 12, 10], bipedHandRight=[42, 0, 0], cape=[2, 0, 0])
+    up1 = full(sky_b, hand(pos=(2, 14, 1), rot=(-10, -18, 0), curl=0.0, spread=1.0, thumb=0.0))
+    up2 = full(sky_b, hand(pos=(3, 60, 2), rot=(-10, -18, 0), curl=0.0, spread=1.0, thumb=0.0, scale=0.02))
+    hold_sky = full(EA.mod(sky_b, head=[-24, 6, 0]), hand(pos=(0, 6, 0), rot=(14, -18, -6), curl=0.0, spread=0.6, thumb=0.0, scale=0.02))
+    down = full(EA.mod(STAND, left_arm=[-80, 30, -10], head=[10, 10, 0]), hand(pos=(0, 6, 0), rot=(14, -18, -6), curl=0.0, spread=0.6, thumb=0.0,
+                                                                              scale=0.02))
+    an['ereb_hand_hand_of_lies'] = anim(3.2, [(0, IDLE0), (0.5, up1, IO), (0.95, up2, IC), (1.2, lerp(up2, hold_sky, 1.0), IO), (2.2, hold_sky),
+                                              (2.4, down, IO), (2.9, full(STAND, hand(pos=(0, 2, 0), curl=0.0, spread=0.5, thumb=0.0)), OC),
+                                              (3.2, IDLE0, IO)],
+                                        [(0.5, 'rise'), (0.95, 'gone'), (1.2, 'descend'), (2.4, 'return')])
+    # ---------------------------------------------------------------- «Падение маски» (45%, 2.2 с): «Длань» берётся за маску (grip 0.5),
+    # срывает и отбрасывает вверх-вперёд (tear 0.85), маска разлетается осколками (shatter 1.1: код — fx осколков, кость mask скрыть
+    # до ereb_hand_mask_return), рука раскрыта к игрокам
+    grip = full(EA.mod(STAND, left_arm=[-132, 46, 2], head=[4, 8, 0], torso=[2, 0, 0]), hand(pos=(1, 2, 1), rot=(10, -20, -6), curl=0.5, thumb=0.4))
+    tear_b = EA.mod(STAND, left_arm=[-150, -10, -40], head=[-12, -8, 0], torso=[-4, 0, 0], body_pos=[0, 0, 0.5])
+    tear = full(tear_b, hand(pos=(2, 5, 1), rot=(-4, -22, 0), curl=0.0, spread=1.1, thumb=0.0),
+                mask=[-30, 20, 0], mask_pos=[3, 6, -6])
+    flung = full(tear_b, hand(pos=(2, 5, 1), rot=(-4, -22, 0), curl=0.0, spread=1.1, thumb=0.0),
+                 mask=[-60, 40, 10], mask_pos=[5, 12, -10], mask_scale=[0.02, 0.02, 0.02])
+    an['ereb_hand_mask_fall'] = anim(2.2, [(0, IDLE0), (0.45, grip, IO), (0.55, grip), (0.85, tear, OQ), (1.1, flung, IC),
+                                           (1.5, full(tear_b, hand(pos=(2, 4, 1), rot=(0, -22, 0), curl=0.1, spread=0.8), mask_scale=[0.02] * 3)),
+                                           (2.2, full(STAND, HOVER, mask_scale=[0.02] * 3), IO)],
+                                     [(0.5, 'grip'), (0.85, 'tear'), (1.1, 'shatter')])
+    # возвращение маски (1.4 с): осколки летят обратно (код: fx), рука проводит над лицом, mend 0.7 — маска снова на лице
+    # (кость mask показать, текстура → ereb_hand_mended)
+    pass_ = full(EA.mod(STAND, left_arm=[-120, 40, 0], head=[4, 6, 0]), hand(pos=(0, 2, 0), rot=(12, -18, -6), curl=0.3), mask_scale=[0.02] * 3)
+    pass2 = full(EA.mod(STAND, left_arm=[-112, 16, -16], head=[0, 2, 0]), hand(pos=(0, 1, 0), rot=(12, -18, -6), curl=0.3))
+    an['ereb_hand_mask_return'] = anim(1.4, [(0, full(STAND, HOVER, mask_scale=[0.02] * 3)), (0.5, pass_, IO), (0.68, pass_),
+                                             (0.7, pass2, LIN), (1.0, pass2, IO), (1.4, IDLE0, IO)], [(0.7, 'mend')])
+    # ---------------------------------------------------------------- «Сон Бабочки: Полное Раскрытие» (20%, 4.0 с): руки в стороны,
+    # призрачная рука поднимается над головой и раскрывается (open 1.4), каст (cast 2.6 — код запускает заклинание), стойка
+    spread_b = EA.mod(STAND, left_arm=[-30, 0, -70], right_arm=[-30, 0, 66], bipedHandRight=[30, 0, 0], head=[-12, 0, 0], torso=[-6, 0, 0],
+                      body_pos=[0, 0.4, 0], cape=[8, 0, 0])
+    high = hand(pos=(10, 14, 3), rot=(-4, -40, 18), curl=0.3, thumb=0.3)
+    openh = hand(pos=(11, 18, 3), rot=(-14, -44, 22), curl=0.0, spread=1.3, thumb=0.0)
+    castp = full(EA.mod(spread_b, left_arm=[-176, 0, -18], right_arm=[-24, 0, 52], bipedHandRight=[36, 0, 0], head=[-30, 0, 0]),
+                 hand(pos=(11, 20, 3), rot=(-18, -44, 22), curl=0.0, spread=1.4, thumb=0.0))
+    an['ereb_hand_full_reveal'] = anim(4.0, [(0, IDLE0), (0.8, full(spread_b, high), IO), (1.4, full(spread_b, openh), OC), (1.9, full(spread_b, openh)),
+                                             (2.6, castp, IO), (3.3, castp), (4.0, IDLE0, IO)],
+                                       [(0.8, 'butterflies'), (1.4, 'open'), (2.6, 'cast')])
+    # ---------------------------------------------------------------- ложная смерть (5.0 с): шатается (0.4), рука трескается и тает
+    # (hand_break 0.7), выпрямляется, «А вы...стали сильнее» (speak 1.6), лёгкая улыбка-поклон (smile 2.6), распадается бабочками
+    # (vanish 3.8: код — fx бабочек, модель скрыть, полоса исчезает)
+    stag = full(EA.mod(STAND, body=[8, 0, -4], body_pos=[0, -1.2, 1.5], head=[16, -6, 0], torso=[8, 0, 0], right_arm=[-4, 12, 16], bipedHandRight=[10, 0, 0],
+                       left_arm=[-30, -6, -20], right_leg=[-12, 0, 4], left_leg=[14, 0, -4], cape=[-2, 0, 0]),
+                hand(pos=(0, -3, 2), rot=(30, -18, -10), curl=0.6, thumb=0.5))
+    broke = full(EA.mod(STAND, body=[4, 0, -2], body_pos=[0, -0.6, 1], head=[10, -2, 0], right_arm=[0, 12, 10], bipedHandRight=[30, 0, 0],
+                        left_arm=[-20, -6, -14], cape=[2, 0, 0]),
+                 hand(pos=(0, -6, 3), rot=(40, -18, -12), curl=0.8, thumb=0.7, scale=0.02))
+    up = full(EA.mod(STAND, head=[-6, 4, 0], left_arm=[-24, 10, -16], right_arm=[-6, 12, 8], bipedHandRight=[40, 0, 0]),
+              hand(pos=(0, -6, 3), curl=0.8, scale=0.02))
+    talk = full(EA.mod(STAND, head=[-4, 6, 0], left_arm=[-44, 24, -24], right_arm=[-6, 12, 8], bipedHandRight=[40, 0, 0]),
+                hand(pos=(0, -6, 3), curl=0.8, scale=0.02))
+    bow2 = full(EA.mod(STAND, body=[14, 0, 0], head=[10, 0, 0], left_arm=[-60, 30, -6], right_arm=[-20, 12, 6], bipedHandRight=[28, 0, 0],
+                       coat_front_r=[-14, 0, 2], coat_front_l=[-14, 0, -2], cape=[10, 0, 0]),
+                hand(pos=(0, -6, 3), curl=0.8, scale=0.02))
+    an['ereb_hand_false_death'] = anim(5.0, [(0, IDLE0), (0.4, stag, OQ), (0.7, broke, IO), (1.2, up, IO), (1.6, talk, IO), (2.4, talk),
+                                             (2.9, bow2, IO), (3.6, bow2), (3.8, full(EA.mod(STAND, body_scale=[1.03, 1.03, 1.03]),
+                                                                                       hand(curl=0.8, scale=0.02)), IO),
+                                             (5.0, full(EA.mod(STAND, body_scale=[1.03, 1.03, 1.03]), hand(curl=0.8, scale=0.02)))],
+                                       [(0.4, 'stagger'), (0.7, 'hand_break'), (1.6, 'speak'), (2.6, 'smile'), (3.8, 'vanish')])
+    # ---------------------------------------------------------------- добивание (3.6 с): хватает (grab 0.6), поднимает, сжимает (squeeze 1.5),
+    # жертва трескается стеклом (shatter 2.1: код — fx стекла и бабочек, урон ereb_hand_finisher), рука раскрывается (release 2.4)
+    lift_h = hand(pos=(7, -2, -22), rot=(0, -2, 4), curl=0.82, thumb=0.85)
+    crush = hand(pos=(7, -1, -21), rot=(-2, -2, 4), curl=1.08, thumb=1.0, wrist=(0, 0, 5))
+    look = EA.mod(STAND, head=[-14, 4, 0], left_arm=[-40, 20, -20], torso=[-3, 0, 0])
+    an['ereb_hand_finisher'] = anim(3.6, [(0, IDLE0), (0.3, reach_pre, IO), (0.5, reach, OC), (0.62, closed, OQ), (1.2, full(look, lift_h), IO),
+                                          (1.5, full(EA.mod(look, left_arm=[-70, 24, -30]), crush), IQ), (1.8, full(EA.mod(look, left_arm=[-72, 26, -32]),
+                                                                                                                   hand(pos=(7, -1, -21), rot=(-2, -2, 4), curl=1.1,
+                                                                                                                        thumb=1.0, wrist=(0, 0, -4))), LIN),
+                                          (2.1, full(EA.mod(look, left_arm=[-70, 24, -30]), crush), LIN),
+                                          (2.4, full(look, hand(pos=(7, -1, -22), rot=(0, -2, 4), curl=0.0, spread=1.2, thumb=0.0)), OQ),
+                                          (2.9, full(look, hand(pos=(4, 0, -10), rot=(12, -10, 0), curl=0.2, spread=0.6)), IO), (3.6, IDLE0, IO)],
+                                    [(0.6, 'grab'), (1.5, 'squeeze'), (2.1, 'shatter'), (2.4, 'release')])
+    # ---------------------------------------------------------------- «Реплика» (2.3 с): рука хватает печать над ним (snap 0.55 — как у T30,
+    # fx ereb_replica_break), сминает (break 0.95), «Ложь во лжи — становится правдой сама по себе» (speak 1.55)
+    rb_up = full(EA.mod(STAND, head=[-24, 0, 0], torso=[-4, 0, 0], left_arm=[-40, 0, -20]), hand(pos=(6, 10, -6), rot=(-20, -10, 10), curl=0.0, spread=1.2,
+                                                                                                   thumb=0.0))
+    rb_grip = full(EA.mod(STAND, head=[-24, 0, 0], torso=[-4, 0, 0], left_arm=[-40, 0, -20]), hand(pos=(6, 11, -7), rot=(-20, -10, 10), curl=0.95,
+                                                                                                     thumb=0.9))
+    rb_crush = full(EA.mod(STAND, head=[-18, 4, 0], torso=[-3, 0, 0], left_arm=[-36, 0, -18]), hand(pos=(5, 8, -5), rot=(-10, -10, 6), curl=1.1, thumb=1.0,
+                                                                                                      wrist=(0, 0, 6)))
+    rb_talk = full(EA.mod(STAND, head=[-2, 6, 0], left_arm=[-46, 22, -26]), hand(pos=(3, 2, -2), rot=(10, -18, -4), curl=0.0, spread=0.9, thumb=0.0))
+    an['ereb_hand_replica_break'] = anim(2.3, [(0, IDLE0), (0.4, rb_up, IO), (0.55, rb_grip, OQ), (0.8, rb_grip), (0.95, rb_crush, IQ), (1.2, rb_crush),
+                                               (1.55, rb_talk, IO), (1.95, rb_talk), (2.3, IDLE0, IO)],
+                                         [(0.55, 'snap'), (0.95, 'break'), (1.55, 'speak')])
+    return an
+
+
+# что за чем играет (для проверки стыков): анимация → (откуда приходит, куда уходит); None — поза покоя IDLE0
+CHAIN = {'ereb_hand_grab': (None, 'ereb_hand_grab_hold'), 'ereb_hand_grab_hold': ('ereb_hand_grab', 'ereb_hand_squeeze'),
+         'ereb_hand_squeeze': ('ereb_hand_grab_hold', 'ereb_hand_grab_hold'), 'ereb_hand_grab_release': ('ereb_hand_grab_hold', None),
+         'ereb_hand_spawn': ('hidden', None), 'ereb_hand_false_death': (None, 'hidden'), 'ereb_hand_mask_fall': (None, 'maskless'),
+         'ereb_hand_mask_return': ('maskless', None), 'ereb_hand_hand_of_lies': (None, None)}
+
+
+def write(M):
+    src = M.jar_json(M.I + 'animations/casting_animations.json')
+    ours = build()
+    doc = {'format_version': src['format_version'], 'geckolib_format_version': src['geckolib_format_version'],
+           'comment': 'T31 Эреб, Длань Лжи: все анимации casting_animations.json Iron\'s (те же имена — их зовёт AbstractSpellCastingMob) + '
+                      'ereb_hand_* (наши). Сгенерировано tools/gen_ereb_hand.py (tools/gen_ereb_hand_anims.py) — правьте генератор.',
+           'animations': {**src['animations'], **ours}}
+    with open(M.out('animations/entity/ereb_hand.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
+        f.write('\n')
+    return ours

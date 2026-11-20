@@ -900,5 +900,20 @@
   "entity.pohsmp_core.ereb_reflection": "Ereb, the First Traitor",
   "entity.pohsmp_core.ereb_shard": "Glass Shard",
   "entity.pohsmp_core.ereb_dream_point": "Butterfly Dream",
-  "death.attack.pohsmp_core.ereb_finisher": "%1$s trusted Ereb"
+  "death.attack.pohsmp_core.ereb_finisher": "%1$s trusted Ereb",
+  "entity.pohsmp_core.ereb_hand": "Ereb, the Hand of Lies",
+  "item.pohsmp_core.ereb_hand_rapier": "Ereb's Glass Rapier",
+  "ui.pohsmp_core.ereb_hand.title": "Ereb, the Hand of Lies",
+  "ui.pohsmp_core.ereb_hand.epithet": "Head of the Cult of Mellisto",
+  "ui.pohsmp_core.ereb_hand.spawn": "So we meet again",
+  "ui.pohsmp_core.ereb_hand.defeat": "You... have grown stronger",
+  "ui.pohsmp_core.ereb_hand.replica": "A lie within a lie becomes the truth by itself",
+  "ui.pohsmp_core.ereb_hand.phase1": "\"The Lying Word\"",
+  "ui.pohsmp_core.ereb_hand.phase2": "\"The Hand\" — it grabs. Strike the hand to free your ally.",
+  "ui.pohsmp_core.ereb_hand.phase3": "\"Head of the Cult\" — the mask cracks.",
+  "ui.pohsmp_core.ereb_hand.hand_of_lies": "The Hand of Lies",
+  "ui.pohsmp_core.ereb_hand.mask_fall": "The Mask Falls",
+  "ui.pohsmp_core.ereb_hand.full_reveal": "Butterfly Dream: Full Revelation",
+  "ui.pohsmp_core.ereb_hand.vanish": "Ereb scattered into butterflies. The battle is over.",
+  "death.attack.pohsmp_core.ereb_hand_finisher": "%1$s was crushed by the Hand of Lies"
 }

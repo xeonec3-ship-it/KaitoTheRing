@@ -536,8 +536,12 @@ class Tyros(Boss):
         dummy = lambda t: [steve(*tgt, id=1)]
         pil = [(tgt[0] + 2.4 * math.cos(a), 0, tgt[1] + 2.4 * math.sin(a)) for a in (0.3, 1.55, 2.8, 4.05, 5.3)]
 
-        def wide(t):
-            return {} if t < 1.3 else {'yaw': 40, 'pitch': 9, 'dist': 66 * B, 'tx': 0, 'ty': 15 * B, 'tz': -6 * B}
+        def wide(t):                                     # как в ТЗ: снизу вверх на печать (1.3–4.0), затем общий план с высоты
+            if t < 1.3:
+                return {}
+            if t < 4.0:
+                return {'yaw': 25, 'pitch': -32, 'dist': 34 * B, 'tx': 0, 'ty': 21 * B, 'tz': -9 * B}
+            return {'yaw': 35, 'pitch': 38, 'dist': 64 * B, 'tx': 0, 'ty': 1 * B, 'tz': -9 * B}
 
         def sickle(t, f):                                # коса-бумеранг: z = 6(1 − cos 2πs), x = 4 sin 2πs (из cult_sickle_warn)
             if 1.0 <= t < 1.8:
@@ -585,7 +589,8 @@ class Tyros(Boss):
             dict(anim='cult_leader_brand', dur=4.0, cap='Новое: «Клеймо культа»', sub='cult_leader_brand: клеймо на игроке 0.55, взрыв r3 через 3 с',
                  fx=[(0.55, 'cult_brand', {'c': (tgt[0], 0, tgt[1])}), (3.55, 'cult_brand_explode', {'c': (tgt[0], 0, tgt[1])})], others=dummy, **newv),
             dict(anim='cult_leader_pillars', dur=3.2, cap='Новое: «Столпы пламени»', sub='cult_leader_pillars: круги 0.3 (1.5 с), столбы 1.8',
-                 fx=[(0.3, 'cult_pillar_warn', {'c': p}) for p in pil] + [(1.8, 'cult_pillar', {'c': p}) for p in pil], others=dummy, **newv),
+                 fx=[(0.3, 'cult_pillar_warn', {'c': p}) for p in pil] + [(1.8, 'cult_pillar', {'c': p}) for p in pil], others=dummy,
+                 zoom=2.4, camkw={'dz': -60, 'dx': -30, 'pitch': 16}),
         ]
         self.blend_to(r, last, self.boss(items[0]['anim'], 0), zoom=1.5, others=dummy(0))
         self.sequence(r, items)

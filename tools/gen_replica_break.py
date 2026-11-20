@@ -335,7 +335,7 @@ def anim_martin(an):
     up = mod(sample(an, 'martin_shield_wall', 0.6), **SH_HAND)
     up = mod(up, left_arm=dict(rot_add=[-66, 0, -12]), head=dict(rot_add=[-16, 0, 0]))
     jolt = mod(up, body=dict(pos_add=[0, -1.2, 0]), left_arm=dict(rot_add=[10, 0, 0]), torso=dict(rot_add=[4, 0, 0]))
-    ow, oh = sample(an, 'martin_overhead', 0.6), sample(an, 'martin_overhead', 0.96)
+    ow, oh = sample(an, 'martin_overhead', 0.6), sample(an, 'martin_overhead', 0.88)    # 0.88: клинок ещё над землёй (0.96 — уже в земле)
     w1 = mod(ow, **SH_BACK, torso=dict(rot_add=[-8, -30, 26]), head=dict(rot_add=[-12, 0, 0]))
     h1 = mod(oh, **SH_BACK, torso=dict(rot_add=[8, 34, -30]))
     w2 = mod(ow, **SH_BACK, torso=dict(rot_add=[-8, 30, -26]), head=dict(rot_add=[-12, 0, 0]))

@@ -823,7 +823,7 @@ class Aris(Boss):
         items = [
             dict(anim=P + 'walk', dur=2.4, cap='Тяжёлый шаг, молот на плече', sub='walk (2 цикла)'),
             dict(anim=P + 'slam', dur=2.2, cap='Удар молотом по земле', sub='slam, удар 0.75 + fx aris_slam (волна металла r8)',
-                 fx=[(0.75, 'aris_slam', {'c': (0, 0, -1.25)})], zoom=1.6),
+                 fx=[(0.75, 'aris_slam', {'c': (0, 0, -1.35)})], zoom=1.6),
             dict(anim=P + 'swing', dur=2.2, cap='Горизонтальный размах', sub='swing, удар 0.62 + fx aris_metal_wave (5 гребней вперёд)',
                  fx=[(0.62, 'aris_metal_wave', {})], zoom=1.7, camkw={'dz': -60}),
             dict(anim=P + 'cast', dur=3.2, cap='Каст: наковальня', sub='cast 0.8 + fx aris_anvil_rise (меш aris_anvil) → aris_anvil_break',
@@ -850,7 +850,7 @@ class Aris(Boss):
         def billet(t, f):                                 # слиток летит из левой руки с 0.7 с (снаряд кода с мешем aris_billet)
             if 0.7 <= t < 1.4:
                 k = (t - 0.7) / 0.7
-                f['actors'].append({'k': 'mesh:aris_billet', 's': 1.0, 'x': 0.5 * B, 'y': (1.4 + 2.2 * k - 3.6 * k * k) * B, 'z': -(0.8 + 6.2 * k) * B,
+                f['actors'].append({'k': 'mesh:aris_billet', 's': 1.0, 'x': -0.45 * B, 'y': (1.4 + 2.2 * k - 3.6 * k * k) * B, 'z': -(0.8 + 6.2 * k) * B,
                                     'rx': 400 * k})
         isl = [(6 * math.cos(a), 0, 6 * math.sin(a)) for a in (0.4, 1.6, 2.8, 4.0, 5.2)]
 
@@ -868,7 +868,7 @@ class Aris(Boss):
                  kw={'v': 'mythic'}, fx=[(0, 'aris_last_blow', {'c': (0, 0, -14)})], zoom=1.15, camf=lb_view),
             dict(anim=P + 'billet', dur=4.6, cap='Новое: «Раскалённая заготовка»',
                  sub='billet: бросок 0.7 (aris_billet_throw), слиток лежит 3 с (aris_billet), взрыв r3',
-                 fx=[(0.7, 'aris_billet_throw', {}), (1.4, 'aris_billet', {'c': (0.5, 0, -7)}), (4.4, 'aris_billet_explode', {'c': (0.5, 0, -7)})],
+                 fx=[(0.7, 'aris_billet_throw', {}), (1.4, 'aris_billet', {'c': (-0.45, 0, -7)}), (4.4, 'aris_billet_explode', {'c': (-0.45, 0, -7)})],
                  extra=billet, zoom=1.6, camkw={'dz': -50}),
             dict(anim=P + 'chains', dur=2.8, cap='Новое: «Цепи кузни»', sub='chains 0.8: четыре цепи из земли к игроку (fx aris_chains)',
                  fx=[(0.8, 'aris_chains', {'c': (tgt[0], 0, tgt[1]), 'stop': 2.8, 'end': 2.85})], others=dummy, zoom=1.5, camkw={'dz': -40, 'dx': -10}),

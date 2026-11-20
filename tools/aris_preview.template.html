@@ -122,7 +122,7 @@ const EASE = {
   easeInCubic: t => t * t * t, easeOutCubic: t => 1 - Math.pow(1 - t, 3), easeInOutCubic: t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
 };
 function chanAt(chan, t, def) {
-  const ks = Object.keys(chan), ts = ks.map(Number);
+  const ks = Object.keys(chan).sort((a, b) => a - b), ts = ks.map(Number);   // JS ставит целые ключи («4») раньше дробных — сортируем по времени
   if (!ts.length) return def;
   const get = i => { const v = chan[ks[i]]; return Array.isArray(v) ? { v } : { v: v.vector || v.post || v.pre, e: v.easing }; };
   if (t <= ts[0]) return get(0).v;
@@ -243,6 +243,14 @@ function setupCell(c) {
     mm.position.set(...(ms.at || [0, 0, 0]).map(v => v * 16)); mm.rotation.y = (ms.yaw || 0) * Math.PI / 180;
     if (ms.pitch) { const p = new THREE.Group(); p.add(mm); mm.rotation.x = ms.pitch * Math.PI / 180; group.add(p); } else group.add(mm);
     h = c.h || Math.max(h, 40);
+  }
+  if (c.arrow) {      // стрелка «вперёд» на полу: взгляд модели (−z в осях модели/Blockbench; в fx-якорях это +z)
+    const s = new THREE.Shape(), L = c.arrow === true ? 34 : c.arrow;
+    s.moveTo(-1.6, 6); s.lineTo(1.6, 6); s.lineTo(1.6, L - 7); s.lineTo(4.5, L - 7); s.lineTo(0, L); s.lineTo(-4.5, L - 7); s.lineTo(-1.6, L - 7); s.closePath();
+    const am = new THREE.Mesh(new THREE.ShapeGeometry(s), new THREE.MeshBasicMaterial({ color: 0xffd23c, side: THREE.DoubleSide, depthWrite: false }));
+    am.rotation.x = -Math.PI / 2; am.position.y = 0.15; am.renderOrder = 5; group.add(am);        // локальная +y фигуры → −z
+    const ring = new THREE.Mesh(new THREE.RingGeometry(5.6, 6.2, 32), new THREE.MeshBasicMaterial({ color: 0xffd23c, side: THREE.DoubleSide }));
+    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.12; group.add(ring);
   }
   if (c.h) h = c.h;
   return { group, h };

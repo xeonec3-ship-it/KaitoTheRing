@@ -18,7 +18,7 @@ def main(args):
     three = args[args.index('--three') + 1] if '--three' in args else None
     out = args[args.index('--out') + 1] if '--out' in args else os.path.join(MR.HERE, '..', 'docs', 'media', 't29_cape_fix.jpg')
     yaw = float(args[args.index('--yaw') + 1]) if '--yaw' in args else 90
-    cells = [dict(model='martin', anim=a, t=t, yaw=yaw, pitch=4, label=lab, sub='%s · %.2f с' % (a, t)) for a, t, lab in POSES]
+    cells = [dict(model='martin', anim=a, t=t, yaw=yaw, pitch=4, dist=3.3, label=lab, sub='%s · %.2f с' % (a, t)) for a, t, lab in POSES]
     MR.sheet(out, {'cols': 5, 'cells': cells}, three, (2000, 1500))
 
 

@@ -13,9 +13,9 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 A = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core')
-PAL = {   # цвета decrepit_scythe Iron's + 2 полутона
-    'k': '#1c1a1a', 'w0': '#231012', 'w1': '#2f2122', 'w2': '#372c2b', 'w3': '#603432', 'w4': '#734543',
-    'b0': '#322727', 'b1': '#4d403d', 'b2': '#62514e', 'b3': '#7a6a68', 'b4': '#8b7d7b', 'b5': '#a29492',
+PAL = {   # владелец 20.11: в обеих фазах — как облик души босса: тёмное древко и сталь, золото венца (палитра cult_leader_soul_mode)
+    'k': '#120d0e', 'w0': '#1b1415', 'w1': '#26252b', 'w2': '#2e2a2f', 'w3': '#393737', 'w4': '#9c5e2c',
+    'b0': '#1b1415', 'b1': '#26252b', 'b2': '#b9892e', 'b3': '#d6af39', 'b4': '#e8e895', 'b5': '#f6f2c4',
 }
 CELL = {k: (i % 16, i // 16) for i, k in enumerate(PAL)}
 R3 = lambda v: round(v, 3)

@@ -1,0 +1,45 @@
+{
+ "comment": "«Обманная брешь», контратака (анимация ereb_feint_counter: parry 0.1, hit 0.45): caster = Эреб, target = кто ударил. Звон и трещина «зеркала» перед ним на parry, блик на острие на hit (ereb_thrust). Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 2,
+   "at": "caster+0.2,1.6,0.6",
+   "duration": 6,
+   "size": 0.8,
+   "rays": 6,
+   "color": "#FFE7A0",
+   "brightness": 1.2
+  },
+  {
+   "type": "sigil",
+   "delay": 2,
+   "at": "caster+0,1.3,0.7",
+   "id": "illusion_mirror_crack",
+   "scale": 0.25,
+   "until": 12
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0.2,1.5,0.7",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.3,
+   "speed": 0.08,
+   "gravity": 0.012,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 12,
+   "color": "#E8FAFF"
+  }
+ ]
+}

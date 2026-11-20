@@ -941,5 +941,28 @@
         "volume": 0.8
       }
     ]
+  },
+  "ereb.rain": {
+    "subtitle": "subtitles.pohsmp_core.ereb.rain",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 1.1,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 0.9,
+        "volume": 1.0
+      },
+      {
+        "name": "minecraft:block.amethyst_cluster.break",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 1.0
+      }
+    ]
   }
 }

@@ -737,5 +737,11 @@
   "subtitles.pohsmp_core.ereb.phase": "Glass cracks",
   "subtitles.pohsmp_core.ereb.spawn": "Butterflies gather",
   "subtitles.pohsmp_core.ereb.butterfly": "Glass butterfly",
-  "subtitles.pohsmp_core.ereb.dissolve": "Ereb scatters into butterflies"
+  "subtitles.pohsmp_core.ereb.dissolve": "Ereb scatters into butterflies",
+  "ui.pohsmp_core.ereb.blade_dance": "\"Dance of Blades\"",
+  "ui.pohsmp_core.ereb.feint": "\"False Opening\"",
+  "ui.pohsmp_core.ereb.feint_counter": "Ereb parries — it was a trap!",
+  "ui.pohsmp_core.ereb.glass_rain": "\"Glass Rain\" — get off the marks!",
+  "ui.pohsmp_core.ereb.mirror_step": "\"Step Through the Reflection\"",
+  "subtitles.pohsmp_core.ereb.rain": "Mirror shards fall"
 }

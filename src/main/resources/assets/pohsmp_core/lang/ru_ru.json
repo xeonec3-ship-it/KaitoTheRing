@@ -737,5 +737,11 @@
   "subtitles.pohsmp_core.ereb.phase": "Стекло трескается",
   "subtitles.pohsmp_core.ereb.spawn": "Слетаются бабочки",
   "subtitles.pohsmp_core.ereb.butterfly": "Стеклянная бабочка",
-  "subtitles.pohsmp_core.ereb.dissolve": "Эреб рассыпается бабочками"
+  "subtitles.pohsmp_core.ereb.dissolve": "Эреб рассыпается бабочками",
+  "ui.pohsmp_core.ereb.blade_dance": "«Танец клинков»",
+  "ui.pohsmp_core.ereb.feint": "«Обманная брешь»",
+  "ui.pohsmp_core.ereb.feint_counter": "Эреб парирует — это была ловушка!",
+  "ui.pohsmp_core.ereb.glass_rain": "«Стеклянный дождь» — уходите с меток!",
+  "ui.pohsmp_core.ereb.mirror_step": "«Шаг сквозь отражение»",
+  "subtitles.pohsmp_core.ereb.rain": "Падают осколки зеркал"
 }

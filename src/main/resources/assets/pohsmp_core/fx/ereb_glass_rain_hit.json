@@ -1,0 +1,60 @@
+{
+ "comment": "«Стеклянный дождь», удар осколка (0.6 с): caster = метка. Осколок зеркала разбивается о землю: вспышка, брызги стекла, трещины на земле r1.2 (гаснут за 2 с). Урон — код, в радиусе метки. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,0.4,0",
+   "duration": 6,
+   "size": 1.6,
+   "rays": 6,
+   "color": "#FFFFFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 22,
+   "rate": 22,
+   "spread": 0.9,
+   "speed": 0.16,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.2,
+    0.06
+   ],
+   "life": 18,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "texture": "higher_cracks",
+   "radius": 1.2,
+   "grow": 4,
+   "glow": 0.4,
+   "fadeOut": 30,
+   "color": "#BFE6FF",
+   "brightness": 0.8
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 2.0,
+   "color": "@secondary",
+   "brightness": 0.5
+  }
+ ]
+}

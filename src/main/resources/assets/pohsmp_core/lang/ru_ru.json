@@ -900,5 +900,20 @@
   "entity.pohsmp_core.ereb_reflection": "Эреб, Первый Предатель",
   "entity.pohsmp_core.ereb_shard": "Стеклянный осколок",
   "entity.pohsmp_core.ereb_dream_point": "Сон бабочки",
-  "death.attack.pohsmp_core.ereb_finisher": "%1$s поверил Эребу"
+  "death.attack.pohsmp_core.ereb_finisher": "%1$s поверил Эребу",
+  "entity.pohsmp_core.ereb_hand": "Эреб, Длань Лжи",
+  "item.pohsmp_core.ereb_hand_rapier": "Стеклянная рапира Эреба",
+  "ui.pohsmp_core.ereb_hand.title": "Эреб, Длань Лжи",
+  "ui.pohsmp_core.ereb_hand.epithet": "Глава Культа Меллисто",
+  "ui.pohsmp_core.ereb_hand.spawn": "Вот мы и снова встретились",
+  "ui.pohsmp_core.ereb_hand.defeat": "А вы...стали сильнее",
+  "ui.pohsmp_core.ereb_hand.replica": "Ложь во лжи - Становится правдой сама по себе",
+  "ui.pohsmp_core.ereb_hand.phase1": "«Лживое слово»",
+  "ui.pohsmp_core.ereb_hand.phase2": "«Длань» — рука хватает. Бейте по руке, чтобы освободить союзника.",
+  "ui.pohsmp_core.ereb_hand.phase3": "«Глава Культа» — маска трескается.",
+  "ui.pohsmp_core.ereb_hand.hand_of_lies": "Длань Лжи",
+  "ui.pohsmp_core.ereb_hand.mask_fall": "Падение маски",
+  "ui.pohsmp_core.ereb_hand.full_reveal": "Сон Бабочки: Полное Раскрытие",
+  "ui.pohsmp_core.ereb_hand.vanish": "Эреб рассыпался бабочками. Бой окончен.",
+  "death.attack.pohsmp_core.ereb_hand_finisher": "%1$s раздавлен Дланью Лжи"
 }

@@ -143,6 +143,7 @@ public final class BossConfig {
         b.pop();
         b.comment("T30 Ereb, the First Traitor").push("ereb");
         PER.put("ereb", new PerBoss(b, new Body(4000, 10, 0, 1.0, 0.28, 10, 1.5, 1.3, -1, -1, 0.85, -1, 1.2, 24, 500)));
+        ru.pohsmp.core.boss.ereb.ErebConfig.define(b);   // T30 mechanics keys
         b.pop();
         SPEC = b.build();
     }

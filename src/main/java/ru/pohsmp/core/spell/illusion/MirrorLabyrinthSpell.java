@@ -124,6 +124,20 @@ public class MirrorLabyrinthSpell extends IllusionBase {
         super.onCast(level, spellLevel, caster, source, md);
     }
 
+    /**
+     * T30 «Эреб, Первый Предатель», special «Зеркальный лабиринт»: the same dome raised by a caster without an Iron's cast, with its own
+     * centre, radius (the arena), time and wall damage (balance [ereb] labyrinth_*). The caster's allies see no walls, as always.
+     */
+    public static void raise(ServerLevel sl, LivingEntity caster, Vec3 c, double r, int ticks, float damage) {
+        long seed = sl.getRandom().nextLong();
+        Lab lab = new Lab(caster, sl, new Maze(c.x, c.y, c.z, r, seed), seed, Illusions.now() + ticks, damage);
+        lab.fx = fx(sl, Fx.fx("illusion_labyrinth").at(c).caster(caster).scale(r / 14.0).duration(ticks), "illusion_labyrinth");
+        sl.playSound(null, c.x, c.y + 1, c.z, SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 3f, 0.7f);
+        sl.playSound(null, c.x, c.y + 1, c.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.HOSTILE, 3f, 0.6f);
+        LABS.add(lab);
+        Illusions.logZone("mirror_labyrinth (boss)", sl, caster, c, r);
+    }
+
     private static void enter(Lab lab, ServerPlayer p) {
         if (!lab.inside.add(p.getUUID())) return;
         int left = (int) Math.max(1, Math.min(lab.until - Illusions.now(), Illusions.duration(p, (int) (lab.until - Illusions.now()))));

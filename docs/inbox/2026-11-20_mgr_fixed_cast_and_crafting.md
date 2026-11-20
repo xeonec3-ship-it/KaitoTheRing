@@ -13,10 +13,8 @@ StarFallSpell, RiteSpell (Печать души, Благословение), Bu
 `CastAnims.hideHands(…, getEffectiveCastTime…)` тогда сам станет верным.
 Перезарядку (cooldown_reduction) — НЕ трогать, владелец не решал.
 
-## 2. Вопрос владельца «может ли игрок скрафтить Высшие, Мифические, Божественные, Запретные…» — факт по коду
-`allowCrafting()` (свиток в Scroll Forge Iron's, вписывание в книгу) по умолчанию **true**. Запрещён (`false`) у: Explosion, HeavenFall,
-FrozenHour, SpaceClosure, CovenArrival, Downfall, Madness, Ark, Taboo, SoulDevour, RiteSpell (Печать души, Благословение), ErasedName,
-MythicT23; IllusionBase — только обычные; безмолвные — без посоха, кроме Врат.
-**Можно скрафтить сейчас** (нет запрета) — в т.ч. ВСЕ Высшие на HigherSpell: Ascension, Ashless, BloodMoon, Countdown, Cradle,
-DisintegrationReplica, EternalBlizzard, FateStar, MilkyWay, MirrorPrison, OblivionBlades, ScarletCut, Seal, Singularity, StarFall,
-WorldRift; плюс школы «Кошмары» (NightmareSpells — проверить) и обычные заклинания мода. Решение владельца по крафту — ждёт.
+## 2. Крафт Высших и выше — по факту НЕ возможен (поправка управляющего)
+Scroll Forge Iron's требует фокус школы. Теги фокусов `higher_focus`, `divine_focus`, `forbidden_focus`, `silent_focus` — **пустые**,
+у `illusion_prism` и `broken_lullaby` нет рецепта. Поэтому заклинания школ Высшая/Божественная/Запретная (и Безмолвная) скрафтить
+нельзя, даже если `allowCrafting()` = true (как у всех на HigherSpell). Кошмары и высшие Иллюзии — `allowCrafting` false (IllusionBase).
+Если когда-нибудь в эти теги добавят предмет — сначала поставить `allowCrafting=false` у HigherSpell, иначе Высшие станут крафтиться.

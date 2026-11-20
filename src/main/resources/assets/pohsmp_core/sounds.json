@@ -570,5 +570,166 @@
         "pitch": 0.7
       }
     ]
+  },
+  "irina.spawn": {
+    "subtitle": "subtitles.pohsmp_core.irina.spawn",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:raise_dead_start",
+        "pitch": 1.3,
+        "volume": 1.3
+      }
+    ]
+  },
+  "irina.death": {
+    "subtitle": "subtitles.pohsmp_core.irina.death",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:dead_king/fake_death",
+        "pitch": 1.4
+      }
+    ]
+  },
+  "irina.death_final": {
+    "subtitle": "subtitles.pohsmp_core.irina.death_final",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:soulcaller_toll_failure",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "irina.mark": {
+    "subtitle": "subtitles.pohsmp_core.irina.mark",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:heartstop_cast",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "irina.bind": {
+    "subtitle": "subtitles.pohsmp_core.irina.bind",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:charge_chains",
+        "pitch": 1.35
+      }
+    ]
+  },
+  "irina.snap": {
+    "subtitle": "subtitles.pohsmp_core.irina.snap",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:blood_explosion",
+        "pitch": 1.5
+      },
+      {
+        "name": "irons_spellbooks:blood_explosion",
+        "pitch": 1.7
+      }
+    ]
+  },
+  "irina.steal": {
+    "subtitle": "subtitles.pohsmp_core.irina.steal",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:magic_spell_reverse_3",
+        "pitch": 1.1
+      }
+    ]
+  },
+  "irina.whip": {
+    "subtitle": "subtitles.pohsmp_core.irina.whip",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:hellrazor_swing_1",
+        "pitch": 1.2
+      },
+      {
+        "name": "irons_spellbooks:hellrazor_swing_2",
+        "pitch": 1.2
+      },
+      {
+        "name": "irons_spellbooks:hellrazor_swing_3",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "irina.cocoon": {
+    "subtitle": "subtitles.pohsmp_core.irina.cocoon",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:abyssal_shroud_cast",
+        "pitch": 1.3
+      }
+    ]
+  },
+  "irina.cocoon_break": {
+    "subtitle": "subtitles.pohsmp_core.irina.cocoon_break",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:blood_explosion",
+        "pitch": 1.8
+      }
+    ]
+  },
+  "irina.cocoon_crush": {
+    "subtitle": "subtitles.pohsmp_core.irina.cocoon_crush",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:devour",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "irina.happiness": {
+    "subtitle": "subtitles.pohsmp_core.irina.happiness",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:dark_magic_buff_03_custom_1",
+        "pitch": 0.8,
+        "volume": 1.4
+      }
+    ]
+  },
+  "irina.phase": {
+    "subtitle": "subtitles.pohsmp_core.irina.phase",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:void_tentacles_start",
+        "pitch": 1.3
+      }
+    ]
+  },
+  "irina.finisher": {
+    "subtitle": "subtitles.pohsmp_core.irina.finisher",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:skewer",
+        "pitch": 1.1
+      }
+    ]
+  },
+  "irina.staff": {
+    "subtitle": "subtitles.pohsmp_core.irina.staff",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:shadow_slash",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "music.irina": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.irina",
+    "comment": "ЗАГЛУШКА до трека владельца (Iron's). Трек владельца — pohsmp_core:music/irina (stream).",
+    "sounds": [
+      {
+        "name": "irons_spellbooks:dead_king/music/second_phase_melody_alt",
+        "stream": true,
+        "volume": 0.6
+      }
+    ]
   }
 }

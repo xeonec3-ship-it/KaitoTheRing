@@ -1,0 +1,132 @@
+{
+ "comment": "Добивание (caster = Ирина, target = жертва; 52 тика = анимация irina_finisher 2.6 с). 0.2 (`wrap`) — нити опутывают жертву (кружат вокруг НЕЁ); 0.8 (`pull_done`) — жертва у Ирины; 1.3 (`pierce`) — крюк посоха: красная вспышка; 1.7 (`whisper`) — сердечки, фраза; 2.2 (`kill`) — нити стягиваются и рвутся.",
+ "style": "irina",
+ "duration": 52,
+ "elements": [
+  {
+   "type": "trail",
+   "delay": 4,
+   "at": "target",
+   "duration": 40,
+   "width": 0.08,
+   "length": 16,
+   "fade": 1.2,
+   "head": 0,
+   "count": 4,
+   "orbit": {
+    "radius": 0.65,
+    "speed": 24,
+    "rise": 1.0,
+    "risePeriod": 12
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 4,
+   "at": "target",
+   "duration": 40,
+   "target": "target",
+   "thickness": 0.2,
+   "pulse": [
+    0.3,
+    6
+   ],
+   "color": "@primary",
+   "motes": 12,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 26,
+   "at": "target+0,1.2,0",
+   "duration": 8,
+   "size": 1.4,
+   "color": "@core",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 26,
+   "at": "target+0,1.2,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 24,
+   "rate": 10,
+   "spread": 0.4,
+   "speed": 0.18,
+   "gravity": 0.02,
+   "size": [
+    0.14,
+    0.03
+   ],
+   "life": 12,
+   "color": "#DC3A30",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 34,
+   "at": "target+0,1.6,0",
+   "duration": 8,
+   "texture": "mote_heart",
+   "count": 10,
+   "rate": 2,
+   "spread": 0.4,
+   "speed": 0.02,
+   "gravity": -0.01,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 26,
+   "color": "@primary",
+   "glow": 0.4,
+   "follow": true
+  },
+  {
+   "type": "wave",
+   "delay": 44,
+   "at": "target+0,1,0",
+   "duration": 8,
+   "shape": "sphere",
+   "radius": 1.4,
+   "reverse": true,
+   "rim": 1.0,
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 44,
+   "at": "target+0,1.1,0",
+   "duration": 10,
+   "size": 2.4,
+   "rays": 8,
+   "screen": 0.2,
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 44,
+   "at": "target+0,1.1,0",
+   "duration": 4,
+   "texture": "mote_thread",
+   "count": 40,
+   "rate": 12,
+   "spread": 0.5,
+   "speed": 0.2,
+   "gravity": 0.02,
+   "spin": 40,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 20,
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

@@ -1,0 +1,90 @@
+{
+ "comment": "T27 «Чужое счастье»: печать r24 под Ириной. 0–30 тиков прорисовывается (знаки чужого счастья по кругу), нити от знаков закручиваются к центру; держится, пока идёт эффект.",
+ "size": 24,
+ "color": "#B99BE0",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.02,
+   "color": "#4E0610",
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 30,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 30
+   }
+  },
+  {
+   "id": "seal",
+   "type": "disc",
+   "texture": "irina_happiness",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "color": "#E2CDF5",
+   "appear": {
+    "delay": 0,
+    "duration": 34,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -0.4,
+    "boost": 3
+   }
+  },
+  {
+   "id": "words",
+   "type": "text",
+   "radius": 0.97,
+   "heightOffset": 0.01,
+   "color": "#DC3A30",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 10,
+    "duration": 30,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": 0.3
+   },
+   "text": "ЧУЖОЕ СЧАСТЬЕ ✦ ВСЁ ЭТО МОЁ ✦ ",
+   "font": "cyrillic",
+   "size": 0.03,
+   "repeat": 3,
+   "side": "outer"
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFE7A0",
+  "size": 1.05,
+  "duration": 14,
+  "sparks": 120
+ },
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 20,
+  "stagger": 2
+ }
+}

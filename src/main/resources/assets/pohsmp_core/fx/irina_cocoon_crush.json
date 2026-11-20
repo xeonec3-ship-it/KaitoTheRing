@@ -1,0 +1,46 @@
+{
+ "comment": "Кокон не разорван за 4 с (caster = жертва, 24 тика): нити стягиваются, тёмная вспышка; сильный урон — код.",
+ "style": "irina",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 1.6,
+   "reverse": true,
+   "rim": 1.2,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 2.0,
+   "rays": 6,
+   "screen": 0.25,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,1.1,0",
+   "duration": 4,
+   "texture": "mote_heart",
+   "count": 16,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.12,
+   "gravity": 0.03,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 18,
+   "color": "#7A0E10"
+  }
+ ]
+}

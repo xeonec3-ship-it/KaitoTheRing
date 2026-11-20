@@ -1,0 +1,58 @@
+{
+ "comment": "T27 фаза 2 «Красные нити»: метка пары №1 над головой (две сцепленные петли и свой знак). Оба игрока пары получают одинаковый знак — без линии между ними.",
+ "size": 0.42,
+ "color": "#C0201C",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.4,
+   "heightOffset": -0.01,
+   "color": "#7A0E10",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.25,
+    "period": 24
+   }
+  },
+  {
+   "id": "knot",
+   "type": "disc",
+   "texture": "irina_knot_1",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.1,
+   "appear": {
+    "delay": 0,
+    "duration": 12,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 1.2
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 8,
+  "stagger": 2
+ }
+}

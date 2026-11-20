@@ -1,0 +1,82 @@
+{
+ "comment": "Кража эффектов — у ИРИНЫ (caster = Ирина, 40 тиков): золотые искры собираются к ней воронкой со всех сторон (r 6 → 0), нити вокруг стягиваются, на 30 тике — вспышка-поглощение у груди. Не из точки игрока.",
+ "style": "irina",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster",
+   "duration": 34,
+   "radius": 6,
+   "height": 0,
+   "arms": 6,
+   "speed": 6,
+   "pull": 1.2,
+   "flow": -1,
+   "width": 0.08,
+   "particles": 60,
+   "texture": "mote_glee",
+   "color": "#FFE7A0",
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 26,
+   "texture": "mote_glee",
+   "count": 60,
+   "rate": 3,
+   "area": 6,
+   "speed": 0.0,
+   "gravity": -0.03,
+   "size": [
+    0.22,
+    0.04
+   ],
+   "life": 20,
+   "color": "#FFE7A0",
+   "glow": 0.6,
+   "avoid": {
+    "radius": 0.1,
+    "push": 0
+   }
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "width": 0.07,
+   "length": 14,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 1.6,
+    "speed": -12,
+    "rise": 1.2,
+    "risePeriod": 30
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0,1.4,0",
+   "duration": 10,
+   "size": 2.0,
+   "ring": true,
+   "color": "#FFE7A0"
+  }
+ ]
+}

@@ -1,0 +1,166 @@
+{
+ "comment": "Ролик появления (caster = точка появления = Ирина, yaw — её взгляд; 140 тиков = анимация irina_spawn 7 с). 0–2.6 с — из земли поднимается кокон нитей (она внутри, свернувшись); 2.6 (`unravel`) — нити расплетаются и разлетаются, вспышка; 4.6 (`pose`) — поправляет шляпу, знак Ячейки под ней (титр); 5.4 (`flourish`) — взмах посохом: кольцо нитей r10; 7.0 — полоса босса.",
+ "style": "irina",
+ "duration": 140,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 140,
+   "radius": 48,
+   "color": "#24102E",
+   "strength": 0.32,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "id": "irina_thread_ring",
+   "scale": 2.2
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 54,
+   "width": 0.1,
+   "length": 24,
+   "fade": 1.2,
+   "head": 0,
+   "count": 6,
+   "orbit": {
+    "radius": 0.9,
+    "speed": 26,
+    "rise": 0.2,
+    "risePeriod": 60,
+    "climb": 0.9
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 6,
+   "at": "caster",
+   "duration": 48,
+   "width": 0.08,
+   "length": 20,
+   "fade": 1.2,
+   "head": 0,
+   "count": 4,
+   "orbit": {
+    "radius": 0.75,
+    "speed": -30,
+    "rise": 0.2,
+    "risePeriod": 50,
+    "climb": 0.9
+   },
+   "color": "@secondary",
+   "follow": true
+  },
+  {
+   "type": "column",
+   "delay": 4,
+   "at": "caster",
+   "duration": 50,
+   "radius": 0.9,
+   "height": 2.4,
+   "fill": 0.4,
+   "color": "@shadow",
+   "blend": "translucent",
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 52,
+   "at": "caster+0,1.2,0",
+   "duration": 14,
+   "size": 3.2,
+   "rays": 10,
+   "screen": 0.2,
+   "ring": true,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 52,
+   "at": "caster+0,1.2,0",
+   "duration": 6,
+   "texture": "mote_thread",
+   "count": 90,
+   "rate": 16,
+   "spread": 0.8,
+   "speed": 0.3,
+   "gravity": 0.01,
+   "spin": 30,
+   "size": [
+    0.34,
+    0.08
+   ],
+   "life": 30,
+   "color": "@primary",
+   "glow": 0.4
+  },
+  {
+   "type": "trail",
+   "delay": 52,
+   "at": "caster",
+   "duration": 88,
+   "width": 0.08,
+   "length": 20,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 2.2,
+    "speed": 8,
+    "rise": 1.4,
+    "risePeriod": 46
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "sigil",
+   "delay": 92,
+   "at": "caster+0,0.06,0",
+   "id": "irina_emblem"
+  },
+  {
+   "type": "wave",
+   "delay": 108,
+   "at": "caster+0,0.15,0",
+   "duration": 24,
+   "shape": "ring",
+   "radius": 10,
+   "thickness": 0.5,
+   "texture": "irina_thread_ring",
+   "spin": 2,
+   "color": "@primary"
+  },
+  {
+   "type": "flash",
+   "delay": 108,
+   "at": "caster+0,2.4,0",
+   "duration": 10,
+   "size": 1.6,
+   "color": "@primary"
+  }
+ ]
+}

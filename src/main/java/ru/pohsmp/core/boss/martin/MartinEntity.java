@@ -330,7 +330,7 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
 
     @Override
     public String finisherVictimAnim() {
-        return "irons_spellbooks:pohsmp_cult_finisher_victim";   // the shared pose (ТЗ: «общая или своя»)
+        return "irons_spellbooks:pohsmp_martin_finisher_victim";   // his own pose (visual assistant), on the martin_finisher clock
     }
 
     /** Faces the victim, martin_finisher + fx; the victim's own camera on him from 0.2 s. */

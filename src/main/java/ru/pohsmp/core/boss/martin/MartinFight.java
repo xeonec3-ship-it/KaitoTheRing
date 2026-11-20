@@ -408,7 +408,7 @@ public final class MartinFight {
                 core.lock(MartinMath.SWING, true, false);
                 boss.anim("martin_swing");
                 core.play(new BossTimeline("atk:swing", MartinMath.SWING_HIT + 1)
-                        .at(MartinMath.SWING_HIT - 2, () -> {
+                        .at(MartinMath.SWING_SWING, () -> {
                             core.sound("martin.swing", 2, 1);
                             Fx.play(sl, Fx.fx("martin_swing_trail").caster(boss).at(boss.position()).yaw(boss.getYRot()));
                         })
@@ -424,7 +424,7 @@ public final class MartinFight {
                 core.lock(MartinMath.OVERHEAD, true, false);
                 boss.anim("martin_overhead");
                 core.play(new BossTimeline("atk:overhead", MartinMath.OVERHEAD_HIT + 1)
-                        .at(MartinMath.OVERHEAD_HIT - 2, () -> core.sound("martin.swing", 2, 0.8f))
+                        .at(MartinMath.OVERHEAD_SWING, () -> core.sound("martin.swing", 2, 0.8f))
                         .at(MartinMath.OVERHEAD_HIT, () -> {
                             Vec3 p = ground(sl, o.add(fwd.scale(4.5)));
                             Fx.play(sl, Fx.fx("martin_slam").at(p).yaw(yaw));

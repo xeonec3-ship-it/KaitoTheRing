@@ -571,6 +571,14 @@
       }
     ]
   },
+  "irina.replica_break": {
+    "subtitle": "subtitles.pohsmp_core.irina.replica_break",
+    "sounds": [
+      { "name": "minecraft:mob/sheep/shear", "pitch": 0.9 },
+      { "name": "minecraft:dig/cloth1", "pitch": 0.8 },
+      { "name": "minecraft:dig/cloth2", "pitch": 0.8 }
+    ]
+  },
   "irina.spawn": {
     "subtitle": "subtitles.pohsmp_core.irina.spawn",
     "sounds": [

@@ -155,8 +155,8 @@ def shade(ctx, tones, folds=True, rim=True, fold_step=3, fold_phase=0, blotch=0.
     n = ctx.n
     i = np.ones(n, int)
     if blotch:
-        b = fbm(ctx.P, 0.3, 300 + seed, 2)
-        i = i + (b > 0.6 - 0.08 * blotch).astype(int) - (b < 0.34 + 0.06 * blotch).astype(int)
+        b = fbm(ctx.P, 0.2, 300 + seed, 2)
+        i = i + (b > 0.72 - 0.04 * blotch).astype(int)                              # редкие крупные потёртости (сдержанно, как ткань эталона)
     up = ctx.N[:, 1] > 0.5
     dn = ctx.N[:, 1] < -0.5
     side = ~(up | dn)
@@ -247,6 +247,15 @@ def mat_hood(ctx):
     c = shade(ctx, T_BLU, fold_step=3, blotch=0.7, seed=2)
     c = trims(ctx, c, info, T_BLU, T_BLU)
     a = 1.0
+    if ctx.face in ('south', 'east', 'west') and ctx.cube.info.get('shell'):
+        r0, r1, c0, c1, w, h = rows(ctx)
+        c = np.where((r0 <= 1)[:, None], pick(T_BLU, np.full(ctx.n, 3)), c)          # тень под полями шляпы
+        c = np.where((r0 == 2)[:, None], pick(T_BLU, np.full(ctx.n, 2)), c)
+        c = np.where((r1 <= 1)[:, None], pick(T_BLU, np.where(r1 == 0, 3, 0)), c)    # кайма внизу: светлый кант над тенью
+    if ctx.face == 'south' and ctx.cube.info.get('hem') and not ctx.cube.info.get('shell'):
+        r0, r1, c0, c1, w, h = rows(ctx)
+        fold = (np.abs(c0 - c1) <= 1) & (r0 <= 1)                                    # складка у шеи
+        c = np.where(fold[:, None], pick(T_BLU, np.full(ctx.n, 3)), c)
     if info.get('shell'):
         if ctx.face == 'north':
             hole = hood_hole(ctx.L)
@@ -320,21 +329,23 @@ def ribbon_alpha(ctx):
 
 
 def mat_ribbon(ctx):
+    """Лента — один материал: 3 тона вдоль ленты (свет сверху, база, тень к хвосту) и тёмная кайма по краю; без случайных пикселей."""
     kind = ctx.cube.info.get('kind', 'lil')
-    tones = {'gg': T_GG, 'lil_l': T_LIL, 'lil': T_LIL2}[kind]
-    c = shade(ctx, tones, folds=False, blotch=0.7 if kind == 'gg' else 0.5, seed=6)
+    tones = {'gg': T_GG, 'lil_l': T_LIL, 'lil': T_LIL}[kind]
     r0, r1, c0, c1, w, h = rows(ctx)
+    y = ctx.P[:, 1]
+    tip = ctx.cube.info.get('tip')
+    # по мировой высоте: верх ленты светлее, низ — в тени (две ступени, без градиента)
+    yt = ctx.cube.frm[1]
+    if tip:
+        i = np.where(r1 <= 1, 3, 2) * 0 + np.where(r0 < h * 0.45, 1, 2)
+        i = np.where(r1 == 0, 3, i)
+    else:
+        i = np.where(r0 < 2, 0, 1)
+    i = np.where(ctx.N[:, 1] > 0.5, 0, np.where(ctx.N[:, 1] < -0.5, 3, i))
     if w >= 2 and ctx.face in ('north', 'south'):
-        edge = (c0 == 0) | (c1 == 0)
-        c = mix(c, pick(tones, np.full(ctx.n, 2)), edge.astype(float))                     # кромка ленты
-        yy = np.floor(ctx.P[:, 1] + 64).astype(int)
-        if kind != 'gg':
-            dot = (np.abs(c0 - c1) <= 1) & (yy % 4 == 0) & (r1 > 0)                       # пиксельные ромбики по середине
-            c = mix(c, pick(tones, np.full(ctx.n, 0 if kind == 'lil' else 3)), dot.astype(float))
-        else:
-            st = (np.abs(c0 - c1) <= 1) & (yy % 3 == 0) & (r1 > 0)                        # лиловая строчка по серо-зелёному
-            c = mix(c, pick(T_LIL, np.full(ctx.n, 2)), st.astype(float))
-        c = np.where(((r1 == 1) & (h >= 4))[:, None], pick(T_PALE if kind != 'gg' else T_LIL, np.full(ctx.n, 2)), c)   # кайма у хвоста
+        i = np.where((c0 == 0) | (c1 == 0), 3, i)                                      # тёмная кайма по краю
+    c = pick(tones, i)
     return c, ribbon_alpha(ctx), None
 
 
@@ -364,13 +375,14 @@ def build():
     m.box('torso', (-4.25, 14.2, -2.25), (4.25, 16.4, 2.25), 'lilac', trim=True)               # кушак
     m.box('torso', (-1.3, 14.0, 2.2), (1.3, 17.0, 3.3), 'lilac', trim=True)                    # бант на спине
     # широкая наплечная накидка (серо-зелёная), поверх неё лиловые лоскуты — плечи шире, как на референсе
-    m.box('torso', (-6.6, 23.2, -3.0), (6.6, 27.2, 3.0), 'gg', hem=True)
+    m.box('torso', (-10.2, 23.0, -3.4), (10.2, 27.2, 3.4), 'gg', hem=True)                     # накидка-воротник шире плеч на 2 текселя
+    m.box('torso', (-7.4, 27.2, -2.8), (7.4, 28.2, 2.8), 'gg', trim=True)
     m.bone('mantle', 'torso', (0, 27.2, 0))
     for k in range(12):
         a = TAU * (k + 0.5) / 12
-        top = np.array([math.sin(a) * 5.4, 26.6, -math.cos(a) * 2.8])
-        bot = np.array([math.sin(a) * 7.6, 19.6 + (k % 2) * 1.2, -math.cos(a) * 4.2])
-        m.rod('mantle', top, bot, 3.0, 0.6, 'ribbon', roll=-math.degrees(a), kind=('gg', 'lil_l', 'gg', 'lil')[k % 4], tip=True)
+        top = np.array([math.sin(a) * 8.6, 26.6, -math.cos(a) * 3.0])
+        bot = np.array([math.sin(a) * 10.8, 19.8 + (k % 2) * 1.0, -math.cos(a) * 4.4])
+        m.rod('mantle', top, bot, 4.2, 0.6, 'ribbon', roll=-math.degrees(a), kind=('gg', 'lil_l')[k % 2], tip=True)
     # брошь на воротнике
     m.cbox('torso', (0, 26.2, -3.35), (1.6, 1.6, 0.6), 'gold')
     m.cbox('torso', (0, 26.2, -3.7), (0.8, 0.8, 0.3), 'thread')
@@ -393,7 +405,7 @@ def build():
     m.bone('head', 'body', (0, NECK, 0))
     m.box('head', (-4.0, NECK, -4.0), (4.0, NECK + 8, 4.0), 'void')
     m.bone('hood', 'head', (0, 35.0, 0))
-    m.box('hood', (-5.0, 26.2, -4.8), (5.0, 36.6, 5.0), 'hood', shell=True)                     # оболочка вокруг головы
+    m.box('hood', (-5.0, 26.2, -4.8), (5.0, 36.6, 5.0), 'hood', shell=True, seam=True)                     # оболочка вокруг головы
     m.box('hood', (-3.6, 36.4, -3.6), (3.6, 37.4, 4.4), 'hood')                                 # макушка (объём под шляпой)
     m.box('hood', (-6.2, 24.4, -4.4), (6.2, 27.4, 4.8), 'hood', hem=True)                       # капюшон спадает на плечи
     m.bone('hood_drape', 'hood', (0, 26.0, 4.6))
@@ -454,20 +466,20 @@ def build():
 
     # ---- юбка: колокол, расходится книзу, + 20 лент-лоскутов (по 2 сегмента — качаются)
     m.bone('skirt', 'body', (0, 15.5, 0))
-    for (y0, y1, sx, sz) in ((10.0, 15.8, 9.8, 6.2), (3.0, 10.2, 13.2, 9.0)):
+    for (y0, y1, sx, sz) in ((10.0, 15.8, 10.4, 6.6), (3.0, 10.2, 15.6, 10.6)):
         m.cbox('skirt', (0, (y0 + y1) / 2, 0), (sx, y1 - y0, sz), 'gg', hem=True)
         m.cbox('skirt', (0, (y0 + y1) / 2, 0), (sx * 0.78, y1 - y0, sz * 1.18), 'gg', hem=True)
     N = 20
-    kinds = ('lil_l', 'gg', 'lil', 'gg', 'gg', 'lil_l', 'gg', 'lil')
+    kinds = ('lil_l', 'gg')
     for k in range(N):
         a = TAU * (k + 0.5) / N
         front = -math.cos(a)
-        top = np.array([math.sin(a) * 5.4, 15.6, -math.cos(a) * 3.6])
+        top = np.array([math.sin(a) * 5.6, 15.6, -math.cos(a) * 3.8])
         end_y = 1.4 + 1.6 * max(0.0, front) ** 2 - 1.0 * max(0.0, -front) + (k % 3 - 1) * 0.9
-        rad = 8.6 + 0.8 * (k % 2)
+        rad = 11.0 + 0.6 * (k % 2)                                # нижний ярус шире верхнего (конус)
         bot = np.array([math.sin(a) * rad, end_y, -math.cos(a) * rad * 0.8])
         mid = top + (bot - top) * 0.5
-        w = 3.0 + 0.6 * ((k * 7) % 3) / 2
+        w = 3.8 + 0.4 * (k % 2)
         kind = kinds[k % len(kinds)]
         bn = 'rib_%02d' % k
         m.bone(bn, 'skirt', top)

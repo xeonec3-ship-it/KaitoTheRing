@@ -55,7 +55,7 @@ import ru.pohsmp.core.spell.HigherSpell;
  * Damage: Silent magic (through armor, Silent power, Silent resistance), numbers in [silent_gate]. Afterwards "Silence": the spell's own
  * cooldown, 3 min. Only hostile entities are hit (see {@link #target}); players never.
  */
-public class SilentGateSpell extends SilentStaffSpell {
+public class SilentGateSpell extends SilentStaffSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "silent_gate";
     /** Ticks: cast (= 50 s in the track), first rays, last rays, crystal, end of the scene, crystal life. */
     public static final int CAST = 992;

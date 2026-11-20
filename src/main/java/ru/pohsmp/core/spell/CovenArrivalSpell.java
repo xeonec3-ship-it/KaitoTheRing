@@ -59,7 +59,7 @@ import org.slf4j.Logger;
  * the retinue and the caster step out of it (from another dimension too), a line, a ritual, and at 83 s Closing of Space
  * (15 min) unfolds over the arena. CNPC NPCs of the retinue get script events coven_exit and coven_ritual.
  */
-public class CovenArrivalSpell extends PohSpell {
+public class CovenArrivalSpell extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "coven_arrival";
     public static final String ID = "pohsmp_core:" + PATH;
     public static final int CAST = 1800, COLOR = 0xB49BFF, MAX_RETINUE = 3, DOME_MIN = 15;

@@ -79,6 +79,7 @@ public abstract class PohSpell extends AbstractSpell {
     /** Silent-school spells also take the Silent cast time reduction (the Silent Witch robe). */
     @Override
     public int getEffectiveCastTime(int spellLevel, @org.jetbrains.annotations.Nullable LivingEntity entity) {
+        if (this instanceof FixedCastSpell) return getCastTime(spellLevel);   // owner 20.11: cutscene spells - fixed cast time
         if (getSchoolType() == ru.pohsmp.core.Reg.SILENT.get()) return ru.pohsmp.core.silent.SilentWitch.castTime(this, spellLevel, entity);
         return super.getEffectiveCastTime(spellLevel, entity);
     }

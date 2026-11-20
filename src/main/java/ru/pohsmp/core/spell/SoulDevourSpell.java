@@ -43,7 +43,7 @@ import ru.pohsmp.core.fx.Fx;
  * (fx soul_devour). The target is held in place in darkness while its soul is drawn out toward the caster; at the end it dies.
  * Nothing saves it: armor, effects, totem, creative mode.
  */
-public class SoulDevourSpell extends PohSpell {
+public class SoulDevourSpell extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "soul_devour";
     public static final int CAST = 500, COLOR = 0x46E0D8;
     private static final DustParticleOptions BLACK = new DustParticleOptions(new Vector3f(0.05f, 0.02f, 0.08f), 1.6f);

@@ -42,7 +42,7 @@ import ru.pohsmp.core.spell.HigherSpell;
  * damage is real; the bestiary's is not). Every [no_awakening] thickenEverySeconds it thickens: 1 more nightmares, 2 the faces of friends
  * come to bite (mimics), 3 the names of real people are gone, 4 the deepest. Killing the caster ends it for all, Blessing for one.
  */
-public class NoAwakeningSpell extends NightmareSpells.Base {
+public class NoAwakeningSpell extends NightmareSpells.Base implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = NightmareSpells.NO_AWAKENING;
     /** Owner 19.11: the cast is 17 s; after the title (12 s) the caster turns into the Dread at MORPH_AT in front of the watchers. */
     public static final int CAST = 340, TAIL = 20, MORPH_AT = 262;

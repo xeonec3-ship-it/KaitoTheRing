@@ -39,7 +39,7 @@ public abstract class SilentStaffSpell extends PohSpell {
     }
 
     @Override public CastType getCastType() { return castTime > 0 ? CastType.LONG : CastType.INSTANT; }
-    @Override public boolean allowCrafting() { return ready() && !needsStaff(); }
+    @Override public boolean allowCrafting() { return false; }   // owner 20.11: no Silent spell is ever crafted (was: ready() && !needsStaff())
     @Override public boolean allowLooting() { return false; }
     @Override public Optional<SoundEvent> getCastStartSound() { return Optional.empty(); }
     @Override public Optional<SoundEvent> getCastFinishSound() { return Optional.of(SoundEvents.AMETHYST_BLOCK_CHIME); }

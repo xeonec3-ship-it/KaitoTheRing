@@ -41,7 +41,7 @@ import ru.pohsmp.core.fx.Fx;
  * nobody but the caster may cast Iron's spells inside (MNA magic is silenced too), and every 5 s all harmful effects
  * (except Divine Backlash) are washed off everyone inside. Lasts 1/5/10/20/30/60 min. Not kept across a server restart.
  */
-public class TabooSpell extends PohSpell {
+public class TabooSpell extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "divine_taboo";
     public static final double R = 128;
     private static final int[] MINUTES = {1, 5, 10, 20, 30, 60};

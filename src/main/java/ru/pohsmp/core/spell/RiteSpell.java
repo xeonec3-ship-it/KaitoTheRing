@@ -33,7 +33,7 @@ import ru.pohsmp.core.fx.Fx;
  * dead or gone, and the cast breaks with nothing spent. The cast has its own cutscene for everyone within 64 (Cutscene, client DownfallCut);
  * after the rite takes effect the camera holds the last shot {@link #HOLD} ticks more before it returns.
  */
-public abstract class RiteSpell extends PohSpell {
+public abstract class RiteSpell extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final int CAST = 200, HOLD = 30, LOST_MAX = 20;
     /** The cast effect lives this much past the cast (its ending after the rite takes effect; manager 19.11: blessing_cast runs to 230). */
     public static final int TAIL = 40;

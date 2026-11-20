@@ -36,7 +36,7 @@ import ru.pohsmp.core.fx.Fx;
  * high over the target ({@link #sky}), falls along an ease-in-cubic path and lands at CAST; the camera stays 40 ticks more.
  * The impact runs on its own timer, so a shorter Iron's cast time does not break the sync.
  */
-public class StarFallSpell extends HigherSpell {
+public class StarFallSpell extends HigherSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "star_fall";
     public static final int CAST = 160, FALL_AT = 100, AFTER = 40, CRATER = 600;
     public static final double RANGE = 48, R = 24;   // owner 19.11: radius x3

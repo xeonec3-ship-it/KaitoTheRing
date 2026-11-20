@@ -940,5 +940,7 @@
   "ui.pohsmp_core.ereb_hand.false_arena": "The world lies to you…",
   "entity.pohsmp_core.ereb_hand_reflection": "Ereb, the Hand of Lies",
   "entity.pohsmp_core.ereb_hand_giant": "Hand of Lies",
-  "entity.pohsmp_core.ereb_hand_mask_shard": "Mask Shard"
+  "entity.pohsmp_core.ereb_hand_mask_shard": "Mask Shard",
+  "entity.pohsmp_core.ereb_hand_traitor": "Traitor Reflection",
+  "ui.pohsmp_core.ereb_hand.traitor_hint": "Your reflection betrayed you — break it with one blow!"
 }

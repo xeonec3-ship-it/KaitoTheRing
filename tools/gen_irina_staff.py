@@ -7,7 +7,8 @@ T27: посох Ирины — объёмная модель предмета и
 Раскладка — как у посохов Iron's (graybeard_staff и др.): древко вертикально по y в плоскости x = 8, z = 8, от −16 до 32; навершие —
 в плоскости XY. Хват — около y = −2 (нижняя треть).
   models/item/irina_staff.json      — в руке 3D, в GUI/на земле/в рамке — та же 3D-модель (уменьшена и повёрнута)
-  textures/item/irina_staff_3d.png   — палитра 16×16 (каждый цвет — клетка 1×1)
+  textures/item/irina_staff_3d.png   — 64×64 (×4, как эталон): каждый тон — клетка 4×4 с ручной светотенью (блик сверху-слева,
+                                       тень снизу-справа, искра лака у красного и золота)
 Превью: tools/irina_staff_preview.html; кадр docs/media/t27_staff.png (делает tools/irina_render.py).
 Предмет pohsmp_core:irina_staff регистрирует код (без рецепта, игрокам не выдаётся) и даёт его боссу в правую руку.
 Запуск: python3 tools/gen_irina_staff.py
@@ -41,7 +42,7 @@ class M:
         faces = {}
         for f in ('north', 'south', 'east', 'west', 'up', 'down'):
             u, v = CELL[(side or {}).get(f, col)]
-            faces[f] = {'uv': [u + .25, v + .25, u + .75, v + .75], 'texture': '#p'}
+            faces[f] = {'uv': [u + .03, v + .03, u + .97, v + .97], 'texture': '#p'}
         e = {'from': [R3(cx - sx / 2), R3(cy - sy / 2), R3(cz - sz / 2)], 'to': [R3(cx + sx / 2), R3(cy + sy / 2), R3(cz + sz / 2)],
              'faces': faces}
         if a:
@@ -195,10 +196,23 @@ DISPLAY = {   # Iron's (HumanoidRenderer.renderStackForBone): у кости ру
 
 
 def main():
-    pal = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
+    pal = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
     for k, (x, y) in CELL.items():
         h = PAL[k]
-        pal.putpixel((x, y), (int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16), 255))
+        base = [int(h[1:3], 16), int(h[3:5], 16), int(h[5:7], 16)]
+        for dy in range(4):
+            for dx in range(4):
+                f = 1.0
+                if dx == 0 or dy == 0:
+                    f = 1.16                                         # блик по верхней-левой кромке
+                if dx == 3 or dy == 3:
+                    f = 0.78                                         # тень по нижней-правой
+                if (dx, dy) == (1, 1) and k[0] in 'rgt':
+                    f = 1.32                                         # искра лака / металла
+                if (dx, dy) == (2, 2) and k[0] == 'k':
+                    f = 1.25                                         # тусклый отблеск чернёного металла
+                c = tuple(max(0, min(255, int(v * f))) for v in base)
+                pal.putpixel((x * 4 + dx, y * 4 + dy), c + (255,))
     os.makedirs(os.path.join(A, 'textures', 'item'), exist_ok=True)
     pal.save(os.path.join(A, 'textures', 'item', 'irina_staff_3d.png'))
     els = build()

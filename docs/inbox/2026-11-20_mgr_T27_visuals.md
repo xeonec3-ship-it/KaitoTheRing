@@ -90,9 +90,45 @@
 4. **Шум — как у эталона.** Пятна потёртостей на ткани редкие и крупные, только темнее основного тона.
    Мелкой ряби и светлых пятен на ткани нет; светотень дают складки, кайма и швы.
 
+## Текстуры ×4, как у эталона (20.11, по уточнённому правилу README)
+Геометрия и анимации не менялись. Перерисованы атлас и UV.
+- **Атлас Ирины:** UV 128×256 ед. → `irina.png` **512×1024** (4 px на единицу UV, как у `cult_leader.png`). Glowmask — тоже 512×1024.
+- **Ручная фактура целыми пикселями**, без сглаживания:
+  - ткань мантии и рукавов — саржа (диагональный рубчик через 4 px);
+  - накидка и юбка (серо-зелёное) — вязь «ёлочкой»;
+  - шляпа и сапоги — фетр (редкие ворсинки);
+  - ленты — атлас (продольные нити, тёмная кайма 1 px и строчка вдоль каймы);
+  - капюшон — саржа.
+- **Складки:** тёмная 2 px и блик 1 px, у каждой своя длина.
+- **Кайма** с двойной кромкой и пунктирной строчкой; **шов** со строчками по обе стороны; 1 px контур по краям граней; редкие крупные потёртости.
+- **Посох:** `textures/item/irina_staff_3d.png` теперь **64×64** (×4). Каждый тон — клетка 4×4 с ручной светотенью: блик по верхней-левой кромке,
+  тень снизу-справа, искра лака у красного и золота, отблеск у чернёного металла. UV граней берут всю клетку.
+- **fx-текстуры** (печати, частицы) — рисунки 512–1024, не модели; оставлены как есть.
+
+Кадры сравнения перерисованы с новой текстурой: `t27_vs_cult_leader.jpg`, `t27_vs_reference.jpg`.
+
+## +4 заклинания (владелец 20.11): визуал
+Анимации — контроллер «тело», `animations/entity/irina.animation.json`. События — ключи `timeline`.
+
+| заклинание | анимация босса | fx | статус (иконка `textures/mob_effect/`) |
+|---|---|---|---|
+| **«Ревнивый взгляд»** | `irina_gaze` 1.2 с, `gaze` 0.5: приподнимает поля шляпы | `irina_gaze_cast` (Ирина, 24); на каждом, кто смотрел > 2 с, — `irina_gaze_mark` (игрок, follow, 80 = 4 с): око над головой, нить у ног | `effect.pohsmp_core.jealous_gaze` — `irina_jealous_gaze.png` (замедление 4 с) |
+| **«Узлы»** | `irina_knots` 1.6 с, `knots` 0.9: присела, ладонь по земле | `irina_knots_cast` (Ирина, 30); в 4–6 точках — `irina_knot_trap` (точка, −1 до `Fx.stop`, узел ВИДЕН); наступил — `Fx.stop` ловушки и `irina_knot_snare` (игрок, 40 = 2 с) | `effect.pohsmp_core.thread_snare` — `irina_snared.png` |
+| **«Подмена любимого»** | `irina_swap` 1.4 с, `swap` 0.8: скрещённые руки резко разводит | `irina_swap` у ОБОИХ: в точке до обмена и (второй вызов) после; рябь нитей, без линии между ними | — (сообщение `ui…irina.swap`) |
+| **«Марионетка»** | `irina_puppet` 1.0 с, `puppet` 0.7 → `irina_puppet_hold` (loop 1 с, пока действует) | `irina_puppet` (игрок, follow, 60 = 3 с): крестовина над головой, нити на трёх высотах вокруг тела, к Ирине — нет; снятие — `Fx.stop` + `irina_puppet_break` (16) | `effect.pohsmp_core.marionette` — `irina_puppet.png` |
+
+- **Печати:** `irina_knot_trap` (r 0.9, на земле), `irina_gaze_eye`, `irina_puppet_cross` (`facing`).
+  Рисунки — `textures/sigil/` с теми же именами.
+- **lang:**
+  - `ui.pohsmp_core.irina.gaze`, `knots_warn`, `snared`, `swap`, `puppet`, `puppet_self`, `puppet_break`;
+  - названия `ui.pohsmp_core.irina.spell.{gaze,knots,swap,puppet}`;
+  - `effect.pohsmp_core.{jealous_gaze,thread_snare,marionette}` + `.description`;
+  - субтитры.
+- **Звуки** (файлы Iron's): `irina.gaze`, `irina.knots`, `irina.snare`, `irina.swap`, `irina.puppet`.
+
 ## 1. Модель — `geo/entity/irina.geo.json` (`geometry.irina`)
 - **Текстуры:**
-  - `textures/entity/irina/irina.png`;
+  - `textures/entity/irina/irina.png` (512×1024 = атлас 128×256 ед. ×4);
   - `irina_glowmask.png` для `AutoGlowingGeoLayer` (светятся нити и знак-крест).
 - **Кости совместимы с магами Iron's** (`abstract_casting_mob`): `body` (корень, пивот y = 14; торс 8×13×4, руки 4×12 — как у мага Iron's), `torso`, `head`, `right_arm`, `left_arm`,
   `right_leg`, `left_leg`, `bipedHandRight`, `rightItem`, `bipedHandLeft`, `leftItem`.

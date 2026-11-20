@@ -43,6 +43,10 @@ def model_entry(name):
         if name == 'ereb_hand':
             e['item'] = rapier_entry()
         return e
+    if name == 'ereb_hand_giant':        # огромная рука: те же кости и атлас, что рука модели (масштаб — в ячейке/кадре)
+        return {'geo': json.load(open(os.path.join(A, 'geo', 'entity', 'ereb_hand_giant.geo.json'), encoding='utf-8')),
+                'tex': CR.b64(os.path.join(T, 'ereb_hand.png')), 'glow': CR.b64(os.path.join(T, 'ereb_hand_glowmask.png')), 'height': 16,
+                'title': 'Огромная рука'}
     if name == 'hand_rapier':
         return {'geo': {'minecraft:geometry': [{'description': {'texture_width': 16, 'texture_height': 16},
                                                 'bones': [{'name': 'bipedHandRight', 'pivot': [0, 0, 0]}]}]},
@@ -63,6 +67,7 @@ def tex_b64(n):
 def anims():
     an = json.load(open(os.path.join(A, 'animations', 'entity', 'ereb_hand.animation.json'), encoding='utf-8'))['animations']
     an.update({k: v for k, v in ER.anims().items() if k.startswith('ereb_')})
+    an.update(json.load(open(os.path.join(A, 'animations', 'entity', 'ereb_hand_giant.animation.json'), encoding='utf-8'))['animations'])
     return an
 
 

@@ -115,6 +115,15 @@ def steve(x, z, ry=180, y=0, **kw):
     return dict({'model': 'steve', 'x': x * 16, 'z': -z * 16, 'ry': ry, 'y': y * 16}, **kw)      # единицы модели (16 на блок)
 
 
+def giant(anim, x, y, z, t=0.0, scale=5, ry=0):
+    """огромная рука (модель ereb_hand_giant ×scale), корень-запястье в точке (x, y, z) бл.; оси взгляда (z — вперёд)"""
+    return {'model': 'ereb_hand_giant', 'anim': anim, 't': t, 'x': x * 16, 'y': y * 16, 'z': -z * 16, 'ry': ry, 'scale': scale}
+
+
+# кулак ×5: середина кулака — на 1.1 бл. ниже и 2.5 бл. впереди запястья; торс игрока — на 1.1 бл. над ногами
+FIST_DY, FIST_DZ = -1.1, 2.5
+
+
 def shots_fx(M, args):
     three = args[args.index('--three') + 1] if '--three' in args else None
     sh = lambda name, cells, cols, size: R.sheet(os.path.join(MEDIA, name), {'cols': cols, 'cells': cells}, three, size)
@@ -159,14 +168,16 @@ def shots_fx(M, args):
                                scale=1.4))
     players = [steve(-3.0, 6.5, 200), steve(2.5, 7.0, 160), steve(0.0, 9.0, 180)]
     cells = [
-        dict(N, model='steve', yaw=235, pitch=6, dist=10.5, ty=110, label='«Длань Лжи» (66%)', bg=VIOLET,
-             sub='огромная рука опускается с неба на игрока (меш ereb_hand_giant_open); Эреб — за ним, «Длань» к небу',
-             meshes=[dict(mesh='ereb_hand_giant_open', pos=[0, 7.5, -1.6])], fx=[ground('illusion_seal', (0, 0, 0), 4, GL, 0.6)],
-             **{'with': [dict(model='ereb_hand', anim='ereb_hand_hand_of_lies', t=1.2, x=0, z=150, ry=0)]}),
-        dict(N, model='steve', y=30, yaw=235, pitch=6, dist=8.0, ty=80, label='поймала', bg=VIOLET,
-             sub='кулак (ereb_hand_giant_fist), игрок на 6 с видит ложную арену',
-             meshes=[dict(mesh='ereb_hand_giant_fist', pos=[0, 2.4, -1.6])], fx=[*flash((0, 3.2, 0), 3.0, GH, 0.4), gls((0, 3, 0), 20, (2, 1.5, 2), 13)],
-             **{'with': [dict(model='ereb_hand', anim='ereb_hand_hand_of_lies', t=2.0, x=0, z=150, ry=0)]}),
+        dict(N, model='steve', yaw=235, pitch=6, dist=11, ty=110, label='«Длань Лжи» (66%)', bg=VIOLET,
+             sub='с неба опускается огромная рука — та же призрачная рука, ×5 (модель ereb_hand_giant); Эреб — за игроком, «Длань» к небу',
+             fx=[ground('illusion_seal', (0, 0, 0), 4, GL, 0.6)],
+             **{'with': [dict(model='ereb_hand', anim='ereb_hand_hand_of_lies', t=1.2, x=0, z=150, ry=0),
+                         giant('ereb_hand_giant_descend', 0, 5.2, -1.7, 0.6)]}),
+        dict(N, model='steve', y=44, yaw=330, pitch=10, dist=8.0, ty=70, label='поймала', bg=VIOLET,
+             sub='игрок в кулаке (ereb_hand_giant_fist), поднят; 6 с видит ложную арену',
+             fx=[*flash((0, 2.6, 0), 3.0, GH, 0.35), gls((0, 2.4, 0), 20, (2, 1.5, 2), 13)],
+             **{'with': [dict(model='ereb_hand', anim='ereb_hand_hand_of_lies', t=2.0, x=0, z=150, ry=0),
+                         giant('ereb_hand_giant_fist', 0, 1.5 + 1.1 - FIST_DY, -FIST_DZ, 0.3)]}),
         dict(N, model='ereb_hand', anim='ereb_hand_mask_fall', t=0.85, yaw=30, pitch=4, dist=2.2, ty=26, label='«Падение маски» (45%)',
              sub='«Длань» срывает маску (tear 0.85)', fx=[sp('spark_soft', (0.15, 1.9, 0.6), 10, (0.25, 0.25, 0.25), (0.08, 0.15), GO, 0.9)]),
         dict(N, model='ereb_hand', anim='ereb_hand_mask_fall', t=1.15, yaw=200, pitch=12, dist=3.4, ty=34, hideBones=['mask'], label='маска разбита',
@@ -195,25 +206,24 @@ def shots_fx(M, args):
              sub='cast 2.6 — белая вспышка, мир раскрывается', fx=[*flash((0, 2, 0), 9.0, WH, 0.7), *flash((0.7, 3.6, 0.2), 2.0, GH, 0.9)]),
         dict(N, model='ereb_hand', anim='ereb_hand_idle', t=1.0, yaw=200, pitch=6, dist=11, ty=120, variant='cracked', bg=VIOLET,
              label='мир сна', sub='зеркальный пол r30, Длань над ареной (в игре +22 бл., в кадре ниже), стекло и бабочки; бой внутри сна',
-             meshes=[dict(mesh='ereb_hand_giant_open', pos=[-3, 10, -6], scale=1.2)], fx=world, **{'with': [steve(-3, 6), steve(3.5, 7)]}),
+             fx=world, **{'with': [steve(-3, 6), steve(3.5, 7), giant('ereb_hand_giant_hover', -1, 9.5, 2, 1.5, scale=6)]}),
         dict(N, model='ereb_hand', anim='ereb_hand_guard', t=0.2, yaw=150, pitch=14, dist=9, ty=40, variant='cracked', bg=VIOLET,
              label='Длань бьёт во сне', sub='тень и кольцо 1.5 с, удар плашмя (урон ненастоящий)',
-             meshes=[dict(mesh='ereb_hand_giant_open', pos=[3.5, 4.5, 3.0], scale=1.2)],
              fx=[ground('illusion_seal', (3.5, 0, 6.5), 4, GL, 0.7), ground('ereb_hand_mirror_floor', (0, 0, 0), 14, GL, 0.4)],
-             **{'with': [steve(3.5, 6.5)]}),
+             **{'with': [steve(3.5, 6.5), giant('ereb_hand_giant_slam', 3.5, 3.0, 4.6, 0.4, scale=4)]}),
         dict(N, model='ereb_hand', anim='ereb_hand_false_death', t=0.75, yaw=25, pitch=6, dist=3.6, ty=24, variant='cracked', label='ложная смерть 1/3',
              sub='рука трескается и осыпается (hand_break 0.7)', fx=[*flash((0.97, 2.0, -0.3), 1.8, GH, 0.6), gls((0.97, 2.0, -0.3), 26, (0.9, 0.7, 0.9), 37)]),
         dict(N, model='ereb_hand', anim='ereb_hand_false_death', t=1.8, yaw=15, pitch=4, dist=2.4, ty=26, variant='cracked', label='ложная смерть 2/3',
              sub='«А вы...стали сильнее» (speak 1.6)'),
         dict(N, model='ereb_hand', anim='ereb_hand_false_death', t=3.85, yaw=20, pitch=6, dist=3.6, ty=24, variant='cracked', label='ложная смерть 3/3',
              sub='vanish 3.8 — распадается на множество бабочек', fx=[*flash((0, 1.1, 0), 2.6, WH, 0.6), *bfl((0, 1.1, 0), 40, (1.0, 1.2, 1.0))]),
-        dict(N, model='ereb_hand', anim='ereb_hand_finisher', t=1.6, yaw=70, pitch=8, dist=4.0, ty=24, label='добивание 1/2',
-             sub='рука держит и сжимает жертву (squeeze 1.5), по ней бежит стеклянная корка',
-             fx=[sp('aura_shell', (0.5, 1.9, 1.34), 1, (0, 0, 0), (1.6, 2.4), GH, 0.5, spin=0), gls((0.5, 1.9, 1.34), 12, (0.4, 0.8, 0.4), 41)],
-             **{'with': [steve(0.5, 1.34, y=0.95)]}),
-        dict(N, model='ereb_hand', anim='ereb_hand_finisher', t=2.15, yaw=70, pitch=8, dist=4.0, ty=24, label='добивание 2/2',
+        dict(N, model='ereb_hand', anim='ereb_hand_finisher', t=1.6, yaw=95, pitch=6, dist=4.4, ty=30, label='добивание 1/2',
+             sub='рука обхватила жертву за торс и подняла на 1.4 бл., сжимает (squeeze 1.5) — по ней бежит стеклянная корка',
+             fx=[sp('aura_shell', (0.5, 2.0, 1.35), 1, (0, 0, 0), (1.4, 2.2), GH, 0.55, spin=0), gls((0.5, 2.0, 1.35), 12, (0.4, 0.8, 0.4), 41)],
+             **{'with': [steve(0.5, 1.38, y=1.45)]}),
+        dict(N, model='ereb_hand', anim='ereb_hand_finisher', t=2.15, yaw=95, pitch=6, dist=4.4, ty=30, label='добивание 2/2',
              sub='shatter 2.1 — жертва трескается стеклом и рассыпается бабочками',
-             fx=[*flash((0.5, 1.9, 1.34), 2.4), gls((0.5, 1.9, 1.34), 40, (0.7, 1.0, 0.7), 43), *bfl((0.5, 2.0, 1.34), 10, (0.6, 0.8, 0.6))]),
+             fx=[*flash((0.5, 2.5, 1.35), 2.4), gls((0.5, 2.4, 1.35), 40, (0.7, 1.0, 0.7), 43), *bfl((0.5, 2.5, 1.35), 10, (0.6, 0.8, 0.6))]),
         dict(N, model='ereb_hand', anim='ereb_hand_spawn', t=1.4, yaw=25, pitch=8, dist=4.0, ty=26, label='появление',
              sub='рука собирается из стекла (form_hand 0.6), Эреб — из роя (form 1.8)', hideBones=[],
              fx=[gls((0.97, 2.3, -0.3), 20, (1.0, 0.8, 1.0), 47), *bfl((0, 1.2, 0), 26, (2.0, 1.2, 2.0))]),

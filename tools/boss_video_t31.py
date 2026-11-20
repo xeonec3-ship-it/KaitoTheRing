@@ -28,7 +28,7 @@ GL, GH, GO, CRM, FL, WH = '#D9CCFF', '#F4EEFF', '#FFE7A0', '#E0606A', '#9A6BFF',
 LOOPS = {'ereb_hand_idle': 4.0, 'ereb_hand_walk': 1.2, 'ereb_hand_guard': 1.0, 'ereb_hand_grab_hold': 2.0, 'ereb_hand_rest': 2.0}
 HAND = [0.97, 2.25, 0.34]         # рука над правым плечом (кадр: вперёд = −z)
 FACE = [0.15, 1.75, -0.33]
-HOLD = [0.5, 1.83, -1.34]
+HOLD = [0.5, 1.25, -1.45]           # ноги схваченного: рука держит его за торс, поднят на 1.25 бл.
 SLAM = [0.6, 0.05, -0.9]
 TEXS = ['glow', 'mote_glass', 'mote_butterfly', 'spark_soft', 'wave_ring', 'illusion_seal', 'higher_cracks', 'ereb_hand_flame_ring',
         'ereb_hand_flame_rim', 'ereb_hand_grip_cone', 'ereb_hand_oath_mark', 'ereb_hand_mirror_floor', 'cult_flame_tongue', 'aura_shell',
@@ -37,7 +37,7 @@ MESHES = ['ereb_hand_giant_open', 'ereb_hand_giant_fist', 'ereb_hand_mask_shard'
 
 
 def build_page(kind, three, texs, preload):
-    html = HR.page(['ereb_hand', 'steve'], {'cols': 1, 'cells': [{'model': 'ereb_hand', 'meshes': [{'mesh': m, 'pos': [0, 0, 0]} for m in MESHES]}]},
+    html = HR.page(['ereb_hand', 'ereb_hand_giant', 'steve'], {'cols': 1, 'cells': [{'model': 'ereb_hand', 'meshes': [{'mesh': m, 'pos': [0, 0, 0]} for m in MESHES]}]},
                    three)
     # варианты текстуры — отдельными моделями (драйвер берёт модель по имени)
     d0 = HR.model_entry('ereb_hand')
@@ -154,12 +154,12 @@ def combat():
     def victim(lt, anim):                         # игрок в руке: стоит до хватки, потом в точке удержания
         if anim == 'ereb_hand_grab':
             k = ease(lin(lt, 0.6, 1.2))
-            p = [VIC[0] + (HOLD[0] - VIC[0]) * k, 0.9 * k, VIC[2] + (HOLD[2] - VIC[2]) * k]
+            p = [VIC[0] + (HOLD[0] - VIC[0]) * k, HOLD[1] * k, VIC[2] + (HOLD[2] - VIC[2]) * k]
         elif anim == 'ereb_hand_grab_release':
             k = ease(lin(lt, 0.2, 0.7))
-            p = [HOLD[0], 0.9 * (1 - k), HOLD[2] - 1.0 * k]
+            p = [HOLD[0], HOLD[1] * (1 - k), HOLD[2] - 1.0 * k]
         else:
-            p = [HOLD[0], 0.9, HOLD[2]]
+            p = [HOLD[0], HOLD[1], HOLD[2]]
         return p
 
     def grab_fx(anim):
@@ -167,13 +167,13 @@ def combat():
             p = victim(lt, anim)
             s = []
             if anim == 'ereb_hand_grab':
-                s += flash([p[0], 1.6, p[2]], lt - 0.6, 1.2, GH) + gls([p[0], 1.6, p[2]], lt - 0.6, 10, 511, speed=1.2)
+                s += flash([p[0], p[1] + 1.1, p[2]], lt - 0.6, 1.2, GH) + gls([p[0], p[1] + 1.1, p[2]], lt - 0.6, 10, 511, speed=1.2)
             if anim == 'ereb_hand_squeeze':
-                s += flash([p[0], 1.8, p[2]], lt - 0.35, 1.0, CRM) + burst('spark_soft', [p[0], 1.8, p[2]], lt - 0.35, 12, 1.6, (0.06, 0.14), CRM, 512, life=0.5)
+                s += flash([p[0], p[1] + 1.1, p[2]], lt - 0.35, 1.0, CRM) + burst('spark_soft', [p[0], p[1] + 1.1, p[2]], lt - 0.35, 12, 1.6, (0.06, 0.14), CRM, 512, life=0.5)
             if anim == 'ereb_hand_grab_hold':
-                s.append(glow([p[0], 1.8, p[2]], 1.6, GL, 0.25))
+                s.append(glow([p[0], p[1] + 1.1, p[2]], 1.6, GL, 0.25))
             if anim == 'ereb_hand_grab_release':
-                s += gls([p[0], 1.6, p[2]], lt - 0.2, 14, 513, speed=1.2)
+                s += gls([p[0], p[1] + 1.1, p[2]], lt - 0.2, 14, 513, speed=1.2)
             return {'sprites': s, 'objs': [ST(p, 180, key='vic')]}
         return fx
 
@@ -296,22 +296,25 @@ def special():
         ms, s = [], []
         u = t - 1.2
         if u >= 0:
-            if u < 1.2:
+            if u < 1.2:                                # огромная рука (та же рука модели ×5) опускается с неба
                 k = ease(u / 1.2)
-                ms.append({'mesh': 'ereb_hand_giant_open', 'pos': [V[0], 3 + 23 * (1 - k) * (1 - k), V[2] + 1.8], 'ry': 180, 'op': min(1, u * 3)})
+                objs.append(E('ereb_hand_giant_descend', u % 2.0, model='ereb_hand_giant', key='giant', scale=5,
+                              pos=[V[0], 3.6 + 23 * (1 - k) * (1 - k), V[2] + 1.7], op=min(1, u * 3)))
                 s.append(decal('illusion_seal', V, 4 * (0.3 + 0.7 * k), GL, 0.6))
                 pv = [V[0], 0, V[2]]
-            else:
+            else:                                       # кулак: игрок зажат, голова и плечи над пальцами; поднимает
                 w = u - 1.2
-                lift = 2.5 * ease(min(1, w / 1.4))
-                ms.append({'mesh': 'ereb_hand_giant_fist', 'pos': [V[0], 3 + lift, V[2] + 1.8], 'ry': 180, 'op': 1 - lin(w, 2.6, 3.0)})
-                s += flash([V[0], 2, V[2]], w, 3.0, GH) + gls([V[0], 2, V[2]], w, 24, 701, speed=2.4, life=0.8)
-                pv = [V[0], 1.6 + lift, V[2]]
+                lift = 2.0 * ease(min(1, w / 1.4))
+                feet = 0.6 + lift
+                an_, ta = ('ereb_hand_giant_grab', min(w, 0.5)) if w < 0.5 else ('ereb_hand_giant_fist', (w - 0.5) % 2.0)
+                objs.append(E(an_, ta, model='ereb_hand_giant', key='giant', scale=5, pos=[V[0], feet + 1.6, V[2] + 2.5], op=1 - lin(w, 2.6, 3.0)))
+                s += flash([V[0], feet + 1.2, V[2]], w, 3.0, GH) + gls([V[0], feet + 1.2, V[2]], w, 24, 701, speed=2.4, life=0.8)
+                pv = [V[0], feet, V[2]]
             objs.append(ST(pv, 0, key='vic'))
         else:
             objs.append(ST(V, 0, key='vic'))
         cam = camkeys([(0, 160, 8, 13, (0, 2.0, -3.5)), (2.4, 200, 14, 18, (0, 5.0, -6.0)), (5.6, 215, 8, 14, (0, 3.5, -6.5))], t)
-        return {'objs': objs, 'meshes': ms, 'sprites': s, 'cam': cam, 'groundSize': 96, 'bg': 0x1d1730,
+        return {'objs': objs, 'sprites': s, 'cam': cam, 'groundSize': 96, 'bg': 0x1d1730,
                 'cap': 'Особое: «Длань Лжи» (66%)', 'sub': 'рука уходит в небо (rise 0.5) → огромная рука опускается на игрока (descend 1.2) → кулак; 6 с ложной арены',
                 'title': {'img': 'title:ereb_hand_hand_of_lies_ru', 'op': tenv(t, 0.3, 3.0)},
                 'tint': ['#3a2a66', 0.3 * lin(t, 2.4, 2.8) * (1 - lin(t, 5.2, 5.6))]}
@@ -417,7 +420,8 @@ def finale():
 
     def world(t):
         objs = [E('ereb_hand_guard', t % 1.0, model='ereb_hand_cracked'), ST([-3, 0, -6], 0, key='p1'), ST([3.5, 0, -7], 0, key='p2')]
-        ms = [{'mesh': 'ereb_hand_giant_open', 'pos': [0, 8.5 + 0.6 * math.sin(t * 0.8), -9], 'ry': 0, 'scale': 1.3}]
+        objs.append(E('ereb_hand_giant_hover', t % 6.0, model='ereb_hand_giant', key='giant', scale=6, pos=[-1, 9.0, -7]))
+        ms = []
         s = [decal('ereb_hand_mirror_floor', [0, 0.03, 0], 24, GL, 0.55, rot=t * 3)]
         R = rnd(821)
         for k in range(70):
@@ -431,8 +435,8 @@ def finale():
                 s.append(decal('illusion_seal', [P[0], 0.03, P[2]], 4 * (0.3 + 0.7 * u / 1.5), GL, 0.7))
             if 1.5 <= u < 2.6:
                 w = u - 1.5
-                ms.append({'mesh': 'ereb_hand_giant_open', 'key': 'slam', 'pos': [P[0], 1.5 + 14 * max(0, 1 - w / 0.3) ** 2, P[2] + 2.5], 'ry': 180, 'scale': 1.0,
-                           'op': 1 - lin(w, 0.8, 1.1)})
+                objs.append(E('ereb_hand_giant_slam', min(1.4, 0.25 + w), model='ereb_hand_giant', key='slam', scale=4,
+                              pos=[P[0], 1.6, P[2] + 1.4], op=1 - lin(w, 0.9, 1.1)))
                 s += flash([P[0], 0.5, P[2]], w - 0.3, 4.0) + gls([P[0], 0.5, P[2]], w - 0.3, 26, 823, speed=3.0)
                 if w >= 0.3:
                     s.append(decal('higher_cracks', [P[0], 0.03, P[2]], 4.0, GL, 0.9 * (1 - lin(w, 0.6, 1.1))))
@@ -459,14 +463,16 @@ def finale():
             vp = V0
         else:
             k = ease(lin(t, 0.6, 1.2))
-            vp = [V0[0] + (HOLD[0] - V0[0]) * k, 1.0 * k, V0[2] + (HOLD[2] - V0[2]) * k]
+            FH = [0.5, 1.45, -1.38]                 # ноги жертвы: рука держит за торс, поднята на 1.45 бл.
+            vp = [V0[0] + (FH[0] - V0[0]) * k, FH[1] * k, V0[2] + (FH[2] - V0[2]) * k]
         objs = [o]
         s = flash([vp[0], 1.6, vp[2]], t - 0.6, 1.2, GH)
         if t < 2.1:
             objs.append(ST(vp, 180, key='vic'))
         if 1.5 <= t < 2.1:
             s.append({'tex': 'aura_shell', 'at': [vp[0], vp[1] + 1.0, vp[2]], 'w': 1.4, 'h': 2.2, 'color': GH, 'op': 0.5 * lin(t, 1.5, 1.9)})
-        s += flash([vp[0], 2.0, vp[2]], t - 2.1, 2.4) + gls([vp[0], 2.0, vp[2]], t - 2.1, 40, 841, speed=2.2) + bfl([vp[0], 2.0, vp[2]], t - 2.1, 12, 842)
+        c0 = [vp[0], vp[1] + 1.1, vp[2]]
+        s += flash(c0, t - 2.1, 2.4) + gls(c0, t - 2.1, 40, 841, speed=2.2) + bfl(c0, t - 2.1, 12, 842)
         return {'objs': objs, 'sprites': s, 'cam': orbit(105, 8, 7.5, (0.4, 1.6, -1.2)), 'groundSize': 96,
                 'cap': 'Добивание', 'sub': 'ereb_hand_finisher · рука хватает (0.6), сжимает (1.5), жертва трескается стеклом и рассыпается бабочками (2.1)'}
     c.seg(3.6, fin)
@@ -479,7 +485,8 @@ CLIPS = {'t31_turntable': turntable, 't31_combat': combat, 't31_spells': spells,
 def main(args):
     three = args[args.index('--three') + 1] if '--three' in args else None
     names = [a for a in args if a in CLIPS] or list(CLIPS)
-    pre = [{'model': m} for m in ('ereb_hand', 'ereb_hand_mended', 'ereb_hand_cracked', 'ereb_reflection', 'steve')]
+    pre = [{'model': m} for m in ('ereb_hand', 'ereb_hand_mended', 'ereb_hand_cracked', 'ereb_reflection', 'steve')] + \
+        [{'model': 'ereb_hand_giant', 'key': k} for k in ('giant', 'slam')]
     for n in names:
         clip = CLIPS[n]()
         VB.render(clip, 'ereb_hand', three, TEXS, pre)

@@ -250,22 +250,30 @@ def hand_boxes(pose_dict, scale, origin):
             c = c / 16 * scale + np.array(origin)
             half = size / 16 * scale / 2
             tip = bn.endswith('_3') or bn == 'ghost_thumb_2'
-            tone = 2 if tip else (1 if bn.endswith('_2') or bn == 'ghost_wrist' else 0)
-            if tip:                                      # кончик: стекло + золотая шапочка (как на модели)
-                gl = half.copy()
-                gl[1] = half[1] * 0.6
-                off = R @ np.array([0, -half[1] * 0.4, 0])
-                out.append([*(c + off - gl).round(3).tolist(), *(c + off + gl).round(3).tolist(), 0, _euler_yxz(R)])
-                gh = half.copy()
-                gh[1] = half[1] * 0.4
-                off = R @ np.array([0, half[1] * 0.6, 0])
-                out.append([*(c + off - gh).round(3).tolist(), *(c + off + gh).round(3).tolist(), 2, _euler_yxz(R)])
+            eu = _euler_yxz(R)
+
+            def slab(y0, y1, grow, tone_):             # кусок бруска по высоте (доли −1…1 от центра), чуть шире/уже
+                hh = half.copy()
+                hh[1] = half[1] * (y1 - y0) / 2
+                hh[0] *= grow
+                hh[2] *= grow
+                off = R @ np.array([0, half[1] * (y0 + y1) / 2, 0])
+                out.append([*(c + off - hh).round(3).tolist(), *(c + off + hh).round(3).tolist(), tone_, eu])
+            if bn == 'ghost_hand':                       # тающие осколки запястья
+                out.append([*(c - half).round(3).tolist(), *(c + half).round(3).tolist(), 3, eu])
                 continue
-            out.append([*(c - half).round(3).tolist(), *(c + half).round(3).tolist(), tone if bn != 'ghost_hand' else 3, _euler_yxz(R)])
+            if tip:                                      # кончик: стекло + тонкая золотая шапочка (как на модели)
+                slab(-1, 0.45, 1.0, 0)
+                slab(0.45, 1.0, 1.04, 2)
+            else:
+                slab(-1, 1, 1.0, 1 if bn.endswith('_2') or bn == 'ghost_wrist' else 0)
+            if bn.startswith(('ghost_index', 'ghost_middle', 'ghost_ring', 'ghost_pinky', 'ghost_thumb')):
+                slab(-1, -0.86, 1.08, 2)                 # золотой шов сустава
+            slab(-0.8, 0.8 if not tip else 0.3, 0.55, 4)  # светящаяся сердцевина стекла
     return out
 
 
-HAND_TONES = ['#E2DCF7', '#BDB3E4', '#F8D260', '#F4EEFF']
+HAND_TONES = ['#D9CFF7', '#B8A9EC', '#F8D260', '#F4EEFF', '#8E7BD6']
 
 
 def mesh(name, comment, parts, formed=8, collapse=8, center=0):
@@ -279,17 +287,18 @@ MESHES = []
 
 
 def _hand_parts(boxes):
-    glass_ = [b for b in boxes if b[6] != 2]
-    gold = [b for b in boxes if b[6] == 2]
-    return [{'type': 'boxes', 'tones': HAND_TONES, 'glowTones': [2, 3], 'blend': 'translucent', 'opacity': 0.55, 'shade': True, 'boxes': glass_},
-            {'type': 'boxes', 'tones': HAND_TONES, 'glowTones': [2], 'blend': 'additive', 'opacity': 0.9, 'shade': False, 'boxes': gold}]
+    glass_ = [b for b in boxes if b[6] in (0, 1, 3)]
+    glow_ = [b for b in boxes if b[6] in (2, 4)]
+    return [{'type': 'boxes', 'tones': HAND_TONES, 'glowTones': [3], 'blend': 'translucent', 'opacity': 0.5, 'shade': True, 'boxes': glass_},
+            {'type': 'boxes', 'tones': HAND_TONES, 'glowTones': [2, 4], 'blend': 'additive', 'opacity': 0.75, 'shade': False, 'boxes': glow_}]
 
 
 def meshes():
     # огромная раскрытая рука ладонью вниз (пальцы вперёд), запястье в начале координат; ×5 (кисть ≈ 7 бл.)
     openp = AN.hand(rot=(90, 0, 0), curl=0.25, spread=0.8, thumb=0.1)
-    mesh('ereb_hand_giant_open', '«Длань» над ареной / с неба: призрачная рука ×5 (кисть ≈ 7 бл.), ладонью вниз, пальцы вперёд (+z), '
-         'запястье — в точке привязки. Стекло полупрозрачное, золотые кончики и швы светятся.', _hand_parts(hand_boxes(openp, 5.0, [0, 0, 0])))
+    mesh('ereb_hand_giant_open', 'ЗАПАСНОЙ вид «Длани» для движка fx (основной — модель geo/entity/ereb_hand_giant.geo.json с текстурой '
+         'ereb_hand.png ×5, см. письмо): те же кости руки ×5 (кисть ≈ 7 бл.), ладонью вниз, пальцы вперёд (+z), запястье — в точке привязки; '
+         'стекло, светящаяся сердцевина, золотые швы суставов и кончики.', _hand_parts(hand_boxes(openp, 5.0, [0, 0, 0])))
     fist = AN.hand(rot=(90, 0, 0), curl=1.0, thumb=1.0)
     mesh('ereb_hand_giant_fist', '«Длань Лжи»: та же рука, сжатая в кулак (поймала игрока) — меняется с ereb_hand_giant_open на тике поимки.',
          _hand_parts(hand_boxes(fist, 5.0, [0, 0, 0])))

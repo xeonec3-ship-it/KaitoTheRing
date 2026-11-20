@@ -156,20 +156,20 @@ def build():
     reach_b = EA.mod(STAND, left_arm=[-40, 6, -12], head=[4, 0, 0], torso=[3, 0, 0])
     reach = full(reach_b, hand(pos=(7, -11, -25), rot=(8, -2, 4), curl=0.0, spread=1.0, thumb=0.0))
     reach_pre = full(reach_b, hand(pos=(2, -8, -12), rot=(24, -6, 0), curl=0.0, spread=0.9, thumb=0.0))
-    HOLD_H = hand(pos=(7, -6, -24), rot=(4, -2, 4), curl=0.78, spread=0.0, thumb=0.8)
+    HOLD_H = hand(pos=(7, 2, -24), rot=(4, -2, 4), curl=0.78, spread=0.0, thumb=0.8)
     hold_b = EA.mod(STAND, left_arm=[-26, 4, -12], head=[-6, 0, 0], torso=[-2, 0, 0], cape=[5, 0, 0])
     HOLD = full(hold_b, HOLD_H)
     closed = full(reach_b, hand(pos=(7, -10, -25), rot=(6, -2, 4), curl=0.8, spread=0.0, thumb=0.8))
-    an['ereb_hand_grab'] = anim(1.2, [(0, IDLE0), (0.3, reach_pre, IO), (0.5, reach, OC), (0.62, closed, OQ), (0.9, lerp(closed, HOLD, 0.6), IO),
+    an['ereb_hand_grab'] = anim(1.2, [(0, IDLE0), (0.3, reach_pre, IO), (0.5, reach, OC), (0.62, closed, OQ), (0.9, lerp(closed, HOLD, 0.5), IO),
                                       (1.2, HOLD, IO)], [(0.6, 'grab')])
-    hold2 = full(EA.mod(hold_b, head=[-4, 4, 0]), hand(pos=(7, -5.4, -24), rot=(4, -2, 6), curl=0.8, thumb=0.8))
+    hold2 = full(EA.mod(hold_b, head=[-4, 4, 0]), hand(pos=(7, 2.6, -24), rot=(4, -2, 6), curl=0.8, thumb=0.8))
     an['ereb_hand_grab_hold'] = anim(2.0, [(0, HOLD), (1.0, hold2, IO), (2.0, HOLD, IO)], loop=True)
     sq = full(EA.mod(hold_b, left_arm=[-60, 20, -30], bipedHandLeft=Z3, head=[-10, 6, 0], torso=[-4, 0, 0]),
-              hand(pos=(7, -5, -23), rot=(4, -2, 4), curl=1.0, thumb=1.0, wrist=(0, 0, 4)))
+              hand(pos=(7, 3, -23), rot=(4, -2, 4), curl=1.0, thumb=1.0, wrist=(0, 0, 4)))
     sq2 = full(EA.mod(hold_b, left_arm=[-62, 22, -32], head=[-10, 6, 0], torso=[-4, 0, 0]),
-               hand(pos=(7, -5, -23), rot=(4, -2, 4), curl=1.05, thumb=1.0, wrist=(0, 0, -3)))
+               hand(pos=(7, 3, -23), rot=(4, -2, 4), curl=1.05, thumb=1.0, wrist=(0, 0, -3)))
     an['ereb_hand_squeeze'] = anim(1.2, [(0, HOLD), (0.3, sq, IQ), (0.45, sq2, LIN), (0.6, sq, LIN), (0.8, sq), (1.2, HOLD, IO)], [(0.35, 'squeeze')])
-    opened = full(hold_b, hand(pos=(7, -7, -24), rot=(6, -2, 4), curl=0.0, spread=1.0, thumb=0.0))
+    opened = full(hold_b, hand(pos=(7, 1, -24), rot=(6, -2, 4), curl=0.0, spread=1.0, thumb=0.0))
     an['ereb_hand_grab_release'] = anim(1.0, [(0, HOLD), (0.2, opened, OQ), (0.5, full(STAND, hand(pos=(1, -6, -12), rot=(30, -10, 0), curl=0.1, spread=0.5)), IO), (0.75, full(STAND, hand(pos=(-2, 0, -5), rot=(22, -14, -4), curl=0.2)), IO), (1.0, IDLE0, IO)], [(0.2, 'release')])
     # ---------------------------------------------------------------- каст (1.4 с): «Длань» вверх, щелчок пальцами перчатки (cast 0.75);
     # призрачная рука вторит жесту — раскрывается над плечом
@@ -271,15 +271,15 @@ def build():
                                        [(0.4, 'stagger'), (0.7, 'hand_break'), (1.6, 'speak'), (2.6, 'smile'), (3.8, 'vanish')])
     # ---------------------------------------------------------------- добивание (3.6 с): хватает (grab 0.6), поднимает, сжимает (squeeze 1.5),
     # жертва трескается стеклом (shatter 2.1: код — fx стекла и бабочек, урон ereb_hand_finisher), рука раскрывается (release 2.4)
-    lift_h = hand(pos=(7, -2, -22), rot=(0, -2, 4), curl=0.82, thumb=0.85)
-    crush = hand(pos=(7, -1, -21), rot=(-2, -2, 4), curl=1.08, thumb=1.0, wrist=(0, 0, 5))
+    lift_h = hand(pos=(7, 5, -22), rot=(0, -2, 4), curl=0.82, thumb=0.85)
+    crush = hand(pos=(7, 6, -21), rot=(-2, -2, 4), curl=1.08, thumb=1.0, wrist=(0, 0, 5))
     look = EA.mod(STAND, head=[-14, 4, 0], left_arm=[-40, 20, -20], torso=[-3, 0, 0])
     an['ereb_hand_finisher'] = anim(3.6, [(0, IDLE0), (0.3, reach_pre, IO), (0.5, reach, OC), (0.62, closed, OQ), (1.2, full(look, lift_h), IO),
                                           (1.5, full(EA.mod(look, left_arm=[-70, 24, -30]), crush), IQ), (1.8, full(EA.mod(look, left_arm=[-72, 26, -32]),
-                                                                                                                   hand(pos=(7, -1, -21), rot=(-2, -2, 4), curl=1.1,
+                                                                                                                   hand(pos=(7, 6, -21), rot=(-2, -2, 4), curl=1.1,
                                                                                                                         thumb=1.0, wrist=(0, 0, -4))), LIN),
                                           (2.1, full(EA.mod(look, left_arm=[-70, 24, -30]), crush), LIN),
-                                          (2.4, full(look, hand(pos=(7, -1, -22), rot=(0, -2, 4), curl=0.0, spread=1.2, thumb=0.0)), OQ),
+                                          (2.4, full(look, hand(pos=(7, 6, -22), rot=(0, -2, 4), curl=0.0, spread=1.2, thumb=0.0)), OQ),
                                           (2.9, full(look, hand(pos=(4, 0, -10), rot=(12, -10, 0), curl=0.2, spread=0.6)), IO), (3.6, IDLE0, IO)],
                                     [(0.6, 'grab'), (1.5, 'squeeze'), (2.1, 'shatter'), (2.4, 'release')])
     # ---------------------------------------------------------------- «Реплика» (2.3 с): рука хватает печать над ним (snap 0.55 — как у T30,
@@ -344,6 +344,43 @@ CHAIN = {'ereb_hand_grab': (None, 'ereb_hand_grab_hold'), 'ereb_hand_grab_hold':
          'ereb_hand_reflection_strike': ('hidden', 'hidden')}
 
 
+def build_giant():
+    """Анимации огромной руки (geo/entity/ereb_hand_giant.geo.json): кости ghost_*, корень ghost_hand — у запястья.
+    Ладонь вниз, пальцы вперёд — ghost_hand x = 90."""
+    def G(**kw):
+        p = hand(**kw)
+        p['ghost_hand_pos'] = list(kw.get('pos', (0, 0, 0)))
+        return {k: v for k, v in p.items()}
+    an = {}
+    opn = G(rot=(90, 0, 0), curl=0.12, spread=0.9, thumb=0.05)
+    opn2 = G(rot=(86, 0, 2), curl=0.2, spread=0.8, thumb=0.1, ripple=0.1)
+    fist = G(rot=(90, 0, 0), curl=1.05, thumb=1.0)
+    fist2 = G(rot=(88, 0, -2), curl=1.0, thumb=0.95, wrist=(0, 0, 3))
+    # спуск с неба: раскрыта, пальцы чуть перебирают (петля 2 с)
+    an['ereb_hand_giant_descend'] = anim(2.0, [(0, opn), (1.0, opn2, IO), (2.0, opn, IO)], loop=True)
+    # поимка: смыкается в кулак (catch 0.25)
+    an['ereb_hand_giant_grab'] = anim(0.5, [(0, opn), (0.25, G(rot=(90, 0, 0), curl=0.8, thumb=0.7), IQ), (0.5, fist, OQ)], [(0.25, 'catch')])
+    # держит в кулаке (петля 2 с) — игрок внутри кулака
+    an['ereb_hand_giant_fist'] = anim(2.0, [(0, fist), (1.0, fist2, IO), (2.0, fist, IO)], loop=True)
+    # раскрывается и тает (код — прозрачность/масштаб): release 0.2
+    an['ereb_hand_giant_release'] = anim(0.8, [(0, fist), (0.25, G(rot=(80, 0, 0), curl=0.0, spread=1.2, thumb=0.0), OQ),
+                                               (0.8, G(rot=(70, 0, 0), curl=0.1, spread=1.0, thumb=0.0, scale=0.02), IC)], [(0.2, 'release')])
+    # над миром сна: парит ладонью вниз, медленно покачивается (петля 6 с)
+    keys = []
+    for i in range(7):
+        t = i * 1.0
+        ph = math.sin(t * math.pi / 3)
+        keys.append((t, G(pos=(0, 4 * ph, 0), rot=(84 + 4 * ph, 3 * ph, 3 * math.cos(t * math.pi / 3)), curl=0.2 + 0.08 * ph, spread=0.8,
+                          thumb=0.1, ripple=0.1 * ph), IO))
+    an['ereb_hand_giant_hover'] = anim(6.0, keys, loop=True)
+    # удар по площади: замах вверх, падение плашмя (slam 0.55), лежит, тает
+    an['ereb_hand_giant_slam'] = anim(1.4, [(0, opn), (0.3, G(pos=(0, 10, 0), rot=(70, 0, 0), curl=0.0, spread=1.0, thumb=0.0), IO),
+                                           (0.55, G(pos=(0, -2, 0), rot=(94, 0, 0), curl=0.05, spread=1.0, thumb=0.0), IC),
+                                           (1.0, G(pos=(0, -2, 0), rot=(94, 0, 0), curl=0.15, spread=0.9, thumb=0.0)),
+                                           (1.4, G(pos=(0, -2, 0), rot=(94, 0, 0), curl=0.2, spread=0.9, thumb=0.0, scale=0.02), IC)], [(0.55, 'slam')])
+    return an
+
+
 def write(M):
     src = M.jar_json(M.I + 'animations/casting_animations.json')
     ours = build()
@@ -353,5 +390,11 @@ def write(M):
            'animations': {**src['animations'], **ours}}
     with open(M.out('animations/entity/ereb_hand.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
+        f.write('\n')
+    gd = {'format_version': src['format_version'], 'geckolib_format_version': src['geckolib_format_version'],
+          'comment': 'T31: огромная рука (geo/entity/ereb_hand_giant.geo.json) — «Длань Лжи» и Длань над миром «Полного Раскрытия». '
+                     'Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_anims.build_giant).', 'animations': build_giant()}
+    with open(M.out('animations/entity/ereb_hand_giant.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(gd, f, ensure_ascii=False, separators=(',', ':'))
         f.write('\n')
     return ours

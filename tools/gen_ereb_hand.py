@@ -366,6 +366,33 @@ def build_model():
     return geo
 
 
+# ================================================================== огромная рука («Длань Лжи», Длань над миром сна)
+def build_giant(geo):
+    """Отдельная модель: только кости призрачной руки (та же геометрия, тот же атлас ereb_hand.png и глоумаска), запястье — в начале
+    координат. Код рисует её сущностью/рендером GeckoLib с масштабом ×5 (кисть ≈ 7 бл.) и RenderType.entityTranslucent."""
+    g = geo['minecraft:geometry'][0]
+    gx, gy, gz = GW
+    bones = []
+    for b in g['bones']:
+        if not b['name'].startswith('ghost') or b['name'] == 'ghost_trail':
+            continue
+        b = json.loads(json.dumps(b))
+        b['pivot'] = [round(b['pivot'][0] - gx, 3), round(b['pivot'][1] - gy, 3), round(b['pivot'][2] - gz, 3)]
+        if b['name'] == 'ghost_hand':
+            b.pop('parent', None)
+        for c in b.get('cubes', []):
+            c['origin'] = [round(c['origin'][0] - gx, 3), round(c['origin'][1] - gy, 3), round(c['origin'][2] - gz, 3)]
+            if 'pivot' in c:
+                c['pivot'] = [round(c['pivot'][0] - gx, 3), round(c['pivot'][1] - gy, 3), round(c['pivot'][2] - gz, 3)]
+        bones.append(b)
+    doc = {'format_version': geo['format_version'], 'minecraft:geometry': [{
+        'description': {'identifier': 'geometry.ereb_hand_giant', 'texture_width': 128, 'texture_height': 128,
+                        'visible_bounds_width': 3, 'visible_bounds_height': 3, 'visible_bounds_offset': [0, 0.8, 0]},
+        'bones': bones}]}
+    write_json('geo/entity/ereb_hand_giant.geo.json', doc, indent=2)
+    return doc
+
+
 # ================================================================== раскраска новых брусков (в единицах атласа; ×4 — потом)
 def paint_new(at):
     for bone, name, f, x, y, w, h in NEW:
@@ -1080,6 +1107,7 @@ def main():
         sys.exit('нет %s — запустите python3 tools/fetch_libs.py' % E.JAR)
     geo = build_model()
     textures(geo)
+    build_giant(geo)
     rapier()
     import gen_ereb_hand_anims as AN
     AN.write(sys.modules[__name__])

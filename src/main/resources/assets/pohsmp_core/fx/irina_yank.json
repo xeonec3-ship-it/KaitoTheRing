@@ -1,0 +1,52 @@
+{
+ "comment": "«Только мой» — рывок жертвы (caster = жертва в ИСХОДНОЙ точке, 16 тиков; второй вызов — в новой точке перед Ириной). Нити хватают и исчезают вспышкой; перенос делает код (без линии между точками).",
+ "style": "irina",
+ "duration": 16,
+ "elements": [
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 10,
+   "width": 0.08,
+   "length": 8,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 0.7,
+    "speed": 30,
+    "rise": 0.4,
+    "risePeriod": 6
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 6,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 1.6,
+   "ring": true,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,1.1,0",
+   "duration": 3,
+   "texture": "mote_thread",
+   "count": 16,
+   "rate": 6,
+   "spread": 0.4,
+   "speed": 0.12,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 14,
+   "color": "@primary"
+  }
+ ]
+}

@@ -1,0 +1,68 @@
+{
+ "comment": "Кража эффектов — у ИГРОКА (caster = игрок, 30 тиков): свет его эффектов поднимается и рассеивается искрами (цвет эффекта — color из кода, по умолчанию золотой); нити вокруг затягиваются. НЕ луч к Ирине.",
+ "style": "irina",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "target": "caster",
+   "thickness": 0.12,
+   "pulse": [
+    0.4,
+    6
+   ],
+   "color": "#FFE7A0",
+   "motes": 14,
+   "ring": false,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 10,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 14,
+   "texture": "mote_glee",
+   "count": 26,
+   "rate": 2,
+   "spread": 0.6,
+   "speed": 0.05,
+   "gravity": -0.02,
+   "size": [
+    0.24,
+    0.02
+   ],
+   "life": 22,
+   "color": "#FFE7A0",
+   "glow": 0.7
+  },
+  {
+   "type": "trail",
+   "delay": 4,
+   "at": "caster",
+   "duration": 24,
+   "width": 0.06,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.9,
+    "speed": 18,
+    "rise": 0.6,
+    "risePeriod": 12
+   },
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

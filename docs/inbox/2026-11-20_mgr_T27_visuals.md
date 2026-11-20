@@ -1,0 +1,183 @@
+# T27 «Ирина, Ведьма Ревности» — визуал готов (помощник по визуалу → управляющему; для чата Кодинга)
+
+Ветка `claude/cnpc-chats-repo-0hcody`. Java не трогал.
+
+## Генераторы и превью
+- Главный генератор — **`tools/gen_irina.py`**: модель, текстура, анимации.
+  Он вызывает `gen_irina_staff.py` (посох) и `gen_irina_fx.py` (fx, печати, полоса, титры, иконки, lang, звуки).
+- Кадры и превью делает `tools/irina_render.py`, шаблон — `tools/irina_preview.template.html`.
+- Запуск: `python3 tools/gen_irina.py [--shots] [--html] [--three путь/three.min.js]`.
+  - Для кадра сравнения нужен jar Iron's: `python3 tools/fetch_libs.py`.
+  - three.js r128: `npm install three@0.128.0`.
+- Интерактивное превью: `tools/irina_preview.html`. Там два контроллера анимаций (тело и ткань) и переключатель посоха.
+
+**Планы роликов** по секундам дописаны в ТЗ: `docs/specs/tasks/T27_irina_boss.md`, раздел «Визуал и ролики».
+Там же учтены CamGuard и камера жертвы.
+
+## Замечания владельца учтены
+1. **Лица нет.** Под капюшоном тьма-арка, как на референсе. Проём арки сделан брусками канта, без рисунка.
+2. **Качество — по эталону Главы Культа.** 1 тексель = 1/16 блока (атлас 128×256), ручная пиксельная светотень:
+   - 3–4 тона на материал;
+   - блик сверху, тень снизу;
+   - складки — столбиками;
+   - пятна потёртостей — целыми тонами, без шума и сглаживания.
+
+   Детали — объёмными брусками: кант капюшона, брошь, кайма раструбов, ленты, загнутый верх шляпы с крестом.
+3. **Сверка с референсом** — `docs/media/t27_vs_reference.jpg` (референс и модель в том же ракурсе 3/4). Что совпадает:
+   - широкие квадратные серые поля;
+   - прямая тулья с двумя лиловыми лентами, верх загнут набок, на нём светлый крест и тёмная прорезь;
+   - светло-синий капюшон с тьмой;
+   - серо-зелёный воротник и плечи, большие лиловые раструбы со светлой каймой;
+   - юбка из серо-зелёных и лиловых лент;
+   - толстые красные нити петлями вокруг.
+
+   Посох сверен с `irina_staff.jpg`: кадр `docs/media/t27_staff.png` показан с той же стороны, что референс.
+4. **Кадр рядом с Главой Культа** в одном масштабе и свете — **`docs/media/t27_vs_cult_leader.jpg`**.
+   Ирина того же роста по телу (2.2 бл. до макушки), шляпа добавляет ≈1.3 бл.
+
+Остальные кадры: `t27_model.jpg`, `t27_anims.jpg`, `t27_poses.jpg`, `t27_fx.jpg`, `t27_special_fx.jpg`, `t27_ui.jpg`.
+
+## 1. Модель — `geo/entity/irina.geo.json` (`geometry.irina`)
+- **Текстуры:**
+  - `textures/entity/irina/irina.png`;
+  - `irina_glowmask.png` для `AutoGlowingGeoLayer` (светятся нити и знак-крест).
+- **Кости совместимы с магами Iron's** (`abstract_casting_mob`): `body` (корень, пивот y = 14), `torso`, `head`, `right_arm`, `left_arm`,
+  `right_leg`, `left_leg`, `bipedHandRight`, `rightItem`, `bipedHandLeft`, `leftItem`.
+  - Анимации каста Iron's (`casting_animations.json`) на ней играются.
+  - `AbstractSpellCastingMobModel` тоже подходит: качает голову и ноги.
+- **Свои кости:**
+  - шляпа: `hat`, `hat_brim`, `hat_tip`, `hat_tip2`, `hat_tip3`;
+  - капюшон: `hood`, `hood_drape`;
+  - наплечная пелерина: `mantle`;
+  - завязки: `tie_r(_b)`, `tie_l(_b)`;
+  - хвосты кушака: `sash_r`, `sash_l`;
+  - раструбы рукавов: `sleeve_r`, `sleeve_l`;
+  - юбка: `skirt` и 18 лент по 2 сегмента `rib_00…rib_17` + `_b`;
+  - нити: `threads` → `thread_a`, `thread_b`, `thread_c`, `thread_bits`.
+- **Нити** — часть модели (кружат всегда). Скрыть их можно `bone.setHidden` на `threads`.
+- **Хитбокс** — предлагаю 0.7 × 2.4.
+
+## 2. Анимации — `animations/entity/irina.animation.json`, ДВА контроллера
+Контроллер **тела** трогает только `body/torso/head/hat/руки/ноги`. Контроллер **ткани** — только ленты, рукава, завязки, `hat_tip*` и нити.
+Наборы костей не пересекаются, поэтому оба контроллера играют одновременно, и каст Iron's ткань не ломает.
+События — ключи `timeline` (`CustomInstructionKeyframeEvent`), их можно заменить таймерами.
+
+| тело | длина, с | события (с) | когда |
+|---|---|---|---|
+| `irina_idle` / `irina_walk` | 4.0 / 1.2, loop | — | покой / шаг |
+| `irina_cast_short` | 0.8 | `cast` 0.35 | короткий каст |
+| `irina_cast_long` (loop) → `irina_cast_long_end` | 2.0 / 0.5 | — | длинный каст |
+| `irina_staff_attack` | 1.2 | `hit` 0.55 | удар крюком сверху |
+| `irina_staff_sweep` | 1.0 | `hit` 0.46 | взмах по кругу |
+| `irina_mark` | 1.4 | `mark` 0.7 | «Предмет ревности» (жест пальцем) |
+| `irina_bind` | 1.6 | `bind` 0.9 | фаза 2: связать пары |
+| `irina_whip` | 1.0 | `lash` 0.45 | фаза 3: хлёст нитей |
+| `irina_steal` | 1.5 | `pull` 0.3, `absorb` 1.2 | кража эффектов |
+| `irina_others_happiness` | 6.0 | `begin` 0, `spread` 1.4, `gather` 3.6, `absorb` 5.2, `end` 6.0 | «Чужое счастье» |
+| `irina_only_mine` | 6.2 | `reach` 0.6, `yank` 1.0, `cocoon` 1.6, `crush` 5.4, `end` 6.2 | «Только мой» |
+| `irina_only_mine_broken` | 1.2 | `broken` 0 | кокон разорван |
+| `irina_phase2` / `irina_phase3` | 2.5 / 3.0 | `burst` 1.45 / `rage` 1.3 | переходы фаз (если особое не играет) |
+| `irina_finisher` | 2.6 | `wrap` 0.2, `pull_done` 0.8, `pierce` 1.3, `whisper` 1.7, `kill` 2.2 | добивание |
+| `irina_spawn` | 7.0 | `cocoon` 0, `unravel` 2.6, `pose` 4.6, `flourish` 5.4, `ready` 7.0 | появление |
+| `irina_death` (hold) | 5.0 | `hit` 0, `knees` 1.6, `hat` 2.4, `fall` 3.4, `unravel` 4.2, `gone` 5.0 | смерть: на `gone` убрать сущность |
+
+| ткань | длина, с | когда |
+|---|---|---|
+| `irina_cloth_idle` / `irina_cloth_walk` | 4.0 / 1.2, loop | покой / шаг |
+| `irina_cloth_storm` | 2.0, loop | касты, особые заклинания, фаза 3 |
+| `irina_cloth_spawn` | 7.0 | вместе с `irina_spawn`: кокон из нитей, потом нити расходятся |
+| `irina_cloth_cocoon` | 6.2 | вместе с `irina_only_mine`: нити уходят в кокон |
+| `irina_cloth_death` (hold) | 5.0 | вместе с `irina_death`: нити распускаются |
+
+## 3. Посох — `models/item/irina_staff.json` + `textures/item/irina_staff_3d.png`
+- Модель из 171 бруска по референсу:
+  - красное древко с чёрными кольцами и обмоткой хвата;
+  - чёрный подток;
+  - чёрное S-навершие-серп с красными кромками и завитками с обеих сторон;
+  - шипы;
+  - на цепочке — золотая бусина, чёрный подвес и красная кисть.
+- Раскладка — как у посохов Iron's (вертикально, −16…32).
+- Код регистрирует `pohsmp_core:irina_staff` (без рецепта, игрокам не выдаётся, lang `item.pohsmp_core.irina_staff`) и даёт его боссу в правую руку.
+- **Хват:** `thirdperson_righthand` = rotation [0, 90, 90], translation [0, 0, 8.5], scale 0.85.
+  - Я рассчитал его по `HumanoidRenderer.renderStackForBone` Iron's (X −90 у кости руки): древко идёт вдоль руки вверх, крюк смотрит вперёд.
+  - **В игре не проверено.** Если посох лежит поперёк — поправьте `rotation`.
+
+## 4. Эффекты (`fx/*.json`, стиль `fx/styles/irina.json`)
+Правило соблюдено: от Ирины к цели нет ни одного луча или линии. Нити — это `trail` с `orbit` вокруг игрока или вокруг неё.
+
+| fx | тики | caster | заметки для кода |
+|---|---|---|---|
+| `irina_mark_apply` → `irina_mark` | 24 → −1 | меченый игрок, follow | метка «Предмет ревности», до `Fx.stop`; слать всем |
+| `irina_bond_1…4` | −1 | игрок пары, follow | обоим игрокам пары — один номер (одинаковый знак над головой); до `Fx.stop` |
+| `irina_bond_strain` | 20 | игрок | дистанция 9–12 бл., раз в секунду |
+| `irina_bond_snap` | 30 | каждый из пары | разрыв > 12 бл. (урон — код) |
+| `irina_bond_share` | 10 | второй игрок пары | отклик, когда урон делится |
+| `irina_steal_lose` | 30 | игрок | свет его эффектов поднимается и гаснет |
+| `irina_steal_gather` | 40 | Ирина | искры собираются к ней воронкой r6 со всех сторон; вспышка на 30 |
+| `irina_fury` | −1 | Ирина, follow | ореол фазы 3 до смерти |
+| `irina_whip_warn` → `irina_whip` | 16 → 24 | Ирина | предупреждение 0.8 с, потом удар; зона r 1.5–7 |
+| `irina_only_mine` | 124 | Ирина | общий фон «Только мой» |
+| `irina_yank` | 16 | жертва | дважды: в старой точке и в новой (перенос — код) |
+| `irina_cocoon` | 80 | жертва, follow | кокон 4 с; при разрыве — `Fx.stop` |
+| `irina_cocoon_break` / `irina_cocoon_crush` | 24 / 24 | жертва | кокон разорван / не разорван |
+| `irina_others_happiness` | 120 | Ирина, не follow | печать r24; 28–72 — искры над всей печатью; 72–106 — воронка к ней; 104 — поглощение |
+| `irina_phase2` / `irina_phase3` | 50 / 60 | Ирина | на 30 тике `irina_phase3` запустить `irina_fury` |
+| `irina_intro` | 140 | Ирина (её yaw) | появление; титр на 92, полоса на 140 |
+| `irina_death` | 100 | Ирина | смерть |
+| `irina_finisher` | 52 | Ирина, **target = жертва** | добивание |
+
+Нужны элементы `trail.orbit`, `wave.reverse`, `vortex.flow`, `tint.saturation` — они уже описаны в `docs/fx.md`, новых параметров нет.
+
+**Печати** (`sigils/`):
+- `irina_mark`;
+- `irina_knot_1…4`, `irina_knot_break`;
+- `irina_thread_ring`;
+- `irina_emblem` — знак 2 Ячейки;
+- `irina_happiness` — r24, с надписью.
+
+**Рисунки** (`textures/sigil/`): те же имена + `mote_thread`, `mote_heart`, `mote_glee`.
+
+## 5. Полоса здоровья, титры, иконки
+**Полоса** (`textures/gui/sprites/boss_bars/`, 192×36, формат tyros):
+- `irina_bossbar` — фаза 1: лиловая рамка, красная витая нить в заливке, по центру шляпа с крестом и завитки нитей;
+- `irina_bossbar_p2` — фаза 2: красные стежки по рамке и узелки-сердца;
+  - `_p2_pulse` — яркий кадр: рисовать поверх с альфой 0.5 + 0.5·sin, пока есть пары;
+- `irina_bossbar_p3` — фаза 3: рваная рамка, заливка ярче;
+  - `_p3_threads` (192×112, 8 кадров по 14 строк) — хлещущие нити над рамкой: кадр `(tick/2)%8` в точке (x, y − 5), полосу рисовать поверх;
+- `irina_bossbar_flash` — вспышка при смене фазы: 6 тиков, альфа 1 → 0.
+
+Всё как у T26: `BossbarSprite(pohsmp_core:boss_bars/irina_bossbar, 192, 18, 3, -1)`.
+
+**Титры** (`textures/gui/title/`, 1024×192):
+- `irina_{ru,en}` — две строки: «Ирина, Ведьма Ревности» / «Глава 2 Ячейки Культа»; «Irina, Witch of Jealousy» / «Head of the Cult's Second Cell»;
+- `irina_happiness_{ru,en}`;
+- `irina_only_mine_{ru,en}`.
+
+**Иконки статусов** (`textures/mob_effect/`):
+- `irina_jealousy_mark` → `effect.pohsmp_core.jealousy_mark`;
+- `irina_thread_bond` → `effect.pohsmp_core.thread_bond`;
+- `irina_stolen_happiness` → `effect.pohsmp_core.stolen_happiness`.
+
+У каждого эффекта есть `.description`.
+
+## 6. lang (ru/en) и звуки
+- **lang:**
+  - `entity.pohsmp_core.irina`, `item.pohsmp_core.irina_staff`;
+  - `ui.pohsmp_core.irina.*`: `title`, `epithet`, `subtitle`, `mark`, `mark_self`, `mark_others`, `phase2`, `bond`, `bond_strain`, `bond_snap`,
+    `phase3`, `steal`, `whip_warn`, `happiness`, `happiness_warn`, `only_mine`, `only_mine_warn`, `only_mine_broken`, `only_mine_crush`,
+    `finisher_whisper`, `death`;
+  - `death.attack.pohsmp_core.irina_finisher`, `irina_threads`, `irina_cocoon`;
+  - субтитры.
+- **Звуки** (`sounds.json`): `irina.spawn`, `death`, `death_final`, `mark`, `bind`, `snap`, `steal`, `whip`, `cocoon`, `cocoon_break`, `cocoon_crush`,
+  `happiness`, `phase`, `finisher`, `staff`.
+  - Все на файлах Iron's с другим pitch.
+  - `music.irina` — заглушка (Iron's `dead_king/music/second_phase_melody_alt`, stream), пока владелец не пришлёт трек `pohsmp_core:music/irina`.
+
+## Что не проверено
+В игре не смотрел. В первую очередь проверить:
+- хват посоха;
+- ленты юбки при беге (ноги могут проходить сквозь ленты);
+- падение шляпы в `irina_death`;
+- читаемость тьмы под капюшоном при разном свете.
+
+Позу жертвы добивания для PlayerAnimator не делал. Временно подойдёт `pohsmp_cult_finisher_victim`.

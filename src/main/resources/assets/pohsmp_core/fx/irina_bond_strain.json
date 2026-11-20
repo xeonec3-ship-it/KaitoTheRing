@@ -1,0 +1,34 @@
+{
+ "comment": "Фаза 2: пара разошлась > 9 бл. — предупреждение (caster = игрок, 20 тиков, повторять каждую секунду, пока 9–12 бл.): нить вокруг дёргается, метка мигает, хруст.",
+ "style": "irina",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "width": 0.07,
+   "length": 8,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.6,
+    "speed": 20,
+    "rise": 0.3,
+    "risePeriod": 8
+   },
+   "color": "@core",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,2.35,0",
+   "duration": 8,
+   "size": 0.6,
+   "color": "@primary"
+  }
+ ]
+}

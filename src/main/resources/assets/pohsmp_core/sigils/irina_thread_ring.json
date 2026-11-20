@@ -1,0 +1,60 @@
+{
+ "comment": "T27: кольцо из петель нити под ногами (меченый, пара, кокон).",
+ "size": 0.9,
+ "color": "#E3262F",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "irina_thread_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "brightness": 1.0,
+   "appear": {
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 2.0
+   }
+  },
+  {
+   "id": "ring2",
+   "type": "disc",
+   "texture": "irina_thread_ring",
+   "radius": 0.8,
+   "heightOffset": 0.01,
+   "color": "#B99BE0",
+   "brightness": 0.6,
+   "appear": {
+    "delay": 4,
+    "duration": 14,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": -90,
+    "direction": -1
+   },
+   "rotation": {
+    "speed": -3.0
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "reverse",
+   "fade"
+  ],
+  "duration": 10,
+  "stagger": 2
+ }
+}

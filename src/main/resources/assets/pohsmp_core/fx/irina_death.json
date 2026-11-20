@@ -1,0 +1,111 @@
+{
+ "comment": "Ролик смерти (caster = Ирина; 100 тиков = анимация irina_death 5 с). 0 (`hit`) — вспышка; 1.6 (`knees`); 2.4 (`hat`) — шляпа падает, пыль; 3.4 (`fall`); 4.2 (`unravel`) — все нити распускаются и уносятся вверх, мир серо-лиловый; 5.0 — исчезает.",
+ "style": "irina",
+ "duration": 100,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100,
+   "radius": 48,
+   "color": "#20182A",
+   "strength": 0.3,
+   "saturation": 0.5,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 24,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.4,0",
+   "duration": 10,
+   "size": 2.4,
+   "ring": true,
+   "color": "@primary"
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 84,
+   "width": 0.07,
+   "length": 14,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 1.4,
+    "speed": 6,
+    "rise": 0.8,
+    "risePeriod": 40
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 48,
+   "at": "caster+0.6,0.2,-0.8",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.04,
+   "gravity": 0.01,
+   "size": [
+    0.2,
+    0.06
+   ],
+   "life": 20,
+   "color": "#8C7A92",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 84,
+   "at": "caster+0,0.6,0",
+   "duration": 14,
+   "texture": "mote_thread",
+   "count": 80,
+   "rate": 6,
+   "spread": 1.2,
+   "speed": 0.04,
+   "gravity": -0.03,
+   "spin": 20,
+   "sway": 0.5,
+   "size": [
+    0.34,
+    0.06
+   ],
+   "life": 40,
+   "color": "@primary",
+   "glow": 0.4
+  },
+  {
+   "type": "wave",
+   "delay": 84,
+   "at": "caster+0,0.1,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 5,
+   "thickness": 0.4,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 98,
+   "at": "caster+0,0.6,0",
+   "duration": 10,
+   "size": 1.8,
+   "color": "@secondary"
+  }
+ ]
+}

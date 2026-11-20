@@ -42,7 +42,7 @@ import ru.pohsmp.core.spell.PohSpell;
  * 10 minutes ({@link Erased}). Scroll; cooldown 600 s; the Creation backlash like «Низвержение». Oneself, the erased and the just returned
  * cannot be taken.
  */
-public class ErasedNameSpell extends PohSpell {
+public class ErasedNameSpell extends PohSpell implements ru.pohsmp.core.spell.FixedCastSpell {
     public static final String PATH = "erased_name";
     public static final int CAST = 300, TAIL = 30, VANISH_AT = 290, BACKLASH_TICKS = 3600;
     public static final double RANGE = 32, HOLD = 48;

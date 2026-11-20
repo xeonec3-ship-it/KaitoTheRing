@@ -48,7 +48,14 @@ def ease(d, e='easeOutCubic'):
 
 
 def at(base, x=0.0, y=0.0, z=0.0):
+    """Якорь fx со смещением в осях взгляда кастера: x — вправо, y — вверх, z — ВПЕРЁД (FxDef.Anchor: forward = +z).
+    Внимание: в осях модели (Blockbench/GeckoLib) вперёд — это −z; точку модели (mx, my, mz) в ед. переводить как
+    at(F, mx/16, my/16, −mz/16). Смещение к уже смещённому якорю складывается (раньше получалось «caster+0,0,1+0,0.6,0»)."""
     f = lambda v: (str(int(v)) if float(v) == int(v) else str(round(v, 2)))
+    if '+' in base:
+        base, off = base.split('+', 1)
+        ox, oy, oz = (float(v) for v in off.split(','))
+        x, y, z = x + ox, y + oy, z + oz
     return '%s+%s,%s,%s' % (base, f(x), f(y), f(z))
 
 
@@ -465,21 +472,21 @@ def effects():
         E('sigil', 90, at(F, 0, 0.04, 0), id='aris_emblem', comment='знак под ней, когда встаёт на колено'),
         E('aura', 120, F, duration=20, follow=True, target='caster', thickness=0.18, pulse=[0.3, 6], color='@primary', motes=20,
           comment='6.0 с: рога и кайма вспыхивают'),
-        *impact(140, at(F, 0.1, 0, -1.2), r=14, big=1.4),
+        *impact(140, at(F, 0.05, 0, 1.3), r=14, big=1.4),                  # боёк на 7.0: ≈1.3 бл. ВПЕРЕДИ (+z)
         E('flash', 140, at(F, 0, 2.0, 0), duration=12, size=4.0, rays=12, screen=0.15, color='@primary'),
         E('sigil', 150, at(F, 0, 0.05, 0), id='aris_emblem', comment='7.5 с — титр'),
     ])
     # ---------------------------------------------------------------- фаза 1 «Ковка»
     fx('aris_slam', 'Удар молотом по земле (фаза 1, событие impact анимации slam/forge, 0.75 с). caster = точка удара (голова молота: '
-       '≈1.25 бл. перед Арис по её взгляду), не follow. Волна раскалённого металла r8 бежит 1.1 с: урон кодом по кольцу |d − r(t)| < 0.7, '
+       '≈1.35 бл. перед Арис по её взгляду; у forge ≈1.2, у last_blow ≈1.45), не follow. Волна раскалённого металла r8 бежит 1.1 с: урон кодом по кольцу |d − r(t)| < 0.7, '
        'r(t) = 8·t/22 тиков; перепрыгнуть можно (выше 1 бл.).', 40, impact(0, F, r=8))
     fx('aris_metal_wave', 'Волна раскалённого металла веером вперёд (фаза 1): caster = Арис, yaw — направление; 5 гребней по линии 10 бл. '
        'с шагом 2 тика (код наносит урон по полосе ширины 3 бл.).', 40, [
-        *[E('decal', 2 * k, at(F, 0, 0, -2 - 2 * k), duration=60, texture='aris_molten_floor', radius=1.4 + 0.2 * k, glow=1.0, fadeOut=40,
+        *[E('decal', 2 * k, at(F, 0, 0, 2 + 2 * k), duration=60, texture='aris_molten_floor', radius=1.4 + 0.2 * k, glow=1.0, fadeOut=40,
             color='@secondary', brightness=1.2) for k in range(5)],
-        *[E('curtain', 2 * k, at(F, 0, 0, -2 - 2 * k), duration=14, radius=[0.2, 1.2], count=8, height=1.4, grow=4, width=[0.3, 0.6],
+        *[E('curtain', 2 * k, at(F, 0, 0, 2 + 2 * k), duration=14, radius=[0.2, 1.2], count=8, height=1.4, grow=4, width=[0.3, 0.6],
             brightness=[0.7, 1.0], flicker=0.6, texture='mote_flame', color='@secondary', out=ease(8)) for k in range(5)],
-        *[sparks(2 * k, at(F, 0, 0.3, -2 - 2 * k), 16, 0.25, 14, 2) for k in range(5)],
+        *[sparks(2 * k, at(F, 0, 0.3, 2 + 2 * k), 16, 0.25, 14, 2) for k in range(5)],
     ])
     fx('aris_anvil_rise', 'Наковальня-препятствие вырастает из земли (фаза 1): caster = место, yaw — поворот. 0–12 тиков растёт (меш '
        'aris_anvil), пыль и искры; держится до Fx.stop (код: 8 с) — тогда разборка 10 тиков и fx aris_anvil_break.', -1, [
@@ -523,7 +530,7 @@ def effects():
         E('aura', 0, F, duration=20, follow=True, target='caster', thickness=0.2, pulse=[0.3, 4], color='@primary', motes=24),
         E('vortex', 4, F, duration=16, radius=2.6, height=2.2, arms=3, speed=12, texture='spark_soft', color='@primary', out=ease(6),
           comment='оборот с молотом'),
-        *impact(20, at(F, 0, 0, -1.3), r=14, big=1.3),
+        *impact(20, at(F, 0.05, 0, 1.2), r=14, big=1.3),                  # удар phase2 1.0: боёк ≈1.2 бл. впереди
         E('sigil', 20, at(F, 0, 0.04, 0), id='aris_emblem', follow=True),
     ])
     # ---------------------------------------------------------------- фаза 3 «Мифический сплав»
@@ -601,16 +608,16 @@ def effects():
        '(пыль, трещины); 2.0–2.6 с — рога гаснут: бирюзовые искры поднимаются с рогов и тают; 3.2 с — молот падает (глухой удар, пыль); '
        '3.6 с — фраза. Жар и бирюза уходят из мира.', 100, [
         sparks(8, at(F, 0, 1.4, 0), 20, 0.2, 12, 3, '@primary'),
-        E('decal', 24, at(F, 0.62, 0, -0.19), duration=76, texture='higher_cracks', radius=1.2, glow=0.2, fadeOut=40, color=STEEL),
-        E('sprites', 24, at(F, 0.62, 0.1, -0.19), duration=5, texture='mote_ash', count=16, rate=4, spread=0.6, speed=0.05, gravity=-0.003,
+        E('decal', 24, at(F, 0.62, 0, 0.19), duration=76, texture='higher_cracks', radius=1.2, glow=0.2, fadeOut=40, color=STEEL),
+        E('sprites', 24, at(F, 0.62, 0.1, 0.19), duration=5, texture='mote_ash', count=16, rate=4, spread=0.6, speed=0.05, gravity=-0.003,
           spin=40, size=[0.5, 0.15], life=26, color=STEEL, blend='translucent'),
         E('sprites', 40, at(F, 0, 2.6, 0), duration=14, texture='spark_soft', count=60, rate=5, spread=0.5, speed=0.03, gravity=-0.02,
           size=[0.14, 0.0], life=30, color='@primary', glow=0.9, comment='бирюза уходит с рогов'),
         E('sprites', 52, at(F, 0, 2.6, 0), duration=6, texture='mote_ash', count=10, rate=2, spread=0.4, speed=0.02, gravity=-0.01,
           size=[0.5, 0.2], life=30, color='#9AA8AC', blend='translucent', comment='дымок, рога погасли'),
-        E('sprites', 64, at(F, 1.0, 0.2, -0.6), duration=5, texture='mote_ash', count=24, rate=6, spread=1.0, speed=0.06, gravity=-0.004,
+        E('sprites', 64, at(F, 0.8, 0.2, 0.37), duration=5, texture='mote_ash', count=24, rate=6, spread=1.0, speed=0.06, gravity=-0.004,
           spin=40, size=[0.6, 0.2], life=30, color=STEEL, blend='translucent', comment='молот упал'),
-        E('wave', 64, at(F, 1.0, 0, -0.6), duration=12, shape='ring', radius=2.5, thickness=0.4, followTerrain=True, color=STEEL_L),
+        E('wave', 64, at(F, 0.8, 0, 0.37), duration=12, shape='ring', radius=2.5, thickness=0.4, followTerrain=True, color=STEEL_L),
         E('tint', 0, F, duration=100, radius=30, color='#0A1416', strength=0.18, **{'in': ease(40), 'out': ease(40)}),
     ])
 
@@ -1060,17 +1067,17 @@ def spells4():
        'конус 60° длиной 8 бл. на земле (decal aris_cone, вершина у Арис, раскрывается вперёд) наливается жаром, по краям — искры.', 16, [
         E('decal', 0, F, duration=16, texture='aris_cone', radius=8, yaw=0, glow=0.8, color='@secondary', brightness=1.0, grow=10,
           pulse=6, comment='вершина — в центре картинки, раскрытие — вперёд по yaw'),
-        E('sprites', 0, at(F, 0, 0.2, -4), duration=16, texture='spark_soft', count=100000, rate=1.5, area=3, speed=0.02, gravity=-0.02,
+        E('sprites', 0, at(F, 0, 0.2, 4), duration=16, texture='spark_soft', count=100000, rate=1.5, area=3, speed=0.02, gravity=-0.02,
           size=[0.12, 0.02], life=10, color='@secondary', glow=0.9),
     ])
     fx('aris_bellows', '«Мехи», порыв (событие gust 0.8 с; caster = Арис, yaw — направление, 24 тика): поток горячего воздуха и искр '
        'по конусу 8 бл. (sprites по path), марево, вспышка у молота. Код: всем в конусе — отброс и поджог.', 24, [
-        E('flash', 0, at(F, 0, 1.4, -1.5), duration=8, size=2.2, color='@core'),
-        E('sprites', 0, at(F, 0, 1.2, -1.0), duration=10, texture='mote_flame', count=120, rate=12, path=[at(F, 0, 1.2, -1.0), at(F, 0, 1.0, -4.5),
-          at(F, 0, 0.8, -8.5)], width=3.6, size=[0.6, 0.1], life=12, color='@secondary', glow=0.8, comment='поток жара конусом'),
-        E('sprites', 0, at(F, 0, 1.2, -1.0), duration=10, texture='spark_soft', count=90, rate=9, path=[at(F, 0, 1.4, -1.0), at(F, 0, 1.2, -5.0),
-          at(F, 0, 1.0, -9.0)], width=4.2, size=[0.14, 0.02], life=10, color='@core', glow=0.9),
-        E('sprites', 2, at(F, 0, 1.0, -1.0), duration=10, texture='mote_ash', count=40, rate=4, path=[at(F, 0, 1.0, -1.0), at(F, 0, 1.0, -8.0)],
+        E('flash', 0, at(F, 0, 1.4, 1.5), duration=8, size=2.2, color='@core'),
+        E('sprites', 0, at(F, 0, 1.2, 1.0), duration=10, texture='mote_flame', count=120, rate=12, path=[at(F, 0, 1.2, 1.0), at(F, 0, 1.0, 4.5),
+          at(F, 0, 0.8, 8.5)], width=3.6, size=[0.6, 0.1], life=12, color='@secondary', glow=0.8, comment='поток жара конусом'),
+        E('sprites', 0, at(F, 0, 1.2, 1.0), duration=10, texture='spark_soft', count=90, rate=9, path=[at(F, 0, 1.4, 1.0), at(F, 0, 1.2, 5.0),
+          at(F, 0, 1.0, 9.0)], width=4.2, size=[0.14, 0.02], life=10, color='@core', glow=0.9),
+        E('sprites', 2, at(F, 0, 1.0, 1.0), duration=10, texture='mote_ash', count=40, rate=4, path=[at(F, 0, 1.0, 1.0), at(F, 0, 1.0, 8.0)],
           width=3.0, size=[1.2, 0.4], life=16, color='#6A5048', blend='translucent', comment='марево/дым'),
     ])
     fx('aris_bellows_burn', 'Игрока задел порыв «Мехов» (caster = игрок): вспышка жара, искры по ветру.', 12, [

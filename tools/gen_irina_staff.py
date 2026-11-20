@@ -183,8 +183,8 @@ def build():
 
 DISPLAY = {   # Iron's (HumanoidRenderer.renderStackForBone): у кости руки item поворачивается X −90 — без поворота посох смотрел бы вперёд.
     # [0, 90, 90]: древко вдоль руки вверх (y предмета → +z до X −90 = вверх), навершие-крюк — вперёд; сдвиг по z — хват у y≈−2.
-    'thirdperson_righthand': {'rotation': [0, 90, 90], 'translation': [0, 0, 8.5], 'scale': [0.85, 0.85, 0.85]},
-    'thirdperson_lefthand': {'rotation': [0, -90, -90], 'translation': [0, 0, 8.5], 'scale': [0.85, 0.85, 0.85]},
+    'thirdperson_righthand': {'rotation': [-28, 90, 90], 'translation': [0, 0, 8.5], 'scale': [0.85, 0.85, 0.85]},
+    'thirdperson_lefthand': {'rotation': [-28, -90, -90], 'translation': [0, 0, 8.5], 'scale': [0.85, 0.85, 0.85]},
     'firstperson_righthand': {'rotation': [0, 0, 0], 'translation': [1.5, 0, -2.75], 'scale': [0.6, 0.6, 0.6]},
     'firstperson_lefthand': {'rotation': [0, 0, 0], 'translation': [1.5, 0, -2.75], 'scale': [0.6, 0.6, 0.6]},
     'gui': {'rotation': [0, 0, -38], 'translation': [-0.5, -1.5, 0], 'scale': [0.34, 0.34, 0.34]},

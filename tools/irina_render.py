@@ -93,7 +93,7 @@ def three_arg(args):
 def shots(args):
     three = three_arg(args)
     os.makedirs(MEDIA, exist_ok=True)
-    V = dict(dist=1.25, ty=26, pitch=4)
+    V = dict(dist=2.2, ty=28, pitch=4, anim='irina_idle', t=1.0)
     sheet(os.path.join(MEDIA, 't27_model.jpg'), {'cols': 4, 'cells': [
         dict(V, yaw=0, label='Спереди', sub='лицо под полями шляпы'),
         dict(V, yaw=35, label='Три четверти'),
@@ -102,8 +102,8 @@ def shots(args):
     ]}, three, (1800, 1000))
     # сверка с референсом владельца (тот же ракурс 3/4, тёмный фон)
     tmp = os.path.join(MEDIA, '_t27_ref_tmp.jpg')
-    sheet(tmp, {'cols': 2, 'cells': [dict(yaw=-28, pitch=10, dist=2.5, ty=28, bg='#050307', ground=False, label='модель (ракурс референса)'),
-                                     dict(yaw=28, pitch=10, dist=2.5, ty=28, bg='#050307', ground=False, label='с другой стороны')]},
+    sheet(tmp, {'cols': 2, 'cells': [dict(yaw=-28, pitch=5, dist=2.2, ty=30, bg='#050307', ground=False, anim='irina_idle', t=1.0, label='модель (ракурс референса)'),
+                                     dict(yaw=28, pitch=5, dist=2.2, ty=30, bg='#050307', ground=False, anim='irina_idle', t=1.0, label='с другой стороны')]},
           three, (1200, 800))
     from PIL import Image
     r = Image.open(os.path.join(ROOT, 'docs', 'references', 't27', 'irina_look.jpg')).convert('RGB').resize((735, 738))
@@ -116,10 +116,10 @@ def shots(args):
     os.remove(tmp)
     print('wrote docs/media/t27_vs_reference.jpg')
     sheet(os.path.join(MEDIA, 't27_vs_cult_leader.jpg'), {'cols': 2, 'cells': [
-        dict(compare=13, yaw=0, pitch=4, dist=1.9, ty=26, label='Ирина ← → Глава Культа (эталон)', sub='один масштаб и свет, спереди'),
-        dict(compare=13, yaw=30, pitch=4, dist=1.9, ty=26, label='три четверти'),
-        dict(compare=13, yaw=0, pitch=2, dist=0.75, ty=31, tx=-13, label='капюшон крупно', sub='лица нет — тьма, как на референсе'),
-        dict(compare=13, yaw=180, pitch=4, dist=1.9, ty=26, label='сзади'),
+        dict(compare=13, anim='irina_idle', t=1.0, yaw=0, pitch=4, dist=1.9, ty=26, label='Ирина ← → Глава Культа (эталон)', sub='один масштаб и свет, спереди'),
+        dict(compare=13, anim='irina_idle', t=1.0, yaw=30, pitch=4, dist=1.9, ty=26, label='три четверти'),
+        dict(compare=13, anim='irina_idle', t=1.0, yaw=0, pitch=2, dist=0.75, ty=31, tx=-13, label='капюшон крупно', sub='лица нет — тьма, как на референсе'),
+        dict(compare=13, anim='irina_idle', t=1.0, yaw=180, pitch=4, dist=1.9, ty=26, label='сзади'),
     ]}, three, (1800, 1400))
     an = [('irina_idle', 1.0, 'idle'), ('irina_walk', 0.3, 'walk'), ('irina_cast_short', 0.35, 'cast_short'), ('irina_cast_long', 0.6, 'cast_long'),
           ('irina_staff_attack', 0.3, 'staff_attack: замах'), ('irina_staff_attack', 0.6, 'staff_attack: удар'),

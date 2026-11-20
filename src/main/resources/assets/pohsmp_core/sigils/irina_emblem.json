@@ -12,7 +12,7 @@
    "texture": "glow",
    "radius": 1.0,
    "heightOffset": -0.01,
-   "color": "#9A0F1E",
+   "color": "#7A0E10",
    "brightness": 0.5,
    "appear": {
     "delay": 0,
@@ -54,7 +54,7 @@
    "texture": "irina_thread_ring",
    "radius": 1.22,
    "heightOffset": 0.01,
-   "color": "#E3262F",
+   "color": "#C0201C",
    "brightness": 1.1,
    "appear": {
     "delay": 10,
@@ -72,7 +72,7 @@
   }
  ],
  "formedFlash": {
-  "color": "#FF6A5E",
+  "color": "#DC3A30",
   "size": 1.2,
   "duration": 10,
   "sparks": 40

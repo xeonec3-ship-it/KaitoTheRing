@@ -1,7 +1,7 @@
 {
  "comment": "T27: разрыв пары — разорванные петли, осколки нити; рассыпаются за 0.6 с.",
  "size": 0.55,
- "color": "#FF6A5E",
+ "color": "#DC3A30",
  "orientation": "ground",
  "lifetime": -1,
  "hold": 8,

@@ -53,7 +53,7 @@
    "type": "text",
    "radius": 0.97,
    "heightOffset": 0.01,
-   "color": "#FF6A5E",
+   "color": "#DC3A30",
    "brightness": 0.9,
    "appear": {
     "delay": 10,

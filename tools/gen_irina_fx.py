@@ -24,7 +24,7 @@ MEDIA = os.path.join(ROOT, 'docs', 'media')
 A = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'pohsmp_core')
 WRITTEN = []
 
-RED, RED_L, RED_D, RED_DD = '#E3262F', '#FF6A5E', '#9A0F1E', '#4E0610'
+RED, RED_L, RED_D, RED_DD = '#C0201C', '#DC3A30', '#7A0E10', '#4E0610'
 LIL, LIL_L, LIL_D = '#B99BE0', '#E2CDF5', '#6E4E9C'
 CORE = '#FFE0E6'
 GOLD = '#F2C14A'

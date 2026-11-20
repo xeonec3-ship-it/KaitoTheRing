@@ -6,7 +6,7 @@
   {
    "type": "flash",
    "delay": 8,
-   "at": "caster+0,2.1,-0.3",
+   "at": "caster+0,2.1,0.3",
    "duration": 10,
    "size": 0.7,
    "color": "@primary"

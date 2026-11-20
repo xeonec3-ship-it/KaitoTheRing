@@ -24,7 +24,8 @@ def P(**kw):
 
 
 # ---------------------------------------------------------------- позы
-STAND = P(head=[-3, 8, 0], right_arm=[-14, 12, 7], bipedHandRight=[52, 0, 0], left_arm=[20, -14, 10],
+# проверка анимаций 20.11 (tools/anim_check.py): кисть подобрана так, чтобы остриё не уходило в землю (было 52 — на 0.6 px в полу)
+STAND = P(head=[-3, 8, 0], right_arm=[-14, 12, 7], bipedHandRight=[47.6, -4.8, -7.6], left_arm=[20, -14, 10],
           right_leg=[-4, 0, 3], left_leg=[6, 0, -4], coat_front_r=[-3, 0, 2], coat_front_l=[2, 0, -2])
 # стойка «ан гард»: правый бок к врагу, рука с рапирой вперёд, левая рука поднята за спиной, колени чуть согнуты
 GUARD = P(body=[4, -38, 0], body_pos=[0, -1.2, 0], head=[0, 36, 0], torso=[0, 4, 0],
@@ -46,7 +47,8 @@ PALM = P(body=[2, 0, 0], head=[18, 4, 0], right_arm=[-10, 8, 10], bipedHandRight
 BOW = P(body=[28, 0, 0], body_pos=[0, -0.4, 0], head=[10, 0, 0], right_arm=[-58, 8, -6], bipedHandRight=[70, 0, 0],
         left_arm=[18, -12, 12], right_leg=[-28, 0, 2], left_leg=[-28, 0, -2], coat_front_r=[-30, 0, 2], coat_front_l=[-30, 0, -2],
         coat_back_r=[-24, 0, 0], coat_back_l=[-24, 0, 0])
-SALUTE = P(body=[-2, -10, 0], head=[-4, 10, 0], right_arm=[-102, 34, 0], bipedHandRight=[-52, 0, 0],
+# салют: клинок вертикально вверх перед лицом (было −52 — клинок уходил назад над головой, сквозь волосы)
+SALUTE = P(body=[-2, -10, 0], head=[-4, 10, 0], right_arm=[-102, 34, 0], bipedHandRight=[14.6, -5.6, -1],
            left_arm=[20, -14, 10], right_leg=[-6, 0, 3], left_leg=[8, 0, -4])
 
 
@@ -151,13 +153,14 @@ def build():
                                    (0.6, mod(STAND, body_pos=[0, 0, 3], head=[12, 8, 0], body_scale=[0.96, 1.04, 0.96]), IO),
                                    (0.8, mod(STAND, body_pos=[0, 0, 3]))], [(0.6, 'gone')])
     # удар в спину (1.2 с): появляется уже в замахе (appear 0), укол сверху вниз в спину (stab 0.45), отходит
-    pre = mod(GUARD, body=[-6, -20, 0], right_arm=[-160, 20, -10], bipedHandRight=[60, 0, 0], left_arm=[-30, 0, -30], body_pos=[0, 0, 1])
-    stab = mod(LUNGE, body=[14, -20, 0], right_arm=[-70, 18, 0], bipedHandRight=[96, 0, 0], body_pos=[0, -1.6, -3],
+    pre = mod(GUARD, body=[-6, -20, 0], right_arm=[-160, 20, -10], bipedHandRight=[69, -2, -11], left_arm=[-30, 0, -30], body_pos=[0, 0, 1])
+    # укол: остриё на высоте спины жертвы перед ним (было: рука −70, кисть 96 — остриё било в пол в 1.8 бл. впереди)
+    stab = mod(LUNGE, body=[14, -20, 0], right_arm=[-107.6, 16.8, 7.6], bipedHandRight=[100, 1.4, -4.7], body_pos=[0, -1.6, -3],
                right_leg=[-40, 20, 0], left_leg=[24, 10, -6], coat_front_r=[-24, 0, 6], coat_front_l=[14, 0, -6])
     an['ereb_backstab'] = anim(1.2, [(0, pre), (0.3, mod(pre, right_arm=[-170, 20, -10]), IO), (0.45, stab, IQ), (0.75, stab),
                                      (1.2, STAND, IO)], [(0.0, 'appear'), (0.45, 'stab')])
     # ---------------------------------------------------------------- фаза (1.6 с): переход 66% / 33% — рапира описывает круг, салют
-    an['ereb_phase'] = anim(1.6, [(0, STAND), (0.4, mod(SALUTE, right_arm=[-100, 60, -10], bipedHandRight=[0, 0, 0]), IO),
+    an['ereb_phase'] = anim(1.6, [(0, STAND), (0.4, mod(SALUTE, right_arm=[-100, 60, -10], bipedHandRight=[44.6, -3.8, -2.2]), IO),
                                   (0.8, SALUTE, OC), (1.2, SALUTE), (1.6, STAND, IO)], [(0.8, 'phase')])
     # ---------------------------------------------------------------- появление (5.0 с): собирается из роя бабочек (код: модель не рисовать
     # 0–2.2 с), поклон, салют рапирой, стойка. form 2.2 (модель видна), bow 2.6, salute 3.9 (титр), ready 5.0 (полоса босса)
@@ -184,7 +187,8 @@ def build():
     an['ereb_feint_counter'] = anim(0.9, [(0, opn), (0.1, PARRY, 'easeOutQuart'), (0.45, LUNGE, OQ), (0.9, GUARD, IO)],
                                     [(0.1, 'parry'), (0.45, 'hit')])
     # «Стеклянный дождь» (1.6 с): рапира и левая ладонь к небу (marks 0.4 — метки на земле), опускает руку (fall 1.6 = марки + 1.2 с)
-    sky = mod(STAND, head=[-30, 0, 0], torso=[-6, 0, 0], right_arm=[-172, 6, -6], bipedHandRight=[-30, 0, 0], left_arm=[-160, -10, -24])
+    # рапира к небу — клинок вертикально вверх (было −30 — клинок лежал назад над головой, сквозь волосы)
+    sky = mod(STAND, head=[-30, 0, 0], torso=[-6, 0, 0], right_arm=[-172, 6, -6], bipedHandRight=[78.4, -0.3, -6.6], left_arm=[-160, -10, -24])
     an['ereb_glass_rain'] = anim(1.6, [(0, STAND), (0.4, sky, OC), (1.2, mod(sky, head=[-34, 6, 0])),
                                        (1.6, mod(STAND, right_arm=[-60, 20, 10], bipedHandRight=[80, 0, 0], head=[6, 0, 0]), IQ)],
                                  [(0.4, 'marks'), (1.6, 'fall')])
@@ -202,7 +206,44 @@ def build():
                                    (2.2, mod(PALM, head=[14, 8, 0]), IO), (2.5, mod(PALM, head=[-4, -6, 0]), IO), (2.9, mod(PALM, head=[-4, -6, 0])), (3.2, up, OQ), (4.6, up), (5.0, mod(up, body_scale=[1.03, 1.03, 1.03])),
                                    (6.5, mod(up, body_scale=[1.03, 1.03, 1.03]))],
                                   [(0.3, 'smile'), (1.4, 'butterfly'), (2.4, 'speak'), (3.2, 'cast'), (5.0, 'vanish')])
+    # ---------------------------------------------------------------- добивание (владелец 20.11: «всем боссам добивание так же добавь»; ТЗ T30,
+    # раздел «Добивание»). 2.4 с: 0.3 vanish — растворяется в стеклянной ряби (код прячет модель и переносит Эреба на 1.3 бл. ЗА СПИНУ жертвы,
+    # лицом к ней — жертва перед ним), 0.7 appear — появляется уже в замахе, 1.1 stab — укол в спину (остриё на высоте спины, проходит насквозь),
+    # 1.9 kill — выдёргивает клинок, жертва рассыпается стеклом и бабочками; 2.4 — стойка.
+    an['ereb_finisher'] = anim(2.4, [
+        (0, STAND), (0.15, mod(STAND, body_pos=[0, 0, 2], head=[12, 8, 0], right_arm=[-30, 12, 7]), IO),
+        (0.3, mod(STAND, body_pos=[0, 0, 3], head=[12, 8, 0], body_scale=[0.96, 1.04, 0.96]), IO),
+        (0.7, pre), (0.95, mod(pre, right_arm=[-170, 20, -10]), IO), (1.1, stab, IQ), (1.6, stab),
+        (1.9, mod(stab, right_arm=[-84, 20, 12], bipedHandRight=[88, 0, 0], body_pos=[0, -1.2, -1.5]), OC),
+        (2.4, STAND, IO)], [(0.3, 'vanish'), (0.7, 'appear'), (1.1, 'stab'), (1.9, 'kill')])
     return an
+
+
+def victim_emote():
+    """Поза жертвы добивания Эреба (PlayerAnimator, 2.4 с = 48 тиков, держит последний кадр): стоит; 1.1 с (stab) — выгибается от укола в спину,
+    руки в стороны, голова назад; 1.5–1.9 — оседает на колени, корпус вперёд; 1.9 (kill) — рассыпается (код прячет игрока, fx)."""
+    poses = [
+        (0, dict(torso=(0, 0, 0, 0), head=(0, 0, 0), rightArm=(0, 0, 4, 0), leftArm=(0, 0, -4, 0), rightLeg=(0, 0, 2, 0), leftLeg=(0, 0, -2, 0))),
+        (20, dict(torso=(0, 0, 0, 0), head=(-4, 10, 0), rightArm=(-6, 0, 6, 4), leftArm=(-6, 0, -6, 4), rightLeg=(0, 0, 2, 0), leftLeg=(0, 0, -2, 0))),
+        (22, dict(torso=(-16, 0, 0, -8), head=(-32, 0, 0), rightArm=(-24, 0, 42, -6), leftArm=(-24, 0, -42, -6), rightLeg=(6, 0, 3, 6),
+                  leftLeg=(-4, 0, -3, 4))),
+        (30, dict(torso=(-12, 0, 0, -6), head=(-26, 0, 6), rightArm=(-16, 0, 34, -4), leftArm=(-18, 0, -30, -4), rightLeg=(4, 0, 3, 10),
+                  leftLeg=(-2, 0, -3, 8))),
+        (38, dict(torso=(22, 0, 0, 10), head=(28, 0, 4), rightArm=(12, 0, 10, 10), leftArm=(10, 0, -12, 10), rightLeg=(-30, 0, 4, 70),
+                  leftLeg=(-24, 0, -4, 64))),
+        (48, dict(torso=(24, 0, 0, 12), head=(30, 0, 4), rightArm=(14, 0, 8, 12), leftArm=(12, 0, -10, 12), rightLeg=(-32, 0, 4, 72),
+                  leftLeg=(-26, 0, -4, 66))),
+    ]
+    moves = []
+    for tick, p in poses:
+        for part, v in p.items():
+            o = {'pitch': float(v[0]), 'yaw': float(v[1]), 'roll': float(v[2])}
+            if len(v) > 3:
+                o['bend'] = float(v[3])
+            moves.append({'tick': tick, 'easing': 'easeOutQuad' if tick == 22 else 'easeInOutSine', part: o})
+    return {'version': 3, 'name': 'pohsmp_ereb_finisher_victim', 'author': 'pohsmp_core',
+            'emote': {'beginTick': 0, 'endTick': 48, 'stopTick': 48, 'degrees': True, 'easeBeforeKeyframe': True, 'isLoop': True,
+                      'returnTick': 48, 'moves': moves}}
 
 
 def write(M):
@@ -214,6 +255,20 @@ def write(M):
            'animations': {**src['animations'], **ours}}
     import gen_replica_break as RB          # «Реплика»: ereb_replica_break (+ fx/печати в gen_ereb.py)
     RB.add_anims('ereb', doc['animations'])
+    # проверка анимаций 20.11 (tools/anim_check.py): явные ключи костей у наших; полы камзола — назад/вниз и мимо ног во всех
+    import anim_cloth
+    mine = [k for k in doc['animations'] if k.startswith('ereb_')]
+    anim_cloth.explicit(doc['animations'], mine, ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg', 'bipedHandRight'))
+    anim_cloth.bake('ereb', doc['animations'])
+    # рапира: остриё не в полу и не сквозь корпус — у наших и у кастов Iron's (без краёв: у Эреба нет позы хвата из кода)
+    import anim_check
+    for _ in range(2):                       # второй проход — добирает кадры на плавных переходах первого
+        anim_cloth.weapon('ereb', doc['animations'], mine + anim_check.SPELL_ANIMS, edge=0)
+    import os
+    vp = os.path.join(M.ROOT, 'src', 'main', 'resources', 'assets', 'irons_spellbooks', 'player_animation', 'pohsmp_ereb_finisher_victim.json')
+    with open(vp, 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(victim_emote(), f, ensure_ascii=False, indent=1)
+        f.write('\n')
     with open(M.out('animations/entity/ereb.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
         f.write('\n')

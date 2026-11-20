@@ -470,7 +470,8 @@ public final class BossCore {
         started = t.getBoolean("started");
         if (t.contains("ax")) arena = new Vec3(t.getDouble("ax"), t.getDouble("ay"), t.getDouble("az"));
         for (Tag s : t.getList("specials", Tag.TAG_STRING)) usedSpecials.add(s.getAsString());
-        barVisible = started;
-        musicOn = started;
+        started = true;   // saved mid-intro: the scripts are gone, the fight just goes on
+        barVisible = true;
+        musicOn = true;
     }
 }

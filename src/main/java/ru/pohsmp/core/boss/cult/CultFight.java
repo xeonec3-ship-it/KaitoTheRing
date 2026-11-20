@@ -42,7 +42,7 @@ public final class CultFight {
     private int verdictIn = -1;
     private long verdictUntil;
     private Vec3 verdictAt;
-    private int firewallFx = -1, furyFx = -1;
+    private int firewallFx = -1, furyFx = -1, vortexFx = -1;
     private final Map<UUID, Double> wallDist = new HashMap<>();
     private final Map<UUID, Long> wallHit = new HashMap<>();
     private final List<UUID> cultists = new ArrayList<>();
@@ -232,6 +232,11 @@ public final class CultFight {
         verdictIn = -1;
         if (furyFx > 0) Fx.stop(sl, furyFx, "");
         furyFx = -1;
+        if (vortexFx > 0) Fx.stop(sl, vortexFx, "");   // died while ash: seen again, the whirl stops
+        vortexFx = -1;
+        if ((core.look() & BossNet.LOOK_HIDDEN) != 0) core.lookFlag(BossNet.LOOK_HIDDEN, false);
+        if (boss.getMainHandItem().isEmpty())   // died with the sickle in the air
+            boss.setItemSlot(net.minecraft.world.entity.EquipmentSlot.MAINHAND, new net.minecraft.world.item.ItemStack(CultLeader.SCYTHE.get()));
         for (UUID u : cultists) if (sl.getEntity(u) instanceof LivingEntity c && c.isAlive()) c.kill();
         cultists.clear();
     }
@@ -301,7 +306,7 @@ public final class CultFight {
                 .at(CultMath.ASH_GONE, () -> {
                     core.lock(CultMath.ASH_REFORM - CultMath.ASH_GONE, true, true);   // invulnerable while he is ash
                     core.lookFlag(BossNet.LOOK_HIDDEN, true);
-                    vortex[0] = Fx.play(sl, Fx.fx("cult_ash_vortex").caster(boss).at(boss.position()).attach(boss));
+                    vortex[0] = vortexFx = Fx.play(sl, Fx.fx("cult_ash_vortex").caster(boss).at(boss.position()).attach(boss));
                     ServerPlayer enemy = core.strongestEnemy();
                     Vec3 from = boss.position();
                     Vec3 tp = enemy != null ? enemy.position() : arena();
@@ -323,6 +328,7 @@ public final class CultFight {
                 })
                 .at(CultMath.ASH_REFORM, () -> {
                     if (vortex[0] > 0) Fx.stop(sl, vortex[0], "");
+                    vortexFx = -1;
                     core.lookFlag(BossNet.LOOK_HIDDEN, false);
                     boss.serverTriggerAnimation("cult_leader_ash_reform");
                     Fx.play(sl, Fx.fx("cult_ash_reform").caster(boss).at(boss.position()).yaw(boss.getYRot()));

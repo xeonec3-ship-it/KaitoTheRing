@@ -157,8 +157,7 @@ public class ErebReflection extends ErebBody {
         if (!(src.getEntity() instanceof Player)) return false;
         if (invulnerableTime > 10) return false;
         invulnerableTime = 20;
-        hurtTime = hurtDuration = 10;
-        level().broadcastEntityEvent(this, (byte) 2);   // the hurt flash, like a real one
+        level().broadcastDamageEvent(this, src);   // the hurt flash and sound, like a real one
         if (--hits <= 0) poof(sl);
         return true;
     }

@@ -38,11 +38,13 @@ public final class BossClient {
 
     private static void setup(FMLClientSetupEvent e) {
         e.enqueueWork(ru.pohsmp.core.boss.cult.client.CultLeaderClient::setup);   // T26: camera plans
+        e.enqueueWork(ru.pohsmp.core.boss.ereb.client.ErebClient::setup);         // T30: camera plans, «Предательство»
     }
 
     private static void renderers(EntityRenderersEvent.RegisterRenderers e) {
         for (var t : Bosses.NPCS.values()) e.registerEntityRenderer(t.get(), BossNpcRenderer::new);
         ru.pohsmp.core.boss.cult.client.CultLeaderClient.renderers(e);
+        ru.pohsmp.core.boss.ereb.client.ErebClient.renderers(e);
     }
 
     public static void handle(BossNet.Msg m) {

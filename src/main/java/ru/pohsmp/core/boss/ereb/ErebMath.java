@@ -1,8 +1,5 @@
 package ru.pohsmp.core.boss.ereb;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * T30 Ereb: the timings (ticks, from the events of animations/entity/ereb.animation.json and the plans of
  * docs/specs/tasks/T30_ereb_boss.md — the events are not read by the code, the same moments are timers) and the pure geometry of his
@@ -114,12 +111,5 @@ public final class ErebMath {
         double[] f = forward(yawDeg);
         double cos = (dx * f[0] + dz * f[1]) / len;
         return cos >= Math.cos(Math.toRadians(deg));
-    }
-
-    /** Players ordered for the dance: the farthest from the last one first, so he crosses the arena (indices into the list). */
-    public static List<Integer> order(int n, int start) {
-        List<Integer> out = new ArrayList<>();
-        for (int i = 0; i < n; i++) out.add((start + i) % Math.max(1, n));
-        return out;
     }
 }

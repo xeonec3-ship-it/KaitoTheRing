@@ -1,0 +1,53 @@
+{
+ "comment": "T27: нити ревности оплетают печать «Реплики». Ставить на печати Реплики: +0.06 (scale 4.5), +2.42 (3.4), +4.82 (4.8).",
+ "size": 1.0,
+ "color": "#E3262F",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": 0.006,
+   "brightness": 0.35,
+   "appear": {
+    "delay": 0,
+    "duration": 6,
+    "easing": "easeOutCubic",
+    "modes": [
+     "fade"
+    ]
+   }
+  },
+  {
+   "id": "web",
+   "type": "disc",
+   "texture": "irina_replica_web",
+   "radius": 1.0,
+   "heightOffset": 0.012,
+   "brightness": 1.5,
+   "appear": {
+    "delay": 0,
+    "duration": 8,
+    "easing": "easeOutCubic",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": -4
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "shatter",
+   "fade"
+  ],
+  "duration": 10
+ }
+}

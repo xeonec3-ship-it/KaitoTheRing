@@ -564,12 +564,14 @@ def main(gmod, args):
     import aris_anims_def as D
     D.G, D.AN = G, sys.modules[__name__]
     anims = D.all_anims(rig)
+    import gen_replica_break as RB          # «Реплика»: animation.aris.replica_break + fx/печати
     G.write_json('animations/entity/aris.animation.json',
-                 {'format_version': '1.8.0', 'animations': {a.name: a.to_json() for a in anims}}, compact=True)
+                 {'format_version': '1.8.0', 'animations': RB.add_anims('aris', {a.name: a.to_json() for a in anims})}, compact=True)
     print('aris: костей %d, кубов %d, атлас %s, молот-предмет %d брусков, анимаций %d'
           % (len(m.bones), sum(len(b.cubes) for b in m.bones.values()), m.tex_px, nel, len(anims)))
     import gen_aris_fx as FX
     FX.run(G, sys.modules[__name__], args, anims)
+    RB.run_assets(('aris',))
     import aris_render as R
     if '--html' in args:
         R.write_html()

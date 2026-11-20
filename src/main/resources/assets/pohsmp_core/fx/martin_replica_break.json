@@ -1,0 +1,257 @@
+{
+ "comment": "T29 Мартин ломает «Дезинтеграцию: Реплику» (caster = Мартин ×2, анимация martin_replica_break 2.2 с). 8 (block) — Реплику принимает на поднятый щит: лязг, сноп искр (призрачные солдаты — martin_soldier_brace в этот же тик); 17 (slash) — первый косой удар, по печатям Реплики бежит разрез; 26 (break) — второй крест-накрест: код Fx.stop экземпляра Реплики, печати раскалываются по разрезам и гаснут.",
+ "style": "martin",
+ "duration": 54,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster+-0.9,3.9,0.8",
+   "duration": 8,
+   "size": 2.6,
+   "rays": 10,
+   "color": "#FFF1C4",
+   "comment": "block: Реплика принята на щит — лязг"
+  },
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster+-0.9,3.9,0.8",
+   "duration": 6,
+   "size": 1.4,
+   "color": "#FF1934"
+  },
+  {
+   "type": "sprites",
+   "delay": 8,
+   "at": "caster+-0.9,3.9,0.8",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 80,
+   "rate": 45,
+   "spread": 0.4,
+   "speed": 0.34,
+   "gravity": 0.08,
+   "size": [
+    0.18,
+    0.04
+   ],
+   "life": 16,
+   "color": "#FFE6A0",
+   "glow": 0.7,
+   "comment": "сноп искр от щита"
+  },
+  {
+   "type": "slash",
+   "delay": 17,
+   "at": "caster+0,3.4,1",
+   "radius": 5.4,
+   "arc": 150,
+   "thickness": 0.55,
+   "bend": 1,
+   "tilt": 55,
+   "dir": 1,
+   "grow": 4,
+   "life": 12,
+   "secondary": 0.6,
+   "color": "@secondary",
+   "comment": "slash: первый косой удар справа сверху"
+  },
+  {
+   "type": "slash",
+   "delay": 26,
+   "at": "caster+0,3.4,1",
+   "radius": 5.4,
+   "arc": 150,
+   "thickness": 0.55,
+   "bend": 1,
+   "tilt": -55,
+   "dir": -1,
+   "grow": 4,
+   "life": 12,
+   "secondary": 0.6,
+   "color": "@secondary",
+   "comment": "break: второй — крест-накрест"
+  },
+  {
+   "type": "flash",
+   "delay": 26,
+   "at": "caster+0,2.42,0",
+   "duration": 10,
+   "size": 3.4,
+   "rays": 10,
+   "color": "#FF1934"
+  },
+  {
+   "type": "sigil",
+   "delay": 18,
+   "at": "caster+0,0.06,0",
+   "id": "martin_replica_cut_a",
+   "scale": 4.5,
+   "until": 30
+  },
+  {
+   "type": "sigil",
+   "delay": 27,
+   "at": "caster+0,0.06,0",
+   "id": "martin_replica_cut_b",
+   "scale": 4.5,
+   "until": 29,
+   "comment": "второй разрез раскалывает печать field"
+  },
+  {
+   "type": "sprites",
+   "delay": 27,
+   "at": "caster+0,0.06,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 46,
+   "rate": 18,
+   "area": 4.5,
+   "speed": 0.06,
+   "gravity": 0.05,
+   "spin": 90,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 24,
+   "color": "#FF1934",
+   "glow": 0.6,
+   "comment": "осколки печати гаснут"
+  },
+  {
+   "type": "sprites",
+   "delay": 18,
+   "at": "caster+0,0.06,0",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 20,
+   "rate": 12,
+   "area": 3.6,
+   "speed": 0.05,
+   "gravity": 0.04,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 14,
+   "color": "#FFF1C4",
+   "glow": 0.6
+  },
+  {
+   "type": "sigil",
+   "delay": 18,
+   "at": "caster+0,2.42,0",
+   "id": "martin_replica_cut_a",
+   "scale": 3.4,
+   "until": 30
+  },
+  {
+   "type": "sigil",
+   "delay": 27,
+   "at": "caster+0,2.42,0",
+   "id": "martin_replica_cut_b",
+   "scale": 3.4,
+   "until": 29,
+   "comment": "второй разрез раскалывает печать tier"
+  },
+  {
+   "type": "sprites",
+   "delay": 27,
+   "at": "caster+0,2.42,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 46,
+   "rate": 18,
+   "area": 3.4,
+   "speed": 0.06,
+   "gravity": 0.05,
+   "spin": 90,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 24,
+   "color": "#FF1934",
+   "glow": 0.6,
+   "comment": "осколки печати гаснут"
+  },
+  {
+   "type": "sprites",
+   "delay": 18,
+   "at": "caster+0,2.42,0",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 20,
+   "rate": 12,
+   "area": 2.72,
+   "speed": 0.05,
+   "gravity": 0.04,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 14,
+   "color": "#FFF1C4",
+   "glow": 0.6
+  },
+  {
+   "type": "sigil",
+   "delay": 18,
+   "at": "caster+0,4.82,0",
+   "id": "martin_replica_cut_a",
+   "scale": 4.8,
+   "until": 30
+  },
+  {
+   "type": "sigil",
+   "delay": 27,
+   "at": "caster+0,4.82,0",
+   "id": "martin_replica_cut_b",
+   "scale": 4.8,
+   "until": 29,
+   "comment": "второй разрез раскалывает печать top"
+  },
+  {
+   "type": "sprites",
+   "delay": 27,
+   "at": "caster+0,4.82,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 46,
+   "rate": 18,
+   "area": 4.8,
+   "speed": 0.06,
+   "gravity": 0.05,
+   "spin": 90,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 24,
+   "color": "#FF1934",
+   "glow": 0.6,
+   "comment": "осколки печати гаснут"
+  },
+  {
+   "type": "sprites",
+   "delay": 18,
+   "at": "caster+0,4.82,0",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 20,
+   "rate": 12,
+   "area": 3.84,
+   "speed": 0.05,
+   "gravity": 0.04,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 14,
+   "color": "#FFF1C4",
+   "glow": 0.6
+  }
+ ]
+}

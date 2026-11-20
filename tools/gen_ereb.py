@@ -809,6 +809,8 @@ def main():
     if '--no-fx' not in args:
         import gen_ereb_fx as FX
         FX.run(sys.modules[__name__], args)
+        import gen_replica_break as RB
+        RB.run_assets(('ereb',))
     print('\n'.join('  ' + w for w in WRITTEN))
 
 

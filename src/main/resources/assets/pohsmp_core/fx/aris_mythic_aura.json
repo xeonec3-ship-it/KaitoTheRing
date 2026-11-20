@@ -1,0 +1,60 @@
+{
+ "comment": "Фаза 3: раскалённая броня (caster = Арис, follow, до Fx.stop): марево, капли металла, искры. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.16,
+   "pulse": [
+    0.2,
+    10
+   ],
+   "color": "@secondary",
+   "motes": 24,
+   "texture": "mote_flame"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.5,
+   "spread": 0.7,
+   "speed": 0.03,
+   "gravity": 0.02,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 14,
+   "color": "@core",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.6,0",
+   "follow": true,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.15,
+   "spread": 0.5,
+   "speed": 0.0,
+   "gravity": 0.03,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "comment": "капли раскалённого металла"
+  }
+ ]
+}

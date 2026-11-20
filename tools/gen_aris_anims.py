@@ -363,7 +363,7 @@ def secondary(rig, poses, times, loop, wind=0.0):
             # набедренники и задняя пластина
             for side in ('right', 'left'):
                 lr = np.asarray(pose.get(side + '_leg', {}).get('rot', (0, 0, 0)), float)
-                a = 0.85 * max(0.0, lr[0]) + 0.2 * min(0.0, lr[0])
+                a = min(32.0, 0.8 * max(0.0, lr[0])) + 0.2 * min(0.0, lr[0])     # юбка идёт за бедром, но свисает (на колене — не торчит)
                 pose['tasset_' + side[0]] = {'rot': (a, 0, (1 if side == 'right' else -1) * max(0.0, abs(lr[2]) * 0.6))}
             back = min(0.0, *(float(pose.get(s + '_leg', {}).get('rot', (0, 0, 0))[0]) for s in ('right', 'left')))
             pose['fauld_b'] = {'rot': (0.7 * back, 0, 0)}

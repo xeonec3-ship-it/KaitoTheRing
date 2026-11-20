@@ -1,0 +1,34 @@
+{
+ "comment": "Парящий клинок её ковки (фаза 2): caster = сущность-клинок, follow; yaw/pitch — по направлению полёта (MeshDraw: pitch наклоняет ось +z). Меш aris_blade_sword + бирюзовый ореол, искры с кромки. До Fx.stop. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "aris_blade_sword",
+   "follow": true,
+   "comment": "yaw/pitch — из ctx (код передаёт направление полёта)"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.4,
+   "spread": 0.3,
+   "speed": 0.01,
+   "gravity": 0.01,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 10,
+   "color": "@primary",
+   "glow": 0.8
+  }
+ ]
+}

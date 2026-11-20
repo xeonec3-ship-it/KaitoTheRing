@@ -1,0 +1,94 @@
+{
+ "comment": "Призыв клинков (фаза 2, событие cast анимации cast): caster = точка над Арис (+3 бл.), где куются клинки; 3 вспышки-удара (молот невидим), на 20/26/32 тике код ставит клинки (3 шт., по кругу r2). Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0,0",
+   "id": "aris_emblem"
+  },
+  {
+   "type": "flash",
+   "delay": 20,
+   "at": "caster+2,0,0",
+   "duration": 8,
+   "size": 1.4,
+   "color": "@core"
+  },
+  {
+   "type": "flash",
+   "delay": 26,
+   "at": "caster+-0.99,0,1.74",
+   "duration": 8,
+   "size": 1.4,
+   "color": "@core"
+  },
+  {
+   "type": "flash",
+   "delay": 32,
+   "at": "caster+-1.02,0,-1.72",
+   "duration": 8,
+   "size": 1.4,
+   "color": "@core"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+2,0,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 26,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 26,
+   "at": "caster+-0.99,0,1.74",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 26,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 32,
+   "at": "caster+-1.02,0,-1.72",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 26,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.3,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  }
+ ]
+}

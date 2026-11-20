@@ -52,7 +52,7 @@ def carry(bob=0.0):
 
 def planted():
     """Молот стоит головой вниз (как кость hammer_ground в покое): хват в мире, d вниз, боёк вдоль x."""
-    g = np.array(G.HG_PIVOT) + np.array(G.hg_local((0, G.HAM_GRIP, 0)))
+    g = G.hg_world_rest((0, G.HAM_GRIP, 0))
     return (g, (0, -1, 0), (1, 0, 0))
 
 
@@ -118,7 +118,7 @@ def swing(rig):
     gd = guard()
     k = [
         K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
-        K(0.45, 'io', **S(ham=((10.0, 18.0, 4.0), (0.55, 0.25, 0.8), (0.75, 0, -0.6)), lh=1, body=(0, -38, 0), torso=(0, -14, 0), head=(0, 30, 0),
+        K(0.45, 'io', **S(ham=((7.0, 18.0, 1.0), (0.55, 0.25, 0.8), (0.75, 0, -0.6)), lh=1, body=(0, -38, 0), torso=(0, -14, 0), head=(0, 30, 0),
                            right_leg=(-12, 0, 12), left_leg=(18, 0, -8), right_shin=(-10, 0, 0), left_shin=(-10, 0, 0), bpos=(0, -1.2, 0),
                            rpole=(0.6, -0.6, 0.5), lpole=(-0.3, -0.7, 0.6))),
         K(0.62, 'in3', **S(ham=((2.0, 16.0, -9.5), (-0.15, 0.08, -0.99), (-1, 0, 0)), lh=1, body=(-6, 6, 0), torso=(0, 6, 0), head=(0, -4, 0),
@@ -149,7 +149,7 @@ def forge(rig):
     """Особое «Горн» (4.0 с): три ритмичных удара по земле (1.0, 1.8, 2.6 — strike), на 3.3 — кулак к небу (ignite)."""
     gd = guard()
     d_imp = (0.0, -0.5, -0.86)
-    hit = lambda y: (AN.ham_from_strike((1.0, y, -18.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    hit = lambda y: (AN.ham_from_strike((1.0, y, -16.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
     up = ((2.0, 25.0, -3.0), (0.0, 0.85, -0.5), (0, 0.5, -0.86))
     low = dict(body=(-18, 0, 0), torso=(-6, 0, 0), head=(12, 0, 0), bpos=(0, -2.2, -0.6), right_leg=(-8, 0, 10), left_leg=(40, 0, -8),
                right_shin=(-20, 0, 0), left_shin=(-40, 0, 0))
@@ -176,7 +176,7 @@ def last_blow(rig):
     удар 4.0 (blow) — глубокий присед, молот в земле; 4.0–5.0 держит."""
     gd = guard()
     wide = dict(right_leg=(-14, 0, 16), left_leg=(18, 0, -16), right_shin=(-12, 0, 0), left_shin=(-18, 0, 0))
-    over = ((1.0, 33.0, 2.5), (0.0, 0.25, 0.97), (0, 1, 0))
+    over = ((1.0, 31.0, 1.5), (0.0, 0.25, 0.97), (0, 1, 0))
     d_imp = (0.0, -0.3, -0.95)
     imp = (AN.ham_from_strike((0.5, 0.0, -21.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
     k = [K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
@@ -332,8 +332,8 @@ def npc_stand(rig):
 def npc_sit(rig):
     """Мирный NPC: сидит на голове лежащего молота (молот на земле под ней), локоть на колене, голова чуть набок."""
     # куда положить hammer_ground, чтобы центр головы оказался под ней (0, 3.4, 1.0); рукоять уходит вправо-вперёд
-    R = AN.euler((95, 60, 0))
-    head_rest = np.array(G.hg_local((0, G.HAM_HEAD, 0)))
+    R = AN.euler((G.HG_REST[0] + 95, 60, 0))
+    head_rest = G.hg_offset((0, G.HAM_HEAD, 0))
     want = np.array([0.0, 3.4, 1.0])
     pos = want - (np.array(G.HG_PIVOT) + R @ head_rest)
     hg = {'rot': (95, 60, 0), 'pos': tuple(pos)}

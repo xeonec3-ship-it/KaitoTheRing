@@ -731,5 +731,165 @@
         "volume": 0.6
       }
     ]
+  },
+  "aris.spawn": {
+    "subtitle": "subtitles.pohsmp_core.aris.spawn",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/land",
+        "pitch": 0.5,
+        "volume": 1.4
+      },
+      {
+        "name": "minecraft:block/lava/pop",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "aris.slam": {
+    "subtitle": "subtitles.pohsmp_core.aris.slam",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/land",
+        "pitch": 0.6,
+        "volume": 1.2
+      },
+      {
+        "name": "minecraft:block/anvil/land",
+        "pitch": 0.7,
+        "volume": 1.2
+      }
+    ]
+  },
+  "aris.swing": {
+    "subtitle": "subtitles.pohsmp_core.aris.swing",
+    "sounds": [
+      {
+        "name": "minecraft:entity/player/attack/sweep1",
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:entity/player/attack/sweep2",
+        "pitch": 0.55
+      }
+    ]
+  },
+  "aris.anvil": {
+    "subtitle": "subtitles.pohsmp_core.aris.anvil",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/place",
+        "pitch": 0.7
+      },
+      {
+        "name": "minecraft:block/anvil/place",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "aris.blade": {
+    "subtitle": "subtitles.pohsmp_core.aris.blade",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/use",
+        "pitch": 1.3
+      },
+      {
+        "name": "minecraft:block/smithing_table/smithing_table1",
+        "pitch": 1.1
+      }
+    ]
+  },
+  "aris.blade_break": {
+    "subtitle": "subtitles.pohsmp_core.aris.blade_break",
+    "sounds": [
+      {
+        "name": "minecraft:random/break",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:block/anvil/break",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "aris.forge": {
+    "subtitle": "subtitles.pohsmp_core.aris.forge",
+    "sounds": [
+      {
+        "name": "minecraft:block/fire/ignite",
+        "pitch": 0.5,
+        "volume": 1.4
+      },
+      {
+        "name": "minecraft:item/firecharge/use",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "aris.last_blow": {
+    "subtitle": "subtitles.pohsmp_core.aris.last_blow",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/land",
+        "pitch": 0.4,
+        "volume": 2.0
+      }
+    ]
+  },
+  "aris.phase": {
+    "subtitle": "subtitles.pohsmp_core.aris.phase",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/use",
+        "pitch": 0.6,
+        "volume": 1.3
+      }
+    ]
+  },
+  "aris.reforge": {
+    "subtitle": "subtitles.pohsmp_core.aris.reforge",
+    "sounds": [
+      {
+        "name": "minecraft:block/smithing_table/smithing_table2",
+        "pitch": 0.7
+      },
+      {
+        "name": "minecraft:block/anvil/use",
+        "pitch": 0.9
+      }
+    ]
+  },
+  "aris.surrender": {
+    "subtitle": "subtitles.pohsmp_core.aris.surrender",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/destroy",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "aris.hammer_drop": {
+    "subtitle": "subtitles.pohsmp_core.aris.hammer_drop",
+    "sounds": [
+      {
+        "name": "minecraft:block/anvil/fall",
+        "pitch": 0.6,
+        "volume": 1.3
+      }
+    ]
+  },
+  "music.aris": {
+    "category": "record",
+    "subtitle": "subtitles.pohsmp_core.music.aris",
+    "comment": "ЗАГЛУШКА до трека владельца (тишина-тон наковальни). Трек — pohsmp_core:music/aris (stream).",
+    "sounds": [
+      {
+        "name": "minecraft:music/game/creative/creative1",
+        "stream": true,
+        "volume": 0.4,
+        "pitch": 0.8
+      }
+    ]
   }
 }

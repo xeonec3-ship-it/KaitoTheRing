@@ -1,0 +1,203 @@
+{
+ "comment": "Особое «Последний удар молота» (≈10% ХП, с роликом; анимация last_blow 5.0 с, событие blow 4.0 с). caster = центр арены, не follow. 0–70 тиков (3.5 с) — ПРЕДУПРЕЖДЕНИЕ: прицел r14 прорисовывается, клинья сходятся; над центром на высоте 20 проявляется исполинский призрачный молот (меш aris_giant_hammer, ×8). 70–80 — молот падает (move.keys 20 → 0 бл.). 80 тиков (= blow) — УДАР: урон кодом всем в r14 (больше в центре), вспышка на экран, волна r30, кратер остывает 6 с. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "id": "aris_target"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 200,
+   "radius": 34,
+   "color": "#062A30",
+   "strength": 0.3,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 60,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster+0,0,0",
+   "model": "aris_giant_hammer",
+   "follow": false,
+   "until": 94,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       20,
+       0
+      ],
+      "linear"
+     ],
+     [
+      70,
+      [
+       0,
+       18,
+       0
+      ],
+      "easeOutSine"
+     ],
+     [
+      80,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   },
+   "comment": "висит над центром, медленно опускается, на 70–80 рушится; collapse после until"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,18,0",
+   "duration": 50,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 1.2,
+   "area": 4,
+   "speed": 0.0,
+   "gravity": 0.04,
+   "size": [
+    0.2,
+    0.03
+   ],
+   "life": 30,
+   "color": "@primary",
+   "glow": 0.9,
+   "comment": "искры осыпаются с молота"
+  },
+  {
+   "type": "flash",
+   "delay": 80,
+   "at": "caster+0,1,0",
+   "duration": 18,
+   "size": 10,
+   "rays": 16,
+   "screen": 0.45,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "flash",
+   "delay": 80,
+   "at": "caster+0,0.6,0",
+   "duration": 10,
+   "size": 7.800000000000001,
+   "rays": 10,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 80,
+   "at": "caster",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 30,
+   "thickness": 4.800000000000001,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary",
+   "comment": "волна раскалённого металла"
+  },
+  {
+   "type": "decal",
+   "delay": 80,
+   "at": "caster",
+   "duration": 120,
+   "texture": "aris_molten_floor",
+   "radius": 6.6000000000000005,
+   "glow": 0.8,
+   "fadeOut": 80,
+   "color": "@secondary",
+   "brightness": 1.2,
+   "comment": "раскалённая вмятина остывает 4 с"
+  },
+  {
+   "type": "sprites",
+   "delay": 80,
+   "at": "caster+0,0.3,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 180,
+   "rate": 45,
+   "spread": 0.6,
+   "speed": 1.35,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 22,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 80,
+   "at": "caster+0,0.2,0",
+   "duration": 6,
+   "texture": "mote_ash",
+   "count": 72,
+   "rate": 6,
+   "spread": 3.5999999999999996,
+   "speed": 0.08,
+   "gravity": -0.004,
+   "spin": 40,
+   "size": [
+    0.6,
+    0.2
+   ],
+   "life": 30,
+   "color": "#60606C",
+   "blend": "translucent",
+   "comment": "пыль/окалина"
+  },
+  {
+   "type": "decal",
+   "delay": 80,
+   "at": "caster",
+   "duration": 120,
+   "texture": "higher_cracks",
+   "radius": 14,
+   "glow": 1.0,
+   "fadeOut": 80,
+   "color": "@secondary",
+   "comment": "кратер"
+  },
+  {
+   "type": "column",
+   "delay": 80,
+   "at": "caster",
+   "duration": 30,
+   "radius": 3,
+   "height": 14,
+   "fill": 0.6,
+   "color": "@primary",
+   "out": {
+    "duration": 20,
+    "easing": "easeInSine"
+   }
+  }
+ ]
+}

@@ -1,0 +1,82 @@
+{
+ "comment": "Наковальня-препятствие вырастает из земли (фаза 1): caster = место, yaw — поворот. 0–12 тиков растёт (меш aris_anvil), пыль и искры; держится до Fx.stop (код: 8 с) — тогда разборка 10 тиков и fx aris_anvil_break. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "aris_anvil",
+   "follow": false
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 40,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "glow": 0.6,
+   "fadeOut": 20,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.1,0",
+   "duration": 10,
+   "texture": "mote_ash",
+   "count": 30,
+   "rate": 4,
+   "spread": 1.2,
+   "speed": 0.06,
+   "gravity": -0.003,
+   "spin": 40,
+   "size": [
+    0.5,
+    0.15
+   ],
+   "life": 24,
+   "color": "#60606C",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,1.55,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 16,
+   "at": "caster+0,1.6,0",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.15,
+   "area": 0.7,
+   "speed": 0.01,
+   "gravity": -0.015,
+   "size": [
+    0.15,
+    0.03
+   ],
+   "life": 20,
+   "color": "@secondary",
+   "comment": "жар над раскалённой поверхностью"
+  }
+ ]
+}

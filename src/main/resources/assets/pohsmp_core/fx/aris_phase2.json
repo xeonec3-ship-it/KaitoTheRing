@@ -1,0 +1,122 @@
+{
+ "comment": "Переход в фазу 2 «Оружейная» (66% ХП, анимация phase2: оборот и удар в 1.0 с): caster = Арис, follow. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 50,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.2,
+   "pulse": [
+    0.3,
+    4
+   ],
+   "color": "@primary",
+   "motes": 24
+  },
+  {
+   "type": "vortex",
+   "delay": 4,
+   "at": "caster",
+   "duration": 16,
+   "radius": 2.6,
+   "height": 2.2,
+   "arms": 3,
+   "speed": 12,
+   "texture": "spark_soft",
+   "color": "@primary",
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "comment": "оборот с молотом"
+  },
+  {
+   "type": "flash",
+   "delay": 20,
+   "at": "caster+0,0,-1.3+0,0.6,0",
+   "duration": 10,
+   "size": 3.3800000000000003,
+   "rays": 10,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 20,
+   "at": "caster+0,0,-1.3",
+   "duration": 22,
+   "shape": "ring",
+   "radius": 14,
+   "thickness": 2.08,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary",
+   "comment": "волна раскалённого металла"
+  },
+  {
+   "type": "decal",
+   "delay": 20,
+   "at": "caster+0,0,-1.3",
+   "duration": 120,
+   "texture": "aris_molten_floor",
+   "radius": 2.8600000000000003,
+   "glow": 0.8,
+   "fadeOut": 80,
+   "color": "@secondary",
+   "brightness": 1.2,
+   "comment": "раскалённая вмятина остывает 4 с"
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,0,-1.3+0,0.3,0",
+   "duration": 4,
+   "texture": "spark_soft",
+   "count": 78,
+   "rate": 19,
+   "spread": 0.6,
+   "speed": 0.5850000000000001,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 22,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 20,
+   "at": "caster+0,0,-1.3+0,0.2,0",
+   "duration": 6,
+   "texture": "mote_ash",
+   "count": 31,
+   "rate": 6,
+   "spread": 1.56,
+   "speed": 0.08,
+   "gravity": -0.004,
+   "spin": 40,
+   "size": [
+    0.6,
+    0.2
+   ],
+   "life": 30,
+   "color": "#60606C",
+   "blend": "translucent",
+   "comment": "пыль/окалина"
+  },
+  {
+   "type": "sigil",
+   "delay": 20,
+   "at": "caster+0,0.04,0",
+   "id": "aris_emblem",
+   "follow": true
+  }
+ ]
+}

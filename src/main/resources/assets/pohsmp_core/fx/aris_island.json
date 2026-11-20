@@ -1,0 +1,33 @@
+{
+ "comment": "Островок «Горна» (caster = точка, не follow): холодный камень r2.2 — печать aris_island, пар по кругу. 300 тиков. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 300,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.06,0",
+   "id": "aris_island"
+  },
+  {
+   "type": "sprites",
+   "delay": 60,
+   "at": "caster+0,0.1,0",
+   "duration": 200,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 0.4,
+   "area": 2.2,
+   "speed": 0.0,
+   "gravity": -0.01,
+   "size": [
+    0.6,
+    0.2
+   ],
+   "life": 30,
+   "color": "#C8D8DC",
+   "blend": "translucent",
+   "comment": "пар"
+  }
+ ]
+}

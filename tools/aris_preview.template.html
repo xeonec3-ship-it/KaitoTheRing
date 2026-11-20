@@ -42,6 +42,14 @@ function facePoint(f, x0, y0, z0, x1, y1, z1, s, t) {
   }
 }
 const NORM = { north: [0, 0, -1], south: [0, 0, 1], east: [1, 0, 0], west: [-1, 0, 0], up: [0, 1, 0], down: [0, -1, 0] };
+function boxFaces(c) {
+  const [u, v] = c.uv, [w, h, d] = c.size.map(x => Math.floor(x + 1e-6) || x);
+  const f = { east: { uv: [u, v + d], uv_size: [d, h] }, north: { uv: [u + d, v + d], uv_size: [w, h] },
+    west: { uv: [u + d + w, v + d], uv_size: [d, h] }, south: { uv: [u + 2 * d + w, v + d], uv_size: [w, h] },
+    up: { uv: [u + d + w, v + d], uv_size: [-w, -d] }, down: { uv: [u + d + 2 * w, v], uv_size: [-w, d] } };
+  if (c.mirror) { const e = f.east; f.east = f.west; f.west = e; for (const k in f) { f[k].uv = [f[k].uv[0] + f[k].uv_size[0], f[k].uv[1]]; f[k].uv_size = [-f[k].uv_size[0], f[k].uv_size[1]]; } }
+  return f;
+}
 const TEXC = {};
 function loadTex(src) {
   if (TEXC[src]) return TEXC[src];
@@ -67,7 +75,8 @@ function buildModel(entry, variant) {
     grp.userData = { piv, rest: [-r[0], -r[1], r[2]].map(v => v * Math.PI / 180), parent: b.parent };
     bones[b.name] = grp;
     for (const c of (b.cubes || [])) {
-      const faces = c.uv;
+      if (!Array.isArray(c.uv) && Object.keys(c.uv || {}).length === 0) continue;
+      const faces = Array.isArray(c.uv) ? boxFaces(c) : c.uv;
       const inf = c.inflate || 0;
       const x0 = -(c.origin[0] + c.size[0]) - inf, x1 = -c.origin[0] + inf;
       const y0 = c.origin[1] - inf, y1 = c.origin[1] + c.size[1] + inf;
@@ -223,6 +232,10 @@ function setupCell(c) {
     pose(m, c.anim ? DATA.anims[c.anim] : null, c.t || 0, c.hide);
     if (c.noGlow) m.root.traverse(o => { if (o.userData.glow) o.visible = false; });
     group.add(m.root);
+  }
+  for (const o of (c.also || [])) {
+    const e2 = DATA.models[o.model]; const m2 = buildModel(e2, o.variant || 'base');
+    pose(m2, o.anim ? DATA.anims[o.anim] : null, o.t || 0, o.hide); m2.root.position.set(o.x || 0, 0, o.z || 0); group.add(m2.root);
   }
   if (c.item) { const it = buildItem(DATA.items[c.item]); it.rotation.set(...(c.itemRot || [0, 0, 0]).map(v => v * Math.PI / 180)); it.scale.setScalar(c.itemScale || 1); group.add(it); h = c.h || 34; }
   for (const ms of (c.meshes || [])) {

@@ -1,0 +1,146 @@
+{
+ "comment": "Сдача (анимация surrender, 5 с; caster = Арис, не follow): 0.4 с — пошатнулась (искры); 1.2 с — молот в землю (пыль, трещины); 2.0–2.6 с — рога гаснут: бирюзовые искры поднимаются с рогов и тают; 3.2 с — молот падает (глухой удар, пыль); 3.6 с — фраза. Жар и бирюза уходят из мира. Сгенерировано tools/gen_aris.py.",
+ "style": "aris",
+ "duration": 100,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 8,
+   "at": "caster+0,1.4,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 20,
+   "rate": 6,
+   "spread": 0.6,
+   "speed": 0.2,
+   "gravity": 0.03,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 12,
+   "color": "@primary",
+   "glow": 0.9
+  },
+  {
+   "type": "decal",
+   "delay": 24,
+   "at": "caster+0.62,0,-0.19",
+   "duration": 76,
+   "texture": "higher_cracks",
+   "radius": 1.2,
+   "glow": 0.2,
+   "fadeOut": 40,
+   "color": "#60606C"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+0.62,0.1,-0.19",
+   "duration": 5,
+   "texture": "mote_ash",
+   "count": 16,
+   "rate": 4,
+   "spread": 0.6,
+   "speed": 0.05,
+   "gravity": -0.003,
+   "spin": 40,
+   "size": [
+    0.5,
+    0.15
+   ],
+   "life": 26,
+   "color": "#60606C",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 40,
+   "at": "caster+0,2.6,0",
+   "duration": 14,
+   "texture": "spark_soft",
+   "count": 60,
+   "rate": 5,
+   "spread": 0.5,
+   "speed": 0.03,
+   "gravity": -0.02,
+   "size": [
+    0.14,
+    0.0
+   ],
+   "life": 30,
+   "color": "@primary",
+   "glow": 0.9,
+   "comment": "бирюза уходит с рогов"
+  },
+  {
+   "type": "sprites",
+   "delay": 52,
+   "at": "caster+0,2.6,0",
+   "duration": 6,
+   "texture": "mote_ash",
+   "count": 10,
+   "rate": 2,
+   "spread": 0.4,
+   "speed": 0.02,
+   "gravity": -0.01,
+   "size": [
+    0.5,
+    0.2
+   ],
+   "life": 30,
+   "color": "#9AA8AC",
+   "blend": "translucent",
+   "comment": "дымок, рога погасли"
+  },
+  {
+   "type": "sprites",
+   "delay": 64,
+   "at": "caster+1,0.2,-0.6",
+   "duration": 5,
+   "texture": "mote_ash",
+   "count": 24,
+   "rate": 6,
+   "spread": 1.0,
+   "speed": 0.06,
+   "gravity": -0.004,
+   "spin": 40,
+   "size": [
+    0.6,
+    0.2
+   ],
+   "life": 30,
+   "color": "#60606C",
+   "blend": "translucent",
+   "comment": "молот упал"
+  },
+  {
+   "type": "wave",
+   "delay": 64,
+   "at": "caster+1,0,-0.6",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 2.5,
+   "thickness": 0.4,
+   "followTerrain": true,
+   "color": "#A9A9B4"
+  },
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100,
+   "radius": 30,
+   "color": "#0A1416",
+   "strength": 0.18,
+   "in": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 40,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

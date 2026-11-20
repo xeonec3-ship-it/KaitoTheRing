@@ -1,0 +1,88 @@
+{
+ "comment": "T28 «Горн»: обод горна r24 по краю арены (кладка, знаки ковки, колосник). 0–60 тиков прорисовывается (предупреждение), дальше держится до конца эффекта. Сгенерировано tools/gen_aris.py.",
+ "size": 24,
+ "color": "#F4A852",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "glow",
+   "type": "disc",
+   "texture": "glow",
+   "radius": 1.0,
+   "heightOffset": -0.02,
+   "color": "#A8502A",
+   "brightness": 0.4,
+   "appear": {
+    "delay": 0,
+    "duration": 60,
+    "easing": "easeInSine",
+    "modes": [
+     "fade"
+    ]
+   },
+   "pulse": {
+    "amp": 0.12,
+    "period": 24
+   }
+  },
+  {
+   "id": "ring",
+   "type": "disc",
+   "texture": "aris_forge_ring",
+   "radius": 1.0,
+   "heightOffset": 0.0,
+   "appear": {
+    "delay": 0,
+    "duration": 56,
+    "easing": "easeInOutSine",
+    "modes": [
+     "draw"
+    ],
+    "startAngle": 90
+   },
+   "rotation": {
+    "speed": 0.15
+   }
+  },
+  {
+   "id": "words",
+   "type": "text",
+   "radius": 0.75,
+   "heightOffset": 0.01,
+   "color": "#FFD490",
+   "brightness": 0.9,
+   "appear": {
+    "delay": 10,
+    "duration": 40,
+    "easing": "linear",
+    "modes": [
+     "draw"
+    ]
+   },
+   "rotation": {
+    "speed": -0.3
+   },
+   "text": "ГОРН АРИС ✦ МЕТАЛЛ ПЛАВИТСЯ ✦ ИЩИ ХОЛОДНЫЙ КАМЕНЬ ✦ ",
+   "font": "cyrillic",
+   "size": 0.045,
+   "repeat": 2,
+   "side": "outer"
+  }
+ ],
+ "formedFlash": {
+  "color": "#FFD490",
+  "size": 1.05,
+  "duration": 14,
+  "sparks": 160
+ },
+ "dissolve": {
+  "modes": [
+   "fade",
+   "collapse"
+  ],
+  "duration": 16,
+  "stagger": 2
+ }
+}

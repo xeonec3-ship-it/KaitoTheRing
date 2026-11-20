@@ -664,6 +664,7 @@
   "subtitles.pohsmp_core.cult_leader.ash": "Cult Leader turns to ash",
   "subtitles.pohsmp_core.cult_leader.ash_slash": "Fiery slash",
   "subtitles.pohsmp_core.cult_leader.replica_break": "Replica seals shattered",
+  "subtitles.pohsmp_core.irina.replica_break": "Replica seals torn by threads",
   "subtitles.pohsmp_core.cult_leader.finisher": "Scythe impales",
   "ui.pohsmp_core.cult_leader.epithet": "Head of the Cult of Mellisto",
   "entity.pohsmp_core.irina": "Irina, Witch of Jealousy",
@@ -696,6 +697,7 @@
   "effect.pohsmp_core.stolen_happiness": "Stolen Happiness",
   "effect.pohsmp_core.stolen_happiness.description": "Irina took your beneficial effects for herself.",
   "death.attack.pohsmp_core.irina_finisher": "%1$s now belongs to Irina, Witch of Jealousy alone",
+  "death.attack.pohsmp_core.aris_finisher": "%1$s was reforged by Aris, the Mythic Smith",
   "death.attack.pohsmp_core.irina_threads": "%1$s was torn apart by red threads",
   "death.attack.pohsmp_core.irina_cocoon": "%1$s was smothered in a cocoon of jealousy",
   "subtitles.pohsmp_core.irina.spawn": "Threads unravel",
@@ -894,5 +896,9 @@
   "ui.pohsmp_core.boss.unknown": "Boss %s is not implemented yet (or unknown)",
   "ui.pohsmp_core.boss.spawned": "Boss summoned: %s",
   "message.pohsmp_core.no_inscribe": "This magic cannot be written down",
-  "message.pohsmp_core.no_imbue": "This magic cannot be imbued into items"
+  "message.pohsmp_core.no_imbue": "This magic cannot be imbued into items",
+  "entity.pohsmp_core.ereb_reflection": "Ereb, the First Traitor",
+  "entity.pohsmp_core.ereb_shard": "Glass Shard",
+  "entity.pohsmp_core.ereb_dream_point": "Butterfly Dream",
+  "death.attack.pohsmp_core.ereb_finisher": "%1$s trusted Ereb"
 }

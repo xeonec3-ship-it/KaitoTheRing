@@ -313,6 +313,62 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
         fight.startYield();
     }
 
+    // ---------------------------------------------------------------- finisher (framework BossFinisher; ТЗ «Добивание»)
+
+    private Vec3 holdBase;
+    private float holdYaw;
+
+    @Override
+    public int finisherTicks() {
+        return MartinMath.FINISHER;
+    }
+
+    @Override
+    public int finisherKillTick() {
+        return MartinMath.FINISHER_KILL;
+    }
+
+    @Override
+    public String finisherVictimAnim() {
+        return "irons_spellbooks:pohsmp_cult_finisher_victim";   // the shared pose (ТЗ: «общая или своя»)
+    }
+
+    /** Faces the victim, martin_finisher + fx; the victim's own camera on him from 0.2 s. */
+    @Override
+    public void onFinisherStart(ServerPlayer victim) {
+        if (!(level() instanceof ServerLevel sl)) return;
+        holdYaw = yawTo(victim.position());
+        face(holdYaw);
+        holdBase = position();
+        anim("martin_finisher");
+        core.sound("martin.swing", 3, 0.9f);
+        Fx.play(sl, Fx.fx("martin_finisher").caster(this).at(position()).yaw(holdYaw).target(victim));
+        core.play(new BossTimeline("finisher_cam", MartinMath.FINISHER_CAM_FROM + 1)
+                .at(MartinMath.FINISHER_CAM_FROM, () -> core.sceneFor(victim, "martin.finisher", MartinMath.FINISHER_CAM,
+                        BossNet.SCENE_LOCK_INPUT | BossNet.SCENE_NO_HUD, holdBase, holdYaw, victim.getId())));
+    }
+
+    @Override
+    public Vec3 finisherVictimPos(ServerPlayer victim, int t, Vec3 from) {
+        if (holdBase == null) return from;
+        double[] h = MartinMath.finisherHold(t);
+        Vec3 line = holdBase.add(Vec3.directionFromRotation(0, holdYaw).scale(h[1]));
+        Vec3 p = from.lerp(line, h[0]);
+        return new Vec3(p.x, Mth.lerp(h[0], from.y, holdBase.y) + h[2] * h[0], p.z);
+    }
+
+    /** Pierce, the throw to his feet; the soldiers slam their shields on the ground. */
+    @Override
+    public void onFinisherTick(ServerPlayer victim, int t) {
+        if (t == MartinMath.FINISHER_PIERCE) vanilla(SoundEvents.TRIDENT_HIT, 0.7f);
+        if (t == MartinMath.FINISHER_THROW) core.sound("martin.swing", 3, 0.8f);
+        if (t == MartinMath.FINISHER_SLAM) {
+            core.sound(victim.position(), "martin.slam", 3, 1);
+            fight.braceAll(20);
+            vanilla(SoundEvents.SHIELD_BLOCK, 0.6f);
+        }
+    }
+
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика»
 
     /** martin_replica_break 2.4 s: block 0.4, slash 0.9, break 1.35, speak 1.7; the phrase over the helmet (+4.6). */

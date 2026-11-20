@@ -134,9 +134,11 @@ public final class BossConfig {
 
         b.comment("T27 Irina, the Witch of Jealousy").push("irina");
         PER.put("irina", new PerBoss(b, new Body(4400, 8, 0, 1.0, 0.26, 22, 1.4, 1.3, 0.85, -1, -1, 1.3, -1, 24, 500)));
+        ru.pohsmp.core.boss.irina.IrinaConfig.define(b);   // T27 mechanics keys
         b.pop();
         b.comment("T28 Aris, the Mythic Smith").push("aris");
         PER.put("aris", new PerBoss(b, new Body(4400, 18, 3, 1.0, 0.22, 18, 1.3, 1.1, 1.5, 0.85, -1, -1, -1, 24, 500)));
+        ru.pohsmp.core.boss.aris.ArisConfig.define(b);   // T28 mechanics
         b.pop();
         b.comment("T29 Martin, the Last Warlord").push("martin");
         PER.put("martin", new PerBoss(b, new Body(4000, 18, 4, 1.0, 0.23, 20, 1.2, 1.15, -1, -1, 0.9, -1, -1, 24, 500)));
@@ -144,6 +146,7 @@ public final class BossConfig {
         b.pop();
         b.comment("T30 Ereb, the First Traitor").push("ereb");
         PER.put("ereb", new PerBoss(b, new Body(4000, 10, 0, 1.0, 0.28, 10, 1.5, 1.3, -1, -1, 0.85, -1, 1.2, 24, 500)));
+        ru.pohsmp.core.boss.ereb.ErebConfig.define(b);   // T30 mechanics keys
         b.pop();
         SPEC = b.build();
     }

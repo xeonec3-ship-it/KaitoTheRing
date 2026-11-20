@@ -1,0 +1,220 @@
+{
+ "comment": "Одна метка залпа (caster = точка на земле; 3–6 меток вокруг игроков). 0–30 тиков — метка горит красным (1.5 с); с 24 по 34 падают 5 призрачных стрел; урон — код на 30 тике, r1.5.",
+ "style": "martin_ghost",
+ "duration": 60,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 50,
+   "texture": "martin_arrow_mark",
+   "radius": 1.6,
+   "grow": 8,
+   "glow": 0.3,
+   "pulse": 8,
+   "color": "#C22A2C",
+   "fadeOut": 14,
+   "comment": "ПРЕДУПРЕЖДЕНИЕ 1.5 с: сюда упадут стрелы"
+  },
+  {
+   "type": "mesh",
+   "delay": 24,
+   "at": "caster+0,0,0",
+   "model": "martin_arrow",
+   "duration": 16,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       14,
+       0
+      ]
+     ],
+     [
+      6,
+      [
+       0,
+       0.05,
+       0
+      ],
+      "easeInQuad"
+     ]
+    ]
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 25,
+   "at": "caster+0.6,0,-0.4",
+   "model": "martin_arrow",
+   "duration": 16,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       14,
+       0
+      ]
+     ],
+     [
+      6,
+      [
+       0,
+       0.05,
+       0
+      ],
+      "easeInQuad"
+     ]
+    ]
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 26,
+   "at": "caster+-0.5,0,0.5",
+   "model": "martin_arrow",
+   "duration": 16,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       14,
+       0
+      ]
+     ],
+     [
+      6,
+      [
+       0,
+       0.05,
+       0
+      ],
+      "easeInQuad"
+     ]
+    ]
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 27,
+   "at": "caster+0.3,0,0.7",
+   "model": "martin_arrow",
+   "duration": 16,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       14,
+       0
+      ]
+     ],
+     [
+      6,
+      [
+       0,
+       0.05,
+       0
+      ],
+      "easeInQuad"
+     ]
+    ]
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "mesh",
+   "delay": 28,
+   "at": "caster+-0.6,0,-0.5",
+   "model": "martin_arrow",
+   "duration": 16,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       14,
+       0
+      ]
+     ],
+     [
+      6,
+      [
+       0,
+       0.05,
+       0
+      ],
+      "easeInQuad"
+     ]
+    ]
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 30,
+   "at": "caster+0,0.3,0",
+   "duration": 6,
+   "size": 1.4,
+   "color": "#D8F6FF",
+   "ring": true
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,0.2,0",
+   "duration": 3,
+   "texture": "mote_ash",
+   "count": 16,
+   "rate": 6,
+   "area": 1.0,
+   "speed": 0.08,
+   "gravity": 0.004,
+   "size": [
+    0.4,
+    0.8
+   ],
+   "life": 18,
+   "color": "#8A8070",
+   "blend": "translucent"
+  },
+  {
+   "type": "decal",
+   "delay": 30,
+   "at": "caster",
+   "duration": 30,
+   "texture": "higher_cracks",
+   "radius": 1.4,
+   "glow": 0.2,
+   "fadeOut": 20,
+   "color": "#8FD8F0"
+  }
+ ]
+}

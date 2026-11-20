@@ -1484,5 +1484,81 @@
         "volume": 0.6
       }
     ]
+  },
+  "martin.shield_wall": {
+    "subtitle": "subtitles.pohsmp_core.martin.shield_wall",
+    "sounds": [
+      {
+        "name": "minecraft:random/anvil_land",
+        "pitch": 0.5,
+        "volume": 1.2
+      },
+      {
+        "name": "minecraft:item/shield/block5",
+        "pitch": 0.6,
+        "volume": 1.4
+      }
+    ]
+  },
+  "martin.volley": {
+    "subtitle": "subtitles.pohsmp_core.martin.volley",
+    "sounds": [
+      {
+        "name": "minecraft:random/bow",
+        "pitch": 0.7,
+        "volume": 1.4
+      }
+    ]
+  },
+  "martin.arrow_hit": {
+    "subtitle": "subtitles.pohsmp_core.martin.arrow_hit",
+    "sounds": [
+      {
+        "name": "minecraft:random/bowhit1",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:random/bowhit2",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:random/bowhit3",
+        "pitch": 0.8
+      },
+      {
+        "name": "minecraft:random/bowhit4",
+        "pitch": 0.8
+      }
+    ]
+  },
+  "martin.duel": {
+    "subtitle": "subtitles.pohsmp_core.martin.duel",
+    "sounds": [
+      {
+        "name": "minecraft:random/anvil_use",
+        "pitch": 0.7,
+        "volume": 1.2
+      }
+    ]
+  },
+  "martin.warcry": {
+    "subtitle": "subtitles.pohsmp_core.martin.warcry",
+    "sounds": [
+      {
+        "name": "minecraft:mob/ravager/roar1",
+        "pitch": 0.6,
+        "volume": 2.0
+      },
+      {
+        "name": "minecraft:mob/ravager/roar2",
+        "pitch": 0.6,
+        "volume": 2.0
+      },
+      {
+        "name": "minecraft:mob/ravager/roar3",
+        "pitch": 0.6,
+        "volume": 2.0
+      }
+    ]
   }
 }

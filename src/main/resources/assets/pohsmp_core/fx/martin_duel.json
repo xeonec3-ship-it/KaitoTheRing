@@ -1,0 +1,106 @@
+{
+ "comment": "Особое «Вызов на дуэль» (caster = центр кольца — середина между Мартином и выбранным игроком; запуск на challenge = 0.9 с анимации martin_duel; 120 тиков = 6 с или Fx.stop). Кольцо r6: герб-кольцо на земле, золото-красная завеса по краю. Внутри урон только у них двоих (код); чужих кольцо отталкивает — martin_duel_push в точке касания.",
+ "style": "martin",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 120,
+   "texture": "martin_duel_ring",
+   "radius": 6.4,
+   "grow": 10,
+   "glow": 0.35,
+   "pulse": 20,
+   "color": "@primary",
+   "fadeOut": 14
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 6.0,
+   "thickness": 1.0,
+   "followTerrain": true,
+   "color": "@secondary"
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "duration": 120,
+   "radius": [
+    5.9,
+    6.1
+   ],
+   "count": 90,
+   "height": 3.4,
+   "grow": 12,
+   "width": [
+    0.08,
+    0.18
+   ],
+   "brightness": [
+    0.35,
+    0.7
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.3,
+   "color": "@primary",
+   "out": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   },
+   "comment": "стена кольца"
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "duration": 120,
+   "radius": [
+    5.95,
+    6.05
+   ],
+   "count": 40,
+   "height": 1.6,
+   "grow": 12,
+   "width": [
+    0.1,
+    0.2
+   ],
+   "brightness": [
+    0.4,
+    0.7
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.4,
+   "color": "#C22A2C",
+   "out": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 120,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.5,
+   "area": 6.0,
+   "speed": 0.01,
+   "gravity": -0.01,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 30,
+   "color": "@secondary"
+  }
+ ]
+}

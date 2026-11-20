@@ -1,0 +1,321 @@
+{
+ "comment": "Особое «Залп лучников» (caster = Мартин, yaw — взгляд; запуск на draw = 0.8 с анимации martin_volley): за спиной встают 7 призрачных лучников дугой, на loose (тик 8 от запуска = 1.2 с анимации) стреляют вверх. Метки — martin_volley_mark в точках падения (запускать на loose).",
+ "style": "martin_ghost",
+ "duration": 70,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 6,
+   "at": "caster+-5.4,0,-6.8",
+   "model": "martin_archer_ghost",
+   "duration": 60,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "move": {
+    "from": [
+     0,
+     -2.2,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "comment": "лучник 1 за спиной Мартина"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+-5.3,2.6,-5.8",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 4,
+   "rate": 1,
+   "spread": 0.1,
+   "speed": 0.6,
+   "gravity": -0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 10,
+   "color": "#D8F6FF",
+   "comment": "стрела ушла вверх (loose)"
+  },
+  {
+   "type": "mesh",
+   "delay": 4,
+   "at": "caster+-3.6,0,-6.2",
+   "model": "martin_archer_ghost",
+   "duration": 62,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "move": {
+    "from": [
+     0,
+     -2.2,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "comment": "лучник 2 за спиной Мартина"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+-3.5,2.6,-5.2",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 4,
+   "rate": 1,
+   "spread": 0.1,
+   "speed": 0.6,
+   "gravity": -0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 10,
+   "color": "#D8F6FF",
+   "comment": "стрела ушла вверх (loose)"
+  },
+  {
+   "type": "mesh",
+   "delay": 2,
+   "at": "caster+-1.8,0,-5.6",
+   "model": "martin_archer_ghost",
+   "duration": 64,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "move": {
+    "from": [
+     0,
+     -2.2,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "comment": "лучник 3 за спиной Мартина"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+-1.7,2.6,-4.6",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 4,
+   "rate": 1,
+   "spread": 0.1,
+   "speed": 0.6,
+   "gravity": -0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 10,
+   "color": "#D8F6FF",
+   "comment": "стрела ушла вверх (loose)"
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster+0,0,-5",
+   "model": "martin_archer_ghost",
+   "duration": 66,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "move": {
+    "from": [
+     0,
+     -2.2,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "comment": "лучник 4 за спиной Мартина"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+0.1,2.6,-4",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 4,
+   "rate": 1,
+   "spread": 0.1,
+   "speed": 0.6,
+   "gravity": -0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 10,
+   "color": "#D8F6FF",
+   "comment": "стрела ушла вверх (loose)"
+  },
+  {
+   "type": "mesh",
+   "delay": 2,
+   "at": "caster+1.8,0,-5.6",
+   "model": "martin_archer_ghost",
+   "duration": 64,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "move": {
+    "from": [
+     0,
+     -2.2,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "comment": "лучник 5 за спиной Мартина"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+1.9,2.6,-4.6",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 4,
+   "rate": 1,
+   "spread": 0.1,
+   "speed": 0.6,
+   "gravity": -0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 10,
+   "color": "#D8F6FF",
+   "comment": "стрела ушла вверх (loose)"
+  },
+  {
+   "type": "mesh",
+   "delay": 4,
+   "at": "caster+3.6,0,-6.2",
+   "model": "martin_archer_ghost",
+   "duration": 62,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "move": {
+    "from": [
+     0,
+     -2.2,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "comment": "лучник 6 за спиной Мартина"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+3.7,2.6,-5.2",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 4,
+   "rate": 1,
+   "spread": 0.1,
+   "speed": 0.6,
+   "gravity": -0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 10,
+   "color": "#D8F6FF",
+   "comment": "стрела ушла вверх (loose)"
+  },
+  {
+   "type": "mesh",
+   "delay": 6,
+   "at": "caster+5.4,0,-6.8",
+   "model": "martin_archer_ghost",
+   "duration": 60,
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   },
+   "move": {
+    "from": [
+     0,
+     -2.2,
+     0
+    ],
+    "scaleFrom": 1.0,
+    "delay": 0,
+    "duration": 14,
+    "easing": "easeOutCubic"
+   },
+   "comment": "лучник 7 за спиной Мартина"
+  },
+  {
+   "type": "sprites",
+   "delay": 24,
+   "at": "caster+5.5,2.6,-5.8",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 4,
+   "rate": 1,
+   "spread": 0.1,
+   "speed": 0.6,
+   "gravity": -0.04,
+   "size": [
+    0.2,
+    0.05
+   ],
+   "life": 10,
+   "color": "#D8F6FF",
+   "comment": "стрела ушла вверх (loose)"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,-6",
+   "duration": 60,
+   "texture": "mote_wisp",
+   "count": 100000,
+   "rate": 1.0,
+   "area": 6.0,
+   "speed": 0.01,
+   "gravity": -0.004,
+   "size": [
+    0.9,
+    1.6
+   ],
+   "life": 50,
+   "color": "#8FD8F0",
+   "blend": "translucent",
+   "comment": "туман, из которого встают лучники"
+  }
+ ]
+}

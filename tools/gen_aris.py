@@ -257,10 +257,26 @@ def m_horn(ctx):
 
 
 def m_visor(ctx):
-    """Тёмная прорезь визора (как на референсе — без глаз); по верхнему краю — отблеск в 1 px."""
+    """Тёмная прорезь визора; в глубине — два тусклых глаза 4×2 px (владелец 20.11): бой — бирюза, dim — слабее,
+    spent — погасли вместе с рогами, mythic — белые. Глаза светятся (glowmask)."""
     i, j, nw, nh = rows(ctx)
     rgb = pick(DARK, 0.02 + (j == 0) * 0.25 + 0 * ctx.s)
-    return rgb, 1.0, no_glow(ctx.n)
+    g = no_glow(ctx.n)
+    va = V['variant']
+    if ctx.face == 'north' and va != 'spent':
+        x = ctx.P[:, 0]
+        eye = (np.abs(np.abs(x) - 1.5) < 0.5) & (j >= 1) & (j <= 2)
+        core = eye & (np.abs(np.abs(x) - 1.5) < 0.25)
+        if va == 'mythic':
+            ec, ek = np.tile(hex2('#FFFFFF'), (ctx.n, 1)), 0.85
+            edge_c = np.tile(hex2('#FFF0D2'), (ctx.n, 1))
+        else:
+            ec = pick(TEAL, (0.55 if va == 'base' else 0.3) + 0 * x)
+            edge_c = pick(TEAL, (0.4 if va == 'base' else 0.18) + 0 * x)
+            ek = 0.6 if va == 'base' else 0.25
+        rgb = np.where(eye[:, None], np.where(core[:, None], ec, edge_c), rgb)
+        g = np.where(eye[:, None], np.where(core[:, None], ec, edge_c) * ek, g)
+    return rgb, 1.0, g
 
 
 def m_grille(ctx):

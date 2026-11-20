@@ -127,7 +127,7 @@ public final class ArisClient {
                     if (v == null) return Shot.of(c.rel(c.b, 3.2, 0, 1.4), head);
                     Vec3 vp = v.getPosition(c.pt), d = vp.subtract(c.b).multiply(1, 0, 1);
                     d = d.lengthSqr() < 1e-3 ? c.fwd : d.normalize();
-                    double a = Math.toRadians(20);
+                    double a = Math.toRadians(30);   // 3.2 from her at 30°: ≈1.6 aside of the victim lying 1.0–2.8 before her
                     Vec3 dd = new Vec3(d.x * Math.cos(a) - d.z * Math.sin(a), 0, d.x * Math.sin(a) + d.z * Math.cos(a));
                     Vec3 pos = c.b.add(dd.scale(3.2));
                     int slam = ArisMath.FINISHER_SLAM - ArisMath.FINISHER_CAM_FROM;

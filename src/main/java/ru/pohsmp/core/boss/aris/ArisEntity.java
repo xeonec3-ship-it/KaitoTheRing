@@ -354,10 +354,10 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         return ArisMath.FINISHER_KILL;
     }
 
-    /** The victim is pressed to the ground: the held pose of TargetPose (no PlayerAnimator pose of her own yet). */
+    /** Her own victim pose: kneels, then lies flat on its face, head to her (48 ticks). */
     @Override
     public String finisherVictimAnim() {
-        return null;
+        return "irons_spellbooks:pohsmp_aris_finisher_victim";
     }
 
     @Override
@@ -368,6 +368,12 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         float yaw = (float) (Math.atan2(victim.getZ() - getZ(), victim.getX() - getX()) * 180 / Math.PI) - 90;
         fight.face(yaw);
         holdPoint = ArisFight.ground(sl, position().add(Vec3.directionFromRotation(0, yaw).scale(ArisMath.FINISHER_DIST)));
+        // the pose is made for «head to Aris»: the victim faces her (body and head), its feet stay where they are until the pull
+        float back = yaw + 180;
+        victim.connection.teleport(victim.getX(), victim.getY(), victim.getZ(), back, 0);
+        victim.setYRot(back);
+        victim.setYHeadRot(back);
+        victim.setYBodyRot(back);
         play("finisher");
         core.sound("aris.swing", 1.5f, 0.7f);
         Fx.play(sl, Fx.fx("aris_finisher").at(position()).yaw(yaw).target(victim));
@@ -387,8 +393,7 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
     public void onFinisherTick(ServerPlayer victim, int t) {
         if (t == ArisMath.FINISHER_SLAM && level() instanceof ServerLevel sl && holdPoint != null) {
             core.sound(holdPoint, "aris.slam", 3, 0.9f);
-            vanilla(net.minecraft.sounds.SoundEvents.ANVIL_LAND, 1.5f, 0.8f);
-            Fx.play(sl, Fx.fx("aris_slam").at(holdPoint).yaw(getYRot()));
+            vanilla(net.minecraft.sounds.SoundEvents.ANVIL_LAND, 1.5f, 0.8f);   // the flash, sparks and heat ring are in aris_finisher
         }
     }
 

@@ -40,6 +40,9 @@ import ru.pohsmp.core.fx.Fx;
  * <li>four spells: «Раскалённая заготовка», «Цепи кузни», «Закалка», «Мехи».</li>
  * </ul>
  * Every strong attack has a visible warning (fx on the ground + action bar); no beams or lines from her to anyone.
+ * Directions: every hit zone and every directional fx is taken from her BODY yaw forward ({@link #fwd()}, getYRot after
+ * {@link #face}), never from the model or the head: directional fx get .at(point).yaw(bodyYaw) without .caster(boss), because the
+ * renderer would turn a caster's fx by its head yaw.
  */
 public final class ArisFight {
     private static final UUID MYTHIC_ID = UUID.fromString("2e7b4c19-5a3d-4f60-8b21-9c0d7e4a6f13");
@@ -475,7 +478,7 @@ public final class ArisFight {
         Set<UUID> hitSet = new HashSet<>();
         core.play(new BossTimeline("spell:metal_wave", ArisMath.SLAM_IMPACT + ArisMath.WAVE_CRESTS * ArisMath.WAVE_STEP + 1)
                 .at(ArisMath.SLAM_IMPACT, () -> {
-                    Fx.play(sl, Fx.fx("aris_metal_wave").caster(boss).at(o).yaw(yaw));
+                    Fx.play(sl, Fx.fx("aris_metal_wave").at(o).yaw(yaw));
                     core.sound("aris.slam", 2.5f, 1.1f);
                 })
                 .during(ArisMath.SLAM_IMPACT, ArisMath.SLAM_IMPACT + ArisMath.WAVE_CRESTS * ArisMath.WAVE_STEP, k -> {
@@ -650,7 +653,7 @@ public final class ArisFight {
         int landAt = ArisMath.BILLET_THROW + ArisMath.BILLET_FLIGHT, boom = landAt + cfg(ArisConfig.BILLET_DELAY) * 20;
         core.play(new BossTimeline("spell:billet", boom + 1)
                 .at(ArisMath.BILLET_THROW, () -> {
-                    Fx.play(sl, Fx.fx("aris_billet_throw").caster(boss).at(boss.position()).yaw(yaw));
+                    Fx.play(sl, Fx.fx("aris_billet_throw").at(boss.position()).yaw(yaw));
                     core.sound("aris.swing", 1, 1.3f);
                     Vec3 from = boss.position().add(0, 1.6, 0).add(Vec3.directionFromRotation(0, yaw).scale(0.5));
                     b[0] = Aris.BILLET.get().create(sl);
@@ -765,7 +768,7 @@ public final class ArisFight {
         core.play(new BossTimeline("spell:quench", ArisMath.QUENCH_SPLASH + 1).at(ArisMath.QUENCH_SPLASH, () -> {
             quenchAt = boss.position();
             quenchUntil = sl.getGameTime() + cfg(ArisConfig.QUENCH_SECONDS) * 20L;
-            Fx.play(sl, Fx.fx("aris_quench").caster(boss).at(quenchAt).yaw(boss.getYRot()).duration(cfg(ArisConfig.QUENCH_SECONDS) * 20));
+            Fx.play(sl, Fx.fx("aris_quench").at(quenchAt).yaw(boss.getYRot()).duration(cfg(ArisConfig.QUENCH_SECONDS) * 20));
             core.sound("aris.quench", 2, 1);
             core.actionbar(core.arenaRadius() + 8, ui("quench"));
         }));
@@ -790,10 +793,10 @@ public final class ArisFight {
         stand(ArisMath.BELLOWS);
         boss.play("bellows");
         Vec3 o = boss.position();
-        Fx.play(sl, Fx.fx("aris_bellows_warn").caster(boss).at(o).yaw(yaw));
+        Fx.play(sl, Fx.fx("aris_bellows_warn").at(o).yaw(yaw));
         for (ServerPlayer p : core.playersNear(core.arenaRadius() + 8)) if (p.distanceToSqr(o) < 14 * 14) p.displayClientMessage(ui("bellows_warn"), true);
         core.play(new BossTimeline("spell:bellows", ArisMath.BELLOWS_GUST + 1).at(ArisMath.BELLOWS_GUST, () -> {
-            Fx.play(sl, Fx.fx("aris_bellows").caster(boss).at(o).yaw(yaw));
+            Fx.play(sl, Fx.fx("aris_bellows").at(o).yaw(yaw));
             core.sound("aris.bellows", 2.5f, 1);
             Vec3 dir = Vec3.directionFromRotation(0, yaw);
             Vec3 from = o.add(0, 1.0, 0);

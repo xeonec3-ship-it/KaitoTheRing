@@ -661,5 +661,21 @@
   "subtitles.pohsmp_core.cult_leader.ash_slash": "Fiery slash",
   "subtitles.pohsmp_core.cult_leader.replica_break": "Replica seals shattered",
   "subtitles.pohsmp_core.cult_leader.finisher": "Scythe impales",
-  "ui.pohsmp_core.cult_leader.epithet": "Head of the Cult of Mellisto"
+  "ui.pohsmp_core.cult_leader.epithet": "Head of the Cult of Mellisto",
+  "entity.pohsmp_core.ereb": "Ereb, the First Traitor",
+  "item.pohsmp_core.ereb_rapier": "Ereb's Rapier",
+  "ui.pohsmp_core.ereb.title": "Ereb, the First Traitor",
+  "ui.pohsmp_core.ereb.epithet": "Head of the Cult's First Cell",
+  "ui.pohsmp_core.ereb.phase1": "\"Two Truths\"",
+  "ui.pohsmp_core.ereb.phase2": "\"A Borrowed Face\" — Ereb hides among you.",
+  "ui.pohsmp_core.ereb.phase3": "\"Betrayal\" — trust no one beside you.",
+  "ui.pohsmp_core.ereb.false_ally_warn": "Glass glints behind you…",
+  "ui.pohsmp_core.ereb.false_ally": "Ereb strikes you in the back!",
+  "ui.pohsmp_core.ereb.false_ally_title": "The False Ally",
+  "ui.pohsmp_core.ereb.labyrinth": "The Mirror Labyrinth",
+  "ui.pohsmp_core.ereb.betrayal_hint": "Your allies look like Ereb — watch for the glint of glass.",
+  "ui.pohsmp_core.ereb.finale": "Ereb smiles…",
+  "ui.pohsmp_core.ereb.butterfly": "The Butterfly Dream",
+  "ui.pohsmp_core.ereb.vanish": "Ereb has vanished. The battle is over.",
+  "ui.pohsmp_core.ereb.vanish_line": "\"Sweet dreams. When you wake, I will be gone.\""
 }

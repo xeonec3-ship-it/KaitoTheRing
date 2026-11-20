@@ -1,0 +1,331 @@
+{
+ "comment": "Финал (6.5 с = 130 тиков = анимация ereb_finale; при 5% ХП). caster = Эреб (не follow: он стоит). 0.3 с (smile) — код меняет текстуру на ereb_smile; 1.4 с (butterfly, тик 28) — из ладони вырастает стеклянная бабочка (модель illusion_butterfly T22, ×0.24), трепещет у ладони; 3.2 с (cast, тик 64) — он поднимает её, она вспархивает со вспышкой: код начинает «Сон бабочки» (ButterflyDreamSpell) с caster = ТОЧКА Эреба (не сущность — он исчезнет); 5.0 с (vanish, тик 100) — Эреб рассыпается бабочками (fx ereb_butterfly_dissolve — уже внутри этого fx; модель спрятать на 104). Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 140,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 26,
+   "at": "caster-0.15,1.25,0.55",
+   "duration": 10,
+   "size": 0.6,
+   "color": "#E8FAFF",
+   "brightness": 0.9,
+   "comment": "свет в ладони"
+  },
+  {
+   "type": "sprites",
+   "delay": 26,
+   "at": "caster-0.15,1.25,0.55",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.15,
+   "speed": -0.02,
+   "gravity": 0.0,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 6,
+   "color": "#E8FAFF",
+   "comment": "осколки складываются в бабочку"
+  },
+  {
+   "type": "mesh",
+   "delay": 28,
+   "at": "caster-0.15,1.25,0.55",
+   "model": "illusion_butterfly",
+   "scale": 0.24,
+   "until": 64,
+   "comment": "стеклянная бабочка в ладони"
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster-0.15,1.25,0.55",
+   "duration": 34,
+   "texture": "glow",
+   "count": 34,
+   "rate": 1,
+   "spread": 0.12,
+   "speed": 0.004,
+   "gravity": -0.002,
+   "size": [
+    0.16,
+    0.04
+   ],
+   "life": 10,
+   "color": "#BFE6FF",
+   "brightness": 0.6
+  },
+  {
+   "type": "mesh",
+   "delay": 62,
+   "at": "caster-0.3,2.1,0.2",
+   "model": "illusion_butterfly",
+   "scale": 0.26,
+   "until": 70,
+   "comment": "поднял над головой"
+  },
+  {
+   "type": "flash",
+   "delay": 64,
+   "at": "caster-0.3,2.1,0.2",
+   "duration": 12,
+   "size": 1.6,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.2,
+   "comment": "cast: вспорхнула — дальше «Сон бабочки»"
+  },
+  {
+   "type": "sprites",
+   "delay": 64,
+   "at": "caster-0.3,2.1,0.2",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.3,
+   "speed": 0.09,
+   "gravity": -0.02,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 30,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 64,
+   "at": "caster-0.3,2.1,0.2",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 5,
+   "rate": 5.0,
+   "spread": 0.3,
+   "speed": 0.09,
+   "gravity": -0.02,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 30,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "aura",
+   "delay": 100,
+   "at": "caster",
+   "target": "caster",
+   "duration": 8,
+   "thickness": 0.09,
+   "pulse": [
+    0.8,
+    3
+   ],
+   "motes": 10,
+   "texture": "mote_glass",
+   "color": "#E8FAFF",
+   "brightness": 0.9,
+   "in": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 103,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 2.2,
+   "rays": 6,
+   "color": "#FFFFFF",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 102,
+   "at": "caster+0,0.3,0",
+   "duration": 3,
+   "texture": "mote_butterfly",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.35,
+   "speed": 0.06,
+   "gravity": -0.012,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.16
+   ],
+   "life": 46,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 102,
+   "at": "caster+0,0.3,0",
+   "duration": 3,
+   "texture": "mote_butterfly_side",
+   "count": 12,
+   "rate": 4.0,
+   "spread": 0.35,
+   "speed": 0.06,
+   "gravity": -0.012,
+   "sway": 0.6,
+   "size": [
+    0.30600000000000005,
+    0.16
+   ],
+   "life": 46,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 103,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "mote_butterfly",
+   "count": 40,
+   "rate": 10,
+   "spread": 0.4,
+   "speed": 0.08,
+   "gravity": -0.014,
+   "sway": 0.6,
+   "size": [
+    0.36,
+    0.16
+   ],
+   "life": 50,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 103,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "mote_butterfly_side",
+   "count": 20,
+   "rate": 5.0,
+   "spread": 0.4,
+   "speed": 0.08,
+   "gravity": -0.014,
+   "sway": 0.6,
+   "size": [
+    0.324,
+    0.16
+   ],
+   "life": 50,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 104,
+   "at": "caster+0,1.7,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 26,
+   "rate": 13,
+   "spread": 0.35,
+   "speed": 0.1,
+   "gravity": -0.016,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.14
+   ],
+   "life": 50,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 104,
+   "at": "caster+0,1.7,0",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 13,
+   "rate": 6.5,
+   "spread": 0.35,
+   "speed": 0.1,
+   "gravity": -0.016,
+   "sway": 0.6,
+   "size": [
+    0.30600000000000005,
+    0.14
+   ],
+   "life": 50,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 104,
+   "at": "caster+0,1,0",
+   "duration": 40,
+   "texture": "mote_sky_butterfly",
+   "count": 12,
+   "rate": 0.3,
+   "spread": 1.5,
+   "speed": 0.03,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.4,
+    0.2
+   ],
+   "life": 50,
+   "color": "#FFE7A0",
+   "glow": 0.5,
+   "comment": "последние — золотые"
+  },
+  {
+   "type": "sprites",
+   "delay": 103,
+   "at": "caster+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 26,
+   "rate": 13,
+   "spread": 0.55,
+   "speed": 0.07,
+   "gravity": 0.012,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 24,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "wave",
+   "delay": 104,
+   "at": "caster+0,0.05,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 5,
+   "color": "@secondary",
+   "brightness": 0.4
+  }
+ ]
+}

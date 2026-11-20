@@ -1,0 +1,225 @@
+{
+ "comment": "Появление (5.0 с = 100 тиков = анимация ereb_spawn). caster = Эреб на конечной точке, yaw — его взгляд. 0–2.2 с: под ним печать иллюзий, из-за края арены слетается рой стеклянных бабочек и кружит воронкой (модель НЕ рисовать 0–44 тиков); 1.5–2.2 с: рой сжимается в силуэт (оболочка); 2.2 с (form) — звон стекла: вспышка, бабочки разлетаются, он стоит; 2.6 поклон; 3.9 с (salute) — салют рапирой, блик на клинке, титр; 5.0 — полоса босса. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 110,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100,
+   "radius": 40,
+   "color": "#1C1830",
+   "strength": 0.22,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 24,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 4,
+   "at": "caster+0,0.05,0",
+   "id": "illusion_seal",
+   "until": 100,
+   "comment": "печать иллюзий под ним"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 40,
+   "texture": "mote_butterfly",
+   "count": 140,
+   "rate": 4,
+   "spread": 7.0,
+   "speed": 0.02,
+   "gravity": -0.002,
+   "sway": 0.6,
+   "size": [
+    0.36,
+    0.2
+   ],
+   "life": 48,
+   "color": "#BFE6FF",
+   "glow": 0.45,
+   "comment": "слетаются со всей арены"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 40,
+   "texture": "mote_butterfly_side",
+   "count": 70,
+   "rate": 2.0,
+   "spread": 7.0,
+   "speed": 0.02,
+   "gravity": -0.002,
+   "sway": 0.6,
+   "size": [
+    0.324,
+    0.2
+   ],
+   "life": 48,
+   "color": "#FFE7A0",
+   "glow": 0.35,
+   "comment": "слетаются со всей арены"
+  },
+  {
+   "type": "vortex",
+   "delay": 6,
+   "at": "caster+0,0.1,0",
+   "duration": 40,
+   "radius": 2.6,
+   "height": 2.6,
+   "arms": 4,
+   "speed": 9,
+   "pull": 0.55,
+   "texture": "mote_butterfly",
+   "particles": 70,
+   "life": 26,
+   "size": 0.3,
+   "color": "#BFE6FF",
+   "funnel": 0.35,
+   "turns": 1.4,
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "comment": "рой кружит воронкой"
+  },
+  {
+   "type": "aura",
+   "delay": 30,
+   "at": "caster",
+   "target": "caster",
+   "duration": 16,
+   "thickness": 0.09,
+   "pulse": [
+    0.6,
+    4
+   ],
+   "motes": 6,
+   "texture": "mote_glass",
+   "color": "#BFE6FF",
+   "brightness": 0.8,
+   "in": {
+    "duration": 10,
+    "easing": "easeInCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "comment": "рой сжимается в силуэт"
+  },
+  {
+   "type": "flash",
+   "delay": 44,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 2.6,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.2,
+   "comment": "form: звон стекла"
+  },
+  {
+   "type": "wave",
+   "delay": 44,
+   "at": "caster+0,1,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 2.4,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 44,
+   "at": "caster+0,1.1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 30,
+   "rate": 30,
+   "spread": 1.1,
+   "speed": 0.14,
+   "gravity": 0.012,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 22,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 44,
+   "at": "caster+0,1.1,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 26,
+   "rate": 26,
+   "spread": 0.8,
+   "speed": 0.11,
+   "gravity": -0.006,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 34,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 44,
+   "at": "caster+0,1.1,0",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 13,
+   "rate": 13.0,
+   "spread": 0.8,
+   "speed": 0.11,
+   "gravity": -0.006,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 34,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "wave",
+   "delay": 46,
+   "at": "caster+0,0.05,0",
+   "duration": 18,
+   "shape": "ring",
+   "radius": 8,
+   "color": "@primary",
+   "brightness": 0.5
+  },
+  {
+   "type": "flash",
+   "delay": 78,
+   "at": "caster+0.35,2.3,0.25",
+   "duration": 7,
+   "size": 0.5,
+   "rays": 4,
+   "anamorphic": 1.4,
+   "color": "#FFE7A0",
+   "comment": "салют: блик на клинке"
+  }
+ ]
+}

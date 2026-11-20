@@ -1,0 +1,70 @@
+{
+ "comment": "Появление за спиной (0.5 с): caster = Эреб в новой точке (в облике союзника — тот же fx). Воздух «трескается» по росту, осколки слетаются внутрь, короткая вспышка. Сразу за ним — ereb_backstab (удар на 0.45 с). Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 8,
+   "thickness": 0.07,
+   "pulse": [
+    0.6,
+    3
+   ],
+   "motes": 0,
+   "color": "#E8FAFF",
+   "brightness": 0.7,
+   "in": {
+    "duration": 1,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 7,
+   "shape": "sphere",
+   "radius": 1.1,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.9,
+   "speed": -0.05,
+   "gravity": 0.0,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 8,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "flash",
+   "delay": 1,
+   "at": "caster+0,1.1,0",
+   "duration": 5,
+   "size": 1.0,
+   "rays": 6,
+   "color": "#FFFFFF"
+  }
+ ]
+}

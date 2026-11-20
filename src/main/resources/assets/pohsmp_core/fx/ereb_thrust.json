@@ -1,0 +1,36 @@
+{
+ "comment": "Укол рапирой (событие hit анимаций ereb_lunge / ereb_flurry / ereb_parry / ereb_backstab): caster = Эреб. Узкий золотой блик на острие (2.2 бл. вперёд на высоте груди) — не луч и не след до цели. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 8,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0.1,1.35,2.2",
+   "duration": 5,
+   "size": 0.45,
+   "anamorphic": 1.2,
+   "rays": 4,
+   "color": "#FFE7A0",
+   "brightness": 1.1
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.1,1.35,2.2",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 5,
+   "rate": 5,
+   "spread": 0.15,
+   "speed": 0.06,
+   "gravity": 0.01,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 7,
+   "color": "#E8B84A"
+  }
+ ]
+}

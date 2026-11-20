@@ -661,5 +661,21 @@
   "subtitles.pohsmp_core.cult_leader.ash_slash": "Огненный разрез",
   "subtitles.pohsmp_core.cult_leader.replica_break": "Печати Реплики разбиты",
   "subtitles.pohsmp_core.cult_leader.finisher": "Коса пронзает",
-  "ui.pohsmp_core.cult_leader.epithet": "Глава Культа Меллисто"
+  "ui.pohsmp_core.cult_leader.epithet": "Глава Культа Меллисто",
+  "entity.pohsmp_core.ereb": "Эреб, Первый Предатель",
+  "item.pohsmp_core.ereb_rapier": "Рапира Эреба",
+  "ui.pohsmp_core.ereb.title": "Эреб, Первый Предатель",
+  "ui.pohsmp_core.ereb.epithet": "Глава 1 Ячейки Культа",
+  "ui.pohsmp_core.ereb.phase1": "«Две правды»",
+  "ui.pohsmp_core.ereb.phase2": "«Чужое лицо» — Эреб прячется среди вас.",
+  "ui.pohsmp_core.ereb.phase3": "«Предательство» — не верь тем, кто рядом.",
+  "ui.pohsmp_core.ereb.false_ally_warn": "За спиной блеснуло стекло…",
+  "ui.pohsmp_core.ereb.false_ally": "Эреб наносит удар в спину!",
+  "ui.pohsmp_core.ereb.false_ally_title": "Ложный союзник",
+  "ui.pohsmp_core.ereb.labyrinth": "Зеркальный лабиринт",
+  "ui.pohsmp_core.ereb.betrayal_hint": "Союзники выглядят как Эреб — присмотрись к отблеску стекла.",
+  "ui.pohsmp_core.ereb.finale": "Эреб улыбается…",
+  "ui.pohsmp_core.ereb.butterfly": "Сон бабочки",
+  "ui.pohsmp_core.ereb.vanish": "Эреб исчез. Бой окончен.",
+  "ui.pohsmp_core.ereb.vanish_line": "«Спите сладко. Когда проснётесь — меня уже не будет.»"
 }

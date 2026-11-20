@@ -1,0 +1,45 @@
+{
+ "comment": "Фаза 3 «Предательство»: союзник, который выглядит как Эреб (6 с = 120 тиков; caster = союзник, follow; видит только обманутый игрок). Едва заметная подсказка: раз в ~1.5 с по силуэту пробегает стеклянный отблеск и падает осколок — кто присмотрится, отличит ложного Эреба от настоящего. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "follow": true,
+   "duration": 120,
+   "thickness": 0.035,
+   "pulse": [
+    0.5,
+    30
+   ],
+   "motes": 0,
+   "ring": false,
+   "color": "#BFE6FF",
+   "brightness": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 110,
+   "texture": "mote_glass",
+   "count": 4,
+   "rate": 0.04,
+   "spread": 0.3,
+   "speed": 0.0,
+   "gravity": 0.004,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.12,
+    0.04
+   ],
+   "life": 20,
+   "color": "#E8FAFF",
+   "follow": true
+  }
+ ]
+}

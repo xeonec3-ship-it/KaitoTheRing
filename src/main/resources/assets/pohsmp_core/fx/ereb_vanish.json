@@ -1,0 +1,79 @@
+{
+ "comment": "Исчезновение (0.8 с, анимация ereb_vanish, событие gone 0.6 с): caster = Эреб. Оболочка-стекло, тело рассыпается осколками и парой бабочек. На 12 тике (gone) код прячет модель и делает босса неуязвимым до ereb_appear. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 18,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 12,
+   "thickness": 0.06,
+   "pulse": [
+    0.5,
+    3
+   ],
+   "motes": 0,
+   "color": "#BFE6FF",
+   "brightness": 0.6,
+   "in": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,1.0,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 18,
+   "rate": 18,
+   "spread": 0.55,
+   "speed": 0.05,
+   "gravity": 0.004,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 16,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 6,
+   "rate": 3,
+   "spread": 0.4,
+   "speed": 0.06,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 24,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "caster+0,1.0,0",
+   "duration": 6,
+   "size": 1.2,
+   "color": "#E8FAFF",
+   "brightness": 0.8
+  }
+ ]
+}

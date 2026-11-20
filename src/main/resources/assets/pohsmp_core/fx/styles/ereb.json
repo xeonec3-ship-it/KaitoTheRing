@@ -1,0 +1,25 @@
+{
+ "comment": "T30 Эреб: золото отделки камзола и стекло иллюзий (холодный блик), тень — чёрное сукно. Движение плавное, с короткими «звонкими» вспышками стекла. Сгенерировано tools/gen_ereb.py.",
+ "palette": {
+  "primary": "#E8B84A",
+  "secondary": "#BFE6FF",
+  "core": "#FFFFFF",
+  "shadow": "#14121A"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_illusion_band",
+  "shards": "mote_glass",
+  "sigil": "illusion_seal"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.8,
+  "jitter": 0.08,
+  "easing": "easeOutSine",
+  "pulse": {
+   "amp": 0.08,
+   "period": 20
+  }
+ }
+}

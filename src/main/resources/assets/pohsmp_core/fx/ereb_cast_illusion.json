@@ -1,0 +1,44 @@
+{
+ "comment": "Каст иллюзий (анимация ereb_cast_illusion, событие cast 0.75 с — щелчок пальцами): caster = Эреб. Над поднятой левой рукой — блик стекла и кольцо-рябь, вокруг него — мерцание. Сами заклинания («Отражения», «Пелена», лабиринт) — их fx из T22. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 14,
+   "at": "caster-0.3,2.15,0.25",
+   "duration": 8,
+   "size": 0.7,
+   "rays": 6,
+   "color": "#E8FAFF",
+   "brightness": 1.1
+  },
+  {
+   "type": "wave",
+   "delay": 15,
+   "at": "caster-0.3,2.15,0.25",
+   "duration": 10,
+   "shape": "sphere",
+   "radius": 0.9,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.6
+  },
+  {
+   "type": "aura",
+   "delay": 10,
+   "at": "caster",
+   "target": "caster",
+   "duration": 10,
+   "thickness": 0.05,
+   "pulse": [
+    0.4,
+    4
+   ],
+   "motes": 4,
+   "texture": "mote_glass",
+   "color": "#BFE6FF",
+   "brightness": 0.5
+  }
+ ]
+}

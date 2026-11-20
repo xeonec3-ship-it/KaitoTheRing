@@ -1,0 +1,212 @@
+{
+ "comment": "Исчезновение бабочками (3 с = 60 тиков): caster = Эреб. Оболочка-стекло, тело рассыпается роем стеклянных и золотых бабочек снизу вверх, они улетают вверх и в стороны; на 4 тике код прячет модель (в финале — внутри ereb_finale, тик 100). Можно и отдельно (если финал прерван). Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 64,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 8,
+   "thickness": 0.09,
+   "pulse": [
+    0.8,
+    3
+   ],
+   "motes": 10,
+   "texture": "mote_glass",
+   "color": "#E8FAFF",
+   "brightness": 0.9,
+   "in": {
+    "duration": 2,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 3,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 2.2,
+   "rays": 6,
+   "color": "#FFFFFF",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,0.3,0",
+   "duration": 3,
+   "texture": "mote_butterfly",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.35,
+   "speed": 0.06,
+   "gravity": -0.012,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.16
+   ],
+   "life": 46,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,0.3,0",
+   "duration": 3,
+   "texture": "mote_butterfly_side",
+   "count": 12,
+   "rate": 4.0,
+   "spread": 0.35,
+   "speed": 0.06,
+   "gravity": -0.012,
+   "sway": 0.6,
+   "size": [
+    0.30600000000000005,
+    0.16
+   ],
+   "life": 46,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 3,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "mote_butterfly",
+   "count": 40,
+   "rate": 10,
+   "spread": 0.4,
+   "speed": 0.08,
+   "gravity": -0.014,
+   "sway": 0.6,
+   "size": [
+    0.36,
+    0.16
+   ],
+   "life": 50,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 3,
+   "at": "caster+0,1.0,0",
+   "duration": 4,
+   "texture": "mote_butterfly_side",
+   "count": 20,
+   "rate": 5.0,
+   "spread": 0.4,
+   "speed": 0.08,
+   "gravity": -0.014,
+   "sway": 0.6,
+   "size": [
+    0.324,
+    0.16
+   ],
+   "life": 50,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,1.7,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 26,
+   "rate": 13,
+   "spread": 0.35,
+   "speed": 0.1,
+   "gravity": -0.016,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.14
+   ],
+   "life": 50,
+   "color": "#BFE6FF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,1.7,0",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 13,
+   "rate": 6.5,
+   "spread": 0.35,
+   "speed": 0.1,
+   "gravity": -0.016,
+   "sway": 0.6,
+   "size": [
+    0.30600000000000005,
+    0.14
+   ],
+   "life": 50,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,1,0",
+   "duration": 40,
+   "texture": "mote_sky_butterfly",
+   "count": 12,
+   "rate": 0.3,
+   "spread": 1.5,
+   "speed": 0.03,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.4,
+    0.2
+   ],
+   "life": 50,
+   "color": "#FFE7A0",
+   "glow": 0.5,
+   "comment": "последние — золотые"
+  },
+  {
+   "type": "sprites",
+   "delay": 3,
+   "at": "caster+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 26,
+   "rate": 13,
+   "spread": 0.55,
+   "speed": 0.07,
+   "gravity": 0.012,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 24,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "wave",
+   "delay": 4,
+   "at": "caster+0,0.05,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 5,
+   "color": "@secondary",
+   "brightness": 0.4
+  }
+ ]
+}

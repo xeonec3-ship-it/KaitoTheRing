@@ -1,0 +1,83 @@
+{
+ "comment": "Фаза 3 «Предательство» (33%): caster = Эреб (анимация ereb_phase, событие phase 0.8 с = 16 тик). Вокруг него на миг проступает стекло: трещины по воздуху на 16 тике, осколки осыпаются, кольцо по земле r12, мир на 2 с тускнеет. Сгенерировано tools/gen_ereb.py (gen_ereb_fx.py).",
+ "style": "ereb",
+ "duration": 50,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 10,
+   "at": "caster+0,1.2,0",
+   "id": "illusion_mirror_crack",
+   "until": 34,
+   "comment": "трещины стекла в воздухе перед ним"
+  },
+  {
+   "type": "flash",
+   "delay": 16,
+   "at": "caster+0,1.2,0",
+   "duration": 8,
+   "size": 2.0,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.0
+  },
+  {
+   "type": "wave",
+   "delay": 16,
+   "at": "caster+0,1,0",
+   "duration": 14,
+   "shape": "sphere",
+   "radius": 3.0,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.6
+  },
+  {
+   "type": "wave",
+   "delay": 17,
+   "at": "caster+0,0.05,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 12,
+   "color": "@primary",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 16,
+   "at": "caster+0,2.2,0",
+   "duration": 6,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 10,
+   "spread": 2.0,
+   "speed": 0.04,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 30,
+   "color": "#E8FAFF"
+  },
+  {
+   "type": "tint",
+   "delay": 16,
+   "at": "caster",
+   "duration": 40,
+   "radius": 32,
+   "color": "#101420",
+   "strength": 0.35,
+   "in": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  }
+ ]
+}

@@ -98,7 +98,7 @@ function overlay() {
   #vtitle{position:fixed;left:0;right:0;top:26px;text-align:center;z-index:9;pointer-events:none}
   #vtitle img{width:540px}
   #vtitle .t{font:700 44px "DejaVu Serif",serif;color:#e8c372;text-shadow:0 0 10px #000,0 0 3px #000;letter-spacing:1px}
-  #vspeech{position:fixed;left:0;right:0;bottom:96px;text-align:center;z-index:9;pointer-events:none;font:italic 400 28px "DejaVu Serif",serif;color:#fff;text-shadow:0 0 6px #000,0 0 2px #000}
+  #vspeech{position:fixed;left:0;right:0;top:64px;text-align:center;z-index:11;pointer-events:none;font:italic 600 30px "DejaVu Serif",serif;color:#fffaf0;text-shadow:0 0 8px #000,0 0 3px #000,0 0 1px #000}
   #vtag{position:fixed;left:16px;top:12px;z-index:9;font:600 15px "DejaVu Sans",sans-serif;color:rgba(232,220,200,.55);pointer-events:none}
   #vtint{position:fixed;inset:0;z-index:8;pointer-events:none}
   #vfade{position:fixed;inset:0;z-index:10;background:#000;pointer-events:none}`;
@@ -160,7 +160,7 @@ window.frame = (f) => {
   OV.vcap.style.opacity = f.capOp ?? 1;
   setHTML('vtitle', f.title ? (f.title.img ? `<img src="${VTEX[f.title.img]}">` : `<div class="t">${f.title.text}</div>`) : '');
   OV.vtitle.style.opacity = f.title ? (f.title.op ?? 1) : 0;
-  setHTML('vspeech', f.speech ? `<span style="background:rgba(8,6,8,.5);padding:4px 14px;border-radius:5px">${f.speech.text}</span>` : ''); OV.vspeech.style.opacity = f.speech ? (f.speech.op ?? 1) : 0;
+  setHTML('vspeech', f.speech ? `<span style="background:rgba(8,6,8,.72);border:1px solid rgba(232,185,90,.45);padding:6px 18px;border-radius:6px;white-space:nowrap;${f.speech.text.length > 50 ? 'font-size:25px' : ''}">${f.speech.text}</span>` : ''); OV.vspeech.style.opacity = f.speech ? (f.speech.op ?? 1) : 0;
   setHTML('vtag', f.tag || '');
   OV.vtint.style.background = f.tint ? f.tint[0] : 'transparent'; OV.vtint.style.opacity = f.tint ? f.tint[1] : 0;
   OV.vfade.style.opacity = Math.min(0.82, f.fade || 0);   // затемнение на стыках — не до чёрного

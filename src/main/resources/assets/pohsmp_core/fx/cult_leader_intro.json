@@ -37,7 +37,7 @@
   {
    "type": "sprites",
    "delay": 0,
-   "at": "caster+0,0,-6.56+0,0.1,0",
+   "at": "caster+0,0.1,-6.56",
    "duration": 150,
    "texture": "mote_flame",
    "count": 100000,
@@ -57,7 +57,7 @@
   {
    "type": "sigil",
    "delay": 10,
-   "at": "caster+0,0,-6.56+0,0.05,0",
+   "at": "caster+0,0.05,-6.56",
    "id": "cult_emblem",
    "comment": "знак культа под проёмом"
   },
@@ -135,7 +135,7 @@
   {
    "type": "sprites",
    "delay": 30,
-   "at": "caster+0,0,-6.56+0,0.4,0",
+   "at": "caster+0,0.4,-6.56",
    "duration": 100,
    "texture": "mote_flame",
    "count": 100000,

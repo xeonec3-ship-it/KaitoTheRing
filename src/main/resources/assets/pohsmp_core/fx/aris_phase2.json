@@ -38,7 +38,7 @@
   {
    "type": "flash",
    "delay": 20,
-   "at": "caster+0,0,-1.3+0,0.6,0",
+   "at": "caster+0,0.6,-1.3",
    "duration": 10,
    "size": 3.3800000000000003,
    "rays": 10,
@@ -74,7 +74,7 @@
   {
    "type": "sprites",
    "delay": 20,
-   "at": "caster+0,0,-1.3+0,0.3,0",
+   "at": "caster+0,0.3,-1.3",
    "duration": 4,
    "texture": "spark_soft",
    "count": 78,
@@ -93,7 +93,7 @@
   {
    "type": "sprites",
    "delay": 20,
-   "at": "caster+0,0,-1.3+0,0.2,0",
+   "at": "caster+0,0.2,-1.3",
    "duration": 6,
    "texture": "mote_ash",
    "count": 31,

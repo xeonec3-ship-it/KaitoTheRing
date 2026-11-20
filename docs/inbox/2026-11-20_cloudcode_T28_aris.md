@@ -23,7 +23,7 @@ src/test/java/ru/pohsmp/core/boss/aris/        ArisMathTest
 | `boss/client/BossClient.java` | в `renderers`, после `CultLeaderClient.renderers(e);` | `ru.pohsmp.core.boss.aris.client.ArisClient.renderers(e);` |
 
 Больше ничего общего (lang, sounds.json, PohCore, Reg, Net) не менял: все нужные ключи lang и звуки уже положил помощник.
-Если программисты Ирины/Мартина/Эреба добавят свои строки рядом — конфликтов нет, строки независимы.
+При слиянии с T29 (Мартин) в `Bosses`/`BossClient` был текстовый конфликт на соседних строках — оставлены обе; после слияния сборка зелёная, 129 тестов.
 
 **Сборка в облаке:** в `libs/` не хватало `voicechat-forge-1.20.1-2.6.20.jar` (его нет в `tools/fetch_libs.py`, а `build.gradle`
 его требует) — скачал с Modrinth руками, в git не попал (libs игнорируется). Стоит добавить его в `fetch_libs.py`.

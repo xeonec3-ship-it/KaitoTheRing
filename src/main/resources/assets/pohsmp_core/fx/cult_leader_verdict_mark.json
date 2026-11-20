@@ -1,0 +1,14 @@
+{
+ "comment": "Метка над головой игрока, пока на нём запрет (caster = игрок, follow). Слать всем; длительность — до конца запрета (код ставит 200).",
+ "style": "cult_leader",
+ "duration": 200,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.35,0",
+   "follow": true,
+   "id": "cult_verdict_mark"
+  }
+ ]
+}

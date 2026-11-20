@@ -1,0 +1,25 @@
+{
+ "comment": "Огненный культист: тлеющие угли у подола (caster = культист, follow, до Fx.stop). Необязательно — у модели есть glowmask.",
+ "style": "cult_leader",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "follow": true,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.12,
+   "spread": 0.4,
+   "speed": 0.01,
+   "gravity": -0.015,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 24,
+   "color": "#FF7A1E"
+  }
+ ]
+}

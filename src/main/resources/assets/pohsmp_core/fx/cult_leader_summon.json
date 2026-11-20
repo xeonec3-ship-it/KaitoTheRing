@@ -1,0 +1,81 @@
+{
+ "comment": "Призыв огненного культиста (фаза 3, 2–4 шт.): caster = точка появления. Печать огня, столб, вспышка; на 24 тике код ставит культиста.",
+ "style": "cult_leader",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,0.04,0",
+   "id": "fire_seal"
+  },
+  {
+   "type": "column",
+   "delay": 6,
+   "at": "caster",
+   "duration": 26,
+   "radius": 0.8,
+   "height": 4.5,
+   "fill": 0.6,
+   "color": "@primary",
+   "out": {
+    "duration": 10,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "curtain",
+   "delay": 6,
+   "at": "caster",
+   "duration": 22,
+   "radius": [
+    0.3,
+    1.1
+   ],
+   "count": 12,
+   "height": 2.6,
+   "grow": 10,
+   "width": [
+    0.4,
+    0.8
+   ],
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "flicker": 0.6,
+   "texture": "cult_flame_tongue",
+   "color": "@secondary",
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 22,
+   "at": "caster+0,1,0",
+   "duration": 8,
+   "size": 2.2,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "at": "caster+0,0.8,0",
+   "duration": 4,
+   "texture": "mote_flame",
+   "count": 24,
+   "rate": 8,
+   "spread": 0.8,
+   "speed": 0.18,
+   "size": [
+    0.4,
+    0.05
+   ],
+   "life": 16,
+   "color": "@primary",
+   "glow": 0.6
+  }
+ ]
+}

@@ -1,0 +1,401 @@
+{
+ "comment": "Фаза 3: стена огня по краю арены r28 от точки появления (caster = центр арены, не follow). Держится до Fx.stop (смерть босса / сброс). Волна от центра 0–30 тиков, стена встаёт к 26–48. Урон при пересечении — код (r 27.5–28.5), на игроке — cult_leader_firewall_burn. Блоки не жечь.",
+ "style": "cult_leader",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 30,
+   "shape": "ring",
+   "radius": 28,
+   "thickness": 3.0,
+   "followTerrain": true,
+   "color": "@primary",
+   "comment": "огонь бежит от центра к краю"
+  },
+  {
+   "type": "decal",
+   "delay": 26,
+   "at": "caster",
+   "texture": "cult_scorch_ring",
+   "radius": 29.5,
+   "blend": "translucent",
+   "color": "#1A0E0C",
+   "grow": 8,
+   "comment": "выжженный край"
+  },
+  {
+   "type": "decal",
+   "delay": 26,
+   "at": "caster",
+   "texture": "cult_scorch_ring",
+   "radius": 29.5,
+   "glow": 0.4,
+   "pulse": 30,
+   "color": "@primary",
+   "brightness": 0.8,
+   "grow": 8
+  },
+  {
+   "type": "curtain",
+   "delay": 26,
+   "at": "caster",
+   "radius": [
+    27.6,
+    28.4
+   ],
+   "count": 240,
+   "height": 4.6,
+   "grow": 22,
+   "width": [
+    0.8,
+    1.5
+   ],
+   "brightness": [
+    0.6,
+    1.0
+   ],
+   "flicker": 0.6,
+   "texture": "cult_flame_tongue",
+   "color": "@primary",
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   },
+   "comment": "стена пламени"
+  },
+  {
+   "type": "curtain",
+   "delay": 30,
+   "at": "caster",
+   "radius": [
+    27.8,
+    28.2
+   ],
+   "count": 140,
+   "height": 2.6,
+   "grow": 18,
+   "width": [
+    0.5,
+    1.0
+   ],
+   "brightness": [
+    0.7,
+    1.0
+   ],
+   "flicker": 0.7,
+   "texture": "cult_flame_tongue",
+   "color": "@secondary",
+   "out": {
+    "duration": 30,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "tint",
+   "delay": 26,
+   "at": "caster",
+   "radius": 28,
+   "color": "#5A1A08",
+   "strength": 0.16,
+   "in": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+28,0.3,0",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+25.87,0.3,10.72",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+19.8,0.3,19.8",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+10.72,0.3,25.87",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,0.3,28",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-10.72,0.3,25.87",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-19.8,0.3,19.8",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-25.87,0.3,10.72",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-28,0.3,0",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-25.87,0.3,-10.72",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-19.8,0.3,-19.8",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+-10.72,0.3,-25.87",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+0,0.3,-28",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+10.72,0.3,-25.87",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+19.8,0.3,-19.8",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "caster+25.87,0.3,-10.72",
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.35,
+   "spread": 1.6,
+   "speed": 0.03,
+   "gravity": -0.03,
+   "size": [
+    0.5,
+    0.06
+   ],
+   "life": 28,
+   "color": "@secondary",
+   "glow": 0.6
+  }
+ ]
+}

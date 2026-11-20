@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Глава Культа</title>
+<style>
+  :root { --bg: #0d0806; --fg: #f0e2d6; --muted: #a08c80; --panel: #1a0f0b; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; overflow: hidden; }
+  #ui { position: fixed; left: 12px; top: 12px; z-index: 2; background: var(--panel); padding: 10px 12px; border-radius: 8px;
+        border: 1px solid #3a2016; max-width: calc(100vw - 48px); }
+  #ui select, #ui button, #ui input { background: #120a08; color: var(--fg); border: 1px solid #4a2a1c; border-radius: 4px; padding: 3px 6px; }
+  #ui label { color: var(--muted); margin-right: 6px; }
+  #ui .row { margin: 4px 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  canvas { display: block; }
+  .lab { position: fixed; z-index: 3; color: var(--fg); font: 600 15px system-ui, sans-serif; text-shadow: 0 0 4px #000, 0 0 2px #000; pointer-events: none; }
+  .lab small { display: block; font-weight: 400; color: #d8c0b0; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <div class="row"><label>Модель</label><select id="model"></select><label>Анимация</label><select id="anim"></select>
+    <button id="play">⏸</button><input id="time" type="range" min="0" max="1" step="0.001" value="0" style="width:160px"></div>
+  <div class="row"><label><input type="checkbox" id="glow" checked> свечение</label><label><input type="checkbox" id="soul"> облик «души»</label>
+    <span id="tinfo"></span></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// Превью «Главы Культа Меллисто» (T26). Данные вставляет tools/gen_cult_leader.py (--html / --sheet).
+const DATA = /*DATA*/null;      // { models: {name: {geo, tex, soul, glow, soulGlow, flame, scythe, height}}, anims: {name: anim} }
+const CELLS = /*CELLS*/null;
+
+// ------------------------------------------------------------------ .geo.json → three.js (как импорт Blockbench; box UV и per-face)
+function facePoint(f, x0, y0, z0, x1, y1, z1, s, t) {
+  switch (f) {
+    case 'north': return [x1 + (x0 - x1) * s, y1 + (y0 - y1) * t, z0];
+    case 'south': return [x0 + (x1 - x0) * s, y1 + (y0 - y1) * t, z1];
+    case 'east':  return [x1, y1 + (y0 - y1) * t, z1 + (z0 - z1) * s];
+    case 'west':  return [x0, y1 + (y0 - y1) * t, z0 + (z1 - z0) * s];
+    case 'up':    return [x1 + (x0 - x1) * s, y1, z1 + (z0 - z1) * t];
+    default:      return [x1 + (x0 - x1) * s, y0, z0 + (z1 - z0) * t];
+  }
+}
+const NORM = { north: [0, 0, -1], south: [0, 0, 1], east: [1, 0, 0], west: [-1, 0, 0], up: [0, 1, 0], down: [0, -1, 0] };
+function boxFaces(c) {
+  const [u, v] = c.uv, [w, h, d] = c.size.map(x => Math.floor(x + 1e-6) || x);
+  const f = {
+    east:  { uv: [u, v + d], uv_size: [d, h] },
+    north: { uv: [u + d, v + d], uv_size: [w, h] },
+    west:  { uv: [u + d + w, v + d], uv_size: [d, h] },
+    south: { uv: [u + 2 * d + w, v + d], uv_size: [w, h] },
+    up:    { uv: [u + d + w, v + d], uv_size: [-w, -d] },
+    down:  { uv: [u + d + 2 * w, v], uv_size: [-w, d] },
+  };
+  if (c.mirror) { const e = f.east; f.east = f.west; f.west = e; for (const k in f) { f[k].uv = [f[k].uv[0] + f[k].uv_size[0], f[k].uv[1]]; f[k].uv_size = [-f[k].uv_size[0], f[k].uv_size[1]]; } }
+  return f;
+}
+
+const TEXC = {};
+function loadTex(src, smooth) {
+  const key = src + (smooth ? '#s' : '');
+  if (TEXC[key]) return TEXC[key];
+  const t = TEXC[key] = new THREE.TextureLoader().load(src);
+  t.magFilter = smooth ? THREE.LinearFilter : THREE.NearestFilter; t.minFilter = smooth ? THREE.LinearFilter : THREE.NearestFilter; t.generateMipmaps = false;
+  return t;
+}
+
+function buildModel(entry, soul) {
+  const g = entry.geo['minecraft:geometry'][0];
+  const TW = g.description.texture_width, TH = g.description.texture_height;
+  const map = loadTex(soul && entry.soul ? entry.soul : entry.tex);
+  const mat = new THREE.MeshLambertMaterial({ map, alphaTest: 0.1, side: THREE.DoubleSide });
+  let gmat = null;
+  const glowSrc = soul && entry.soulGlow ? entry.soulGlow : entry.glow;
+  if (glowSrc) gmat = new THREE.MeshBasicMaterial({ map: loadTex(glowSrc), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+                                                    side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 });
+  const bones = {}, root = new THREE.Group();
+  for (const b of g.bones) {
+    const grp = new THREE.Group();
+    grp.name = b.name;
+    const piv = [-b.pivot[0], b.pivot[1], b.pivot[2]];
+    const r = b.rotation || [0, 0, 0];
+    grp.userData = { piv, rest: [-r[0], -r[1], r[2]].map(v => v * Math.PI / 180), parent: b.parent };
+    bones[b.name] = grp;
+    for (const c of (b.cubes || [])) {
+      if (Array.isArray(c.uv) === false && Object.keys(c.uv || {}).length === 0) continue;   // пустые armorBiped* (uv: {})
+      if (c.size[0] * c.size[1] * c.size[2] === 0 && !Array.isArray(c.uv) && c.uv.north && c.uv.north.uv_size[0] === 0) continue;
+      const faces = Array.isArray(c.uv) ? boxFaces(c) : c.uv;
+      const inf = c.inflate || 0;
+      const x0 = -(c.origin[0] + c.size[0]) - inf, x1 = -c.origin[0] + inf;
+      const y0 = c.origin[1] - inf, y1 = c.origin[1] + c.size[1] + inf;
+      const z0 = c.origin[2] - inf, z1 = c.origin[2] + c.size[2] + inf;
+      const cp = c.pivot ? [-c.pivot[0], c.pivot[1], c.pivot[2]] : piv;
+      const pos = [], uv = [], nrm = [], idx = [];
+      for (const f in faces) {
+        const U = faces[f].uv, S = faces[f].uv_size, base = pos.length / 3;
+        if (!U || !S) continue;
+        for (const [s, t] of [[0, 0], [1, 0], [1, 1], [0, 1]]) {
+          const p = facePoint(f, x0, y0, z0, x1, y1, z1, s, t);
+          pos.push(p[0] - cp[0], p[1] - cp[1], p[2] - cp[2]);
+          uv.push((U[0] + s * S[0]) / TW, 1 - (U[1] + t * S[1]) / TH);
+          nrm.push(...NORM[f]);
+        }
+        idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
+      }
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+      geom.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+      geom.setIndex(idx);
+      const holder = new THREE.Group();
+      holder.position.set(cp[0] - piv[0], cp[1] - piv[1], cp[2] - piv[2]);
+      if (c.rotation) holder.rotation.set(-c.rotation[0] * Math.PI / 180, -c.rotation[1] * Math.PI / 180, c.rotation[2] * Math.PI / 180, 'ZYX');
+      holder.add(new THREE.Mesh(geom, mat));
+      if (gmat) { const gm = new THREE.Mesh(geom, gmat); gm.renderOrder = 2; gm.userData.glow = true; holder.add(gm); }
+      grp.add(holder);
+    }
+  }
+  for (const n in bones) {
+    const grp = bones[n], par = grp.userData.parent ? bones[grp.userData.parent] : null;
+    const pp = par ? par.userData.piv : [0, 0, 0];
+    grp.userData.base = [grp.userData.piv[0] - pp[0], grp.userData.piv[1] - pp[1], grp.userData.piv[2] - pp[2]];
+    (par || root).add(grp);
+  }
+  // огненный слой головы (FireBossFlameLayer: два скрещённых квадрата на голове, полная яркость; в облике души — нет)
+  if (entry.flame && !soul && bones.head) {
+    const ft = loadTex(entry.flame); ft.repeat.set(1, 1 / 8); ft.offset.set(0, 7 / 8);
+    const fm = new THREE.MeshBasicMaterial({ map: ft, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
+    const fg = new THREE.Group(); fg.userData.flame = ft; fg.userData.glow = true;
+    for (const a of [45, 135]) { const q = new THREE.Mesh(new THREE.PlaneGeometry(11.3, 16), fm); q.position.y = 8 + 26 - bones.head.userData.piv[1]; q.rotation.y = a * Math.PI / 180; fg.add(q); }
+    fg.position.set(0, 0, 0); bones.head.add(fg);
+  }
+  // коса (предмет в правой руке — в игре рисует Iron's; здесь упрощённый силуэт для поз)
+  if (entry.scythe && bones.bipedHandRight) {
+    const sg = new THREE.Group(), wood = new THREE.MeshLambertMaterial({ color: 0x2a1a14 }), iron = new THREE.MeshLambertMaterial({ color: 0x55504e });
+    const shaft = new THREE.Mesh(new THREE.BoxGeometry(1.2, 40, 1.2), wood); shaft.position.y = 6; sg.add(shaft);
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(1, 3, 22), iron); blade.position.set(0, 25, -9); blade.rotation.x = -0.25; sg.add(blade);
+    const tip = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.4, 8), iron); tip.position.set(0, 22.5, -21); tip.rotation.x = -0.9; sg.add(tip);
+    sg.rotation.x = Math.PI / 2; sg.position.z = -2;
+    bones.bipedHandRight.add(sg);
+  }
+  return { root, bones };
+}
+
+// ------------------------------------------------------------------ анимации GeckoLib (vector + easing на ключе-приёмнике)
+const EASE = {
+  linear: t => t, step: t => (t < 1 ? 0 : 1),
+  easeInSine: t => 1 - Math.cos(t * Math.PI / 2), easeOutSine: t => Math.sin(t * Math.PI / 2), easeInOutSine: t => -(Math.cos(Math.PI * t) - 1) / 2,
+  easeInQuad: t => t * t, easeOutQuad: t => 1 - (1 - t) * (1 - t), easeInOutQuad: t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
+  easeInCubic: t => t * t * t, easeOutCubic: t => 1 - Math.pow(1 - t, 3), easeInOutCubic: t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+  easeInQuart: t => t ** 4, easeOutQuart: t => 1 - Math.pow(1 - t, 4), easeInOutQuart: t => t < 0.5 ? 8 * t ** 4 : 1 - Math.pow(-2 * t + 2, 4) / 2,
+  easeInOutQuint: t => t < 0.5 ? 16 * t ** 5 : 1 - Math.pow(-2 * t + 2, 5) / 2,
+  easeInOutExpo: t => t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2,
+  easeInElastic: t => t === 0 ? 0 : t === 1 ? 1 : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * (2 * Math.PI) / 3),
+  easeOutElastic: t => t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI) / 3) + 1,
+  easeInOutElastic: t => t === 0 ? 0 : t === 1 ? 1 : t < 0.5 ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * (2 * Math.PI) / 4.5)) / 2
+                                                           : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * (2 * Math.PI) / 4.5)) / 2 + 1,
+};
+function chanAt(chan, t, def) {
+  const ts = Object.keys(chan).map(Number).sort((a, b) => a - b);
+  const get = k => { const v = chan[Object.keys(chan).find(x => Number(x) === k)]; return Array.isArray(v) ? { v } : { v: v.vector || v.post || v.pre, e: v.easing }; };
+  if (!ts.length) return def;
+  if (t <= ts[0]) return get(ts[0]).v;
+  if (t >= ts[ts.length - 1]) return get(ts[ts.length - 1]).v;
+  let i = 0; while (ts[i + 1] < t) i++;
+  const a = ts[i], b = ts[i + 1], A = get(a), B = get(b);
+  const k = (EASE[B.e] || EASE.linear)((t - a) / (b - a));
+  return A.v.map((x, j) => x + (B.v[j] - x) * k);
+}
+function pose(model, anim, t) {
+  for (const n in model.bones) {
+    const g = model.bones[n], u = g.userData;
+    let r = [0, 0, 0], p = [0, 0, 0], s = [1, 1, 1];
+    const bk = anim && anim.bones[n];
+    if (bk) {
+      if (bk.rotation) r = Array.isArray(bk.rotation) ? bk.rotation : chanAt(bk.rotation.vector ? { 0: bk.rotation } : bk.rotation, t, r);
+      if (bk.position) p = Array.isArray(bk.position) ? bk.position : chanAt(bk.position.vector ? { 0: bk.position } : bk.position, t, p);
+      if (bk.scale) { s = Array.isArray(bk.scale) ? bk.scale : chanAt(bk.scale.vector ? { 0: bk.scale } : bk.scale, t, s); if (!Array.isArray(s)) s = [s, s, s]; }
+    }
+    g.position.set(u.base[0] - p[0], u.base[1] + p[1], u.base[2] + p[2]);
+    g.rotation.set(u.rest[0] - r[0] * Math.PI / 180, u.rest[1] - r[1] * Math.PI / 180, u.rest[2] + r[2] * Math.PI / 180, 'ZYX');
+    g.scale.set(Math.max(1e-4, s[0]), Math.max(1e-4, s[1]), Math.max(1e-4, s[2]));
+  }
+}
+function flameFrame(model, tick) { model.root.traverse(o => { if (o.userData.flame) o.userData.flame.offset.y = 1 - ((Math.floor(tick / 2) % 8) + 1) / 8; }); }
+
+// ------------------------------------------------------------------ сцена
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(window.devicePixelRatio || 1);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setScissorTest(true);
+document.body.appendChild(renderer.domElement);
+
+function groundTex() {
+  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { x.fillStyle = (i + j) % 2 ? '#3a2e28' : '#342822'; x.fillRect(i * 16, j * 16, 16, 16); }
+  const gt = new THREE.CanvasTexture(c); gt.magFilter = THREE.NearestFilter; gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(32, 32);
+  return gt;
+}
+function makeScene(c) {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(c.bg || 0x1c1210);
+  scene.fog = new THREE.Fog(scene.background, 200, 700);
+  scene.add(new THREE.HemisphereLight(0xd8c8c0, 0x281410, (c.dim ?? 1) * 0.8));
+  const d = new THREE.DirectionalLight(0xfff0e0, (c.dim ?? 1) * 0.7); d.position.set(30, 60, -40); scene.add(d);
+  const d2 = new THREE.DirectionalLight(0xff8040, (c.dim ?? 1) * 0.35); d2.position.set(-40, 20, 50); scene.add(d2);
+  if (c.ground !== false) {
+    const gr = new THREE.Mesh(new THREE.PlaneGeometry(512, 512), new THREE.MeshLambertMaterial({ map: groundTex() }));
+    gr.rotation.x = -Math.PI / 2; gr.position.y = -0.01; scene.add(gr);
+  }
+  return scene;
+}
+function cameraFor(entry, view) {
+  const h = entry.height || 34;
+  const cam = new THREE.PerspectiveCamera(view.fov || 30, 1, 0.5, 3000);
+  const yaw = (view.yaw ?? 25) * Math.PI / 180, pitch = (view.pitch ?? 8) * Math.PI / 180;
+  const dist = (view.dist || 2.3) * h * (30 / (view.fov || 30));
+  const ty = view.ty ?? h * 0.55;
+  cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, ty + Math.sin(pitch) * dist, -Math.cos(yaw) * Math.cos(pitch) * dist);
+  cam.lookAt(0, ty, 0);
+  return cam;
+}
+
+function setup(c) {
+  const e = DATA.models[c.model];
+  const m = buildModel(e, c.soul);
+  const anim = c.anim ? DATA.anims[c.anim] : null;
+  pose(m, anim, c.t || 0); flameFrame(m, Math.floor((c.t || 0) * 20));
+  if (c.noGlow) m.root.traverse(o => { if (o.userData.glow) o.visible = false; });
+  return { e, m };
+}
+
+if (CELLS) {
+  const cols = CELLS.cols, rows = Math.ceil(CELLS.cells.length / cols);
+  const W = window.innerWidth, H = window.innerHeight, cw = W / cols, ch = H / rows;
+  const draw = () => {
+    CELLS.cells.forEach((c, i) => {
+      const { e, m } = setup(c);
+      const sc = makeScene(c); sc.add(m.root);
+      if (c.light) { const p = new THREE.PointLight(0xff7a30, c.light, 120, 2); p.position.set(0, 30, -20); sc.add(p); }
+      const cam = cameraFor(e, c); cam.aspect = cw / ch; cam.updateProjectionMatrix();
+      const x = (i % cols) * cw, y = H - (Math.floor(i / cols) + 1) * ch;
+      renderer.setViewport(x, y, cw, ch); renderer.setScissor(x, y, cw, ch);
+      renderer.render(sc, cam);
+      if (c.label) {
+        const d = document.createElement('div'); d.className = 'lab';
+        d.style.left = (x + 8) + 'px'; d.style.top = (Math.floor(i / cols) * ch + 6) + 'px';
+        d.innerHTML = c.label + (c.sub ? '<small>' + c.sub + '</small>' : ''); document.body.appendChild(d);
+      }
+    });
+    document.getElementById('ui').style.display = 'none';
+    window.READY = true;
+  };
+  THREE.DefaultLoadingManager.onLoad = () => { if (!window.READY) setTimeout(draw, 50); };
+  for (const c of CELLS.cells) setup(c);
+} else {
+  const sel = document.getElementById('model'), asel = document.getElementById('anim');
+  for (const n in DATA.models) sel.add(new Option(DATA.models[n].title || n, n));
+  asel.add(new Option('(покой)', ''));
+  for (const a of Object.keys(DATA.anims).sort()) asel.add(new Option(a, a));
+  let cur, scene, anim, t0 = performance.now(), playing = true, yaw = 25, pitch = 8, zoom = 1, tfix = 0;
+  const setModel = () => {
+    scene = makeScene({});
+    cur = buildModel(DATA.models[sel.value], document.getElementById('soul').checked); scene.add(cur.root);
+    setAnim();
+  };
+  const setAnim = () => { anim = asel.value ? DATA.anims[asel.value] : null; t0 = performance.now(); };
+  sel.onchange = setModel; asel.onchange = setAnim; document.getElementById('soul').onchange = setModel;
+  document.getElementById('glow').onchange = e => cur.root.traverse(o => { if (o.userData.glow) o.visible = e.target.checked; });
+  document.getElementById('play').onclick = e => { playing = !playing; e.target.textContent = playing ? '⏸' : '▶'; t0 = performance.now() - tfix * 1000; };
+  document.getElementById('time').oninput = e => { playing = false; document.getElementById('play').textContent = '▶'; tfix = e.target.value * (anim ? anim.animation_length : 1); };
+  let drag = null;
+  renderer.domElement.onpointerdown = e => drag = [e.clientX, e.clientY, yaw, pitch];
+  window.onpointerup = () => drag = null;
+  window.onpointermove = e => { if (drag) { yaw = drag[2] - (e.clientX - drag[0]) * 0.4; pitch = Math.max(-30, Math.min(80, drag[3] + (e.clientY - drag[1]) * 0.3)); } };
+  renderer.domElement.onwheel = e => { zoom *= Math.exp(e.deltaY * 0.001); e.preventDefault(); };
+  window.onresize = () => renderer.setSize(window.innerWidth, window.innerHeight);
+  setModel();
+  const loop = () => {
+    const W = window.innerWidth, H = window.innerHeight;
+    renderer.setViewport(0, 0, W, H); renderer.setScissor(0, 0, W, H);
+    let t = tfix;
+    if (anim && playing) {
+      const L = anim.animation_length, el = (performance.now() - t0) / 1000;
+      t = anim.loop === true ? el % L : Math.min(el % (L + 1.0), L);
+      tfix = t; document.getElementById('time').value = t / L;
+    }
+    if (cur) { pose(cur, anim, t); flameFrame(cur, Math.floor(performance.now() / 50)); }
+    document.getElementById('tinfo').textContent = anim ? t.toFixed(2) + ' / ' + anim.animation_length + ' с' : '';
+    const cam = cameraFor(DATA.models[sel.value], { yaw, pitch, dist: 2.3 * zoom }); cam.aspect = W / H; cam.updateProjectionMatrix();
+    renderer.render(scene, cam);
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+</script>
+</body>
+</html>

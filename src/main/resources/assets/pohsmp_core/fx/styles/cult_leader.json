@@ -1,0 +1,25 @@
+{
+ "comment": "T26 Глава Культа Меллисто: огонь Тироса (палитра tyros_flame) и багровая ткань культа; движение тяжёлое, с рывками пламени.",
+ "palette": {
+  "primary": "#FF7A1E",
+  "secondary": "#FFD24A",
+  "core": "#FFF4D8",
+  "shadow": "#4A0E10"
+ },
+ "textures": {
+  "sparks": "spark_soft",
+  "runes": "school_fire_band",
+  "shards": "mote_flame",
+  "sigil": "cult_emblem"
+ },
+ "blend": "additive",
+ "motion": {
+  "rotationScale": 0.9,
+  "jitter": 0.2,
+  "easing": "easeOutCubic",
+  "pulse": {
+   "amp": 0.15,
+   "period": 8
+  }
+ }
+}

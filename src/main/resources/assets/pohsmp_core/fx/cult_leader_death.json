@@ -1,0 +1,152 @@
+{
+ "comment": "Ролик смерти 3.5 с (70 тиков = начало анимации fire_boss_death): 0–2.6 с босс падает на колени, пламя спиралью стекает вниз; 2.6 с (52) — пламя головы гаснет (код выключает слой огня), дымный выдох, искры; 2.6–3.5 — пепел поднимается с тела. caster = босс. Стену огня гасить на 52 тике (Fx.stop).",
+ "style": "cult_leader",
+ "duration": 100,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100,
+   "radius": 32,
+   "color": "#2A0806",
+   "strength": 0.3,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 30,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "vortex",
+   "delay": 0,
+   "at": "caster",
+   "duration": 52,
+   "radius": 1.4,
+   "height": 3.2,
+   "arms": 3,
+   "speed": -6,
+   "flow": -1,
+   "texture": "mote_flame",
+   "color": "@primary",
+   "out": {
+    "duration": 12,
+    "easing": "easeOutCubic"
+   },
+   "comment": "пламя спиралью стекает вниз по телу"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 50,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.8,
+   "spread": 0.6,
+   "speed": 0.02,
+   "gravity": 0.01,
+   "size": [
+    0.4,
+    0.05
+   ],
+   "life": 20,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 52,
+   "at": "caster+0,1.9,0",
+   "duration": 10,
+   "size": 2.4,
+   "color": "#FFD24A",
+   "comment": "пламя гаснет"
+  },
+  {
+   "type": "sprites",
+   "delay": 52,
+   "at": "caster+0,2,0",
+   "duration": 8,
+   "texture": "mote_ash",
+   "count": 40,
+   "rate": 6,
+   "spread": 0.5,
+   "speed": 0.05,
+   "gravity": -0.012,
+   "spin": 40,
+   "size": [
+    0.5,
+    0.2
+   ],
+   "life": 40,
+   "color": "#1A0E0C",
+   "blend": "translucent",
+   "comment": "дымный выдох"
+  },
+  {
+   "type": "sprites",
+   "delay": 52,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 50,
+   "rate": 10,
+   "spread": 0.8,
+   "speed": 0.2,
+   "gravity": 0.015,
+   "size": [
+    0.15,
+    0.02
+   ],
+   "life": 18,
+   "color": "#FF7A1E"
+  },
+  {
+   "type": "sprites",
+   "delay": 54,
+   "at": "caster+0,0.9,0",
+   "duration": 46,
+   "texture": "mote_ash",
+   "count": 100000,
+   "rate": 1.2,
+   "spread": 0.7,
+   "speed": 0.01,
+   "gravity": -0.008,
+   "spin": 30,
+   "size": [
+    0.22,
+    0.06
+   ],
+   "life": 50,
+   "color": "#62514E",
+   "blend": "translucent",
+   "comment": "пепел с тела"
+  },
+  {
+   "type": "decal",
+   "delay": 52,
+   "at": "caster",
+   "duration": 48,
+   "texture": "glow",
+   "radius": 3.0,
+   "blend": "translucent",
+   "color": "#1A0E0C",
+   "fadeOut": 30,
+   "comment": "выжженное пятно"
+  },
+  {
+   "type": "wave",
+   "delay": 52,
+   "at": "caster",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 8,
+   "thickness": 1.2,
+   "followTerrain": true,
+   "color": "#C8320C"
+  }
+ ]
+}

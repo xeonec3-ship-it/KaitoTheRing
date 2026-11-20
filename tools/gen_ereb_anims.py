@@ -210,11 +210,12 @@ def build():
     # раздел «Добивание»). 2.4 с: 0.3 vanish — растворяется в стеклянной ряби (код прячет модель и переносит Эреба на 1.3 бл. ЗА СПИНУ жертвы,
     # лицом к ней — жертва перед ним), 0.7 appear — появляется уже в замахе, 1.1 stab — укол в спину (остриё на высоте спины, проходит насквозь),
     # 1.9 kill — выдёргивает клинок, жертва рассыпается стеклом и бабочками; 2.4 — стойка.
+    fstab = mod(stab, body_pos=[0, -1.4, 0], body=[8, -20, 0])     # без шага вперёд: жертва вплотную, голова не заходит в неё
     an['ereb_finisher'] = anim(2.4, [
         (0, STAND), (0.15, mod(STAND, body_pos=[0, 0, 2], head=[12, 8, 0], right_arm=[-30, 12, 7]), IO),
         (0.3, mod(STAND, body_pos=[0, 0, 3], head=[12, 8, 0], body_scale=[0.96, 1.04, 0.96]), IO),
-        (0.7, pre), (0.95, mod(pre, right_arm=[-170, 20, -10]), IO), (1.1, stab, IQ), (1.6, stab),
-        (1.9, mod(stab, right_arm=[-84, 20, 12], bipedHandRight=[88, 0, 0], body_pos=[0, -1.2, -1.5]), OC),
+        (0.7, pre), (0.95, mod(pre, right_arm=[-170, 20, -10]), IO), (1.1, fstab, IQ), (1.6, fstab),
+        (1.9, mod(fstab, right_arm=[-84, 20, 12], bipedHandRight=[88, 0, 0], body_pos=[0, -1.2, 1.5]), OC),
         (2.4, STAND, IO)], [(0.3, 'vanish'), (0.7, 'appear'), (1.1, 'stab'), (1.9, 'kill')])
     return an
 
@@ -225,9 +226,9 @@ def victim_emote():
     poses = [
         (0, dict(torso=(0, 0, 0, 0), head=(0, 0, 0), rightArm=(0, 0, 4, 0), leftArm=(0, 0, -4, 0), rightLeg=(0, 0, 2, 0), leftLeg=(0, 0, -2, 0))),
         (20, dict(torso=(0, 0, 0, 0), head=(-4, 10, 0), rightArm=(-6, 0, 6, 4), leftArm=(-6, 0, -6, 4), rightLeg=(0, 0, 2, 0), leftLeg=(0, 0, -2, 0))),
-        (22, dict(torso=(-16, 0, 0, -8), head=(-32, 0, 0), rightArm=(-24, 0, 42, -6), leftArm=(-24, 0, -42, -6), rightLeg=(6, 0, 3, 6),
+        (22, dict(torso=(-7, 0, 0, -4), head=(-22, 0, 0), rightArm=(-24, 0, 42, -6), leftArm=(-24, 0, -42, -6), rightLeg=(6, 0, 3, 6),
                   leftLeg=(-4, 0, -3, 4))),
-        (30, dict(torso=(-12, 0, 0, -6), head=(-26, 0, 6), rightArm=(-16, 0, 34, -4), leftArm=(-18, 0, -30, -4), rightLeg=(4, 0, 3, 10),
+        (30, dict(torso=(-5, 0, 0, -3), head=(-18, 0, 6), rightArm=(-16, 0, 34, -4), leftArm=(-18, 0, -30, -4), rightLeg=(4, 0, 3, 10),
                   leftLeg=(-2, 0, -3, 8))),
         (38, dict(torso=(22, 0, 0, 10), head=(28, 0, 4), rightArm=(12, 0, 10, 10), leftArm=(10, 0, -12, 10), rightLeg=(-30, 0, 4, 70),
                   leftLeg=(-24, 0, -4, 64))),

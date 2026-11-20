@@ -64,7 +64,7 @@ public class BloodMoonSpell extends HigherSpell {
                         int threads = 0;
                         for (LivingEntity e : around(sl, c, R, e -> !friendly(caster, e))) {
                             float before = e.getHealth();
-                            hurt(sl, caster, e, dmg(e.getMaxHealth() * PCT));
+                            hurt(sl, caster, e, dmg(e.getMaxHealth() * PCT * ru.pohsmp.core.boss.BossGuard.percentMult(e)));   // cult bosses: percent_damage_mult
                             float lost = Math.max(0, before - e.getHealth());
                             sum += lost;
                             if (lost > 0 && threads++ < 8)   // a thread of blood to the caster

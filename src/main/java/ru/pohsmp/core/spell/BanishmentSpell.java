@@ -41,7 +41,8 @@ public class BanishmentSpell extends PohSpell {
         if (level instanceof ServerLevel sl) {
             double d = dist(spellLevel);
             Vec3 c = caster.position();
-            for (LivingEntity e : HigherSpell.around(sl, c, radius(spellLevel), e -> e != caster && !e.isSpectator() && !e.isPassenger())) {
+            for (LivingEntity e : HigherSpell.around(sl, c, radius(spellLevel), e -> e != caster && !e.isSpectator() && !e.isPassenger()
+                    && !ru.pohsmp.core.boss.BossGuard.immovable(e))) {   // cult bosses stay in their arena
                 Vec3 dir = e.position().subtract(c).multiply(1, 0, 1);
                 if (dir.lengthSqr() < 1e-4) dir = caster.getLookAngle().multiply(1, 0, 1);
                 if (dir.lengthSqr() < 1e-4) dir = new Vec3(1, 0, 0);

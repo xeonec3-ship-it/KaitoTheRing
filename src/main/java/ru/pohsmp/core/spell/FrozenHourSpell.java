@@ -131,6 +131,8 @@ public class FrozenHourSpell extends PohSpell {
             if (e instanceof Player p && (p.isCreative() || p.isSpectator())) continue;
             if (!(e instanceof LivingEntity || e instanceof Projectile || e instanceof ItemEntity)) continue;
             if (e.getTags().contains(Disp.TAG) || FROZEN.containsKey(e.getUUID())) continue;
+            int life = ru.pohsmp.core.boss.BossGuard.frozenHourTicks(e, LIFE);   // cult bosses: 1.5 s, then 30 s immune
+            if (life <= 0) continue;
             Frozen f = new Frozen();
             f.e = e;
             f.pos = e.position();
@@ -139,7 +141,7 @@ public class FrozenHourSpell extends PohSpell {
             f.xRot = e.getXRot();
             f.noGravity = e.isNoGravity();
             f.fire = e.getRemainingFireTicks();
-            f.until = until;
+            f.until = sl.getGameTime() + life;
             if (e instanceof Mob m) {
                 f.noAi = m.isNoAi();
                 m.setNoAi(true);
@@ -152,7 +154,7 @@ public class FrozenHourSpell extends PohSpell {
             if (e instanceof LivingEntity le && prisms++ < MAX_PRISMS) {   // a glass prism around each frozen creature
                 double h = le.getBbHeight() + 0.3;
                 f.prism = Fx.play(sl, Fx.fx("frozen_hour_prism").at(le.position()).yaw(le.getYRot()).scale(Math.max(0.5, h / 2.3))
-                        .point("top", le.position().add(0, h, 0)).duration(LIFE));
+                        .point("top", le.position().add(0, h, 0)).duration(life));
             }
         }
     }
@@ -164,7 +166,8 @@ public class FrozenHourSpell extends PohSpell {
         if (e instanceof LivingEntity le) {
             if (Math.abs(e.getX() - f.pos.x) + Math.abs(e.getY() - f.pos.y) + Math.abs(e.getZ() - f.pos.z) > 0.05)
                 HigherSpell.place(le, f.pos.x, f.pos.y, f.pos.z);
-            if (e.tickCount % 10 == 0) le.addEffect(new MobEffectInstance(Reg.PARALYSIS.get(), 15, 0, false, false, false));
+            if (e.tickCount % 10 == 0 && !ru.pohsmp.core.boss.BossGuard.isBoss(le))   // a boss is held by the freeze itself (its paralysis would count as control)
+                le.addEffect(new MobEffectInstance(Reg.PARALYSIS.get(), 15, 0, false, false, false));
         } else {
             e.setPos(f.pos.x, f.pos.y, f.pos.z);
         }
@@ -180,7 +183,7 @@ public class FrozenHourSpell extends PohSpell {
     private static void free(Frozen f) {
         Entity e = f.e;
         if (f.prism >= 0 && e.level() instanceof ServerLevel sl && sl.getGameTime() < f.until - 4) Fx.stop(sl, f.prism, "");   // died or left early
-        if (e instanceof Mob m) m.setNoAi(f.noAi);
+        if (e instanceof Mob m) m.setNoAi(ru.pohsmp.core.boss.BossGuard.noAiAfterFreeze(m, f.noAi));   // a cult boss: as its own locks say
         e.setNoGravity(f.noGravity);
         e.getPersistentData().remove(KEY_AI);
         e.getPersistentData().remove(KEY_NG);

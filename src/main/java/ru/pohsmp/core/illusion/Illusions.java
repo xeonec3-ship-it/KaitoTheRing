@@ -86,7 +86,7 @@ public final class Illusions {
     public static int duration(LivingEntity victim, int ticks) {
         if (victim == null) return ticks;
         double r = victim.getAttribute(Reg.ILLUSION_RESIST.get()) == null ? 1 : victim.getAttributeValue(Reg.ILLUSION_RESIST.get());
-        double k = Math.max(ServerConfig.get(ServerConfig.IL_RESIST_FLOOR), Math.min(2, 2 - r));
+        double k = Math.max(ServerConfig.get(ServerConfig.IL_RESIST_FLOOR), Math.min(2, 2 - r)) * ru.pohsmp.core.boss.BossGuard.illusionMult(victim);   // cult bosses x0.5
         return Math.max(1, (int) Math.round(ticks * k));
     }
 

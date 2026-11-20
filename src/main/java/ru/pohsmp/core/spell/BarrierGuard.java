@@ -44,7 +44,7 @@ public final class BarrierGuard {
 
     public static boolean boss(Entity e) {
         EntityType<?> t = e.getType();
-        return t.is(Tags.EntityTypes.BOSSES) || t == EntityType.WITHER || t == EntityType.ENDER_DRAGON || t == EntityType.WARDEN
+        return ru.pohsmp.core.boss.BossGuard.isBoss(e) || t.is(Tags.EntityTypes.BOSSES) || t == EntityType.WITHER || t == EntityType.ENDER_DRAGON || t == EntityType.WARDEN
                 || t == EntityType.ELDER_GUARDIAN;
     }
 
@@ -145,7 +145,8 @@ public final class BarrierGuard {
 
     /** A boss on the shell: pushed along `away` (unit, the side it came from), once a second it loses BARRIER_BOSS_PCT of its max health. */
     public static void repel(ServerLevel sl, LivingEntity e, Vec3 away, Vec3 at, int rgb) {
-        HigherSpell.push(e, away.scale(1.1).add(0, 0.3, 0));
+        e.setDeltaMovement(away.scale(1.1).add(0, 0.3, 0));   // not HigherSpell.push: the shell pushes even displacement-immune bosses
+        e.hurtMarked = true;
         long now = sl.getGameTime();
         Long last = LAST_BOSS_HIT.get(e.getUUID());
         if (last != null && now - last < 20) return;
@@ -153,7 +154,7 @@ public final class BarrierGuard {
         if (LAST_BOSS_HIT.size() > 256) LAST_BOSS_HIT.values().removeIf(t -> now - t > 200);
         HigherSpell.burst(sl, at.x, at.y, at.z, 2.2, rgb);
         sl.playSound(null, at.x, at.y, at.z, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.HOSTILE, 1.5f, 0.5f);
-        float dmg = (float) (e.getMaxHealth() * ServerConfig.BARRIER_BOSS_PCT.get());
+        float dmg = (float) (e.getMaxHealth() * ru.pohsmp.core.boss.BossGuard.barrierShare(e, ServerConfig.BARRIER_BOSS_PCT.get()));   // cult bosses: [bosses_common] barrier_push_share
         if (dmg > 0) {
             e.invulnerableTime = 0;
             e.hurt(source(sl), dmg);

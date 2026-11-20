@@ -68,13 +68,14 @@ public class MirrorPrisonSpell extends HigherSpell {
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData md) {
         if (level instanceof ServerLevel sl) {
             LivingEntity t = target(sl, md);
-            if (t != null && t.isAlive() && !CELLS.containsKey(t.getUUID())) {
+            int life = t == null ? 0 : ru.pohsmp.core.boss.BossGuard.mirrorPrisonTicks(t, LIFE);   // cult bosses: 1 s
+            if (t != null && t.isAlive() && !CELLS.containsKey(t.getUUID()) && life > 0) {
                 if (t.isPassenger()) t.stopRiding();
                 Cell cell = new Cell();
                 cell.caster = caster;
                 cell.t = t;
                 cell.c = t.position();
-                cell.until = sl.getGameTime() + LIFE;
+                cell.until = sl.getGameTime() + life;
                 Vec3 c = cell.c;
                 // the mirror cage (owner, 19.11.2026: new look instead of blue glass blocks): seal, mirror panes, glints — fx/mirror_prison.json
                 cell.fx = ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx("mirror_prison").at(c).yaw(0));

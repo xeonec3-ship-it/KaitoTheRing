@@ -171,6 +171,7 @@ public class WorldTreeSpell extends MythicT23 {
                 v.addEffect(new MobEffectInstance(Reg.ENTANGLED.get(), 15, 0, false, false, true));
                 v.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 3, false, false, false));
             }
+            if (ru.pohsmp.core.boss.BossGuard.immovable(v)) return;   // cult bosses: slowed by the roots, never pulled
             Vec3 to = p.subtract(v.position()).multiply(1, 0, 1);
             double dist = to.length();
             Vec3 m = v.getDeltaMovement();

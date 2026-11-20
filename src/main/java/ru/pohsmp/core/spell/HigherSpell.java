@@ -121,6 +121,7 @@ public abstract class HigherSpell extends AbstractSpell {
 
     /** Sets velocity and makes sure players receive it. */
     public static void push(Entity t, Vec3 v) {
+        if (ru.pohsmp.core.boss.BossGuard.immovable(t)) return;   // cult bosses: displacement_immune (balance 1.2)
         t.setDeltaMovement(v);
         t.hurtMarked = true;
     }

@@ -105,9 +105,13 @@ def rows(ctx):
 
 
 def pick(tones, idx):
-    idx = np.clip(np.asarray(idx), 0, len(tones) - 1)
+    """Тон по индексу; дробный индекс квантуется до половин — промежуточный тон = середина соседних (мягкий переход целыми пикселями)."""
+    f = np.clip(np.round(np.asarray(idx, float) * 2) / 2, 0, len(tones) - 1)
     T = np.array(tones)
-    return T[idx]
+    lo = np.floor(f).astype(int)
+    hi = np.minimum(lo + 1, len(tones) - 1)
+    k = (f - lo)[..., None]
+    return T[lo] * (1 - k) + T[hi] * k
 
 
 T_HAT = [hex2('#7C7986'), hex2('#625F6C'), hex2('#4E4B58'), hex2('#3A3743')]
@@ -151,25 +155,19 @@ def phash(q, seed=0):
 
 
 def weave(ctx, kind, seed=0):
-    """Фактура ткани целыми пикселями (поправка тона: −1 светлее, +1 темнее).
-    twill — саржа: диагональные рубчики через 4 px; felt — фетр: редкие тёмные и светлые ворсинки; satin — лента: продольные нити;
-    knit — вязь: «ёлочка» 2×2."""
+    """Фактура ткани (поправка тона, ≤ 0.5): только МЕСТАМИ (пятнами по низкочастотной маске) и слабее — как на ткани эталона.
+    twill — саржа: диагональный рубчик; satin — лента: продольная нить; knit — вязь. felt (фетр) — без штриховки: только пятна."""
     pc, pr, q = pxy(ctx)
-    d = np.zeros(ctx.n, int)
+    d = np.zeros(ctx.n)
     side = np.abs(ctx.N[:, 1]) < 0.5
+    patch = fbm(ctx.P, 0.28, 700 + seed, 2) > 0.56                         # где фактура видна
     if kind == 'twill':
         u = q[:, 0] + q[:, 2]
-        d += (((u + q[:, 1]) % 4) == 0).astype(int)
-        d -= ((((u + q[:, 1]) % 8) == 2) & (phash(q, seed) < 0.5)).astype(int)
-    elif kind == 'felt':
-        r = phash(q, seed + 5)
-        d += (r < 0.07).astype(int)
-        d -= (r > 0.955).astype(int)
+        d += 0.5 * ((((u + q[:, 1]) % 4) == 0) & patch)
     elif kind == 'satin':
-        d -= ((pc % 3 == 1) & side).astype(int)
-        d += ((pc % 3 == 2) & (pr % 6 == 0) & side).astype(int)
+        d -= 0.5 * ((pc % 3 == 1) & side & patch)
     elif kind == 'knit':
-        d += ((((q[:, 0] + q[:, 2]) // 2 + q[:, 1]) % 3 == 0) & ((q[:, 1] // 2) % 2 == 0)).astype(int)
+        d += 0.5 * (((((q[:, 0] + q[:, 2]) // 2 + q[:, 1]) % 3) == 0) & ((q[:, 1] // 2) % 2 == 0) & patch)
     return d
 
 
@@ -188,10 +186,15 @@ def fold_columns(ctx, i, step=3, phase=0):
     top = (14 + (hsh % 23)) * K4                                          # верх складки (в 1/4 ед. мировой высоты)
     yy = np.floor((ctx.P[:, 1] + 64) * K4).astype(int)
     rel = (64 * K4 + top) - yy                                            # >0 — ниже верха складки
-    dark = side & (rel > 0) & ((m_ == 0) | ((m_ == 1) & (rel > 6)))
-    lit = side & (rel > 2) & (m_ == 2) & (yy % 7 != 0)
-    i[dark] = np.maximum(i[dark], 2)
-    i[lit & (i == 1)] = 0
+    core = side & (rel > 0) & (m_ == 0)
+    soft = side & (rel > 4) & ((m_ == 1) | (m_ == per - 1))                 # полутон по бокам складки — мягкий переход
+    fade = side & (rel > 0) & (rel <= 4) & (m_ == 0)                        # верх складки сходит на нет
+    lit = side & (rel > 3) & (m_ == 2)
+    i = i.astype(float)
+    i[soft] = np.maximum(i[soft], 1.5)
+    i[core] = np.maximum(i[core], 2.0)
+    i[fade] = np.minimum(i[fade], 1.5)
+    i[lit & (i == 1)] = 0.5
     return i
 
 
@@ -199,10 +202,12 @@ def shade(ctx, tones, folds=True, rim=True, fold_step=3, fold_phase=0, blotch=0.
     """tones: [блик, основной, полутень, тень]. Пиксельная светотень: верх/низ граней, контурные края, складки разной длины,
     крупные пятна-потёртости целыми тонами (blotch) — как на ткани Главы Культа."""
     n = ctx.n
-    i = np.ones(n, int)
+    i = np.ones(n, float)
     if blotch:
-        b = fbm(ctx.P, 0.2, 300 + seed, 2)
-        i = i + (b > 0.72 - 0.04 * blotch).astype(int)                              # редкие крупные потёртости (сдержанно, как ткань эталона)
+        b1 = fbm(ctx.P, 0.18, 300 + seed, 3)                                       # крупные пятна
+        b2 = fbm(ctx.P, 0.55, 340 + seed, 2)                                       # мелкие
+        i = i.astype(float) + 0.5 * (b1 > 0.62) + 0.5 * (b1 > 0.7) * blotch + 0.5 * ((b2 > 0.74) & (b1 > 0.45)) \
+            - 0.5 * ((b1 < 0.3) & (b2 < 0.45))                                     # потёртости светлее
     up = ctx.N[:, 1] > 0.5
     dn = ctx.N[:, 1] < -0.5
     side = ~(up | dn)
@@ -259,7 +264,7 @@ def no_glow(n):
 
 def mat_hat(ctx):
     info = ctx.cube.info
-    c = shade(ctx, T_HAT, folds=not info.get('brim'), fold_step=3, blotch=0.8, seed=1, tex='felt')
+    c = shade(ctx, T_HAT, folds=not info.get('brim'), fold_step=3, blotch=1.0, seed=1)
     if info.get('band'):                                            # лиловая лента: 2 тёмные полосы и светлый кант (референс)
         y0, y1 = ctx.cube.frm[1], ctx.cube.to[1]
         r = np.floor(ctx.L[:, 1] - y0).astype(int)
@@ -279,7 +284,7 @@ def mat_hat(ctx):
             b = fbm(ctx.P, 0.35, 41, 2)
             idx = np.where(rr < 5.8, 2, np.where(b > 0.6, 2, np.where(b < 0.36, 0, 1)))       # тень тульи, потёртости
             idx = np.where(edge_dist(ctx) < 0.5, 0, idx)                                      # светлый край
-            c = pick(T_HAT, np.clip(idx + weave(ctx, 'felt', 21), 0, 3))
+            c = pick(T_HAT, idx)
         else:
             c = pick(T_HAT, np.where(r1 == 0, 3, np.where(r0 == 0, 0, 2)))
     return c, 1.0, None
@@ -369,7 +374,7 @@ def mat_gg(ctx):
 
 
 def mat_boot(ctx):
-    c = shade(ctx, T_LIL if ctx.cube.info.get('cuff') else T_BOOT, folds=False, blotch=0.4, seed=8, tex='felt')
+    c = shade(ctx, T_LIL if ctx.cube.info.get('cuff') else T_BOOT, folds=False, blotch=0.6, seed=8)
     return c, 1.0, None
 
 

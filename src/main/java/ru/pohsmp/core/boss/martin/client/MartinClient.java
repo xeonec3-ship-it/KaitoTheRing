@@ -71,6 +71,23 @@ public final class MartinClient {
                 .shot(0, (k, t, c) -> Shot.of(c.rel(c.b, 8, 0, 1.6), c.b.add(0, 2.2, 0)))                                  // щит в землю
                 .cut(MartinMath.HOLD_WALL, (k, t, c) -> Shot.of(c.orbit(c.b, 150, 9, 3), c.b.add(0, 2, 0)));              // барьер, спина открыта
 
+        // добивание: только камера жертвы (2 с) — крупно на его шлем сбоку от жертвы, поднимаясь с ней; не ближе 6 бл.
+        BossCam.plan("martin.finisher", MartinMath.FINISHER_CAM)
+                .shot(0, (k, t, c) -> {
+                    Entity v = c.extra;
+                    Vec3 helm = c.b.add(0, 3.6, 0);
+                    if (v == null) return Shot.of(c.orbit(c.b, 20, 7, 2.6), helm);
+                    Vec3 vp = v.getPosition(c.pt);
+                    Vec3 d = vp.subtract(c.b).multiply(1, 0, 1);
+                    d = d.lengthSqr() < 1e-3 ? c.fwd : d.normalize();
+                    double a = Math.toRadians(25);
+                    Vec3 dd = new Vec3(d.x * Math.cos(a) - d.z * Math.sin(a), 0, d.x * Math.sin(a) + d.z * Math.cos(a));
+                    Vec3 pos = c.b.add(dd.scale(7));
+                    double y = Math.max(vp.y + v.getEyeHeight(), c.b.y + 2.4);
+                    int slam = MartinMath.FINISHER_SLAM - MartinMath.FINISHER_CAM_FROM;
+                    return Shot.of(new Vec3(pos.x, y, pos.z), helm).shake(t >= slam && t < slam + 5 ? 0.1 : 0);
+                });
+
         // Блок-сдача 5 s (extra = the player whose blow he blocked)
         BossCam.plan("martin.yield", MartinMath.YIELD_CAM)
                 .shot(0, (k, t, c) -> {                                                                                       // из-за плеча ударившего

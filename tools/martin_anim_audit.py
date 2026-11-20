@@ -23,7 +23,8 @@ import gen_martin as G  # noqa: E402
 FILE = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core', 'animations', 'entity', 'martin.animation.json')
 # Где острие в землю задумано (опора на меч, вонзить в землю): (анимация, от, до)
 GROUND_OK = [('martin_overhead', 0.9, 1.85), ('martin_phase2', 0.45, 2.6), ('martin_phase3', 0.0, 1.5), ('martin_spawn', 0.0, 3.9),
-             ('martin_npc_idle', 0, 99), ('martin_to_npc', 0.6, 99), ('martin_block_yield', 1.6, 99)]
+             ('martin_npc_idle', 0, 99), ('martin_to_npc', 0.6, 99), ('martin_block_yield', 1.6, 99),
+             ('martin_finisher', 1.9, 2.3)]
 BOXES = {   # кость: [(x0,y0,z0, x1,y1,z1)] во внутренних координатах модели (покой), чуть ужатые
     'torso': [(-4.2, 12.3, -2.8, 4.2, 23.8, 2.6)],
     'head': [(-3.8, 24.4, -4.3, 3.8, 31.4, 3.8), (-4.0, 31.4, -0.3, 4.0, 38.5, 1.5)],

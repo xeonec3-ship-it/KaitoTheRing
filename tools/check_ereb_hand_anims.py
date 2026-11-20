@@ -123,13 +123,13 @@ def main():
                     errors.append('%s t=%.2f: рука в теле: %s' % (name, t, ', '.join(sorted(hit_parts))))
             # рапира сквозь тело (клинок от гарды к острию; правая рука держит — её не считаем)
             blade = F.rapier_points(W, model, 10)[2:]
-            hit_parts = model.hits(model.solids(W, ('torso', 'head', 'left_arm', 'right_leg', 'left_leg', 'cape'), 0.2), blade)
+            hit_parts = model.hits(model.solids(W, ('torso', 'head', 'mask', 'left_arm', 'right_leg', 'left_leg', 'cape', 'cape_mid', 'cape_low'), 0.0), blade)
             if blade[-1][1] < -0.6:
                 errors.append('%s t=%.2f: острие рапиры в земле (y=%.1f)' % (name, t, blade[-1][1]))
             if hit_parts:
                 errors.append('%s t=%.2f: клинок в %s' % (name, t, ', '.join(sorted(hit_parts))))
             # 4) накидка
-            cp = model.points(W, 'cape', 3)
+            cp = model.points(W, 'cape', 3) + model.points(W, 'cape_mid', 3) + model.points(W, 'cape_low', 3)
             bad = model.hits(model.solids(W, ('right_leg', 'left_leg', 'torso'), 0.3), cp)
             if bad:
                 errors.append('%s t=%.2f: накидка в %s' % (name, t, ', '.join(sorted(bad))))
@@ -141,14 +141,14 @@ def main():
                     errors.append('%s t=%.2f: удар не вперёд (острие z=%.1f)' % (name, t, tip[2]))
                 notes.append('%s %s %.2f: острие (x %.1f, y %.1f, z %.1f)' % (name, ev, t, *tip))
             if ev in ('slam', 'grab', 'squeeze', 'snap'):
-                pc = model.point(W, 'ghost_palm', [-15.5, 36, 4.0])
+                pc = model.point(W, 'ghost_palm', [-15.5, 35.5, 4.25])
                 if ev in ('slam', 'grab') and pc[2] > -10:
                     errors.append('%s t=%.2f: ладонь не впереди (z=%.1f)' % (name, t, pc[2]))
                 notes.append('%s %s %.2f: ладонь (x %.1f, y %.1f, z %.1f)' % (name, ev, t, *pc))
         notes.append('%s: L=%.2f, макс. поворот за 0.1 с = %.0f°' % (name, L, worst_step))
     # точка удержания схваченного игрока
     W = model.world(pose_of(an, 'ereb_hand_grab_hold', 0))
-    pc = model.point(W, 'ghost_palm', [-15.5, 36, 2.5])
+    pc = model.point(W, 'ghost_palm', [-15.5, 35.5, 3.0])
     notes.append('удержание: середина ладони спереди (x %.1f, y %.1f, z %.1f) ед. = (%.2f, %.2f, %.2f) бл.' % (*pc, *(pc / 16)))
     if not quiet:
         print('\n'.join(notes))

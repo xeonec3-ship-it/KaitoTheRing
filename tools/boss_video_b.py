@@ -214,7 +214,8 @@ def build_page(kind, three, texs, preload):
     if kind == 'martin':
         d = MR.data(['martin', 'martin_soldier', 'martin_banner'])
         st = CR.model_entry('steve')
-        st.update(anims={}, scale=1, bg=0x231a1c)
+        import boss_video as BV                                      # поза жертвы добивания (PlayerAnimator → GeckoLib)
+        st.update(anims={'victim': BV.victim_anim('pohsmp_martin_finisher_victim')}, scale=1, bg=0x231a1c)
         d['steve'] = st
         meshes = ['martin_cavalry_rider', 'martin_shield_wall', 'martin_shield_line', 'martin_archer_ghost', 'martin_arrow', 'martin_soldier_ghost']
         html = MR.page(d, None, three, meshes, [])
@@ -760,6 +761,64 @@ def martin_finale():
                 'title': {'img': 'title:martin_ru', 'op': pulse(t, 5.4, 0.5, 1.6, 0.75)}, 'fade': 0.6 * (1 - lin(t, 0, 0.5))}
     c.seg(8.4, spawn)
     c.seg(0.4, lambda t: dict(spawn(8.4), fade=ease(t / 0.4)))
+
+    # ---------------- добивание (martin_finisher 2.5 с + жертва pohsmp_martin_finisher_victim по MartinMath.finisherHold)
+    import gen_martin as GM
+    FS = [(-3.4, 2.2), (3.4, 2.2), (-5.2, 3.6), (5.2, 3.6)]           # призрачные солдаты за спиной
+
+    def fin(t):
+        u = t - 0.5                    # 0.5 с стойки до удара
+        if u < 0:
+            a, ta, mix = 'martin_idle', t % 3.0, None
+            if u > -0.3:
+                mix = {'anim': 'martin_finisher', 't': 0, 'k': ease((u + 0.3) / 0.3)}
+        elif u < 2.5:
+            a, ta, mix = 'martin_finisher', u, None
+        else:
+            a, ta = 'martin_finisher', 2.5
+            mix = {'anim': 'martin_idle', 't': (u - 2.5) % 3.0, 'k': ease((u - 2.5) / 0.4)}
+        uu = max(0.0, min(2.5, u))
+        f, up = GM.finisher_hold(uu * 20)
+        if u < 0:
+            f, up = 4.2 - 1.0 * max(0.0, u + 0.5) / 0.5, 0.0
+        elif u < 0.4:
+            f = 4.2 - 1.0 * ease(u / 0.4)                       # тянет на 3.2 бл. (pull)
+        vop = 1 - lin(u, 2.45, 2.75)
+        objs = [m_obj(a, ta, mix)]
+        if vop > 0:
+            objs.append(dict(model='steve', key='victim', anim='victim', t=uu, pos=[0, up, -f], ry=180, op=vop))
+        for i, (x, z) in enumerate(FS):
+            sa = 'martin_soldier_brace' if 1.95 <= u < 2.9 else 'martin_soldier_idle'
+            st = (u - 1.95) % 1.6 if sa == 'martin_soldier_brace' else t % 2.4
+            objs.append(dict(model='martin_soldier', key='fs%d' % i, anim=sa, t=st, pos=[x, 0, z], ry=0, op=0.9))
+        spr = []
+        chest = [0, up + 1.2, -f]
+        spr += burst('glow', chest, u - 0.4, 22, 3.0, (0.08, 0.2), GOLD_HI, 201, life=0.6, grav=5, spread=(1, 0.8, 1))
+        spr += burst('glow', chest, u - 0.4, 8, 2.0, (0.08, 0.16), '#b01818', 202, life=0.5, grav=6)
+        if 0.4 <= u < 0.7:
+            spr.append(glow(chest, 1.6 * (1 - (u - 0.4) / 0.3), WHITE, 0.8 * (1 - (u - 0.4) / 0.3)))
+        if 0.8 <= u < 2.3:
+            spr.append(glow(chest, 1.4, GOLD, 0.25 + 0.1 * math.sin(u * 9)))
+        if 1.5 <= u < 1.9:
+            spr.append(glow(chest, 3.0 * (1 - (u - 1.5) / 0.4), GOLD_HI, 0.6 * (1 - (u - 1.5) / 0.4)))
+        ts = u - 2.0                   # удар о землю + солдаты бьют щитами
+        gp = [0, 0.1, -2.2]
+        spr += burst('mote_ash', gp, ts, 20, 2.2, (0.25, 0.5), '#b8a890', 203, life=0.9, grav=3, up=1.2, spread=(1, 0.3, 1), op=0.8)
+        spr += burst('glow', gp, ts, 10, 3.0, (0.12, 0.25), GOLD_HI, 204, life=0.5, grav=6, up=1.5)
+        if 0 <= ts < 0.6:
+            spr.append(decal('wave_ring', gp, 0.6 + 3.5 * ts, GOLD, 0.8 * (1 - ts / 0.6)))
+            spr.append(decal('wave_ring', M0, 1 + 9 * ts, GHOST, 0.7 * (1 - ts / 0.6)))
+        for i, (x, z) in enumerate(FS):
+            spr += burst('mote_wisp', [x, 0.2, z], ts, 5, 1.2, (0.3, 0.5), GHOST, 210 + i, life=0.7, up=1.0, spread=(1, 0.2, 1), op=0.6)
+        cam = camkeys([(0, -62, 8, 15.0, (0, 2.2, -1.8)), (0.9, -66, 10, 15.5, (0, 2.6, -1.8)), (1.6, -60, 14, 19.5, (0, 4.2, -1.0)),
+                       (2.3, -58, 14, 20.0, (0, 4.4, -0.8)), (2.6, -62, 10, 15.5, (0, 2.4, -1.6)), (3.6, -64, 10, 16.0, (0, 2.2, -1.6))], t)
+        sh = 0.07 * pulse(u, 2.0, 0.03, 0.08, 0.2) * math.sin(t * 70)
+        cam['look'][0] += sh
+        return {'objs': objs, 'sprites': spr, 'cam': cam, 'groundSize': 200,
+                'cap': 'Добивание', 'sub': 'martin_finisher · пронзает (impale 0.4) → над головой (raise 0.8–1.7) → бросает (throw 1.7) → '
+                                         'удар о землю, солдаты бьют щитами (slam 2.0) → смерть (kill 2.3)',
+                'fade': max(1 - lin(t, 0, 0.4), 0.6 * lin(t, 3.6, 4.0))}
+    c.seg(4.0, fin)
     SOLS = [(-3.0, -0.6), (3.0, -0.6)]
     BAN = [-4.8, 0, 1.4]
     SPEECH = 'Хорошо, вы доказали свою силу... Я помогу Эребу, если эта ваша просьба'

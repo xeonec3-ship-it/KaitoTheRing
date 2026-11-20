@@ -1426,7 +1426,71 @@ def anims(m):
     a = A('warcry', 1.8)
     a.sample(warcry, 0.04)
     a.instruction(0.6, 'cry')
+
+    # ================================================================ добивание (владелец 20.11; ТЗ T29 «Добивание»)
+    def finisher(t):
+        # 0–0.4 выпад, пронзает жертву спереди (impale 0.4); 0.4–0.8 приподнимает на клинке (raise 0.8); 0.8–1.5 вскидывает над
+        # головой, 1.5–1.7 держит; 1.7–2.0 бросает к ногам ударом вниз (throw 1.7, slam 2.0 — солдаты бьют щитами); kill 2.3; 2.5 стойка.
+        # Клинок всё время направлен в грудь жертвы — её точка по MartinMath.finisherHold (код программиста T29).
+        lunge = float(track(t, [(0, 0), (0.4, 1, 'in'), (0.8, 1), (1.5, 0.3), (1.7, 0.3), (2.0, 1, 'in'), (2.5, 0)]))
+        lift = float(track(t, [(0, 0), (0.8, 0), (1.5, 1), (1.7, 1), (1.9, 0), (2.5, 0)]))
+        thr = float(track(t, [(0, 0), (1.7, 0), (2.0, 1, 'in'), (2.2, 1), (2.5, 0)]))
+        o = {'body': {'pos': [0, -1.6 * thr - 0.6 * lunge, -3.0 * lunge]},
+             'torso': {'rot': [14 * lunge * (1 - lift) - 8 * lift + 16 * thr, 0, 0]},
+             'head': {'rot': [-6 * lunge - 26 * lift + 10 * thr, 0, 0]},
+             'right_leg': {'rot': [-30 * lunge, 0, 4]}, 'left_leg': {'rot': [26 * lunge, 0, -4]}}
+        cape_follow(t, o, lag=10 * lunge + 6 * thr, wind=6 * lift)
+        # кисть (оси торса) по участкам
+        H = [(0.0, GUARD[0]), (0.4, (2.5, 14.0, -11.0)), (0.8, (2.5, 19.0, -9.5)), (1.5, (2.5, 30.0, -6.0)), (1.7, (2.5, 30.0, -6.0)),
+             (2.0, (1.0, 13.0, -10.0)), (2.2, (1.0, 13.0, -10.0)), (2.5, GUARD[0])]
+        hand = np.asarray(track(t, [(a, b, 'io') if i else (a, b) for i, (a, b) in enumerate(H)]), float)
+        bb_in(o)
+        Mt, ot = fk(m, o, 'torso')
+        tick = t * 20
+        fh = finisher_hold(tick)
+        chest = np.array([0.0, (fh[1] + 1.2) * 8.0, -fh[0] * 8.0])        # мир модели: 1 бл. = 8 ед. (модель ×2)
+        hw = Mt @ hand + ot
+        aim = Mt.T @ unit(chest - hw)                                       # направление на грудь — в осях торса
+        if t < 0.25:
+            d = lerp_dir(GUARD[1], aim, ease(t / 0.25))
+        elif t <= 1.7:
+            d = aim
+        elif t <= 2.0:
+            d = lerp_dir(FIN_AIM17, (0.0, -0.5, -0.87), ease((t - 1.7) / 0.3, 'in'))
+        elif t <= 2.2:
+            d = unit((0.0, -0.5, -0.87))
+        else:
+            d = lerp_dir((0.0, -0.5, -0.87), GUARD[1], ease((t - 2.2) / 0.3))
+        if abs(t - 1.7) < 0.021:
+            FIN_AIM17[:] = list(aim)
+        g(o, hand, d)
+        return vis(o)
+    FIN_AIM17 = [0.0, 0.95, 0.3]
+    a = A('finisher', 2.5)
+    a.sample(finisher, 0.04)
+    a.instruction(0.4, 'impale')
+    a.instruction(0.8, 'raise')
+    a.instruction(1.7, 'throw')
+    a.instruction(2.0, 'slam')
+    a.instruction(2.3, 'kill')
     return an
+
+
+def finisher_hold(tick):
+    """Порт MartinMath.finisherHold (программист T29): {вперёд, бл.; высота ног над землёй, бл.} на тике добивания."""
+    PIERCE, RAISE, RAISED, THROW, SLAM = 8, 16, 30, 34, 40
+    e = lambda u: 0.5 - 0.5 * math.cos(math.pi * max(0.0, min(1.0, u)))
+    if tick <= RAISE:
+        return 3.2, (0.0 if tick <= PIERCE else 1.6 * e((tick - PIERCE) / (RAISE - PIERCE)))
+    if tick <= RAISED:
+        k = e((tick - RAISE) / (RAISED - RAISE))
+        return 3.2 - 2.6 * k, 1.6 + 3.2 * k
+    if tick <= THROW:
+        return 0.6, 4.8
+    if tick <= SLAM:
+        k = (tick - THROW) / (SLAM - THROW)
+        return 0.6 + 1.6 * k, 4.8 * (1 - k * k)
+    return 2.2, 0.0
 
 
 def iron_anims():

@@ -56,7 +56,7 @@ def shots(M, args):
          ('ereb_hand_lunge', 0.5, 60, 'выпад', 'hit 0.5'),
          ('ereb_hand_flurry', 1.15, 50, 'серия', 'hit 0.45 / 0.8 / 1.15'),
          ('ereb_hand_slam', 0.45, 40, 'удар рукой: замах', 'raise 0.45'),
-         ('ereb_hand_slam', 0.8, 55, 'удар рукой по площади', 'slam 0.8 — 1.6 бл. впереди'),
+         ('ereb_hand_slam', 0.8, 55, 'удар рукой по площади', 'slam 0.8 — ладонь ≈0.9 бл. впереди'),
          ('ereb_hand_grab', 0.6, 70, 'хватка', 'grab 0.6'),
          ('ereb_hand_grab_hold', 0.5, 70, 'держит игрока', 'петля 2 с'),
          ('ereb_hand_squeeze', 0.45, 70, 'сжатие', 'squeeze 0.35'),

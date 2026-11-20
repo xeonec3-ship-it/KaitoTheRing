@@ -87,10 +87,12 @@ public class ErebEntity extends ErebBody implements PohBoss {
             getLookControl().setLookAt(t, 30, 30);
             double d = distanceTo(t);
             double want = fight.wantsRange() ? 6 : 2.2;
-            if (d > want + 0.6) getNavigation().moveTo(t, 1.0);
-            else if (d < want - 2.5 && fight.wantsRange()) {   // step back a little from someone in his face
+            boolean repath = tickCount % 5 == 0 || getNavigation().isDone();
+            if (d > want + 0.6) {
+                if (repath) getNavigation().moveTo(t, 1.0);
+            } else if (d < want - 2.5 && fight.wantsRange()) {   // step back a little from someone in his face
                 Vec3 away = position().subtract(t.position()).multiply(1, 0, 1).normalize().scale(3);
-                getNavigation().moveTo(getX() + away.x, getY(), getZ() + away.z, 1.0);
+                if (repath) getNavigation().moveTo(getX() + away.x, getY(), getZ() + away.z, 1.0);
             } else getNavigation().stop();
         }
 

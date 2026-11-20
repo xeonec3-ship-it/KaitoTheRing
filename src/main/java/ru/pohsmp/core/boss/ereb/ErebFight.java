@@ -591,6 +591,7 @@ public final class ErebFight {
         play(new BossTimeline("scene:false_ally", ErebMath.FA)
                 .at(ErebMath.FA_GONE, () -> {
                     hide(true);
+                    hiddenLeft = 0;
                     invuln = ErebMath.FA_APPEAR - ErebMath.FA_GONE + 2;
                 })
                 .at(ErebMath.FA_APPEAR, () -> {
@@ -803,6 +804,7 @@ public final class ErebFight {
         play(new BossTimeline("act:mirror_step", ErebMath.STEP)
                 .at(ErebMath.STEP_GONE, () -> {
                     hide(true);
+                    hiddenLeft = 0;
                     invuln = ErebMath.STEP_WARN + 2;
                     if (!p.isAlive()) return;
                     Fx.play(sl, Fx.fx("ereb_mirror_step_warn").caster(p).at(p.position()).attach(p));

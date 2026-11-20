@@ -101,8 +101,8 @@ public class ErebReflection extends ErebBody {
         if (t == null) return;
         getLookControl().setLookAt(t, 30, 30);
         double d = distanceTo(t);
-        if (d > 2.4) getNavigation().moveTo(t, 1.0);
-        else getNavigation().stop();
+        if (d <= 2.4) getNavigation().stop();
+        else if (tickCount % 10 == 0 || getNavigation().isDone()) getNavigation().moveTo(t, 1.0);
         if (swingAtWho != null && --swingAt == 0) {
             if (swingAtWho.isAlive() && distanceTo(swingAtWho) < 3.4) thrust(swingAtWho);
             swingAtWho = null;

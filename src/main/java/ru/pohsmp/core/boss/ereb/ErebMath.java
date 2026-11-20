@@ -43,6 +43,13 @@ public final class ErebMath {
     /** «Дезинтеграция: Реплика»: ereb_replica_break 2.3 s, break 0.95, speak 1.55; 2 s after the hold began. */
     public static final int REPLICA_DELAY = 40, REPLICA_ANIM = 46, REPLICA_BREAK = 19, REPLICA_SPEAK = 31;
 
+    /**
+     * The finisher (owner 20.11, ТЗ «Добивание»; 2.4 s): he vanishes in a ripple (gone 0.6 s), comes out behind the victim (0.8 s), the
+     * thrust in the back (0.45 s after: 1.25 s), the victim breaks into glass and butterflies and dies at 2.2 s; the victim's camera from
+     * his coming out for 1.2 s. Until the visual assistant's ereb_finisher exists, his part is ereb_vanish + ereb_backstab (same events).
+     */
+    public static final int FINISHER = 48, FIN_GONE = 12, FIN_APPEAR = 16, FIN_STAB = FIN_APPEAR + 9, FIN_KILL = 44, FIN_CAM = 24;
+
     // ---------------------------------------------------------------- geometry (Minecraft yaw: forward = (-sin, cos))
 
     /** Flat forward of a yaw in degrees: {x, z}. */

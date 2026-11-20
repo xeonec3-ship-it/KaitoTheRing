@@ -150,6 +150,15 @@ public final class ErebClient {
                     return Shot.of(c.orbit(v, 120, 2.2 + 1.8 * sine(k), 1.9), c.b.add(0, 1.6, 0));
                 });
 
+        // the finisher, only the victim's camera (1.2 s from his coming out): on his head from beside the victim, a tremble on the thrust
+        BossCam.plan("ereb.finisher", ErebMath.FIN_CAM)
+                .shot(0, (k, t, c) -> {
+                    Vec3 v = c.extra != null ? c.extra.getPosition(c.pt) : c.focus;
+                    Vec3 head = c.b.add(0, 1.6, 0);
+                    double shake = t >= ErebMath.FIN_STAB - ErebMath.FIN_APPEAR && t < ErebMath.FIN_STAB - ErebMath.FIN_APPEAR + 4 ? 0.12 : 0;
+                    return Shot.of(c.orbit(v, 70, 2.4 + 0.4 * sine(k), 1.7), head).shake(shake);
+                });
+
         // Финал: up to the cast (3.2 s); then the camera of the spell's own scene (T22 «Небесная бабочка»)
         BossCam.plan("ereb.finale", ErebMath.FINALE_CAST + 2)
                 .shot(0, (k, t, c) -> Shot.of(c.rel(c.b, 2.2, 0, 1.62), c.b.add(0, 1.62, 0)))   // улыбка: close on the face

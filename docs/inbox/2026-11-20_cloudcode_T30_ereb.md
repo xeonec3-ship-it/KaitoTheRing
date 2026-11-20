@@ -22,6 +22,7 @@ src/main/java/ru/pohsmp/core/boss/ereb/          Ereb, ErebConfig, ErebMath, Ere
                                                 ErebShard, ErebDreamPoint
 src/main/java/ru/pohsmp/core/boss/ereb/client/   ErebClient, ErebModel, ErebRenderer, ErebDisguise
 src/test/java/ru/pohsmp/core/boss/ereb/ErebMathTest.java
+src/main/resources/data/pohsmp_core/damage_type/ereb_finisher.json
 ```
 
 ### Точечные правки существующих файлов (это всё, что тронуто)
@@ -34,7 +35,7 @@ src/test/java/ru/pohsmp/core/boss/ereb/ErebMathTest.java
 | `boss/client/BossClient.java` | `renderers` | `ru.pohsmp.core.boss.ereb.client.ErebClient.renderers(e);` |
 | `spell/illusion/ButterflyDreamSpell.java` | 1) `dream(sl, caster)` теперь вызывает новую перегрузку `dream(sl, caster, r, ticks)`. Тело старого метода переехало туда без изменений, кроме двух первых строк (`r`, `ticks` — параметры). 2) Новый `public static castFromPoint(ServerLevel, LivingEntity point, double radius, int dreamTicks)` перед разделом `// --- the dream`. | Весь каст из точки: ролик `Cutscene.BUTTERFLY_DREAM`, музыка, fx, звуки, вспышки, через 240 тиков — сон с заданными радиусом и временем |
 | `spell/illusion/MirrorLabyrinthSpell.java` | новый `public static raise(ServerLevel, LivingEntity caster, Vec3 c, double r, int ticks, float damage)` перед `enter(...)` | Купол лабиринта без каста Iron's, со своим центром, радиусом, временем и уроном стен |
-| `lang/ru_ru.json`, `lang/en_us.json` | в конец | `entity.pohsmp_core.ereb_reflection` «Эреб, Первый Предатель» / «Ereb, the First Traitor»; `entity.pohsmp_core.ereb_shard` «Стеклянный осколок» / «Glass Shard»; `entity.pohsmp_core.ereb_dream_point` «Сон бабочки» / «Butterfly Dream» |
+| `lang/ru_ru.json`, `lang/en_us.json` | в конец | `death.attack.pohsmp_core.ereb_finisher` «%1$s поверил Эребу» / «%1$s trusted Ereb»; `entity.pohsmp_core.ereb_reflection` «Эреб, Первый Предатель» / «Ereb, the First Traitor»; `entity.pohsmp_core.ereb_shard` «Стеклянный осколок» / «Glass Shard»; `entity.pohsmp_core.ereb_dream_point` «Сон бабочки» / «Butterfly Dream» |
 
 Больше ничего не менялось: ни `Reg`, ни `Net`, ни `ServerConfig`, ни `PohCore`, ни `BossCore`/`BossNet`/`BossCam`, ни ассеты помощника.
 
@@ -162,6 +163,32 @@ src/test/java/ru/pohsmp/core/boss/ereb/ErebMathTest.java
 Точка живёт до конца сна и исчезает сама.
 Почему точка — сущность: `ButterflyDreamSpell` и `Cutscene` требуют живого заклинателя, и клиентская камера вращается вокруг его позиции. Без сущности на клиенте камера ушла бы к игроку.
 
+### Добивание (владелец 20.11, ТЗ «Добивание», коммит `73ff871`; дописано после сообщения управляющего)
+Через общий механизм каркаса `BossFinisher`, `DEF.finisher(true)`. Всё по ТЗ:
+- удар, который убил бы игрока, отменяется — **любой удар Эреба**: рапира, осколки (их владелец — Эреб), +4, иллюзорный укол копий (его заклинатель — Эреб);
+- с тотемом в руке добивания нет;
+- жертва неуязвима для других и не действует, босс никого не атакует;
+- не чаще раза в 5 с.
+
+Ход добивания, 2.4 с (48 тиков):
+
+| тик | что происходит |
+|---|---|
+| 0 | `ereb_vanish` + fx `ereb_vanish`, звук `ereb.vanish` |
+| 12 | Эреб пропадает |
+| 16 | выходит в 1.1 блока **за спиной** жертвы (жертва перед ним), `ereb_backstab` + fx `ereb_appear`; камера жертвы — 1.2 с, крупно на него сбоку, дрожь на уколе |
+| 25 | укол, fx `ereb_thrust` |
+| 43 | жертва рассыпается стеклом и бабочками: fx `ereb_butterfly_dissolve` на жертве, звук `ereb.dissolve` |
+| 44 | смерть, сообщение `death.attack.pohsmp_core.ereb_finisher` — «%1$s поверил Эребу» / «%1$s trusted Ereb» |
+
+- **Поза жертвы** — общая `pohsmp_cult_finisher_victim`.
+- **Новые файлы:** `data/pohsmp_core/damage_type/ereb_finisher.json` (`scaling: never`) и ключ lang `death.attack.pohsmp_core.ereb_finisher` (ru/en).
+- **Анимации `ereb_finisher` и письма `docs/inbox/2026-11-20_mgr_anim_check_T26_T30.md` в ветке пока нет.**
+  - Сейчас добивание собрано из готовых `ereb_vanish` + `ereb_backstab` (их события сверяет `ErebMathTest`).
+  - Когда анимация появится: в `ErebEntity.FINISHER_ANIM` поставить `"ereb_finisher"` и, если у неё другие события, поправить `ErebMath.FIN_*`.
+  - Fx `ereb_finisher` подхватится сам, если файл есть: код проверяет `FxLib`.
+- **Кулдаун:** `[ereb] finisher_cooldown_seconds = 5` отдельным ключом не заводил. Каркас читает общий `[bosses_common] finisher_cooldown_seconds` (= 5), у Главы и Ирины так же. Для своего ключа на каждого босса нужна правка `BossCore.finisherUsed` (каркас).
+
 ### «Дезинтеграция: Реплика»
 Через каркас (`BossReplica`), со своими таймингами:
 - `ereb_replica_break` 2.3 с;
@@ -216,5 +243,6 @@ src/test/java/ru/pohsmp/core/boss/ereb/ErebMathTest.java
 9. +4: метки дождя и время до удара, окно «Бреши» и контратака, блик за спиной у «Шага», переходы «Танца».
 10. **Финал:** улыбка (текстура), фраза в чате и над головой, переход камеры босса (до 3.3 с) в ролик T22 «Сна бабочки». ⚠ Камера каркаса возвращается за 1 с, а ролик T22 начинается в ту же секунду — возможен рывок. Если мешает, ролик босса `ereb.finale` можно сократить или убрать возврат.
 11. Сон 120 с после ухода: урон во сне ненастоящий. Точка `ereb_dream_point` исчезает после сна.
-12. «Реплика» на Эребе: печати в стекло, фраза, кулдаун заклинателю.
-13. Выделенный сервер: всё клиентское — в `boss/ereb/client` и вызывается только из `BossClient`.
+12. Добивание: исчезновение, выход за спиной жертвы, камера жертвы, рассыпание, сообщение «… поверил Эребу». С тотемом — обычная смерть с тотемом.
+13. «Реплика» на Эребе: печати в стекло, фраза, кулдаун заклинателю.
+14. Выделенный сервер: всё клиентское — в `boss/ereb/client` и вызывается только из `BossClient`.

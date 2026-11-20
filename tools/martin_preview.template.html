@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мартин — превью</title>
+<style>
+  :root { --bg: #0b080e; --fg: #e8e0d8; --muted: #9a8c98; --accent: #b01a4a; --panel: #160f1c; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+  #ui { position: fixed; left: 12px; top: 12px; z-index: 2; background: var(--panel); padding: 10px 12px; border-radius: 8px;
+        border: 1px solid #2a1e32; max-width: calc(100vw - 48px); }
+  #ui select, #ui button, #ui input { background: #0e0a12; color: var(--fg); border: 1px solid #3a2a48; border-radius: 4px; padding: 3px 6px; }
+  #ui label { color: var(--muted); margin-right: 6px; }
+  #ui .row { margin: 4px 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  #desc { color: var(--muted); max-width: 520px; font-size: 12px; }
+  canvas { display: block; }
+  .lab { position: fixed; z-index: 3; color: var(--fg); font: 600 15px system-ui, sans-serif; text-shadow: 0 0 4px #000, 0 0 2px #000; pointer-events: none; }
+  .lab small { display: block; font-weight: 400; color: #c8b8c4; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <div class="row"><label>Кошмар</label><select id="model"></select><label>Анимация</label><select id="anim"></select>
+    <button id="play">⏸</button><input id="time" type="range" min="0" max="1" step="0.001" value="0" style="width:160px"></div>
+  <div class="row"><label><input type="checkbox" id="glow" checked> свечение</label><label><input type="checkbox" id="ground" checked> земля</label>
+    <span id="tinfo"></span></div>
+  <div id="desc"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const DATA = /*DATA*/null;
+const CELLS = /*CELLS*/null;
+
+// ------------------------------------------------------------------ модель GeckoLib (.geo.json) → three.js, как импорт Blockbench
+function facePoint(f, x0, y0, z0, x1, y1, z1, s, t) {
+  switch (f) {
+    case 'north': return [x1 + (x0 - x1) * s, y1 + (y0 - y1) * t, z0];
+    case 'south': return [x0 + (x1 - x0) * s, y1 + (y0 - y1) * t, z1];
+    case 'east':  return [x1, y1 + (y0 - y1) * t, z1 + (z0 - z1) * s];
+    case 'west':  return [x0, y1 + (y0 - y1) * t, z0 + (z1 - z0) * s];
+    case 'up':    return [x1 + (x0 - x1) * s, y1, z1 + (z0 - z1) * t];
+    default:      return [x1 + (x0 - x1) * s, y0, z0 + (z1 - z0) * t];
+  }
+}
+const NORM = { north: [0, 0, -1], south: [0, 0, 1], east: [1, 0, 0], west: [-1, 0, 0], up: [0, 1, 0], down: [0, -1, 0] };
+
+const TEXC = {};
+function loadTex(src) {
+  if (TEXC[src]) return TEXC[src];
+  const t = TEXC[src] = new THREE.TextureLoader().load(src);
+  t.magFilter = THREE.NearestFilter; t.minFilter = THREE.NearestFilter; t.generateMipmaps = false;
+  return t;
+}
+
+function buildModel(entry) {
+  const g = entry.geo['minecraft:geometry'][0];
+  const TW = g.description.texture_width, TH = g.description.texture_height;
+  const map = loadTex(entry.tex);
+  const mat = entry.opacity ? new THREE.MeshLambertMaterial({ map, transparent: true, opacity: entry.opacity, alphaTest: 0.02, side: THREE.DoubleSide, depthWrite: false, emissive: new THREE.Color(entry.emissive || 0x000000) })
+    : new THREE.MeshLambertMaterial({ map, alphaTest: 0.5, side: THREE.DoubleSide });
+  let gmat = null;
+  if (entry.glow) {
+    gmat = new THREE.MeshBasicMaterial({ map: loadTex(entry.glow), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+                                          side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -1 });
+  }
+  const bones = {}, root = new THREE.Group();
+  for (const b of g.bones) {
+    const grp = new THREE.Group();
+    grp.name = b.name;
+    const piv = [-b.pivot[0], b.pivot[1], b.pivot[2]];
+    const r = b.rotation || [0, 0, 0];
+    grp.userData = { piv, rest: [-r[0], -r[1], r[2]].map(v => v * Math.PI / 180), parent: b.parent };
+    bones[b.name] = grp;
+    for (const c of (b.cubes || [])) {
+      const inf = c.inflate || 0;
+      const x0 = -(c.origin[0] + c.size[0]) - inf, x1 = -c.origin[0] + inf;
+      const y0 = c.origin[1] - inf, y1 = c.origin[1] + c.size[1] + inf;
+      const z0 = c.origin[2] - inf, z1 = c.origin[2] + c.size[2] + inf;
+      const cp = c.pivot ? [-c.pivot[0], c.pivot[1], c.pivot[2]] : piv;
+      const pos = [], uv = [], nrm = [], idx = [];
+      for (const f in c.uv) {
+        const U = c.uv[f].uv, S = c.uv[f].uv_size, base = pos.length / 3;
+        for (const [s, t] of [[0, 0], [1, 0], [1, 1], [0, 1]]) {
+          const p = facePoint(f, x0, y0, z0, x1, y1, z1, s, t);
+          pos.push(p[0] - cp[0], p[1] - cp[1], p[2] - cp[2]);
+          uv.push((U[0] + s * S[0]) / TW, 1 - (U[1] + t * S[1]) / TH);
+          nrm.push(...NORM[f]);
+        }
+        idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
+      }
+      const geom = new THREE.BufferGeometry();
+      geom.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      geom.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+      geom.setAttribute('normal', new THREE.Float32BufferAttribute(nrm, 3));
+      geom.setIndex(idx);
+      const holder = new THREE.Group();
+      holder.position.set(cp[0] - piv[0], cp[1] - piv[1], cp[2] - piv[2]);
+      if (c.rotation) holder.rotation.set(-c.rotation[0] * Math.PI / 180, -c.rotation[1] * Math.PI / 180, c.rotation[2] * Math.PI / 180, 'ZYX');
+      holder.add(new THREE.Mesh(geom, mat));
+      if (gmat) { const gm = new THREE.Mesh(geom, gmat); gm.renderOrder = 2; gm.userData.glow = true; holder.add(gm); }
+      grp.add(holder);
+    }
+  }
+  for (const n in bones) {
+    const grp = bones[n], par = grp.userData.parent ? bones[grp.userData.parent] : null;
+    const pp = par ? par.userData.piv : [0, 0, 0];
+    grp.userData.base = [grp.userData.piv[0] - pp[0], grp.userData.piv[1] - pp[1], grp.userData.piv[2] - pp[2]];
+    (par || root).add(grp);
+  }
+  root.scale.setScalar(entry.scale || 1);
+  return { root, bones };
+}
+
+function keysAt(chan, t, def) {
+  const ts = Object.keys(chan).map(Number).sort((a, b) => a - b);
+  const val = k => { const v = chan[String(k)] ?? chan[k.toString()]; return Array.isArray(v) ? v : (v.vector || v.post || v.pre); };
+  if (!ts.length) return def;
+  if (t <= ts[0]) return val(ts[0]);
+  if (t >= ts[ts.length - 1]) return val(ts[ts.length - 1]);
+  let i = 0; while (ts[i + 1] < t) i++;
+  const a = ts[i], b = ts[i + 1], k = (t - a) / (b - a), va = val(a), vb = val(b);
+  return va.map((v, j) => v + (vb[j] - v) * k);
+}
+function findKey(chan) { const o = {}; for (const k in chan) o[parseFloat(k)] = chan[k]; return o; }
+
+function pose(model, anim, t) {
+  for (const n in model.bones) {
+    const g = model.bones[n], u = g.userData;
+    let r = [0, 0, 0], p = [0, 0, 0], s = [1, 1, 1];
+    const bk = anim && anim.bones[n];
+    if (bk) {
+      if (bk.rotation) r = keysAt(findKey(bk.rotation), t, r);
+      if (bk.position) p = keysAt(findKey(bk.position), t, p);
+      if (bk.scale) { s = keysAt(findKey(bk.scale), t, s); if (!Array.isArray(s)) s = [s, s, s]; }
+    }
+    g.position.set(u.base[0] - p[0], u.base[1] + p[1], u.base[2] + p[2]);
+    g.rotation.set(u.rest[0] - r[0] * Math.PI / 180, u.rest[1] - r[1] * Math.PI / 180, u.rest[2] + r[2] * Math.PI / 180, 'ZYX');
+    g.scale.set(Math.max(1e-4, s[0]), Math.max(1e-4, s[1]), Math.max(1e-4, s[2]));
+  }
+}
+
+// ------------------------------------------------------------------ сцена
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(window.devicePixelRatio || 1);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setScissorTest(true);
+document.body.appendChild(renderer.domElement);
+
+function makeScene(entry, showGround) {
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(entry.bg || 0x1a1420);
+  scene.fog = new THREE.Fog(scene.background, 120, 260);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x3a3634, 0.8));
+  const d = new THREE.DirectionalLight(0xffffff, 0.7); d.position.set(30, 60, -40); scene.add(d);
+  const d2 = new THREE.DirectionalLight(0xd8dce8, 0.3); d2.position.set(-40, 20, 50); scene.add(d2);
+  if (showGround) {
+    const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { x.fillStyle = (i + j) % 2 ? '#2a2420' : '#24201c'; x.fillRect(i * 16, j * 16, 16, 16); }
+    const gt = new THREE.CanvasTexture(c); gt.magFilter = THREE.NearestFilter; gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(16, 16);
+    const gr = new THREE.Mesh(new THREE.PlaneGeometry(256, 256), new THREE.MeshLambertMaterial({ map: gt }));
+    gr.rotation.x = -Math.PI / 2; gr.position.y = -0.01; scene.add(gr);
+  }
+  return scene;
+}
+
+function cameraFor(entry, view) {
+  const h = entry.height || 32;
+  const cam = new THREE.PerspectiveCamera(view.fov || 30, 1, 0.5, 2000);
+  const yaw = (view.yaw ?? 25) * Math.PI / 180, pitch = (view.pitch ?? 8) * Math.PI / 180;
+  const dist = (view.dist || 2.3) * h * (30 / (view.fov || 30));
+  if (view.tx !== undefined) { cam.position.set(view.tx * 16 + Math.sin(yaw) * Math.cos(pitch) * dist, (view.ty ?? h * 0.48) + Math.sin(pitch) * dist, view.tz * 16 - Math.cos(yaw) * Math.cos(pitch) * dist); cam.lookAt(view.tx * 16, view.ty ?? h * 0.48, view.tz * 16); return cam; }
+  const ty = view.ty ?? h * 0.48;
+  if (view.cam) { cam.position.set(...view.cam.map(v => v * 16)); cam.lookAt(...view.look.map(v => v * 16)); return cam; }
+  cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, ty + Math.sin(pitch) * dist, -Math.cos(yaw) * Math.cos(pitch) * dist);
+  cam.lookAt(0, ty, 0);
+  return cam;
+}
+
+// ------------------------------------------------------------------ fx/meshes (части boxes) — для сцен (коридор, ветви)
+const MESHES = /*MESHES*/null;
+const TEXS = /*TEXS*/null;
+function buildBoxes(name) {
+  const g = new THREE.Group(), m = MESHES[name];
+  for (const part of m.parts) {
+    if (part.type === 'quad') {
+      const geo = new THREE.BufferGeometry(); const c = part.corners;
+      geo.setAttribute('position', new THREE.Float32BufferAttribute([].concat(...c).map(v => v * 16), 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute([0, 1, 1, 1, 1, 0, 0, 0], 2)); geo.setIndex([0, 1, 2, 0, 2, 3]);
+      const mt = new THREE.MeshBasicMaterial({ map: loadTex(TEXS[part.texture]), color: part.color || 0xffffff, transparent: true, opacity: part.opacity ?? 1,
+        side: THREE.DoubleSide, depthWrite: false, blending: part.blend === 'additive' ? THREE.AdditiveBlending : THREE.NormalBlending });
+      g.add(new THREE.Mesh(geo, mt)); continue;
+    }
+    if (part.type !== 'boxes') continue;
+    const glow = new Set(part.glowTones || []);
+    const mats = part.tones.map((c, i) => glow.has(i)
+      ? new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: part.opacity, blending: THREE.AdditiveBlending, depthWrite: false })
+      : new THREE.MeshLambertMaterial({ color: c, transparent: part.opacity < 1, opacity: part.opacity }));
+    for (const b of part.boxes) {
+      const geo = new THREE.BoxGeometry((b[3] - b[0]) * 16, (b[4] - b[1]) * 16, (b[5] - b[2]) * 16);
+      const mesh = new THREE.Mesh(geo, mats[b[6]]);
+      mesh.position.set((b[0] + b[3]) * 8, (b[1] + b[4]) * 8, (b[2] + b[5]) * 8);
+      if (b[7]) mesh.rotation.set(b[7][0] * Math.PI / 180, b[7][1] * Math.PI / 180, b[7][2] * Math.PI / 180, 'YXZ');
+      g.add(mesh);
+    }
+  }
+  return g;
+}
+function sceneExtras(sc, c) {
+  for (const x of (c.meshes || [])) {
+    const g = buildBoxes(x.mesh); g.position.set(...x.pos.map(v => v * 16)); g.rotation.y = (x.ry || 0) * Math.PI / 180;
+    g.scale.setScalar(x.scale || 1); if (x.rz) g.rotation.z = x.rz * Math.PI / 180; if (x.rx) g.rotation.x = x.rx * Math.PI / 180; sc.add(g);
+  }
+  for (const d of (c.decals || [])) {
+    const mt = new THREE.MeshBasicMaterial({ map: loadTex(TEXS[d.tex]), color: d.color || 0xffffff, transparent: true, opacity: d.opacity ?? 1,
+      depthWrite: false, blending: d.blend === 'translucent' ? THREE.NormalBlending : THREE.AdditiveBlending });
+    const pl = new THREE.Mesh(new THREE.PlaneGeometry((d.w || d.r * 2) * 16, (d.h || d.r * 2) * 16), mt);
+    pl.rotation.set(-Math.PI / 2, 0, (d.rot || 0) * Math.PI / 180); pl.position.set(d.pos[0] * 16, (d.pos[1] || 0.03) * 16, d.pos[2] * 16);
+    if (d.vertical) { pl.rotation.set(0, (d.rot || 0) * Math.PI / 180, 0); }
+    sc.add(pl);
+  }
+  for (const x of (c.models || [])) {
+    const e = DATA[x.model], m = buildModel(e);
+    pose(m, x.anim ? e.anims[x.anim] : null, x.t || 0);
+    m.root.position.set(...x.pos.map(v => v * 16)); m.root.rotation.y = (x.ry || 0) * Math.PI / 180; sc.add(m.root);
+  }
+  for (const l of (c.lights || [])) {
+    const p = new THREE.PointLight(l.color, l.intensity, (l.distance || 0) * 16, 2); p.position.set(...l.pos.map(v => v * 16)); sc.add(p);
+  }
+  if (c.dim) sc.children.forEach(o => { if (o.isLight && !o.isPointLight) o.intensity *= c.dim; });
+  if (c.bg) { sc.background = new THREE.Color(c.bg); sc.fog = new THREE.Fog(c.bg, (c.fogNear || 60) * 16 / 16, (c.fogFar || 200)); }
+}
+
+const built = {};
+function getModel(name) { if (!built[name]) built[name] = buildModel(DATA[name]); return built[name]; }
+
+if (CELLS) {
+  // режим сетки (проверочные кадры): CELLS = { cols, cells: [{model, anim, t, yaw, pitch, dist, label, sub}] }
+  const cols = CELLS.cols, rows = Math.ceil(CELLS.cells.length / cols);
+  const W = window.innerWidth, H = window.innerHeight, cw = W / cols, ch = H / rows;
+  const draw = () => {
+    CELLS.cells.forEach((c, i) => {
+      const e = DATA[c.model];
+      const m = buildModel(e);
+      const sc = makeScene(e, c.ground !== false);
+      if (c.hideMain) m.root.visible = false;
+      sc.add(m.root);
+      sceneExtras(sc, c);
+      pose(m, c.anim ? e.anims[c.anim] : null, c.t || 0);
+      const cam = cameraFor(e, c); cam.aspect = cw / ch; cam.updateProjectionMatrix();
+      const x = (i % cols) * cw, y = H - (Math.floor(i / cols) + 1) * ch;
+      renderer.setViewport(x, y, cw, ch); renderer.setScissor(x, y, cw, ch);
+      renderer.render(sc, cam);
+      if (c.label) {
+        const d = document.createElement('div'); d.className = 'lab';
+        d.style.left = (x + 8) + 'px'; d.style.top = (Math.floor(i / cols) * ch + 6) + 'px';
+        d.innerHTML = c.label + (c.sub ? '<small>' + c.sub + '</small>' : ''); document.body.appendChild(d);
+      }
+    });
+    document.getElementById('ui').style.display = 'none';
+    window.READY = true;
+  };
+  THREE.DefaultLoadingManager.onLoad = () => { if (!window.READY) setTimeout(draw, 50); };
+  for (const c of CELLS.cells) { buildModel(DATA[c.model]); for (const x of (c.models || [])) buildModel(DATA[x.model]); }   // текстуры грузятся заранее
+} else {
+  const sel = document.getElementById('model'), asel = document.getElementById('anim');
+  for (const n in DATA) sel.add(new Option(DATA[n].title || n, n));
+  let cur, scene, anim, t0 = performance.now(), playing = true, yaw = 25, pitch = 8, zoom = 1, tfix = 0;
+  const setModel = () => {
+    const e = DATA[sel.value];
+    scene = makeScene(e, document.getElementById('ground').checked);
+    cur = buildModel(e); scene.add(cur.root);
+    asel.innerHTML = ''; for (const a in e.anims) if (!e.ironsHide || a.startsWith(e.ironsHide)) asel.add(new Option(a, a));
+    document.getElementById('desc').textContent = e.desc || '';
+    setAnim();
+  };
+  const setAnim = () => { anim = DATA[sel.value].anims[asel.value]; t0 = performance.now(); };
+  sel.onchange = setModel; asel.onchange = setAnim;
+  document.getElementById('ground').onchange = setModel;
+  document.getElementById('glow').onchange = e => cur.root.traverse(o => { if (o.userData.glow) o.visible = e.target.checked; });
+  document.getElementById('play').onclick = e => { playing = !playing; e.target.textContent = playing ? '⏸' : '▶'; t0 = performance.now() - tfix * 1000; };
+  document.getElementById('time').oninput = e => { playing = false; document.getElementById('play').textContent = '▶'; tfix = e.target.value * (anim ? anim.animation_length : 1); };
+  let drag = null;
+  renderer.domElement.onpointerdown = e => drag = [e.clientX, e.clientY, yaw, pitch];
+  window.onpointerup = () => drag = null;
+  window.onpointermove = e => { if (drag) { yaw = drag[2] - (e.clientX - drag[0]) * 0.4; pitch = Math.max(-30, Math.min(80, drag[3] + (e.clientY - drag[1]) * 0.3)); } };
+  renderer.domElement.onwheel = e => { zoom *= Math.exp(e.deltaY * 0.001); e.preventDefault(); };
+  window.onresize = () => renderer.setSize(window.innerWidth, window.innerHeight);
+  setModel();
+  const loop = () => {
+    const W = window.innerWidth, H = window.innerHeight;
+    renderer.setViewport(0, 0, W, H); renderer.setScissor(0, 0, W, H);
+    let t = tfix;
+    if (anim && playing) {
+      const L = anim.animation_length, el = (performance.now() - t0) / 1000;
+      t = anim.loop === true ? el % L : Math.min(el % (L + 1.0), L);
+      tfix = t; document.getElementById('time').value = t / L;
+    }
+    if (cur) pose(cur, anim, t);
+    document.getElementById('tinfo').textContent = anim ? t.toFixed(2) + ' / ' + anim.animation_length + ' с' : '';
+    const cam = cameraFor(DATA[sel.value], { yaw, pitch, dist: 2.3 * zoom }); cam.aspect = W / H; cam.updateProjectionMatrix();
+    renderer.render(scene, cam);
+    requestAnimationFrame(loop);
+  };
+  loop();
+}
+</script>
+</body>
+</html>

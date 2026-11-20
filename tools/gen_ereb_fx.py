@@ -584,7 +584,7 @@ def sheet_textures():
     img = Image.new('RGBA', (Wd, Hd), M.hx('#16151b'))
     d = ImageDraw.Draw(img)
     f1, f2 = font(24), font(18)
-    d.text((24, 14), 'T30 — текстуры Эреба ×4, как у эталона (атлас 128 → 512) и скин владельца', font=f1, fill=(240, 230, 210))
+    d.text((24, 14), 'T30 — текстуры Эреба 128×128 (1 тексель = 1/16 блока, ×5) и скин владельца', font=f1, fill=(240, 230, 210))
     T_ = os.path.join(M.A, 'textures', 'entity', 'ereb')
     for i, nm in enumerate(('ereb', 'ereb_smile', 'ereb_glowmask')):
         t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA')
@@ -594,7 +594,7 @@ def sheet_textures():
         d.text((24 + i * 500, 546), nm + '.png', font=f2, fill=(220, 210, 195))
     # лица крупно
     for i, nm in enumerate(('ereb', 'ereb_smile')):
-        t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA').crop((32, 32, 64, 64)).resize((160, 160), Image.NEAREST)
+        t = Image.open(os.path.join(T_, nm + '.png')).convert('RGBA').crop((8, 8, 16, 16)).resize((160, 160), Image.NEAREST)
         img.alpha_composite(t, (24 + i * 180, 590))
     d.text((24, 760), 'лицо: обычное / улыбка (финал)', font=f2, fill=(220, 210, 195))
     ref = Image.open(os.path.join(ROOT, 'docs', 'references', 't30', 'ereb_front.jpg')).convert('RGBA')

@@ -151,6 +151,31 @@ window.VID = (() => {
   // декали с yaw (линии разреза, полосы): в превью-движке yaw декали не применялся — поворачиваем плоскость вокруг вертикали
   const _make = FxRun.prototype.make;
   FxRun.prototype.make = function (it) { _make.call(this, it); const e = it.e; if (e.type === 'decal' && e.yaw && it.m) it.m.rotation.z = e.yaw * D; };
+  // меши fx: плашка «проявления» в превью рассчитана на ворота 12×3 бл. — подгоняем под размер меша
+  const _pmake = Portal.prototype.make;
+  Portal.prototype.make = function (p) {
+    const P = _pmake.call(this, p);
+    if (p.type === 'boxes' && P.flash && p.boxes.length) {
+      const xs = p.boxes.flatMap(b => [b[0], b[3]]), zs = p.boxes.flatMap(b => [b[2], b[5]]);
+      P.flash.scale.set(Math.max(0.1, (Math.max(...xs) - Math.min(...xs)) * 1.1) / 12, 0.5, Math.max(0.1, (Math.max(...zs) - Math.min(...zs)) * 1.1) / 3);
+    }
+    return P;
+  };
+  // mesh.move.keys [тик, [x, y, z], плавность к ключу] (исполинский молот «Последнего удара»): в превью-движке не было
+  const _pupd = Portal.prototype.update;
+  Portal.prototype.update = function (t, dt) {
+    _pupd.call(this, t, dt);
+    const K = this.move && this.move.keys;
+    if (!K) return;
+    const lt = t - this.t0;
+    let v = K[K.length - 1][1];
+    if (lt < K[0][0]) v = K[0][1];
+    else for (let i = 1; i < K.length; i++) if (lt <= K[i][0]) {
+      const a = K[i - 1], b = K[i], k = ease(b[2] || 'linear', clamp01((lt - a[0]) / Math.max(1, b[0] - a[0])));
+      v = a[1].map((x, j) => x + (b[1][j] - x) * k); break;
+    }
+    this.root.position.copy(this.base).add(new THREE.Vector3(-v[0], v[1], v[2]));
+  };
   function itemMesh(els) {
     const grp = new THREE.Group();
     for (const [a, b, rot, fc] of els) {

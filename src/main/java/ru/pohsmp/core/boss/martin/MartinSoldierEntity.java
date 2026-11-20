@@ -261,6 +261,11 @@ public class MartinSoldierEntity extends Monster implements GeoEntity, IAnimated
     }
 
     @Override
+    protected boolean shouldDespawnInPeaceful() {
+        return false;   // summoned by an admin: stays on Peaceful too
+    }
+
+    @Override
     public boolean causeFallDamage(float d, float m, DamageSource s) {
         return false;
     }

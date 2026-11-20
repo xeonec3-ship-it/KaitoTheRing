@@ -90,6 +90,11 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
     }
 
     @Override
+    protected boolean shouldDespawnInPeaceful() {
+        return false;   // summoned by an admin: stays on Peaceful too
+    }
+
+    @Override
     protected boolean shouldDropLoot() {
         return false;   // no loot (owner), only experience
     }

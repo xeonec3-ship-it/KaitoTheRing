@@ -463,6 +463,27 @@ def paint_new(atl, soul=False):
                 d.rectangle(box, fill=M6)
 
 
+def clear_soul_mouth(atl, geo, k=1):
+    """Облик души: на передних гранях кубов кости head перекрашивает золотые/рыжие пиксели (полоса у рта из tyros_soul_mode Iron's)
+    в тёмный тон лица — лицо остаётся пустой тьмой (владелец 20.11)."""
+    px = atl.load()
+    g = geo['minecraft:geometry'][0] if 'minecraft:geometry' in geo else geo
+    for b in g['bones']:
+        if b['name'] != 'head':
+            continue
+        for c in b.get('cubes', []):
+            if not isinstance(c.get('uv'), list):
+                continue
+            sx, sy, sz = c['size']
+            u, v = c['uv'][0] + sz, c['uv'][1] + sz
+            for x in range(int(u * k), int((u + sx) * k)):
+                for y in range(int(v * k), int((v + sy) * k)):
+                    r, gg, bb, a = px[x, y]
+                    if a and r > 100 and r - bb > 60:
+                        px[x, y] = (28, 20, 22, a)
+
+
+
 def paint_eyes(atl, soul=False):
     """Тёмное «лицо» в капюшоне (внутренний куб головы, uv 40,80, грань north 48..56 × 88..96): тлеющие щели глаз."""
     d = ImageDraw.Draw(atl)
@@ -505,6 +526,9 @@ def textures_leader(geo):
             paint_eyes(atl, is_soul)
         pal = Palette(atl)
         big = hires(atl, rects, pal, 26 if not is_soul else 27)
+        if is_soul:
+            big = big.copy()
+            clear_soul_mouth(big, geo, K)             # владелец 20.11: убрать «золотую часть» в области рта (она из tyros_soul_mode Iron's)
         big.save(out(TEX + nm + '.png'))
         res[nm] = big
         # --- свечение

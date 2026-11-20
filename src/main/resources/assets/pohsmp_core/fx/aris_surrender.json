@@ -25,7 +25,7 @@
   {
    "type": "decal",
    "delay": 24,
-   "at": "caster+0.62,0,-0.19",
+   "at": "caster+0.62,0,0.19",
    "duration": 76,
    "texture": "higher_cracks",
    "radius": 1.2,
@@ -36,7 +36,7 @@
   {
    "type": "sprites",
    "delay": 24,
-   "at": "caster+0.62,0.1,-0.19",
+   "at": "caster+0.62,0.1,0.19",
    "duration": 5,
    "texture": "mote_ash",
    "count": 16,
@@ -96,7 +96,7 @@
   {
    "type": "sprites",
    "delay": 64,
-   "at": "caster+1,0.2,-0.6",
+   "at": "caster+0.8,0.2,0.37",
    "duration": 5,
    "texture": "mote_ash",
    "count": 24,
@@ -117,7 +117,7 @@
   {
    "type": "wave",
    "delay": 64,
-   "at": "caster+1,0,-0.6",
+   "at": "caster+0.8,0,0.37",
    "duration": 12,
    "shape": "ring",
    "radius": 2.5,

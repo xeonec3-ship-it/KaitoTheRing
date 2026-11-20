@@ -1,0 +1,37 @@
+{
+ "comment": "T31 «Чужая клятва», отражённый урон (10 тиков; каждый раз): caster = союзник, получивший половину. Багровая вспышка, стекло трескается. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 6,
+   "size": 1.0,
+   "rays": 4,
+   "color": "#E0606A",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 8,
+   "rate": 8,
+   "spread": 0.4,
+   "speed": 0.1,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 10,
+   "color": "#F4EEFF"
+  }
+ ]
+}

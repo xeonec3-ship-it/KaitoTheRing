@@ -31,12 +31,14 @@ ONE = [1, 1, 1]
 
 
 # ================================================================== позы
-def hand(pos=(0, 0, 0), rot=(14, -18, -6), curl=0.2, spread=0.0, thumb=0.15, wrist=(0, 0, 0), scale=1.0, ripple=0.0):
+def hand(pos=(0, 0, 0), rot=(14, -18, -6), curl=0.2, spread=0.0, thumb=0.15, wrist=(0, 0, 0), scale=1.0, ripple=0.0, point=False):
     """Поза призрачной руки. curl 0 — раскрыта, 1 — кулак; spread — веер пальцев; thumb 0 — отведён, 1 — прижат к ладони;
     ripple — сдвиг сгиба по пальцам (волна «перебирает пальцами»)."""
     p = {'ghost_hand': list(rot), 'ghost_hand_pos': list(pos), 'ghost_hand_scale': [scale] * 3, 'ghost_wrist': list(wrist), 'ghost_palm': Z3}
     for i, f in enumerate(FINGERS):
         c = max(0.0, min(1.1, curl + ripple * math.sin(i * 1.3)))
+        if point and f == 'index':
+            c = 0.05                                    # указующий палец прямой («Чужая клятва»)
         for k in (1, 2, 3):
             p['ghost_%s_%d' % (f, k)] = [round(c * CURL[k - 1] + (3 if k > 1 else 0), 2), 0, round(spread * SPREAD[f], 2) if k == 1 else 0]
     p['ghost_thumb_1'] = [thumb * 18, thumb * 38, -thumb * 6]
@@ -292,6 +294,45 @@ def build():
     an['ereb_hand_replica_break'] = anim(2.3, [(0, IDLE0), (0.4, rb_up, IO), (0.55, rb_grip, OQ), (0.8, rb_grip), (0.95, rb_crush, IQ), (1.2, rb_crush),
                                                (1.55, rb_talk, IO), (1.95, rb_talk), (2.3, IDLE0, IO)],
                                          [(0.55, 'snap'), (0.95, 'break'), (1.55, 'speak')])
+    # ================================================================ +4 заклинания (владелец 20.11: приняты как предложено)
+    # «Ложное пламя» (1.6 с): «Длань» проводит над землёй дугу перед собой, рука прижимает воздух ладонью вниз — на земле загораются
+    # 5 кругов (marks 0.6: код ставит круги, fx ereb_hand_false_flame_real/decoy), вспышка огня (ignite 1.0)
+    ff_a = full(EA.mod(STAND, left_arm=[-50, 40, -10], head=[10, 10, 0], torso=[4, 0, 0], body=[0, 10, 0]),
+                hand(pos=(2, 4, -4), rot=(40, -10, 0), curl=0.0, spread=0.8, thumb=0.0))
+    ff_b = full(EA.mod(STAND, left_arm=[-60, -20, -40], head=[14, -10, 0], torso=[6, 0, 0], body=[0, -12, 0], body_pos=[0, -0.4, 0]),
+                hand(pos=(3, -6, -10), rot=(78, -6, 2), curl=0.05, spread=1.0, thumb=0.0))
+    an['ereb_hand_false_flame'] = anim(1.6, [(0, IDLE0), (0.35, ff_a, IO), (0.6, ff_b, OQ), (1.0, ff_b), (1.3, full(STAND, hand(pos=(-2, -2, -8), rot=(40, -14, -6), curl=0.2)), IO), (1.6, IDLE0, IO)],
+                                       [(0.6, 'marks'), (1.0, 'ignite')])
+    # «Стеклянная хватка» (2.0 с): warn 0.0 — конус-предупреждение перед ним (1 с, fx ereb_hand_glass_grip_warn), рука отводится назад
+    # раскрытой, на grip 1.0 — бросок вперёд и сжатие кулака в 2 бл. перед ним (урон и притяжение — код), отпускает
+    gg_back = full(EA.mod(STAND, left_arm=[-30, 10, -20], head=[2, 0, 0]), hand(pos=(1, 6, 4), rot=(-10, -20, 0), curl=0.0, spread=1.2, thumb=0.0))
+    gg_fwd = full(EA.mod(STAND, left_arm=[-70, 20, -16], head=[6, 0, 0], torso=[5, 0, 0], body_pos=[0, -0.4, -0.5]),
+                  hand(pos=(8, -10, -22), rot=(20, -2, 4), curl=0.0, spread=1.1, thumb=0.0))
+    gg_fist = full(EA.mod(STAND, left_arm=[-70, 22, -18], head=[6, 0, 0], torso=[5, 0, 0], body_pos=[0, -0.4, -0.5]),
+                   hand(pos=(8, -10, -21), rot=(20, -2, 4), curl=1.05, thumb=1.0, wrist=(0, 0, 4)))
+    an['ereb_hand_glass_grip'] = anim(2.0, [(0, IDLE0), (0.6, gg_back, IO), (0.85, gg_back), (1.0, gg_fwd, IC), (1.08, gg_fist, OQ), (1.4, gg_fist),
+                                            (1.7, full(STAND, hand(pos=(2, -2, -8), rot=(30, -10, 0), curl=0.5, thumb=0.4)), IO), (2.0, IDLE0, IO)],
+                                      [(0.0, 'warn'), (1.0, 'grip')])
+    # «Чужая клятва» (1.4 с): указывает «Дланью» на жертву, рука вторит — указующий палец; mark 0.6 — код ставит метку (fx ereb_hand_oath_mark)
+    oath = full(EA.mod(STAND, left_arm=[-88, 8, -6], head=[0, -4, 0], torso=[0, -6, 0], body=[0, -10, 0]),
+                hand(pos=(2, -2, -8), rot=(60, -6, 0), curl=1.0, thumb=0.9, point=True))
+    an['ereb_hand_foreign_oath'] = anim(1.4, [(0, IDLE0), (0.45, oath, IO), (0.6, full(EA.mod(STAND, left_arm=[-92, 8, -6], head=[0, -4, 0], torso=[0, -6, 0],
+                                                                                                 body=[0, -10, 0]),
+                                                                                         hand(pos=(2, -2, -9), rot=(64, -6, 0), curl=1.0, thumb=0.9,
+                                                                                              point=True)), OQ),
+                                              (0.95, oath), (1.4, IDLE0, IO)], [(0.6, 'mark')])
+    # «Тысяча отражений» (2.6 с): рапира к небу (клинок вертикально), «Длань» в сторону — вокруг арены встают зеркала (mirrors 0.6);
+    # рапира опускается остриём на арену — из зеркал начинают бить отражения (strikes 1.4: код по очереди шлёт fx и анимацию отражения)
+    tr_up = full(EA.mod(STAND, right_arm=[-172, 6, -6], bipedHandRight=[78, 0, -6], left_arm=[-40, 0, -60], head=[-20, 0, 0], torso=[-4, 0, 0]),
+                 hand(pos=(4, 8, 2), rot=(-8, -26, 8), curl=0.0, spread=1.1, thumb=0.0))
+    tr_dn = full(EA.mod(STAND, right_arm=[-84, 20, 6], bipedHandRight=[60, 0, 0], left_arm=[-36, 0, -50], head=[4, 0, 0]),
+                 hand(pos=(3, 4, 0), rot=(10, -22, 2), curl=0.3, spread=0.4))
+    an['ereb_hand_thousand_reflections'] = anim(2.6, [(0, IDLE0), (0.6, tr_up, IO), (1.0, tr_up), (1.5, tr_dn, IO), (2.0, tr_dn), (2.6, IDLE0, IO)],
+                                                [(0.6, 'mirrors'), (1.5, 'strikes')])
+    # отражение из зеркала (1.0 с; модель ereb_hand, полупрозрачно — рисует код): появляется уже в выпаде (appear 0), укол (hit 0.45), тает (gone 0.9)
+    pre_r = full(EA.mod(GUARD, body_pos=[0, -1.8, 2], right_arm=[-70, 40, 10], bipedHandRight=[70, 0, 0]), HG_back)
+    an['ereb_hand_reflection_strike'] = anim(1.0, [(0, pre_r), (0.45, lunge, OQ), (0.7, lunge), (1.0, guard, IO)],
+                                             [(0.0, 'appear'), (0.45, 'hit'), (0.9, 'gone')])
     return an
 
 
@@ -299,7 +340,8 @@ def build():
 CHAIN = {'ereb_hand_grab': (None, 'ereb_hand_grab_hold'), 'ereb_hand_grab_hold': ('ereb_hand_grab', 'ereb_hand_squeeze'),
          'ereb_hand_squeeze': ('ereb_hand_grab_hold', 'ereb_hand_grab_hold'), 'ereb_hand_grab_release': ('ereb_hand_grab_hold', None),
          'ereb_hand_spawn': ('hidden', None), 'ereb_hand_false_death': (None, 'hidden'), 'ereb_hand_mask_fall': (None, 'maskless'),
-         'ereb_hand_mask_return': ('maskless', None), 'ereb_hand_hand_of_lies': (None, None)}
+         'ereb_hand_mask_return': ('maskless', None), 'ereb_hand_hand_of_lies': (None, None),
+         'ereb_hand_reflection_strike': ('hidden', 'hidden')}
 
 
 def write(M):

@@ -1,0 +1,44 @@
+{
+ "comment": "T31 «Тысяча отражений», зеркало (duration −1; встаёт на mirrors 0.6 с ereb_hand_thousand_reflections, код стопит в конце): caster = точка зеркала на краю арены, yaw — к центру. Меш ereb_hand_mirror встаёт из земли, по стеклу бегут блики. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ereb_hand_mirror",
+   "scale": 1.0,
+   "appear": "rise",
+   "until": 100000
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "illusion_seal",
+   "radius": 1.2,
+   "glow": 0.2,
+   "color": "#D9CCFF",
+   "brightness": 0.4
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.4,0.1",
+   "duration": 100000,
+   "texture": "glint4",
+   "count": 1,
+   "rate": 0.08,
+   "spread": 0.6,
+   "speed": 0,
+   "size": [
+    0.4,
+    0.1
+   ],
+   "life": 12,
+   "color": "#FFFFFF"
+  }
+ ]
+}

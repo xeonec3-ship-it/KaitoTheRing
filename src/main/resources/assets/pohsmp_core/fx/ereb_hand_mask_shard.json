@@ -1,0 +1,56 @@
+{
+ "comment": "T31 «Падение маски», осколок одного игрока (duration −1; 8 с — код стопит): caster = точка осколка (Fx.move — кружит по арене на 1.5–3 бл., медленно, yaw — к своему игроку). Меш ereb_hand_mask_shard (slot player_face = лицо игрока; ник над осколком — код/текст), мягкий ореол и блёстки. Видят все. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "ereb_hand_mask_shard",
+   "scale": 1.0,
+   "follow": true,
+   "until": 100000
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "glow",
+   "count": 1,
+   "rate": 0.05,
+   "spread": 0,
+   "speed": 0,
+   "size": [
+    1.3,
+    1.2
+   ],
+   "life": 40,
+   "color": "#D9CCFF",
+   "brightness": 0.35,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "mote_glass",
+   "count": 2,
+   "rate": 0.15,
+   "spread": 0.4,
+   "speed": 0.0,
+   "gravity": 0.004,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.1,
+    0.03
+   ],
+   "life": 16,
+   "color": "#F4EEFF",
+   "follow": true
+  }
+ ]
+}

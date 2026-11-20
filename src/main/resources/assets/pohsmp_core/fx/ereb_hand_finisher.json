@@ -1,0 +1,179 @@
+{
+ "comment": "T31 Добивание (72 тика = ereb_hand_finisher 3.6 с): caster = Эреб на месте (не follow), target = жертва (код держит её в ладони: точка удержания). 12 (grab) — звон у ладони; 12–30 поднимает; 30 (squeeze) — хруст, по жертве бежит стеклянная корка; 42 (shatter) — жертва трескается и рассыпается стеклом и бабочками (код прячет её, смерть ereb_hand_finisher); 48 (release) — ладонь раскрывается, остатки стекла осыпаются. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 76,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "target+0,1,0",
+   "duration": 6,
+   "size": 1.2,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "target+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 12,
+   "rate": 12,
+   "spread": 0.6,
+   "speed": 0.1,
+   "gravity": 0.01,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 12,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "aura",
+   "delay": 30,
+   "at": "target",
+   "target": "target",
+   "follow": true,
+   "duration": 12,
+   "thickness": 0.09,
+   "pulse": [
+    0.8,
+    3
+   ],
+   "motes": 8,
+   "texture": "mote_glass",
+   "color": "#F4EEFF",
+   "brightness": 0.9,
+   "in": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 3,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 30,
+   "at": "target+0,1,0",
+   "id": "illusion_mirror_crack",
+   "scale": 0.35,
+   "until": 42,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 30,
+   "at": "target+0,1,0",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 14,
+   "spread": 0.5,
+   "speed": 0.14,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#E0606A"
+  },
+  {
+   "type": "flash",
+   "delay": 42,
+   "at": "target+0,1,0",
+   "duration": 10,
+   "size": 2.4,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.3
+  },
+  {
+   "type": "sprites",
+   "delay": 42,
+   "at": "target+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 50,
+   "rate": 50,
+   "spread": 0.6,
+   "speed": 0.18,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.26,
+    0.08
+   ],
+   "life": 26,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 42,
+   "at": "target+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 20,
+   "rate": 20,
+   "spread": 0.5,
+   "speed": 0.1,
+   "gravity": -0.012,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 40,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 42,
+   "at": "target+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 10,
+   "rate": 10.0,
+   "spread": 0.5,
+   "speed": 0.1,
+   "gravity": -0.012,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 40,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "sprites",
+   "delay": 48,
+   "at": "target+0,1.4,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 16,
+   "rate": 16,
+   "spread": 0.8,
+   "speed": 0.04,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 20,
+   "color": "#F4EEFF"
+  }
+ ]
+}

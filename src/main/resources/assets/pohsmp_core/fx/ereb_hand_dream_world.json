@@ -1,0 +1,150 @@
+{
+ "comment": "T31 «Полное Раскрытие», мир сна (duration −1 — до конца боя; caster = центр арены, не follow; слать игрокам во сне). Раскрытый зеркальный мир: пол — зеркальные плиты r30 (ereb_hand_mirror_floor, медленно вращается), небо — тусклый фиолетовый тон, над ареной на +22 бл. висит огромная Длань (меш ereb_hand_giant_open ×1.6 ≈ 11 бл.), медленно покачивается; в воздухе — поле стеклянной пыльцы и бабочек. Мобов нет (как T22). Удары Длани по площади — ereb_hand_dream_slam_warn → ereb_hand_dream_slam. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "radius": 64,
+   "color": "#2E2450",
+   "strength": 0.32,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "texture": "ereb_hand_mirror_floor",
+   "radius": 30,
+   "grow": 20,
+   "glow": 0.35,
+   "spin": 0.05,
+   "color": "#D9CCFF",
+   "brightness": 0.6,
+   "lift": 0.02
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster+0,22,0",
+   "model": "ereb_hand_giant_open",
+   "scale": 1.6,
+   "until": 100000,
+   "move": {
+    "from": [
+     0,
+     20,
+     0
+    ],
+    "scaleFrom": 0.3,
+    "delay": 0,
+    "duration": 40,
+    "easing": "easeOutCubic",
+    "keys": [
+     [
+      40,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      140,
+      [
+       0,
+       1.2,
+       0
+      ],
+      "easeInOutSine"
+     ],
+     [
+      240,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInOutSine"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3,0",
+   "duration": 100000,
+   "texture": "mote_glass",
+   "count": 400,
+   "rate": 2,
+   "spread": 26,
+   "speed": 0.0,
+   "gravity": -0.002,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 80,
+   "color": "#F4EEFF",
+   "wrap": 26
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,3,0",
+   "duration": 100000,
+   "texture": "mote_butterfly",
+   "count": 120,
+   "rate": 0.6,
+   "spread": 24,
+   "speed": 0.02,
+   "gravity": -0.004,
+   "sway": 0.6,
+   "size": [
+    0.3,
+    0.2
+   ],
+   "life": 100,
+   "color": "#D9CCFF",
+   "glow": 0.4,
+   "wrap": 24
+  },
+  {
+   "type": "curtain",
+   "delay": 0,
+   "at": "caster",
+   "duration": 100000,
+   "count": 48,
+   "radius": [
+    29,
+    31
+   ],
+   "height": [
+    10,
+    18
+   ],
+   "grow": 30,
+   "width": [
+    0.6,
+    1.2
+   ],
+   "brightness": [
+    0.15,
+    0.35
+   ],
+   "texture": "beam_fade",
+   "flicker": 0.2,
+   "color": "#D9CCFF",
+   "comment": "зеркальная стена-горизонт по краю"
+  }
+ ]
+}

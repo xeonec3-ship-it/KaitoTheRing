@@ -99,7 +99,7 @@ def main():
                     r0 = prev[1].get(bn, ([0, 0, 0],))[0]
                     st = max(st, max(abs(r[i] - r0[i]) for i in range(3)) * (0.1 / max(dt, 1e-3)))
                 worst_step = max(worst_step, st)
-                fast = any(abs(t - te) <= 0.25 and ev in ('hit', 'slam', 'phase', 'crack', 'tear', 'squeeze', 'grab', 'stagger', 'snap', 'break', 'release', 'shatter')
+                fast = any(abs(t - te) <= 0.25 and ev in ('hit', 'slam', 'phase', 'crack', 'tear', 'squeeze', 'grab', 'stagger', 'snap', 'break', 'release', 'shatter', 'grip')
                            for te, ev in events.items())
                 if st > (STEP_HIT if fast else STEP_MAX):
                     errors.append('%s t=%.2f: рывок %.0f° за 0.1 с' % (name, t, st))

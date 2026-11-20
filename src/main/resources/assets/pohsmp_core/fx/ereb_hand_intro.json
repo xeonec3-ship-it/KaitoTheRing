@@ -1,0 +1,277 @@
+{
+ "comment": "T31 Появление (110 тиков = ereb_hand_spawn 5.5 с). caster = Эреб на конечной точке. 0–12: над правым плечом стягиваются стеклянные осколки и бабочки; 12 (form_hand) — из них собирается рука (модель руки видна: в анимации масштаб 0.02 → 1); 12–36: рой бабочек кружит воронкой, сжимается в его силуэт (модель Эреба НЕ рисовать 0–36); 36 (form) — звон стекла, он стоит; 52 поклон; 68 (salute) — блик на клинке, титр; 86 (speak) — «Вот мы и снова встретились» (ui…ereb_hand.spawn), рука раскрыта к игрокам; 110 (ready) — полоса. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 120,
+ "elements": [
+  {
+   "type": "tint",
+   "delay": 0,
+   "at": "caster",
+   "duration": 110,
+   "radius": 40,
+   "color": "#20142E",
+   "strength": 0.24,
+   "in": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 24,
+    "easing": "easeInSine"
+   }
+  },
+  {
+   "type": "sigil",
+   "delay": 2,
+   "at": "caster+0,0.05,0",
+   "id": "illusion_seal",
+   "until": 110,
+   "comment": "печать иллюзий под ним"
+  },
+  {
+   "type": "decal",
+   "delay": 4,
+   "at": "caster",
+   "duration": 110,
+   "texture": "cult_emblem",
+   "radius": 2.2,
+   "glow": 0.4,
+   "fadeOut": 20,
+   "color": "#A3323B",
+   "brightness": 0.6,
+   "comment": "знак Меллисто под печатью"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.97,2.25,-0.34",
+   "duration": 12,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 4,
+   "spread": 1.6,
+   "speed": -0.06,
+   "gravity": 0.0,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 12,
+   "color": "#F4EEFF",
+   "comment": "осколки стягиваются в руку"
+  },
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "caster+0.97,2.25,-0.34",
+   "duration": 8,
+   "size": 1.6,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 1.0,
+   "comment": "form_hand"
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,1.2,0",
+   "duration": 30,
+   "texture": "mote_butterfly",
+   "count": 120,
+   "rate": 4,
+   "spread": 6.0,
+   "speed": 0.02,
+   "gravity": -0.002,
+   "sway": 0.6,
+   "size": [
+    0.34,
+    0.2
+   ],
+   "life": 44,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 6,
+   "at": "caster+0,1.2,0",
+   "duration": 30,
+   "texture": "mote_butterfly_side",
+   "count": 60,
+   "rate": 2.0,
+   "spread": 6.0,
+   "speed": 0.02,
+   "gravity": -0.002,
+   "sway": 0.6,
+   "size": [
+    0.30600000000000005,
+    0.2
+   ],
+   "life": 44,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "vortex",
+   "delay": 12,
+   "at": "caster+0,0.1,0",
+   "duration": 24,
+   "radius": 2.4,
+   "height": 2.6,
+   "arms": 4,
+   "speed": 9,
+   "pull": 0.55,
+   "texture": "mote_butterfly",
+   "particles": 60,
+   "life": 24,
+   "size": 0.3,
+   "color": "#D9CCFF",
+   "funnel": 0.35,
+   "turns": 1.4,
+   "out": {
+    "duration": 8,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "aura",
+   "delay": 26,
+   "at": "caster",
+   "target": "caster",
+   "duration": 12,
+   "thickness": 0.09,
+   "pulse": [
+    0.6,
+    4
+   ],
+   "motes": 6,
+   "texture": "mote_glass",
+   "color": "#D9CCFF",
+   "brightness": 0.8,
+   "in": {
+    "duration": 8,
+    "easing": "easeInCubic"
+   },
+   "out": {
+    "duration": 4,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 36,
+   "at": "caster+0,1.1,0",
+   "duration": 10,
+   "size": 2.6,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.2,
+   "comment": "form"
+  },
+  {
+   "type": "wave",
+   "delay": 36,
+   "at": "caster+0,1,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 2.4,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 36,
+   "at": "caster+0,1.1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 30,
+   "rate": 30,
+   "spread": 1.1,
+   "speed": 0.14,
+   "gravity": 0.012,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 22,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 36,
+   "at": "caster+0,1.1,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 24,
+   "rate": 24,
+   "spread": 0.8,
+   "speed": 0.11,
+   "gravity": -0.006,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 34,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 36,
+   "at": "caster+0,1.1,0",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 12,
+   "rate": 12.0,
+   "spread": 0.8,
+   "speed": 0.11,
+   "gravity": -0.006,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 34,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "wave",
+   "delay": 38,
+   "at": "caster+0,0.05,0",
+   "duration": 18,
+   "shape": "ring",
+   "radius": 8,
+   "color": "@primary",
+   "brightness": 0.5
+  },
+  {
+   "type": "flash",
+   "delay": 68,
+   "at": "caster+0.35,2.3,0.25",
+   "duration": 7,
+   "size": 0.5,
+   "rays": 4,
+   "anamorphic": 1.4,
+   "color": "#FFE7A0",
+   "comment": "salute: блик на клинке"
+  },
+  {
+   "type": "flash",
+   "delay": 86,
+   "at": "caster+0.6,1.9,0.5",
+   "duration": 10,
+   "size": 0.8,
+   "rays": 6,
+   "color": "#F4EEFF",
+   "brightness": 0.8,
+   "comment": "speak: рука раскрыта"
+  }
+ ]
+}

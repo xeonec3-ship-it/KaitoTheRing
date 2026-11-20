@@ -1,0 +1,91 @@
+{
+ "comment": "T31 Фаза 3 «Глава Культа» (33%, ereb_hand_phase3, событие crack 0.9 с = 18 тик): caster = Эреб. «Длань» у маски, маска трескается (на 18 код меняет текстуру на ereb_hand_cracked): рябь у лица, золотые трещины, мир на 2 с тускнеет, по краям — вспышка багрянца. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 50,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 12,
+   "at": "caster+0.15,1.75,0.33",
+   "id": "illusion_face_ripple",
+   "until": 30,
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 18,
+   "at": "caster+0.15,1.75,0.33",
+   "duration": 8,
+   "size": 1.0,
+   "rays": 6,
+   "color": "#FFE7A0",
+   "brightness": 1.2,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 18,
+   "at": "caster+0.15,1.75,0.33",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 14,
+   "spread": 0.25,
+   "speed": 0.08,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "sprites",
+   "delay": 18,
+   "at": "caster+0.15,1.75,0.33",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.2,
+   "speed": 0.06,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 16,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "tint",
+   "delay": 18,
+   "at": "caster",
+   "duration": 40,
+   "radius": 32,
+   "color": "#1A0A14",
+   "strength": 0.35,
+   "in": {
+    "duration": 6,
+    "easing": "easeOutCubic"
+   },
+   "out": {
+    "duration": 20,
+    "easing": "easeOutCubic"
+   }
+  },
+  {
+   "type": "wave",
+   "delay": 18,
+   "at": "caster+0,0.05,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 12,
+   "color": "#A3323B",
+   "brightness": 0.5
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "comment": "T31 Удар рукой по площади (анимация ereb_hand_slam, событие slam 0.8 с): caster = Эреб, слать на slam. Ладонь бьёт о землю ≈0.9 бл. вперёд и 0.6 бл. вправо: трещины стекла r2.5, кольцо r5 (зона урона — код, рекомендую r3.5 от точки удара), осколки и искры. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 40,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0.6,0.05,0.9",
+   "duration": 8,
+   "size": 3.0,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.2
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0.6,0.05,0.9",
+   "duration": 40,
+   "texture": "higher_cracks",
+   "radius": 2.5,
+   "grow": 4,
+   "glow": 0.5,
+   "fadeOut": 30,
+   "color": "#D9CCFF",
+   "brightness": 0.9
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0.6,0.05,0.9",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 5.0,
+   "color": "@secondary",
+   "brightness": 0.8
+  },
+  {
+   "type": "wave",
+   "delay": 2,
+   "at": "caster+0.6,0.05,0.9",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 3.5,
+   "color": "@primary",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.6,0.05,0.9",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 34,
+   "rate": 34,
+   "spread": 1.6,
+   "speed": 0.2,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.22,
+    0.06
+   ],
+   "life": 20,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.6,0.05,0.9",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 16,
+   "spread": 1.0,
+   "speed": 0.16,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#E8B84A"
+  }
+ ]
+}

@@ -1,0 +1,66 @@
+{
+ "comment": "T31 «Стеклянная хватка», удар (ereb_hand_glass_grip, событие grip 1.0 с): caster = Эреб. Рука сжимает область перед ним: стекло стягивается к кулаку (≈2 бл. вперёд), вспышка, кольцо сходится (урон и притяжение — код). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.5,1.2,2.0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 34,
+   "rate": 34,
+   "spread": 3.0,
+   "speed": -0.25,
+   "gravity": 0.0,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.22,
+    0.06
+   ],
+   "life": 12,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "flash",
+   "delay": 4,
+   "at": "caster+0.5,1.2,2.0",
+   "duration": 8,
+   "size": 2.2,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.2
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.05,3",
+   "duration": 10,
+   "shape": "ring",
+   "radius": 4.0,
+   "color": "@secondary",
+   "brightness": 0.7,
+   "reverse": true
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0.5,1.2,2.0",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 14,
+   "spread": 0.6,
+   "speed": 0.14,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0"
+  }
+ ]
+}

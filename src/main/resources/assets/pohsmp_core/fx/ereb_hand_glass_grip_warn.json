@@ -1,0 +1,39 @@
+{
+ "comment": "T31 «Стеклянная хватка», предупреждение (20 тиков = 1 с; ereb_hand_glass_grip warn 0.0): caster = Эреб (не follow). Конус 70° на 6 бл. вперёд (ereb_hand_grip_cone, вершина у его ног), заполняется стеклом, по краю — золото. Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 22,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster+0,0,3",
+   "duration": 22,
+   "texture": "ereb_hand_grip_cone",
+   "radius": 6.0,
+   "grow": 14,
+   "glow": 0.3,
+   "color": "#D9CCFF",
+   "brightness": 0.7,
+   "rotation": 0,
+   "comment": "вершина конуса — у его ног (центр картинки), раскрыт вперёд; radius 6 → картинка 12×12 со смещением"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,3",
+   "duration": 20,
+   "texture": "mote_glass",
+   "count": 24,
+   "rate": 1.2,
+   "area": 2.5,
+   "speed": 0.0,
+   "gravity": -0.004,
+   "size": [
+    0.14,
+    0.05
+   ],
+   "life": 14,
+   "color": "#F4EEFF"
+  }
+ ]
+}

@@ -1,0 +1,126 @@
+{
+ "comment": "T31 «Падение маски», срыв (44 тика = ereb_hand_mask_fall 2.2 с): caster = Эреб. 10 (grip) — блик у лица; 17 (tear) — золотые искры, маска отрывается; 22 (shatter) — над ним маска лопается: вспышка, осколки разлетаются по арене (сами осколки — ereb_hand_mask_shard на каждом игроке), бабочки. Титр «Падение маски». Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 46,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 10,
+   "at": "caster+0.15,1.75,0.33",
+   "duration": 6,
+   "size": 0.6,
+   "rays": 4,
+   "color": "#F4EEFF",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 17,
+   "at": "caster+0.15,1.75,0.33",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 14,
+   "spread": 0.2,
+   "speed": 0.1,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#FFE7A0"
+  },
+  {
+   "type": "flash",
+   "delay": 22,
+   "at": "caster-0.2,2.8,0.6",
+   "duration": 10,
+   "size": 3.2,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.3
+  },
+  {
+   "type": "wave",
+   "delay": 22,
+   "at": "caster-0.2,2.8,0.6",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 3.0,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "at": "caster-0.2,2.8,0.6",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 40,
+   "rate": 40,
+   "spread": 0.6,
+   "speed": 0.25,
+   "gravity": 0.0,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.3,
+    0.1
+   ],
+   "life": 26,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "at": "caster-0.2,2.8,0.6",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 12,
+   "rate": 12,
+   "spread": 0.4,
+   "speed": 0.1,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.32,
+    0.12
+   ],
+   "life": 30,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  },
+  {
+   "type": "sprites",
+   "delay": 22,
+   "at": "caster-0.2,2.8,0.6",
+   "duration": 2,
+   "texture": "mote_butterfly_side",
+   "count": 6,
+   "rate": 6.0,
+   "spread": 0.4,
+   "speed": 0.1,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.28800000000000003,
+    0.12
+   ],
+   "life": 30,
+   "color": "#FFE7A0",
+   "glow": 0.35
+  },
+  {
+   "type": "wave",
+   "delay": 24,
+   "at": "caster+0,0.05,0",
+   "duration": 20,
+   "shape": "ring",
+   "radius": 14,
+   "color": "@primary",
+   "brightness": 0.5
+  }
+ ]
+}

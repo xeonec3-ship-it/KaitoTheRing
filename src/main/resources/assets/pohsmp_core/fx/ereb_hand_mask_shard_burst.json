@@ -1,0 +1,77 @@
+{
+ "comment": "T31 «Падение маски», осколок НЕ разбит за 8 с (30 тиков): caster = его игрок. Осколок влетает в игрока и взрывается: багряно-золотая вспышка, кольцо, стекло (урон — код). Сгенерировано tools/gen_ereb_hand.py (gen_ereb_hand_fx.py).",
+ "style": "ereb_hand",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "size": 2.4,
+   "rays": 8,
+   "color": "#E0606A",
+   "brightness": 1.3,
+   "screen": 0.25
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 12,
+   "shape": "sphere",
+   "radius": 2.0,
+   "rim": 1.0,
+   "color": "#A3323B",
+   "brightness": 0.8
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,0.05,0",
+   "duration": 14,
+   "shape": "ring",
+   "radius": 3.0,
+   "color": "@primary",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 30,
+   "rate": 30,
+   "spread": 0.5,
+   "speed": 0.22,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.18,
+    0.05
+   ],
+   "life": 20,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 1,
+   "texture": "spark_soft",
+   "count": 18,
+   "rate": 18,
+   "spread": 0.6,
+   "speed": 0.18,
+   "gravity": 0.015,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 10,
+   "color": "#E0606A"
+  }
+ ]
+}

@@ -1083,6 +1083,8 @@ def main():
     rapier()
     import gen_ereb_hand_anims as AN
     AN.write(sys.modules[__name__])
+    import gen_ereb_hand_fx as HF
+    HF.run(sys.modules[__name__])
     if '--no-ui' not in args:
         import gen_ereb_hand_ui as UI
         UI.run(sys.modules[__name__], args)

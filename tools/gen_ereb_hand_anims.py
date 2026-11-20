@@ -62,6 +62,16 @@ def full(body, gh=None, **kw):
     p.update(body)
     p.update(gh if gh is not None else HOVER)
     p.update(kw)
+    # накидка — три кости: общий угол cape раскладывается волной (верх ведёт, середина догоняет, низ отстаёт и провисает)
+    if 'cape_mid' not in p:
+        c = p['cape']
+        if c[0] > 15:
+            p['cape'], p['cape_mid'], p['cape_low'] = ([c[0] * 0.6, c[1], c[2] * 0.5], [c[0] * 0.38, 0, c[2] * 0.3],
+                                                       [-c[0] * 0.12, 0, c[2] * 0.2])
+        else:
+            p['cape'], p['cape_mid'], p['cape_low'] = ([c[0] * 0.55, c[1], c[2] * 0.5], [c[0] * 0.3, 0, c[2] * 0.3],
+                                                       [c[0] * 0.15, 0, c[2] * 0.2])
+    p['ghost_trail_scale'] = list(p.get('ghost_hand_scale', ONE))
     return p
 
 
@@ -79,7 +89,8 @@ def idle_pose(t):
     ph2 = math.sin(t * math.pi / 2 + 1.1)
     body = EA.mod(STAND, torso=[-1.5 * abs(ph), 0, 0], body_pos=[0, 0.12 * abs(ph), 0], head=[-3 + 1.5 * ph, 8 + 4 * ph, 0],
                   coat_front_r=[-3, 0, 2 + 1.2 * ph], coat_front_l=[2, 0, -2 + 1.2 * ph], coat_back_r=[1.5 * ph, 0, 1.0 * ph],
-                  coat_back_l=[1.5 * ph, 0, 1.0 * ph], right_arm=[-14 + 2 * ph, 12, 7], cape=[4 + 1.5 * ph2, 0, 0.8 * ph])
+                  coat_back_l=[1.5 * ph, 0, 1.0 * ph], right_arm=[-14 + 2 * ph, 12, 7], cape=[2.4 + 0.8 * ph2, 0, 0.4 * ph],
+                  cape_mid=[1.2 + 1.0 * math.sin(t * math.pi / 2 + 1.9), 0, 0.3 * ph2], cape_low=[0.6 + 1.2 * math.sin(t * math.pi / 2 + 2.7), 0, 0.3 * ph])
     gh = hand(pos=(0, 0.6 * ph2, 0), rot=(14 + 2 * ph, -18 + 3 * ph2, -6 + 2 * ph), curl=0.22 + 0.06 * ph2, ripple=0.08 * ph, thumb=0.15)
     return full(body, gh)
 
@@ -181,8 +192,8 @@ def build():
                                        (5.0, speak2, IO), (5.5, IDLE0, IO)],
                                  [(0.6, 'form_hand'), (1.8, 'form'), (2.6, 'bow'), (3.4, 'salute'), (4.3, 'speak'), (5.5, 'ready')])
     # ---------------------------------------------------------------- переход в фазу 2 (66%, 1.6 с): рука сжимается в кулак и бьёт в землю рядом
-    fist_up = full(EA.mod(SALUTE, head=[-10, 0, 0]), hand(pos=(2, 7, 2), rot=(-8, -14, 0), curl=1.0, thumb=1.0))
-    fist_dn = full(EA.mod(SALUTE, body_pos=[0, -0.6, 0], head=[10, 6, 0], cape=[10, 0, 0], right_arm=[-80, 30, 0], bipedHandRight=[-20, 0, 0]), hand(pos=(-1, -21, -15), rot=(46, -10, -4), curl=1.0, thumb=1.0))
+    fist_up = full(EA.mod(SALUTE, head=[-10, 0, 0], right_arm=[-62, 40, 12], bipedHandRight=[40, 0, 0]), hand(pos=(2, 7, 2), rot=(-8, -14, 0), curl=1.0, thumb=1.0))
+    fist_dn = full(EA.mod(SALUTE, body_pos=[0, -0.6, 0], head=[10, 6, 0], cape=[10, 0, 0], right_arm=[-34, 22, 24], bipedHandRight=[50, 0, 0]), hand(pos=(-1, -21, -15), rot=(46, -10, -4), curl=1.0, thumb=1.0))
     an['ereb_hand_phase2'] = anim(1.6, [(0, IDLE0), (0.45, fist_up, IO), (0.6, fist_up), (0.8, fist_dn, IC), (1.0, fist_dn), (1.25, full(STAND, hand(pos=(-3, -8, -10), rot=(34, -12, -6), curl=0.6, thumb=0.5)), IO), (1.6, IDLE0, IO)],
                                   [(0.8, 'phase')])
     # ---------------------------------------------------------------- переход в фазу 3 (33%, 2.0 с): ладонь «Длани» к маске (0.6), маска

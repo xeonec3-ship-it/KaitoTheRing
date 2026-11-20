@@ -214,12 +214,15 @@ def build_page(kind, three, texs, preload):
     if kind == 'martin':
         d = MR.data(['martin', 'martin_soldier', 'martin_banner'])
         st = CR.model_entry('steve')
-        st.update(anims={}, scale=1, bg=0x231a1c)
+        import boss_video as BV                                      # поза жертвы добивания (PlayerAnimator → GeckoLib)
+        st.update(anims={'victim': BV.victim_anim('pohsmp_martin_finisher_victim')}, scale=1, bg=0x231a1c)
         d['steve'] = st
         meshes = ['martin_cavalry_rider', 'martin_shield_wall', 'martin_shield_line', 'martin_archer_ghost', 'martin_arrow', 'martin_soldier_ghost']
         html = MR.page(d, None, three, meshes, [])
     else:
-        html = ER.page(['ereb', 'pyromancer'], None, three)
+        html = ER.page(['ereb', 'pyromancer', 'steve'], None, three)
+        import boss_video as BV                      # жертва добивания Эреба: эмоция PlayerAnimator → ключи для каркаса Стива
+        html = html.replace('"anims":{', '"anims":{"ereb_victim":%s,' % json.dumps(BV.victim_anim('pohsmp_ereb_finisher_victim')), 1)
     i = html.index('if (CELLS) {')
     j = html.rindex('</script>')
     drv = open(os.path.join(HERE, 'boss_video_b_driver.js'), encoding='utf-8').read()
@@ -758,6 +761,64 @@ def martin_finale():
                 'title': {'img': 'title:martin_ru', 'op': pulse(t, 5.4, 0.5, 1.6, 0.75)}, 'fade': 0.6 * (1 - lin(t, 0, 0.5))}
     c.seg(8.4, spawn)
     c.seg(0.4, lambda t: dict(spawn(8.4), fade=ease(t / 0.4)))
+
+    # ---------------- добивание (martin_finisher 2.5 с + жертва pohsmp_martin_finisher_victim по MartinMath.finisherHold)
+    import gen_martin as GM
+    FS = [(-3.4, 2.2), (3.4, 2.2), (-5.2, 3.6), (5.2, 3.6)]           # призрачные солдаты за спиной
+
+    def fin(t):
+        u = t - 0.5                    # 0.5 с стойки до удара
+        if u < 0:
+            a, ta, mix = 'martin_idle', t % 3.0, None
+            if u > -0.3:
+                mix = {'anim': 'martin_finisher', 't': 0, 'k': ease((u + 0.3) / 0.3)}
+        elif u < 2.5:
+            a, ta, mix = 'martin_finisher', u, None
+        else:
+            a, ta = 'martin_finisher', 2.5
+            mix = {'anim': 'martin_idle', 't': (u - 2.5) % 3.0, 'k': ease((u - 2.5) / 0.4)}
+        uu = max(0.0, min(2.5, u))
+        f, up = GM.finisher_hold(uu * 20)
+        if u < 0:
+            f, up = 4.2 - 1.0 * max(0.0, u + 0.5) / 0.5, 0.0
+        elif u < 0.4:
+            f = 4.2 - 1.0 * ease(u / 0.4)                       # тянет на 3.2 бл. (pull)
+        vop = 1 - lin(u, 2.45, 2.75)
+        objs = [m_obj(a, ta, mix)]
+        if vop > 0:
+            objs.append(dict(model='steve', key='victim', anim='victim', t=uu, pos=[0, up, -f], ry=180, op=vop))
+        for i, (x, z) in enumerate(FS):
+            sa = 'martin_soldier_brace' if 1.95 <= u < 2.9 else 'martin_soldier_idle'
+            st = (u - 1.95) % 1.6 if sa == 'martin_soldier_brace' else t % 2.4
+            objs.append(dict(model='martin_soldier', key='fs%d' % i, anim=sa, t=st, pos=[x, 0, z], ry=0, op=0.9))
+        spr = []
+        chest = [0, up + 1.2, -f]
+        spr += burst('glow', chest, u - 0.4, 22, 3.0, (0.08, 0.2), GOLD_HI, 201, life=0.6, grav=5, spread=(1, 0.8, 1))
+        spr += burst('glow', chest, u - 0.4, 8, 2.0, (0.08, 0.16), '#b01818', 202, life=0.5, grav=6)
+        if 0.4 <= u < 0.7:
+            spr.append(glow(chest, 1.6 * (1 - (u - 0.4) / 0.3), WHITE, 0.8 * (1 - (u - 0.4) / 0.3)))
+        if 0.8 <= u < 2.3:
+            spr.append(glow(chest, 1.4, GOLD, 0.25 + 0.1 * math.sin(u * 9)))
+        if 1.5 <= u < 1.9:
+            spr.append(glow(chest, 3.0 * (1 - (u - 1.5) / 0.4), GOLD_HI, 0.6 * (1 - (u - 1.5) / 0.4)))
+        ts = u - 2.0                   # удар о землю + солдаты бьют щитами
+        gp = [0, 0.1, -2.2]
+        spr += burst('mote_ash', gp, ts, 20, 2.2, (0.25, 0.5), '#b8a890', 203, life=0.9, grav=3, up=1.2, spread=(1, 0.3, 1), op=0.8)
+        spr += burst('glow', gp, ts, 10, 3.0, (0.12, 0.25), GOLD_HI, 204, life=0.5, grav=6, up=1.5)
+        if 0 <= ts < 0.6:
+            spr.append(decal('wave_ring', gp, 0.6 + 3.5 * ts, GOLD, 0.8 * (1 - ts / 0.6)))
+            spr.append(decal('wave_ring', M0, 1 + 9 * ts, GHOST, 0.7 * (1 - ts / 0.6)))
+        for i, (x, z) in enumerate(FS):
+            spr += burst('mote_wisp', [x, 0.2, z], ts, 5, 1.2, (0.3, 0.5), GHOST, 210 + i, life=0.7, up=1.0, spread=(1, 0.2, 1), op=0.6)
+        cam = camkeys([(0, -62, 8, 15.0, (0, 2.2, -1.8)), (0.9, -66, 10, 15.5, (0, 2.6, -1.8)), (1.6, -60, 14, 19.5, (0, 4.2, -1.0)),
+                       (2.3, -58, 14, 20.0, (0, 4.4, -0.8)), (2.6, -62, 10, 15.5, (0, 2.4, -1.6)), (3.6, -64, 10, 16.0, (0, 2.2, -1.6))], t)
+        sh = 0.07 * pulse(u, 2.0, 0.03, 0.08, 0.2) * math.sin(t * 70)
+        cam['look'][0] += sh
+        return {'objs': objs, 'sprites': spr, 'cam': cam, 'groundSize': 200,
+                'cap': 'Добивание', 'sub': 'martin_finisher · пронзает (impale 0.4) → над головой (raise 0.8–1.7) → бросает (throw 1.7) → '
+                                         'удар о землю, солдаты бьют щитами (slam 2.0) → смерть (kill 2.3)',
+                'fade': max(1 - lin(t, 0, 0.4), 0.6 * lin(t, 3.6, 4.0))}
+    c.seg(4.0, fin)
     SOLS = [(-3.0, -0.6), (3.0, -0.6)]
     BAN = [-4.8, 0, 1.4]
     SPEECH = 'Хорошо, вы доказали свою силу... Я помогу Эребу, если эта ваша просьба'
@@ -1186,12 +1247,47 @@ def ereb_finale():
                 'cap': 'Финал', 'sub': 'ereb_finale · улыбка (0.3 с) → бабочка из ладони (1.4) → фраза (2.4) → каст «Сна бабочки» (3.2) → рассыпается (5.0)',
                 'speech': {'text': SPEECH, 'op': sp} if sp > 0 else None, 'fade': max(1 - lin(t, 0, 0.4), 0.6 * lin(t, 7.0, 7.4))}
     c.seg(7.4, finale)
+    # ---------------------------------------------------------------- добивание (ereb_finisher 2.4 с + жертва pohsmp_ereb_finisher_victim)
+    VZ = -2.0                                     # жертва в 2 бл. перед Эребом, спиной к нему; он появляется в 1.3 бл. за её спиной
+    E0, E1 = 0.6, VZ + 1.3
+
+    def finisher(t):
+        ta = max(0.0, min(t - 0.4, 2.4))
+        appear = ta >= 0.7
+        ez = E1 if appear else E0
+        op = 1.0 if ta < 0.2 else (1 - lin(ta, 0.2, 0.3) if ta < 0.7 else lin(ta, 0.7, 0.8))
+        o = e_obj('ereb_finisher', ta, pos=[0, 0, ez], op=op)
+        vop = 1 - lin(ta, 1.9, 2.05)
+        vic = dict(model='steve', anim='ereb_victim', t=ta, pos=[0, 0, VZ], ry=0, op=vop, scale=0.94)
+        chest = [0, 1.3, VZ]
+        spr = []
+        spr += shards([0, 1.0, E0], ta - 0.25, 18, 431, speed=1.0, life=0.7, spread=(0.6, 1.0, 0.6))
+        spr += bfly_burst([0, 1.2, E0], ta - 0.25, 6, 432, speed=1.0, life=1.0)
+        u = ta - 0.3
+        if 0 <= u < 0.3:
+            spr.append(glow([0, 1.0, E0], 1.4 * (1 - u / 0.3) + 0.2, GLASS_HI, 0.6 * (1 - u / 0.3)))
+        u = ta - 0.6
+        if 0 <= u < 0.3:
+            spr.append(glow([0, 1.45, E1], 0.9 * (1 - u / 0.3) + 0.2, GLASS_HI, 0.7 * (1 - u / 0.3)))
+        spr += glint(chest, ta - 1.1, 0.8, GOLD_HI, 0.35)
+        spr += shards(chest, ta - 1.1, 8, 433, speed=0.8, life=0.6, spread=(0.3, 0.3, 0.3))
+        u = ta - 1.9
+        if 0 <= u < 0.5:
+            spr.append(glow([0, 1.0, VZ], 2.0 * (1 - u / 0.5) + 0.3, WHITE, 0.6 * (1 - u / 0.5)))
+        spr += shards([0, 1.0, VZ], u, 30, 434, speed=1.6, life=0.9, spread=(0.6, 1.1, 0.6))
+        spr += bfly_burst([0, 0.9, VZ], u, 22, 435, speed=1.6, life=1.4)
+        cam = camkeys([(0, 62, 8, 6.4, (0, 1.1, -0.8)), (1.4, 70, 8, 5.4, (0, 1.2, -1.2)), (3.4, 74, 10, 5.8, (0, 1.1, -1.2))], t)
+        return {'objs': [o, vic], 'sprites': spr, 'cam': cam, 'groundSize': 96,
+                'cap': 'Добивание', 'sub': 'ereb_finisher · исчезает в ряби (0.3 с) → за спиной жертвы (0.7) → укол в спину (1.1) → жертва рассыпается стеклом и бабочками (1.9)',
+                'fade': max(1 - lin(t, 0, 0.4), lin(t, 3.0, 3.4))}
+    c.seg(3.4, finisher)
     return c
 
 
 E_TEX = ['glow', 'mote_glass', 'mote_butterfly', 'mote_butterfly_side', 'illusion_seal', 'wave_ring',
          'title:ereb_ru', 'title:ereb_false_ally_ru']
-E_PRE = [{'model': 'ereb'}, {'model': 'ereb', 'key': 'ereb_smile', 'smile': True}, {'model': 'ereb', 'key': 'ereb2'}, {'model': 'pyromancer'}]
+E_PRE = [{'model': 'ereb'}, {'model': 'ereb', 'key': 'ereb_smile', 'smile': True}, {'model': 'ereb', 'key': 'ereb2'}, {'model': 'pyromancer'},
+         {'model': 'steve'}]
 
 CLIPS = {
     't29_turntable': ('martin', martin_turntable), 't29_combat': ('martin', martin_combat), 't29_spells': ('martin', martin_spells),

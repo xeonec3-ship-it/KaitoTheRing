@@ -30,17 +30,24 @@ PILLAR_MARK, PILLAR_ERUPT = 0.3, 1.8           # круги на 0.3 с, сто�
 
 
 def anims():
-    from gen_cult_leader_extra import A, ch
+    from gen_cult_leader_extra import A, ch, CARRY_ARM, CARRY_HAND
     an = {}
     wind = {'torso': [0, 45, 0], 'right_arm': [-35, 35, 85], 'left_arm': [-60, 0, -25], 'body': [12, 0, 0], 'head': [5, -30, 0]}
     an['cult_leader_sickle_throw'] = A(2.2, {
-        'body': {'rotation': ch((0, Z), (0.6, wind['body'], IO), (SICKLE_THROW, [16, 0, 0]), (1.15, [6, -8, 0], OQ), (2.2, Z, IO)),
+        'body': {'rotation': ch((0, Z), (0.6, wind['body'], IO), (SICKLE_THROW - 0.15, [16, 0, 0]), (SICKLE_THROW, [12, -4, 0], 'easeInQuad'),
+                                (1.15, [6, -8, 0], OQ), (2.2, Z, IO)),
                  'position': ch((0, Z), (0.6, [0, -2, 0], IO), (1.15, [0, -1, -3], OQ), (2.2, Z, IO))},
-        'torso': {'rotation': ch((0, Z), (0.6, wind['torso'], IO), (SICKLE_THROW, [0, 50, 0]), (1.15, [0, -45, 0], OQ),
+        'torso': {'rotation': ch((0, Z), (0.6, wind['torso'], IO), (SICKLE_THROW - 0.15, [0, 50, 0]), (SICKLE_THROW, [0, -15, 0], 'easeInQuad'),
+                                 (1.15, [0, -45, 0], OQ),
                                  (SICKLE_CATCH, [0, -20, 0], IO), (1.95, [0, 10, 0], OC), (2.2, Z, IO))},
         'head': {'rotation': ch((0, Z), (0.6, wind['head'], IO), (1.15, [0, 20, 0], OQ), (SICKLE_CATCH, [0, 10, 0]), (2.2, Z, IO))},
-        'right_arm': {'rotation': ch((0, Z), (0.6, wind['right_arm'], IO), (SICKLE_THROW, [-30, 40, 92]), (1.15, [-90, -35, -5], OQ),
-                                     (1.65, [-80, -20, 10], IO), (SICKLE_CATCH, [-95, 0, 15], OC), (1.95, [-60, 20, 30], OC), (2.2, Z, IO))},
+        # бросок (проверка 20.11): замах держится до 0.85, на throw (1.0) рука уже прошла вперёд — коса летит из руки ВПЕРЁД
+        # (раньше на 1.0 рука была ещё в замахе за правым плечом, взмах начинался после броска)
+        'right_arm': {'rotation': ch((0, Z), (0.6, wind['right_arm'], IO), (SICKLE_THROW - 0.15, [-30, 40, 92]),
+                                     (SICKLE_THROW, [-88, 5, 20], 'easeInQuad'), (1.15, [-90, -35, -5], OQ),
+                                     (1.65, [-95, 0, 20], IO), (SICKLE_CATCH, [-95, 0, 15], OC), (1.95, [-60, 20, 30], OC), (2.2, Z, IO))},
+        'bipedHandRight': {'rotation': ch((0, Z), (SICKLE_THROW, Z), (1.15, [5, 25, -17], OQ), (1.3, [10, 0, 60], IO),
+                                          (1.5, [15, 10, 50], IO), (1.65, [21, 5.4, 18.5], IO), (2.2, Z, IO))},
         'left_arm': {'rotation': ch((0, Z), (0.6, wind['left_arm'], IO), (1.15, [20, 0, -35], OQ), (2.2, Z, IO))},
         'right_leg': {'rotation': ch((0, Z), (0.6, [-20, 0, 5], IO), (1.15, [-30, 0, 5], OQ), (2.2, Z, IO))},
         'left_leg': {'rotation': ch((0, Z), (0.6, [15, 0, -5], IO), (1.15, [25, 0, -5], OQ), (2.2, Z, IO))},
@@ -49,7 +56,10 @@ def anims():
         'body': {'rotation': ch((0, Z), (0.4, [18, 0, 0], IO), (DASH_T, [38, 0, 0], OQ), (0.9, [38, 0, 0]), (1.05, [-8, 0, 0], OC), (1.4, Z, IO)),
                  'position': ch((0, Z), (0.4, [0, -3, 2], IO), (DASH_T, [0, -2, -2], OQ), (0.9, [0, -2, -2]), (1.05, [0, -1, 2], OC), (1.4, Z, IO))},
         'head': {'rotation': ch((0, Z), (0.4, [-15, 0, 0], IO), (DASH_T, [-30, 0, 0], OQ), (1.05, [5, 0, 0], OC), (1.4, Z, IO))},
-        'right_arm': {'rotation': ch((0, Z), (0.4, [20, 10, 30], IO), (DASH_T, [45, 10, 25], OQ), (0.9, [45, 10, 25]), (1.05, [-40, 0, 30], OC),
+        # коса (проверка 20.11): в рывке держит её наискось перед собой лезвием вверх (раньше рука уходила назад и лезвие
+        # резало землю / проходило сквозь голову)
+        'bipedHandRight': {'rotation': ch((0, Z), (0.4, [0, -5, 96], IO), (0.9, [0, -5, 96]), (1.05, [0, -5, 96]), (1.4, Z, IO))},
+        'right_arm': {'rotation': ch((0, Z), (0.4, CARRY_ARM, IO), (DASH_T, CARRY_ARM, OQ), (0.9, CARRY_ARM), (1.05, [-40, 0, 30], OC),
                                      (1.4, Z, IO))},
         'left_arm': {'rotation': ch((0, Z), (0.4, [20, 0, -20], IO), (DASH_T, [50, 0, -15], OQ), (0.9, [50, 0, -15]), (1.05, [-30, 0, -40], OC),
                                     (1.4, Z, IO))},
@@ -59,6 +69,9 @@ def anims():
     an['cult_leader_brand'] = A(1.2, {
         'torso': {'rotation': ch((0, Z), (0.3, [0, -20, 0], IO), (BRAND_T, [-5, -25, 0], OQ), (1.2, Z, IO))},
         'head': {'rotation': ch((0, Z), (0.3, [0, 20, 0], IO), (1.2, Z, IO))},
+        # правая несёт косу (раньше рука висела и коса лежала лезвием в земле всю анимацию)
+        'right_arm': {'rotation': ch((0, Z), (0.25, CARRY_ARM, IO), (1.0, CARRY_ARM), (1.2, Z, IO))},
+        'bipedHandRight': {'rotation': ch((0, Z), (0.25, CARRY_HAND, IO), (1.0, CARRY_HAND), (1.2, Z, IO))},
         'left_arm': {'rotation': ch((0, Z), (0.3, [-95, 15, -5], OC), (0.45, [-100, 15, -5]), (BRAND_T, [-85, 15, 0], OQ), (0.8, [-80, 10, 0]),
                                     (1.2, Z, IO))},
     }, [(BRAND_T, 'brand')])
@@ -68,6 +81,10 @@ def anims():
         'head': {'rotation': ch((0, Z), (0.3, [-25, 0, 0], OC), (1.6, [-25, 0, 0]), (PILLAR_ERUPT, [15, 0, 0], IQ), (2.3, Z, IO))},
         'right_arm': {'rotation': ch((0, Z), (0.3, [-175, 0, -10], OC), (1.6, [-178, 0, -12]), (PILLAR_ERUPT, [-110, 40, 0], IQ),
                                      (2.0, [-115, 45, 0]), (2.3, Z, IO))},
+        # руки к небу — коса поднята вертикально лезвием вверх-вперёд (раньше лежала поперёк над головой, лезвие за спиной);
+        # erupt — удар вперёд-вниз, лезвие над землёй
+        'bipedHandRight': {'rotation': ch((0, Z), (0.3, [83, -1, -10], OC), (1.6, [83, -1, -10]), (PILLAR_ERUPT, [42.7, 25, -46.3], IQ),
+                                          (2.0, [41, -25.7, -11.7]), (2.3, Z, IO))},
         'left_arm': {'rotation': ch((0, Z), (0.3, [-175, 0, 10], OC), (1.6, [-178, 0, 12]), (PILLAR_ERUPT, [-80, 0, -10], IQ), (2.3, Z, IO))},
         'right_leg': {'rotation': ch((0, Z), (PILLAR_ERUPT, [-15, 0, 5], IQ), (2.3, Z, IO))},
         'left_leg': {'rotation': ch((0, Z), (PILLAR_ERUPT, [15, 0, -5], IQ), (2.3, Z, IO))},

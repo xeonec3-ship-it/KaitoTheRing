@@ -651,7 +651,10 @@ def effects():
 BP = {k: _c(v) for k, v in {
     'O': '#120A1A', 'o': '#2A1838', 'L': '#E2CDF5', 'l': '#B99BE0', 'm': '#8865BA', 'd': '#55397F',
     'R': '#FF6A5E', 'r': '#E3262F', 'q': '#B0141F', 'Q': '#7A0A16', 'e': '#2A0C1A', 'E': '#1A0812',
-    'H': '#433F4E', 'h': '#2B2935', 'C': '#EFE4C8', 'G': '#F2C14A', 'W': '#FFFFFF'}.items()}
+    'H': '#433F4E', 'h': '#2B2935', 'C': '#EFE4C8', 'G': '#F2C14A', 'W': '#FFFFFF',
+    # заливка фазы 1 — лиловая (зависть), фазы 2 — тёмно-красная (нити); фаза 3 — ярко-красная (R/r/q/Q, ниже ярче)
+    '1R': '#F0DCFF', '1r': '#B98AE8', '1q': '#8A5CC4', '1Q': '#5A3690',
+    '2R': '#E0485A', '2r': '#A8182E', '2q': '#760C20', '2Q': '#4C0614'}.items()}
 
 
 def _bar_base(full, phase=1):
@@ -661,6 +664,8 @@ def _bar_base(full, phase=1):
     def px(x, y, k):
         if 0 <= x < 192 and 0 <= y < 18:
             a[y, x] = BP[k]
+    def FK(k):                                               # цвет заливки по фазе (как у остальных боссов)
+        return ('%d%s' % (phase, k)) if phase in (1, 2) else k
     x0, x1 = 3, 188
     for x in range(x0, x1 + 1):
         px(x, 7, 'O'); px(x, 16, 'O')
@@ -668,12 +673,13 @@ def _bar_base(full, phase=1):
         for y in range(9, 15):
             if full:
                 k = 'R' if y == 9 else 'r' if y <= 11 else 'q' if y <= 13 else 'Q'
+                k = FK(k)
             else:
                 k = 'o' if y == 9 else 'e' if y <= 13 else 'E'
             px(x, y, k)
         if full and (x % 6 in (0, 1)):                       # витая нить в заливке
-            px(x, 11 + (x // 6) % 2, 'R')
-            px(x + 1, 12 - (x // 6) % 2, 'q')
+            px(x, 11 + (x // 6) % 2, FK('R'))
+            px(x + 1, 12 - (x // 6) % 2, FK('q'))
     # торцы-ромбы
     for (cx, sgn) in ((2, 1), (189, -1)):
         for dy in range(-4, 5):

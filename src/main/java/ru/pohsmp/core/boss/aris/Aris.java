@@ -20,7 +20,7 @@ import ru.pohsmp.core.boss.Bosses;
  * T28 «Арис, Мифический Кузнец» (pohsmp_core:aris; docs/specs/tasks/T28_aris_boss.md): definition and registrations. A GeckoLib body
  * of her own (geo/entity/aris.geo.json, animation.aris.*), three phases («Ковка» / «Оружейная» 66% / «Мифический сплав» 33%), the
  * specials «Горн» (75%) and «Последний удар молота» (10%), four spells of her own, surrender at 5% → the peaceful NPC aris_npc,
- * the answer to «Дезинтеграция: Реплика». No finisher (owner).
+ * the finisher (owner 20.11), the answer to «Дезинтеграция: Реплика».
  */
 public final class Aris {
     private Aris() {}
@@ -37,7 +37,7 @@ public final class Aris {
             .surrender(0.05, "aris_npc")
             .special("forge", 0.75)
             .special("last_blow", 0.10)
-            .finisher(false)
+            .finisher(true)   // owner 20.11: «всем боссам добивание»
             .music("music.aris")
             .title("aris")
             .fightRadius(40)

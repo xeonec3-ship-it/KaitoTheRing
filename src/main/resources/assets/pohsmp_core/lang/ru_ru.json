@@ -697,6 +697,7 @@
   "effect.pohsmp_core.stolen_happiness": "Украденное счастье",
   "effect.pohsmp_core.stolen_happiness.description": "Ирина забрала ваши полезные эффекты себе.",
   "death.attack.pohsmp_core.irina_finisher": "%1$s теперь только её — Ирины, Ведьмы Ревности",
+  "death.attack.pohsmp_core.aris_finisher": "%1$s перекована Арис, Мифическим Кузнецом",
   "death.attack.pohsmp_core.irina_threads": "%1$s разорван красными нитями",
   "death.attack.pohsmp_core.irina_cocoon": "%1$s задушен коконом ревности",
   "subtitles.pohsmp_core.irina.spawn": "Нити расплетаются",

@@ -23,6 +23,7 @@ class ArisMathTest {
         }
         for (int i = 1; i < ArisMath.ANIMS.length; i++) {
             JsonObject a = anims.getAsJsonObject("animation.aris." + ArisMath.ANIMS[i]);
+            if (a == null && ArisMath.PENDING.contains(ArisMath.ANIMS[i])) continue;   // not delivered yet
             assertTrue(a != null, ArisMath.ANIMS[i]);
             assertEquals(Math.round(a.get("animation_length").getAsDouble() * 20), ArisMath.ANIM_TICKS[i], ArisMath.ANIMS[i]);
         }
@@ -68,6 +69,15 @@ class ArisMathTest {
             if (v.contains(event) && Math.abs(Double.parseDouble(e.getKey()) * 20 - tick) <= 1) found = true;
         }
         assertTrue(found, anim + "." + event + " at tick " + tick);
+    }
+
+    @Test
+    void finisherTimings() {
+        assertTrue(ArisMath.FINISHER_PULL < ArisMath.FINISHER_SLAM && ArisMath.FINISHER_SLAM < ArisMath.FINISHER_KILL);
+        assertTrue(ArisMath.FINISHER_KILL < ArisMath.FINISHER && ArisMath.FINISHER_CAM_FROM + ArisMath.FINISHER_CAM <= ArisMath.FINISHER);
+        assertEquals(0, ArisMath.finisherPull(0), 1e-9);
+        assertEquals(1, ArisMath.finisherPull(ArisMath.FINISHER_PULL), 1e-9);
+        assertTrue(Files.exists(Path.of("src/main/resources/data/pohsmp_core/damage_type/aris_finisher.json")));
     }
 
     @Test

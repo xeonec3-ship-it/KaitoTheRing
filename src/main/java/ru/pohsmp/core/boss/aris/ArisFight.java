@@ -812,6 +812,11 @@ public final class ArisFight {
         }));
     }
 
+    /** A finisher began (the framework locked her): no swing / spell starts meanwhile. */
+    void onFinisher() {
+        actingUntil = Math.max(actingUntil, boss.tickCount + ArisMath.FINISHER);
+    }
+
     // ---------------------------------------------------------------- the end
 
     /** Surrender / death: everything of hers goes (anvils, blades, billets, chains, the floor, the aura, the steam). */

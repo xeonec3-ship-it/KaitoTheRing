@@ -697,6 +697,7 @@
   "effect.pohsmp_core.stolen_happiness": "Stolen Happiness",
   "effect.pohsmp_core.stolen_happiness.description": "Irina took your beneficial effects for herself.",
   "death.attack.pohsmp_core.irina_finisher": "%1$s now belongs to Irina, Witch of Jealousy alone",
+  "death.attack.pohsmp_core.aris_finisher": "%1$s was reforged by Aris, the Mythic Smith",
   "death.attack.pohsmp_core.irina_threads": "%1$s was torn apart by red threads",
   "death.attack.pohsmp_core.irina_cocoon": "%1$s was smothered in a cocoon of jealousy",
   "subtitles.pohsmp_core.irina.spawn": "Threads unravel",

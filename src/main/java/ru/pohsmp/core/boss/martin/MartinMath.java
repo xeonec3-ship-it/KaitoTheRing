@@ -52,6 +52,48 @@ public final class MartinMath {
     /** Banner cut: removed 2 s later. */
     public static final int BANNER_GONE = 40;
 
+    /**
+     * Finisher (owner 20.11, ТЗ «Добивание»; provisional until martin_finisher arrives, 2.5 s): the victim is drawn 3.2 before him and
+     * pierced (0.4 s), lifted on the blade, raised over his head (0.8–1.5 s), thrown to his feet (1.7–2.0 s, the soldiers slam their
+     * shields), dies at 2.3 s. Its camera: 2 s from 0.2 s.
+     */
+    public static final int FINISHER = 50, FINISHER_KILL = 46, FINISHER_PIERCE = 8, FINISHER_RAISE = 16, FINISHER_RAISED = 30,
+            FINISHER_THROW = 34, FINISHER_SLAM = 40, FINISHER_CAM_FROM = 4, FINISHER_CAM = 40;
+
+    /**
+     * Where the finisher holds the victim at tick t: {pull (0..1 from where it was hit to the hold line), blocks in front of him,
+     * height above his feet}.
+     */
+    public static double[] finisherHold(int t) {
+        double pull = Math.min(1, t / (double) FINISHER_PIERCE);
+        pull *= pull;
+        double f, up;
+        if (t <= FINISHER_RAISE) {
+            f = 3.2;
+            up = t <= FINISHER_PIERCE ? 0 : 1.6 * ease((t - FINISHER_PIERCE) / (double) (FINISHER_RAISE - FINISHER_PIERCE));
+        } else if (t <= FINISHER_RAISED) {
+            double k = ease((t - FINISHER_RAISE) / (double) (FINISHER_RAISED - FINISHER_RAISE));
+            f = 3.2 - 2.6 * k;
+            up = 1.6 + 3.2 * k;
+        } else if (t <= FINISHER_THROW) {
+            f = 0.6;
+            up = 4.8;
+        } else if (t <= FINISHER_SLAM) {
+            double k = (t - FINISHER_THROW) / (double) (FINISHER_SLAM - FINISHER_THROW);
+            f = 0.6 + 1.6 * k;
+            up = 4.8 * (1 - k * k);
+        } else {
+            f = 2.2;
+            up = 0;
+        }
+        return new double[] {pull, f, up};
+    }
+
+    private static double ease(double u) {
+        u = Math.max(0, Math.min(1, u));
+        return 0.5 - 0.5 * Math.cos(Math.PI * u);
+    }
+
     // ---------------------------------------------------------------- counts
 
     /** Soldiers in the line: base + players, at most max. */

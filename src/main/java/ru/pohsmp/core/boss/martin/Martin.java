@@ -11,7 +11,7 @@ import ru.pohsmp.core.boss.Bosses;
 /**
  * T29 «Мартин, Последний Полководец» (pohsmp_core:martin; docs/specs/tasks/T29_martin_boss.md): definition and registrations.
  * Model ×2 (hitbox 1.4×4.0), three phases («Строй» / «Знамя» 66% / «Последний полководец» 33%), the specials «Приказ стоять насмерть»
- * (50%) and «Атака конницы» (25%) — thresholds from balance_bosses.md [martin] hold_at / cavalry_at, four spells of his own, no
+ * (50%) and «Атака конницы» (25%) — thresholds from balance_bosses.md [martin] hold_at / cavalry_at, four spells of his own, the
  * finisher; at 5% he blocks the next blow and becomes the peaceful NPC pohsmp_core:martin_npc.
  */
 public final class Martin {
@@ -28,7 +28,7 @@ public final class Martin {
             .surrender(0.05, ID + "_npc")
             .special("hold_the_line", 0.50)
             .special("cavalry", 0.25)
-            .finisher(false)
+            .finisher(true)   // owner 20.11: all five finish players off
             .music("music.martin")
             .title("martin")
             .fightRadius(40)

@@ -10,7 +10,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -28,6 +34,7 @@ import ru.pohsmp.core.boss.BossCore;
 import ru.pohsmp.core.boss.BossNet;
 import ru.pohsmp.core.boss.BossTimeline;
 import ru.pohsmp.core.fx.Fx;
+import ru.pohsmp.core.fx.FxLib;
 import ru.pohsmp.core.spell.illusion.ButterflyDreamSpell;
 
 /**
@@ -86,6 +93,28 @@ public final class ErebHandFight {
     private boolean dreamOn;
     private int dreamSlamIn;
     private final Map<UUID, Integer> dreamFx = new HashMap<>();
+    // the second four: things in flight («Пламя-подменыш», «Рой лжи»), the copies, the double of «Ложное отступление»; the mythic
+    private final List<Flight> flights = new ArrayList<>();
+    private final List<ErebHandTraitor> traitors = new ArrayList<>();
+    private ErebHandReflection decoy;
+    private int retreatLeft;
+    private boolean dawnDone;
+
+    /** A fireball / glass butterfly simulated by the server (drawn with particles till the visual assistant's fx are in). */
+    private static final class Flight {
+        final boolean swarm;
+        Vec3 pos, dir;
+        LivingEntity target, swapTo;
+        boolean real = true, butterfly, passed;
+        int t, swapAt = Integer.MAX_VALUE, flickerAt = Integer.MAX_VALUE;
+
+        Flight(boolean swarm, Vec3 pos, Vec3 dir, LivingEntity target) {
+            this.swarm = swarm;
+            this.pos = pos;
+            this.dir = dir;
+            this.target = target;
+        }
+    }
 
     ErebHandFight(ErebHandEntity boss) {
         this.boss = boss;
@@ -94,6 +123,10 @@ public final class ErebHandFight {
         cooldown.put("glass_grip", 20 * 6);
         cooldown.put("foreign_oath", 20 * 16);
         cooldown.put("thousand", 20 * 14);
+        cooldown.put("changeling_flame", 20 * 8);
+        cooldown.put("false_retreat", 20 * 12);
+        cooldown.put("traitor_reflection", 20 * 18);
+        cooldown.put("swarm_of_lies", 20 * 12);
     }
 
     // ---------------------------------------------------------------- helpers
@@ -132,6 +165,11 @@ public final class ErebHandFight {
 
     private void fx(String id) {
         Fx.play(sl(), Fx.fx(id).caster(boss).at(boss.position()).yaw(boss.getYRot()));
+    }
+
+    /** The visual assistant's fx of the second four may not be there yet: played only if it exists. */
+    private void fxIf(String id) {
+        if (FxLib.fx(id) != null) fx(id);
     }
 
     /** His own hit (pohsmp_core:boss_attack: not scaled by difficulty, armour counts). Inside the dream it is a dream hit (T22). */
@@ -215,6 +253,9 @@ public final class ErebHandFight {
         if (firewallFx >= 0) firewall(sl);
         if (oathLeft > 0 && --oathLeft == 0) oathVictim = oathAlly = null;
         if (dreamOn) tickDream(sl);
+        tickFlights(sl);
+        traitors.removeIf(x -> x.isRemoved() || !x.isAlive());
+        if (retreatLeft > 0) tickRetreat(sl);
         cooldown.replaceAll((k, v) -> Math.max(0, v - 1));
         if (gcd > 0) gcd--;
         if (meleeIn > 0) meleeIn--;
@@ -242,6 +283,7 @@ public final class ErebHandFight {
             }
             gcd = 10;
         }
+        if (core.onPillar(t)) return;   // BossGuard: one he cannot reach is hit only by ranged spells
         if (slamIn <= 0 && d < 4.5) {
             slam(sl, t);
             return;
@@ -258,7 +300,7 @@ public final class ErebHandFight {
                 return true;
             }
         } else if (phase == 1) {
-            if (grabIn <= 0 && grabbed == null && d < 3.6 && t instanceof ServerPlayer p && p != holVictim
+            if (grabIn <= 0 && grabbed == null && d < 3.6 && !core.onPillar(t) && t instanceof ServerPlayer p && p != holVictim
                     && ErebHandMath.inArc(t.getX() - boss.getX(), t.getZ() - boss.getZ(), boss.getYRot(), 60)) {
                 grab(sl, p);
                 return true;
@@ -272,7 +314,7 @@ public final class ErebHandFight {
                 cultHead(sl);
                 return true;
             }
-            if (grabIn <= 0 && grabbed == null && d < 3.6 && t instanceof ServerPlayer p && p != holVictim
+            if (grabIn <= 0 && grabbed == null && d < 3.6 && !core.onPillar(t) && t instanceof ServerPlayer p && p != holVictim
                     && ErebHandMath.inArc(t.getX() - boss.getX(), t.getZ() - boss.getZ(), boss.getYRot(), 60)) {
                 grab(sl, p);
                 return true;
@@ -547,23 +589,29 @@ public final class ErebHandFight {
             grabIn = ErebHandMath.PHASE2 + 40;
             wallsIn = ErebHandMath.PHASE2 + 20 * 6;
         } else if (to == 2) {
-            act(ErebHandMath.PHASE3);
-            anim("ereb_hand_phase3");
-            fx("ereb_hand_phase3");
-            core.actionbar(arenaR(), ui("phase3"));
             stopWalls(sl);
-            doublesIn = ErebHandMath.PHASE3 + 20 * 4;
-            play(new BossTimeline("phase", ErebHandMath.PHASE3).at(ErebHandMath.PHASE3_CRACK, () -> {
-                boss.setMask(2);   // the mask cracks: ereb_hand_cracked
-                core.sound("ereb_hand.crack", 3, 1);
-                core.sound("ereb.phase", 4, 0.8f);
-                if (firewallFx < 0) {
-                    double r = core.arenaRadius();
-                    firewallFx = Fx.play(sl, Fx.fx("cult_leader_firewall").style("ereb_hand").at(core.arena()).yaw(0).scale(r / 28.0));
-                    core.sound(core.arena(), "ereb_hand.flame", 4, 0.8f);
-                }
-            }));
+            doublesIn = ErebHandMath.DAWN + ErebHandMath.PHASE3 + 20 * 4;
+            if (!dawnDone) falseDawn(sl);   // mythic «Ложный рассвет» first, the mask cracks after it
+            else phase3Crack(sl);
         }
+    }
+
+    /** ereb_hand_phase3: «Длань» to the mask, it cracks (ereb_hand_cracked); the mirror wall of fire rises on the arena edge. */
+    private void phase3Crack(ServerLevel sl) {
+        act(ErebHandMath.PHASE3);
+        anim("ereb_hand_phase3");
+        fx("ereb_hand_phase3");
+        core.actionbar(arenaR(), ui("phase3"));
+        play(new BossTimeline("phase", ErebHandMath.PHASE3).at(ErebHandMath.PHASE3_CRACK, () -> {
+            boss.setMask(2);   // the mask cracks: ereb_hand_cracked
+            core.sound("ereb_hand.crack", 3, 1);
+            core.sound("ereb.phase", 4, 0.8f);
+            if (firewallFx < 0) {
+                double r = core.arenaRadius();
+                firewallFx = Fx.play(sl, Fx.fx("cult_leader_firewall").style("ereb_hand").at(core.arena()).yaw(0).scale(r / 28.0));
+                core.sound(core.arena(), "ereb_hand.flame", 4, 0.8f);
+            }
+        }));
     }
 
     // ---------------------------------------------------------------- specials
@@ -883,22 +931,35 @@ public final class ErebHandFight {
     private boolean castSpell(ServerLevel sl, LivingEntity t, double d) {
         List<String> can = new ArrayList<>();
         int players = fighters().size();
-        if (ready("false_flame")) can.add("false_flame");
-        if (ready("glass_grip") && d < ErebHandConfig.d(ErebHandConfig.GRIP_RANGE)) can.add("glass_grip");
-        if (ready("foreign_oath") && players >= 2) can.add("foreign_oath");
-        if (ready("thousand") && players >= 1) can.add("thousand");
+        boolean pillar = core.onPillar(t);
+        for (String id : ErebHandMath.spellPool(core.phase())) {
+            if (!ready(id) || pillar && !ErebHandMath.ranged(id)) continue;
+            if (id.equals("glass_grip") && d >= ErebHandConfig.d(ErebHandConfig.GRIP_RANGE)) continue;
+            if (id.equals("foreign_oath") && players < 2) continue;
+            if (id.equals("false_retreat") && (d > 8 || retreatLeft > 0)) continue;
+            if (id.equals("traitor_reflection") && !traitors.isEmpty()) continue;
+            can.add(id);
+        }
         if (can.isEmpty()) return false;
         String pick = can.get(boss.getRandom().nextInt(can.size()));
         boolean done = switch (pick) {
             case "false_flame" -> falseFlame(sl);
             case "glass_grip" -> glassGrip(sl, t);
             case "foreign_oath" -> foreignOath(sl);
+            case "changeling_flame" -> changelingFlame(sl, t);
+            case "false_retreat" -> falseRetreat(sl, t);
+            case "traitor_reflection" -> traitorReflection(sl);
+            case "swarm_of_lies" -> swarmOfLies(sl);
             default -> thousand(sl);
         };
         cooldown.put(pick, 20 * switch (pick) {
             case "false_flame" -> ErebHandConfig.i(ErebHandConfig.FLAME_COOLDOWN);
             case "glass_grip" -> ErebHandConfig.i(ErebHandConfig.GRIP_COOLDOWN);
             case "foreign_oath" -> ErebHandConfig.i(ErebHandConfig.OATH_COOLDOWN);
+            case "changeling_flame" -> ErebHandConfig.i(ErebHandConfig.CHANGELING_COOLDOWN);
+            case "false_retreat" -> ErebHandConfig.i(ErebHandConfig.RETREAT_COOLDOWN);
+            case "traitor_reflection" -> ErebHandConfig.i(ErebHandConfig.TRAITOR_COOLDOWN);
+            case "swarm_of_lies" -> ErebHandConfig.i(ErebHandConfig.SWARM_COOLDOWN);
             default -> ErebHandConfig.i(ErebHandConfig.THOUSAND_COOLDOWN);
         });
         return done;
@@ -1084,6 +1145,300 @@ public final class ErebHandFight {
         return true;
     }
 
+    // ---------------------------------------------------------------- the second four (owner 20.11; ⚠ TEMP timings, ErebHandMath)
+
+    /**
+     * «Пламя-подменыш»: a fireball at a player; half way it turns into a glass butterfly and flies at the ally nearest that player (6
+     * blocks; none — the player itself). The hint: 0.5 s before the swap the ball flickers gold.
+     */
+    private boolean changelingFlame(ServerLevel sl, LivingEntity t) {
+        face(t);
+        act(ErebHandMath.CHANGELING);
+        anim("ereb_hand_changeling_flame");
+        fxIf("ereb_hand_changeling_flame");
+        play(new BossTimeline("act:changeling", ErebHandMath.CHANGELING).at(ErebHandMath.CHANGELING_AT, () -> {
+            if (!t.isAlive()) return;
+            Vec3 from = boss.position().add(0, 1.5, 0);
+            Vec3 aim = t.position().add(0, t.getBbHeight() * 0.5, 0);
+            Flight f = new Flight(false, from, aim.subtract(from).normalize(), t);
+            f.swapAt = ErebHandMath.changelingSwapTick(from.distanceTo(aim), ErebHandMath.CHANGELING_SPEED);
+            f.flickerAt = ErebHandMath.changelingFlickerTick(f.swapAt);
+            List<ServerPlayer> who = fighters();
+            double[][] xz = new double[who.size()][];
+            int ti = -1;
+            for (int i = 0; i < who.size(); i++) {
+                xz[i] = new double[] {who.get(i).getX(), who.get(i).getZ()};
+                if (who.get(i) == t) ti = i;
+            }
+            f.swapTo = ti < 0 ? t : who.get(ErebHandMath.nearestAlly(xz, ti, ErebHandMath.CHANGELING_ALLY_R));
+            flights.add(f);
+            sl.playSound(null, from.x, from.y, from.z, SoundEvents.BLAZE_SHOOT, SoundSource.HOSTILE, 1.2f, 0.8f);
+        }));
+        return true;
+    }
+
+    /**
+     * «Рой лжи»: 12 glass butterflies at the players; 6 are false (they fly through), 6 real — a hit and blindness 1 s. The hint: the real
+     * ones ring quietly and shine gold at the edges of their wings.
+     */
+    private boolean swarmOfLies(ServerLevel sl) {
+        List<ServerPlayer> who = fighters();
+        if (who.isEmpty()) return false;
+        act(ErebHandMath.SWARM);
+        anim("ereb_hand_swarm_of_lies");
+        fxIf("ereb_hand_swarm_of_lies");
+        play(new BossTimeline("act:swarm", ErebHandMath.SWARM).at(ErebHandMath.SWARM_AT, () -> {
+            int n = ErebHandConfig.i(ErebHandConfig.SWARM_COUNT);
+            double[] rnd = new double[n];
+            for (int i = 0; i < n; i++) rnd[i] = boss.getRandom().nextDouble();
+            boolean[] real = ErebHandMath.pickReal(n, ErebHandConfig.i(ErebHandConfig.SWARM_REAL), rnd);
+            List<ServerPlayer> now = fighters();
+            if (now.isEmpty()) return;
+            for (int i = 0; i < n; i++) {
+                ServerPlayer p = now.get(i % now.size());
+                double a = Math.PI * 2 * i / n;
+                Vec3 from = boss.position().add(Math.cos(a) * 1.2, 1.6 + boss.getRandom().nextDouble(), Math.sin(a) * 1.2);
+                Flight f = new Flight(true, from, new Vec3(Math.cos(a), 0.6, Math.sin(a)).normalize(), p);
+                f.real = real[i];
+                f.butterfly = true;
+                flights.add(f);
+            }
+            sl.playSound(null, boss.getX(), boss.getY() + 1.5, boss.getZ(), SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.HOSTILE, 1.5f, 1.4f);
+        }));
+        return true;
+    }
+
+    private void tickFlights(ServerLevel sl) {
+        for (var it = flights.iterator(); it.hasNext(); ) {
+            Flight f = it.next();
+            f.t++;
+            LivingEntity tgt = f.target;
+            if (f.t > (f.swarm ? ErebHandMath.SWARM_LIFE : ErebHandMath.CHANGELING_LIFE) || tgt == null || !tgt.isAlive() || tgt.level() != sl) {
+                it.remove();
+                continue;
+            }
+            if (!f.swarm && !f.butterfly && f.t >= f.swapAt) {   // the swap: a glass butterfly now, at the ally
+                f.butterfly = true;
+                if (f.swapTo != null && f.swapTo.isAlive()) f.target = tgt = f.swapTo;
+                sl.sendParticles(ParticleTypes.END_ROD, f.pos.x, f.pos.y, f.pos.z, 12, 0.2, 0.2, 0.2, 0.05);
+                sl.playSound(null, f.pos.x, f.pos.y, f.pos.z, SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.HOSTILE, 1.2f, 1.5f);
+            }
+            Vec3 aim = tgt.position().add(0, tgt.getBbHeight() * 0.55, 0);
+            Vec3 to = aim.subtract(f.pos);
+            double speed = f.swarm ? ErebHandMath.SWARM_SPEED : f.butterfly ? ErebHandMath.BUTTERFLY_SPEED : ErebHandMath.CHANGELING_SPEED;
+            if (!f.passed) {   // they home in (gently for the swarm: one can step aside)
+                double turn = f.swarm ? (f.t < 12 ? 0.05 : 0.12) : 0.35;
+                f.dir = f.dir.scale(1 - turn).add(to.normalize().scale(turn)).normalize();
+            }
+            f.pos = f.pos.add(f.dir.scale(speed));
+            particles(sl, f);
+            double hitR = f.swarm ? ErebHandMath.SWARM_HIT_R : ErebHandMath.CHANGELING_HIT_R;
+            if (f.passed || f.pos.distanceTo(aim) > hitR + tgt.getBbWidth() * 0.5) continue;
+            if (f.swarm && !f.real) {   // a false one goes through
+                f.passed = true;
+                f.t = Math.max(f.t, ErebHandMath.SWARM_LIFE - 12);
+                continue;
+            }
+            if (!f.swarm && !f.butterfly) continue;   // the fireball only bites as a butterfly (it swaps half way anyway)
+            hit(tgt, ErebHandConfig.d(f.swarm ? ErebHandConfig.SWARM_DAMAGE : ErebHandConfig.CHANGELING_DAMAGE));
+            if (f.swarm) tgt.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, ErebHandConfig.i(ErebHandConfig.SWARM_BLIND_TICKS), 0, false, false, true));
+            sl.sendParticles(ParticleTypes.END_ROD, f.pos.x, f.pos.y, f.pos.z, 10, 0.25, 0.25, 0.25, 0.08);
+            sl.playSound(null, f.pos.x, f.pos.y, f.pos.z, SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 0.8f, 1.6f);
+            it.remove();
+        }
+    }
+
+    private static final DustParticleOptions GOLD = new DustParticleOptions(new org.joml.Vector3f(1f, 0.78f, 0.25f), 0.9f);
+
+    /** Till the visual assistant's fx: the fireball (flame; its gold flicker), the butterflies (glass glints; the real ones gold-edged and ringing). */
+    private void particles(ServerLevel sl, Flight f) {
+        Vec3 p = f.pos;
+        if (!f.butterfly) {
+            sl.sendParticles(ParticleTypes.FLAME, p.x, p.y, p.z, 3, 0.08, 0.08, 0.08, 0.01);
+            if (f.t >= f.flickerAt && f.t % 2 == 0) sl.sendParticles(GOLD, p.x, p.y, p.z, 4, 0.15, 0.15, 0.15, 0);
+            return;
+        }
+        sl.sendParticles(ParticleTypes.END_ROD, p.x, p.y, p.z, 1, 0.05, 0.05, 0.05, 0);
+        if (f.real && (!f.swarm || f.t % 2 == 0)) sl.sendParticles(GOLD, p.x, p.y, p.z, 1, 0.12, 0.05, 0.12, 0);
+        if (f.swarm && f.real && f.t % 12 == 0) sl.playSound(null, p.x, p.y, p.z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.HOSTILE, 0.35f, 1.8f);
+    }
+
+    /**
+     * «Ложное отступление»: he jumps back and «opens up» — that is a double (no shadow). The real one is unseen for 2 s and thrusts in the
+     * back of the first who comes within 3 blocks of the double (nobody — he comes out where the double stood).
+     */
+    private boolean falseRetreat(ServerLevel sl, LivingEntity t) {
+        face(t);
+        act(ErebHandMath.RETREAT_OPEN + ErebHandMath.RETREAT_WINDOW + 2);
+        anim("ereb_hand_false_retreat");
+        fxIf("ereb_hand_false_retreat");
+        play(new BossTimeline("act:false_retreat", ErebHandMath.RETREAT_OPEN + 1)
+                .at(ErebHandMath.RETREAT_JUMP, () -> {
+                    double[] f = ErebHandMath.forward(boss.getYRot());
+                    boss.setDeltaMovement(-f[0] * 0.9, 0.35, -f[1] * 0.9);
+                    boss.hurtMarked = true;
+                    core.sound("ereb.vanish", 1.5f, 1.1f);
+                })
+                .at(ErebHandMath.RETREAT_OPEN, () -> {
+                    ErebHandReflection d = ErebHand.REFLECTION.get().create(sl);
+                    if (d == null) return;
+                    Vec3 at = boss.position();
+                    d.moveTo(at.x, at.y, at.z, boss.getYRot(), 0);
+                    d.setYHeadRot(boss.getYRot());
+                    d.setYBodyRot(boss.getYRot());
+                    d.setup(boss, ErebHandReflection.Kind.DECOY, false, ErebHandMath.RETREAT_WINDOW + 10, 1, null);
+                    sl.addFreshEntity(d);
+                    decoy = d;
+                    hide(true);
+                    invuln = ErebHandMath.RETREAT_WINDOW + 2;
+                    double[] f = ErebHandMath.forward(boss.getYRot());   // the real one stands unseen a little behind his double
+                    Vec3 back = free(sl, at.add(-f[0] * 3, 0, -f[1] * 3));
+                    boss.moveTo(back.x, back.y, back.z, boss.getYRot(), 0);
+                    boss.getNavigation().stop();
+                    retreatLeft = ErebHandMath.RETREAT_WINDOW;
+                }));
+        return true;
+    }
+
+    private void tickRetreat(ServerLevel sl) {
+        retreatLeft--;
+        if (decoy == null || decoy.isRemoved()) {
+            endRetreat(sl, null);
+            return;
+        }
+        for (ServerPlayer p : fighters())
+            if (p.distanceTo(decoy) < ErebHandMath.RETREAT_NEAR) {
+                endRetreat(sl, p);
+                return;
+            }
+        if (retreatLeft <= 0) endRetreat(sl, null);
+    }
+
+    /** The double was struck by someone: the trick is up — he strikes that one if near, else comes out. */
+    void decoyStruck(ServerLevel sl, LivingEntity by) {
+        if (retreatLeft <= 0) return;
+        endRetreat(sl, by instanceof ServerPlayer p && decoy != null && p.distanceTo(decoy) < 6 ? p : null);
+    }
+
+    /** Out of hiding: behind `victim`'s back with a thrust, or (null) where the double stood. */
+    private void endRetreat(ServerLevel sl, ServerPlayer victim) {
+        retreatLeft = 0;
+        invuln = 0;
+        Vec3 at = decoy != null ? decoy.position() : boss.position();
+        float yaw = decoy != null ? decoy.getYRot() : boss.getYRot();
+        if (decoy != null && !decoy.isRemoved()) decoy.poof(sl);
+        decoy = null;
+        core.unlock();
+        busy = 0;
+        if (victim != null && !gone(victim)) {
+            double[] b = ErebHandMath.forward(victim.getYRot());
+            at = free(sl, victim.position().add(-b[0] * 1.2, 0, -b[1] * 1.2));
+            yaw = ErebHandMath.yawTo(at.x, at.z, victim.getX(), victim.getZ());
+        } else victim = null;
+        boss.moveTo(at.x, at.y, at.z, yaw, 0);
+        face(yaw);
+        hide(false);
+        Fx.play(sl, Fx.fx("ereb_appear").caster(boss).at(at).yaw(yaw));
+        core.sound("ereb.appear", 2, 1);
+        if (victim == null) return;
+        ServerPlayer v = victim;
+        act(ErebHandMath.LUNGE);
+        anim("ereb_hand_lunge");
+        play(new BossTimeline("act:retreat_strike", ErebHandMath.LUNGE).at(ErebHandMath.LUNGE_HIT, () -> {
+            fx("ereb_thrust");
+            core.sound("ereb.thrust", 1.5f, 0.8f);
+            if (!gone(v) && boss.distanceTo(v) < 3.6) hit(v, ErebHandConfig.d(ErebHandConfig.RETREAT_DAMAGE));
+        }));
+    }
+
+    /**
+     * «Отражение-предатель»: out of a mirror by one player steps a glass copy of it (its skin and weapon) and attacks its allies for 6 s;
+     * its original breaks it with 1 hit, the others with 3; not broken — it bursts into shards (r3).
+     */
+    private boolean traitorReflection(ServerLevel sl) {
+        List<ServerPlayer> who = fighters();
+        if (who.isEmpty()) return false;
+        ServerPlayer orig = who.get(boss.getRandom().nextInt(who.size()));
+        act(ErebHandMath.TRAITOR);
+        anim("ereb_hand_traitor_reflection");
+        fxIf("ereb_hand_traitor_reflection");
+        Vec3 dir = boss.position().subtract(orig.position()).multiply(1, 0, 1);
+        dir = dir.lengthSqr() < 1e-4 ? new Vec3(0, 0, 1) : dir.normalize();
+        Vec3 at = free(sl, ground(sl, orig.position().add(dir.scale(2.5))));
+        float yaw = ErebHandMath.yawTo(at.x, at.z, orig.getX(), orig.getZ());
+        int mirror = Fx.play(sl, Fx.fx("ereb_hand_mirror").at(at).yaw(yaw));
+        core.sound(at, "ereb_hand.mirror", 2, 1.2f);
+        play(new BossTimeline("act:traitor", ErebHandMath.TRAITOR + 12)
+                .at(ErebHandMath.TRAITOR_AT, () -> {
+                    if (gone(orig)) return;
+                    ErebHandTraitor c = ErebHand.TRAITOR.get().create(sl);
+                    if (c == null) return;
+                    c.moveTo(at.x, at.y, at.z, yaw, 0);
+                    c.setYHeadRot(yaw);
+                    c.setYBodyRot(yaw);
+                    c.setup(boss, orig, ErebHandConfig.i(ErebHandConfig.TRAITOR_SECONDS) * 20);
+                    sl.addFreshEntity(c);
+                    traitors.add(c);
+                    orig.displayClientMessage(ui("traitor_hint"), true);
+                    core.sound(at, "ereb_hand.shard_ring", 2, 0.8f);
+                })
+                .at(ErebHandMath.TRAITOR + 10, () -> {
+                    Fx.stop(sl, mirror, "");
+                    Fx.play(sl, Fx.fx("ereb_hand_mirror_break").at(at));
+                }));
+        return true;
+    }
+
+    /** A copy not broken in time: shards all round it. */
+    void traitorBurst(ServerLevel sl, ErebHandTraitor c) {
+        Fx.play(sl, Fx.fx("ereb_hand_mask_shard_burst").caster(c).at(c.position()));
+        core.sound(c.position(), "ereb_hand.shard_burst", 2, 0.9f);
+        for (LivingEntity e : targets(sl, c.position(), ErebHandConfig.d(ErebHandConfig.TRAITOR_BURST_RADIUS)))
+            if (e != c) hit(e, ErebHandConfig.d(ErebHandConfig.TRAITOR_BURST_DAMAGE));
+    }
+
+    // ---------------------------------------------------------------- mythic «Ложный рассвет» (33%, once; ⚠ TEMP timings)
+
+    /**
+     * On entering «Глава Культа», before the mask cracks: he falls on one knee, the bar is hidden, the sky brightens, a short fanfare — a
+     * false victory, no title. Invulnerable 4 s (the hint: the butterflies round him do not fly away). Then he rises — the wave over the
+     * arena: within 6 blocks 60% of max health, the rest 20% (boss_mechanic); the bar is back; then the mask cracks (phase 3 as planned).
+     */
+    private void falseDawn(ServerLevel sl) {
+        dawnDone = true;
+        if (grabbed != null) releaseGrab(sl, false);
+        if (retreatLeft > 0) endRetreat(sl, null);
+        act(ErebHandMath.DAWN);
+        invuln = ErebHandMath.DAWN_INVULN;
+        anim("ereb_hand_false_dawn");
+        fxIf("ereb_hand_false_dawn");
+        core.setBar(false);
+        core.scene("ereb_hand.false_dawn", ErebHandMath.DAWN_SCENE, BossNet.SCENE_BARS, BossConfig.get(BossConfig.SCENE_RADIUS), boss.position(),
+                boss.getYRot(), -1);
+        sl.playSound(null, boss.getX(), boss.getY() + 1, boss.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 3f, 1f);   // «победа»
+        Vec3 c = boss.position();
+        play(new BossTimeline("scene:false_dawn", ErebHandMath.DAWN)
+                .during(0, ErebHandMath.DAWN_INVULN, t -> {   // the butterflies stay round him (till the fx: glints that circle, not fly off)
+                    if (FxLib.fx("ereb_hand_false_dawn") != null || t % 4 != 0) return;
+                    double a = t * 0.3;
+                    sl.sendParticles(ParticleTypes.END_ROD, c.x + Math.cos(a) * 1.4, c.y + 1.2 + 0.4 * Math.sin(t * 0.2), c.z + Math.sin(a) * 1.4, 1, 0, 0, 0, 0);
+                })
+                .at(ErebHandMath.DAWN_INVULN, () -> core.sound("ereb.appear", 3, 0.8f))
+                .at(ErebHandMath.DAWN_WAVE, () -> {
+                    if (FxLib.fx("ereb_hand_false_dawn") == null) Fx.play(sl, Fx.fx("ereb_hand_slam").caster(boss).at(boss.position()).scale(3));
+                    core.sound("ereb_hand.slam", 4, 0.6f);
+                    double near = ErebHandConfig.d(ErebHandConfig.DAWN_NEAR_RADIUS);
+                    for (ServerPlayer p : fighters()) {
+                        double share = ErebHandMath.dawnShare(p.distanceTo(boss), near, ErebHandConfig.d(ErebHandConfig.DAWN_NEAR_SHARE),
+                                ErebHandConfig.d(ErebHandConfig.DAWN_FAR_SHARE));
+                        p.invulnerableTime = 0;
+                        p.hurt(core.mechanicDamage(), (float) (p.getMaxHealth() * share));
+                    }
+                    core.setBar(true);
+                })
+                .then(() -> phase3Crack(sl)));
+    }
+
     // ---------------------------------------------------------------- damage to him
 
     /** Called from his hurt (after the framework's filter). Returns the damage to take. */
@@ -1172,6 +1527,13 @@ public final class ErebHandFight {
         firewallFx = -1;
         oathLeft = 0;
         oathVictim = oathAlly = null;
+        flights.clear();
+        for (ErebHandTraitor c : new ArrayList<>(traitors)) c.discard();
+        traitors.clear();
+        if (decoy != null && !decoy.isRemoved()) decoy.poof(sl);
+        decoy = null;
+        if (retreatLeft > 0) hide(false);
+        retreatLeft = 0;
         if (endDream) endDream(sl);
     }
 }

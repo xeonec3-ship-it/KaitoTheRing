@@ -956,5 +956,7 @@
   "ui.pohsmp_core.ereb_hand.changeling_flame": "«Пламя-подменыш» — шар мерцает золотом, прежде чем стать бабочкой",
   "ui.pohsmp_core.ereb_hand.false_retreat": "«Ложное отступление» — у двойника нет тени",
   "ui.pohsmp_core.ereb_hand.traitor_reflection": "«Отражение-предатель» — разбей свою копию!",
-  "ui.pohsmp_core.ereb_hand.swarm_of_lies": "«Рой лжи» — настоящие звенят и горят золотом по краю"
+  "ui.pohsmp_core.ereb_hand.swarm_of_lies": "«Рой лжи» — настоящие звенят и горят золотом по краю",
+  "entity.pohsmp_core.ereb_hand_traitor": "Отражение-предатель",
+  "ui.pohsmp_core.ereb_hand.traitor_hint": "Твоё отражение предало тебя — разбей его одним ударом!"
 }

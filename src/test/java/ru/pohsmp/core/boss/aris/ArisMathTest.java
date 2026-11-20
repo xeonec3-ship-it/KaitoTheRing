@@ -57,6 +57,9 @@ class ArisMathTest {
         assertEvent(anims, "bellows", "gust", ArisMath.BELLOWS_GUST);
         assertEvent(anims, "replica_break", "break", ArisMath.REPLICA_BREAK);
         assertEvent(anims, "replica_break", "speak", ArisMath.REPLICA_SPEAK);
+        assertEvent(anims, "finisher", "windup", ArisMath.FINISHER_PULL);
+        assertEvent(anims, "finisher", "slam", ArisMath.FINISHER_SLAM);
+        assertEvent(anims, "finisher", "kill", ArisMath.FINISHER_KILL);
         // the forge fx starts 0.3 s in, so its floor (tick 60) meets ignite
         assertEquals(ArisMath.FORGE_IGNITE, ArisMath.FORGE_FX + ArisMath.FORGE_FLOOR_FROM);
     }
@@ -78,6 +81,7 @@ class ArisMathTest {
         assertEquals(0, ArisMath.finisherPull(0), 1e-9);
         assertEquals(1, ArisMath.finisherPull(ArisMath.FINISHER_PULL), 1e-9);
         assertTrue(Files.exists(Path.of("src/main/resources/data/pohsmp_core/damage_type/aris_finisher.json")));
+        assertTrue(Files.exists(Path.of("src/main/resources/assets/irons_spellbooks/player_animation/pohsmp_aris_finisher_victim.json")));
     }
 
     @Test
@@ -170,7 +174,7 @@ class ArisMathTest {
                 "aris_blade_glaive", "aris_blade_shatter", "aris_blade_strike", "aris_blades_forge", "aris_phase2", "aris_phase3",
                 "aris_mythic_aura", "aris_reforge", "aris_reforge_hit", "aris_forge", "aris_island", "aris_forge_burn", "aris_last_blow",
                 "aris_surrender", "aris_billet_throw", "aris_billet", "aris_billet_explode", "aris_chains", "aris_chains_hit",
-                "aris_chains_break", "aris_quench", "aris_bellows_warn", "aris_bellows", "aris_bellows_burn", "aris_replica_break"})
+                "aris_chains_break", "aris_quench", "aris_bellows_warn", "aris_bellows", "aris_bellows_burn", "aris_replica_break", "aris_finisher"})
             assertTrue(Files.exists(ASSETS.resolve("fx/" + f + ".json")), f);
     }
 }

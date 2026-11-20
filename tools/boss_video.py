@@ -354,6 +354,21 @@ SCENE = {
 }
 
 
+VICTIM = {'aris': 'pohsmp_aris_finisher_victim'}          # поза жертвы добивания (PlayerAnimator) по боссу
+
+
+def victim_body_y(name, t):
+    """Подъём/опускание тела жертвы (канал body.y эмоции, блоки) в момент t — в раскадровке его даёт координата y актёра."""
+    p = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'irons_spellbooks', 'player_animation', name + '.json')
+    ks = sorted((mv['tick'] / 20, mv['body'].get('y', 0)) for mv in json.load(open(p, encoding='utf-8'))['emote']['moves'] if 'body' in mv)
+    if t <= ks[0][0]:
+        return ks[0][1]
+    for (t0, y0), (t1, y1) in zip(ks, ks[1:]):
+        if t <= t1:
+            return y0 + (y1 - y0) * ease_io((t - t0) / max(1e-6, t1 - t0))
+    return ks[-1][1]
+
+
 def build_page(boss, three, cfg):
     html = open(os.path.join(HERE, 'sigil_preview.template.html'), encoding='utf-8').read()
     html = html.replace('/*DATA*/null', json.dumps(sigil_data(), ensure_ascii=False), 1)
@@ -362,7 +377,7 @@ def build_page(boss, three, cfg):
     html = '\n'.join(l for l in html.split('\n') if 'fonts.googleapis.com' not in l)
     html = html.replace('</head>', PAGE_CSS + '</head>', 1)
     js = ADAPTER.replace('VW', str(W)).replace('VH', str(H)).replace('VCFG', json.dumps(cfg, ensure_ascii=False))
-    js = js.replace('<script>', '<script>\nconst VANIMS = %s;\n' % json.dumps({'victim': victim_anim()}), 1)
+    js = js.replace('<script>', '<script>\nconst VANIMS = %s;\n' % json.dumps({'victim': victim_anim(VICTIM.get(boss, 'pohsmp_cult_finisher_victim'))}), 1)
     return html + '\n' + boss_lib(boss) + js
 
 
@@ -918,7 +933,26 @@ class Aris(Boss):
         self.blend_to(r, self.boss(P + 'npc_stand', 4.0 - 1 / FPS, v='dim'), self.boss(P + 'npc_sit', 0, v='dim'), dur=0.5, zoom=1.15)
         r.add(secs(4.0), lambda i: {'actors': [self.boss(P + 'npc_sit', i / FPS, v='dim')], 'cam': self.cam(r.t, zoom=1.15),
                                     'cap': 'Мирный NPC: сидит на молоте', 'sub': 'npc_sit (текстура aris_dim)'})
+        sit = self.boss(P + 'npc_sit', 4.0, v='dim')
+        r.add(nf, lambda i: {'actors': [sit], 'cam': self.cam(r.t, zoom=1.15), 'fade': (i + 1) / nf})
+        r.mark('Добивание (`finisher` + жертва `pohsmp_aris_finisher_victim` + fx aris_finisher: pull 0, windup 0.7, slam 1.5, kill 2.2)')
+        r.add(nf, lambda i: dict(self.finisher_frame(0, r.t), fade=1 - (i + 1) / nf))
+        r.fx('aris_finisher', r.t, tgId=1)
+        r.add(secs(2.4 + 1.2), lambda i: self.finisher_frame(i / FPS, r.t))
         return r
+
+    FIN_DIST = 1.9                                        # = ArisMath.FINISHER_DIST
+
+    def finisher_frame(self, t, rt):
+        boss = self.boss('animation.aris.finisher', min(t, 2.4))
+        z = -(3.4 - (3.4 - self.FIN_DIST) * ease_io(t / 0.7)) * B
+        y = victim_body_y('pohsmp_aris_finisher_victim', min(t, 2.4)) * B * 0.9375
+        victim = {'k': 'steve', 'anim': 'victim', 't': min(t, 2.4), 's': 0.9375, 'x': 0, 'y': y, 'z': z, 'ry': 0, 'id': 1}   # лицом к Арис
+        cam = self.cam(rt, zoom=1.0, ty=self.h * 0.42, dz=-16, yaw=68, pitch=12)
+        sub = ('finisher: тянет 0–0.7 (pull) · замах 0.7 (windup) · молот в спину 1.5 (slam) · смерть 2.2 (kill)' if t < 2.2
+               else 'finisher: 2.2 — kill (смерть «%1$s перекована Арис, Мифическим Кузнецом»)')
+        return {'actors': [boss, victim], 'cam': cam, 'cap': 'Добивание', 'sub': sub,
+                'flash': 0.25 * max(0.0, 1 - abs(t - 1.5) / 0.1)}
 
 
 BOSSES = {'t26': (Tyros, 'tyros', [{'k': 'boss'}, {'k': 'boss', 'v': 'soul'}, {'k': 'steve'}, {'k': 'scythe'}]),

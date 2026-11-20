@@ -42,6 +42,7 @@ public final class ErebHand {
     public static RegistryObject<EntityType<ErebHandReflection>> REFLECTION;
     public static RegistryObject<EntityType<ErebHandGiant>> GIANT;
     public static RegistryObject<EntityType<ErebHandShard>> SHARD;
+    public static RegistryObject<EntityType<ErebHandTraitor>> TRAITOR;
     public static RegistryObject<Item> RAPIER;
 
     /** Called from Bosses.init before the registers are attached. */
@@ -52,6 +53,7 @@ public final class ErebHand {
                 .sized(1.0f, 1.0f).clientTrackingRange(16).updateInterval(1).noSummon().fireImmune().build("ereb_hand_giant"));
         SHARD = Bosses.ENTITIES.register("ereb_hand_mask_shard", () -> EntityType.Builder.<ErebHandShard>of(ErebHandShard::new, MobCategory.MISC)
                 .sized(0.8f, 0.8f).clientTrackingRange(10).updateInterval(1).noSummon().fireImmune().build("ereb_hand_mask_shard"));
+        TRAITOR = Bosses.living("ereb_hand_traitor", ErebHandTraitor::new, MobCategory.MISC, 0.6f, 1.8f, ErebHandTraitor::attributes);
         // his glass rapier: no recipe, never given to players (not in the creative tab)
         RAPIER = Bosses.ITEMS.register("ereb_hand_rapier", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
     }

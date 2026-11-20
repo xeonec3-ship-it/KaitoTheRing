@@ -567,6 +567,11 @@ def main(gmod, args):
     import gen_replica_break as RB          # «Реплика»: animation.aris.replica_break + fx/печати
     G.write_json('animations/entity/aris.animation.json',
                  {'format_version': '1.8.0', 'animations': RB.add_anims('aris', {a.name: a.to_json() for a in anims})}, compact=True)
+    vp = os.path.join(G.ROOT if hasattr(G, 'ROOT') else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'), 'src', 'main',
+                      'resources', 'assets', 'irons_spellbooks', 'player_animation', 'pohsmp_aris_finisher_victim.json')
+    with open(vp, 'w', encoding='utf-8', newline='\n') as fh:      # поза жертвы добивания (PlayerAnimator)
+        json.dump(D.victim_emote(), fh, ensure_ascii=False, indent=1)
+        fh.write('\n')
     print('aris: костей %d, кубов %d, атлас %s, молот-предмет %d брусков, анимаций %d'
           % (len(m.bones), sum(len(b.cubes) for b in m.bones.values()), m.tex_px, nel, len(anims)))
     import gen_aris_fx as FX

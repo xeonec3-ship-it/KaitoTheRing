@@ -38,6 +38,7 @@ public final class ErebHandClient {
         e.registerEntityRenderer((EntityType) ErebHand.REFLECTION.get(), c -> new ErebHandRenderer((EntityRendererProvider.Context) c));
         e.registerEntityRenderer(ErebHand.GIANT.get(), ErebHandGiantRenderer::new);
         e.registerEntityRenderer(ErebHand.SHARD.get(), ErebHandShardRenderer::new);
+        e.registerEntityRenderer(ErebHand.TRAITOR.get(), ErebHandTraitorRenderer::new);
     }
 
     /** Client setup: camera plans and the false arena events. */
@@ -158,6 +159,14 @@ public final class ErebHandClient {
                 .shot(ErebHandMath.REVEAL_OPEN, (k, t, c) -> {
                     double s = sine(k);
                     return Shot.of(c.orbit(c.b, 35, 4.5 + 5 * s, 1.5 + 4 * s), c.b.add(0, 2.2 + 1.2 * s, 0));
+                });
+
+        // «Ложный рассвет» (⚠ TEMP, till the visual assistant's events): on one knee under a brightening sky, then up and out
+        BossCam.plan("ereb_hand.false_dawn", ErebHandMath.DAWN_SCENE)
+                .shot(0, (k, t, c) -> Shot.of(c.rel(c.b, 3.2, 0.4, 1.0), c.b.add(0, 1.1, 0)))
+                .shot(20, (k, t, c) -> {
+                    double s = sine(k);
+                    return Shot.of(c.orbit(c.b, 20 * s, 3.2 + 4 * s, 1.0 + 3 * s), c.b.add(0, 1.2 + 2 * s, 0));
                 });
 
         // ложная смерть 5 s: he staggers, the hand breaks, the phrase (close), the bow, the butterflies (out and up)

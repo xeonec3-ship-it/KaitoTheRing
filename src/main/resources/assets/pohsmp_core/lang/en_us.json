@@ -956,5 +956,7 @@
   "ui.pohsmp_core.ereb_hand.changeling_flame": "\"Changeling Flame\" — the fireball flickers gold before it turns",
   "ui.pohsmp_core.ereb_hand.false_retreat": "\"False Retreat\" — the double casts no shadow",
   "ui.pohsmp_core.ereb_hand.traitor_reflection": "\"Traitor Reflection\" — break your own copy!",
-  "ui.pohsmp_core.ereb_hand.swarm_of_lies": "\"Swarm of Lies\" — the real ones chime and glow gold at the edges"
+  "ui.pohsmp_core.ereb_hand.swarm_of_lies": "\"Swarm of Lies\" — the real ones chime and glow gold at the edges",
+  "entity.pohsmp_core.ereb_hand_traitor": "Traitor Reflection",
+  "ui.pohsmp_core.ereb_hand.traitor_hint": "Your reflection betrayed you — break it with one blow!"
 }

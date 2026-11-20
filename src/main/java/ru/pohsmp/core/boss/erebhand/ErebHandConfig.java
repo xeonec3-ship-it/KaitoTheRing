@@ -13,11 +13,14 @@ public final class ErebHandConfig {
 
     public static ForgeConfigSpec.DoubleValue RAPIER_DAMAGE, SLAM_DAMAGE, SLAM_RADIUS, DOUBLE_FIRE_DAMAGE, SQUEEZE_DAMAGE, GRAB_BREAK_DAMAGE,
             MIRROR_WALLS_RADIUS, FIREWALL_SHARE, FIREWALL_PUSH, HAND_OF_LIES_DAMAGE, MASK_FAIL_SHARE, DREAM_SLAM_DAMAGE, DREAM_SLAM_RADIUS,
-            FLAME_RADIUS, FLAME_DAMAGE, GRIP_DAMAGE, GRIP_RANGE, GRIP_ANGLE, GRIP_PULL, OATH_SHARE, OATH_MAX_HIT, THOUSAND_DAMAGE;
+            FLAME_RADIUS, FLAME_DAMAGE, GRIP_DAMAGE, GRIP_RANGE, GRIP_ANGLE, GRIP_PULL, OATH_SHARE, OATH_MAX_HIT, THOUSAND_DAMAGE,
+            CHANGELING_DAMAGE, RETREAT_DAMAGE, TRAITOR_DAMAGE, TRAITOR_BURST_DAMAGE, TRAITOR_BURST_RADIUS, SWARM_DAMAGE, DAWN_NEAR_RADIUS,
+            DAWN_NEAR_SHARE, DAWN_FAR_SHARE;
     public static ForgeConfigSpec.IntValue MELEE_MIN, MELEE_MAX, SLAM_COOLDOWN, DOUBLES_COUNT, DOUBLES_REAL, DOUBLES_SECONDS, DOUBLES_INTERVAL,
             DOUBLE_HITS, GRAB_SECONDS, GRAB_COOLDOWN, MIRROR_WALLS_COUNT, MIRROR_WALLS_SECONDS, MIRROR_WALLS_INTERVAL, FIREWALL_BURN,
             HAND_OF_LIES_SECONDS, MASK_SECONDS, DREAM_SLAM_INTERVAL, DREAM_MAX_MINUTES, FLAME_CIRCLES, FLAME_DECOYS, FLAME_SECONDS, FLAME_COOLDOWN,
-            GRIP_COOLDOWN, OATH_SECONDS, OATH_COOLDOWN, THOUSAND_MIRRORS, THOUSAND_REAL, THOUSAND_COOLDOWN;
+            GRIP_COOLDOWN, OATH_SECONDS, OATH_COOLDOWN, THOUSAND_MIRRORS, THOUSAND_REAL, THOUSAND_COOLDOWN, CHANGELING_COOLDOWN, RETREAT_COOLDOWN,
+            TRAITOR_SECONDS, TRAITOR_HITS_ORIGINAL, TRAITOR_HITS_OTHERS, TRAITOR_COOLDOWN, SWARM_COUNT, SWARM_REAL, SWARM_BLIND_TICKS, SWARM_COOLDOWN;
     public static ForgeConfigSpec.BooleanValue ILLUSION_IMMUNE;
 
     /** Called from BossConfig's static block between push("ereb_hand") and pop(). */
@@ -85,6 +88,31 @@ public final class ErebHandConfig {
         THOUSAND_REAL = b.defineInRange("thousand_real", 2, 0, 16);
         THOUSAND_DAMAGE = b.defineInRange("thousand_damage", 40.0, 0, 1000);
         THOUSAND_COOLDOWN = b.defineInRange("thousand_cooldown", 18, 1, 600);
+
+        CHANGELING_DAMAGE = b.comment("«Пламя-подменыш»: the fireball turns into a butterfly half way and hits the ally nearest its target (6 blocks; none — the target)")
+                .defineInRange("changeling_flame_damage", 28.0, 0, 1000);
+        CHANGELING_COOLDOWN = b.defineInRange("changeling_flame_cooldown", 12, 1, 600);
+        RETREAT_DAMAGE = b.comment("«Ложное отступление»: the double stays, he is unseen 2 s and thrusts in the back of the first who comes within 3 blocks of it")
+                .defineInRange("false_retreat_damage", 36.0, 0, 1000);
+        RETREAT_COOLDOWN = b.defineInRange("false_retreat_cooldown", 20, 1, 600);
+        TRAITOR_DAMAGE = b.comment("«Отражение-предатель»: a glass copy of a player attacks its allies (a hit), lives this long, hits to break (its original / the others), the burst if not broken")
+                .defineInRange("traitor_reflection_damage", 14.0, 0, 1000);
+        TRAITOR_SECONDS = b.defineInRange("traitor_reflection_seconds", 6, 1, 60);
+        TRAITOR_HITS_ORIGINAL = b.defineInRange("traitor_reflection_hits_original", 1, 1, 20);
+        TRAITOR_HITS_OTHERS = b.defineInRange("traitor_reflection_hits_others", 3, 1, 20);
+        TRAITOR_BURST_DAMAGE = b.defineInRange("traitor_reflection_burst_damage", 30.0, 0, 1000);
+        TRAITOR_BURST_RADIUS = b.defineInRange("traitor_reflection_burst_radius", 3.0, 0.5, 16);
+        TRAITOR_COOLDOWN = b.defineInRange("traitor_reflection_cooldown", 24, 1, 600);
+        SWARM_COUNT = b.comment("«Рой лжи»: glass butterflies at the players, of them real (a hit + blindness), the rest pass through")
+                .defineInRange("swarm_of_lies_count", 12, 1, 64);
+        SWARM_REAL = b.defineInRange("swarm_of_lies_real", 6, 0, 64);
+        SWARM_DAMAGE = b.defineInRange("swarm_of_lies_damage", 10.0, 0, 1000);
+        SWARM_BLIND_TICKS = b.defineInRange("swarm_of_lies_blind_ticks", 20, 0, 600);
+        SWARM_COOLDOWN = b.defineInRange("swarm_of_lies_cooldown", 16, 1, 600);
+        DAWN_NEAR_RADIUS = b.comment("Mythic «Ложный рассвет» (33%, once): the wave after 4 s — within near_radius this share of max health, the rest of the fight that share (boss_mechanic)")
+                .defineInRange("false_dawn_near_radius", 6.0, 0, 64);
+        DAWN_NEAR_SHARE = b.defineInRange("false_dawn_near_share", 0.6, 0, 1);
+        DAWN_FAR_SHARE = b.defineInRange("false_dawn_far_share", 0.2, 0, 1);
     }
 
     static double d(ForgeConfigSpec.DoubleValue v) {

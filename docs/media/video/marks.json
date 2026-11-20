@@ -307,7 +307,7 @@
   ]
  },
  "t28_finale": {
-  "dur": 24.7,
+  "dur": 29.3,
   "marks": [
    [
     0.0,
@@ -320,6 +320,10 @@
    [
     15.7,
     "Мирный NPC: `npc_stand` (aris_dim), затем `npc_sit`"
+   ],
+   [
+    25.2,
+    "Добивание (`finisher` + жертва `pohsmp_aris_finisher_victim` + fx aris_finisher: pull 0, windup 0.7, slam 1.5, kill 2.2)"
    ]
   ]
  }

@@ -190,4 +190,46 @@ class ErebHandMathTest {
         assertEquals(30, ErebHandMath.oathShare(100, 0.5, 30), 1e-9);
         assertEquals(0, ErebHandMath.oathShare(-5, 0.5, 30), 1e-9);
     }
+
+    @Test
+    void secondFour() {
+        // «Пламя-подменыш»: the swap at half way, the gold flicker 0.5 s before it
+        assertEquals(5, ErebHandMath.changelingSwapTick(9, 0.9));
+        assertEquals(0, ErebHandMath.changelingFlickerTick(5));
+        assertEquals(10, ErebHandMath.changelingFlickerTick(20));
+        assertEquals(1, ErebHandMath.changelingSwapTick(0, 0.9));
+        double[][] xz = {{0, 0}, {4, 0}, {2, 0}, {20, 0}};
+        assertEquals(2, ErebHandMath.nearestAlly(xz, 0, 6));   // the nearest within 6
+        assertEquals(3, ErebHandMath.nearestAlly(new double[][] {{0, 0}, {30, 0}, {40, 0}, {20, 0}}, 3, 6));
+        assertEquals(0, ErebHandMath.nearestAlly(new double[][] {{0, 0}, {7, 0}}, 0, 6));   // none in 6: the target itself
+        // «Ложный рассвет»: 60% within 6 blocks, 20% the rest
+        assertEquals(0.6, ErebHandMath.dawnShare(5.9, 6, 0.6, 0.2), 1e-9);
+        assertEquals(0.6, ErebHandMath.dawnShare(6, 6, 0.6, 0.2), 1e-9);
+        assertEquals(0.2, ErebHandMath.dawnShare(6.1, 6, 0.6, 0.2), 1e-9);
+        assertEquals(80, ErebHandMath.DAWN_INVULN);   // invulnerable 4 s (ТЗ)
+        assertTrue(ErebHandMath.DAWN_WAVE > ErebHandMath.DAWN_INVULN && ErebHandMath.DAWN_WAVE <= ErebHandMath.DAWN);
+        // «Отражение-предатель»: 1 hit of its original, 3 of the others
+        assertEquals(1, ErebHandMath.traitorHits(true, 1, 3));
+        assertEquals(3, ErebHandMath.traitorHits(false, 1, 3));
+        assertEquals(1, ErebHandMath.traitorHits(false, 1, 0));
+        // «Ложное отступление»: 2 s unseen, 3 blocks
+        assertEquals(40, ErebHandMath.RETREAT_WINDOW);
+        assertEquals(3, ErebHandMath.RETREAT_NEAR, 1e-9);
+        // «Рой лжи»: 12, 6 of them real
+        assertEquals(6, count(ErebHandMath.pickReal(12, 6, new double[] {.1, .9, .2, .8, .3, .7, .4, .6, .5, .05, .95, .55})));
+    }
+
+    @Test
+    void spellPoolsByPhase() {
+        var all = new java.util.HashSet<String>();
+        for (int ph = 0; ph < 3; ph++) all.addAll(ErebHandMath.spellPool(ph));
+        assertEquals(8, all.size());   // every one of the eight is used somewhere
+        assertEquals(8, ErebHandMath.spellPool(2).size());   // «Глава Культа» (and the dream): all eight
+        assertTrue(ErebHandMath.spellPool(0).contains("changeling_flame") && ErebHandMath.spellPool(0).contains("swarm_of_lies"));
+        assertTrue(ErebHandMath.spellPool(1).contains("false_retreat") && ErebHandMath.spellPool(1).contains("traitor_reflection"));
+        for (int ph = 0; ph < 3; ph++)   // a target on a «столб» can still be reached in every phase
+            assertTrue(ErebHandMath.spellPool(ph).stream().anyMatch(ErebHandMath::ranged));
+        assertFalse(ErebHandMath.ranged("false_retreat"));
+        assertFalse(ErebHandMath.ranged("glass_grip"));
+    }
 }

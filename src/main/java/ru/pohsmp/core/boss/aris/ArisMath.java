@@ -204,13 +204,13 @@ public final class ArisMath {
     // ---------------------------------------------------------------- finisher (owner 20.11: «всем боссам добивание»)
 
     /**
-     * animation.aris.finisher (fx aris_finisher) — PROVISIONAL until the visual letter's «Добивание» lands: 2.4 s, the victim is pulled
-     * 1.6 before her in 0.7 s and pressed to the ground, the hammer comes down like on a billet at 1.5 s, death at 2.2 s.
+     * animation.aris.finisher (fx aris_finisher; docs/inbox/2026-11-20_mgr_aris_finisher.md): 2.4 s — pull 0–0.7 s (the victim is pulled
+     * 1.9 before her and pressed down), windup 0.7, the hammer on her back at 1.5 s, kill at 2.2 s.
      */
     public static final int FINISHER = 48, FINISHER_PULL = 14, FINISHER_SLAM = 30, FINISHER_KILL = 44, FINISHER_CAM_FROM = 6, FINISHER_CAM = 40;
-    public static final double FINISHER_DIST = 1.6;
+    public static final double FINISHER_DIST = 1.9;   // the victim lies head to her, pelvis here (visual 20.11)
     /** Animations the visual assistant has not delivered yet (the test only checks them once they exist). */
-    public static final java.util.Set<String> PENDING = java.util.Set.of("finisher");
+    public static final java.util.Set<String> PENDING = java.util.Set.of();
 
     /** Pull of the victim toward the hold point at finisher tick t (0..1, ease in-out). */
     public static double finisherPull(int t) {

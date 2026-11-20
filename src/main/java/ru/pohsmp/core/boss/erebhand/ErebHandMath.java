@@ -202,4 +202,78 @@ public final class ErebHandMath {
     public static double oathShare(double dealt, double share, double cap) {
         return Math.max(0, Math.min(dealt * share, cap));
     }
+
+    // ---------------------------------------------------------------- the second four + the mythic (owner 20.11)
+    /*
+     * ⚠ TEMPORARY timings: the visual assistant's animations animation.ereb_hand.<id> and fx ereb_hand_<id> are being made in parallel;
+     * his events (ticks) will be in docs/inbox/2026-11-20_mgr_T31_spells2.md — then these numbers are fitted to them (and ErebHandMathTest
+     * checks them against the file, as for the first spells). TEMP_SPELLS2 = true until then.
+     */
+    public static final boolean TEMP_SPELLS2 = true;
+    /** «Пламя-подменыш»: the cast (release), the fireball flies, flickers gold 0.5 s before it turns into a glass butterfly at half way. */
+    public static final int CHANGELING = 30, CHANGELING_AT = 12, CHANGELING_FLICKER = 10, CHANGELING_LIFE = 90;
+    public static final double CHANGELING_SPEED = 0.9, BUTTERFLY_SPEED = 0.7, CHANGELING_ALLY_R = 6, CHANGELING_HIT_R = 1.0;
+    /** «Ложное отступление»: the jump back, the «opening» (the double stays, he is gone 2 s), a thrust in the back. */
+    public static final int RETREAT = 24, RETREAT_JUMP = 4, RETREAT_OPEN = 14, RETREAT_WINDOW = 40;
+    public static final double RETREAT_BACK = 4, RETREAT_NEAR = 3;
+    /** «Отражение-предатель»: the cast; the copy lives 6 s (config) and strikes every TRAITOR_SWING ticks. */
+    public static final int TRAITOR = 30, TRAITOR_AT = 14, TRAITOR_SWING = 20;
+    /** «Рой лжи»: the cast; the butterflies fly SWARM_LIFE ticks at most. */
+    public static final int SWARM = 30, SWARM_AT = 14, SWARM_LIFE = 70;
+    public static final double SWARM_SPEED = 0.45, SWARM_HIT_R = 0.9;
+    /** Mythic «Ложный рассвет» (33%): on one knee, the bar hidden, invulnerable 4 s; he rises; the wave; the bar back; then the mask cracks. */
+    public static final int DAWN = 100, DAWN_INVULN = 80, DAWN_WAVE = 88, DAWN_SCENE = 40;
+
+    /** «Пламя-подменыш»: the tick (from the release) it turns into a butterfly — half way to the target. */
+    public static int changelingSwapTick(double dist, double speed) {
+        return Math.max(1, (int) Math.ceil(dist / 2 / Math.max(1e-3, speed)));
+    }
+
+    /** …and the tick its gold flicker begins (0.5 s before). */
+    public static int changelingFlickerTick(int swap) {
+        return Math.max(0, swap - CHANGELING_FLICKER);
+    }
+
+    /** Index of the one (other than `target`) nearest to the target within r (x,z pairs); none — the target itself. */
+    public static int nearestAlly(double[][] xz, int target, double r) {
+        int best = target;
+        double bd = r * r;
+        for (int i = 0; i < xz.length; i++) {
+            if (i == target) continue;
+            double dx = xz[i][0] - xz[target][0], dz = xz[i][1] - xz[target][1], d = dx * dx + dz * dz;
+            if (d <= bd) {
+                bd = d;
+                best = i;
+            }
+        }
+        return best;
+    }
+
+    /** «Ложный рассвет»: the share of max health the wave takes from one at `dist` (near: within nearR). */
+    public static double dawnShare(double dist, double nearR, double nearShare, double farShare) {
+        return dist <= nearR ? nearShare : farShare;
+    }
+
+    /** «Отражение-предатель»: hits that break the copy — its original's, or anyone else's. */
+    public static int traitorHits(boolean original, int byOriginal, int byOthers) {
+        return Math.max(1, original ? byOriginal : byOthers);
+    }
+
+    /** The spells he may pick in a phase (0-based; the dream is phase 2). Proposal in the T31 letter. */
+    public static java.util.List<String> spellPool(int phase) {
+        return switch (phase) {
+            case 0 -> java.util.List.of("false_flame", "glass_grip", "changeling_flame", "swarm_of_lies");
+            case 1 -> java.util.List.of("glass_grip", "foreign_oath", "thousand", "false_retreat", "traitor_reflection");
+            default -> java.util.List.of("false_flame", "glass_grip", "foreign_oath", "thousand", "changeling_flame", "false_retreat",
+                    "traitor_reflection", "swarm_of_lies");
+        };
+    }
+
+    /** Spells that reach a player he cannot walk to («на столбе», BossGuard: only ranged moves at it). */
+    public static boolean ranged(String spell) {
+        return switch (spell) {
+            case "false_flame", "changeling_flame", "swarm_of_lies", "thousand", "foreign_oath" -> true;
+            default -> false;
+        };
+    }
 }

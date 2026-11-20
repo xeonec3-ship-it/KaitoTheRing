@@ -86,4 +86,19 @@ class MartinMathTest {
         assertFalse(MartinMath.blocksLine(0, 0, 10, 0, 7, 2, 0.9));
         assertFalse(MartinMath.blocksLine(0, 0, 10, 0, 11, 0, 0.9));        // behind Martin
     }
+
+    @Test
+    void finisherHold() {
+        double[] a = MartinMath.finisherHold(0);
+        assertEquals(0, a[0], 1e-9);                                          // still where it was hit
+        double[] b = MartinMath.finisherHold(MartinMath.FINISHER_PIERCE);
+        assertEquals(1, b[0], 1e-9);
+        assertEquals(3.2, b[1], 1e-9);                                        // pierced 3.2 before him
+        double[] c = MartinMath.finisherHold(MartinMath.FINISHER_RAISED);
+        assertEquals(4.8, c[2], 1e-9);                                        // over his head
+        double[] d = MartinMath.finisherHold(MartinMath.FINISHER_KILL);
+        assertEquals(0, d[2], 1e-9);                                          // at his feet when it dies
+        assertTrue(MartinMath.FINISHER_KILL < MartinMath.FINISHER);
+        assertTrue(MartinMath.FINISHER_CAM_FROM + MartinMath.FINISHER_CAM <= MartinMath.FINISHER);
+    }
 }

@@ -538,7 +538,7 @@ def effects():
     # ---- +4 заклинания (владелец 20.11)
     fx('irina_gaze_cast', '«Ревнивый взгляд» — у Ирины (caster = Ирина, 24 тика; анимация irina_gaze, событие gaze 0.5 с): из тьмы капюшона '
                           'вспыхивают два красных огонька, по полям шляпы бежит нить. Метку смотревшим ставит код (кто смотрел на неё > 2 с).', 24, [
-        E('flash', 8, 'caster+0,2.1,-0.3', duration=10, size=0.7, color='@primary'),
+        E('flash', 8, 'caster+0,2.1,0.3', duration=10, size=0.7, color='@primary'),     # перед капюшоном (z — вперёд; было −0.3 — за головой)
         orbit_threads('caster+0,2.3,0', 0, 24, 1.3, 2, 16, rise=0.1, period=10, width=0.05, length=10),
     ])
     fx('irina_gaze_mark', '«Ревнивый взгляд» — метка-нить на смотревшем (caster = игрок, follow, 80 тиков = 4 с замедления): око над головой, '
@@ -617,13 +617,13 @@ def effects():
         E('flash', 108, 'caster+0,2.4,0', duration=10, size=1.6, color='@primary'),
     ])
     fx('irina_death', 'Ролик смерти (caster = Ирина; 100 тиков = анимация irina_death 5 с). 0 (`hit`) — вспышка; 1.6 (`knees`); '
-                      '2.4 (`hat`) — шляпа падает, пыль; 3.4 (`fall`); 4.2 (`unravel`) — все нити распускаются и уносятся вверх, '
+                      '2.4 (`hat`) — шляпа слетает назад-вправо, 2.9 ложится на землю — пыль (тик 58, там же, где шляпа в анимации); 3.4 (`fall`); 4.2 (`unravel`) — все нити распускаются и уносятся вверх, '
                       'мир серо-лиловый; 5.0 — исчезает.', T_DEATH, [
         E('tint', 0, 'caster', duration=T_DEATH, radius=48, color='#20182A', strength=0.3, saturation=0.5,
           **{'in': ease(20), 'out': ease(24, 'easeInSine')}),
         E('flash', 0, 'caster+0,1.4,0', duration=10, size=2.4, ring=True, color='@primary'),
         orbit_threads('caster', 0, 84, 1.4, 3, 6, rise=0.8, period=40, width=0.07, length=14),
-        E('sprites', 48, 'caster+0.6,0.2,-0.8', duration=4, texture='spark_soft', count=14, rate=4, spread=0.4, speed=0.04, gravity=0.01,
+        E('sprites', 58, 'caster+0.9,0.2,-1.0', duration=4, texture='spark_soft', count=14, rate=4, spread=0.4, speed=0.04, gravity=0.01,
           size=[0.2, 0.06], life=20, color='#8C7A92', blend='translucent'),
         E('sprites', 84, 'caster+0,0.6,0', duration=14, texture='mote_thread', count=80, rate=6, spread=1.2, speed=0.04, gravity=-0.03, spin=20,
           sway=0.5, size=[0.34, 0.06], life=40, color='@primary', glow=0.4),

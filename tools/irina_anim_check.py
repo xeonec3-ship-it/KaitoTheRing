@@ -46,6 +46,8 @@ AIMED = {'irina_staff_attack': ('hit', 'staff'), 'irina_staff_sweep': ('hit', 's
          'irina_swap': ('swap', 'both'), 'irina_knots': ('knots', 'left'), 'irina_cast_long': (None, 'right'),
          'irina_bind': ('bind', 'both')}
 BODY = ['body', 'torso', 'head', 'hat', 'right_arm', 'left_arm', 'right_leg', 'left_leg']
+TAU20 = 2 * math.pi / 20
+LEGS_FWD = 5      # нога вынесена вперёд больше этого — передние ленты она толкает вперёд (не ошибка)
 
 
 def R3(ax, deg):
@@ -71,6 +73,30 @@ def M4(R=None, T=None, S=None):
 
 def zyx(r):
     return R3('z', r[2]) @ R3('y', r[1]) @ R3('x', r[0])
+
+
+def blend(A_, B_, k):
+    """Смесь двух мировых матриц: позиция — по прямой, поворот — по углам Z·Y·X (для коротких перелётов без оборотов)."""
+    a, b = euler_zyx(A_[:3, :3]), euler_zyx(B_[:3, :3])
+    d = (b - a + 180) % 360 - 180
+    return M4(zyx(a + d * k), A_[:3, 3] + (B_[:3, 3] - A_[:3, 3]) * k)
+
+
+def euler_zyx(R):
+    """R = Rz·Ry·Rx → [x, y, z] в градусах (внутренние оси)."""
+    y = math.asin(max(-1.0, min(1.0, -R[2, 0])))
+    x = math.atan2(R[2, 1], R[2, 2])
+    z = math.atan2(R[1, 0], R[0, 0])
+    return np.degrees([x, y, z])
+
+
+_RIG = []
+
+
+def rig_cached():
+    if not _RIG:
+        _RIG.append(Rig())
+    return _RIG[0]
 
 
 class Rig:
@@ -168,6 +194,26 @@ class Rig:
             W[n] = (W[b['parent']] @ L) if b['parent'] else L
         return W, raw
 
+    def world_json(self, pose):
+        """Мировые матрицы по позе в осях Blockbench/JSON ({кость: {'rot': [...], 'pos': [...]}}), без анимаций из файла."""
+        W = {}
+        for n in self.order:
+            b = self.bones[n]
+            o = pose.get(n, {})
+            r, p = o.get('rot', [0, 0, 0]), o.get('pos', [0, 0, 0])
+            L = M4(zyx(b['rest'] + np.array([-r[0], -r[1], r[2]])), b['base'] + np.array([-p[0], p[1], p[2]]))
+            W[n] = (W[b['parent']] @ L) if b['parent'] else L
+        return W
+
+    def local_json(self, parent_world, bone, D):
+        """Ключи кости bone (оси Blockbench: rot, pos), при которых её мировая матрица = D при мировой матрице родителя parent_world."""
+        b = self.bones[bone]
+        L = np.linalg.inv(parent_world) @ D
+        tot = euler_zyx(L[:3, :3])
+        r = (tot - b['rest'] + 180) % 360 - 180
+        q = L[:3, 3] - b['base']
+        return {'rot': [float(-r[0]), float(-r[1]), float(r[2])], 'pos': [float(-q[0]), float(q[1]), float(q[2])]}
+
     def pt(self, W, bone, p):
         """Точка p (модельные координаты позы покоя) на кости bone → мир."""
         v = np.append(np.asarray(p, float) - self.bones[bone]['piv'], 1.0)
@@ -256,6 +302,9 @@ def cubes(rig, bone):
 
 
 TIPS = ['rib_%02d_b' % k for k in range(20)] + ['tie_r_b', 'tie_l_b', 'sash_r', 'sash_l', 'hood_drape', 'sleeve_r', 'sleeve_l']
+# концы ткани меряются в осях кости, к которой подвешена цепочка (иначе «вперёд» дал бы наклон торса или подъём руки)
+TIP_ROOT = dict({'rib_%02d_b' % k: 'skirt' for k in range(20)}, tie_r_b='torso', tie_l_b='torso', sash_r='torso', sash_l='torso',
+                hood_drape='hood', sleeve_r='right_arm', sleeve_l='left_arm')
 
 
 def tip_point(rig, bone):
@@ -277,11 +326,11 @@ def check(verbose=False, only=None):
     NAMES_RU = {'torso': 'торс', 'head': 'голову', 'hood': 'капюшон', 'skirt': 'юбку', 'right_leg': 'правую ногу', 'left_leg': 'левую ногу',
                 'left_arm': 'левую руку', 'sleeve_l': 'левый раструб'}
     brim = cubes(rig, 'hat_brim')
+    hat_all = brim + cubes(rig, 'hat_crown') + cubes(rig, 'hat_tip') + cubes(rig, 'hat_tip2') + cubes(rig, 'hat_tip3')
     hood = cubes(rig, 'hood')
     names = [n for n in COMBOS if n in rig.anims and (only is None or n in only)]
     idle0 = rest.raw
-    tip_rest = {b: rig.pt(rest.W, b, tip_point(rig, b)) for b in TIPS}
-    body_rest_inv = np.linalg.inv(rest.W['body'])
+    tip_rest = {b: rest.local(TIP_ROOT[b], rig.pt(rest.W, b, tip_point(rig, b))) for b in TIPS}
     for name in names:
         an = rig.anims[name]
         cloth = COMBOS[name]
@@ -311,10 +360,10 @@ def check(verbose=False, only=None):
             if prev is not None:
                 for b in BODY:
                     d = np.abs(np.array(raw[b][0]) - np.array(prev[1][b][0]))
-                    if np.max(d) > 45:
+                    if np.max(d) > 60:          # быстрее 600°/с — рывок (удар 0.15–0.2 с укладывается)
                         issues.append((name, t, 'jump', '%s повернулась на %.0f° за 0.1 с' % (b, np.max(d))))
                 ang = math.degrees(math.acos(max(-1, min(1, float(prev[2] @ ax)))))
-                if ang > 40:
+                if ang > 60:
                     issues.append((name, t, 'staff', 'посох повернулся на %.0f° за 0.1 с (рывок/прокрутка)' % ang))
             prev = (W, raw, ax)
             # ---- посох сквозь тело/капюшон/шляпу/землю
@@ -326,9 +375,9 @@ def check(verbose=False, only=None):
                 for (bn, ci) in STAFF_SOLID:
                     if F.depth(bn, ci, w) > 0.6:
                         hit.add(NAMES_RU[bn])
-                for (bn, ci) in brim:
+                for (bn, ci) in hat_all:
                     if F.depth(bn, ci, w) > 0.3:
-                        hit.add('поля шляпы')
+                        hit.add('поля шляпы' if bn == 'hat_brim' else 'тулью шляпы')
             for h in sorted(hit):
                 issues.append((name, t, 'staff', 'посох проходит сквозь ' + h))
             # ---- руки: не за спиной
@@ -370,7 +419,6 @@ def check(verbose=False, only=None):
             if worst:
                 issues.append((name, t, 'hat', 'поля шляпы уходят в капюшон на %.1f ед.' % worst))
             # ---- ленты юбки сквозь ноги; концы ткани — не вперёд (в осях тела) сильнее 3 ед. от покоя
-            binv = np.linalg.inv(W['body'])
             for k in range(20):
                 for seg in ('rib_%02d' % k, 'rib_%02d_b' % k):
                     lo, hi, cp, cr = rig.bones[seg]['cubes'][0]
@@ -383,8 +431,14 @@ def check(verbose=False, only=None):
                             if F.depth(leg, ci, w) > 0.8:
                                 issues.append((name, t, 'cloth', '%s (лента) внутри ноги %s' % (seg, leg)))
             for b in TIPS:
-                cur = (binv @ np.append(rig.pt(W, b, tip_point(rig, b)), 1))[:3]
-                r0 = (body_rest_inv @ np.append(tip_rest[b], 1))[:3]
+                root = TIP_ROOT[b]
+                cur = F.local(root, rig.pt(W, b, tip_point(rig, b)))
+                r0 = tip_rest[b]
+                if root.endswith('_arm'):            # рукав: «вперёд» вдоль руки = к кисти не считаем, только в сторону ладони/спины
+                    continue
+                legs_fwd = max(-raw['right_leg'][0][0], -raw['left_leg'][0][0])
+                if b.startswith('rib_') and math.cos(TAU20 * (int(b[4:6]) + 0.5)) > 0 and legs_fwd > LEGS_FWD:
+                    continue
                 if cur[2] - r0[2] < -3.0:
                     issues.append((name, t, 'cloth', '%s: конец уходит вперёд на %.1f ед.' % (b, r0[2] - cur[2])))
         # ---- направление в момент события

@@ -70,6 +70,7 @@ public final class Bosses {
 
     public static void init(IEventBus modBus) {
         ru.pohsmp.core.boss.cult.CultLeader.register();   // T26 (static registrations)
+        ru.pohsmp.core.boss.aris.Aris.register();   // T28
         ENTITIES.register(modBus);
         ITEMS.register(modBus);
         EFFECTS.register(modBus);
@@ -80,6 +81,7 @@ public final class Bosses {
         MinecraftForge.EVENT_BUS.register(BossFinisher.Events.class);
         MinecraftForge.EVENT_BUS.register(BossCommands.class);
         ru.pohsmp.core.boss.cult.CultLeader.events();
+        ru.pohsmp.core.boss.aris.Aris.events();   // T28
         if (FMLEnvironment.dist.isClient()) ru.pohsmp.core.boss.client.BossClient.init(modBus);
     }
 

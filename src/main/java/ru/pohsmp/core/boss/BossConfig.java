@@ -137,6 +137,7 @@ public final class BossConfig {
         b.pop();
         b.comment("T28 Aris, the Mythic Smith").push("aris");
         PER.put("aris", new PerBoss(b, new Body(4400, 18, 3, 1.0, 0.22, 18, 1.3, 1.1, 1.5, 0.85, -1, -1, -1, 24, 500)));
+        ru.pohsmp.core.boss.aris.ArisConfig.define(b);   // T28 mechanics
         b.pop();
         b.comment("T29 Martin, the Last Warlord").push("martin");
         PER.put("martin", new PerBoss(b, new Body(4000, 18, 4, 1.0, 0.23, 20, 1.2, 1.15, -1, -1, 0.9, -1, -1, 24, 500)));

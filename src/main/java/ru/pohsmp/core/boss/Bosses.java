@@ -84,6 +84,7 @@ public final class Bosses {
         MinecraftForge.EVENT_BUS.register(BossScenes.Events.class);
         MinecraftForge.EVENT_BUS.register(BossFinisher.Events.class);
         MinecraftForge.EVENT_BUS.register(BossCommands.class);
+        MinecraftForge.EVENT_BUS.register(BossGuard.Events.class);   // control / displacement / projectiles (balance 1.2, 1.3)
         ru.pohsmp.core.boss.cult.CultLeader.events();
         ru.pohsmp.core.boss.irina.Irina.events();         // T27
         ru.pohsmp.core.boss.aris.Aris.events();   // T28

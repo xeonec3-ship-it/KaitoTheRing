@@ -1,0 +1,33 @@
+{
+ "comment": "T29: разрез двуручником по печати «Реплики» (справа сверху; a — первый удар, b — второй, крест-накрест; b раскалывает печать). Ставить на печати Реплики: +0.06 (scale 4.5), +2.42 (3.4), +4.82 (4.8).",
+ "size": 1.0,
+ "color": "#FFF1C4",
+ "orientation": "ground",
+ "lifetime": -1,
+ "hold": -1,
+ "layers": [
+  {
+   "id": "cut",
+   "type": "disc",
+   "texture": "martin_replica_cut_a",
+   "radius": 1.0,
+   "heightOffset": 0.02,
+   "brightness": 1.8,
+   "appear": {
+    "delay": 0,
+    "duration": 3,
+    "easing": "easeOutQuart",
+    "modes": [
+     "fade",
+     "grow"
+    ]
+   }
+  }
+ ],
+ "dissolve": {
+  "modes": [
+   "fade"
+  ],
+  "duration": 8
+ }
+}

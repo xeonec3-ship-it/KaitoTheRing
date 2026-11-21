@@ -1,0 +1,6 @@
+{
+ "parent": "item/generated",
+ "textures": {
+  "layer0": "pohsmp_core:item/scroll_anvil_strike"
+ }
+}

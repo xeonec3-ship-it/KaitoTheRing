@@ -81,13 +81,25 @@ def fallen(ry=135.0, rot_extra=95.0):
 
 # ================================================================== анимации
 def idle(rig):
-    rg = rest_ground()
-    k = [K(t, 'io', **S(ham=rg, lh=0.0, torso=(1.5 * math.sin(t / 3.2 * 2 * math.pi), 0, 0),
-                         head=(-3 + 2 * math.sin(t / 3.2 * 2 * math.pi + 1), 6 * math.sin(t / 3.2 * 2 * math.pi), 0),
-                         bpos=(0, -0.25 + 0.25 * math.cos(t / 3.2 * 2 * math.pi), 0),
-                         larm=(4 + 2 * math.sin(t / 3.2 * 2 * math.pi), 0, -9), rpole=(0.9, -0.2, 0.4)))
-         for t in (0, 0.8, 1.6, 2.4, 3.2)]
-    return AN.bake(rig, 'idle', 3.2, k, loop=True, ground='feet', wind=0.25)
+    """Стойка по эталону Epic Fight (21.11): опирается на молот у правой ноги, вполоборота (плечи −28°, голова на цель), правая нога
+    впереди, левая сзади, вес гуляет; дыхание — период 2.8 с: колени чуть пружинят (ground_fix опускает таз), грудь ≈0.02 L."""
+    d = AN.nrm((0.50, -0.72, -0.48))                       # покой rest_ground, повёрнутый вместе с плечами на −28° (вправо)
+    rg = (AN.ham_from_strike((15.0, 0.0, -2.8), d, (0.21, -1, 0.45)), d, (0.21, -1, 0.45))
+    L = 2.8
+    k = []
+    for t in (0, 0.35, 0.7, 1.05, 1.4, 1.75, 2.1, 2.45, 2.8):
+        br = math.sin(t / L * 2 * math.pi)
+        b = 0.5 - 0.5 * br                                   # 0 — вдох (выше), 1 — выдох (колени мягче)
+        sw = math.sin(t / L * 2 * math.pi + 1.1)
+        k.append(K(t, 'io', **S(ham=rg, lh=0.0, body=(-2, -28 + 1.5 * sw, 0), torso=(1.0 * br, -4, 0),
+                                head=(-3 + 1.5 * br, 30 + 3 * sw, 0),
+                                right_leg=(20, 22, 5), left_leg=(-14, 20, -6), right_shin=(-16, 0, 0), left_shin=(-8, 0, 0),
+                                larm=(4 + 2 * br, 0, -9), rpole=(0.9, -0.2, 0.4))))
+    def breathe(t, pose, P):                                 # после ground_fix: таз чуть оседает на выдохе (≈0.25 ед.)
+        b = 0.5 - 0.5 * math.sin(t / L * 2 * math.pi)
+        bp = pose['body'].get('pos', (0, 0, 0))
+        pose['body']['pos'] = (bp[0], bp[1] - 0.25 * b, bp[2])
+    return AN.bake(rig, 'idle', L, k, loop=True, ground='feet', wind=0.25, extra=breathe, exact=True)
 
 
 def walk(rig):
@@ -107,55 +119,89 @@ def walk(rig):
     return AN.bake(rig, 'walk', L, keys, loop=True, ground=None, wind=0.0)
 
 
+def H(psi, pitch, gphi, gr, gy, dz=0.0, turn=1):
+    """Молот по дуге вокруг тела (эталон Epic Fight, 21.11): хват — цилиндр (азимут gphi: 0 — перед, + влево; радиус gr; высота gy;
+    dz — вынос вперёд вместе с тазом), голова молота — по азимуту psi и углу pitch (+ вверх), боёк смотрит по ходу удара
+    (turn = +1: азимут растёт — справа налево)."""
+    pr = math.radians(psi)
+    g = (-math.sin(math.radians(gphi)) * gr, gy, -math.cos(math.radians(gphi)) * gr + dz)
+    d = (-math.sin(pr) * math.cos(math.radians(pitch)), math.sin(math.radians(pitch)), -math.cos(pr) * math.cos(math.radians(pitch)))
+    f = (-math.cos(pr) * turn, 0.0, math.sin(pr) * turn)
+    return (g, d, f)
+
+
 def slam(rig):
-    """Удар по земле двумя руками: замах из-за головы, удар в 0.75 с (событие impact), отдача."""
+    """Удар по земле двумя руками по эталону Epic Fight (21.11). Тики прежние: windup 0.42, impact 0.75 (SLAM_IMPACT 15), волна от
+    удара — кодом. Замах 0–0.45 (корпус назад и вправо, вес назад), взвод до 0.60 (левая нога отрывается), удар 0.60–0.75 (левая
+    нога шагает, колени глубоко, корпус в наклон −24°), молот в земле до 1.15 (удержание тяжёлого), выдёргивает, отшаг, стойка к 2.2."""
     gd = guard()
     d_imp = (0.0, -0.42, -0.9)
-    imp = (AN.ham_from_strike((0.8, 0.0, -21.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
-    imp2 = (AN.ham_from_strike((0.8, 1.0, -21.5), d_imp, (0, -1, 0)), d_imp, (0, -1, 0.2))
+    imp = (AN.ham_from_strike((0.8, 0.0, -24.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0))
+    imp2 = (AN.ham_from_strike((0.8, 1.2, -24.0), d_imp, (0, -1, 0)), d_imp, (0, -1, 0.2))
+    W2 = ((7.5, 27.0, 5.5), (0.28, 0.12, 0.95), (0.1, 0.98, -0.15))      # голова молота почти горизонтально за спиной
     k = [
         K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
-        K(0.22, 'io', **S(ham=RAISE, lh=0.6, body=(4, -6, 0), torso=(4, -3, 0), head=(2, 8, 0), rpole=(0.9, -0.2, 0.3), lpole=(-0.7, -0.4, 0.5),
-                           **GUARD_LEGS)),
-        K(0.42, 'io', **S(ham=windup(), lh=0.45, **WINDUP)),
-        K(0.62, 'in', **S(ham=FWD_UP, lh=1, body=(-8, 0, 0), torso=(-4, 0, 0), head=(4, 0, 0),
-                           bpos=(0, -0.5, -0.5), right_leg=(-18, 0, 8), left_leg=(30, 0, -6), right_shin=(-10, 0, 0), left_shin=(-24, 0, 0),
+        K(0.18, 'io', **S(ham=RAISE, lh=0.6, body=(4, -12, 0), torso=(4, -3, 0), head=(2, 12, 0), rpole=(0.9, -0.2, 0.3), lpole=(-0.7, -0.4, 0.5),
+                           right_leg=(-8, 8, 7), left_leg=(14, 8, -6), right_shin=(-6, 0, 0), left_shin=(-14, 0, 0))),
+        K(0.45, 'out3', **S(ham=windup(), lh=0.45, body=(12, -38, 0), torso=(8, -8, 0), head=(8, 26, 0), bpos=(0, 0.6, 1.2),
+                             right_leg=(-16, 18, 8), left_leg=(18, 18, -6), right_shin=(-6, 0, 0), left_shin=(-12, 0, 0),
+                             rpole=(0.9, 0.1, 0.3), lpole=(-0.6, -0.3, -0.6))),
+        K(0.62, 'linear', **S(ham=W2, lh=0.45, body=(15, -44, 0), torso=(9, -9, 0), head=(9, 28, 0), bpos=(0, 0.6, 1.5),
+                            right_leg=(-18, 20, 8), left_leg=(10, 20, -6), right_shin=(-8, 0, 0), left_shin=(-30, 0, 0))),
+        K(0.69, 'in', **S(ham=FWD_UP, lh=1, body=(-8, -12, 0), torso=(-4, -2, 0), head=(4, 8, 0), bpos=(0, -0.5, -1.5),
+                           right_leg=(-20, 6, 8), left_leg=(34, 6, -6), right_shin=(-12, 0, 0), left_shin=(-30, 0, 0),
                            rpole=(0.9, -0.2, 0.3), lpole=(-0.9, -0.2, 0.3))),
-        K(0.75, 'in3', **S(ham=imp, lh=1, body=(-18, 0, 0), torso=(-6, 0, 0), head=(14, 0, 0), bpos=(0, -3.0, -1.0),
-                            right_leg=(-6, 0, 10), left_leg=(52, 0, -8), right_shin=(-26, 0, 0), left_shin=(-52, 0, 0),
+        K(0.75, 'linear', **S(ham=imp, lh=1, body=(-24, 8, 0), torso=(-7, 2, 0), head=(16, -2, 0), bpos=(0, -3.0, -3.0),
+                            right_leg=(-10, -2, 10), left_leg=(56, -2, -8), right_shin=(-30, 0, 0), left_shin=(-56, 0, 0),
                             rpole=(0.8, -0.4, 0.3), lpole=(-0.8, -0.4, 0.3))),
-        K(0.92, 'out', **S(ham=imp2, lh=1, body=(-16, 0, 0), torso=(-5, 0, 0), head=(12, 0, 0), bpos=(0, -2.6, -1.0),
-                            right_leg=(-6, 0, 10), left_leg=(48, 0, -8), right_shin=(-24, 0, 0), left_shin=(-48, 0, 0))),
-        K(1.6, 'io', **S(ham=gd, lh=1, **GUARD_LEGS)),
+        K(0.84, 'out', **S(ham=imp2, lh=1, body=(-21, 4, 0), torso=(-6, 2, 0), head=(14, -2, 0), bpos=(0, -2.6, -3.0),
+                            right_leg=(-10, -2, 10), left_leg=(52, -2, -8), right_shin=(-27, 0, 0), left_shin=(-52, 0, 0))),
+        K(1.15, 'io', **S(ham=imp, lh=1, body=(-22, 4, 0), torso=(-6, 2, 0), head=(14, -2, 0), bpos=(0, -2.8, -3.0),
+                           right_leg=(-10, -2, 10), left_leg=(54, -2, -8), right_shin=(-28, 0, 0), left_shin=(-54, 0, 0))),
+        K(1.45, 'io', **S(ham=((2.0, 14.0, -11.0), (0.1, 0.35, -0.93), (0, -1, 0.3)), lh=1, body=(-12, 0, 0), torso=(-3, 0, 0), head=(6, 0, 0),
+                           bpos=(0, -1.5, -2.2), right_leg=(-12, 0, 9), left_leg=(36, 0, -7), right_shin=(-18, 0, 0), left_shin=(-36, 0, 0))),
+        K(1.75, 'io', **S(ham=((1.0, 17.0, -8.5), (0.35, 0.7, -0.6), (0.9, -0.4, 0.05)), lh=1, body=(-4, -4, 0), bpos=(0, -0.4, -0.6),
+                           right_leg=(-8, 0, 7), left_leg=(22, 0, -6), right_shin=(-8, 0, 0), left_shin=(-34, 0, 0))),
+        K(2.2, 'io', **S(ham=gd, lh=1, **GUARD_LEGS)),
     ]
-    return AN.bake(rig, 'slam', 1.6, k, loop=False, ground='feet', events={0.42: 'windup', 0.75: 'impact'})
+    return AN.bake(rig, 'slam', 2.2, k, loop=False, ground='feet', events={0.42: 'windup', 0.75: 'impact'}, dt=0.025, exact=True)
 
 
 def swing(rig):
-    """Горизонтальный размах справа налево (удар в 0.62 с, событие hit)."""
+    """Горизонтальный размах справа налево по эталону Epic Fight (21.11). Тики прежние: windup 0.45, hit 0.62 (SWING_HIT 12).
+    Замах 0–0.40 (плечи −90°, молот за спиной справа, вес назад), взвод до 0.50, удар 0.50–0.71 (таз ведёт, левая нога шагает,
+    молот проходит ~280° — справа через перед налево), перехлёст до 0.80 (плечи +100°), тяжёлый молот провисает, отшаг, стойка к 2.1."""
     gd = guard()
+    LG = dict(rpole=(0.6, -0.6, 0.5), lpole=(-0.3, -0.7, 0.6))
     k = [
         K(0.0, **S(ham=gd, lh=1, **GUARD_LEGS)),
-        K(0.25, 'io', **S(ham=((6.0, 19.0, -6.0), (0.9, 0.42, -0.1), (0.1, 0, -1)), lh=0.8, body=(0, -18, 0), torso=(0, -6, 0), head=(0, 16, 0),
-                           right_leg=(-10, 0, 10), left_leg=(16, 0, -7), right_shin=(-8, 0, 0), left_shin=(-10, 0, 0), bpos=(0, -0.6, 0),
-                           rpole=(0.6, -0.6, 0.5), lpole=(-0.3, -0.7, 0.6))),
-        K(0.45, 'io', **S(ham=((9.5, 18.0, -1.0), (0.7, 0.25, 0.67), (0.69, 0, -0.72)), lh=1, body=(0, -38, 0), torso=(0, -14, 0), head=(0, 30, 0),
-                           right_leg=(-12, 0, 12), left_leg=(18, 0, -8), right_shin=(-10, 0, 0), left_shin=(-10, 0, 0), bpos=(0, -1.2, 0),
-                           rpole=(0.6, -0.6, 0.5), lpole=(-0.3, -0.7, 0.6))),
-        K(0.55, 'in', **S(ham=((7.0, 16.5, -9.5), (0.45, 0.05, -0.89), (0.89, 0, 0.45)), lh=1, body=(-4, -10, 0), torso=(0, -4, 0), head=(0, 12, 0),
-                           right_leg=(-14, 0, 12), left_leg=(22, 0, -8), right_shin=(-12, 0, 0), left_shin=(-14, 0, 0), bpos=(0, -1.6, -0.3),
+        K(0.16, 'io', **S(ham=H(-70, -18, -40, 8.0, 15.0, 0.3), lh=1, body=(2, -34, 0), torso=(1, -4, 0), head=(0, 18, 0),
+                           right_leg=(-10, 20, 8), left_leg=(12, 20, -6), right_shin=(-8, 0, 0), left_shin=(-12, 0, 0), **LG)),
+        K(0.40, 'out3', **S(ham=H(-150, 14, -112, 8.4, 19.5, 1.0), lh=1, body=(6, -96, 0), torso=(2, -8, 0), head=(0, 44, 0),
+                             bpos=(0, 0, 1.0), right_leg=(-12, 52, 8), left_leg=(8, 50, -6), right_shin=(-10, 0, 0), left_shin=(-12, 0, 0), **LG)),
+        K(0.50, 'linear', **S(ham=H(-168, 18, -122, 8.5, 20.0, 1.3), lh=1, body=(7, -105, 0), torso=(2, -9, 0), head=(0, 46, 0),
+                            bpos=(0, 0, 1.3), right_leg=(-12, 54, 8), left_leg=(4, 52, -6), right_shin=(-10, 0, 0), left_shin=(-30, 0, 0), **LG)),
+        K(0.57, 'in', **S(ham=H(-100, 8, -72, 10.2, 18.5, -0.5), lh=1, body=(0, -55, 0), torso=(0, -4, 0), head=(0, 30, 0), bpos=(0, 0, -0.8),
+                           right_leg=(-14, 22, 9), left_leg=(26, 20, -6), right_shin=(-14, 0, 0), left_shin=(-30, 0, 0),
                            rpole=(0.6, -0.7, 0.3), lpole=(-0.5, -0.7, 0.4))),
-        K(0.62, 'in3', **S(ham=((2.0, 16.0, -9.5), (-0.45, 0.06, -0.89), (-0.89, 0, 0.45)), lh=1, body=(-6, 6, 0), torso=(0, 6, 0), head=(0, -4, 0),
-                            right_leg=(-16, 0, 12), left_leg=(26, 0, -8), right_shin=(-14, 0, 0), left_shin=(-18, 0, 0), bpos=(0, -2.0, -0.5),
+        K(0.63, 'linear', **S(ham=H(-2, 0, -24, 9.8, 17.0, -3.6), lh=1, body=(-10, 12, 0), torso=(-4, 6, 0), head=(4, -4, 0), bpos=(0, 0, -3.6),
+                            right_leg=(-22, -8, 9), left_leg=(36, -8, -6), right_shin=(-18, 0, 0), left_shin=(-30, 0, 0),
                             rpole=(0.6, -0.7, 0.3), lpole=(-0.6, -0.7, 0.3))),
-        K(0.86, 'out', **S(ham=((-6.0, 18.0, -8.5), (-0.85, 0.1, -0.5), (-0.5, 0, 0.85)), lh=1, body=(-4, 42, 0), torso=(0, 16, 0), head=(0, -30, 0),
-                            right_leg=(-10, 0, 12), left_leg=(20, 0, -8), right_shin=(-12, 0, 0), left_shin=(-12, 0, 0), bpos=(0, -1.6, 0),
+        K(0.71, 'out', **S(ham=H(86, -6, 48, 10.2, 16.0, -5.2), lh=1, body=(-14, 72, 0), torso=(-4, 12, 0), head=(6, -36, 0), bpos=(0, 0, -5.2),
+                            right_leg=(-22, -42, 9), left_leg=(34, -36, -6), right_shin=(-20, 0, 0), left_shin=(-30, 0, 0),
                             rpole=(0.2, -0.8, 0.5), lpole=(-0.7, -0.6, 0.3))),
-        K(1.1, 'io', **S(ham=((-2.0, 20.0, -9.0), (-0.2, 0.95, -0.25), (1, 0, 0)), lh=1, body=(-2, 14, 0), torso=(0, 6, 0), head=(0, -12, 0),
-                          rpole=(0.4, -0.8, 0.4), lpole=(-0.7, -0.6, 0.3), **GUARD_LEGS)),
-        K(1.4, 'io', **S(ham=gd, lh=1, **GUARD_LEGS)),
+        K(0.80, 'out', **S(ham=H(118, -12, 76, 10.0, 15.5, -5.8), lh=1, body=(-14, 105, 0), torso=(-3, 14, 0), head=(6, -45, 0), bpos=(0, 0, -5.8),
+                            right_leg=(-18, -56, 9), left_leg=(32, -50, -6), right_shin=(-18, 0, 0), left_shin=(-28, 0, 0))),
+        K(0.95, 'io', **S(ham=H(108, -26, 68, 9.8, 14.6, -5.6), lh=1, body=(-12, 90, 0), torso=(-2, 10, 0), head=(6, -42, 0), bpos=(0, 0, -5.6))),
+        K(1.25, 'io', **S(ham=H(96, -38, 58, 9.8, 14.0, -5.2), lh=1, body=(-10, 80, 0), torso=(-2, 8, 0), head=(6, -38, 0), bpos=(0, 0, -5.2),
+                           right_shin=(-14, 0, 0), left_shin=(-24, 0, 0))),
+        K(1.55, 'io', **S(ham=H(60, 10, 22, 9.4, 16.5, -2.5), lh=1, body=(-4, 40, 0), torso=(0, 4, 0), head=(2, -20, 0), bpos=(0, 0, -2.5),
+                           right_leg=(-12, -20, 8), left_leg=(12, -20, -6), right_shin=(-10, 0, 0), left_shin=(-34, 0, 0))),
+        K(1.75, 'io', **S(ham=((-1.0, 19.0, -8.0), (0.0, 0.9, -0.4), (1, 0, 0)), lh=1, body=(-2, 10, 0), torso=(0, 2, 0), head=(0, -6, 0),
+                           bpos=(0, 0, -0.6), rpole=(0.4, -0.8, 0.4), lpole=(-0.7, -0.6, 0.3), **GUARD_LEGS)),
+        K(2.1, 'io', **S(ham=gd, lh=1, **GUARD_LEGS)),
     ]
-    return AN.bake(rig, 'swing', 1.4, k, loop=False, ground='feet', events={0.45: 'windup', 0.62: 'hit'})
+    return AN.bake(rig, 'swing', 2.1, k, loop=False, ground='feet', events={0.45: 'windup', 0.62: 'hit'}, dt=0.025, exact=True)
 
 
 def cast(rig):

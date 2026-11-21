@@ -20,8 +20,9 @@ public final class ArisMath {
 
     /** Animation names (animation.aris.<name>) and their lengths in ticks. */
     public static final String[] ANIMS = {"", "slam", "swing", "cast", "forge", "last_blow", "phase2", "phase3", "spawn", "surrender",
-            "billet", "chains", "quench", "bellows", "replica_break", "finisher"};
-    public static final int[] ANIM_TICKS = {0, 32, 28, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40, 48};
+            "billet", "chains", "quench", "bellows", "replica_break", "finisher", "guard_break"};
+    /** guard_break 36: T32 visuals (docs/inbox/2026-11-21_mgr_guard_break_visuals.md): warn tick 2, hit tick 14, length 36. */
+    public static final int[] ANIM_TICKS = {0, 44, 42, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40, 48, 36};
 
     public static int anim(String name) {
         for (int i = 1; i < ANIMS.length; i++) if (ANIMS[i].equals(name)) return i;
@@ -41,9 +42,9 @@ public final class ArisMath {
 
     // ---------------------------------------------------------------- melee and phase 1
 
-    public static final int SWING = 28, SWING_HIT = 12;
+    public static final int SWING = 42, SWING_HIT = 12;
     public static final double SWING_REACH = 3.6;
-    public static final int SLAM = 32, SLAM_IMPACT = 15, SLAM_WAVE = 22;
+    public static final int SLAM = 44, SLAM_IMPACT = 15, SLAM_WAVE = 22;
     /** The hammer head touches the ground this far before her (slam / forge / last_blow). */
     public static final double SLAM_FWD = 1.35, FORGE_FWD = 1.2, LAST_FWD = 1.45;   // visual letter «Правка направлений» 20.11
     public static final double SLAM_RADIUS = 8, SLAM_BAND = 0.7, JUMP_CLEAR = 1.0;

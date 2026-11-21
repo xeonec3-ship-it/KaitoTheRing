@@ -22,8 +22,8 @@ public final class ErebMath {
 
     // ---------------------------------------------------------------- his animations
     public static final int SHARD_CAST = 24, SHARD_RELEASE = 11;
-    public static final int LUNGE = 24, LUNGE_HIT = 10;
-    public static final int FLURRY = 36;
+    public static final int LUNGE = 32, LUNGE_HIT = 10;      // Epic Fight style 21.11: 1.6 s (was 24)
+    public static final int FLURRY = 40;                    // Epic Fight style 21.11: 2.0 s (was 36)
     public static final int[] FLURRY_HITS = {9, 16, 23};
     public static final int CAST_ILLUSION = 28, CAST_AT = 15;
     public static final int DISGUISE = 20, DISGUISE_SWAP = 10;

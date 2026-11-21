@@ -98,15 +98,18 @@ def build():
     an = {}
     # ---------------------------------------------------------------- покой: элегантная стойка (4 с, петля). Левая рука за спиной,
     # рапира опущена к земле; дыхание, лёгкий перенос веса, полы чуть колышутся.
+    # эталон Epic Fight (21.11): вполоборота (правым боком к цели 24°, голова на цель), правая нога впереди, дыхание 2.8 с
     keys = []
-    for i in range(5):
-        t = i * 1.0
-        ph = math.sin(i * math.pi / 2)
-        p = mod(STAND, torso=[-1.5 * abs(ph), 0, 0], body_pos=[0, 0.12 * abs(ph), 0], head=[-3 + 1.5 * ph, 8 + 4 * ph, 0],
-                coat_front_r=[-3, 0, 2 + 1.2 * ph], coat_front_l=[2, 0, -2 + 1.2 * ph], coat_back_r=[1.5 * ph, 0, 1.0 * ph],
-                coat_back_l=[1.5 * ph, 0, 1.0 * ph], right_arm=[-14 + 2 * ph, 12, 7])
+    for i in range(9):
+        t = i * 0.35
+        br = math.sin(i * math.pi / 4)
+        sw = math.sin(i * math.pi / 4 + 1.1)
+        p = mod(STAND, body=[0, -34 + 1.2 * sw, 0], torso=[-0.8 * br, 0, 0], body_pos=[0.15 * sw, 0.1 * br, 0],
+                head=[-3 + 1.0 * br, 34 + 3 * sw, 0], right_leg=[-10, 24, 3], left_leg=[10, 22, -4],
+                coat_front_r=[-6, 0, 2 + 1.2 * br], coat_front_l=[6, 0, -2 + 1.2 * br], coat_back_r=[3 + 1.5 * br, 0, 1.0 * br],
+                coat_back_l=[3 + 1.5 * br, 0, 1.0 * br], right_arm=[-14 + 1.5 * br, 12, 7])
         keys.append((t, p, IO))
-    an['ereb_idle'] = anim(4.0, keys, loop=True)
+    an['ereb_idle'] = anim(2.8, keys, loop=True)
     # ---------------------------------------------------------------- шаг (1.2 с, петля): ноги ±26°, полы следуют за ногами с запаздыванием
     keys = []
     for i in range(9):
@@ -121,17 +124,40 @@ def build():
     # ---------------------------------------------------------------- фехтование
     an['ereb_guard'] = anim(1.0, [(0, GUARD), (0.5, mod(GUARD, body_pos=[0, -1.4, 0]), IO), (1.0, GUARD, IO)], loop=True)
     # выпад (1.2 с): 0.3 — сжался, 0.5 — укол (hit), 0.8–1.2 — возврат в стойку
-    an['ereb_lunge'] = anim(1.2, [
-        (0, GUARD), (0.3, mod(GUARD, body_pos=[0, -1.8, 2], right_arm=[-70, 40, 10], bipedHandRight=[70, 0, 0]), IO),
-        (0.5, LUNGE, OQ), (0.75, LUNGE), (1.2, GUARD, IO)], [(0.5, 'hit')])
+    # эталон Epic Fight (21.11; hit 0.5 — прежний тик LUNGE_HIT 10): сжатие 0–0.30 (вес на заднюю ногу, рука с рапирой оттянута),
+    # взвод до 0.40, укол 0.40–0.52 (пик скорости у hit: передняя нога — длинный выпад, таз вперёд 0.9 L, плечи в профиль),
+    # перехлёст и короткое удержание, отшаг в стойку к 1.6 с
+    coil = mod(GUARD, body=[2, -30, 0], body_pos=[0, -2.0, 2.6], right_arm=[-58, 44, 14], bipedHandRight=[66, 0, 0],
+               right_leg=[-12, 30, 2], left_leg=[22, 18, -8], left_arm=[-150, -10, -46], coat_front_r=[6, 0, 6])
+    load = mod(coil, body_pos=[0, -2.2, 3.0], right_arm=[-56, 46, 15], right_leg=[-8, 30, 2], coat_front_r=[8, 0, 8])
+    mid = mod(LUNGE, body=[8, -46, 0], body_pos=[0, -2.2, -4.0], right_arm=[-80, 42, 4], bipedHandRight=[80, 0, 0],
+              right_leg=[-44, 34, 1], left_leg=[30, 20, -9], coat_front_r=[4, 0, 8])
+    ext = mod(LUNGE, body=[12, -50, 0], body_pos=[0, -2.8, -10.5], right_arm=[-92, 40, 0], bipedHandRight=[90, 0, 0],
+              right_leg=[-70, 34, 0], left_leg=[42, 20, -10], left_arm=[-50, -10, -100])
+    rec = mod(ext, body_pos=[0, -2.6, -9.6], right_arm=[-88, 40, 2])
+    an['ereb_lunge'] = anim(1.6, [
+        (0, GUARD), (0.27, coil, OC), (0.37, load, 'linear'), (0.44, mid, 'easeInQuad'), (0.505, ext, 'linear'), (0.60, rec, 'easeOutQuad'),
+        (0.78, rec), (1.05, mod(GUARD, body_pos=[0, -1.6, -4.0], right_leg=[-30, 30, 2]), IO), (1.6, GUARD, IO)], [(0.5, 'hit')])
     # серия (1.8 с): три укола — 0.45, 0.8, 1.15 (вверх, в корпус, финт снизу)
-    a1 = mod(LUNGE, right_arm=[-104, 36, 0], body_pos=[0, -2.6, -4], bipedHandRight=[92, 0, 0])
-    a2 = mod(LUNGE, right_arm=[-86, 44, 4], body_pos=[0, -3.0, -5])
-    a3 = mod(LUNGE, right_arm=[-72, 40, -6], bipedHandRight=[70, 0, 0], body=[22, -42, 0], body_pos=[0, -3.6, -6])
-    back = mod(GUARD, body_pos=[0, -1.6, 1], right_arm=[-70, 36, 10])
-    an['ereb_flurry'] = anim(1.8, [
-        (0, GUARD), (0.25, back, IO), (0.45, a1, OQ), (0.62, back, IO), (0.8, a2, OQ), (0.97, back, IO), (1.15, a3, OQ),
-        (1.4, a3), (1.8, GUARD, IO)], [(0.45, 'hit'), (0.8, 'hit'), (1.15, 'hit')])
+    # эталон Epic Fight (21.11; hits 0.45 / 0.8 / 1.15 — прежние тики FLURRY_HITS 9/16/23): каждый укол — оттяжка (out) → разгон
+    # (in) → пик у hit → перехлёст; плечи доворачиваются в профиль на уколе и раскрываются на оттяжке, шаги вперёд; возврат к 2.0 с
+    a1 = mod(LUNGE, body=[10, -48, 0], right_arm=[-104, 36, 0], body_pos=[0, -2.6, -5], bipedHandRight=[92, 0, 0],
+             right_leg=[-52, 34, 0], left_leg=[34, 20, -9])
+    a2 = mod(LUNGE, body=[12, -50, 0], right_arm=[-88, 44, 4], body_pos=[0, -3.0, -7], right_leg=[-60, 34, 0], left_leg=[38, 20, -10])
+    a3 = mod(LUNGE, right_arm=[-72, 40, -6], bipedHandRight=[70, 0, 0], body=[22, -54, 0], body_pos=[0, -3.6, -9],
+             right_leg=[-68, 34, 0], left_leg=[42, 20, -10])
+    b1 = mod(GUARD, body=[0, -24, 0], body_pos=[0, -1.8, 2.6], right_arm=[-40, 40, 18], bipedHandRight=[56, 0, 0])
+    b2 = mod(GUARD, body=[2, -26, 0], body_pos=[0, -2.2, -0.5], right_arm=[-42, 42, 18], bipedHandRight=[56, 0, 0],
+             right_leg=[-30, 32, 2], left_leg=[26, 18, -8])
+    b3 = mod(GUARD, body=[4, -26, 0], body_pos=[0, -2.4, -2.5], right_arm=[-40, 40, 16], bipedHandRight=[54, 0, 0],
+             right_leg=[-40, 32, 2], left_leg=[30, 18, -8])
+    m = lambda a, b: lerp_pose(a, b, 0.35)
+    an['ereb_flurry'] = anim(2.0, [
+        (0, GUARD), (0.32, b1, OC), (0.40, m(b1, a1), 'easeInQuad'), (0.455, a1, 'linear'), (0.52, mod(a1, body_pos=[0, -2.6, -4.6]), 'easeOutQuad'),
+        (0.68, b2, IO), (0.75, m(b2, a2), 'easeInQuad'), (0.805, a2, 'linear'), (0.87, mod(a2, body_pos=[0, -3.0, -6.6]), 'easeOutQuad'),
+        (1.03, b3, IO), (1.10, m(b3, a3), 'easeInQuad'), (1.155, a3, 'linear'), (1.24, mod(a3, body_pos=[0, -3.5, -8.4]), 'easeOutQuad'),
+        (1.45, mod(a3, body_pos=[0, -3.4, -8.2])), (1.7, mod(GUARD, body_pos=[0, -1.8, -3.0], right_leg=[-30, 30, 2]), IO), (2.0, GUARD, IO)],
+        [(0.45, 'hit'), (0.8, 'hit'), (1.15, 'hit')])
     # парирование (1.0 с): 0.15 — клинок поперёк (parry, звон, искра), 0.6 — ответный укол (hit)
     an['ereb_parry'] = anim(1.0, [(0, GUARD), (0.15, PARRY, OQ), (0.35, mod(PARRY, body_pos=[0, -1.6, 1.6]), IO),
                                   (0.6, LUNGE, OQ), (1.0, GUARD, IO)], [(0.15, 'parry'), (0.6, 'hit')])
@@ -217,6 +243,9 @@ def build():
         (0.7, pre), (0.95, mod(pre, right_arm=[-170, 20, -10]), IO), (1.1, fstab, IQ), (1.6, fstab),
         (1.9, mod(fstab, right_arm=[-84, 20, 12], bipedHandRight=[88, 0, 0], body_pos=[0, -1.2, 1.5]), OC),
         (2.4, STAND, IO)], [(0.3, 'vanish'), (0.7, 'appear'), (1.1, 'stab'), (1.9, 'kill')])
+    # T32 «Сломать блок»: финт в лицо → укол под защиту (по эталону Epic Fight, tools/guard_break_ereb.py; warn 0.1, hit 0.7)
+    import guard_break_ereb
+    an['ereb_guard_break'] = guard_break_ereb.build()
     return an
 
 

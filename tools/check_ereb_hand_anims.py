@@ -25,6 +25,7 @@ import gen_ereb_hand_anims as AN   # noqa: E402
 BODY_SOLID = ('torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg')
 STEP_MAX = 62          # град. за 0.1 с — плавно
 STEP_HIT = 95          # у ударов (slam, выпад) — допустимо быстрее
+STEP_STRIKE = 300      # в окне самого удара (hit/slam ± 0.2 с) — скорость эталона Epic Fight (21.11)
 LIMITS = {'right_arm': ((-185, 40), (-60, 70), (-40, 75)), 'left_arm': ((-185, 40), (-70, 60), (-110, 40)),
           'head': ((-40, 30), (-45, 45), (-12, 12)), 'bipedHandRight': ((-60, 100), (-60, 60), (-30, 30))}
 
@@ -104,7 +105,9 @@ def main():
                 fast = any(abs(t - te) <= 0.25 and ev in ('hit', 'slam', 'phase', 'crack', 'tear', 'squeeze', 'grab', 'stagger', 'snap', 'break', 'release', 'shatter', 'grip',
                                                           'throw', 'leap', 'land', 'kneel', 'wave', 'emerge')
                            for te, ev in events.items())
-                if st > (STEP_HIT if fast else STEP_MAX):
+                # окно самого удара (hit/slam ± 0.2 с) — до 300°/0.1 с: эталон Epic Fight (владелец 21.11), удар 0.08–0.24 с, пик 1750–2500°/с
+                strike = any(abs(t - te) <= 0.2 and ev in ('hit', 'slam') for te, ev in events.items())
+                if st > (STEP_STRIKE if strike else STEP_HIT if fast else STEP_MAX):
                     errors.append('%s t=%.2f: рывок %.0f° за 0.1 с' % (name, t, st))
             prev = (t, pose)
             # 5) пределы

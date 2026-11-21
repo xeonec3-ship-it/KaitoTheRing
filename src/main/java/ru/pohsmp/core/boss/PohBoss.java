@@ -67,6 +67,36 @@ public interface PohBoss {
     /** The break animation has just started (extra fx, sounds of the boss's own). */
     default void onReplicaBreak(net.minecraft.world.entity.LivingEntity caster) {}
 
+    // ---------------------------------------------------------------- T32 «Сломать блок» (BossGuardBreak; only with Epic Fight)
+
+    /** May the Guard Break start now (not in the middle of its own attack / cast)? Default: none of the framework's locks. */
+    default boolean guardBreakFree() {
+        return !bossCore().locked();
+    }
+
+    /** The blow's damage: the strongest melee hit of this boss in its current phase (its config, ×phase, with the enrage). */
+    default double guardBreakDamage() {
+        return bossMob().getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+    }
+
+    /** Ticks of its animation: the hit and the length (the warning comes guard_break_warn_ticks before the hit). Default 14 / 36. */
+    default BossGuardBreak.Timing guardBreakTiming() {
+        return BossGuardBreak.Timing.STANDARD;
+    }
+
+    /** Its animation name, by the rule of its animation file: <id>_guard_break (Aris: animation.aris.guard_break). */
+    default String guardBreakAnimation() {
+        return bossCore().def.id + "_guard_break";
+    }
+
+    /** The Guard Break has just started at target (its animation and fx are on): the boss's own reaction (Ereb drops a disguise...). */
+    default void onGuardBreakStart(net.minecraft.server.level.ServerPlayer target) {}
+
+    /** Plays it (default: Iron's / GeckoLib trigger of IAnimatedAttacker). */
+    default void playGuardBreak(String animation) {
+        if (bossMob() instanceof io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker a) a.serverTriggerAnimation(animation);
+    }
+
     // ---------------------------------------------------------------- finisher (def.finisher)
 
     /** Finisher length in ticks (the victim dies at {@link #finisherKillTick()}). */

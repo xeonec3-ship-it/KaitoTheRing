@@ -371,6 +371,18 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
 
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика»
 
+    /** T32 «Сломать блок»: martin_guard_break 40 ticks (warn 2, hit 14, the shield push ~20 is only visual). */
+    @Override
+    public ru.pohsmp.core.boss.BossGuardBreak.Timing guardBreakTiming() {
+        return new ru.pohsmp.core.boss.BossGuardBreak.Timing(14, 40);
+    }
+
+    /** T32 «Сломать блок»: the heavy hit from his melee table (MartinFight). */
+    @Override
+    public double guardBreakDamage() {
+        return fight.guardBreakDamage();
+    }
+
     /** martin_replica_break 2.4 s: block 0.4, slash 0.9, break 1.35, speak 1.7; the phrase over the helmet (+4.6). */
     @Override
     public BossReplica.Reaction replicaReaction() {

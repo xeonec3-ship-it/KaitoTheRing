@@ -126,18 +126,46 @@ def build():
     HG_back = hand(pos=(1, 1, 1), rot=(8, -14, -6), curl=0.25)
     guard = full(GUARD, HG)
     an['ereb_hand_guard'] = anim(1.0, [(0, guard), (0.5, full(EA.mod(GUARD, body_pos=[0, -1.4, 0]), HG), IO), (1.0, guard, IO)], loop=True)
+    # прежние позы выпада — ими пользуются reflection_strike / false_retreat_strike / build_spells2 (не входят в перенос)
     pre = full(EA.mod(GUARD, body_pos=[0, -1.8, 2], right_arm=[-70, 40, 10], bipedHandRight=[70, 0, 0]), HG_back)
     lunge = full(LUNGE, hand(pos=(2, -2, 2), rot=(10, -6, -4), curl=0.4))
-    an['ereb_hand_lunge'] = anim(1.4, [(0, IDLE0), (0.2, lerp(IDLE0, guard, 0.7), IO), (0.35, pre, IO), (0.5, lunge, OQ), (0.75, lunge),
-                                       (1.05, guard, IO), (1.4, IDLE0, IO)], [(0.5, 'hit')])
-    a1 = full(EA.mod(LUNGE, right_arm=[-104, 36, 0], body_pos=[0, -2.6, -4], bipedHandRight=[92, 0, 0]), hand(pos=(2, -2, 2), rot=(10, -6, -4), curl=0.4))
-    a2 = full(EA.mod(LUNGE, right_arm=[-86, 44, 4], body_pos=[0, -3.0, -5]), hand(pos=(2, -2, 2), rot=(10, -6, -4), curl=0.45))
-    a3 = full(EA.mod(LUNGE, right_arm=[-72, 40, -6], bipedHandRight=[70, 0, 0], body=[22, -42, 0], body_pos=[0, -3.6, -6], cape=[40, 0, 0]),
-              hand(pos=(2, -3, 3), rot=(8, -6, -4), curl=0.5))
-    back = full(EA.mod(GUARD, body_pos=[0, -1.6, 1], right_arm=[-70, 36, 10]), HG_back)
-    an['ereb_hand_flurry'] = anim(2.1, [(0, IDLE0), (0.25, back, IO), (0.45, a1, OQ), (0.62, back, IO), (0.8, a2, OQ), (0.97, back, IO),
-                                        (1.15, a3, OQ), (1.4, a3), (1.75, guard, IO), (2.1, IDLE0, IO)],
-                                  [(0.45, 'hit'), (0.8, 'hit'), (1.15, 'hit')])
+    # ---- выпад и серия — по эталону Epic Fight (21.11; тики прежние: LUNGE_HIT 10, FLURRY_HITS 9/16/23), как у T30 (gen_ereb_anims):
+    # сжатие с весом на задней ноге → взвод → укол без остановки на ключах (пик скорости у hit) → перехлёст → отшаг; призрачная рука
+    # отстаёт от тела (сзади на оттяжке, догоняет после укола)
+    coil = full(EA.mod(GUARD, body=[2, -30, 0], body_pos=[0, -2.0, 2.6], right_arm=[-58, 44, 14], bipedHandRight=[66, 0, 0],
+                       right_leg=[-12, 30, 2], left_leg=[22, 18, -8], left_arm=[-100, -10, -46], coat_front_r=[6, 0, 6]), HG_back)
+    load = full(EA.mod(GUARD, body=[2, -30, 0], body_pos=[0, -2.2, 3.0], right_arm=[-56, 46, 15], bipedHandRight=[66, 0, 0],
+                       right_leg=[-8, 30, 2], left_leg=[22, 18, -8], left_arm=[-110, -10, -46], coat_front_r=[8, 0, 8]),
+                hand(pos=(1, 1.5, 2), rot=(6, -14, -6), curl=0.25))
+    ext = full(EA.mod(LUNGE, body=[12, -50, 0], body_pos=[0, -2.8, -10.5], right_arm=[-92, 40, 0], bipedHandRight=[90, 0, 0],
+                      right_leg=[-70, 34, 0], left_leg=[42, 20, -10], left_arm=[-50, -10, -100], cape=[36, 0, 0]),
+               hand(pos=(2, -1, 4), rot=(8, -6, -4), curl=0.4))
+    rec = lerp(ext, full(EA.mod(LUNGE, body=[12, -50, 0], body_pos=[0, -2.6, -9.6], right_arm=[-88, 40, 2], bipedHandRight=[90, 0, 0],
+                                right_leg=[-70, 34, 0], left_leg=[42, 20, -10], left_arm=[-50, -10, -100], cape=[30, 0, 0]),
+                         hand(pos=(2, -2, 2), rot=(10, -6, -4), curl=0.4)), 1.0)
+    step_back = full(EA.mod(GUARD, body_pos=[0, -1.6, -4.0], right_leg=[-30, 30, 2]), HG)
+    an['ereb_hand_lunge'] = anim(1.6, [(0, IDLE0), (0.28, coil, IO), (0.37, load, LIN), (0.44, lerp(load, ext, 0.35), 'easeInQuad'),
+                                       (0.505, ext, LIN), (0.6, rec, 'easeOutQuad'), (0.8, rec), (1.1, step_back, IO), (1.6, IDLE0, IO)],
+                                 [(0.5, 'hit')])
+
+    def strike(body, gh_curl):
+        return full(body, hand(pos=(2, -2, 3), rot=(10, -6, -4), curl=gh_curl))
+    a1 = strike(EA.mod(LUNGE, body=[10, -48, 0], right_arm=[-104, 36, 0], body_pos=[0, -2.6, -5], bipedHandRight=[92, 0, 0],
+                       right_leg=[-52, 34, 0], left_leg=[34, 20, -9]), 0.4)
+    a2 = strike(EA.mod(LUNGE, body=[12, -50, 0], right_arm=[-88, 44, 4], body_pos=[0, -3.0, -7], right_leg=[-60, 34, 0], left_leg=[38, 20, -10]), 0.45)
+    a3 = strike(EA.mod(LUNGE, right_arm=[-72, 40, -6], bipedHandRight=[70, 0, 0], body=[22, -54, 0], body_pos=[0, -3.6, -9],
+                       right_leg=[-68, 34, 0], left_leg=[42, 20, -10], cape=[40, 0, 0]), 0.5)
+    b1 = full(EA.mod(GUARD, body=[0, -24, 0], body_pos=[0, -1.8, 2.6], right_arm=[-40, 40, 18], bipedHandRight=[56, 0, 0], left_arm=[-100, -10, -40]), HG_back)
+    b2 = full(EA.mod(GUARD, body=[2, -26, 0], body_pos=[0, -2.2, -0.5], right_arm=[-42, 42, 18], bipedHandRight=[56, 0, 0],
+                     right_leg=[-30, 32, 2], left_leg=[26, 18, -8]), HG_back)
+    b3 = full(EA.mod(GUARD, body=[4, -26, 0], body_pos=[0, -2.4, -2.5], right_arm=[-40, 40, 16], bipedHandRight=[54, 0, 0],
+                     right_leg=[-40, 32, 2], left_leg=[30, 18, -8]), HG_back)
+    over = lambda a, dz: dict(a, body_pos=[0, a['body_pos'][1], dz])          # перехлёст: таз догоняет вперёд
+    an['ereb_hand_flurry'] = anim(2.3, [
+        (0, IDLE0), (0.32, b1, IO), (0.40, lerp(b1, a1, 0.35), 'easeInQuad'), (0.455, a1, LIN), (0.52, over(a1, -4.6), 'easeOutQuad'),
+        (0.68, b2, IO), (0.75, lerp(b2, a2, 0.35), 'easeInQuad'), (0.805, a2, LIN), (0.87, over(a2, -6.6), 'easeOutQuad'),
+        (1.03, b3, IO), (1.10, lerp(b3, a3, 0.35), 'easeInQuad'), (1.155, a3, LIN), (1.24, over(a3, -8.4), 'easeOutQuad'),
+        (1.45, a3), (1.8, step_back, IO), (2.3, IDLE0, IO)], [(0.45, 'hit'), (0.8, 'hit'), (1.15, 'hit')])
     # ---------------------------------------------------------------- удар рукой по площади (1.8 с): замах вверх, удар ладонью о землю ВПЕРЕДИ
     # (slam 0.8 — центр удара ≈ 1.6 бл. перед Эребом, см. письмо), рука лежит, возвращается
     point = EA.mod(STAND, left_arm=[-70, 10, -10], head=[8, 0, 0], torso=[4, 0, 0], body=[4, 0, 0], bipedHandRight=[38, 0, 0])
@@ -150,8 +178,26 @@ def build():
                  hand(pos=(6, -26.5, -15), rot=(86, 0, 4), curl=0.15, spread=0.6, thumb=0.0))
     lift = full(STAND, hand(pos=(1, -4, -13), rot=(40, -8, 0), curl=0.2, spread=0.3))
     lift2 = full(STAND, hand(pos=(-2, 1, -5), rot=(24, -14, -4), curl=0.2, spread=0.2))
-    an['ereb_hand_slam'] = anim(1.8, [(0, IDLE0), (0.45, wind, IO), (0.62, over, IC), (0.8, slam, IQ), (0.95, slam2, OC), (1.15, slam2),
-                                      (1.4, lift, IO), (1.6, lift2, IO), (1.8, IDLE0, IO)], [(0.45, 'raise'), (0.8, 'slam')])
+    # эталон Epic Fight (21.11; тики прежние: SLAM_RAISE 9, SLAM_HIT 16): замах 0–0.45 (тело вправо 20°, отклон назад, рука высоко сзади),
+    # взвод до 0.60 (рука выше, пальцы раскрываются), удар 0.60–0.80 (тело доворачивается и наклоняется в удар, левая нога шагает, ладонь
+    # разгоняется сверху вперёд-вниз), жёсткий стоп о землю с отскоком, ладонь лежит до 1.2, поднимается, покой к 2.0
+    wind2 = full(EA.mod(STAND, body=[-6, 20, 0], head=[-16, -12, 0], torso=[-8, 0, 0], left_arm=[-36, -6, -16], cape=[6, 0, 0],
+                        right_leg=[6, -14, 3], left_leg=[-2, -14, -4]),
+                 hand(pos=(4, 12, 6), rot=(-20, -14, 6), curl=0.0, spread=1.0, thumb=0.0))
+    load2 = full(EA.mod(STAND, body=[-8, 22, 0], head=[-18, -12, 0], torso=[-9, 0, 0], left_arm=[-38, -6, -16], cape=[6, 0, 0],
+                        right_leg=[4, -14, 3], left_leg=[-6, -14, -4]),
+                 hand(pos=(4, 13.5, 7), rot=(-26, -14, 6), curl=0.0, spread=1.1, thumb=0.0))
+    slam_b = EA.mod(point, body=[12, -6, 0], body_pos=[0, -1.4, -2.0], cape=[14, 0, 0], left_arm=[-60, 10, -10],
+                    right_arm=[-26, 12, 10], bipedHandRight=[16, 0, 0],
+                    right_leg=[10, 4, 3], left_leg=[-26, 4, -4])
+    slam = full(slam_b, hand(pos=(6, -27.5, -15), rot=(90, 0, 4), curl=0.08, spread=0.7, thumb=0.0))
+    bounce = full(EA.mod(slam_b, body_pos=[0, -1.2, -2.0]), hand(pos=(6, -25.0, -15), rot=(82, 0, 4), curl=0.12, spread=0.65, thumb=0.0))
+    slam2 = full(EA.mod(slam_b, body_pos=[0, -1.3, -2.0]), hand(pos=(6, -26.5, -15), rot=(86, 0, 4), curl=0.15, spread=0.6, thumb=0.0))
+    lift = full(EA.mod(STAND, body_pos=[0, -0.4, -1.0], left_leg=[-12, 0, -4]), hand(pos=(1, -4, -13), rot=(40, -8, 0), curl=0.2, spread=0.3))
+    an['ereb_hand_slam'] = anim(2.0, [(0, IDLE0), (0.45, wind2, OC), (0.60, load2, LIN), (0.72, lerp(load2, slam, 0.4), 'easeInQuad'),
+                                      (0.80, slam, LIN), (0.86, bounce, 'easeOutQuad'), (0.93, slam2, 'easeInQuad'), (1.2, slam2),
+                                      (1.5, lift, IO), (1.75, full(STAND, hand(pos=(-2, 1, -5), rot=(24, -14, -4), curl=0.2, spread=0.2)), IO),
+                                      (2.0, IDLE0, IO)], [(0.45, 'raise'), (0.8, 'slam')])
     # ---------------------------------------------------------------- хватка: тянется вперёд (grab 0.6), держит, сжимает, отпускает
     reach_b = EA.mod(STAND, left_arm=[-40, 6, -12], head=[4, 0, 0], torso=[3, 0, 0])
     reach = full(reach_b, hand(pos=(7, -11, -25), rot=(8, -2, 4), curl=0.0, spread=1.0, thumb=0.0))
@@ -334,6 +380,9 @@ def build():
     an['ereb_hand_reflection_strike'] = anim(1.0, [(0, pre_r), (0.45, lunge, OQ), (0.7, lunge), (1.0, guard, IO)],
                                              [(0.0, 'appear'), (0.45, 'hit'), (0.9, 'gone')])
     an.update(build_spells2(pre_r, lunge, guard))
+    # T32 «Сломать блок»: призрачная рука отводит защиту, укол стеклянной рапирой (tools/guard_break_ereb_hand.py)
+    import guard_break_ereb_hand
+    an['ereb_hand_guard_break'] = guard_break_ereb_hand.build()
     return an
 
 

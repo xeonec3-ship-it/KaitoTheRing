@@ -67,6 +67,8 @@ public final class BossCore {
     private int enrageStage;
     /** Protection against cheese and control (BossGuard): windows, counted players, pillar watch. */
     final BossGuard.State guard = new BossGuard.State();
+    /** T32 «Сломать блок» (BossGuardBreak): cooldown, the blow in progress. */
+    final BossGuardBreak.State guardBreak = new BossGuardBreak.State();
 
     public BossCore(PohBoss boss, BossDef def) {
         this.boss = boss;
@@ -214,6 +216,7 @@ public final class BossCore {
         if (!started || dead) return;
         BossGuard.tick(this, boss);
         BossReplica.tick(this, boss, replica);
+        BossGuardBreak.tick(this, boss, guardBreak);
         enrage();
         float frac = healthFrac();
         if (!finale) {
@@ -272,6 +275,8 @@ public final class BossCore {
         amount = BossGuard.filter(this, src, amount);
         if (def.finale != BossDef.Finale.DEATH) amount = BossMath.clipToFloor(mob.getHealth(), amount, (float) (def.finaleAt * mob.getMaxHealth()));
         if (amount > 0) guard.lastDamage = mob.level().getGameTime();
+        guard.filterTime = mob.level().getGameTime();
+        guard.filtered = amount;
         if (amount > 0 && src.getEntity() instanceof Player p)
             damageBy.computeIfAbsent(p.getUUID(), k -> new ArrayDeque<>()).add(new double[] {mob.level().getGameTime(), amount});
         return amount;
@@ -572,6 +577,14 @@ public final class BossCore {
     /** Mechanics (walls, snapped threads...: pohsmp_core:boss_mechanic): through armour and enchantments, a share of the victim's health. */
     public DamageSource mechanicDamage() {
         return source("boss_mechanic");
+    }
+
+    /**
+     * T32 «Сломать блок» (pohsmp_core:boss_guard_break): as boss_attack (armour counts, no difficulty scaling), but in
+     * epicfight:unblockable — the Epic Fight guard and parry do not stop it.
+     */
+    public DamageSource guardBreakSource() {
+        return source("boss_guard_break");
     }
 
     // ---------------------------------------------------------------- save

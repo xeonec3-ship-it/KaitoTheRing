@@ -283,6 +283,25 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
         return new Vec3(p.x, Mth.lerp(h[0], from.y, holdPoint.y) + h[1], p.z);
     }
 
+    // ---------------------------------------------------------------- T32 «Сломать блок» (framework BossGuardBreak)
+
+    /** Not during Tyros's own swing / cast / broken stance (his melee is Tyros's AI: the heavy hit is attack_damage, the default). */
+    @Override
+    public boolean guardBreakFree() {
+        return !core.locked() && !isAnimating() && !isCasting() && !isStanceBroken() && !isHalfHealthAttacking();
+    }
+
+    /** TEMP_GUARD_BREAK: cult_leader_guard_break comes after the scythe grip letter (planned hit 14, length 36). */
+    @Override
+    public ru.pohsmp.core.boss.BossGuardBreak.Timing guardBreakTiming() {
+        return ru.pohsmp.core.boss.BossGuardBreak.Timing.TEMP;
+    }
+
+    @Override
+    public void playGuardBreak(String animation) {
+        serverTriggerAnimation(animation);
+    }
+
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика» (framework BossReplica)
 
     /** His break: cult_leader_replica_break (2.6 s, crush 0.9, speak 1.9), «Эта фальшивка на меня не сработает» on +4.2. */

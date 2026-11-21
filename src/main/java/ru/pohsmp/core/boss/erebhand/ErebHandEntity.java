@@ -287,6 +287,18 @@ public class ErebHandEntity extends ErebHandBody implements PohBoss {
 
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика»
 
+    // ---------------------------------------------------------------- T32 «Сломать блок» (framework BossGuardBreak): ereb_hand_guard_break
+
+    @Override
+    public boolean guardBreakFree() {
+        return fight.guardBreakFree();
+    }
+
+    @Override
+    public double guardBreakDamage() {
+        return fight.guardBreakDamage();
+    }
+
     /** ereb_hand_replica_break 2.3 s: snap 0.55, break 0.95, speak 1.55; «Ложь во лжи - Становится правдой сама по себе». The fx is
      * T30's ereb_replica_break (the visual assistant: the same timing, no T31 one). */
     @Override

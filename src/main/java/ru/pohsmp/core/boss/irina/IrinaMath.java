@@ -35,7 +35,7 @@ public final class IrinaMath {
     public static final int REPLICA_DELAY = 40, REPLICA_ANIM = 44, REPLICA_BREAK = 20, REPLICA_SPEAK = 25;
 
     // ---- attacks (animation lengths and their event ticks)
-    public static final int STAFF = 24, STAFF_HIT = 11;
+    public static final int STAFF = 36, STAFF_HIT = 11;   // 36: irina_staff_attack по эталону Epic Fight (21.11, длина 1.8 с)
     public static final int MARK = 28, MARK_AT = 14;
     public static final int BIND = 32, BIND_AT = 18;
     public static final int WHIP_WARN = 16, WHIP = WHIP_WARN + 20, WHIP_LASH = WHIP_WARN + 9;

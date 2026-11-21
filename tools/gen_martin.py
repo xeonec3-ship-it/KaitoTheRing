@@ -1057,15 +1057,12 @@ def anims(m):
             a.sample = sample
         return a
 
-    # ---------------------------------------------------------------- idle: двуручник в стойке, тяжёлое дыхание
-    def idle(t):
-        br = math.sin(TAU * t / 3.0)
-        o = {'body': {'pos': [0, -0.3 + 0.15 * br, 0]}, 'torso': {'rot': [2 + 0.8 * br, 8, 0]}, 'head': {'rot': [-2 - 0.6 * br, -6, 0]},
-             'right_leg': {'rot': [-8, 14, 3]}, 'left_leg': {'rot': [10, -10, -3]}}
-        cape_follow(t, o)
-        g(o, np.add(GUARD[0], [0, 0.25 * br, 0]), GUARD[1])
-        return vis(o)
-    A('idle', 3.0, True).sample(idle, 0.1)
+    # ---------------------------------------------------------------- idle, swing, overhead, thrust, shield_bash — по эталону Epic Fight
+    # (пилот 21.11, tools/gen_martin_ef.py; правила — docs/specs/anim_style_epicfight.md)
+    import gen_martin_ef as EF
+    EF.define(A, m, sys.modules[__name__], g, sf)
+    import guard_break_martin as GB          # T32 «Сломать блок» (навершие в блок, затем щит)
+    GB.define(A, m, sys.modules[__name__], g, sf)
 
     # ---------------------------------------------------------------- walk: тяжёлый шаг, меч на плече, свободная рука качается
     def walk(t):
@@ -1082,86 +1079,6 @@ def anims(m):
     a.sample(walk, 0.05)
     a.instruction(0.4, 'step')
     a.instruction(1.2, 'step')
-
-    # ---------------------------------------------------------------- swing: горизонтальный размах справа налево (удар 0.75)
-    def swing(t):
-        k = float(track(t, [(0, 0), (0.55, 1), (0.75, 2, 'in'), (1.0, 2.4, 'out'), (1.6, 3)]))
-        P = [GUARD[0], (7.0, 18.0, -1.0), (-2.5, 16.5, -8.0), (-6.0, 15.0, -3.0), GUARD[0]]
-        D = [GUARD[1], (0.9, 0.3, 0.3), (-0.95, 0.12, -0.3), (-0.55, -0.1, 0.83), GUARD[1]]
-        i = min(3, int(k))
-        f = k - i
-        hand = np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f
-        d = lerp_dir(D[i], D[i + 1], f)
-        tw = float(track(t, [(0, 0), (0.55, 1), (0.8, -1, 'in'), (1.0, -1.1), (1.6, 0)]))
-        o = {'body': {'rot': [0, -30 * tw, 0], 'pos': [0, -0.6 * abs(tw), -1.2 * max(0, -tw)]}, 'torso': {'rot': [4, -20 * tw, -3 * tw]},
-             'right_leg': {'rot': [10 * tw, 18 * tw, 0]}, 'left_leg': {'rot': [-12 * tw, 10 * tw, 0]}, 'head': {'rot': [0, 22 * tw, 0]}}
-        cape_follow(t, o, lag=8 * abs(tw))
-        g(o, hand, d)
-        return vis(o)
-    a = A('swing', 1.6)
-    a.sample(swing, 0.04)
-    a.instruction(0.62, 'swing')
-    a.instruction(0.75, 'hit')
-
-    # ---------------------------------------------------------------- overhead: рубящий сверху, клинок в землю (удар 0.95)
-    def overhead(t):
-        k = float(track(t, [(0, 0), (0.7, 1, 'out'), (0.95, 2, 'in'), (1.5, 2), (2.0, 3)]))
-        # замах из-за правого плеча (была кисть над макушкой — внутри шлема, клинок резал рога)
-        P = [GUARD[0], (5.5, 30.0, 2.0), (0.5, 12.5, -9.0), (0.5, 12.5, -9.0), GUARD[0]]
-        D = [GUARD[1], (0.15, 0.35, 0.92), (0.0, -0.5, -0.87), (0.0, -0.5, -0.87), GUARD[1]]
-        i = min(3, int(k))
-        f = k - i
-        hand = np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f + AROUND_HEAD * math.sin(math.pi * f) * (i == 0)
-        d = lerp_dir(D[i], D[i + 1], f)
-        up = float(track(t, [(0, 0), (0.7, 1, 'out'), (0.95, -1, 'in'), (1.5, -1), (2.0, 0)]))
-        dn = max(0, -up)
-        o = {'body': {'pos': [0, -2.4 * dn, -1.6 * dn]}, 'torso': {'rot': [-10 * max(0, up) + 30 * dn, 0, 0]},
-             'head': {'rot': [8 * max(0, up) - 20 * dn, 0, 0]},
-             'right_leg': {'rot': [40 * dn, 0, 4]}, 'left_leg': {'rot': [-34 * dn, 0, -4]}}    # вперёд левая: клинок справа от неё
-        cape_follow(t, o, lag=-6 * max(0, up) + 14 * dn)
-        g(o, hand, d)
-        return vis(o)
-    a = A('overhead', 2.0)
-    a.sample(overhead, 0.04)
-    a.instruction(0.82, 'swing')
-    a.instruction(0.95, 'hit')
-
-    # ---------------------------------------------------------------- thrust: выпад (удар 0.6), корпус уходит вперёд
-    def thrust(t):
-        k = float(track(t, [(0, 0), (0.4, 1), (0.6, 2, 'in'), (0.9, 2), (1.4, 3)]))
-        P = [GUARD[0], (4.5, 16.0, 1.5), (1.0, 17.0, -11.0), (1.0, 17.0, -11.0), GUARD[0]]
-        D = [GUARD[1], (-0.05, 0.08, -1.0), (0, 0.02, -1.0), (0, 0.02, -1.0), GUARD[1]]
-        i = min(3, int(k))
-        f = k - i
-        hand = np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f
-        d = lerp_dir(D[i], D[i + 1], f)
-        l = float(track(t, [(0, 0), (0.4, -0.3), (0.6, 1, 'in'), (0.9, 1), (1.4, 0)]))
-        o = {'body': {'pos': [0, -1.4 * max(0, l), -6 * max(0, l)]}, 'torso': {'rot': [12 * max(0, l), -24 * l, 0]},
-             'right_leg': {'rot': [-42 * max(0, l), 0, 0]}, 'left_leg': {'rot': [36 * max(0, l), 0, 0]}, 'head': {'rot': [-8 * max(0, l), 20 * l, 0]}}
-        cape_follow(t, o, lag=16 * max(0, l))
-        g(o, hand, d)
-        return vis(o)
-    a = A('thrust', 1.4)
-    a.sample(thrust, 0.04)
-    a.instruction(0.6, 'hit')
-
-    # ---------------------------------------------------------------- shield_bash: щит в руку, рывок (dash 0.45–0.75), удар 0.75
-    def bash(t):
-        k = float(track(t, [(0, 0), (0.35, 1), (1.15, 1), (1.5, 0)]))
-        d = float(track(t, [(0, 0), (0.45, 0), (0.75, 1, 'in'), (0.85, 1.1), (1.5, 0)]))
-        o = {'body': {'pos': [0, -1.0 * k, -2 * d], 'rot': [0, 20 * k, 0]}, 'torso': {'rot': [16 * k, 12 * k, 0]},
-             'right_leg': {'rot': [-30 * d, 0, 0]}, 'left_leg': {'rot': [30 * d, 0, 0]}, 'head': {'rot': [-8 * k, -18 * k, 0]}}
-        if k > 0.01:
-            sf(o, (-1.5, 15.5, -6.5 - 1.5 * d), tilt=-6 * d, yaw=-14, w=min(1, k * 1.3))
-        cape_follow(t, o, lag=18 * d)
-        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([6.5, 14.0, 2.0]) * k + np.array([3.0, 0.0, -2.0]) * math.sin(math.pi * k),
-          lerp_dir(GUARD[1], (0.35, 0.3, 0.88), k), left=0)
-        return vis(o, shield_hand=0.12 < t < 1.4)
-    a = A('shield_bash', 1.5)
-    a.sample(bash, 0.04)
-    a.instruction(0.12, 'shield_draw')
-    a.instruction(0.45, 'dash')
-    a.instruction(0.75, 'hit')
 
     # ---------------------------------------------------------------- command: «в атаку!» — меч вверх-вперёд одной рукой, рёв (0.85)
     def command(t):

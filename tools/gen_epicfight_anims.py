@@ -724,15 +724,17 @@ WHIP_TRAIL_R = dict(WHIP_HOLD_R, blade=(0.25, -0.75, -0.6), edge=(0, -0.6, 0.8))
 
 
 def whip_idle():
-    """Стойка с хлыстом: рука с рукоятью опущена чуть вбок и вперёд, кисть медленно покачивает хлыстом, лёгкое дыхание. 3 с."""
-    base = _merge(STANCE_BODY, P(hand_r=WHIP_HOLD_R, hand_l=FREE_BODY_L, foot_r={'pos': (0.16, 0.05, 0), 'frame': 'body'},
-                                 foot_l={'pos': (-0.15, -0.06, 0), 'frame': 'body'}, root={'pos': (0, 0, -0.01), 'yaw': 8}))
+    """Стойка с хлыстом: рука с рукоятью опущена чуть вбок и вперёд, кисть медленно покачивает хлыстом. 3 с.
+    Эталон Epic Fight (21.11): вполоборота (таз вправо 32°, голова на цель), правая нога впереди, один вдох за петлю (3 с)."""
+    base = _merge(STANCE_BODY, P(hand_r=WHIP_HOLD_R, hand_l=FREE_BODY_L, foot_r={'pos': (0.16, 0.17, 0), 'frame': 'body'},
+                                 foot_l={'pos': (-0.15, -0.15, 0), 'frame': 'body'}, root={'pos': (0, 0, -0.01), 'yaw': 32},
+                                 head=(0, -28, 0)))
     sway = lambda dx, dy, dz: dict(WHIP_HOLD_R, pos=(0.33 + dx, 0.12 + dy, 0.84 + dz))
     return [
         (0, base),
-        (15, P(chest=(-1.5, 2, 0), head=(-1, -3, 0), root={'pos': (0, 0, -0.025), 'yaw': 8}, hand_r=sway(0.03, 0.06, 0.02))),
-        (30, P(chest=(0, 0, 0), head=(0, 0, 0), root={'pos': (0, 0, -0.01), 'yaw': 8}, hand_r=sway(-0.02, -0.03, -0.01))),
-        (45, P(chest=(-1.5, -2, 0), head=(-1, 3, 0), root={'pos': (0, 0, -0.025), 'yaw': 8}, hand_r=sway(0.02, 0.08, 0.03))),
+        (15, P(chest=(-0.8, 1, 0), head=(-0.5, -29.5, 0), root={'pos': (0, 0, -0.018), 'yaw': 33}, hand_r=sway(0.03, 0.06, 0.02))),
+        (30, P(chest=(-1.5, 0, 0), head=(-1, -28, 0), root={'pos': (0, 0, -0.025), 'yaw': 32}, hand_r=sway(-0.02, -0.03, -0.01))),
+        (45, P(chest=(-0.8, -1, 0), head=(-0.5, -26.5, 0), root={'pos': (0, 0, -0.018), 'yaw': 31}, hand_r=sway(0.02, 0.08, 0.03))),
         (60, base),
     ]
 
@@ -808,17 +810,45 @@ BEATS = {
     'whip_walk': ('Шаг с хлыстом', 'Хлыст волочится следом.', [(0, 'правая вперёд'), (10, 'левая вперёд'), (20, 'цикл')]),
     'whip_run': ('Бег с хлыстом', 'Рука отведена, хлыст летит за спиной.', [(0, 'правая вперёд'), (6, 'левая вперёд'), (12, 'цикл')]),
 }
+def ef_body(keys, yaw=1.45, chest=1.4, fwd=2.0, step=1.5):
+    """Эталон Epic Fight (владелец 21.11; docs/specs/anim_style_epicfight.md): в тех же тиках и длинах (фазы удара заданы в Java —
+    EmberEpicFight, менять их — баланс оружия) больше работы тела: разворот таза (root yaw) и груди (chest/torso yaw) шире, таз подаётся
+    вперёд в пределах позы (Coord остаётся нулевым — игрок не перемещается), шаг стопы в удар длиннее (y стопы в осях тела)."""
+    out = []
+    for k in keys:
+        t, p, *rest = k
+        q = json.loads(json.dumps(p))
+        r = q.get('root')
+        if isinstance(r, dict):
+            if 'yaw' in r:
+                r['yaw'] = r['yaw'] * yaw
+            if 'pos' in r and t > 0:
+                x, y, z = r['pos']
+                r['pos'] = (x, y * fwd, z)
+        for part in ('chest', 'torso'):
+            if part in q and isinstance(q[part], (list, tuple)):
+                a_, b_, c_ = q[part]
+                q[part] = (a_, b_ * chest, c_)
+        for f in ('foot_r', 'foot_l'):
+            if f in q and isinstance(q[f], dict) and q[f].get('frame') == 'body' and t > 0:
+                x, y, z = q[f]['pos']
+                base = 0.02 if f == 'foot_r' else -0.02
+                q[f] = dict(q[f], pos=(x, base + (y - base) * step, z))
+        out.append((t, q, *rest))
+    return out
+
+
 ANIMS = {
     'last_heat': last_heat,
     'fire_vortex': fire_vortex,
-    'whip1': whip1,
-    'whip2': whip2,
-    'whip3': whip3,
-    'sword1': sword1,
-    'sword2': sword2,
-    'sword3': sword3,
-    'sword4': sword4,
-    'sword_dash': sword_dash,
+    'whip1': lambda: ef_body(whip1()),
+    'whip2': lambda: ef_body(whip2()),
+    'whip3': lambda: ef_body(whip3(), yaw=1.0, chest=1.0),
+    'sword1': lambda: ef_body(sword1()),
+    'sword2': lambda: ef_body(sword2()),
+    'sword3': lambda: ef_body(sword3(), yaw=1.0, chest=1.0, fwd=1.0, step=1.0),
+    'sword4': lambda: ef_body(sword4(), yaw=1.0, chest=1.0),
+    'sword_dash': lambda: ef_body(sword_dash(), fwd=1.0, step=1.0),
     'sword_air': sword_air,
     'whip_idle': whip_idle,
     'whip_walk': whip_walk,

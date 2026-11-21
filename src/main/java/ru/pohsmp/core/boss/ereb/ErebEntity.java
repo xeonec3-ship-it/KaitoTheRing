@@ -272,6 +272,18 @@ public class ErebEntity extends ErebBody implements PohBoss {
         fight.finisher(sl, victim);
     }
 
+    // ---------------------------------------------------------------- T32 «Сломать блок» (framework BossGuardBreak): ereb_guard_break
+
+    @Override
+    public boolean guardBreakFree() {
+        return fight.guardBreakFree();
+    }
+
+    @Override
+    public void onGuardBreakStart(ServerPlayer target) {
+        fight.onGuardBreak();
+    }
+
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика»
 
     /** ereb_replica_break 2.3 s: snap 0.55, break 0.95, speak 1.55; «Прекрасная копия, увы не идеальная» over his head. */

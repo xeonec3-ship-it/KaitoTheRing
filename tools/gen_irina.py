@@ -821,18 +821,18 @@ def anims():
         # правую ногу, посох над правым плечом, крюк за шляпой), взвод до 0.42 (левая нога отрывается), удар 0.42–0.58 без остановки
         # на ключах (левая нога шагает вперёд, таз вперёд и вниз, тело доворачивается влево, крюк — по дуге сверху вперёд-вниз),
         # перехлёст до 0.66, держит до 1.0, отшаг и стойка к 1.8.
-        wind = P(body=[-4, 44, 0], body_pos=[0, 0, 0.8], torso=[-8, 8, 0], head=[-8, -8, 0], right_arm=[-88, 30, 74],
-                 left_arm=[-40, 0, -30], right_leg=[10, -30, 0], left_leg=[-4, -30, 0])
-        load = P(body=[-5, 50, 0], body_pos=[0, 0, 1.0], torso=[-9, 9, 0], head=[-8, -8, 0], right_arm=[-92, 32, 78],
-                 left_arm=[-42, 0, -32], right_leg=[10, -32, 0], left_leg=[-12, -32, 0])
+        wind = P(body=[-4, 56, 0], body_pos=[0, 0, 0.8], torso=[-8, 8, 0], head=[-8, -18, 0], right_arm=[-88, 30, 74],
+                 left_arm=[-40, 0, -30], right_leg=[10, -42, 0], left_leg=[-4, -42, 0])
+        load = P(body=[-5, 62, 0], body_pos=[0, 0, 1.0], torso=[-9, 9, 0], head=[-8, -18, 0], right_arm=[-92, 32, 78],
+                 left_arm=[-42, 0, -32], right_leg=[10, -44, 0], left_leg=[-12, -44, 0])
         mid = P(body=[6, 22, 0], body_pos=[0, -0.3, -1.2], torso=[4, 2, 0], head=[0, -14, 0], right_arm=[-92, 24, 34],
                 left_arm=[-30, 0, -28], right_leg=[10, -14, 0], left_leg=[-14, -14, 0])
         hit = P(body=[16, -12, 0], body_pos=[0, -0.8, -3.6], torso=[14, -6, 0], head=[6, 12, 0], right_arm=[-40, 0, 8],
                 left_arm=[-20, 0, -28], right_leg=[14, 10, 0], left_leg=[-16, 10, 0])
-        fol = P(body=[20, -26, 0], body_pos=[0, -0.9, -4.2], torso=[18, -8, 0], head=[8, 22, 0], right_arm=[-12, -8, 6],
-                left_arm=[-16, 0, -30], right_leg=[14, 18, 0], left_leg=[-16, 18, 0])
-        hold = P(body=[17, -20, 0], body_pos=[0, -0.8, -4.0], torso=[15, -6, 0], head=[6, 18, 0], right_arm=[-20, -6, 6],
-                 left_arm=[-18, 0, -28], right_leg=[14, 14, 0], left_leg=[-16, 14, 0])
+        fol = P(body=[20, -40, 0], body_pos=[0, -0.9, -4.2], torso=[18, -8, 0], head=[8, 34, 0], right_arm=[-12, -8, 6],
+                left_arm=[-16, 0, -30], right_leg=[14, 32, 0], left_leg=[-16, 32, 0])
+        hold = P(body=[17, -32, 0], body_pos=[0, -0.8, -4.0], torso=[15, -6, 0], head=[6, 28, 0], right_arm=[-20, -6, 6],
+                 left_arm=[-18, 0, -28], right_leg=[14, 26, 0], left_leg=[-16, 26, 0])
         back = P(body=[6, 12, 0], body_pos=[0, -0.2, -1.6], torso=[4, 0, 0], head=[0, -10, 0], right_arm=[-40, 0, 10],
                  right_leg=[10, -6, 0], left_leg=[-10, -6, 0])
         side = P(body=[0, 30, 0], body_pos=[0, 0, 0.4], torso=[-4, 4, 0], head=[-4, -20, 0], right_arm=[-60, 20, 62], left_arm=[-38, 0, -28])

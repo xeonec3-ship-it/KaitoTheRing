@@ -85,14 +85,20 @@ def anim(length, keys, timeline=None, loop=False):
     return EA.anim(length, keys, timeline, loop)
 
 
+IDLE_T = 2.8          # петля покоя: один вдох (эталон Epic Fight: период дыхания 2.2–2.9 с)
+
+
 def idle_pose(t):
-    """Поза покоя в момент t (петля 4 с): дыхание, перенос веса, рука парит (±0.6), пальцы медленно перебирают, накидка колышется."""
-    ph = math.sin(t * math.pi / 2)
-    ph2 = math.sin(t * math.pi / 2 + 1.1)
-    body = EA.mod(STAND, torso=[-1.5 * abs(ph), 0, 0], body_pos=[0, 0.12 * abs(ph), 0], head=[-3 + 1.5 * ph, 8 + 4 * ph, 0],
-                  coat_front_r=[-3, 0, 2 + 1.2 * ph], coat_front_l=[2, 0, -2 + 1.2 * ph], coat_back_r=[1.5 * ph, 0, 1.0 * ph],
-                  coat_back_l=[1.5 * ph, 0, 1.0 * ph], right_arm=[-14 + 2 * ph, 12, 7], cape=[2.4 + 0.8 * ph2, 0, 0.4 * ph],
-                  cape_mid=[1.2 + 1.0 * math.sin(t * math.pi / 2 + 1.9), 0, 0.3 * ph2], cape_low=[0.6 + 1.2 * math.sin(t * math.pi / 2 + 2.7), 0, 0.3 * ph])
+    """Поза покоя в момент t (петля IDLE_T): дыхание, перенос веса, рука парит (±0.6), пальцы медленно перебирают, накидка колышется.
+    Эталон Epic Fight (21.11, как у Эреба): вполоборота — плечи и таз правым боком к цели (−30°), голова на цель, правая нога впереди."""
+    w = 2 * math.pi * t / IDLE_T
+    ph = math.sin(w)
+    ph2 = math.sin(w + 1.1)
+    body = EA.mod(STAND, body=[0, -30 + 1.2 * ph2, 0], torso=[-0.8 * ph, 0, 0], body_pos=[0.15 * ph2, 0.1 * ph, 0],
+                  head=[-3 + 1.0 * ph, 38 + 3 * ph2, 0], right_leg=[-10, 22, 3], left_leg=[10, 20, -4],
+                  coat_front_r=[-6, 0, 2 + 1.2 * ph], coat_front_l=[6, 0, -2 + 1.2 * ph], coat_back_r=[3 + 1.5 * ph, 0, 1.0 * ph],
+                  coat_back_l=[3 + 1.5 * ph, 0, 1.0 * ph], right_arm=[-14 + 1.5 * ph, 12, 7], cape=[2.4 + 0.8 * ph2, 0, 0.4 * ph],
+                  cape_mid=[1.2 + 1.0 * math.sin(w + 1.9), 0, 0.3 * ph2], cape_low=[0.6 + 1.2 * math.sin(w + 2.7), 0, 0.3 * ph])
     gh = hand(pos=(0, 0.6 * ph2, 0), rot=(14 + 2 * ph, -18 + 3 * ph2, -6 + 2 * ph), curl=0.22 + 0.06 * ph2, ripple=0.08 * ph, thumb=0.15)
     return full(body, gh)
 
@@ -103,7 +109,7 @@ IDLE0 = idle_pose(0)
 def build():
     an = {}
     # ---------------------------------------------------------------- покой (4 с, петля)
-    an['ereb_hand_idle'] = anim(4.0, [(i * 0.5, idle_pose(i * 0.5), IO) for i in range(9)], loop=True)
+    an['ereb_hand_idle'] = anim(IDLE_T, [(i * IDLE_T / 8, idle_pose(i * IDLE_T / 8), IO) for i in range(9)], loop=True)
     # поза покоя (2 с, петля, без колыхания рук — для ожидания вне боя / заставки)
     still = full(STAND, hand(pos=(0, -0.5, 0.5), rot=(18, -18, -6), curl=0.35, thumb=0.3))
     an['ereb_hand_rest'] = anim(2.0, [(0, still), (1.0, full(EA.mod(STAND, torso=[-1, 0, 0]), hand(pos=(0, -0.2, 0.5), rot=(18, -18, -6),

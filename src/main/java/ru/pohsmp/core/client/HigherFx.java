@@ -89,6 +89,10 @@ public final class HigherFx {
             PohHud.flash(m.dur, m.i);
             return;
         }
+        if (m.kind == HFx.VIEW) {   // owner 21.11: far chunks of a scene (spell.RemoteView)
+            RemoteChunksClient.window(m.key, m.a, m.b, m.dur);
+            return;
+        }
         if (m.kind == HFx.WHIP) {   // T14: the physics whip of the fire sword-whip strikes
             EmberWhipClient.strike(m);
             return;

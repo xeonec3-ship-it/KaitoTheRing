@@ -389,7 +389,8 @@ public final class Fx {
     }
 
     private static boolean near(ServerPlayer p, FxMsg m) {
-        return p.distanceToSqr(m.x, m.y, m.z) < RANGE * RANGE || (m.hasTarget && p.distanceToSqr(m.tx, m.ty, m.tz) < RANGE * RANGE);
+        return p.distanceToSqr(m.x, m.y, m.z) < RANGE * RANGE || (m.hasTarget && p.distanceToSqr(m.tx, m.ty, m.tz) < RANGE * RANGE)
+                || ru.pohsmp.core.spell.RemoteView.covers(p, m.x, m.z);   // owner 21.11: a far scene place shown to this player
     }
 
     private static void offer(ServerLevel sl, ServerPlayer p, Active a) {

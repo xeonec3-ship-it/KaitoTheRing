@@ -140,7 +140,8 @@ public final class Net {
                 CLOSURE_CAST = 24, CLOSURE = 25, CLOSURE_HIT = 26, ANIM = 27,
                 JOINT = 28,   // joint cast: a = caster, b = partner, dur, f = sigil radius, i = (school sigil << 24) | color
                 WHIP = 29,    // T14 whip strike: a = holder, b = 0 lash / 1 vortex, dur = ticks, x = facing angle atan2(z, x), y = lash direction ±1, f = half arc
-                CLOSURE_CRACK = 30;   // cracks on a barrier dome: a, b = normal yaw/pitch x1000, x y z = touch point, dur = ticks, f = radius, i = color
+                CLOSURE_CRACK = 30,   // cracks on a barrier dome: a, b = normal yaw/pitch x1000, x y z = touch point, dur = ticks, f = radius, i = color
+                VIEW = 31;    // a far chunk window (spell.RemoteView): key = window id, a, b = centre chunk x, z, dur = radius (-1: the window ends)
         public final byte kind;
         public final int key, a, b, dur, i;
         public final float x, y, z, f;

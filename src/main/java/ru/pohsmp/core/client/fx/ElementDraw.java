@@ -563,8 +563,9 @@ public final class ElementDraw {
             double rad = range(p, "radius", 4, jr) * s, w = range(p, "width", 0.1, jw) * s, br = range(p, "brightness", 1, jb);
             double al = a * br * (1 - fl * 0.5 * (1 + Math.sin(te * 0.9 + ph)));
             Vec3 base = at.add(Math.cos(ang) * rad, 0, Math.sin(ang) * rad);
-            double len = h * g;
-            if (fromTop) FxDraw.pillar(vc, f, base.add(0, h - len, 0), len, w, col, al, al, 1, 0);
+            double hi = p.has("height") && p.get("height").isJsonArray() ? range(p, "height", 6, ph / 10) * s : h;   // [min, max] per beam
+            double len = hi * g;
+            if (fromTop) FxDraw.pillar(vc, f, base.add(0, hi - len, 0), len, w, col, al, al, 1, 0);
             else FxDraw.pillar(vc, f, base, len, w, col, al, al, 1, (float) (1 - g));
         }
     }

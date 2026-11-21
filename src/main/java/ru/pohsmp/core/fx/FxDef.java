@@ -27,8 +27,32 @@ public record FxDef(String id, String style, int duration, List<Element> element
             return t >= delay && t < end();
         }
 
+        /**
+         * A number parameter. Tolerant (T34: one `"tumble": true` or `"height": [8, 14]` threw while drawing and the client silently
+         * dropped the whole effect — Ereb's intro, the Hand's false death and ~70 others): true/false = 1/0, an array [a, b] = its
+         * middle (elements that want a random value per piece read it with ElementDraw.range), anything else = the default.
+         */
         public double num(String key, double def) {
-            return params.has(key) ? params.get(key).getAsDouble() : def;
+            return params.has(key) ? asNum(params.get(key), def) : def;
+        }
+
+        public static double asNum(com.google.gson.JsonElement e, double def) {
+            if (e == null || e.isJsonNull()) return def;
+            if (e.isJsonPrimitive()) {
+                var p = e.getAsJsonPrimitive();
+                if (p.isNumber()) return p.getAsDouble();
+                if (p.isBoolean()) return p.getAsBoolean() ? 1 : 0;
+                try {
+                    return Double.parseDouble(p.getAsString());
+                } catch (NumberFormatException ex) {
+                    return def;
+                }
+            }
+            if (e.isJsonArray() && !e.getAsJsonArray().isEmpty()) {
+                var a = e.getAsJsonArray();
+                return (asNum(a.get(0), def) + asNum(a.get(a.size() - 1), def)) / 2;
+            }
+            return def;
         }
 
         public String str(String key, String def) {

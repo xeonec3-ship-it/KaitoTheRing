@@ -545,6 +545,10 @@ def write(M):
            'comment': 'T31 Эреб, Длань Лжи: все анимации casting_animations.json Iron\'s (те же имена — их зовёт AbstractSpellCastingMob) + '
                       'ereb_hand_* (наши). Сгенерировано tools/gen_ereb_hand.py (tools/gen_ereb_hand_anims.py) — правьте генератор.',
            'animations': {**src['animations'], **ours}}
+    # 21.11: GeckoLib 4.8.4 поворачивает рапиру кистью дважды — ключи кисти (подобраны по превью с одним поворотом) → видимый поворот.
+    # ereb_hand_guard_break (T32) — не трогаю: его считает guard_break_lib, автор правит сам.
+    import anim_cloth
+    anim_cloth.visible_hand(doc['animations'], [k for k in ours if k != 'ereb_hand_guard_break'])
     with open(M.out('animations/entity/ereb_hand.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
         f.write('\n')

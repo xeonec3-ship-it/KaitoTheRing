@@ -140,7 +140,10 @@ function buildModel(entry, soul) {
     bones.bipedHandRight.add(sg);
   }
   // предмет из models/item/*.json (рапира): бруски с поворотом вокруг origin; хват — как ванильный handheld в руке
-  if (entry.item && bones.bipedHandRight) bones.bipedHandRight.add(buildItem(entry.item));
+  if (entry.item && bones.bipedHandRight) {
+    // GeckoLib 4.8.4 (BlockAndItemGeoLayer): предмет поворачивается поворотом кисти ВТОРОЙ раз — группа h2 повторяет поворот кисти (pose)
+    const h2 = new THREE.Group(); h2.add(buildItem(entry.item)); bones.bipedHandRight.add(h2); bones.bipedHandRight.userData.hand2 = h2;
+  }
   return { root, bones };
 }
 
@@ -207,6 +210,7 @@ function pose(model, anim, t) {
     g.position.set(u.base[0] - p[0], u.base[1] + p[1], u.base[2] + p[2]);
     g.rotation.set(u.rest[0] - r[0] * Math.PI / 180, u.rest[1] - r[1] * Math.PI / 180, u.rest[2] + r[2] * Math.PI / 180, 'ZYX');
     g.scale.set(Math.max(1e-4, s[0]), Math.max(1e-4, s[1]), Math.max(1e-4, s[2]));
+    if (u.hand2) u.hand2.rotation.copy(g.rotation);
   }
 }
 function flameFrame(model, tick) { model.root.traverse(o => { if (o.userData.flame) o.userData.flame.offset.y = 1 - ((Math.floor(tick / 2) % 8) + 1) / 8; }); }

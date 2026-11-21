@@ -448,6 +448,34 @@ def V(h):
     return _m_euler(Rh)
 
 
+def visible_hand(anims, names):
+    """Ключи поворота bipedHandRight, подобранные по превью с ОДНИМ поворотом предмета (до 21.11), переводятся в ключи для игры:
+    каждый ключ k → V(k), тогда в игре (двойной поворот GeckoLib) предмет повёрнут ровно как на превью. Вызывать ОДИН раз на свежесобранных
+    анимациях (повторный вызов снова уполовинит поворот)."""
+    def conv(v):
+        try:
+            return V(v)
+        except ValueError:                                   # ровно 180°: половина неоднозначна — берём покомпонентно
+            return [round(x / 2, 2) for x in v]
+    n = 0
+    for name in names:
+        ch = anims.get(name, {}).get('bones', {}).get('bipedHandRight', {}).get('rotation')
+        if not isinstance(ch, dict):
+            if isinstance(ch, list):
+                anims[name]['bones']['bipedHandRight']['rotation'] = conv(ch)
+                n += 1
+            continue
+        for t, k in ch.items():
+            if isinstance(k, list):
+                ch[t] = conv(k)
+            elif isinstance(k, dict):
+                for f in ('vector', 'pre', 'post'):
+                    if isinstance(k.get(f), list):
+                        k[f] = conv(k[f])
+            n += 1
+    return n
+
+
 # ------------------------------------------------------------------ поза хвата как у Тироса (isAnimatingDampener FireBossModel)
 def _uses_arm(an):
     """Анимация работает правой рукой (коса в деле): у кисти есть ненулевые ключи поворота или рука уходит дальше 45°."""

@@ -289,6 +289,9 @@ def write(M):
     import anim_cloth
     mine = [k for k in doc['animations'] if k.startswith('ereb_')]
     anim_cloth.explicit(doc['animations'], mine, ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg', 'bipedHandRight'))
+    # 21.11: GeckoLib 4.8.4 поворачивает рапиру кистью дважды — ключи кисти (подобраны по превью с одним поворотом) → видимый поворот.
+    # ereb_guard_break (T32) — не трогаю: его считает guard_break_lib, автор правит сам.
+    anim_cloth.visible_hand(doc['animations'], [k for k in mine if k != 'ereb_guard_break'])
     anim_cloth.bake('ereb', doc['animations'])
     # рапира: остриё не в полу и не сквозь корпус — у наших и у кастов Iron's (без краёв: у Эреба нет позы хвата из кода)
     import anim_check

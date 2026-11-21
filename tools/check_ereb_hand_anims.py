@@ -62,6 +62,9 @@ def main():
     an = json.load(open(os.path.join(F.A, 'animations', 'entity', 'ereb_hand.animation.json'), encoding='utf-8'))['animations']
     model = F.Model()
     idle0 = dict_pose(AN.IDLE0)
+    if 'bipedHandRight' in idle0:            # 21.11: в файле ключ кисти — половина видимого поворота (anim_cloth.visible_hand)
+        import anim_cloth
+        idle0['bipedHandRight'][0] = anim_cloth.V(idle0['bipedHandRight'][0])
     errors, notes = [], []
     names = sorted(k for k in an if k.startswith('ereb_hand_'))
     for name in names:

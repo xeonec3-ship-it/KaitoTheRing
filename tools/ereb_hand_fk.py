@@ -118,6 +118,8 @@ class Model:
             m = tr(base[0] - p[0], base[1] + p[1], base[2] + p[2]) @ \
                 euler_zyx((-r0[0] - r[0]) * D2R, (-r0[1] - r[1]) * D2R, (r0[2] + r[2]) * D2R) @ sc(*[max(1e-4, v) for v in s])
             W[n] = (get(par) if par else np.eye(4)) @ m
+            if n == 'bipedHandRight':          # GeckoLib 4.8.4 поворачивает предмет кистью ВТОРОЙ раз (BlockAndItemGeoLayer)
+                W[HAND2] = euler_zyx((-r0[0] - r[0]) * D2R, (-r0[1] - r[1]) * D2R, (r0[2] + r[2]) * D2R)
             return W[n]
         for n in self.order:
             get(n)
@@ -190,6 +192,9 @@ class Model:
         return np.array([-w[0], w[1], w[2]])
 
 
+HAND2 = '~hand_rot'      # в W: второй поворот кисти для предмета (как в игре)
+
+
 # ---------------------------------------------------------------- рапира в кости bipedHandRight (как buildItem шаблона)
 def rapier_points(W, model, n=8):
     """Точки клинка (от гарды к острию) в модельных координатах. Хват — как в превью (ITEM_FIX, ITEM_OFF, display thirdperson_righthand)."""
@@ -203,6 +208,6 @@ def rapier_points(W, model, n=8):
     for k in range(n + 1):
         y = 6.5 + (24.2 - 6.5) * k / n
         q = np.array([0.0, y - 8, 0.0, 1.0])
-        w = W['bipedHandRight'] @ hold @ dm @ el @ q
+        w = W['bipedHandRight'] @ W.get(HAND2, np.eye(4)) @ hold @ dm @ el @ q
         pts.append(np.array([-w[0], w[1], w[2]]))
     return pts

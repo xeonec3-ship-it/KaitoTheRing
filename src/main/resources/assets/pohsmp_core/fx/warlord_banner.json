@@ -1,89 +1,59 @@
 {
- "comment": "T34 «Знамя Полководца» стоит (caster = основание, до Fx.stop; 20 с = 400 тиков): призрачное знамя t34_banner, золотое кольцо r8 на земле, искры. Союзникам в r8 — warlord_banner_buff.",
+ "comment": "T34 «Знамя Полководца»: вонзить (caster = основание знамени — 1.3 бл. перед игроком, 30 тиков; тик 14 анимации): вспышка, волна r8, трещины, пыль.",
  "style": "martin",
- "duration": -1,
+ "duration": 30,
  "elements": [
   {
-   "type": "mesh",
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 12,
+   "size": 2.2,
+   "rays": 8,
+   "screen": 0.05,
+   "color": "@secondary",
+   "ring": true
+  },
+  {
+   "type": "wave",
    "delay": 0,
    "at": "caster",
-   "model": "t34_banner",
-   "scale": 1.0,
-   "follow": true,
-   "duration": 100000
+   "duration": 20,
+   "shape": "ring",
+   "radius": 8,
+   "thickness": 1.2,
+   "followTerrain": true,
+   "color": "@primary"
   },
   {
    "type": "decal",
    "delay": 0,
    "at": "caster",
-   "follow": true,
-   "texture": "martin_banner_ring",
-   "radius": 8,
-   "glow": 0.25,
-   "pulse": 30,
-   "grow": 14,
-   "color": "@primary",
-   "brightness": 0.7
-  },
-  {
-   "type": "curtain",
-   "delay": 0,
-   "at": "caster",
-   "radius": [
-    7.8,
-    8.0
-   ],
-   "count": 40,
-   "height": 0.9,
-   "grow": 14,
-   "width": [
-    0.05,
-    0.1
-   ],
-   "brightness": [
-    0.25,
-    0.45
-   ],
-   "texture": "beam_fade",
-   "flicker": 0.3,
+   "texture": "higher_cracks",
+   "radius": 1.8,
+   "glow": 0.4,
+   "fadeOut": 20,
+   "duration": 30,
    "color": "@primary"
   },
   {
    "type": "sprites",
    "delay": 0,
    "at": "caster+0,0.2,0",
-   "follow": true,
-   "texture": "spark_soft",
-   "count": 100000,
-   "rate": 0.3,
-   "area": 8,
-   "speed": 0.02,
-   "gravity": -0.012,
+   "duration": 5,
+   "texture": "mote_ash",
+   "count": 26,
+   "rate": 6,
+   "area": 1.0,
+   "speed": 0.06,
+   "gravity": -0.002,
    "size": [
-    0.14,
-    0.02
+    0.4,
+    0.8
    ],
-   "life": 40,
-   "color": "@secondary"
-  },
-  {
-   "type": "sprites",
-   "delay": 0,
-   "at": "caster+0,3.3,0",
-   "follow": true,
-   "texture": "spark_soft",
-   "count": 100000,
-   "rate": 0.25,
-   "spread": 0.3,
-   "speed": 0.01,
-   "gravity": -0.008,
-   "size": [
-    0.18,
-    0.03
-   ],
-   "life": 30,
-   "color": "@secondary",
-   "glow": 0.6
+   "life": 28,
+   "color": "#8A8070",
+   "blend": "translucent"
   }
  ]
 }

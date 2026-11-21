@@ -443,8 +443,7 @@ def lang():
         for sid, (ru, en, gru, gen, ui) in LANG.items():
             d['spell.pohsmp_core.%s' % sid] = (ru, en)[col]
             d['spell.pohsmp_core.%s.guide' % sid] = (gru, gen)[col]
-            for k, v in ui.items():
-                d['ui.pohsmp_core.%s.%s' % (sid, k)] = v[col]
+            # строки уровней ui.pohsmp_core.<id>.* — у программиста (свои ключи под код), здесь не пишем
         d['ui.pohsmp_core.reward_scroll'] = ('Трофей босса культа Меллисто', 'Trophy of a Mellisto cult boss')[col]
         with open(p, 'w', encoding='utf-8') as fh:
             json.dump(d, fh, ensure_ascii=False, indent=2)
@@ -578,7 +577,7 @@ def effects():
     # ---------------------------------------------------------------- Объятия Ревности (Ирина)
     # анимация pohsmp_jealous_embrace: бросок нитей 0–7 (нити на цели — тик 6), захват 7–12, рывок 12–14 (тянуть 14–20),
     # замах крюком 20–24, удар 26, длина 44
-    fx('jealous_embrace_bind', 'T34 «Объятия Ревности»: нити опутывают цель (caster = ЦЕЛЬ, follow, 20 тиков, тик 6 анимации). '
+    fx('jealous_embrace', 'T34 «Объятия Ревности»: нити опутывают цель (caster = ЦЕЛЬ, follow, 20 тиков, тик 6 анимации). '
        'Нити только вокруг цели — без нити от заклинателя (правило «никаких лучей»).', 20, [
         E('trail', 0, 'caster', duration=8, width=0.13, length=8, fade=1.2, head=0, count=4,
           orbit={'radius': 0.75, 'speed': 32, 'rise': 0.9, 'risePeriod': 10}, color='@primary', follow=True),
@@ -618,26 +617,30 @@ def effects():
     # ---------------------------------------------------------------- Удар Наковальни (Арис)
     # анимация pohsmp_anvil_strike: замах 0–12, удар вниз 12–15.5, удар/урон 15, длина 40
     S = 0.22
-    fx('anvil_strike', 'T34 «Удар Наковальни» (caster = ТОЧКА УДАРА на земле, 40 тиков, тик 0 = анимация pohsmp_anvil_strike): призрачный '
-       'бирюзовый молот Арис (aris_giant_hammer ×%g ≈ 3.3 бл.) собирается над точкой и на 12–15 рушится; урон и отброс r3 — тик 15. '
-       'Прицел — печать-кольцо на земле с тика 0 (без луча от игрока).' % S, 40, [
-        E('decal', 0, 'caster', duration=16, texture='aris_forge_ring', radius=3.0, grow=10, glow=0.5, fadeOut=4, color='@primary', brightness=0.7,
-          comment='куда упадёт'),
-        E('mesh', 0, 'caster', model='aris_giant_hammer', scale=S, follow=False, until=22,
-          move={'keys': [[0, [0, 27, 0], 'linear'], [12, [0, 24, 0], 'easeOutSine'], [15, [0, 0, 0], 'easeInCubic']]},
+    fx('anvil_strike_warn', 'T34 «Удар Наковальни»: прицел (caster = ТОЧКА УДАРА на земле, взгляд до 20 бл.; 12 тиков, тик 0 = анимация '
+       'pohsmp_anvil_strike): кольцо-печать на земле, над точкой собирается призрачный бирюзовый молот Арис (aris_giant_hammer ×%g ≈ 3 бл.) '
+       'и медленно опускается. Без луча от игрока. На тике 12 — anvil_strike.' % S, 12, [
+        E('decal', 0, 'caster', duration=16, texture='aris_forge_ring', radius=3.0, grow=10, glow=0.5, fadeOut=4, color='@primary', brightness=0.7),
+        E('mesh', 0, 'caster', model='aris_giant_hammer', scale=S, follow=False, until=12,
+          move={'keys': [[0, [0, 27, 0], 'linear'], [12, [0, 24, 0], 'easeOutSine']]},
           comment='move.keys — в единицах меша (× scale 0.22): 27 ≈ 6 бл. над точкой'),
-        E('sprites', 4, 'caster+0,8,0', duration=10, texture='spark_soft', count=100000, rate=0.8, area=0.8, speed=0.0, gravity=0.04,
+        E('sprites', 4, 'caster+0,5.5,0', duration=8, texture='spark_soft', count=100000, rate=0.8, area=0.8, speed=0.0, gravity=0.04,
           size=[0.16, 0.03], life=20, color='@primary', glow=0.9),
-        E('flash', 15, 'caster+0,0.8,0', duration=10, size=3.2, rays=10, screen=0.12, color='@core', ring=True),
-        E('wave', 15, 'caster', duration=16, shape='ring', radius=3.2, thickness=0.8, followTerrain=True, texture='aris_molten_ring', color='@secondary'),
-        E('decal', 15, 'caster', duration=25, texture='aris_molten_floor', radius=1.4, glow=0.8, fadeOut=18, color='@secondary', brightness=1.1),
-        E('decal', 15, 'caster', duration=25, texture='higher_cracks', radius=3.0, glow=0.6, fadeOut=18, color='@primary'),
-        E('sprites', 15, 'caster+0,0.3,0', duration=3, texture='spark_soft', count=50, rate=17, spread=0.5, speed=0.4, gravity=0.03,
+    ], 'aris')
+    fx('anvil_strike', 'T34 «Удар Наковальни»: удар (caster = ТОЧКА УДАРА, 30 тиков; запуск на тике 12 каста): молот рушится за 3 тика, '
+       '**удар/урон/отброс r3 — тик 3 этого fx = тик 15 каста**.', 30, [
+        E('mesh', 0, 'caster', model='aris_giant_hammer', scale=S, follow=False, until=10,
+          move={'keys': [[0, [0, 24, 0], 'linear'], [3, [0, 0, 0], 'easeInCubic']]}),
+        E('flash', 3, 'caster+0,0.8,0', duration=10, size=3.2, rays=10, screen=0.12, color='@core', ring=True),
+        E('wave', 3, 'caster', duration=16, shape='ring', radius=3.2, thickness=0.8, followTerrain=True, texture='aris_molten_ring', color='@secondary'),
+        E('decal', 3, 'caster', duration=25, texture='aris_molten_floor', radius=1.4, glow=0.8, fadeOut=18, color='@secondary', brightness=1.1),
+        E('decal', 3, 'caster', duration=25, texture='higher_cracks', radius=3.0, glow=0.6, fadeOut=18, color='@primary'),
+        E('sprites', 3, 'caster+0,0.3,0', duration=3, texture='spark_soft', count=50, rate=17, spread=0.5, speed=0.4, gravity=0.03,
           size=[0.14, 0.02], life=18, color='@secondary', glow=0.9),
-        E('sprites', 15, 'caster+0,0.2,0', duration=5, texture='mote_ash', count=16, rate=4, spread=1.0, speed=0.06, gravity=-0.004, spin=40,
+        E('sprites', 3, 'caster+0,0.2,0', duration=5, texture='mote_ash', count=16, rate=4, spread=1.0, speed=0.06, gravity=-0.004, spin=40,
           size=[0.5, 0.18], life=26, color='#60606C', blend='translucent'),
     ], 'aris')
-    fx('anvil_strike_tempered', 'T34 «Закалка» (caster = заклинатель, follow, до Fx.stop; 15 с): оружие в руке тлеет бирюзой — искры '
+    fx('anvil_strike_temper', 'T34 «Закалка» (caster = заклинатель, follow, до Fx.stop; 15 с): оружие в руке тлеет бирюзой — искры '
        'и раскалённые отблески у правой руки.', -1, [
         E('sprites', 0, 'caster.hand', duration=-1, texture='spark_soft', count=100000, rate=0.5, spread=0.15, speed=0.01, gravity=0.02,
           size=[0.1, 0.02], life=12, color='@primary', glow=0.9, follow=True),
@@ -649,7 +652,7 @@ def effects():
 
     # ---------------------------------------------------------------- Знамя Полководца (Мартин)
     # анимация pohsmp_warlord_banner: подъём 0–10, вонзить 10–14 (тик 14 — знамя в земле), клич 22–28 (солдаты — тик 30), длина 48
-    fx('warlord_banner_plant', 'T34 «Знамя Полководца»: вонзить (caster = основание знамени — 1.3 бл. перед игроком, 30 тиков; тик 14 '
+    fx('warlord_banner', 'T34 «Знамя Полководца»: вонзить (caster = основание знамени — 1.3 бл. перед игроком, 30 тиков; тик 14 '
        'анимации): вспышка, волна r8, трещины, пыль.', 30, [
         E('flash', 0, 'caster+0,1.2,0', duration=12, size=2.2, rays=8, screen=0.05, color='@secondary', ring=True),
         E('wave', 0, 'caster', duration=20, shape='ring', radius=8, thickness=1.2, followTerrain=True, color='@primary'),
@@ -657,7 +660,7 @@ def effects():
         E('sprites', 0, 'caster+0,0.2,0', duration=5, texture='mote_ash', count=26, rate=6, area=1.0, speed=0.06, gravity=-0.002,
           size=[0.4, 0.8], life=28, color='#8A8070', blend='translucent'),
     ], 'martin')
-    fx('warlord_banner', 'T34 «Знамя Полководца» стоит (caster = основание, до Fx.stop; 20 с = 400 тиков): призрачное знамя t34_banner, '
+    fx('warlord_banner_aura', 'T34 «Знамя Полководца» стоит (caster = основание, до Fx.stop; 20 с = 400 тиков): призрачное знамя t34_banner, '
        'золотое кольцо r8 на земле, искры. Союзникам в r8 — warlord_banner_buff.', -1, [
         E('mesh', 0, 'caster', model='t34_banner', scale=1.0, follow=True, duration=100000),
         E('decal', 0, 'caster', follow=True, texture='martin_banner_ring', radius=8, glow=0.25, pulse=30, grow=14, color='@primary', brightness=0.7),
@@ -672,12 +675,15 @@ def effects():
         E('aura', 0, 'caster', follow=True, target='caster', thickness=0.08, pulse=[0.3, 16], color='@primary', motes=6, ring=False,
           brightness=0.7),
     ], 'martin')
-    fx('warlord_banner_soldier', 'T34: призрачный солдат встаёт у знамени (caster = солдат, 30 тиков; тик 30 анимации, два солдата '
+    fx('warlord_banner_soldier_spawn', 'T34: призрачный солдат встаёт у знамени (caster = солдат, 30 тиков; тик 30 анимации, два солдата '
        'слева и справа от знамени).', 30, [
         E('decal', 0, 'caster', duration=30, texture='martin_banner_ring', radius=1.0, grow=6, glow=0.4, fadeOut=14, color='@primary'),
         E('sprites', 0, 'caster+0,0.2,0', duration=14, texture='mote_wisp', count=20, rate=2.0, area=0.7, speed=0.03, gravity=-0.01,
           size=[0.5, 1.0], life=26, color='#8FD8F0', blend='translucent'),
         E('flash', 4, 'caster+0,1,0', duration=8, size=1.1, color='@secondary'),
+    ], 'martin_ghost')
+    fx('warlord_banner_soldier', 'T34: призрачный солдат знамени (caster = солдат, follow, до Fx.stop): голубой ореол, золотые искры.', -1, [
+        E('aura', 0, 'caster', follow=True, target='caster', thickness=0.06, pulse=[0.3, 20], color='@primary', motes=4, ring=False, brightness=0.5),
     ], 'martin_ghost')
     fx('warlord_banner_soldier_vanish', 'T34: солдат уходит со знаменем (caster = солдат, 20 тиков).', 20, [
         E('sprites', 0, 'caster+0,1,0', duration=10, texture='mote_wisp', count=26, rate=4, spread=0.5, speed=0.04, gravity=-0.012,
@@ -695,7 +701,7 @@ def effects():
     # ---------------------------------------------------------------- Шаг сквозь отражение (Эреб)
     # анимация pohsmp_mirror_step: шаг в рябь 0–4 (тик 4 — исчезает, телепорт за спину цели), сжатие 4–7, укол 7–9 (урон 8), длина 28;
     # невидимость с тика 10
-    fx('mirror_step_out', 'T34 «Шаг сквозь отражение»: уход в рябь (caster = заклинатель на старом месте, 14 тиков; тик 0 анимации, '
+    fx('mirror_step_vanish', 'T34 «Шаг сквозь отражение»: уход в рябь (caster = заклинатель на старом месте, 14 тиков; тик 0 анимации, '
        'на тике 4 — телепорт): стеклянная рябь-сфера, осколки, бабочки.', 14, [
         E('wave', 0, 'caster+0,1,0.3', duration=6, shape='sphere', radius=1.0, rim=1.0, color='@secondary', brightness=0.6),
         E('wave', 3, 'caster+0,1,0', duration=8, shape='sphere', radius=1.3, rim=1.2, color='#E8FAFF', brightness=0.5),
@@ -707,13 +713,13 @@ def effects():
           sway=0.6, size=[0.3, 0.1], life=20, color='#BFE6FF', glow=0.4),
         E('flash', 4, 'caster+0,1.1,0', duration=5, size=1.0, color='#FFFFFF', brightness=0.7),
     ], 'ereb')
-    fx('mirror_step_in', 'T34 «Шаг сквозь отражение»: выход из ряби за спиной цели (caster = заклинатель на новом месте, 10 тиков, тик 4).', 10, [
+    fx('mirror_step_appear', 'T34 «Шаг сквозь отражение»: выход из ряби за спиной цели (caster = заклинатель на новом месте, 10 тиков, тик 4).', 10, [
         E('wave', 0, 'caster+0,1,0', duration=7, shape='sphere', radius=0.9, rim=1.0, color='@secondary', brightness=0.6),
         E('flash', 0, 'caster+0,1.1,0', duration=4, size=0.9, color='#FFFFFF', brightness=0.7),
         E('sprites', 0, 'caster+0,1,0', duration=2, texture='mote_glass', count=10, rate=8, spread=0.45, speed=0.05, gravity=0.006, spin=140,
           tumble=True, size=[0.16, 0.05], life=10, color='#E8FAFF'),
     ], 'ereb')
-    fx('mirror_step_hit', 'T34 «Шаг сквозь отражение»: укол рапирой (caster = ЦЕЛЬ, 10 тиков, тик 8 = урон): золотая искра в спине, '
+    fx('mirror_step', 'T34 «Шаг сквозь отражение»: укол рапирой (caster = ЦЕЛЬ, 10 тиков, тик 8 = урон): золотая искра в спине, '
        'стеклянная трещина.', 10, [
         E('flash', 0, 'caster+0,1.3,0', duration=5, size=0.7, anamorphic=1.4, rays=4, color='#FFE7A0', brightness=1.1),
         E('sprites', 0, 'caster+0,1.3,0', duration=1, texture='spark_soft', count=8, rate=8, spread=0.15, speed=0.08, gravity=0.01,

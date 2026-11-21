@@ -56,8 +56,8 @@ XFADE = 0.040                   # кроссфейд внутри петли, с
 # и вступление — это ровно исходник от intro_from до начала p1 (переход вступление→p1 = естественное продолжение).
 PRESETS = {
     'cult_leader': dict(intro_from=0.0, p1=(0, 80), p2=(78, 170), p3=(256, 420)),
-    'irina':       dict(intro_from=0.0, p1=(0, 76), p2=(74, 145), p3=(144, 238)),
-    'martin':      dict(intro_from=5.4, p1=(5, 82), p2=(78, 176), p3=(183, 345)),
+    'irina':       dict(intro_from=0.0, p1=(0, 76), p2=(74, 145), p3_fixed=(165.5, 231.91)),   # p3 = игровая петля 66.41 с
+    'martin':      dict(intro_from=5.4, p1=(5, 82), p2=(78, 176), p3=(288, 345)),
     'ereb':        dict(intro_from=0.0, p1=(0, 54), p2=(54, 120), p3=(115, 190)),
     'ereb_hand':   dict(intro=15, p1=(10, 104), p2=(110, 172), p3=(185, 255)),
     'aris':        dict(intro_from=0.0),   # окна — автоматически (трети трека), пока файла нет
@@ -155,6 +155,8 @@ def onset_align(feat, s, e, R=0.06):
     best = (-2.0, 0)
     for lag in range(-Rk, Rk + 1):
         o = f[ei + lag - w0:ei + lag + w1]
+        if len(o) != len(ref):          # у самого края трека
+            continue
         o = o - o.mean()
         c = float(np.dot(ref, o) / (np.linalg.norm(ref) * np.linalg.norm(o) + 1e-9))
         best = max(best, (c, lag))
@@ -352,7 +354,7 @@ def cmd_cut(a):
         fixed = pre.get(k + '_fixed')
         if fixed:
             win = (fixed[0] - 8, fixed[1] + 8)
-        lo, hi = win
+        lo, hi = max(0.0, win[0]), min(win[1], dur - 5.0)     # после конца петли нужно ещё ~4 с исходника
         sr_ = None
         if k == 'p1' and pre.get('intro_from') is not None and not fixed:
             f0 = pre['intro_from']

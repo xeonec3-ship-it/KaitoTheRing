@@ -27,6 +27,7 @@ public class PohCore {
         LOG.info("[pohsmp_core] loaded, dist={}", FMLEnvironment.dist);
         IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         Reg.register(modBus);
+        ru.pohsmp.core.trophy.Trophies.init(modBus);   // T35 boss armor
         modBus.addListener(PohCore::commonSetup);
         modBus.addListener(PohCore::attributes);
         modBus.addListener(ru.pohsmp.core.nightmare.Bestiary::attributes);   // T25

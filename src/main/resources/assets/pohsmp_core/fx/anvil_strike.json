@@ -1,22 +1,8 @@
 {
- "comment": "T34 «Удар Наковальни» (caster = ТОЧКА УДАРА на земле, 40 тиков, тик 0 = анимация pohsmp_anvil_strike): призрачный бирюзовый молот Арис (aris_giant_hammer ×0.22 ≈ 3.3 бл.) собирается над точкой и на 12–15 рушится; урон и отброс r3 — тик 15. Прицел — печать-кольцо на земле с тика 0 (без луча от игрока).",
+ "comment": "T34 «Удар Наковальни»: удар (caster = ТОЧКА УДАРА, 30 тиков; запуск на тике 12 каста): молот рушится за 3 тика, **удар/урон/отброс r3 — тик 3 этого fx = тик 15 каста**.",
  "style": "aris",
- "duration": 40,
+ "duration": 30,
  "elements": [
-  {
-   "type": "decal",
-   "delay": 0,
-   "at": "caster",
-   "duration": 16,
-   "texture": "aris_forge_ring",
-   "radius": 3.0,
-   "grow": 10,
-   "glow": 0.5,
-   "fadeOut": 4,
-   "color": "@primary",
-   "brightness": 0.7,
-   "comment": "куда упадёт"
-  },
   {
    "type": "mesh",
    "delay": 0,
@@ -24,29 +10,20 @@
    "model": "aris_giant_hammer",
    "scale": 0.22,
    "follow": false,
-   "until": 22,
+   "until": 10,
    "move": {
     "keys": [
      [
       0,
       [
        0,
-       27,
+       24,
        0
       ],
       "linear"
      ],
      [
-      12,
-      [
-       0,
-       24,
-       0
-      ],
-      "easeOutSine"
-     ],
-     [
-      15,
+      3,
       [
        0,
        0,
@@ -55,31 +32,11 @@
       "easeInCubic"
      ]
     ]
-   },
-   "comment": "move.keys — в единицах меша (× scale 0.22): 27 ≈ 6 бл. над точкой"
-  },
-  {
-   "type": "sprites",
-   "delay": 4,
-   "at": "caster+0,8,0",
-   "duration": 10,
-   "texture": "spark_soft",
-   "count": 100000,
-   "rate": 0.8,
-   "area": 0.8,
-   "speed": 0.0,
-   "gravity": 0.04,
-   "size": [
-    0.16,
-    0.03
-   ],
-   "life": 20,
-   "color": "@primary",
-   "glow": 0.9
+   }
   },
   {
    "type": "flash",
-   "delay": 15,
+   "delay": 3,
    "at": "caster+0,0.8,0",
    "duration": 10,
    "size": 3.2,
@@ -90,7 +47,7 @@
   },
   {
    "type": "wave",
-   "delay": 15,
+   "delay": 3,
    "at": "caster",
    "duration": 16,
    "shape": "ring",
@@ -102,7 +59,7 @@
   },
   {
    "type": "decal",
-   "delay": 15,
+   "delay": 3,
    "at": "caster",
    "duration": 25,
    "texture": "aris_molten_floor",
@@ -114,7 +71,7 @@
   },
   {
    "type": "decal",
-   "delay": 15,
+   "delay": 3,
    "at": "caster",
    "duration": 25,
    "texture": "higher_cracks",
@@ -125,7 +82,7 @@
   },
   {
    "type": "sprites",
-   "delay": 15,
+   "delay": 3,
    "at": "caster+0,0.3,0",
    "duration": 3,
    "texture": "spark_soft",
@@ -144,7 +101,7 @@
   },
   {
    "type": "sprites",
-   "delay": 15,
+   "delay": 3,
    "at": "caster+0,0.2,0",
    "duration": 5,
    "texture": "mote_ash",

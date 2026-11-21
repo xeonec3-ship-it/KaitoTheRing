@@ -331,13 +331,14 @@ def scene(sid, tick):
 
 FXS = {
     'ashen_harvest': [(0, 'ashen_harvest', 'p', None), (12, 'ashen_harvest_trail', 'p', None)],
-    'jealous_embrace': [(6, 'jealous_embrace_bind', 'd', None), (14, 'jealous_embrace_pull', 'd', None), (24, 'jealous_embrace_hit', 'p', None),
+    'jealous_embrace': [(6, 'jealous_embrace', 'd', None), (14, 'jealous_embrace_pull', 'd', None), (24, 'jealous_embrace_hit', 'p', None),
                         (24, 'jealous_embrace_mark', 'd', 120)],
-    'anvil_strike': [(0, 'anvil_strike', 'impact', None), (15, 'anvil_strike_tempered', 'p', 120)],
-    'warlord_banner': [(14, 'warlord_banner_plant', 'banner', None), (14, 'warlord_banner', 'banner', None), (14, 'warlord_banner_buff', 'p', None),
-                       (30, 'warlord_banner_soldier', 'sol_l', None), (30, 'warlord_banner_soldier', 'sol_r', None),
-                       (36, 'vid_soldier', 'sol_l', None), (36, 'vid_soldier', 'sol_r', None)],
-    'mirror_step': [(0, 'mirror_step_out', 'p', None), (4, 'mirror_step_in', 'p_new', None), (8, 'mirror_step_hit', 'd', None),
+    'anvil_strike': [(0, 'anvil_strike_warn', 'impact', None), (12, 'anvil_strike', 'impact', None), (15, 'anvil_strike_temper', 'p', 120)],
+    'warlord_banner': [(14, 'warlord_banner', 'banner', None), (14, 'warlord_banner_aura', 'banner', None), (14, 'warlord_banner_buff', 'p', None),
+                       (30, 'warlord_banner_soldier_spawn', 'sol_l', None), (30, 'warlord_banner_soldier_spawn', 'sol_r', None),
+                       (36, 'vid_soldier', 'sol_l', None), (36, 'vid_soldier', 'sol_r', None),
+                       (36, 'warlord_banner_soldier', 'sol_l', None), (36, 'warlord_banner_soldier', 'sol_r', None)],
+    'mirror_step': [(0, 'mirror_step_vanish', 'p', None), (4, 'mirror_step_appear', 'p_new', None), (8, 'mirror_step', 'd', None),
                     (10, 'mirror_step_veil', 'p_new', None)],
     'hand_of_lies': [(0, 'hand_of_lies', 'd', None), (10, 'hand_of_lies_hold', 'd', 60), (60, 'hand_of_lies_release', 'd', None)],
 }

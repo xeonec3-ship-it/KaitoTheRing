@@ -34,7 +34,6 @@ import tempfile
 
 import numpy as np
 import soundfile as sf
-from scipy.signal import stft
 
 SR = 44100
 HOP = 2048                      # 46.4 мс
@@ -74,102 +73,105 @@ def load(src):
     return np.frombuffer(raw, dtype=np.float32).reshape(-1, 2).astype(np.float64)
 
 
-def melspec(mono):
-    f, t, Z = stft(mono, SR, nperseg=4096, noverlap=4096 - HOP, boundary=None, padded=False)
-    P = np.abs(Z) ** 2
-    # 48 мел-полос 40 Гц–16 кГц (треугольные)
-    mel = lambda hz: 2595 * np.log10(1 + hz / 700)
-    imel = lambda m: 700 * (10 ** (m / 2595) - 1)
-    edges = imel(np.linspace(mel(40), mel(16000), 50))
-    fb = np.zeros((48, len(f)))
-    for i in range(48):
-        a, b, c = edges[i:i + 3]
-        fb[i] = np.clip(np.minimum((f - a) / (b - a), (c - f) / (c - b)), 0, None)
-    M = np.log10(fb @ P + 1e-10)
-    return M  # (48, frames); кадр k ~ время k*HOP/SR (начало окна)
+class Feat:
+    """Признаки трека на 22.05 кГц, hop 512 (23 мс): лог-мел 64 полосы и хрома, обе z-нормированы по полосам по всему треку;
+    сетка долей (librosa.beat); огибающая онсетов hop 128 на 44.1 кГц для точной подгонки конца петли."""
+
+    def __init__(self, x):
+        import librosa
+        self.lr = librosa
+        y = librosa.resample(x.mean(1).astype(np.float32), orig_sr=SR, target_sr=FSR)
+        self.y = y
+        mel = librosa.power_to_db(librosa.feature.melspectrogram(y=y, sr=FSR, hop_length=FHOP, n_mels=64, fmax=11000))
+        chroma = librosa.feature.chroma_stft(y=y, sr=FSR, hop_length=FHOP)
+        z = lambda A: (A - A.mean(1, keepdims=True)) / (A.std(1, keepdims=True) + 1e-9)
+        self.mel, self.chroma = z(mel), z(chroma)
+        self.onset = librosa.onset.onset_strength(y=y, sr=FSR, hop_length=FHOP)
+        self.fine = librosa.onset.onset_strength(y=x.mean(1).astype(np.float32), sr=SR, hop_length=128)
+
+    def beats(self, t0, t1):
+        a, b = int(t0 * FSR / FHOP), int(t1 * FSR / FHOP)
+        o = self.onset[a:b]
+        bpm = float(self.lr.feature.tempo(onset_envelope=o, sr=FSR, hop_length=FHOP)[0])
+        _, bt = self.lr.beat.beat_track(onset_envelope=o, sr=FSR, hop_length=FHOP, start_bpm=bpm, tightness=200)
+        bt = np.asarray(bt) + a
+        # сила пульса: автокорреляция онсетов на лаге доли
+        oc = o - o.mean()
+        lag = int(round(60 / bpm * FSR / FHOP))
+        st = float(np.dot(oc[:-lag], oc[lag:]) / (np.dot(oc, oc) + 1e-9))
+        return bpm, st, bt
+
+    def beat_sync(self, bt):
+        F = np.vstack([self.mel, self.chroma * np.sqrt(64 / 12)])
+        out = np.stack([F[:, bt[i]:bt[i + 1]].mean(1) for i in range(len(bt) - 1)], 1)
+        out /= np.linalg.norm(out, axis=0, keepdims=True) + 1e-9
+        return out
 
 
-def onset_env(M):
-    d = np.diff(M, axis=1)
-    return np.concatenate([[0], np.clip(d, 0, None).sum(0)])
+FSR, FHOP = 22050, 512
 
 
-def tempo(M, lo=60, hi=180):
-    o = onset_env(M)
-    o = o - np.convolve(o, np.ones(43) / 43, 'same')
-    ac = np.correlate(o, o, 'full')[len(o) - 1:]
-    fps = SR / HOP
-    lags = np.arange(len(ac))
-    bpm = np.where(lags > 0, 60 * fps / np.maximum(lags, 1), 0)
-    ok = (bpm >= lo) & (bpm <= hi)
-    # уточнение параболой по пику
-    k = int(np.argmax(np.where(ok, ac, -np.inf)))
-    if 0 < k < len(ac) - 1:
-        a, b, c = ac[k - 1:k + 2]
-        k = k + 0.5 * (a - c) / (a - 2 * b + c + 1e-12)
-    strength = float(ac[int(round(k))] / (ac[0] + 1e-12))
-    return 60 * fps / k, strength
+def tempo_of(feat, t0, t1):
+    bpm, st, _ = feat.beats(t0, t1)
+    return bpm, st
 
 
-def find_loop(x, M, t0, t1, lmin=30.0, lmax=60.0, bpm=None, fixed=None):
-    fps = SR / HOP
-    W = int(CTX * fps)
+def find_loop(x, feat, t0, t1, lmin=30.0, lmax=60.0, fixed=None):
+    """Начало и конец петли — на долях; длина — кратна 4 долям (такт); оценка — сходство ±K долей вокруг начала и конца."""
+    bpm, st, bt = feat.beats(t0, t1)
+    T = bt * FHOP / FSR
+    B = feat.beat_sync(bt)
+    S = B.T @ B
+    K = max(4, int(round(3.0 * bpm / 60)))     # ±~3 с контекста
+    nb = len(bt) - 1
+    cands = []
     if fixed:
-        s = int(fixed[0] * fps)
-        e = int(fixed[1] * fps)
-        best = (s, e - s, None)
+        i = int(np.argmin(np.abs(T - fixed[0])))
+        j = int(np.argmin(np.abs(T - fixed[1])))
+        js = [(i, j)]
     else:
-        a, b = int(t0 * fps), int(min(t1 * fps, M.shape[1] - W - 1))
-        a = max(a, W + 1)
-        F = M[:, a - W:b + W].T
-        F = F - F.mean(1, keepdims=True)
-        F /= np.linalg.norm(F, axis=1, keepdims=True) + 1e-9
-        S = (F @ F.T).astype(np.float32)
-        n = S.shape[0]
-        best = None
-        cands = []
-        for L in range(int(lmin * fps), int(lmax * fps) + 1):
-            if L + 2 * W >= n:
-                break
-            d = np.diagonal(S, L)                       # S[i, i+L]
-            cs = np.concatenate([[0], np.cumsum(d)])
-            # центр i в [W, n-L-W): сумма d[i-W:i+W]
-            i = np.arange(W, len(d) - W)
-            sc = (cs[i + W] - cs[i - W]) / (2 * W)
-            # и начало петли не должно уходить за окно поиска
-            j = int(np.argmax(sc))
-            score = float(sc[j])
-            # предпочтение длинным петлям (меньше заметна повторяемость) и целому числу тактов
-            bonus = 0.04 * (L / fps - lmin) / (lmax - lmin)
-            if bpm:
-                beats = L / fps * bpm / 60
-                bars = beats / 4
-                bonus += 0.02 * (1 - 2 * abs(bars - round(bars)))
-            cands.append((score + bonus, score, a - W + i[j], L))
-        cands.sort(reverse=True)
-        _, raw, s, L = cands[0]
-        best = (s, L, raw)
-    s, L, raw = best
-    # уточнение по волне: ищем сдвиг конца ±50 мс, максимизирующий корреляцию src[s:s+0.5c] и src[e:e+0.5c]
+        js = []
+        for i in range(K, nb):
+            for j in range(i + 4, nb - K, 4):
+                L = T[j] - T[i]
+                if L < lmin:
+                    continue
+                if L > lmax:
+                    break
+                js.append((i, j))
+    for i, j in js:
+        lo, hi = max(-K, -i), min(K, nb - j)
+        sc = float(np.mean([S[i + k, j + k] for k in range(lo, hi)]))
+        L = T[j] - T[i]
+        cands.append((sc + 0.03 * (L - lmin) / (lmax - lmin), sc, i, j))
+    cands.sort(reverse=True)
+    _, sim, i, j = cands[0]
+    # точная подгонка конца по онсетам (hop 128 @ 44.1 кГц ≈ 2.9 мс): окно −1…+4 с, сдвиг ±80 мс
+    f = feat.fine
+    r = SR / 128
+    si, ei = int(T[i] * r), int(T[j] * r)
+    w0, w1, R = int(1 * r), int(4 * r), int(0.08 * r)
+    ref = f[si - w0:si + w1] - f[si - w0:si + w1].mean()
+    best = (-2, 0)
+    for lag in range(-R, R + 1):
+        o = f[ei + lag - w0:ei + lag + w1]
+        o = o - o.mean()
+        c = float(np.dot(ref, o) / (np.linalg.norm(ref) * np.linalg.norm(o) + 1e-9))
+        best = max(best, (c, lag))
+    corr, lag = best
+    s_smp = int(T[i] * SR)
+    e_smp = int(T[j] * SR) + lag * 128
+    # сдвиг обеих точек на 30 мс раньше доли: кроссфейд ложится перед атакой, а не на неё
+    s_smp -= int(0.03 * SR)
+    e_smp -= int(0.03 * SR)
     mono = x.mean(1)
-    s_smp = s * HOP + 2048          # центр окна stft
-    e_smp = (s + L) * HOP + 2048
-    seg = mono[s_smp:s_smp + SR // 2]
-    best_lag, best_c = 0, -2
-    R = int(0.05 * SR)
-    for lag in range(-R, R + 1, 1):
-        o = mono[e_smp + lag:e_smp + lag + SR // 2]
-        c = float(np.dot(seg, o) / (np.linalg.norm(seg) * np.linalg.norm(o) + 1e-12))
-        if c > best_c:
-            best_c, best_lag = c, lag
-    e_smp += best_lag
-    # начало — на ближайший нулевой переход (по моно), конец сдвигаем так же
     zc = np.where(np.diff(np.signbit(mono[s_smp - 200:s_smp + 200])))[0]
     if len(zc):
         dz = int(zc[np.argmin(np.abs(zc - 200))]) - 200
         s_smp += dz
         e_smp += dz
-    return s_smp, e_smp, raw, best_c
+    return dict(s=s_smp, e=e_smp, sim=sim, onset_corr=corr, bpm=bpm, pulse=st, beats=j - i,
+                top=[(round(c[1], 3), round(T[c[2]], 2), round(T[c[3]] - T[c[2]], 2)) for c in cands[:5]])
 
 
 def make_loop(x, s, e):
@@ -226,8 +228,9 @@ def cmd_analyze(a):
             print(line)
             line = ''
     print(line)
-    bpm, st = tempo(melspec(mono))
-    print(f'темп ≈ {bpm:.1f} уд/мин (сила автокорреляции {st:.2f})')
+    feat = Feat(seg)
+    bpm, st = tempo_of(feat, 0, len(mono) / SR)
+    print(f'темп ≈ {bpm:.1f} уд/мин (сила пульса {st:.2f})')
 
 
 def cmd_cut(a):
@@ -250,27 +253,26 @@ def cmd_cut(a):
     intro_len = a.intro if a.intro else pre.get('intro', 10)
     mono = x.mean(1)
     print(f'[{a.id}] {a.src}: {dur:.1f} c', file=sys.stderr)
-    M = melspec(mono)
+    feat = Feat(x)
     rep = dict(id=a.id, source=os.path.basename(a.src), parts={})
     loops = {}
     for k in ('p1', 'p2', 'p3'):
         win = pre.get(k)
         fixed = pre.get(k + '_fixed')
         if fixed:
-            win = (fixed[0] - 5, fixed[1] + 5)
+            win = (fixed[0] - 8, fixed[1] + 8)
         lo, hi = win
-        Mw = M[:, int(lo * SR / HOP):int(hi * SR / HOP)]
-        bpm, st = tempo(Mw)
-        s, e, sim, corr = find_loop(x, M, lo, hi, a.lmin, a.lmax, bpm if st > 0.15 else None, fixed)
+        r = find_loop(x, feat, lo, hi, a.lmin, a.lmax, fixed)
+        s, e = r['s'], r['e']
         y = make_loop(x, s, e)
         L = (e - s) / SR
         loops[k] = y
         rep['parts'][k] = dict(window=f'{tc(lo)}–{tc(hi)}', start=tc(s / SR), end=tc(e / SR), length=round(L, 3),
-                               bpm=round(bpm, 1), bpm_strength=round(st, 2), beats=round(L * bpm / 60, 2),
-                               ssm_similarity=None if sim is None else round(sim, 3), wave_corr=round(corr, 3),
-                               _s=int(s), _e=int(e))
-        print(f'  {k}: {tc(s / SR)}–{tc(e / SR)} ({L:.2f} c, {bpm:.1f} bpm×{L * bpm / 60:.1f} долей, '
-              f'сходство {sim if sim is None else round(sim, 3)}, корр. волны {corr:.3f})', file=sys.stderr)
+                               bpm=round(r['bpm'], 1), pulse=round(r['pulse'], 2), beats=r['beats'],
+                               beat_similarity=round(r['sim'], 3), onset_corr=round(r['onset_corr'], 3),
+                               alternatives=r['top'][1:], _s=int(s), _e=int(e))
+        print(f"  {k}: {tc(s / SR)}–{tc(e / SR)} ({L:.2f} c, {r['bpm']:.1f} bpm, {r['beats']} долей, "
+              f"сходство {r['sim']:.3f}, онсеты {r['onset_corr']:.3f}); топ {r['top']}", file=sys.stderr)
     s1 = rep['parts']['p1']['_s']
     i0 = max(0, s1 - int(intro_len * SR))
     intro = x[i0:s1].copy()

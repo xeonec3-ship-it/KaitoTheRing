@@ -155,6 +155,8 @@ def boss_anims():
 def write_anims():
     src = M.jar_json(M.I + 'animations/casting_animations.json')
     ours = boss_anims()
+    import guard_break_cult_leader          # T32 «Сломать блок»: крюк косы рвёт защиту, удар подтоком (хват Тироса, двойной поворот кисти)
+    ours['cult_leader_guard_break'] = guard_break_cult_leader.build()
     out = {'format_version': src['format_version'], 'geckolib_format_version': src['geckolib_format_version'],
            'comment': 'T26: все анимации casting_animations.json Iron\'s (те же имена — их зовёт логика FireBoss) + cult_leader_* (наши). '
                       'Сгенерировано tools/gen_cult_leader.py — правьте генератор.',
@@ -164,7 +166,7 @@ def write_anims():
     anim_cloth.explicit(out['animations'], list(ours), ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg',
                                                         'bipedHandRight'))
     anim_cloth.bake('cult_leader', out['animations'])
-    print('  удары без толчка (easing):', anim_cloth.strike_ease(out['animations'], list(ours)))
+    print('  удары без толчка (easing):', anim_cloth.strike_ease(out['animations'], [n for n in ours if n != 'cult_leader_guard_break']))
     # коса: все анимации, что играют на боссе (наши + удары FireBoss и касты Iron's), начинаются и кончаются в позе хвата; в кадрах,
     # где лезвие в земле или сквозь тело/ноги, — наименьший доворот кисти (три прохода: следующие добирают плавные переходы прежних)
     import anim_check
@@ -172,6 +174,9 @@ def write_anims():
     # fire_boss_spawn: на 6.42 с коса возникает в руке, влетая из точки сбоку-снизу (21, −6, 0) — лезвие проходило сквозь землю;
     # влетает сбоку-сверху (10, 10, 0), время то же
     out['animations']['fire_boss_spawn']['bones']['bipedHandRight']['position']['6.4167']['vector'] = [10, 10, 0]
+    # cult_leader_guard_break (T32) — коса уже посчитана с двойным поворотом и без земли/тела (tools/guard_break_cult_leader.py):
+    # обработки косы ниже переписали бы её ключи кисти на свою сетку (провороты между ключами) — её не трогаем
+    plays = [n for n in plays if n != 'cult_leader_guard_break']
     # короткие касты Iron's (< 0.5 с): правая рука с косой не дёргается вверх на долю секунды — держит косу, кастует левая
     still = [n for n in anim_check.SPELL_ANIMS if n in out['animations'] and float(out['animations'][n]['animation_length']) < 0.5]
     # «Пепел Меллисто» — цепочка: рассыпание → (вихрь, модель скрыта) → сборка → разрез; сборка кончается замахом, разрез с него

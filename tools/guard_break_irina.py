@@ -78,8 +78,8 @@ def build():
          (0.255, dict(ayaw=64.0, apit=46.0, byaw=-31.0, bpit=149.0)),
          (0.45, dict(ayaw=26.0, apit=48.0, byaw=-14.0, bpit=88.0)),
          (0.80, dict(ayaw=-4.0, apit=-14.0, byaw=-3.0, bpit=-4.0)),          # крюк в блок (грудь цели)
-         (0.86, dict(ayaw=-22.0, apit=-24.0, byaw=-24.0, bpit=-30.0)),
-         (0.90, dict(ayaw=-16.0, apit=-26.0, byaw=-18.0, bpit=-14.0)),
+         (0.86, dict(ayaw=-22.0, apit=-16.0, byaw=-24.0, bpit=-12.0)),
+         (0.90, dict(ayaw=-16.0, apit=-18.0, byaw=-18.0, bpit=0.0)),
          (1.0, dict(HOLD))]
 
     def pose(t):

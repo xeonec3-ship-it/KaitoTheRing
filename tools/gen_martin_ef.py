@@ -421,3 +421,477 @@ def define_gestures(A, m, G, g, sf):
     a = A('warcry', 1.8)
     a.sample(warcry, 0.02)
     a.instruction(0.6, 'cry')
+
+
+# ================================================================== остаток Мартина (ходьба, особые, фазы, сцены) — эталон EF, 21.11
+# Длины и тики событий — прежние (MartinMath). Все начинаются и кончаются в стойке STANCE с хватом GUARD_W (как idle), кроме петель
+# и «держащих» (hold_the_line → hold_loop → hold_end, block_yield → to_npc → npc_idle — стыки между ними совпадают).
+# Оружие — путь по времени из точек трёх видов: ('G',) — хват стойки (мир, от таза), ('T', кисть, клинок) — в осях торса
+# (как старые GUARD/LEAN/HOLD_SW), ('W', кисть, клинок) — неподвижно в мире (меч воткнут в землю: остриё не ездит вместе с телом).
+class FnK:
+    """Ключи-функция: fn(t) → dict (для петель — ходьба, дыхание)."""
+
+    def __init__(self, fn):
+        self.fn = fn
+
+    def __call__(self, t, name, default=0.0):
+        v = self.fn(t).get(name, default)
+        return np.asarray(v, float) if isinstance(v, (tuple, list)) else v
+
+    def f(self, t, name, default=0.0):
+        return float(self(t, name, default))
+
+
+def _unit(v):
+    v = np.asarray(v, float)
+    return v / np.linalg.norm(v)
+
+
+def define_rest(A, m, G, g, sf):
+    bd = Body(m, G, g, sf)
+    vis = G.vis
+    ST = dict(yaw=-32.0, pitch=-4.0, roll=0.0, tyaw=0.0, tpitch=0.0, pel=(0.3, 0.0), drop=0.35, hpitch=0.0,
+              rf=(3.4, 2.5, -38.0, 0.0), lf=(-2.6, -2.7, -8.0, 0.0), lw=1.0, larm=(0.0, 0.0, 0.0), lfore=0.0, wind=0.0)
+    GUARD_T, LEAN_T = G.GUARD, G.LEAN
+    LEAN_W = ('W', (0.3, 18.6, -7.6), (0.0, -0.99, -0.12))                 # опора на меч (как прежний LEAN в покое): остриё в земле
+    HOLD_SW = ('T', (5.0, 30.0, -2.0), (0.1, 0.9, -0.42))                   # меч поднят над щитом
+    DOWN_T = ('T', (4.0, 13.5, -4.0), (0.12, -0.45, -0.88))                 # опущенный меч (сдача), остриё у земли
+
+    def wp(o, p):
+        if p[0] == 'G':
+            pel = o['body']['pos']
+            return (cyl(GUARD_W['hphi'], GUARD_W['hr'], GUARD_W['hy']) + np.array([pel[0], 0.0, pel[2]]),
+                    sag_dir(GUARD_W['byaw'], GUARD_W['bth']))
+        if p[0] == 'T':
+            Mt, ot = G.fk(m, o, 'torso')
+            return Mt @ np.asarray(p[1], float) + ot, Mt @ _unit(p[2])
+        return np.asarray(p[1], float), _unit(p[2])
+
+    def wpath(o, P, t):
+        """P: [(t, точка, кривая)] → (кисть, клинок) в мире."""
+        if t <= P[0][0]:
+            return wp(o, P[0][1])
+        for (t0, p0, *_), (t1, p1, e) in zip(P, P[1:]):
+            if t <= t1:
+                k = B.ease((t - t0) / max(1e-6, t1 - t0), e)
+                h0, d0 = wp(o, p0)
+                h1, d1 = wp(o, p1)
+                return h0 * (1 - k) + h1 * k, G.lerp_dir(d0, d1, k)
+        return wp(o, P[-1][1])
+
+    def arm_to(o, hw, dw, left):
+        sh = G.world_pt(m, o, 'right_arm', m.bones['right_arm'].pivot)
+        d = hw - sh
+        if np.linalg.norm(d) > REACH:
+            hw = sh + d / np.linalg.norm(d) * REACH
+        Mt, ot = G.fk(m, o, 'torso')
+        g(o, Mt.T @ (hw - ot), Mt.T @ _unit(dw), left=left)
+
+    def pose(K, t, look=0.0, cape_lag=0.1, sway=1.0, period=3.0):
+        o = bd.body(K, t, look=look, wind=float(K(t, 'wind', 0.0)), cape_lag=cape_lag, sway=sway, period=period)
+        o['left_arm'] = {'rot': list(np.asarray(K(t, 'larm', (0.0, 0.0, 0.0)), float))}
+        o['left_forearm'] = {'rot': [float(K(t, 'lfore', 0.0)), 0.0, 0.0]}
+        return o
+
+    def shield(o, K, t):
+        w = float(K(t, 'sw', 0.0))
+        if w > 0.005:
+            sf(o, tuple(K(t, 'sh', (-0.8, 12.6, -6.4))), tilt=float(K(t, 'stilt', 8.0)), yaw=float(K(t, 'syaw', 0.0)), w=min(1.0, w))
+
+    # ---------------------------------------------------------------- walk (петля 1.6; step 0.4 / 1.2 — удар правой / левой пяткой)
+    # стопы — точки на земле: опора уезжает назад под телом, перенос — дугой вперёд; таз ниже всего на ударе пятки и выше всего над
+    # опорой, качается к опорной ноге; плечи крутятся против бёдер, свободная рука — против ноги; меч на плече.
+    S = 4.2
+
+    def foot(u, x):
+        if u < 0.5:
+            return (x, -S + 2 * S * u / 0.5, 0.0, 0.0)
+        v = (u - 0.5) / 0.5
+        return (x, S - 2 * S * B.ease(v, 'io'), 0.0, 2.2 * math.sin(math.pi * v))
+
+    def walk_k(t):
+        u = (t / 1.6 - 0.25) % 1.0
+        c = math.cos(TAU * u)
+        return dict(yaw=-8.0 - 7.0 * c, pitch=-5.0, roll=-1.5 * math.sin(TAU * u), tyaw=2.5 * c, tpitch=1.0 * math.cos(2 * TAU * u),
+                    pel=(0.35 * math.sin(TAU * u), -0.3), drop=0.55 + 0.35 * math.cos(2 * TAU * u),
+                    rf=foot(u, 2.8), lf=foot((u + 0.5) % 1.0, -2.8), hpitch=1.0,
+                    larm=(20.0 * c, 0.0, -7.0), lfore=14.0 + 8.0 * max(0.0, c), wind=3.0)
+    WK = FnK(walk_k)
+
+    def walk(t):
+        o = pose(WK, t, period=0.8)
+        g(o, G.SHOULDER[0], G.SHOULDER[1], left=0)
+        return vis(o)
+    a = A('walk', 1.6, True)
+    a.sample(walk, 0.05)
+    a.instruction(0.4, 'step')
+    a.instruction(1.2, 'step')
+
+    # ---------------------------------------------------------------- banner_plant (raise 0.7, plant 1.3): знамя в левой — вверх
+    # (корпус назад, вес назад), удар древком в землю с шагом левой и просадкой, держит, стойка к 2.4. Меч — одной правой у бедра.
+    def bp_k(dn, up):
+        return dict(larm=(150.0 * up + 50.0 * dn, 0.0, -10.0 * up), lfore=10.0 * up)
+    BP_K = Keys([(0.0, dict(ST)),
+                 (0.2, dict(lw=0.0), 'io'),
+                 (0.7, dict(yaw=-4.0, pitch=8.0, roll=-3.0, drop=0.2, pel=(0.3, 0.8), hpitch=16.0, **bp_k(0, 1), wind=3.0), 'out'),
+                 (1.15, dict(yaw=-2.0, pitch=10.0, drop=0.3, hpitch=18.0, pel=(0.3, 1.0), lf=(-2.6, -2.7, -8.0, 1.6), **bp_k(0, 1)), 'io'),
+                 (1.3, dict(yaw=4.0, pitch=-16.0, roll=2.0, drop=1.8, pel=(-0.2, -2.0), hpitch=-10.0, lf=(-2.9, -6.2, -4.0, 0.0),
+                            **bp_k(1, 0), wind=0.0), 'in'),
+                 (1.4, dict(pitch=-18.0, drop=1.95), 'back'),
+                 (1.8, dict(yaw=2.0, pitch=-14.0, drop=1.7, pel=(-0.2, -1.9), lf=(-2.9, -6.2, -4.0, 0.0), **bp_k(1, 0)), 'io'),
+                 (2.05, dict(lf=(-2.7, -4.0, -6.0, 1.2), pel=(0.1, -0.8), drop=0.9, **bp_k(0, 0)), 'io'),
+                 (2.2, dict(lw=0.0), 'io'),
+                 (2.4, dict(ST), 'io')])
+    BP_BAN = Keys([(0.0, dict(r=0.0)), (1.15, dict(r=0.0)), (1.3, dict(r=-90.0), 'in'), (2.4, dict(r=-90.0))])
+    BP_W = [(0.0, ('G',), 'io'), (0.6, ('T', (4.6, 14.0, -4.0), (0.25, 0.75, -0.6)), 'io'), (1.8, ('T', (4.6, 14.0, -4.0), (0.25, 0.75, -0.6)), 'io'),
+            (2.4, ('G',), 'io')]
+
+    # Подмена знамени сущностью (MartinFight.plantBanner, тик PLANT_AT = 26 = 1.3 с): к 1.3 древко в руке стоит ВЕРТИКАЛЬНО, низ — в точке
+    # сущности (MartinMath.BANNER_FWD / BANNER_LEFT, бл. → ед. модели Мартина ×8), полотнище лицом вперёд, размер — как у сущности
+    # (масштаб кости). 1.3–1.4 рука держит древко на месте (перекрытие на тик), потом знамя в руке скрыто, рука отпускает.
+    BAN_B = np.array([-1.125 * 8.0, 0.0, -1.5 * 8.0])          # = MartinMath.BANNER_LEFT 1.125, BANNER_FWD 1.5
+    BAN_S = [0.7, 0.871, 0.871]                                 # высота 63.4 px и полотнище 14 px — как martin_banner.geo.json
+    BAN_P = np.array([-5.6, 10.6, -0.2])                        # шарнир banner_held = кисть; древко — ось y, низ на −10
+    BAN_GRIP = 14.0                                             # кисть над землёй в момент вонзания (рука дотягивается)
+    BAN_HAND = Keys([(0.9, dict(h=0.0)), (1.15, dict(h=1.0)), (1.4, dict(h=1.0)), (1.75, dict(h=0.0))])
+    BAN_DROP = Keys([(0.0, dict(y=12.0)), (1.15, dict(y=12.0)), (1.3, dict(y=0.0), 'in'), (2.4, dict(y=0.0))])
+    bprev = [None]
+
+    def plant(t):
+        o = pose(BP_K, t)
+        o['banner_held'] = {'rot': [BP_BAN.f(t, 'r'), 0.0, 0.0]}
+        arm_to(o, *wpath(o, BP_W, t), left=BP_K.f(t, 'lw'))
+        w = B.ease(BAN_HAND.f(t, 'h'), 'io')
+        if w > 0.001:
+            # кисть: от позы по ключам к точке над местом сущности (знамя опускается на BAN_DROP), решатель руки
+            hk = G.world_pt(m, o, 'left_forearm', BAN_P)
+            ht = BAN_B + np.array([0.0, BAN_GRIP + BAN_DROP.f(t, 'y'), 0.0])
+            sol, _ = G.solve_arm(m, o, 'left', hk * (1 - w) + ht * w, bprev[0])
+            bprev[0] = sol
+            o['left_arm'] = dict(o['left_arm'], rot=list(sol[:3]))
+            o['left_forearm'] = {'rot': [sol[3], 0, 0]}
+            # древко вертикально: полный поворот кости = I (коробки знамени заданы стоя) → углы = to_euler(Mf^T) − покой кости
+            Mf, _ = G.fk(m, o, 'left_forearm')
+            rv = np.array(G.to_euler(Mf.T), float) - np.asarray(m.bones['banner_held'].rot, float)
+            rk = np.array(o['banner_held']['rot'], float)
+            rv += 360.0 * np.round((rk - rv) / 360.0)
+            o['banner_held']['rot'] = list(rk * (1 - w) + rv * w)
+            # низ древка — в точку (кисть держит выше по древку): сдвиг кости вдоль древка в осях предплечья
+            low = G.world_pt(m, o, 'banner_held', BAN_P + np.array([0.0, -10.0 * BAN_S[1], 0.0]))
+            want = BAN_B + np.array([0.0, -0.5 + BAN_DROP.f(t, 'y'), 0.0])
+            top = G.world_pt(m, o, 'banner_held', BAN_P + np.array([0.0, 26.4 * BAN_S[1], 0.0]))
+            ax = (top - low) / np.linalg.norm(top - low)
+            o['banner_held']['pos'] = list(Mf.T @ (ax * float((want - low) @ ax)) * w)       # только вдоль древка: оно всегда в кулаке
+        else:
+            bprev[0] = None
+        o = vis(o, banner=0.15 < t < 1.4)            # знамя «в руке» — когда левая отпустила рукоять; до 1.4 — перекрытие с сущностью
+        if 0.15 < t < 1.4:
+            o['banner_held']['scale'] = list(BAN_S)
+        return o
+    a = A('banner_plant', 2.4)
+    a.sample(plant, 0.02)
+    a.instruction(0.7, 'raise')
+    a.instruction(1.3, 'plant')
+
+    # ---------------------------------------------------------------- «Стоять насмерть»: hold_the_line (shield_draw 0.15, wall 1.1),
+    # hold_loop (2.0, дыхание), hold_end (0.8). Щит со спины — вверх (собирается, вес назад), с размаху в землю перед собой с шагом левой,
+    # широкая низкая стойка лицом к врагу, меч поднят над щитом.
+    HOLD = dict(yaw=-8.0, pitch=-10.0, roll=0.0, tyaw=0.0, pel=(0.0, -1.0), drop=1.9, hpitch=6.0, rf=(4.0, 3.4, -25.0, 0.0),
+                lf=(-3.4, -5.0, -5.0, 0.0), lw=0.0, sw=1.0, sh=(-0.8, 12.6, -6.4), stilt=8.0, wind=0.0)
+    HT_K = Keys([(0.0, dict(ST, sw=0.0, sh=(-1.2, 15.0, -6.0), stilt=0.0)),
+                 (0.15, dict(lw=0.0), 'io'),
+                 (0.45, dict(sw=1.0), 'io'),
+                 (0.7, dict(yaw=-16.0, pitch=5.0, drop=0.5, pel=(0.3, 0.9), hpitch=4.0, sh=(-1.2, 18.0, -6.0), stilt=-8.0,
+                            lf=(-2.6, -2.7, -8.0, 0.0)), 'out'),
+                 (0.85, dict(lf=(-3.0, -4.0, -6.0, 1.4)), 'io'),
+                 (1.1, dict(HOLD, pitch=-12.0, drop=2.0), 'in'),
+                 (1.25, dict(pitch=-13.0, drop=2.05), 'back'),
+                 (1.5, dict(HOLD), 'io'),
+                 (2.5, dict(HOLD), 'io')])
+    HT_W = [(0.0, ('G',), 'io'), (0.7, ('T', (4.6, 24.0, -3.0), (0.15, 0.95, -0.25)), 'out'), (1.1, HOLD_SW, 'in'), (2.5, HOLD_SW, 'io')]
+
+    def hold(t):
+        o = pose(HT_K, t)
+        shield(o, HT_K, t)
+        arm_to(o, *wpath(o, HT_W, t), left=HT_K.f(t, 'lw'))
+        return vis(o, shield_hand=t > 0.15)
+    a = A('hold_the_line', 2.5, 'hold')
+    a.sample(hold, 0.02)
+    a.instruction(0.15, 'shield_draw')
+    a.instruction(1.1, 'wall')
+
+    def hl_k(t):
+        br = math.sin(TAU * t / 2.0)
+        return dict(HOLD, drop=HOLD['drop'] - 0.12 * br, pitch=HOLD['pitch'] + 1.0 * br, tpitch=0.6 * br, hpitch=HOLD['hpitch'] - 0.8 * br)
+    HL_K = FnK(hl_k)
+
+    def hold_loop(t):
+        o = pose(HL_K, t, period=2.0)
+        shield(o, HL_K, t)
+        br = math.sin(TAU * t / 2.0)
+        arm_to(o, *wp(o, ('T', (5.0, 30.0 + 0.2 * br, -2.0), HOLD_SW[2])), left=0.0)
+        return vis(o, shield_hand=True)
+    A('hold_loop', 2.0, True).sample(hold_loop, 0.05)
+
+    HE_K = Keys([(0.0, dict(HOLD)),
+                 (0.2, dict(drop=1.6, pitch=-8.0), 'io'),
+                 (0.42, dict(lf=(-2.9, -4.0, -6.0, 1.2), rf=(3.7, 3.0, -32.0, 0.0), pel=(0.1, -0.5), drop=1.0), 'io'),
+                 (0.6, dict(sw=0.15, sh=(-1.2, 15.0, -6.0), stilt=0.0), 'io'),
+                 (0.65, dict(sw=0.0, lw=0.0), 'io'),
+                 (0.8, dict(ST, sw=0.0, sh=(-1.2, 15.0, -6.0), stilt=0.0), 'io')])
+    HE_W = [(0.0, HOLD_SW, 'io'), (0.8, ('G',), 'io')]
+
+    def hold_end(t):
+        o = pose(HE_K, t)
+        shield(o, HE_K, t)
+        arm_to(o, *wpath(o, HE_W, t), left=HE_K.f(t, 'lw'))
+        return vis(o, shield_hand=t < 0.7)
+    A('hold_end', 0.8).sample(hold_end, 0.02)
+
+    # ---------------------------------------------------------------- phase2 (66%; plant 0.6, roar 1.4): меч вверх остриём вниз
+    # (вес назад) — вонзает в землю перед собой с шагом и просадкой, налегает на навершие; выпрямляется и ревёт (корпус назад, голова
+    # вверх); к 2.4 выдёргивает меч и встаёт в стойку — в 2.4 код запускает banner_plant (MartinMath.P2_PLANT_ANIM), стык — стойка.
+    P_PLANT = ('W', (0.3, 17.4, -9.6), (0.0, -0.97, -0.24))
+    P2_K = Keys([(0.0, dict(ST)),
+                 (0.42, dict(yaw=-18.0, pitch=7.0, drop=0.2, pel=(0.3, 0.8), hpitch=8.0), 'out'),
+                 (0.5, dict(lf=(-2.8, -4.4, -6.0, 1.2)), 'io'),
+                 (0.6, dict(yaw=-6.0, pitch=-16.0, roll=2.0, drop=1.9, pel=(0.0, -1.6), hpitch=-14.0, lf=(-3.0, -5.6, -6.0, 0.0)), 'in'),
+                 (0.7, dict(pitch=-18.0, drop=2.0), 'back'),
+                 (1.15, dict(pitch=-12.0, drop=1.6, hpitch=-8.0), 'io'),
+                 (1.4, dict(yaw=-10.0, pitch=10.0, roll=0.0, drop=0.6, pel=(0.1, -0.6), hpitch=28.0, wind=8.0), 'in'),
+                 (1.5, dict(pitch=12.0, hpitch=31.0), 'back'),
+                 (1.9, dict(pitch=9.0, hpitch=24.0, wind=5.0, drop=0.7, lf=(-3.0, -5.6, -6.0, 0.0)), 'io'),
+                 (2.12, dict(pitch=-6.0, drop=1.1, hpitch=0.0, pel=(0.2, -1.0), wind=0.0, lf=(-2.8, -4.0, -8.0, 1.0)), 'io'),
+                 (2.4, dict(ST), 'io'), (3.0, dict(ST), 'io')])
+    P2_W = [(0.0, ('G',), 'io'), (0.42, ('T', (1.6, 27.0, -6.6), (0.05, -0.55, -0.83)), 'out'), (0.6, P_PLANT, 'in'), (1.95, P_PLANT, 'io'),
+            (2.15, ('T', (2.2, 19.0, -7.5), (-0.1, 0.4, -0.9)), 'out'), (2.4, ('G',), 'io')]
+
+    def phase2(t):
+        o = pose(P2_K, t)
+        arm_to(o, *wpath(o, P2_W, t), left=1.0)
+        return vis(o)
+    a = A('phase2', 3.0)
+    a.sample(phase2, 0.02)
+    a.instruction(0.6, 'plant')
+    a.instruction(1.4, 'roar')
+
+    # ---------------------------------------------------------------- phase3 (33%; kneel 0.8, spin 1.4, roar 2.0): оседает на воткнутый
+    # меч (низкая стойка), рывком выдёргивает и оборачивается на месте (стопы проворачиваются на носках), меч над головой, рёв; стойка к 3.2.
+    # Поворот на 360° — как и прежде, кость body заканчивает на yaw стойки + 360 (тот же поворот).
+    P3_K = Keys([(0.0, dict(ST, spin=0.0)),
+                 (0.5, dict(lf=(-2.8, -4.6, -6.0, 1.2)), 'io'),
+                 (0.8, dict(yaw=-10.0, pitch=-20.0, roll=3.0, drop=2.0, pel=(0.0, -1.6), hpitch=-20.0, lf=(-3.0, -6.0, -4.0, 0.0),
+                            rf=(3.6, 3.6, -30.0, 0.0)), 'out'),
+                 (1.3, dict(pitch=-17.0, drop=1.9, hpitch=-14.0), 'io'),
+                 (1.45, dict(pitch=-4.0, drop=1.2, hpitch=0.0, spin=0.0, lf=(-3.0, -6.0, -4.0, 0.4), rf=(3.6, 3.6, -30.0, 0.4)), 'io'),
+                 (1.9, dict(spin=360.0, pitch=6.0, drop=0.9, wind=6.0, lf=(-3.0, -6.0, -4.0, 0.0), rf=(3.6, 3.6, -30.0, 0.0)), 'io'),
+                 (2.0, dict(pitch=12.0, hpitch=28.0, drop=0.7, wind=10.0), 'in'),
+                 (2.1, dict(pitch=14.0, hpitch=31.0), 'back'),
+                 (2.6, dict(pitch=11.0, hpitch=24.0, wind=6.0, drop=0.8, lf=(-3.0, -6.0, -4.0, 0.0), rf=(3.6, 3.6, -30.0, 0.0)), 'io'),
+                 (2.85, dict(lf=(-2.8, -4.0, -6.0, 1.0), pel=(0.2, -0.8), wind=0.0, hpitch=0.0, pitch=-4.0), 'io'),
+                 (3.0, dict(rf=(3.4, 2.5, -38.0, 0.0)), 'io'),
+                 (3.2, dict(ST, spin=360.0), 'io')])
+    P3_PLANT = ('W', (0.3, 15.6, -9.4), (0.0, -0.96, -0.28))
+    OVER = ('T', (2.0, 32.0, -1.0), (0.1, 0.95, 0.3))
+    P3_W = [(0.0, ('G',), 'io'), (0.8, P3_PLANT, 'out'), (1.4, P3_PLANT, 'io'), (1.52, ('T', (2.4, 22.0, -9.0), (0.0, 0.35, -0.94)), 'out'),
+            (1.72, ('T', (3.6, 29.0, -7.0), (0.1, 0.8, -0.6)), 'io'), (1.95, OVER, 'io'), (2.6, OVER, 'io'), (3.2, ('G',), 'io')]
+
+    class Spin:
+        def __call__(self, t, name, default=0.0):
+            v = P3_K(t, name, default)
+            if name == 'yaw':
+                return float(v) + P3_K.f(t, 'spin')
+            if name in ('rf', 'lf'):
+                ph = math.radians(P3_K.f(t, 'spin'))
+                x, z, yw, lift = [float(q) for q in v]
+                return np.array([x * math.cos(ph) + z * math.sin(ph), -x * math.sin(ph) + z * math.cos(ph), yw + math.degrees(ph), lift])
+            return v
+
+        def f(self, t, name, default=0.0):
+            return float(self(t, name, default))
+    SP = Spin()
+
+    def phase3(t):
+        o = pose(SP, t)
+        arm_to(o, *wpath(o, P3_W, t), left=1.0)
+        return vis(o)
+    a = A('phase3', 3.2)
+    a.sample(phase3, 0.02)
+    a.instruction(0.8, 'kneel')
+    a.instruction(1.4, 'spin')
+    a.instruction(2.0, 'roar')
+
+    # ---------------------------------------------------------------- spawn (6.5; look 1.0, rise 2.6, pull 4.0, salute 5.0): на колене
+    # (позы ног — прежние), руки на воткнутом мече, поднимает голову; встаёт, перенося вес вперёд; выдёргивает меч с замахом вверх,
+    # салют (клинок перед лицом, лицом к цели), шаг правой назад — стойка.
+    KN_L = {'right_leg': [86.0, 0.0, 6.0], 'left_leg': [-86.0, 0.0, 0.0]}                    # прежнее колено (внутренние оси)
+    SAL = ('T', (0.5, 26.0, -5.5), (0.0, 1.0, -0.05))
+    SN_K = Keys([(0.0, dict(ST, yaw=0.0, pitch=-12.0, hpitch=-26.0, kn=1.0, lw=1.0, rf=(2.8, 0.0, 0.0, 0.0), lf=(-2.8, 0.0, 0.0, 0.0), drop=0.3)),
+                 (1.0, dict(hpitch=-26.0), 'io'),
+                 (2.4, dict(hpitch=4.0, pitch=-10.0), 'out'),
+                 (2.6, dict(kn=1.0, pitch=-10.0), 'io'),
+                 (3.2, dict(kn=0.35, pitch=-18.0, hpitch=-2.0, drop=1.2, pel=(0.0, -1.0)), 'io'),
+                 (3.6, dict(kn=0.0, pitch=-6.0, drop=0.6, pel=(0.1, -0.4), rf=(3.0, 1.2, -20.0, 0.0), lf=(-2.8, -2.0, -6.0, 0.0)), 'out'),
+                 (3.9, dict(pitch=-10.0, drop=1.0, yaw=-12.0), 'io'),
+                 (4.4, dict(pitch=6.0, drop=0.3, yaw=-4.0, hpitch=6.0, wind=4.0), 'out'),
+                 (4.6, dict(lw=1.0), 'io'), (4.8, dict(lw=0.0, larm=(4.0, 0.0, -6.0)), 'io'),
+                 (5.0, dict(yaw=0.0, pitch=2.0, drop=0.25, hpitch=0.0, wind=0.0), 'in'),
+                 (5.1, dict(pitch=3.0), 'back'),
+                 (5.8, dict(pitch=1.0, lw=0.0, rf=(3.0, 1.2, -20.0, 0.0)), 'io'),
+                 (6.05, dict(rf=(3.3, 2.0, -32.0, 1.2), lw=1.0, larm=(0.0, 0.0, 0.0)), 'io'),
+                 (6.25, dict(rf=(3.4, 2.5, -38.0, 0.0), lf=(-2.6, -2.7, -8.0, 0.0)), 'io'),
+                 (6.5, dict(ST), 'io')])
+    SN_W = [(0.0, ('T', (0.3, 23.6, -7.6), LEAN_T[1]), 'io'), (2.6, ('T', (0.3, 23.6, -7.6), LEAN_T[1]), 'io'),
+            (3.6, LEAN_W, 'io'), (3.9, LEAN_W, 'io'), (4.4, ('G',), 'out'), (5.0, SAL, 'in'), (5.8, SAL, 'io'), (6.5, ('G',), 'io')]
+
+    def spawn(t):
+        o = pose(SN_K, t, sway=0.6)
+        kn = SN_K.f(t, 'kn')
+        if kn > 0.001:                                      # колено: прежние углы ног и просадка, смешиваются с ногами на земле
+            for leg, r in KN_L.items():
+                cur = np.asarray(o[leg]['rot'], float)
+                o[leg] = dict(o[leg], rot=list(cur * (1 - kn) + np.asarray(r) * kn))
+            p = o['body']['pos']
+            o['body']['pos'] = [p[0], p[1] * (1 - kn) - 6.2 * kn, p[2]]
+        arm_to(o, *wpath(o, SN_W, t), left=SN_K.f(t, 'lw'))
+        return vis(o)
+    a = A('spawn', 6.5)
+    a.sample(spawn, 0.04)
+    a.instruction(1.0, 'look')
+    a.instruction(2.6, 'rise')
+    a.instruction(4.0, 'pull')
+    a.instruction(5.0, 'salute')
+
+    # ---------------------------------------------------------------- block_yield (3.2, держит; block 0.2, lower 1.2, speak 2.4): щит
+    # рывком вверх, отдача удара (отшаг правой, корпус назад), держит; щит за спину, меч опускается остриём к земле, голова вниз.
+    YE = dict(yaw=-10.0, pitch=-5.0, roll=0.0, tyaw=0.0, pel=(0.2, 0.4), drop=0.3, hpitch=-12.0, rf=(3.0, 1.6, -20.0, 0.0),
+              lf=(-2.8, -1.4, -6.0, 0.0), lw=0.0, sw=0.0, larm=(4.0, 0.0, -5.0), lfore=10.0, wind=0.0)
+    BY_K = Keys([(0.0, dict(ST, sw=0.0, sh=(-1.2, 17.5, -6.0), stilt=-10.0, syaw=-10.0)),
+                 (0.1, dict(lw=0.0), 'io'),
+                 (0.15, dict(sw=1.0, yaw=-30.0, pitch=-8.0, drop=1.1, hpitch=-4.0), 'out'),
+                 (0.2, dict(pel=(0.3, 0.0)), 'io'),
+                 (0.3, dict(pitch=2.0, pel=(0.4, 1.6), drop=1.3, sh=(-1.2, 16.5, -5.2), stilt=-4.0, rf=(3.5, 3.8, -38.0, 0.0)), 'out'),
+                 (0.7, dict(pitch=-6.0, pel=(0.3, 1.0), drop=1.0, sh=(-1.2, 17.5, -6.0), stilt=-10.0), 'io'),
+                 (0.9, dict(sw=1.0), 'io'),
+                 (1.2, dict(yaw=-18.0, drop=0.7, hpitch=-6.0), 'io'),
+                 (2.0, dict(sw=0.0, sh=(-1.2, 15.0, -6.0), stilt=0.0, rf=(3.0, 1.6, -20.0, 0.0)), 'io'),
+                 (1.75, dict(rf=(3.3, 2.6, -28.0, 1.0)), 'io'),
+                 (2.6, dict(YE), 'io'),
+                 (3.2, dict(YE), 'io')])
+    BY_W = [(0.0, ('G',), 'io'), (1.2, ('G',), 'io'), (2.6, DOWN_T, 'io'), (3.2, DOWN_T, 'io')]
+
+    def yield_(t):
+        o = pose(BY_K, t)
+        shield(o, BY_K, t)
+        arm_to(o, *wpath(o, BY_W, t), left=BY_K.f(t, 'lw'))
+        return vis(o, shield_hand=0.1 < t < 2.1)
+    a = A('block_yield', 3.2, 'hold')
+    a.sample(yield_, 0.02)
+    a.instruction(0.2, 'block')
+    a.instruction(1.2, 'lower')
+    a.instruction(2.4, 'speak')
+
+    # ---------------------------------------------------------------- мирный NPC: опирается на воткнутый меч, вес гуляет, дыхание 4 с
+    NPC = dict(yaw=-8.0, pitch=-4.0, roll=0.0, tyaw=0.0, pel=(0.2, 0.0), drop=0.3, hpitch=2.0, rf=(3.0, 1.0, -22.0, 0.0),
+               lf=(-3.0, -1.0, -10.0, 0.0), lw=1.0, larm=(0.0, 0.0, 0.0), lfore=0.0, wind=0.0)
+
+    def npc_k(t):
+        br = math.sin(TAU * t / 4.0)
+        sw = math.sin(TAU * t / 4.0 + 1.3)
+        return dict(NPC, drop=NPC['drop'] - 0.1 * br, pitch=NPC['pitch'] - 0.6 * br, tpitch=0.6 * br, pel=(0.2 + 0.3 * sw, 0.03 * br),
+                    yaw=NPC['yaw'] + 1.0 * sw, hpitch=NPC['hpitch'] + 0.6 * br)
+    NK = FnK(npc_k)
+
+    def npc(t):
+        o = pose(NK, t, sway=0.7, period=4.0)
+        arm_to(o, *wp(o, LEAN_W), left=1.0)
+        return vis(o)
+    A('npc_idle', 4.0, True).sample(npc, 0.1)
+
+    TN_K = Keys([(0.0, dict(YE)), (0.5, dict(lw=0.3), 'io'), (1.2, dict(npc_k(0.0)), 'io')])
+    TN_W = [(0.0, DOWN_T, 'io'), (1.2, LEAN_W, 'io')]
+
+    def to_npc(t):
+        o = pose(TN_K, t, sway=0.7)
+        arm_to(o, *wpath(o, TN_W, t), left=TN_K.f(t, 'lw'))
+        return vis(o)
+    A('to_npc', 1.2, 'hold').sample(to_npc, 0.04)
+
+    # ---------------------------------------------------------------- shield_wall (2.0; shield_draw 0.15, slam 1.0): щит со спины над
+    # головой (корпус назад, вес назад), с размаху в землю с шагом левой и просадкой, меч поднят; стойка к 2.0
+    SW_K = Keys([(0.0, dict(ST, sw=0.0, sh=(-1.2, 15.0, -6.0), stilt=0.0)),
+                 (0.15, dict(lw=0.0), 'io'),
+                 (0.4, dict(sw=1.0), 'io'),
+                 (0.6, dict(yaw=-14.0, pitch=9.0, drop=0.15, pel=(0.3, 1.0), hpitch=10.0, sh=(-1.5, 22.0, -5.5), stilt=-16.0, wind=3.0), 'out'),
+                 (0.85, dict(pitch=10.0, sh=(-1.5, 22.5, -5.2), stilt=-18.0, lf=(-2.9, -4.2, -6.0, 1.4)), 'lin'),
+                 (1.0, dict(yaw=-6.0, pitch=-14.0, drop=2.0, pel=(0.0, -1.2), hpitch=0.0, sh=(-0.8, 12.6, -6.4), stilt=8.0, wind=0.0,
+                            lf=(-3.3, -5.4, -5.0, 0.0), rf=(3.9, 3.2, -26.0, 0.0)), 'in'),
+                 (1.12, dict(pitch=-16.0, drop=2.05), 'back'),
+                 (1.6, dict(pitch=-12.0, drop=1.85, sw=1.0, lf=(-3.3, -5.4, -5.0, 0.0), rf=(3.9, 3.2, -26.0, 0.0)), 'io'),
+                 (1.75, dict(lf=(-2.9, -4.0, -6.0, 1.2), pel=(0.2, -0.6), drop=1.0), 'io'),
+                 (1.85, dict(sw=0.0, lw=0.0), 'io'),
+                 (2.0, dict(ST, sw=0.0, sh=(-1.2, 15.0, -6.0), stilt=0.0), 'io')])
+    SWL_W = [(0.0, ('G',), 'io'), (0.6, ('T', (4.6, 24.0, -3.0), (0.15, 0.95, -0.25)), 'out'), (1.0, HOLD_SW, 'in'), (1.6, HOLD_SW, 'io'),
+             (2.0, ('G',), 'io')]
+
+    def shieldwall(t):
+        o = pose(SW_K, t)
+        shield(o, SW_K, t)
+        arm_to(o, *wpath(o, SWL_W, t), left=SW_K.f(t, 'lw'))
+        return vis(o, shield_hand=0.15 < t < 1.9)
+    a = A('shield_wall', 2.0)
+    a.sample(shieldwall, 0.02)
+    a.instruction(0.15, 'shield_draw')
+    a.instruction(1.0, 'slam')
+
+    # ---------------------------------------------------------------- finisher (2.5; impale 0.4, raise 0.8, throw 1.7, slam 2.0, kill 2.3):
+    # выпад с шагом левой (таз вперёд и вниз, плечи к цели), поднимает жертву на клинке, корпус назад — над головой, бросает к ногам
+    # ударом вниз с просадкой, стойка. Клинок всё время в груди жертвы (MartinMath.finisherHold — как и прежде).
+    FN_K = Keys([(0.0, dict(ST)),
+                 (0.3, dict(lf=(-2.8, -5.0, -6.0, 1.4)), 'io'),
+                 (0.4, dict(yaw=-6.0, pitch=-12.0, roll=2.0, drop=1.5, pel=(-0.2, -3.0), hpitch=-6.0, lf=(-3.0, -7.4, -4.0, 0.0),
+                            rf=(3.4, 2.0, -30.0, 0.0)), 'in'),
+                 (0.5, dict(pitch=-13.0, drop=1.6), 'back'),
+                 (0.8, dict(pitch=-6.0, drop=1.2, hpitch=4.0), 'io'),
+                 (1.5, dict(yaw=-4.0, pitch=10.0, drop=0.6, pel=(-0.1, -2.4), hpitch=22.0, wind=6.0), 'io'),
+                 (1.7, dict(pitch=11.0, hpitch=24.0, wind=6.0, lf=(-3.0, -7.4, -4.0, 0.0)), 'io'),
+                 (2.0, dict(pitch=-20.0, drop=1.9, pel=(-0.2, -3.2), hpitch=-10.0, wind=0.0), 'in'),
+                 (2.08, dict(pitch=-21.0, drop=1.95), 'back'),
+                 (2.2, dict(pitch=-18.0, drop=1.8, lf=(-3.0, -7.4, -4.0, 0.0), rf=(3.4, 2.0, -30.0, 0.0)), 'io'),
+                 (2.36, dict(lf=(-2.8, -4.0, -6.0, 1.0), rf=(3.4, 2.5, -38.0, 0.0), pel=(0.1, -1.0), drop=0.9, pitch=-6.0, hpitch=0.0), 'io'),
+                 (2.5, dict(ST), 'io')])
+    FN_H = [(0.0, ('G',), 'io'), (0.4, ('T', (2.5, 14.0, -11.0), GUARD_T[1]), 'in'), (0.8, ('T', (2.5, 19.0, -9.5), GUARD_T[1]), 'io'),
+            (1.5, ('T', (2.5, 30.0, -6.0), GUARD_T[1]), 'io'), (1.7, ('T', (2.5, 30.0, -6.0), GUARD_T[1]), 'io'),
+            (2.0, ('T', (1.0, 13.0, -10.0), GUARD_T[1]), 'in'), (2.2, ('T', (1.0, 13.0, -10.0), GUARD_T[1]), 'io'), (2.5, ('G',), 'io')]
+    FIN17 = [None]
+
+    def finisher(t):
+        o = pose(FN_K, t)
+        hw, _ = wpath(o, FN_H, t)
+        fh = G.finisher_hold(t * 20)
+        chest = np.array([0.0, (fh[1] + 1.2) * 8.0, -fh[0] * 8.0])        # мир модели: 1 бл. = 8 ед. (модель ×2)
+        aim = _unit(chest - hw)
+        Mt, _ = G.fk(m, o, 'torso')
+        dn = Mt @ _unit((0.0, -0.5, -0.87))
+        gd = wp(o, ('G',))[1]
+        if t < 0.25:
+            d = G.lerp_dir(gd, aim, B.ease(t / 0.25, 'io'))
+        elif t <= 1.7:
+            d = aim
+            if abs(t - 1.7) < 0.011:
+                FIN17[0] = aim
+        elif t <= 2.0:
+            d = G.lerp_dir(FIN17[0] if FIN17[0] is not None else aim, dn, B.ease((t - 1.7) / 0.3, 'in'))
+        elif t <= 2.2:
+            d = dn
+        else:
+            d = G.lerp_dir(dn, gd, B.ease((t - 2.2) / 0.3, 'io'))
+        arm_to(o, hw, d, left=1.0)
+        return vis(o)
+    a = A('finisher', 2.5)
+    a.sample(finisher, 0.02)
+    a.instruction(0.4, 'impale')
+    a.instruction(0.8, 'raise')
+    a.instruction(1.7, 'throw')
+    a.instruction(2.0, 'slam')
+    a.instruction(2.3, 'kill')

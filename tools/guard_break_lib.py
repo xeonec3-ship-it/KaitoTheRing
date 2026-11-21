@@ -26,10 +26,13 @@ A = AC.A
 D = math.pi / 180
 
 BOSS = {
-    'irina': dict(geo='irina', item='irina_staff', scale=1.0, chest='torso'),
-    'ereb': dict(geo='ereb', item='ereb_rapier', scale=1.0, chest='torso'),
-    'ereb_hand': dict(geo='ereb_hand', item='ereb_hand_rapier', scale=1.0, chest='torso'),
-    'cult_leader': dict(geo='cult_leader', item='cult_scythe', scale=1.75, chest='torso'),
+    'irina': dict(geo='irina', item='irina_staff', scale=1.0, chest='torso', hand2=True),
+    'ereb': dict(geo='ereb', item='ereb_rapier', scale=1.0, chest='torso', hand2=True),
+    'ereb_hand': dict(geo='ereb_hand', item='ereb_hand_rapier', scale=1.0, chest='torso', hand2=True),
+    # hand2: предмет в руке рисуется GeckoLib 4.8.4 с поворотом кисти ДВАЖДЫ (BlockAndItemGeoLayer.renderForBone, письмо
+    # docs/inbox/2026-11-21_mgr_t26_hold_tyros.md §1; anim_check.Model.item_world). Включено у Главы; Ирина/Эреб/Длань — по решению
+    # помощника по хвату (их guard_break он перепроверяет), флаг тот же.
+    'cult_leader': dict(geo='cult_leader', item='cult_scythe', scale=1.75, chest='torso', hand2=True),
     # Арис — своя модель (голени, предплечья), молот — кость hammer; только для проверки метрик (анимацию пишет gen_aris_anims)
     'aris': dict(geo='aris', item=None, scale=1.0, chest='torso', weapon_bone='hammer', shin=True),
 }
@@ -64,6 +67,7 @@ class JModel:
     def __init__(self, boss, anims=None):
         c = BOSS[boss]
         self.boss, self.scale, self.chest = boss, c['scale'], c['chest']
+        self.hand2 = bool(c.get('hand2'))
         g = json.load(open(os.path.join(A, 'geo', 'entity', c['geo'] + '.geo.json'), encoding='utf-8'))['minecraft:geometry'][0]
         self.bones = {}
         for b in g['bones']:
@@ -134,6 +138,12 @@ class JModel:
         # ось предмета: от кисти к самой дальней точке
         far = hp[int(np.argmax(np.linalg.norm(hp, axis=1)))]
         self.axis_far = far
+        # «верх» предмета по умолчанию (крен вокруг оси предмета): ось кисти y, перпендикулярно оси предмета
+        ax_ = far / max(1e-9, np.linalg.norm(far))
+        u_ = np.array([0.0, 1.0, 0.0]) - ax_ * ax_[1]
+        if np.linalg.norm(u_) < 0.3:
+            u_ = np.array([1.0, 0.0, 0.0]) - ax_ * ax_[0]
+        self.item_up = u_ / np.linalg.norm(u_)
         self.anims = anims if anims is not None else self._load_anims()
         self.special = {}                  # точки, заданные боссом: {'tip': p (оси кисти), 'butt': p, ...}
 
@@ -181,6 +191,20 @@ class JModel:
                 Rz(rest[2] + r[2] * D) @ Ry(rest[1] - r[1] * D) @ Rx(rest[0] - r[0] * D)
         return M
 
+    def hand_rot(self, pose):
+        """Поворот кости bipedHandRight (4×4, у шарнира) — второй раз GeckoLib поворачивает им предмет (если hand2)."""
+        if not self.hand2:
+            return np.eye(4)
+        b = self.bones['bipedHandRight']
+        r = pose.get('bipedHandRight', {}).get('rotation', (0, 0, 0))
+        rest = b['rest']
+        return Rz(rest[2] + r[2] * D) @ Ry(rest[1] - r[1] * D) @ Rx(rest[0] - r[0] * D)
+
+    def item_frame(self, pose, W=None):
+        """Матрица, которой рисуется предмет в правой руке (мир): кисть [· поворот кисти ещё раз]."""
+        Mh = W['bipedHandRight'] if W is not None else self.chain(pose, 'bipedHandRight')
+        return Mh @ self.hand_rot(pose)
+
     def world(self, an, t):
         pose = {}
         for n, bk in an['bones'].items():
@@ -193,6 +217,7 @@ class JModel:
                 q['position'] = AC.chan_at(bk['position'], t)
             pose[n] = q
         W = self.world_pose(pose)
+        W['~item'] = self.item_frame(pose, W)
         for n, bk in an['bones'].items():           # скрытые кости (scale 0) — как у GeckoLib
             if n in W and 'scale' in bk:
                 s = AC.chan_at(bk['scale'], t)
@@ -203,7 +228,7 @@ class JModel:
         return W
 
     def item_world(self, W):
-        m = W['bipedHandRight']
+        m = W.get('~item', W['bipedHandRight'])
         return np.array([ap(m, p) for p in self.item_hand])
 
     def foot_pt(self, W, leg):
@@ -213,7 +238,7 @@ class JModel:
 
     def strike_pts(self, W):
         """(основание, точка удара) — R-мир, для метрик."""
-        m = W[self.weapon_bone] if getattr(self, 'weapon_bone', None) else W['bipedHandRight']
+        m = W[self.weapon_bone] if getattr(self, 'weapon_bone', None) else W.get('~item', W['bipedHandRight'])
         a, b = self.special.get('strike', (np.zeros(3), self.axis_far))
         return flip(ap(m, a)), flip(ap(m, b))
 
@@ -338,34 +363,135 @@ class Solver:
         hb = 'bipedHandRight' if side == 'right' else 'bipedHandLeft'
         x0 = self.prev.get(bn, pose.get(bn, {}).get('rotation', [0.0, 0.0, 0.0]))
         x0 = np.array(x0, float)
+        # рука — одна кость: кисть всегда на расстоянии длины руки от плеча. Недостижимую цель проецируем на эту сферу (ближайшая
+        # достижимая точка единственна) и решаем тёплым стартом — без перескоков между ветвями; несколько стартов — только в 1-м кадре
+        sh = flip(ap(M.chain(pose, bn), (0, 0, 0)))
+        if not hasattr(self, '_arm_len'):
+            self._arm_len = {}
+        if bn not in self._arm_len:
+            self._arm_len[bn] = float(np.linalg.norm(flip(ap(M.chain({}, hb), (0, 0, 0))) - flip(ap(M.chain({}, bn), (0, 0, 0)))))
+        reach = sh + nrm(np.asarray(hand, float) - sh) * self._arm_len[bn]
 
         def f(v):
             pose[bn] = {'rotation': [v[0], v[1], v[2]]}
-            e = flip(ap(M.chain(pose, hb), (0, 0, 0))) - hand
+            e = flip(ap(M.chain(pose, hb), (0, 0, 0))) - reach
             return float(e @ e) + w_reg * float(np.sum((v - x0) ** 2)) + 2e-4 * v[1] ** 2
-        v, err = descend(f, x0, 20.0 if bn not in self.prev else 5.0, iters=300)
-        ex = math.sqrt(max(0.0, err))
-        if ex > 1.0:                                   # тёплый старт застрял (рука — одна кость: локальные минимумы) — несколько стартов
-            sh = flip(ap(M.chain(pose, bn), (0, 0, 0)))
-            Lh = np.linalg.norm(flip(ap(M.chain({}, hb), (0, 0, 0))) - flip(ap(M.chain({}, bn), (0, 0, 0))))
-            reach = sh + nrm(np.asarray(hand) - sh) * Lh          # ближайшая достижимая точка
-            for s0 in ([-90, 0, 0], [-45, 0, 20], [-140, 0, 0], [-20, 0, 10], [-90, 30, 60], [-90, -30, -40], [x0[0], x0[1], 0.0]):
-                def g(q):
-                    pose[bn] = {'rotation': [q[0], q[1], q[2]]}
-                    e = flip(ap(M.chain(pose, hb), (0, 0, 0))) - reach
-                    return float(e @ e) + 2e-4 * q[1] ** 2 + 1e-4 * q[2] ** 2
-                q, eq = descend(g, s0, 20.0, iters=300)
-                pose[bn] = {'rotation': list(q)}
-                e2 = float(np.sum((flip(ap(M.chain(pose, hb), (0, 0, 0))) - np.asarray(hand)) ** 2))
-                if e2 + 1e-3 < err:
-                    v, err = q, e2
-            ex = math.sqrt(max(0.0, err))
+        if bn in self.prev:
+            v, err = descend(f, x0, 5.0, iters=300)
+        else:
+            best = None
+            for s0 in (x0, [-90, 0, 0], [-45, 0, 20], [-140, 0, 0], [-20, 0, 10], [-90, 30, 60], [-90, -30, -40]):
+                x0 = np.array(s0, float)
+                c = descend(f, x0, 20.0, iters=300)
+                if best is None or c[1] < best[1]:
+                    best = c
+            v, err = best
         pose[bn] = {'rotation': [float(x) for x in v]}
-        self.prev[bn] = v
+        ex = float(np.linalg.norm(flip(ap(M.chain(pose, hb), (0, 0, 0))) - np.asarray(hand, float)))
         self.err = max(getattr(self, 'err', 0.0), ex)
         return ex
 
     def wrist(self, pose, d, up=None, base=(0, 0, 0), far=None, w_up=0.3):
+        """Двойной поворот кисти (hand2): решаем ВИДИМЫЙ поворот предмета (непрерывен), ключ — его половина (кватернион, знак —
+        ближе к прошлому кадру), чтобы ключи шли без перескоков между ветвями и GeckoLib не проворачивал предмет между кадрами."""
+        M = self.M
+        if not M.hand2:
+            return self._wrist(pose, d, up, base, far, w_up)
+        saved = self.prev.get('hand')
+        rest = M.bones['bipedHandRight']['rest']
+        far_ = M.axis_far if far is None else np.asarray(far, float)
+        a_l = nrm(far_ - np.asarray(base, float))                       # ось предмета и его «верх» — в осях кисти (до её поворота)
+        u_l = np.asarray(M.item_up, float)
+        u_l = nrm(u_l - a_l * float(u_l @ a_l))
+        pose['bipedHandRight'] = dict(pose.get('bipedHandRight', {}), rotation=[0.0, 0.0, 0.0])
+        d_w = nrm(d)
+        # крен предмета — параллельным переносом: «верх» прошлого кадра переносится на новую ось и доворачивается к заданному не быстрее
+        # 16° за кадр (заданный «верх» почти вдоль оси — не доворачивается): перескоков крена нет по построению
+        u_des = nrm(np.asarray(up if up is not None else (0.0, 1.0, 0.0), float))
+        k_par = abs(float(u_des @ d_w))
+        u_des = u_des - d_w * float(u_des @ d_w)
+        up_prev = self.prev.get('item_up_w')
+        if up_prev is None:
+            u_w0 = nrm(u_des) if np.linalg.norm(u_des) > 1e-6 else nrm(np.cross(d_w, [1.0, 0.0, 0.0]))
+        else:
+            u_pt = up_prev - d_w * float(up_prev @ d_w)
+            u_pt = nrm(u_pt) if np.linalg.norm(u_pt) > 1e-6 else nrm(np.cross(d_w, [1.0, 0.0, 0.0]))
+            if k_par < 0.85 and np.linalg.norm(u_des) > 1e-6:
+                u_d = nrm(u_des)
+                th = math.atan2(float(np.cross(u_pt, u_d) @ d_w), float(u_pt @ u_d))
+                lim = math.radians(16.0) * (1.0 if k_par < 0.6 else (0.85 - k_par) / 0.25)
+                th = max(-lim, min(lim, th))
+                u_pt = u_pt * math.cos(th) + np.cross(d_w, u_pt) * math.sin(th)
+            u_w0 = nrm(u_pt)
+        self.prev['item_up_w'] = u_w0
+        Bl = np.column_stack([a_l, u_l, np.cross(a_l, u_l)])
+        Bworld = np.column_stack([d_w, u_w0, np.cross(d_w, u_w0)])
+        # скручивание руки вокруг её оси (кисть остаётся на месте) — свободно: берём такое, при котором кисть поворачивает предмет
+        # меньше всего (видимый поворот кисти < 180°: тогда ключ — главная половина, без перескока ветвей) и ближе к прошлому кадру
+        side = 'right_arm'
+        r_arm = np.array(pose[side]['rotation'], float)
+        rest_a = M.bones[side]['rest']
+        Ra = (Rz(rest_a[2] + r_arm[2] * D) @ Ry(rest_a[1] - r_arm[1] * D) @ Rx(rest_a[0] - r_arm[0] * D))[:3, :3]
+        v_l = nrm(M.bones['bipedHandRight']['base'])
+        tw0 = self.prev.get('twist', 0.0)
+
+        def rel(th):
+            K_ = np.array([[0, -v_l[2], v_l[1]], [v_l[2], 0, -v_l[0]], [-v_l[1], v_l[0], 0]])
+            Rt = np.eye(3) + math.sin(th) * K_ + (1 - math.cos(th)) * K_ @ K_
+            e = _euler_zyx(Ra @ Rt)
+            key = [-(e[0] - rest_a[0]) / D, -(e[1] - rest_a[1]) / D, (e[2] - rest_a[2]) / D]
+            key = [p_ + ((k - p_ + 180) % 360 - 180) for p_, k in zip(r_arm, key)]
+            pose[side] = {'rotation': key}
+            P0 = M.chain(pose, 'bipedHandRight')[:3, :3]
+            R_ = P0.T @ Bworld @ Bl.T
+            ang = math.acos(max(-1.0, min(1.0, (np.trace(R_) - 1) / 2)))
+            return ang, R_, key
+        Rprev = self.prev.get('arm_R')                                   # поворот руки прошлого кадра (непрерывность)
+
+        def cost_of(th):
+            ang, R_, key = rel(th)
+            Rk = (Rz(rest_a[2] + key[2] * D) @ Ry(rest_a[1] - key[1] * D) @ Rx(rest_a[0] - key[0] * D))[:3, :3]
+            c = ang + 20.0 * max(0.0, ang - math.radians(150))          # поворот кисти > 150° — почти запрещён (главная ветвь)
+            if Rprev is not None:
+                c += 1.5 * math.acos(max(-1.0, min(1.0, (np.trace(Rprev.T @ Rk) - 1) / 2)))
+            ref = getattr(self, 'arm_ref', None)                          # опорный поворот руки (поза стойки на краях анимации)
+            if ref is not None and ref[1] > 0:
+                c += ref[1] * math.acos(max(-1.0, min(1.0, (np.trace(ref[0].T @ Rk) - 1) / 2)))
+            return c, R_, key, Rk
+        best = None
+        for th in np.radians(np.arange(-180, 180, 10)):
+            c, R_, key, Rk = cost_of(th)
+            if best is None or c < best[0]:
+                best = (c, th, R_, key, Rk)
+        th0 = best[1]
+        for th in np.radians(np.arange(-9, 10, 1.0)) + th0:
+            c, R_, key, Rk = cost_of(th)
+            if c < best[0]:
+                best = (c, th, R_, key, Rk)
+        self.prev['arm_R'] = best[4]
+        best = best[:4]
+        _, th, R, key_arm = best
+        pose[side] = {'rotation': [float(x) for x in key_arm]}
+        self.prev[side] = np.array(key_arm, float)
+        self.prev['twist'] = float(th) * 0.0                            # скручивание считаем от решения руки каждого кадра
+        err = 0.0
+        q = _quat(R)
+        cands = []
+        for sgn in (1.0, -1.0):
+            h = np.array([1.0, 0, 0, 0]) + sgn * q
+            if np.linalg.norm(h) > 1e-6:
+                cands.append(h / np.linalg.norm(h))
+        qh = max(cands, key=lambda c: c[0])                            # главная половина (поворот кисти < 180°)
+        self.prev['hand_q'] = qh
+        e = _euler_zyx(_qmat(qh))                          # R = Rz(c)·Ry(b)·Rx(a); ключ: x = −(a − rest0), y = −(b − rest1), z = c − rest2
+        key = [-(e[0] - rest[0]) / D, -(e[1] - rest[1]) / D, (e[2] - rest[2]) / D]
+        if saved is not None:
+            key = [p_ + ((k - p_ + 180) % 360 - 180) for p_, k in zip(saved, key)]
+        pose['bipedHandRight'] = dict(pose.get('bipedHandRight', {}), rotation=[float(x) for x in key])
+        self.prev['hand'] = np.array(key, float)
+        return err
+
+    def _wrist(self, pose, d, up=None, base=(0, 0, 0), far=None, w_up=0.3):
         """bipedHandRight: ось предмета (base → far, оси кисти) по направлению d (R-мир), ребро/плоскость по up."""
         M = self.M
         far = M.axis_far if far is None else far
@@ -374,8 +500,8 @@ class Solver:
         base = np.asarray(base, float)
 
         def f(v):
-            pose['bipedHandRight'] = {'rotation': [v[0], v[1], v[2]]}
-            Mw = M.chain(pose, 'bipedHandRight')
+            pose['bipedHandRight'] = dict(pose.get('bipedHandRight', {}), rotation=[v[0], v[1], v[2]])
+            Mw = M.item_frame(pose)
             a = flip(ap(Mw, base))
             b = flip(ap(Mw, far))
             ax = nrm(b - a)
@@ -385,9 +511,40 @@ class Solver:
                 e += w_up * float(np.sum((nrm(u - ax * float(u @ ax)) - nrm(up)) ** 2))
             return e + 1e-6 * float(np.sum((v - x0) ** 2))
         v, err = descend(f, x0, 30.0 if 'hand' not in self.prev else 6.0, iters=400)
-        pose['bipedHandRight'] = {'rotation': [float(x) for x in v]}
+        pose['bipedHandRight'] = dict(pose.get('bipedHandRight', {}), rotation=[float(x) for x in v])
         self.prev['hand'] = v
         return err
+
+
+def _quat(R):
+    t = np.trace(R)
+    if t > 0:
+        s = math.sqrt(t + 1) * 2
+        return np.array([0.25 * s, (R[2, 1] - R[1, 2]) / s, (R[0, 2] - R[2, 0]) / s, (R[1, 0] - R[0, 1]) / s])
+    i = int(np.argmax([R[0, 0], R[1, 1], R[2, 2]]))
+    if i == 0:
+        s = math.sqrt(1 + R[0, 0] - R[1, 1] - R[2, 2]) * 2
+        return np.array([(R[2, 1] - R[1, 2]) / s, 0.25 * s, (R[0, 1] + R[1, 0]) / s, (R[0, 2] + R[2, 0]) / s])
+    if i == 1:
+        s = math.sqrt(1 + R[1, 1] - R[0, 0] - R[2, 2]) * 2
+        return np.array([(R[0, 2] - R[2, 0]) / s, (R[0, 1] + R[1, 0]) / s, 0.25 * s, (R[1, 2] + R[2, 1]) / s])
+    s = math.sqrt(1 + R[2, 2] - R[0, 0] - R[1, 1]) * 2
+    return np.array([(R[1, 0] - R[0, 1]) / s, (R[0, 2] + R[2, 0]) / s, (R[1, 2] + R[2, 1]) / s, 0.25 * s])
+
+
+def _qmat(q):
+    w, x, y, z = q
+    return np.array([[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+                     [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+                     [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]])
+
+
+def _euler_zyx(R):
+    """R = Rz(c)·Ry(b)·Rx(a) → (a, b, c), радианы."""
+    b = math.asin(max(-1.0, min(1.0, -R[2, 0])))
+    if abs(R[2, 0]) < 0.9999:
+        return math.atan2(R[2, 1], R[2, 2]), b, math.atan2(R[1, 0], R[0, 0])
+    return math.atan2(-R[1, 2], R[1, 1]), b, 0.0
 
 
 def hand_pt(M, pose, side='right'):
@@ -396,8 +553,8 @@ def hand_pt(M, pose, side='right'):
 
 
 def item_pt(M, pose, p):
-    """Точка предмета (оси кисти) → R-мир."""
-    return flip(ap(M.chain(pose, 'bipedHandRight'), p))
+    """Точка предмета (оси кисти) → R-мир (с вторым поворотом кисти, если hand2)."""
+    return flip(ap(M.item_frame(pose), p))
 
 
 # ================================================================== запекание
@@ -467,6 +624,7 @@ def path_at(path, s):
 def stance_targets(M, pose):
     """Цели стойки из её JSON-позы (FK): стопы (x, z, носок, 0), кисти, направление предмета (yaw, pitch)."""
     W = M.world_pose(pose)
+    W['~item'] = M.item_frame(pose, W)
     out = {}
     for leg, key in (('right_leg', 'rf'), ('left_leg', 'lf')):
         p = ap(W[leg], M.foot)
@@ -495,3 +653,22 @@ def blend_edges(fn, pose0, length, t_in=0.08, t_out=0.3):
                 o[b][c] = [cv * (1 - w) + x * w for cv, x in zip(cur, v)]
         return o
     return g
+
+
+def pose_at(boss, anim, t=0.0, bones=None):
+    """JSON-поза анимации из файла босса (assets) в момент t: {кость: {'rotation'|'position': [..]}}."""
+    an = JModel(boss).anims.get(anim)
+    pose = {}
+    if not an:
+        return pose
+    for b, bk in an['bones'].items():
+        if bones is not None and b not in bones:
+            continue
+        q = {}
+        if 'rotation' in bk:
+            q['rotation'] = AC.chan_at(bk['rotation'], t)
+        if 'position' in bk:
+            q['position'] = AC.chan_at(bk['position'], t)
+        if q:
+            pose[b] = q
+    return pose

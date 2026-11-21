@@ -79,9 +79,9 @@ public interface PohBoss {
         return bossMob().getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
     }
 
-    /** Ticks of its animation: the hit and the length (the warning comes guard_break_warn_ticks before the hit). */
+    /** Ticks of its animation: the hit and the length (the warning comes guard_break_warn_ticks before the hit). Default 14 / 36. */
     default BossGuardBreak.Timing guardBreakTiming() {
-        return BossGuardBreak.Timing.TEMP;
+        return BossGuardBreak.Timing.STANDARD;
     }
 
     /** Its animation name, by the rule of its animation file: <id>_guard_break (Aris: animation.aris.guard_break). */

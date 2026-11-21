@@ -34,11 +34,13 @@ public final class BossGuardBreak {
     public static final int PARRY_STAGGER = 16;
 
     /**
-     * Ticks of a boss's guard_break animation: the blow at hit, the whole length. TEMP_GUARD_BREAK: the stand-in timings (blow on the
-     * 14th tick, 28 long) until the visuals' letter (docs/inbox/2026-11-21_mgr_guard_break_visuals.md) gives each boss its own.
+     * Ticks of a boss's guard_break animation: the blow at hit, the whole length (docs/inbox/2026-11-21_mgr_guard_break_visuals.md:
+     * warn 2, hit 14, length 36 — Irina, Aris, Ereb, Ereb Hand; Martin 40 with his shield push). TEMP: the Head of the Cult's stand-in
+     * until his animation comes (after the scythe grip letter; planned 14 / 36).
      */
     public record Timing(int hit, int length) {
-        public static final Timing TEMP = new Timing(14, 28);   // TEMP_GUARD_BREAK
+        public static final Timing STANDARD = new Timing(14, 36);
+        public static final Timing TEMP = new Timing(14, 28);   // TEMP_GUARD_BREAK: cult_leader only
     }
 
     /** Per boss (owned by BossCore). */
@@ -115,7 +117,7 @@ public final class BossGuardBreak {
         c.lock(t[2], true, false);
         boss.playGuardBreak(boss.guardBreakAnimation());
         String fx = c.def.id + "_guard_break";
-        if (FxLib.fx(fx) != null) Fx.play(sl, Fx.fx(fx).caster(mob).at(mob.position()).yaw(mob.getYRot()));
+        if (FxLib.fx(fx) != null) Fx.play(sl, Fx.fx(fx).caster(mob).at(mob.position()).yaw(mob.getYRot()).target(target));   // tick 14: the crack at the target
         boss.onGuardBreakStart(target);
         st.running = c.play(new BossTimeline("guard_break", t[2])
                 .at(t[0], () -> warn(c, sl, target))

@@ -291,6 +291,12 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
         return !core.locked() && !isAnimating() && !isCasting() && !isStanceBroken() && !isHalfHealthAttacking();
     }
 
+    /** TEMP_GUARD_BREAK: cult_leader_guard_break comes after the scythe grip letter (planned hit 14, length 36). */
+    @Override
+    public ru.pohsmp.core.boss.BossGuardBreak.Timing guardBreakTiming() {
+        return ru.pohsmp.core.boss.BossGuardBreak.Timing.TEMP;
+    }
+
     @Override
     public void playGuardBreak(String animation) {
         serverTriggerAnimation(animation);

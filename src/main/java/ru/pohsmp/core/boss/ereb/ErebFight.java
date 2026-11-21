@@ -914,8 +914,7 @@ public final class ErebFight {
                 .at(ErebMath.FINALE_VANISH, () -> core.sound("ereb.dissolve", 3, 1))
                 .at(ErebMath.FINALE_HIDE, () -> {
                     hide(true);
-                    Component line = ui("vanish");
-                    for (ServerPlayer p : core.playersNear(BossConfig.get(BossConfig.INTRO_RADIUS))) p.sendSystemMessage(line);
+                    core.sysLine(core.playersNear(BossConfig.get(BossConfig.INTRO_RADIUS)), "ui.pohsmp_core.ereb.vanish");
                 })
                 .then(core::endFinale));
     }

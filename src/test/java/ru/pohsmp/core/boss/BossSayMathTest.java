@@ -135,4 +135,28 @@ class BossSayMathTest {
         q.clear();
         assertNull(q.update(2));
     }
+
+    @Test
+    void systemArgsRoundTrip() {
+        assertEquals("", BossSayMath.packArgs());
+        assertEquals(0, BossSayMath.unpackArgs("").length);
+        String[] one = BossSayMath.unpackArgs(BossSayMath.packArgs("Steve"));
+        assertEquals(1, one.length);
+        assertEquals("Steve", one[0]);
+        String[] two = BossSayMath.unpackArgs(BossSayMath.packArgs("A", ""));
+        assertEquals(2, two.length);
+        assertEquals("", two[1]);
+        String big = "x".repeat(1000);
+        assertTrue(BossSayMath.packArgs(big, big, big).length() <= BossSayMath.ARGS_MAX);
+        assertEquals("a b", BossSayMath.unpackArgs(BossSayMath.packArgs("a" + BossSayMath.ARG_SEP + "b"))[0]);
+    }
+
+    @Test
+    void systemLayout() {
+        assertTrue(BossSayMath.systemBoxHeight(1) < BossSayMath.boxHeight(1));   // no name line
+        assertTrue(BossSayMath.systemBoxHeight(2) > BossSayMath.systemBoxHeight(1));
+        assertEquals(200 + 26 + 2 * BossSayMath.PAD_X, BossSayMath.systemBoxWidth(200, 640));
+        assertTrue(BossSayMath.systemBoxWidth(1000, 320) <= 320 - 2 * BossSayMath.SCREEN_MARGIN);
+        assertTrue(BossSayMath.SYSTEM != BossSayMath.SPEECH);
+    }
 }

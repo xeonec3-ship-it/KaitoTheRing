@@ -1546,8 +1546,7 @@ public final class ErebHandFight {
                 })
                 .at(ErebHandMath.DEATH_HIDE, () -> {
                     hide(true);
-                    Component line = ui("vanish");
-                    for (ServerPlayer p : core.playersNear(r)) p.sendSystemMessage(line);
+                    core.sysLine(core.playersNear(r), "ui.pohsmp_core.ereb_hand.vanish");
                 })
                 .then(core::endFinale));
     }

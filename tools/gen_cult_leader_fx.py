@@ -457,11 +457,53 @@ def bossbar():
 
 
 # ================================================================== титр
+class MixedFont:
+    """Несколько шрифтов-подмножеств (woff Cormorant порезаны по алфавитам): каждый знак берётся из первого, где он есть."""
+    def __init__(self, fonts):
+        self.fonts = fonts
+        self._notdef = [f.getmask('\uffff').getbbox() for f in fonts]
+
+    def _font(self, ch):
+        if len(self.fonts) == 1 or ch.isspace():
+            return self.fonts[0]
+        for f, nd in zip(self.fonts, self._notdef):
+            if f.getmask(ch).getbbox() != nd:
+                return f
+        return self.fonts[0]
+
+    def _runs(self, text):
+        runs = []
+        for ch in text:
+            f = self._font(ch)
+            if runs and runs[-1][0] is f:
+                runs[-1][1] += ch
+            else:
+                runs.append([f, ch])
+        return runs
+
+    def getbbox(self, text):
+        x, box = 0.0, None
+        for f, t in self._runs(text):
+            b = f.getbbox(t)
+            b = (b[0] + x, b[1], b[2] + x, b[3])
+            box = b if box is None else (min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3]))
+            x += f.getlength(t)
+        return box
+
+    def draw(self, d, xy, text, fill):
+        x, y = xy
+        for f, t in self._runs(text):
+            d.text((x, y), t, font=f, fill=fill)
+            x += f.getlength(t)
+
+
 def title(bar, name='cult_leader', texts=None):
     """Титр. Владелец 20.11: имя — как в оригинале, без «Эхо» («Tyros, First Flamebearer»), ниже вторая строка — «Глава Культа Меллисто»
     (en: «Head of the Cult of Mellisto»). texts: (lang, строка1, шрифт1[, строка2, шрифт2])."""
     gold = [M.hx(c) for c in ('#e8e895', '#d6af39', '#b9892e', '#9c5e2c')]
-    texts = texts or (('ru', 'Tyros, First Flamebearer', 'CormorantGaramond-BoldItalic-latin.woff',
+    # владелец 21.11: в русском титре имя русское — «Тирос, Первый Пламеносец» (en остаётся «Tyros, First Flamebearer»);
+    # шрифт «cyrillic+latin»: кириллица из cyrillic-подмножества, знаки, которых в нём нет (запятая), — из latin
+    texts = texts or (('ru', 'Тирос, Первый Пламеносец', 'CormorantGaramond-BoldItalic-cyrillic.woff+CormorantGaramond-BoldItalic-latin.woff',
                        'Глава Культа Меллисто', 'CormorantGaramond-BoldItalic-cyrillic.woff'),
                       ('en', 'Tyros, First Flamebearer', 'CormorantGaramond-BoldItalic-latin.woff',
                        'Head of the Cult of Mellisto', 'CormorantGaramond-BoldItalic-latin.woff'))
@@ -470,12 +512,12 @@ def title(bar, name='cult_leader', texts=None):
         sub = tt[3:5] if len(tt) > 3 else None
         S = 2
         Wd, Hd = 1024 * S, 192 * S
-        fnt = ImageFont.truetype(os.path.join(HERE, 'fonts', font), (84 if not sub else 70) * S)
+        fnt = MixedFont([ImageFont.truetype(os.path.join(HERE, 'fonts', f_), (84 if not sub else 70) * S) for f_ in font.split('+')])
         bb = fnt.getbbox(text)
         tw, th = bb[2] - bb[0], bb[3] - bb[1]
         tx, ty = (Wd - tw) / 2 - bb[0], (18 if not sub else 6) * S - bb[1] + ((96 if not sub else 80) * S - th) / 2
         mask = Image.new('L', (Wd, Hd), 0)
-        ImageDraw.Draw(mask).text((tx, ty), text, font=fnt, fill=255)
+        fnt.draw(ImageDraw.Draw(mask), (tx, ty), text, 255)
         if sub:                                                             # вторая строка — мельче, под именем
             f2 = ImageFont.truetype(os.path.join(HERE, 'fonts', sub[1]), 40 * S)
             b2 = f2.getbbox(sub[0])
@@ -538,9 +580,9 @@ def icon():
 
 # ================================================================== lang и звуки
 LANG = {
-    'entity.pohsmp_core.cult_leader': ('Tyros, First Flamebearer', 'Tyros, First Flamebearer'),     # владелец 20.11: имя как в оригинале, без «Эхо»
+    'entity.pohsmp_core.cult_leader': ('Тирос, Первый Пламеносец', 'Tyros, First Flamebearer'),     # владелец 21.11: в ru — русское имя
     'entity.pohsmp_core.fire_cultist': ('Огненный культист', 'Fire Cultist'),
-    'ui.pohsmp_core.cult_leader.title': ('Tyros, First Flamebearer', 'Tyros, First Flamebearer'),
+    'ui.pohsmp_core.cult_leader.title': ('Тирос, Первый Пламеносец', 'Tyros, First Flamebearer'),
     'ui.pohsmp_core.cult_leader.epithet': ('Глава Культа Меллисто', 'Head of the Cult of Mellisto'),     # нижняя строка (под именем, под полосой босса)
     'ui.pohsmp_core.cult_leader.subtitle': ('Глава Культа Меллисто', 'Head of the Cult of Mellisto'),
     'ui.pohsmp_core.cult_leader.verdict_warn': ('Глава Культа выносит приговор…', 'The Cult Leader passes judgement…'),

@@ -140,11 +140,15 @@ ExtendedServerBossEvent Iron's).
 и давать его боссу вместо `ItemRegistry.DECREPIT_SCYTHE` (в т.ч. в призыве косы). Проверить хват в руке босса, при сдвиге — поправить
 `display` в генераторе.
 
-## Имя (владелец 20.11)
-Имя — **как в оригинале, без «Эхо»: «Tyros, First Flamebearer»**, а **нижней строкой — «Глава Культа Меллисто»** (en: «Head of the Cult of Mellisto»).
-- `entity.pohsmp_core.cult_leader` = «Tyros, First Flamebearer» (имя сущности и строка над полосой босса);
+## Имя (владелец 20.11; владелец 21.11 — русское имя в ru)
+Имя — **как в оригинале, без «Эхо»**: en «Tyros, First Flamebearer», **ru — «Тирос, Первый Пламеносец»** (владелец 21.11 — русское имя в ru);
+**нижней строкой — «Глава Культа Меллисто»** (en: «Head of the Cult of Mellisto»).
+- `entity.pohsmp_core.cult_leader` = ru «Тирос, Первый Пламеносец» / en «Tyros, First Flamebearer» (имя сущности, строка над полосой босса,
+  подпись свитка фраз `BossSayClient`, «Вызван: …» команды `/pohsmp boss`); `ui.pohsmp_core.cult_leader.title` — так же;
 - `ui.pohsmp_core.cult_leader.epithet` = нижняя строка — **коду:** рисовать её под полосой босса мелким шрифтом в цвете полосы;
 - титр ролика появления `textures/gui/title/cult_leader_{ru,en}.png` — две строки (кадр `docs/media/t26_title_names.png`);
+  ru (владелец 21.11): «Тирос, Первый Пламеносец» / «Глава Культа Меллисто» — тот же Cormorant Garamond Bold Italic и золото, кириллица
+  из cyrillic-подмножества, запятая из latin (`MixedFont` в `gen_cult_leader_fx.py`); до/после — `docs/media/t26_name_ru_and_sysline.png`;
 - сообщение о смерти от добивания: «%1$s пал от косы Тироса, Главы Культа Меллисто».
 
 ## +4 заклинания (владелец 20.11: «добавь каждому по 4 новых»)

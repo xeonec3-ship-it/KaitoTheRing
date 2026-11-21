@@ -32,7 +32,7 @@ public final class ClientConfig {
         FX_QUALITY = b.comment("high or low (fewer particles, sparks and curtain beams)").defineInList("quality", "high", List.of("high", "low"));
         b.pop();
         b.push("bossSay");
-        SAY_TO_CHAT = b.comment("Also copy the bosses' spoken lines into the chat (they are shown as a subtitle over the hotbar)")
+        SAY_TO_CHAT = b.comment("Also copy the bosses' spoken lines and the system lines of a fight into the chat (they are shown as a subtitle over the hotbar)")
                 .define("copyToChat", false);
         SAY_SOUND = b.comment("A quiet pen sound while a boss line is being typed").define("typingSound", true);
         b.pop();

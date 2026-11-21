@@ -7,6 +7,8 @@ a simple perspective arena of vanilla block textures and the vanilla HUD (hotbar
 
   python3 tools/boss_say_preview.py mockups   -> docs/media/boss_say_mockups.png
   python3 tools/boss_say_preview.py video     -> docs/media/video/boss_say.mp4 (ffmpeg)
+  python3 tools/boss_say_preview.py sysline <title_ru_before.png> -> docs/media/t26_name_ru_and_sysline.png
+        (the Cult Leader's ru title before/after, the system lines of a fight beside a spoken line; owner 21.11)
 Needs Pillow + numpy and the client jar of ForgeGradle (~/.gradle/caches/forge_gradle/minecraft_repo/versions/1.20.1/client.jar).
 """
 import io
@@ -229,6 +231,30 @@ def draw_say(img, font, style, name, color, text, age, oat, gw, gh, hud, bar):
         if part: font.draw(img, part, gw // 2 - font.width(lines[i]) // 2, ty + i * LINE_H, tc, a, italic=True)
 
 
+SYSTEM_TEXT, SYSTEM_MARK_ALPHA = (0xD6, 0xD3, 0xCC), 0.55
+
+
+def draw_sys(img, font, style, text, age, oat, gw, gh, hud, bar):
+    """BossSayClient.renderSystem: the «default» scroll, no name, upright SYSTEM_TEXT, the boss marks dimmed by the first line."""
+    a = alpha(age, oat)
+    if a < 0.03: return
+    n = len(text.strip())
+    lines = wrap(text, max_text(gw) - 26, font.width)
+    tw = max(font.width(l) for l in lines)
+    bw = min(tw + 26 + 2 * PAD_X, gw - 2 * SCREEN_MARGIN)
+    bh = PAD_TOP + max(1, len(lines)) * LINE_H - 1 + PAD_BOTTOM
+    x, y = (gw - bw) // 2, bottom(gh, hud, bar) - bh + int(round(rise(age, oat)))
+    tex = Image.open(os.path.join(TEX, "default.png")).convert("RGBA")
+    mark = Image.open(os.path.join(TEX, style + "_mark.png")).convert("RGBA")
+    nine_slice(img, tex, x, y, bw, bh, a)
+    ty = y + PAD_TOP
+    fw = font.width(lines[0])
+    blit(img, mark, gw // 2 - fw // 2 - 13, ty - 1, 9, 9, 0, 0, 9, 9, a * SYSTEM_MARK_ALPHA)
+    blit(img, mark, gw // 2 + fw // 2 + 3, ty - 1, 9, 9, 9, 0, 9, 9, a * SYSTEM_MARK_ALPHA)
+    for i, part in enumerate(typed(lines, visible(age, n))):
+        if part: font.draw(img, part, gw // 2 - font.width(lines[i]) // 2, ty + i * LINE_H, SYSTEM_TEXT, a)
+
+
 # ---- the frame: arena + HUD ----
 ARENAS = {
     "cult_leader": ("blackstone", "polished_blackstone_bricks", (70, 26, 18), (150, 70, 40)),
@@ -330,6 +356,9 @@ def frame(jar, font, lang, style, says, now, scene=False, size=(SW, SH)):
         icons, hx, lvl = hud(img, jar, gw, gh)
         hud_rows(img, font, icons, hx, gh, lvl)
     for st, col, text, start, oat in says:
+        if col is None:                                  # a system line
+            draw_sys(img, font, st, text, now - start, oat, gw, gh, 0 if scene else 49, bar)
+            continue
         name = lang["entity.pohsmp_core." + st]
         draw_say(img, font, st, name, col, text, now - start, oat, gw, gh, 0 if scene else 49, bar)
     if scene:
@@ -393,11 +422,41 @@ def video(jar, font, lang):
     print("written", out, n, "frames")
 
 
+def sysline(jar, font, lang, before):
+    """The ru title of the Cult Leader before/after and the system lines of a fight on screen beside a spoken line."""
+    tiles = []
+    for path, cap in ((before, "title ru - before (Tyros, First Flamebearer)"),
+                      (os.path.join(ROOT, "src/main/resources/assets/pohsmp_core/textures/gui/title/cult_leader_ru.png"),
+                       "title ru - after (owner 21.11: the Russian name)")):
+        t = Image.open(path).convert("RGBA")
+        bg = Image.fromarray((np.clip(arena(jar, "cult_leader"), 0, 1) * 255).astype(np.uint8)).convert("RGBA")
+        k = SW * 0.8 / t.width
+        t = t.resize((int(t.width * k), int(t.height * k)), Image.LANCZOS)
+        bg.alpha_composite(t, ((SW - t.width) // 2, int(SH * 0.22)))
+        tiles.append(label(bg.convert("RGB"), cap))
+    def one(st, col, text, cap, scene=False):
+        n = len(text)
+        tiles.append(label(frame(jar, font, lang, st, [(st, col, text, 0, out_at(n))], typed_at(n) + 20, scene=scene), cap))
+    one("cult_leader", 0xFFB040, lang["ui.pohsmp_core.cult_leader.replica_taunt"], "speech (as before): the name is now Russian")
+    one("irina", None, lang["ui.pohsmp_core.irina.mark"].replace("%s", "Steve"), "system line: irina.mark (was the chat)")
+    one("ereb", None, lang["ui.pohsmp_core.ereb.vanish"], "system line: ereb.vanish, in the finale scene", scene=True)
+    one("irina", None, lang["ui.pohsmp_core.irina.bond"].replace("%s", "Alex"), "system line: irina.bond (long, wrapped)")
+    cols, pad = 2, 8
+    rows = (len(tiles) + 1) // 2
+    sheet = Image.new("RGB", (cols * SW + (cols + 1) * pad, rows * SH + (rows + 1) * pad), (12, 12, 14))
+    for i, t in enumerate(tiles):
+        sheet.paste(t, (pad + (i % cols) * (SW + pad), pad + (i // cols) * (SH + pad)))
+    out = os.path.join(ROOT, "docs/media/t26_name_ru_and_sysline.png")
+    sheet.save(out, optimize=True)
+    print("written", out, sheet.size)
+
+
 def main():
     jar = Jar(os.environ.get("MC_CLIENT_JAR", JAR))
     font, lang = Font(jar), load_names()
     if sys.argv[1] == "mockups": mockups(jar, font, lang)
     elif sys.argv[1] == "video": video(jar, font, lang)
+    elif sys.argv[1] == "sysline": sysline(jar, font, lang, sys.argv[2])
     elif sys.argv[1] == "one":
         st, col, key = BOSSES[int(sys.argv[3]) if len(sys.argv) > 3 else 0]
         text = lang[key]

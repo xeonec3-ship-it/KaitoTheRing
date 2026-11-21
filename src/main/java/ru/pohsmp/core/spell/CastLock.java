@@ -14,7 +14,18 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.network.protocol.game.ClientboundSetCarriedItemPacket;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -95,12 +106,53 @@ public final class CastLock {
             if (!recast) STATE.remove(p.getUUID());   // a finished window: forget it before the new cast
             return false;
         }
+        hint(p);
+        return true;
+    }
+
+    /** «Заклинание ещё не завершено» over the hotbar and a quiet bass note, at most twice a second (holding a button repeats the act). */
+    public static void hint(ServerPlayer p) {
+        long now = p.level().getGameTime();
         Long last = LAST_TOLD.get(p.getUUID());
-        if (last == null || now - last >= 10 || now < last) {   // holding the button repeats the use: say it twice a second at most
-            LAST_TOLD.put(p.getUUID(), now);
-            SpellBans.tell(p, "cast_busy");
-            p.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 0.35f, 0.6f);
-        }
+        if (!CastLockMath.hintDue(last == null ? Long.MIN_VALUE : last, now)) return;
+        LAST_TOLD.put(p.getUUID(), now);
+        SpellBans.tell(p, "cast_busy");
+        p.playNotifySound(SoundEvents.NOTE_BLOCK_BASS.value(), SoundSource.PLAYERS, 0.35f, 0.6f);
+    }
+
+    /**
+     * Called by the mixins on Iron's cancel paths (owner 21.11, 2): false = keep the running cast. The player's own acts (another spell,
+     * switching the item, releasing the use button, opening a screen) may not stop the spell that holds the window.
+     */
+    public static boolean cancelAllowed(ServerPlayer p, CastLockMath.Cancel why) {
+        return CastLockMath.cancelAllowed(p.isAlive() && busy(p), why);
+    }
+
+    /** The player is held by the window: every act but the camera, the pause menu and the chat is stopped (server events below). */
+    private static boolean held(Object e) {
+        return e instanceof ServerPlayer p && p.isAlive() && STATE.containsKey(p.getUUID()) && busy(p);
+    }
+
+    /** Server: the player is held right now (Epic Fight skills, scripts). Says the hint. */
+    public static boolean heldNow(ServerPlayer p) {
+        return stop(p, CastLockMath.Act.EF_SKILL);
+    }
+
+    /** Server: a spell wheel / spell bar selection is refused now (IronsSelectSpellMixin). */
+    public static boolean selectionLocked(ServerPlayer p) {
+        return stop(p, CastLockMath.Act.SPELL_SELECT);
+    }
+
+    /** Client: the local player is held (set by Net.Lock from the server; the client classes read it in client/CastLockClient). */
+    public static volatile boolean clientLocked;
+
+    public static boolean clientHeld(net.minecraft.world.entity.player.Player p) {
+        return clientLocked && p.isLocalPlayer();
+    }
+
+    private static boolean stop(Object e, CastLockMath.Act a) {
+        if (!held(e) || !CastLockMath.blocks(true, a)) return false;
+        if (CastLockMath.hints(a)) hint((ServerPlayer) e);
         return true;
     }
 
@@ -148,10 +200,139 @@ public final class CastLock {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent e) {
-        if (e.phase != TickEvent.Phase.END || STATE.isEmpty() || !(e.player instanceof ServerPlayer p)) return;
+        if (e.phase != TickEvent.Phase.END || !(e.player instanceof ServerPlayer p)) return;
+        if (STATE.isEmpty() && SENT.isEmpty()) return;
         CastLockMath.State s = STATE.get(p.getUUID());
-        if (s == null) return;
-        if (!p.isAlive() || CastLockMath.tick(s, p.level().getGameTime(), castingThis(p, s)) == null) STATE.remove(p.getUUID());
+        if (s != null && (!p.isAlive() || CastLockMath.tick(s, p.level().getGameTime(), castingThis(p, s)) == null)) STATE.remove(p.getUUID());
+        hold(p, STATE.containsKey(p.getUUID()) && p.isAlive() && busy(p));
+    }
+
+    /** Players whose client was told «held» (CastLockMsg). */
+    private static final java.util.Set<UUID> SENT = new java.util.HashSet<>();
+    /** The hotbar slot the player had when the window opened. */
+    private static final Map<UUID, Integer> SLOT = new HashMap<>();
+    private static final UUID STAND_ID = UUID.fromString("6a0b9b0e-3c1e-4c55-9a59-2a1d7c4d2f11");
+
+    /** Keeps the held player still: the client flag, no walking speed (falling and knockback stay), the hotbar slot, no sprint. */
+    private static void hold(ServerPlayer p, boolean on) {
+        UUID id = p.getUUID();
+        if (on != SENT.contains(id)) {
+            if (on) {
+                SENT.add(id);
+                SLOT.put(id, p.getInventory().selected);
+            } else {
+                SENT.remove(id);
+                SLOT.remove(id);
+            }
+            ru.pohsmp.core.net.Net.CH.send(net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> p), new ru.pohsmp.core.net.Net.Lock(on));
+        }
+        AttributeInstance speed = p.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speed != null) {
+            boolean has = speed.getModifier(STAND_ID) != null;
+            if (on && !has) speed.addTransientModifier(new AttributeModifier(STAND_ID, "pohsmp_core cast lock", -1.0, AttributeModifier.Operation.MULTIPLY_TOTAL));
+            else if (!on && has) speed.removeModifier(STAND_ID);
+        }
+        if (!on) return;
+        Integer slot = SLOT.get(id);
+        if (slot != null && p.getInventory().selected != slot) {
+            p.getInventory().selected = slot;
+            p.connection.send(new ClientboundSetCarriedItemPacket(slot));
+            hint(p);
+        }
+        if (p.isSprinting()) p.setSprinting(false);
+        if (p.isShiftKeyDown()) p.setShiftKeyDown(false);
+    }
+
+    /** Ends the hold at once (logout, dimension change): the modifier must not stay. */
+    private static void release(ServerPlayer p) {
+        STATE.remove(p.getUUID());
+        hold(p, false);
+    }
+
+    // ---- the server stops every act of a held player (the client does the same first, so nothing jerks) ----
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onAttack(AttackEntityEvent e) {
+        if (stop(e.getEntity(), CastLockMath.Act.ATTACK)) e.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onLeftBlock(PlayerInteractEvent.LeftClickBlock e) {
+        if (stop(e.getEntity(), CastLockMath.Act.BREAK)) e.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onBreak(BlockEvent.BreakEvent e) {
+        if (stop(e.getPlayer(), CastLockMath.Act.BREAK)) e.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onPlace(BlockEvent.EntityPlaceEvent e) {
+        if (stop(e.getEntity(), CastLockMath.Act.PLACE)) e.setCanceled(true);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onRightBlock(PlayerInteractEvent.RightClickBlock e) {
+        if (stop(e.getEntity(), CastLockMath.Act.USE_BLOCK)) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.FAIL);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onRightItem(PlayerInteractEvent.RightClickItem e) {
+        if (stop(e.getEntity(), CastLockMath.Act.USE_ITEM)) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.FAIL);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onEntity(PlayerInteractEvent.EntityInteract e) {
+        if (stop(e.getEntity(), CastLockMath.Act.USE_ENTITY)) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.FAIL);
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onEntityAt(PlayerInteractEvent.EntityInteractSpecific e) {
+        if (stop(e.getEntity(), CastLockMath.Act.USE_ENTITY)) {
+            e.setCanceled(true);
+            e.setCancellationResult(InteractionResult.FAIL);
+        }
+    }
+
+    /** Started using an item some other way (it was already in use when the window opened: eating, a bow) — stopped. Spell items go on. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onUseStart(LivingEntityUseItemEvent.Start e) {
+        if (!held(e.getEntity()) || e.getItem().getItem() instanceof io.redspace.ironsspellbooks.item.CastingItem
+                || io.redspace.ironsspellbooks.api.spells.ISpellContainer.isSpellContainer(e.getItem())
+                || e.getItem().getItem() instanceof io.redspace.ironsspellbooks.item.Scroll) return;
+        e.setCanceled(true);
+    }
+
+    /** Q: the item comes back to the hand (a cancelled toss would lose it: it already left the inventory). */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onToss(ItemTossEvent e) {
+        if (!stop(e.getPlayer(), CastLockMath.Act.DROP)) return;
+        e.setCanceled(true);
+        ServerPlayer p = (ServerPlayer) e.getPlayer();
+        net.minecraft.world.item.ItemStack st = e.getEntity().getItem().copy();
+        if (!p.getInventory().add(p.getInventory().selected, st) && !p.getInventory().add(st)) p.drop(st, false, false);
+        p.containerMenu.broadcastChanges();
+    }
+
+    /** F (hands swap). */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onSwap(net.minecraftforge.event.entity.living.LivingSwapItemsEvent.Hands e) {
+        if (stop(e.getEntity(), CastLockMath.Act.SWAP_HANDS)) e.setCanceled(true);
+    }
+
+    /** A container opened anyway (a command, another mod): closed again; the spell goes on (Iron's cancel there is skipped by the mixin). */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onContainer(PlayerContainerEvent.Open e) {
+        if (e.getEntity() instanceof ServerPlayer p && e.getContainer() != p.inventoryMenu && stop(p, CastLockMath.Act.SCREEN)) p.closeContainer();
     }
 
     @SubscribeEvent
@@ -159,25 +340,29 @@ public final class CastLock {
         interrupt(e.getEntity());
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent e) {
+        if (e.getEntity() instanceof ServerPlayer p) release(p);
         STATE.remove(e.getEntity().getUUID());
+        SENT.remove(e.getEntity().getUUID());
         LAST_TOLD.remove(e.getEntity().getUUID());
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onDimension(PlayerEvent.PlayerChangedDimensionEvent e) {
-        STATE.remove(e.getEntity().getUUID());
+        if (e.getEntity() instanceof ServerPlayer p) release(p);
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onRespawn(PlayerEvent.PlayerRespawnEvent e) {
-        STATE.remove(e.getEntity().getUUID());
+        if (e.getEntity() instanceof ServerPlayer p) release(p);
     }
 
     @SubscribeEvent
     public static void onStopping(ServerStoppingEvent e) {
         STATE.clear();
+        SENT.clear();
+        SLOT.clear();
         LAST_TOLD.clear();
     }
 }

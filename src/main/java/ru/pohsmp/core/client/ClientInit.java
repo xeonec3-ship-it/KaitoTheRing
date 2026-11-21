@@ -23,6 +23,7 @@ public final class ClientInit {
         MinecraftForge.EVENT_BUS.register(SilentMusic.class);
         MinecraftForge.EVENT_BUS.register(GateStaff.class);
         MinecraftForge.EVENT_BUS.register(GateOrder.class);
+        MinecraftForge.EVENT_BUS.register(CastLockClient.class);   // owner 21.11: nothing but the camera while an animated spell runs
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.client.fx.gate.GateManaRender.class);
         MinecraftForge.EVENT_BUS.register(IceWallClient.class);
         MinecraftForge.EVENT_BUS.register(NpcCastClient.class);

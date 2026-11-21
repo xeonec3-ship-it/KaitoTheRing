@@ -107,6 +107,71 @@ class CastLockMathTest {
         assertNull(CastLockMath.tick(null, 0, true));
     }
 
+    /** The owner's case: an animated spell runs, another animated one is tried at every moment of its window — always refused. */
+    @Test
+    void animatedThenAnotherAnimated() {
+        CastLockMath.State s = CastLockMath.begin(null, S, 0);
+        s = CastLockMath.scene(s, 7, 0, 600);   // its cutscene
+        for (long t = 1; t < 500; t += 7) assertTrue(CastLockMath.refuses(s, t, true, false), "during the cast, tick " + t);
+        CastLockMath.fired(s, 500, CastLockMath.TAIL);
+        for (long t = 500; t < 600; t += 7) assertTrue(CastLockMath.refuses(s, t, false, false), "tail / scene, tick " + t);
+        CastLockMath.sceneEnd(s, 7);
+        assertTrue(CastLockMath.refuses(s, 529, false, false), "the tail outlives the scene end");
+        assertFalse(CastLockMath.refuses(s, 530, false, false), "free after the tail");
+        // the player's own ways to cut it do not stop the cast; the world's do
+        for (CastLockMath.Cancel c : new CastLockMath.Cancel[] {CastLockMath.Cancel.NEW_CAST, CastLockMath.Cancel.ITEM_CHANGED,
+                CastLockMath.Cancel.CONTAINER, CastLockMath.Cancel.USE_RELEASED, CastLockMath.Cancel.CLIENT_REQUEST}) {
+            assertFalse(CastLockMath.cancelAllowed(true, c), c + " cut the animated spell");
+            assertTrue(CastLockMath.cancelAllowed(false, c), c + " without a window works as in Iron's");
+        }
+        for (CastLockMath.Cancel c : new CastLockMath.Cancel[] {CastLockMath.Cancel.DEATH, CastLockMath.Cancel.STUN, CastLockMath.Cancel.GUARD_BREAK,
+                CastLockMath.Cancel.DIMENSION, CastLockMath.Cancel.LOGOUT, CastLockMath.Cancel.RESPAWN, CastLockMath.Cancel.HIT, CastLockMath.Cancel.SCRIPT})
+            assertTrue(CastLockMath.cancelAllowed(true, c), c + " must still stop it");
+    }
+
+    /** Owner 21.11 (2): nothing but the camera, the pause menu and the chat while the window is open. */
+    @Test
+    void nothingButTheCamera() {
+        for (CastLockMath.Act a : CastLockMath.Act.values()) {
+            boolean free = a == CastLockMath.Act.CAMERA || a == CastLockMath.Act.PAUSE || a == CastLockMath.Act.CHAT;
+            assertEquals(!free, CastLockMath.blocks(true, a), a.name());
+            assertFalse(CastLockMath.blocks(false, a), a + " blocked without a window");
+        }
+        assertTrue(CastLockMath.hints(CastLockMath.Act.ATTACK) && CastLockMath.hints(CastLockMath.Act.HOTBAR) && CastLockMath.hints(CastLockMath.Act.EF_SKILL));
+        assertFalse(CastLockMath.hints(CastLockMath.Act.MOVE) || CastLockMath.hints(CastLockMath.Act.JUMP), "walking is stopped silently");
+    }
+
+    @Test
+    void hintTwiceASecond() {
+        assertTrue(CastLockMath.hintDue(Long.MIN_VALUE, 0));
+        assertFalse(CastLockMath.hintDue(100, 109));
+        assertTrue(CastLockMath.hintDue(100, 110));
+        assertTrue(CastLockMath.hintDue(100, 5), "the clock went back (another level)");
+    }
+
+    /** Every cancel path and every act is wired: Iron's redirects, the server events, the client, Epic Fight. */
+    @Test
+    void holdWiredIn() throws IOException {
+        String json = Files.readString(Path.of("src/main/resources/pohsmp_core.mixins.json"));
+        for (String m : new String[] {"IronsInitiateCastMixin", "IronsServerEventsMixin", "IronsCancelPacketMixin", "IronsSelectSpellMixin",
+                "EpicFightSkillMixin", "IronsClientInputMixin"})
+            assertTrue(json.contains("\"" + m + "\""), m);
+        String init = Files.readString(Path.of("src/main/java/ru/pohsmp/core/mixin/IronsInitiateCastMixin.java"));
+        assertTrue(init.contains("\"serverSideInitiateCast\", \"serverSideInitiateQuickCast\"") && init.contains("\"releaseUsingHelper\""));
+        String ev = Files.readString(Path.of("src/main/java/ru/pohsmp/core/mixin/IronsServerEventsMixin.java"));
+        assertTrue(ev.contains("\"onLivingEquipmentChangeEvent\"") && ev.contains("\"onPlayerOpenContainer\""));
+        String lock = Files.readString(Path.of("src/main/java/ru/pohsmp/core/spell/CastLock.java"));
+        for (String e : new String[] {"AttackEntityEvent", "LeftClickBlock", "BreakEvent", "EntityPlaceEvent", "RightClickBlock", "RightClickItem",
+                "EntityInteract ", "EntityInteractSpecific", "ItemTossEvent", "LivingSwapItemsEvent.Hands", "PlayerContainerEvent.Open",
+                "ClientboundSetCarriedItemPacket", "MOVEMENT_SPEED"})
+            assertTrue(lock.contains(e), e);
+        String client = Files.readString(Path.of("src/main/java/ru/pohsmp/core/client/CastLockClient.java"));
+        for (String e : new String[] {"InteractionKeyMappingTriggered", "MovementInputUpdateEvent", "MouseScrollingEvent", "ScreenEvent.Opening",
+                "keyHotbarSlots", "keySwapOffhand", "keyDrop", "keyInventory"})
+            assertTrue(client.contains(e), e);
+        assertTrue(Files.readString(Path.of("src/main/java/ru/pohsmp/core/client/ClientInit.java")).contains("register(CastLockClient.class)"));
+    }
+
     /** The refusal and the window are wired: mixin, cutscenes, lang lines. */
     @Test
     void wiredIn() throws IOException {

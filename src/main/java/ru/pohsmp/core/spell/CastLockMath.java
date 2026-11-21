@@ -100,4 +100,61 @@ public final class CastLockMath {
     public static boolean refuses(State s, long now, boolean castingThis, boolean recastOfLocked) {
         return locked(s, now, castingThis) && !recastOfLocked;
     }
+
+    // ---- Owner 21.11 (2): while the window is open the player does nothing at all ----
+
+    /** What a player may try while the window is open. */
+    public enum Act {
+        ATTACK, USE_ITEM, USE_BLOCK, USE_ENTITY, BREAK, PLACE, HOTBAR, SPELL_SELECT, DROP, SWAP_HANDS, INVENTORY, SCREEN,
+        EF_SKILL, CAST, MOVE, JUMP, SPRINT, SNEAK, CAMERA, PAUSE, CHAT
+    }
+
+    /** True if this act is stopped while the window is open (camera, the pause menu and the chat stay free). */
+    public static boolean blocks(boolean locked, Act a) {
+        if (!locked) return false;
+        return a != Act.CAMERA && a != Act.PAUSE && a != Act.CHAT;
+    }
+
+    /** True if a stopped act says «Заклинание ещё не завершено» (movement and the camera are stopped silently). */
+    public static boolean hints(Act a) {
+        return switch (a) {
+            case MOVE, JUMP, SPRINT, SNEAK, CAMERA, PAUSE, CHAT -> false;
+            default -> true;
+        };
+    }
+
+    /** The hint at most twice a second (holding a button repeats the act every tick). */
+    public static final int HINT_EVERY = 10;
+
+    public static boolean hintDue(long last, long now) {
+        return last == Long.MIN_VALUE || now - last >= HINT_EVERY || now < last;
+    }
+
+    /** Why Iron's (or we) would stop a running cast. */
+    public enum Cancel {
+        /** the book key / quick cast of another spell (Iron's cancels before attemptInitiateCast) */
+        NEW_CAST,
+        /** the hand item changed (hotbar slot, swap, the item gone) */
+        ITEM_CHANGED,
+        /** a container opened on the server */
+        CONTAINER,
+        /** the use button released (staff, scroll) */
+        USE_RELEASED,
+        /** the client asked (it opened a screen: chat, pause) */
+        CLIENT_REQUEST,
+        DEATH, STUN, GUARD_BREAK, DIMENSION, LOGOUT, RESPAWN,
+        /** Iron's: a hit while casting an interruptible spell, a counterspell of another mage */
+        HIT,
+        /** our own code: joint cast merge, a spell that lost its condition, a boss phase */
+        SCRIPT
+    }
+
+    /** True if this cancel may stop the cast that holds the window. The player's own acts may not; the world may. */
+    public static boolean cancelAllowed(boolean locked, Cancel c) {
+        if (!locked) return true;
+        return switch (c) {
+            case NEW_CAST, ITEM_CHANGED, CONTAINER, USE_RELEASED, CLIENT_REQUEST -> false;
+            default -> true;
+        };
+    }
 }

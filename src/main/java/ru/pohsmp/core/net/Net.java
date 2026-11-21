@@ -17,7 +17,7 @@ import ru.pohsmp.core.PohCore;
 public final class Net {
     private Net() {}
 
-    private static final String V = "14";   // 14: IlluMsg WALK, NIGHT, IMMERSION, dream kinds (an old client is refused, owner 19.11); 13: IlluMsg (T22); 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
+    private static final String V = "15";   // 15: Lock (cast lock flag, owner 21.11); 14: 14: IlluMsg WALK, NIGHT, IMMERSION, dream kinds (an old client is refused, owner 19.11); 13: IlluMsg (T22); 12: EmberMsg form 0/1/2; 8: FxMsg HIT (T08); 9: FxMsg TEXT + inscriptions in START (T07); 10: GateCommand (C2S); 11: EmberMsg
     public static final SimpleChannel CH = NetworkRegistry.newSimpleChannel(new ResourceLocation(PohCore.MODID, "main"), () -> V, V::equals, V::equals);
 
     public static void register() {
@@ -39,6 +39,29 @@ public final class Net {
                 .consumerMainThread(IlluMsg::handle).add();
         CH.messageBuilder(CopyHit.class, 11, NetworkDirection.PLAY_TO_SERVER).encoder(CopyHit::encode).decoder(CopyHit::new)
                 .consumerMainThread(CopyHit::handle).add();
+        CH.messageBuilder(Lock.class, 12, NetworkDirection.PLAY_TO_CLIENT).encoder(Lock::encode).decoder(Lock::new)
+                .consumerMainThread(Lock::handle).add();
+    }
+
+    /** Owner 21.11: this client's player is held by the window of an animated spell (spell/CastLock) — input is dropped on the client. */
+    public static final class Lock {
+        public final boolean on;
+
+        public Lock(boolean on) {
+            this.on = on;
+        }
+
+        public Lock(FriendlyByteBuf b) {
+            on = b.readBoolean();
+        }
+
+        public void encode(FriendlyByteBuf b) {
+            b.writeBoolean(on);
+        }
+
+        public void handle(Supplier<NetworkEvent.Context> ctx) {
+            ru.pohsmp.core.spell.CastLock.clientLocked = on;
+        }
     }
 
     /** T22: this client struck false copy id (it exists only on the server and in the victims' clients). */

@@ -7,7 +7,12 @@
     "TrackedEntityMixin",
     "PlayerListMixin",
     "AbstractSpellMixin",
-    "ArcaneAnvilMenuMixin"
+    "ArcaneAnvilMenuMixin",
+    "IronsInitiateCastMixin",
+    "IronsServerEventsMixin",
+    "IronsCancelPacketMixin",
+    "IronsSelectSpellMixin",
+    "EpicFightSkillMixin"
   ],
   "client": [
     "HumanoidModelMixin",
@@ -22,7 +27,8 @@
     "AbstractClientPlayerMixin",
     "XaeroRadarMixin",
     "XaeroMinimapTrackerMixin",
-    "XaeroWorldMapTrackerMixin"
+    "XaeroWorldMapTrackerMixin",
+    "IronsClientInputMixin"
   ],
   "injectors": {
     "defaultRequire": 0

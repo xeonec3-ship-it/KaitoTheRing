@@ -30,6 +30,9 @@ public final class MartinMath {
     public static final int P2_ANIM = 60, P2_ROAR = 28, P2_PLANT_ANIM = 48, P2_PLANT = 48 + 26, P2_LOCK = 48 + 48;
     /** Banner planted later (a replant): martin_banner_plant alone. */
     public static final int PLANT_ANIM = 48, PLANT_AT = 26;
+    /** Where the banner entity stands (blocks, from the boss along his body yaw): the bottom of the held banner in martin_banner_plant at
+     *  1.3 s (PLANT_AT), vertical — the entity replaces it without a jump (tools/gen_martin_ef.py, BAN_B). */
+    public static final double BANNER_FWD = 1.5, BANNER_LEFT = 1.125;
     /** Phase 3: martin_phase3 3.2 s (kneel 0.8, spin 1.4, roar 2.0). */
     public static final int P3_ANIM = 64, P3_ROAR = 40;
 

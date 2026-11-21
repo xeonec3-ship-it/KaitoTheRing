@@ -34,9 +34,11 @@ public final class BossShowcase {
     private BossShowcase() {}
 
     private static final boolean ON = System.getProperty("pohsmp.bossshow") != null;
-    private static final String[] BOSSES = {"ereb", "aris", "irina", "ereb_hand", "martin", "cult_leader"};
-    private static final int FIRST = 100, EACH = 330;
-    private static final int[] SHOTS = {6, 20, 40, 70, 250};
+    private static final String[] BOSSES = System.getProperty("pohsmp.bossshow.only", "ereb,aris,irina,ereb_hand,martin,cult_leader").split(",");
+    /** -Dpohsmp.bossshow.dense=from,to: a shot every 4 ticks there too (the finale). */
+    private static final int[] DENSE = java.util.Arrays.stream(System.getProperty("pohsmp.bossshow.dense", "0,0").split(",")).mapToInt(Integer::parseInt).toArray();
+    private static final int FIRST = 100, EACH = 680;
+    private static final int[] SHOTS = {6, 20, 40, 70, 250, 300, 340, 380, 420, 450, 480, 510, 540, 580, 620};
 
     private static ServerPlayer player;
     private static int serverTick = -1;
@@ -66,7 +68,9 @@ public final class BossShowcase {
                     lvl.setBlockAndUpdate(base.offset(x, -1, z), ((x + z & 1) == 0 ? Blocks.SMOOTH_STONE : Blocks.POLISHED_ANDESITE).defaultBlockState());
                     for (int y = 0; y < 10; y++) lvl.setBlockAndUpdate(base.offset(x, y, z), Blocks.AIR.defaultBlockState());
                 }
-            player.setGameMode(GameType.CREATIVE);
+            player.setGameMode(GameType.SURVIVAL);
+            player.getAbilities().invulnerable = true;
+            player.onUpdateAbilities();
             player.teleportTo(lvl, 0.5, 100, 8.5, 180, 10);   // facing north (-z)
         }
         int k = serverTick - FIRST;
@@ -83,6 +87,20 @@ public final class BossShowcase {
             lvl.getServer().getCommands().performPrefixedCommand(src, "pohsmp boss " + id + " 0.5 100 -3.5");
         }
         for (int s : SHOTS) if (t == s) pendingShot = "boss_" + id + "_" + s;
+        if (t >= DENSE[0] && t < DENSE[1] && t % 4 == 0) pendingShot = "boss_" + id + "_" + t;
+        if (t == 260)
+            for (Mob m : lvl.getEntitiesOfClass(Mob.class, new AABB(new Vec3(0, 100, 0), new Vec3(0, 100, 0)).inflate(60), x -> x instanceof PohBoss))
+                m.setHealth(m.getMaxHealth() * 0.08f);
+        if (t >= 270 && t <= 560 && t % 5 == 0) {   // the finale by ordinary blows (surrender / leave at the floor, death for the rest)
+            for (Mob m : lvl.getEntitiesOfClass(Mob.class, new AABB(new Vec3(0, 100, 0), new Vec3(0, 100, 0)).inflate(60), x -> x instanceof PohBoss)) {
+                if (((PohBoss) m).bossCore().inFinale()) continue;
+                m.invulnerableTime = 0;
+                m.hurt(lvl.damageSources().playerAttack(player), m.getMaxHealth() * 0.03f);
+            }
+        }
+        if (t == 560) PohCore.LOG.info("[bossshow] {} finale: {}", id, lvl.getEntitiesOfClass(Mob.class, new AABB(new Vec3(0, 100, 0),
+                new Vec3(0, 100, 0)).inflate(60), x -> x instanceof PohBoss).stream().map(m -> m.getHealth() + "/" + m.getMaxHealth() + " finale="
+                + ((PohBoss) m).bossCore().inFinale() + " dead=" + ((PohBoss) m).bossCore().dead()).toList());
         if (t == EACH - 20) {
             for (Mob m : lvl.getEntitiesOfClass(Mob.class, new AABB(new Vec3(0, 100, 0), new Vec3(0, 100, 0)).inflate(60), x -> x instanceof PohBoss))
                 m.discard();

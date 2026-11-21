@@ -3,7 +3,7 @@
 T27 «Ирина»: покадровая проверка анимаций (шаг 0.1 с) — та же математика, что у GeckoLib 4 / превью three.js.
   Модель: geo/entity/irina.geo.json (x зеркалится, поворот кости (−x, −y, z), порядок Z·Y·X — RenderUtils.rotateMatrixAroundBone).
   Анимации: animations/entity/irina.animation.json — тело и ткань (контроллеры не пересекаются по костям).
-  Посох: models/item/irina_staff.json на кости bipedHandRight, как Iron's HumanoidRenderer.renderStackForBone:
+  Посох: models/item/irina_staff.json на кости bipedHandRight (повёрнут кистью дважды — GeckoLib 4.8.4), как Iron's renderStackForBone:
          translate(0, −1/16, −1/16), X −90, затем display thirdperson_righthand (translation, rotationXYZ, scale), −0.5.
 Система координат проверки — модельная: вперёд (по взгляду) = −z, вправо = +x, вверх = +y; 16 ед. = 1 блок.
 
@@ -26,6 +26,7 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 A = os.path.join(HERE, '..', 'src', 'main', 'resources', 'assets', 'pohsmp_core')
 DT = 0.1
+HAND2 = '~hand_rot'     # в W: второй поворот кисти для посоха (как в игре, GeckoLib 4.8.4)
 
 # анимация тела → ткань, с которой она играет в игре (письмо T27, раздел 2)
 COMBOS = {
@@ -192,6 +193,8 @@ class Rig:
             rot = b['rest'] + np.array([-r[0], -r[1], r[2]])
             L = M4(zyx(rot), b['base'] + np.array([-p[0], p[1], p[2]]), [max(1e-4, v) for v in s])
             W[n] = (W[b['parent']] @ L) if b['parent'] else L
+            if n == 'bipedHandRight':
+                W[HAND2] = M4(zyx(rot))
         return W, raw
 
     def world_json(self, pose):
@@ -203,6 +206,8 @@ class Rig:
             r, p = o.get('rot', [0, 0, 0]), o.get('pos', [0, 0, 0])
             L = M4(zyx(b['rest'] + np.array([-r[0], -r[1], r[2]])), b['base'] + np.array([-p[0], p[1], p[2]]))
             W[n] = (W[b['parent']] @ L) if b['parent'] else L
+            if n == 'bipedHandRight':
+                W[HAND2] = M4(zyx(b['rest'] + np.array([-r[0], -r[1], r[2]])))
         return W
 
     def local_json(self, parent_world, bone, D):
@@ -224,7 +229,8 @@ class Rig:
         a = M4(T=[0, -1, -1]) @ M4(R3('x', -90))
         rx, ry, rz = d.get('rotation', [0, 0, 0])
         a = a @ M4(T=d.get('translation', [0, 0, 0])) @ M4(R3('x', rx) @ R3('y', ry) @ R3('z', rz)) @ M4(S=d.get('scale', [1, 1, 1]))
-        return W['bipedHandRight'] @ a
+        # GeckoLib 4.8.4 (BlockAndItemGeoLayer.renderForBone): предмет повёрнут поворотом кисти ВТОРОЙ раз (у шарнира кисти)
+        return W['bipedHandRight'] @ W.get(HAND2, np.eye(4)) @ a
 
     def staff_world(self, W, p):
         return (self.staff_M(W) @ np.append(np.asarray(p, float) - 8.0, 1.0))[:3]

@@ -79,6 +79,14 @@ public class ErebHandTraitor extends PathfinderMob {
     @Override
     protected void registerGoals() {}
 
+    /** The swing timer (getAttackAnim, the renderer's attackTime) runs only where aiStep calls updateSwingTime — Monster and Player do,
+     *  PathfinderMob does not: without this the copy's swing() never animated (its weapon stayed still while it hit). */
+    @Override
+    public void aiStep() {
+        updateSwingTime();
+        super.aiStep();
+    }
+
     @Override
     public void tick() {
         super.tick();

@@ -32,7 +32,9 @@ public final class BossClient {
         MinecraftForge.EVENT_BUS.register(BossCam.class);
         MinecraftForge.EVENT_BUS.register(BossHudClient.class);
         MinecraftForge.EVENT_BUS.register(BossMusicClient.class);   // T33: fades / crossfades by the client tick
+        MinecraftForge.EVENT_BUS.register(BossSoundClient.class);   // boss sounds 21.11: animation sound keyframes, aura loops
         BossMusicClient.quietMissingParts();
+        modBus.addListener(BossSayClient::overlays);   // 21.11: the bosses' lines as an on-screen subtitle
         modBus.addListener(BossPoseClient::setup);
         modBus.addListener(BossClient::renderers);
         modBus.addListener(BossClient::setup);
@@ -63,6 +65,7 @@ public final class BossClient {
             case BossNet.BAR, BossNet.BAR_STOP -> BossBarClient.onMsg(m);
             case BossNet.SCENE, BossNet.SCENE_STOP -> BossCam.onMsg(m);
             case BossNet.TITLE, BossNet.SUBTITLE -> BossHudClient.onMsg(m);
+            case BossNet.SAY -> BossSayClient.onMsg(m);
             case BossNet.MUSIC -> BossMusicClient.onMsg(m);
             case BossNet.POSE -> BossPoseClient.onMsg(m);
             case BossNet.LOOK -> {
@@ -78,6 +81,8 @@ public final class BossClient {
         LOOKS.clear();
         BossBarClient.clear();
         BossHudClient.clear();
+        BossSayClient.clear();
         BossMusicClient.clear();
+        BossSoundClient.clear();
     }
 }

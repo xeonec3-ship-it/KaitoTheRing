@@ -100,6 +100,7 @@ public final class BossEpicFight {
             if (patch == null) return;
             patch.setStamina(0);
             patch.applyStun(StunType.NEUTRALIZE, stunTicks / 20.0F);
+            ru.pohsmp.core.spell.CastLock.interrupt(p);   // owner 21.11: a broken guard ends the cast window
             patch.playSound(EpicFightSounds.NEUTRALIZE_MOBS.get(), 3.0F, 0.0F, 0.1F);
         }
 
@@ -123,6 +124,7 @@ public final class BossEpicFight {
         static void onStun(EntityStunEvent e) {
             LivingEntity le = e.getStunnedEntityPatch().getOriginal();
             if (BossGuard.isBoss(le) && BossConfig.get(BossConfig.EF_STUN_IMMUNE)) e.setCanceled(true);
+            else if (!e.isCanceled() && !le.level().isClientSide) ru.pohsmp.core.spell.CastLock.interrupt(le);   // a stunned player: the cast window ends
         }
 
         /** An Epic Fight hit on a boss, after Epic Fight scaled it: our protection again. */

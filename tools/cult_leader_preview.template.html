@@ -122,8 +122,8 @@ function buildModel(entry, soul) {
     grp.userData.base = [grp.userData.piv[0] - pp[0], grp.userData.piv[1] - pp[1], grp.userData.piv[2] - pp[2]];
     (par || root).add(grp);
   }
-  // огненный слой головы (FireBossFlameLayer: два скрещённых квадрата на голове, полная яркость; в облике души — нет)
-  if (entry.flame && !soul && bones.head) {
+  // огненный слой головы (CultFlameLayer: скрещённые квадраты на голове, полная яркость; в обоих обликах — правка 21.11)
+  if (entry.flame && bones.head) {
     const ft = loadTex(entry.flame); ft.repeat.set(1, 1 / 8); ft.offset.set(0, 7 / 8);
     const fm = new THREE.MeshBasicMaterial({ map: ft, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
     const fg = new THREE.Group(); fg.userData.flame = ft; fg.userData.glow = true;
@@ -227,6 +227,8 @@ function setup(c) {
   const anim = c.anim ? DATA.anims[c.anim] : null;
   pose(m, anim, c.t || 0); flameFrame(m, Math.floor((c.t || 0) * 20));
   if (c.noGlow) m.root.traverse(o => { if (o.userData.glow) o.visible = false; });
+  if (c.noFlame) m.root.traverse(o => { if (o.userData.flame) o.visible = false; });
+  if (c.glowOnly) m.root.traverse(o => { if (o.isMesh && !o.userData.glow && !(o.parent && o.parent.userData.flame)) o.visible = false; });
   return { e, m };
 }
 
@@ -240,7 +242,7 @@ if (CELLS) {
       if (c.scale) m.root.scale.setScalar(c.scale);
       if (c.x) m.root.position.x = c.x * 16;
       for (const x of (c.models || [])) {                         // несколько моделей в клетке (сравнение роста)
-        const r = setup({ ...x, noGlow: x.noGlow }); r.m.root.scale.setScalar(x.scale || 1); r.m.root.position.set((x.x || 0) * 16, (x.y || 0) * 16, (x.z || 0) * 16); r.m.root.rotation.y = (x.ry || 0) * Math.PI / 180; sc.add(r.m.root);
+        const r = setup({ ...x, noGlow: x.noGlow, soul: x.soul ?? c.soul }); r.m.root.scale.setScalar(x.scale || 1); r.m.root.position.set((x.x || 0) * 16, (x.y || 0) * 16, (x.z || 0) * 16); r.m.root.rotation.y = (x.ry || 0) * Math.PI / 180; sc.add(r.m.root);
       }
       if (c.ruler) {                                              // линейка: столбик из блоков 1×1 (чередование цветов)
         for (let k = 0; k < c.ruler; k++) {

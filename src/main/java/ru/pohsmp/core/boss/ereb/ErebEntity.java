@@ -169,6 +169,12 @@ public class ErebEntity extends ErebBody implements PohBoss {
     @Override
     protected void dropAllDeathLoot(DamageSource src) {}
 
+    /** Boss sounds 21.11: glass cracks (sounds.json ereb.hurt). */
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource src) {
+        return ru.pohsmp.core.boss.BossCore.sound("ereb.hurt");
+    }
+
     @Override
     public void die(DamageSource src) {   // only /kill and the like: no scene
         super.die(src);

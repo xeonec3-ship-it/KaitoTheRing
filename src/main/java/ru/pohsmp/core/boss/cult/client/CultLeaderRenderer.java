@@ -23,7 +23,7 @@ import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 /**
  * FireBossRenderer's behaviour for the Head of the Cult (size as the original Tyros: ×1.75, soul form ×2.0125, shadow 0.65) with our
- * model, the glow masks, our head flame (goes out at 2.6 s of the death scene), not drawn while it is ash (LOOK_HIDDEN) and for the
+ * model, the glow masks (scaled once: see preRender), our head flame in both forms (goes out at 2.6 s of the death scene), not drawn while it is ash (LOOK_HIDDEN) and for the
  * first 30 ticks of the intro (it is still inside the fire).
  */
 public class CultLeaderRenderer extends AbstractSpellCastingMobRenderer {
@@ -45,6 +45,10 @@ public class CultLeaderRenderer extends AbstractSpellCastingMobRenderer {
     public void preRender(PoseStack ps, AbstractSpellCastingMob e, BakedGeoModel model, MultiBufferSource buf, VertexConsumer vc, boolean reRender,
                           float pt, int light, int overlay, float r, float g, float b, float a) {
         super.preRender(ps, e, model, buf, vc, reRender, pt, light, overlay, r, g, b, a);
+        // Only on the main pass: AutoGlowingGeoLayer draws the glow mask with GeoRenderer.reRender, which calls preRender again on
+        // the already scaled pose stack - scaled here a second time the glowing parts (eyes, crown tips, medallion; in the soul form
+        // the whole golden armour) were drawn x3.06 / x4.05 from the feet, 2-3 heights over his head (owner's screenshots 21.11).
+        if (reRender) return;
         float s = e instanceof CultLeaderEntity c && c.isSoulMode() ? 2.0125f : 1.75f;
         ps.scale(s, s, s);
     }

@@ -65,6 +65,10 @@ public final class ErebHandFight {
     private final Set<Integer> reflected = new HashSet<>();
     // phase 3: the wall of fire
     private int firewallFx = -1;
+    /** «Тысяча отражений»: the endless mirrors, known here so cleanup stops them too (the timeline that ends them is cancelled on a false death; FX audit 21.11). */
+    private final List<Integer> thousandFx = new ArrayList<>();
+    /** «Длань Лжи»: the false arena fill on the victim (FX audit 21.11: was not kept, outlived an early release by up to 6 s). */
+    private int holArenaFx = -1;
     private final Map<UUID, Double> wallDist = new HashMap<>();
     private final Map<UUID, Long> wallHit = new HashMap<>();
     // «Длань Лжи»
@@ -709,7 +713,7 @@ public final class ErebHandFight {
             holHold = hold;
             hit(v, ErebHandConfig.d(ErebHandConfig.HAND_OF_LIES_DAMAGE));
             boss.setFalseArena(v.getUUID());
-            Fx.play(sl, Fx.fx("ereb_hand_false_arena").caster(v).at(v.position()).attach(v).duration(hold + 4).only(v));
+            holArenaFx = Fx.play(sl, Fx.fx("ereb_hand_false_arena").caster(v).at(v.position()).attach(v).duration(hold + 4).only(v));
             holFx = Fx.play(sl, Fx.fx("ereb_hand_hold").caster(v).at(v.position()).attach(v));
             v.displayClientMessage(ui("false_arena"), true);
         }
@@ -732,6 +736,8 @@ public final class ErebHandFight {
         boss.setFalseArena(null);
         if (holFx >= 0) Fx.stop(sl, holFx, "");
         holFx = -1;
+        if (holArenaFx >= 0 && Fx.running(holArenaFx)) Fx.stop(sl, holArenaFx, "");   // released early: the purple fill goes with it
+        holArenaFx = -1;
         if (giant != null && !giant.isRemoved()) {
             giant.setPose(ErebHandGiant.RELEASE);
             giant.lifeTicks(ErebHandMath.GIANT_RELEASE + 4);
@@ -779,7 +785,9 @@ public final class ErebHandFight {
                         shards.put(p.getUUID(), s);
                         shardIndex.put(p.getUUID(), i);
                         shardFx.put(s.getId(), Fx.play(sl, Fx.fx("ereb_hand_mask_shard").caster(s).at(at).attach(s)));
-                        arrows.put(p.getUUID(), Fx.play(sl, Fx.fx("ereb_hand_mask_arrow").caster(p).at(arrowPos(p)).only(p)));
+                        // no caster (FX audit 21.11): with a live caster the client takes the player's look for yaw and Fx.move never turned it to
+                        // the shard; now it stands at the player's feet + the JSON offset (1.2 up, 1.2 towards the shard), moved each tick
+                        arrows.put(p.getUUID(), Fx.play(sl, Fx.fx("ereb_hand_mask_arrow").at(p.position()).yaw(p.getYRot()).only(p)));
                         p.displayClientMessage(ui("mask_fall_hint"), true);
                     }
                     maskT = 0;
@@ -813,7 +821,7 @@ public final class ErebHandFight {
                 Vec3 to = at.subtract(from);
                 float yaw = ErebHandMath.yawTo(from.x, from.z, at.x, at.z);
                 float pitch = (float) -Math.toDegrees(Math.atan2(to.y, Math.sqrt(to.x * to.x + to.z * to.z)));
-                Fx.move(sl, ar, from, yaw, pitch);
+                Fx.move(sl, ar, p.position(), yaw, pitch);   // the instance base is the feet: the JSON puts it 1.2 up and 1.2 along yaw
             }
         }
         if (maskT == ErebHandMath.MASK_ARROW) arrows.clear();
@@ -1115,6 +1123,7 @@ public final class ErebHandFight {
             for (int i = 0; i < n; i++) {
                 Vec3 q = pts.get(i);
                 fx[i] = Fx.play(sl, Fx.fx("ereb_hand_mirror").at(q).yaw(ErebHandMath.yawTo(q.x, q.z, centre.x, centre.z)));
+                thousandFx.add(fx[i]);
             }
         });
         for (int i = 0; i < n; i++) {
@@ -1148,6 +1157,7 @@ public final class ErebHandFight {
                 if (fx[i] >= 0) Fx.stop(sl, fx[i], "");
                 Fx.play(sl, Fx.fx("ereb_hand_mirror_break").at(pts.get(i)));
             }
+            thousandFx.clear();
         });
         play(tl);
         return true;
@@ -1370,7 +1380,7 @@ public final class ErebHandFight {
         ServerPlayer v = victim;
         act(ErebHandMath.RETREAT_STRIKE);
         anim("ereb_hand_false_retreat_strike");
-        Fx.play(sl, Fx.fx("ereb_hand_false_retreat_strike").caster(boss).at(at).yaw(yaw).target(v));
+        Fx.play(sl, Fx.fx("ereb_hand_false_retreat_strike").at(at).yaw(yaw).target(v));   // no caster: just moved, the client still lerps him from the old spot and would draw it there (FX audit 21.11)
         core.sound("ereb.appear", 2, 1.1f);
         play(new BossTimeline("act:retreat_strike", ErebHandMath.RETREAT_STRIKE).at(ErebHandMath.RETREAT_STRIKE_HIT, () -> {
             core.sound("ereb.thrust", 1.5f, 0.8f);
@@ -1554,6 +1564,8 @@ public final class ErebHandFight {
         maskT = -1;
         maskReturnDue = false;
         stopWalls(sl);
+        for (int f : thousandFx) Fx.stop(sl, f, "");
+        thousandFx.clear();
         if (firewallFx >= 0) Fx.stop(sl, firewallFx, "");
         firewallFx = -1;
         oathLeft = 0;

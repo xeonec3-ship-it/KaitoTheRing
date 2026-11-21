@@ -73,6 +73,14 @@ public class MartinBannerEntity extends Mob implements GeoEntity, IAnimatedAttac
     }
 
     /** The top snaps and falls; removed 2 s later. */
+    /** FX audit 21.11: unloaded / discarded without cut() - the endless aura stayed as a ghost ring. */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (auraFx > 0 && level() instanceof ServerLevel sl) Fx.stop(sl, auraFx, "");
+        auraFx = -1;
+        super.remove(reason);
+    }
+
     void cut(ServerLevel sl) {
         if (!standing()) return;
         entityData.set(CUT, true);

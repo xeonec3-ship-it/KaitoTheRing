@@ -27,6 +27,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import ru.pohsmp.core.PohCore;
 import ru.pohsmp.core.boss.BossConfig;
 import ru.pohsmp.core.boss.BossCore;
 import ru.pohsmp.core.boss.BossMath;
@@ -104,6 +105,7 @@ public final class CultFight {
     // ---------------------------------------------------------------- tick
 
     void tick(ServerLevel sl) {
+        watchdog(sl);
         if (!core.started() || core.inFinale()) return;
         int phase = core.phase();
         if (phase == 1 && verdictIn >= 0 && !core.inScene() && --verdictIn == 0) verdict(sl);
@@ -142,6 +144,7 @@ public final class CultFight {
     }
 
     private void phase3(ServerLevel sl) {
+        PohCore.LOG.info("[boss] cult_leader: phase 3 (soul form, wall of fire) at {}", boss.blockPosition());
         verdictIn = -1;
         core.actionbar(core.arenaRadius() + 8, ui("phase3"));
         core.sound("cult_leader.phase", 4, 0.9f);
@@ -260,6 +263,34 @@ public final class CultFight {
         return Math.abs(y - p.y) <= 6 ? new Vec3(p.x, y, p.z) : p;
     }
 
+    /**
+     * Nothing may hang (owner's screenshot 3, 21.11): hidden as ash only while «Пепел Меллисто» plays (its script cancelled - shown
+     * again, the whirl stops); the wall of fire of phase 3 is there while he fights in phase 3 (after a reload of the chunk / server the
+     * fx ids are gone: played again).
+     */
+    private void watchdog(ServerLevel sl) {
+        if ((core.look() & BossNet.LOOK_HIDDEN) != 0 && !core.dead() && !core.playing("scene:ash")) {
+            PohCore.LOG.warn("[boss] cult_leader: hidden (ash) without the ash scene - shown again at {}", boss.blockPosition());
+            if (vortexFx > 0) Fx.stop(sl, vortexFx, "");
+            vortexFx = -1;
+            core.lookFlag(BossNet.LOOK_HIDDEN, false);   // the ash lock (invulnerable, AI off) runs out by its own ticks
+        }
+        if (core.started() && !core.inFinale() && core.phase() >= 2 && firewallFx < 0 && !core.playing("phase3") && boss.tickCount % 20 == 0) {
+            PohCore.LOG.info("[boss] cult_leader: the wall of fire played again (phase 3, no fx id - reloaded?)");
+            firewallFx = Fx.play(sl, Fx.fx("cult_leader_firewall").at(arena()).yaw(0));
+        }
+    }
+
+    /** The entity leaves the world (any reason): every fx of the fight that is not tied to him stops, the servants go. */
+    void cleanUp(ServerLevel sl) {
+        stopFires(sl);
+        if (vortexFx > 0) Fx.stop(sl, vortexFx, "");
+        vortexFx = -1;
+        for (UUID u : cultists) if (sl.getEntity(u) instanceof LivingEntity c && c.isAlive()) c.discard();
+        cultists.clear();
+        burns.clear();
+    }
+
     /** Death 2.6 s: the wall goes out, the fury aura stops. */
     void stopFires(ServerLevel sl) {
         if (firewallFx > 0) Fx.stop(sl, firewallFx, "");
@@ -345,6 +376,7 @@ public final class CultFight {
                 .at(CultMath.ASH_GONE, () -> {
                     core.lock(CultMath.ASH_REFORM - CultMath.ASH_GONE, true, true);   // invulnerable while he is ash
                     core.lookFlag(BossNet.LOOK_HIDDEN, true);
+                    PohCore.LOG.info("[boss] cult_leader: ash - hidden at {}", boss.blockPosition());
                     vortexFx = Fx.play(sl, Fx.fx("cult_ash_vortex").caster(boss).at(boss.position()).attach(boss));
                     ServerPlayer enemy = core.strongestEnemy();
                     Vec3 from = boss.position();
@@ -369,6 +401,7 @@ public final class CultFight {
                     if (vortexFx > 0) Fx.stop(sl, vortexFx, "");
                     vortexFx = -1;
                     core.lookFlag(BossNet.LOOK_HIDDEN, false);
+                    PohCore.LOG.info("[boss] cult_leader: ash - reformed at {}", boss.blockPosition());
                     boss.serverTriggerAnimation("cult_leader_ash_reform");
                     Fx.play(sl, Fx.fx("cult_ash_reform").caster(boss).at(boss.position()).yaw(boss.getYRot()));
                     Fx.play(sl, Fx.fx("cult_ash_line").at(boss.position()).yaw(boss.getYRot()));
@@ -547,6 +580,7 @@ public final class CultFight {
                         if (!mark.isAlive()) continue;
                         mark.addEffect(new MobEffectInstance(CultLeader.BRAND.get(), delay, 0, false, true, true));
                         Fx.play(sl, Fx.fx("cult_brand").caster(mark).at(mark.position()).attach(mark).duration(delay));
+                        core.sound(mark.position(), "cult_leader.brand", 1.5f, 1);
                         if (mark instanceof ServerPlayer sp) sp.displayClientMessage(ui("brand_warn"), true);
                     }
                     core.actionbar(20, ui("brand"));
@@ -557,7 +591,7 @@ public final class CultFight {
                         Vec3 c = mark.position();
                         Fx.play(sl, Fx.fx("cult_brand_explode").at(c));
                         for (LivingEntity e : targets(sl, c, cfg(BossConfig.CL_BRAND_RADIUS))) hit(e, cfg(BossConfig.CL_BRAND_DAMAGE), 0);
-                        sl.playSound(null, c.x, c.y, c.z, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE, net.minecraft.sounds.SoundSource.HOSTILE, 2, 1.2f);
+                        core.sound(c, "cult_leader.brand_explode", 2.5f, 1);
                     }
                 }));
     }

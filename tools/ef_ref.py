@@ -142,9 +142,21 @@ def _ortho(M):
 
 # ---------------------------------------------------------------- анимация
 class EFAnim:
-    def __init__(self, jars, member, jar_key=None):
+    def __init__(self, jars, member, jar_key=None, path=None):
+        """member — путь внутри jar; path — наш файл анимации EF (assets/pohsmp_core/animmodels/...), jar не нужен."""
+        if path:
+            d = json.load(open(path, encoding='utf-8'))
+            self._init(d, path, None, None)
+            dm = os.path.join(os.path.dirname(path), 'data', os.path.basename(path))
+            if os.path.exists(dm):
+                for t in json.load(open(dm, encoding='utf-8')).get('trail_effects', []):
+                    self.trail.append((float(t['start_time']), float(t['end_time']), t.get('joint', 'Tool_R')))
+            return
         jk = jar_key or next(k for k, p in jars.items() if Jar(p).has(member))
         d = Jar(jars[jk]).json(member)
+        self._init(d, member, jk, jars)
+
+    def _init(self, d, member, jk, jars):
         self.name = os.path.splitext(os.path.basename(member))[0]
         self.member, self.src = member, jk
         self.tracks = {}
@@ -162,6 +174,8 @@ class EFAnim:
             self.length = max(self.length, float(ts[-1]))
         # окно удара — trail_effects из data/<имя>.json (если есть у источника)
         self.trail = []
+        if jars is None:
+            return
         dm = os.path.join(os.path.dirname(member), 'data', os.path.basename(member))
         j = Jar(jars[jk])
         if j.has(dm):

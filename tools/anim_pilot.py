@@ -87,6 +87,21 @@ def geo_render(modname, model):
     return render
 
 
+# ---------------------------------------------------------------- игрок (T14, Epic Fight): наши анимации — тем же проигрывателем, что эталон
+EMBER = os.path.join(A, 'animmodels', 'animations', 'biped', 'ember')
+
+
+def player_render(jars, three, old_dir):
+    def render(cells, size, old):
+        cs = []
+        for c in cells['cells']:
+            name = c['anim'].split('.')[-1]
+            path = os.path.join(old_dir if c['anim'].startswith('old.') else EMBER, name + '.json')
+            cs.append(dict(c, ref='file:' + path, blade=1.0))
+        return ref_cells_png(jars, {'cols': cells['cols'], 'cells': cs}, three, size)
+    return render
+
+
 BOSSES = {
     'aris': dict(tag='t28', title='T28 Арис', old_rev='82eaf87', path='animations/entity/aris.animation.json', prefix='animation.aris.',
                  render=aris_render, model='aris',
@@ -100,6 +115,9 @@ BOSSES = {
                       prefix='ereb_hand_', render=geo_render('gen_ereb_hand_render', 'ereb_hand'), model='ereb_hand',
                       pairs=[('lunge', 'EF mob_spear_twohand3', 'Выпад рапирой'), ('flurry', 'EF spear_onehand_auto', 'Серия из трёх уколов'),
                              ('slam', 'NF ng_great_auto2', 'Удар призрачной ладонью о землю')]),
+    'player': dict(tag='player', title='Игрок: меч-хлыст T14', old_rev=None, path=None, prefix='', model='player',
+                   pairs=[('whip1', 'EF longsword_auto1', 'Хлёст справа налево'), ('sword1', 'EF longsword_auto2', 'Разрез мечом'),
+                          ('whip_idle', 'EF hold_longsword', 'Стойка с хлыстом')]),
     'irina': dict(tag='t27', title='T27 Ирина', old_rev='dab42e3', path='animations/entity/irina.animation.json', prefix='irina_',
                   render=irina_render, model='irina',
                   pairs=[('staff_attack', 'NF ng_great_auto2', 'Удар крюком посоха сверху'),
@@ -246,6 +264,71 @@ def video(boss, jars, three):
     print('wrote', out, i, 'frames')
 
 
+def player_old_dir(rev='HEAD'):
+    """Анимации меча-хлыста игрока из git (rev) во временную папку — «было»."""
+    d = tempfile.mkdtemp(prefix='ember_old_')
+    rel = 'src/main/resources/assets/pohsmp_core/animmodels/animations/biped/ember'
+    names = subprocess.run(['git', '-C', ROOT, 'ls-tree', '--name-only', '%s:%s' % (rev, rel)], capture_output=True, text=True, check=True).stdout
+    for n in names.split():
+        if n.endswith('.json'):
+            open(os.path.join(d, n), 'wb').write(subprocess.run(['git', '-C', ROOT, 'show', '%s:%s/%s' % (rev, rel, n)],
+                                                                capture_output=True, check=True).stdout)
+    return d
+
+
+def player_phases(dirpath, name):
+    rig = C.PlayerEFRig(dirpath)
+    a = rig.anim(name)
+    if name not in C.BOSSES['player']['attacks']:
+        return [a.length * k / 6 for k in range(6)], a.length
+    ev = rig.events(name)
+    th = list(ev)
+    sig, L = rig.signals(name)
+    return phase_times(C.metrics(sig, L, (th[0] - 0.3, th[0] + 0.12) if th else None)), L
+
+
+def player_media(jars, three, rev='HEAD', video_too=False):
+    B = BOSSES['player']
+    old_dir = player_old_dir(rev)
+    cw, ch = 300, 330
+    rows = []
+    for name, ref, title in B['pairs']:
+        to, _ = player_phases(old_dir, name)
+        tn, _ = player_phases(EMBER, name)
+        cells = [dict(ref='file:' + os.path.join(old_dir, name + '.json'), t=t, blade=1.0, **VIEW_R) for t in to] + \
+                [dict(ref='file:' + os.path.join(EMBER, name + '.json'), t=t, blade=1.0, **VIEW_R) for t in tn]
+        tiles = slice_grid(ref_cells_png(jars, {'cols': 6, 'cells': cells}, three, (6 * cw, 2 * ch)), 6, 12, cw, ch)
+        rows.append((title + ' — было', to, tiles[:6]))
+        rows.append((title + ' — стало', tn, tiles[6:]))
+        tr, _ = ref_phase_times(jars, ref)
+        rim = ref_cells_png(jars, {'cols': 6, 'cells': [dict(ref=ref, t=t, blade=1.0, **VIEW_R) for t in tr]}, three, (6 * cw, ch))
+        rows.append(('эталон: ' + ref, tr, slice_grid(rim, 6, 6, cw, ch)))
+    lw, hh = 210, 34
+    W, H = lw + 6 * cw, hh + len(rows) * ch
+    im = Image.new('RGB', (W, H), (22, 20, 26))
+    dr = ImageDraw.Draw(im)
+    f1, f2 = font(15), font(13)
+    for j, p in enumerate(PHASES):
+        dr.text((lw + j * cw + 8, 9), p, fill=(235, 230, 240), font=f1)
+    for i, (lab, ts, tiles) in enumerate(rows):
+        y = hh + i * ch
+        for j, tl in enumerate(tiles):
+            im.paste(tl, (lw + j * cw, y))
+            dr.text((lw + j * cw + 6, y + ch - 20), '%.2f с' % ts[j], fill=(220, 215, 228), font=f2)
+        col = (150, 150, 160) if 'было' in lab else ((240, 200, 120) if 'стало' in lab else (140, 190, 255))
+        line, yy = '', y + 10
+        for w in lab.split(' '):
+            if dr.textlength(line + ' ' + w, font=f1) > lw - 16:
+                dr.text((8, yy), line.strip(), fill=col, font=f1)
+                yy += 19
+                line = ''
+            line += ' ' + w
+        dr.text((8, yy), line.strip(), fill=col, font=f1)
+    out = os.path.join(MEDIA, 'player_epicfight.jpg')
+    im.save(out, quality=88)
+    print('wrote', out, im.size)
+
+
 if __name__ == '__main__':
     a = sys.argv[1:]
     boss = a[0]
@@ -253,6 +336,9 @@ if __name__ == '__main__':
     if three:
         os.environ['THREE_JS'] = three
     jars = R.find_jars()
+    if boss == 'player':
+        player_media(jars, three)
+        sys.exit(0)
     if '--sheet' in a:
         sheet(boss, jars, three)
     if '--video' in a:

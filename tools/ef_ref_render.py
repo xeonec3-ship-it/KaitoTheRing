@@ -25,6 +25,8 @@ ALL.update(R.REF_IDLE)
 
 
 def load(jars, key):
+    if key.startswith('file:'):                              # наша анимация EF (например, меч-хлыст игрока T14)
+        return R.EFAnim(None, None, path=key[5:])
     if key in ALL:
         src, mem = ALL[key][0], ALL[key][1]
     else:

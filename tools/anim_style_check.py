@@ -489,6 +489,35 @@ class ErebHandRig:
         return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
 
 
+# ================================================================== наши: игрок — анимации Epic Fight меча-хлыста T14 (тот же формат, что эталон)
+class PlayerEFRig:
+    DIR = os.path.join(A, 'animmodels', 'animations', 'biped', 'ember')
+
+    def __init__(self, path=None):
+        import ef_ref as R
+        self.R = R
+        self.dir = path or self.DIR
+        self.jars = R.find_jars()
+        self.an = {os.path.splitext(f)[0]: os.path.join(self.dir, f) for f in os.listdir(self.dir) if f.endswith('.json')}
+        self._c = {}
+
+    def key(self, name):
+        return name
+
+    def anim(self, name):
+        if name not in self._c:
+            self._c[name] = self.R.EFAnim(None, None, path=self.an[name])
+        return self._c[name]
+
+    def signals(self, name, weapon='item'):
+        a = self.anim(name)
+        return (lambda t: self.R.ef_signals(self.jars, a, t)), a.length
+
+    def events(self, name):
+        a = self.anim(name)
+        return {a.trail[0][0] + 0.5 * (a.trail[0][1] - a.trail[0][0]): 'trail'} if a.trail else {}
+
+
 def ereb_rig(path=None):
     return GeoRig(path, 'ereb', 'ereb_')
 
@@ -505,6 +534,12 @@ BOSSES = {
     'ereb_hand': dict(rig=ErebHandRig, scale=1.0, code_move={}, idle=['idle'],
                       attacks={'lunge': ('hit', 'thrust', 'rapier'), 'flurry': ('hit', 'thrust', 'rapier'),
                                'slam': ('slam', 'heavy', 'ghost')}),       # удар призрачной ладонью о землю: «клинок» — запястье → ладонь
+    # игрок (T14, меч-хлыст «Раскалённые угли», Epic Fight): окно удара — trail_effects (середина следа); касты Iron's (PlayerAnimator)
+    # — не удары оружием, их метрики не считаем
+    'player': dict(rig=PlayerEFRig, scale=1.0, code_move={}, idle=['whip_idle'],
+                   attacks={'whip1': ('trail', 'light', 'item'), 'whip2': ('trail', 'light', 'item'), 'whip3': ('trail', 'light', 'item'),
+                            'sword1': ('trail', 'light', 'item'), 'sword2': ('trail', 'light', 'item'), 'sword3': ('trail', 'light', 'item'),
+                            'sword4': ('trail', 'light', 'item'), 'sword_dash': ('trail', 'thrust', 'item')}),
     'irina': dict(rig=IrinaRig, scale=14.0 / 12.0, code_move={}, idle=['idle'],
                   attacks={'staff_attack': ('hit', 'heavy', 'staff'), 'staff_sweep': ('hit', 'heavy', 'staff')}),
 }

@@ -382,12 +382,8 @@ public final class Reg {
                 return new ItemStack(crown == null || crown == Items.AIR ? Items.NETHER_STAR : crown);
             })
             .displayItems((params, out) -> {
-                for (String p : COMMON_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
-                for (String p : HIGHER_SPELLS) if (!ru.pohsmp.core.spell.MagicRules.itemOnly(PohCore.MODID + ":" + p)) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
-                out.accept(Scrolls.make(DisintegrationSpell.ID, 1, null));
-                for (String p : MYTHIC_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
-                for (String p : DIVINE_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
-                out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, ru.pohsmp.core.erased.ErasedNameSpell.PATH), 1, null));   // T24
+                // owner 21.11: every scroll of ours at every level, here and not in Iron's scroll tab (ScrollTab)
+                for (ItemStack st : ScrollTab.ourScrolls()) out.accept(st);
                 for (RegistryObject<Item> s : STAFFS) out.accept(s.get());
                 out.accept(DOWNFALL_STAFF.get());
                 out.accept(SILENT_WITCH_HOOD.get());

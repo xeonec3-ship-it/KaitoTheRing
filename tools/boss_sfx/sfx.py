@@ -357,7 +357,7 @@ def whisper(d=1.5, syll=6, base=1.0):
     bounds = np.sort(_rng.uniform(0, 1, syll * 2)) * n
     for i in range(0, len(bounds) - 1, 2):
         a, b = int(bounds[i]), int(bounds[i + 1])
-        if b - a < 800:
+        if b - a < secs(0.09):   # shorter bursts read as clicks
             continue
         f1, f2 = forms[_rng.integers(len(forms))]
         seg = x[a:b]
@@ -410,3 +410,8 @@ def variants(fn, k, seed):
         rng(seed * 100 + i)
         out.append(fn(i))
     return out
+
+
+def uni(a, b, n=None):
+    """Seeded uniform random (the generator of the last rng(seed))."""
+    return _rng.uniform(a, b, n)

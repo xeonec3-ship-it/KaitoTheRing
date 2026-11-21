@@ -214,8 +214,7 @@ public final class ArisFight {
         if (acting() || core.inScene() || !core.started()) return false;
         face(yawTo(t.position()));
         boss.play("swing");
-        actingUntil = boss.tickCount + ArisMath.SWING;
-        core.sound("aris.swing", 1.2f, 1);
+        actingUntil = boss.tickCount + ArisMath.SWING;   // the swish: a sound keyframe of the animation at the windup (0.4 s)
         core.play(new BossTimeline("swing", ArisMath.SWING_HIT + 1).at(ArisMath.SWING_HIT, () -> {
             Vec3 c = boss.position().add(fwd().scale(1.6));
             for (LivingEntity e : targets(c, 2.2, 2.5)) {
@@ -228,7 +227,7 @@ public final class ArisFight {
                     e.hurtMarked = true;
                 }
             }
-            boss.vanilla(net.minecraft.sounds.SoundEvents.ANVIL_LAND, 0.6f, 1.4f);
+            core.sound("aris.anvil_ring", 1, 1.25f);   // the hammer connected
         }));
         return true;
     }
@@ -385,7 +384,7 @@ public final class ArisFight {
                 .at(ArisMath.LAST_PEAK, () -> core.sound("aris.forge", 3, 0.6f))
                 .at(ArisMath.LAST_BLOW, () -> {
                     core.sound(p, "aris.slam", 6, 0.6f);
-                    boss.vanilla(net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE, 3, 0.7f);
+                    core.sound(p, "aris.billet_explode", 4, 0.7f);
                     for (LivingEntity e : targets(p, 30, 10)) {
                         double d = Math.sqrt(e.distanceToSqr(p.x, e.getY(), p.z));
                         double dmg = ArisMath.lastBlowDamage(d, r, cfg(ArisConfig.LAST_CENTER), cfg(ArisConfig.LAST_EDGE));
@@ -457,8 +456,7 @@ public final class ArisFight {
     private void slam(ServerLevel sl, LivingEntity t) {
         face(yawTo(t.position()));
         stand(ArisMath.SLAM);
-        boss.play("slam");
-        core.sound("aris.swing", 1, 0.8f);
+        boss.play("slam");   // windup swish: animation sound keyframe (0.5 s)
         Set<UUID> hitSet = new HashSet<>();
         Vec3[] at = {null};
         core.play(new BossTimeline("spell:slam", ArisMath.SLAM_IMPACT + ArisMath.SLAM_WAVE + 1)
@@ -593,7 +591,7 @@ public final class ArisFight {
                 sl.addFreshEntity(b);
                 b.setup(boss, blades.size(), cfg(ArisConfig.BLADE_HP) * core.playerMultiplier(), 40 + k * 15);
                 blades.add(b.getUUID());
-                boss.vanilla(net.minecraft.sounds.SoundEvents.ANVIL_USE, 1, 1.4f);
+                core.sound(at[0], "aris.anvil_ring", 1.2f, 1.4f);
             });
         }
         core.play(t);
@@ -752,7 +750,7 @@ public final class ArisFight {
         ServerLevel sl = sl();
         c.hits++;
         Fx.play(sl, Fx.fx("aris_chains_hit").caster(victim).at(victim.position()));
-        sl.playSound(null, victim.getX(), victim.getY(), victim.getZ(), net.minecraft.sounds.SoundEvents.CHAIN_HIT, net.minecraft.sounds.SoundSource.PLAYERS, 1.2f, 0.8f);
+        core.sound(victim.position(), "aris.chain_rattle", 1.2f, 1);
         if (c.hits >= cfg(ArisConfig.CHAINS_HITS)) {
             release(sl, c);
             by.displayClientMessage(ui("chains_break"), true);

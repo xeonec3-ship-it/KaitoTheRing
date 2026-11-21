@@ -1,0 +1,285 @@
+{
+ "comment": "T34 «Пепельная Жатва» (caster = заклинатель, 30 тиков, тик 0 = анимация pohsmp_ashen_harvest): призрачная огненная коса Главы проходит дугой 150° r4 перед игроком. Урон — тик 11; на тике 12 — ashen_harvest_trail.",
+ "style": "cult_leader",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster+0,1.0,0",
+   "model": "t34_ghost_scythe",
+   "until": 17,
+   "scale": 1.0,
+   "hinge": {
+    "pivot": [
+     0,
+     0,
+     0
+    ],
+    "axis": "y",
+    "keys": [
+     [
+      0,
+      95,
+      "linear"
+     ],
+     [
+      9,
+      115,
+      "easeOutSine"
+     ],
+     [
+      11,
+      20,
+      "easeInQuad"
+     ],
+     [
+      13,
+      -75,
+      "easeOutQuad"
+     ],
+     [
+      17,
+      -95,
+      "easeOutCubic"
+     ]
+    ]
+   },
+   "comment": "коса справа-сзади (замах, +95…+115°: в MeshDraw угол + — к правой руке), взмах справа налево 9–13 (−75°), перехлёст"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0.6,1.0,-0.4",
+   "duration": 10,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 1.5,
+   "spread": 0.4,
+   "speed": 0.02,
+   "gravity": -0.02,
+   "size": [
+    0.35,
+    0.05
+   ],
+   "life": 12,
+   "color": "@primary",
+   "glow": 0.6,
+   "comment": "огонь собирается у косы в замахе"
+  },
+  {
+   "type": "trail",
+   "delay": 9,
+   "at": "caster+0,1.0,4",
+   "shape": "slash",
+   "radius": 4.0,
+   "arc": 150,
+   "thickness": 0.5,
+   "bend": 1,
+   "secondary": 0.6,
+   "sweep": 4,
+   "tail": 0.6,
+   "roll": 0,
+   "reverse": true,
+   "duration": 12,
+   "color": "@primary",
+   "comment": "огненный серп взмаха r4, 150°: at — СЕРЕДИНА дуги (4 бл. впереди), центр дуги — у игрока"
+  },
+  {
+   "type": "slash",
+   "delay": 10,
+   "at": "caster+0,0.9,3.7",
+   "radius": 3.7,
+   "arc": 150,
+   "thickness": 0.28,
+   "bend": 1,
+   "secondary": 0.4,
+   "tilt": 0,
+   "grow": 3,
+   "life": 10,
+   "dir": -1,
+   "color": "@secondary"
+  },
+  {
+   "type": "flash",
+   "delay": 11,
+   "at": "caster+0,1.0,2.6",
+   "duration": 8,
+   "size": 2.6,
+   "rays": 8,
+   "screen": 0.08,
+   "color": "@secondary"
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+3.09,0.4,0.83",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+2.66,0.4,1.78",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+1.95,0.4,2.54",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 11,
+   "at": "caster+1.03,0.4,3.03",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 11,
+   "at": "caster+-0,0.4,3.2",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 11,
+   "at": "caster+-1.03,0.4,3.03",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+-1.95,0.4,2.54",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+-2.66,0.4,1.78",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  },
+  {
+   "type": "sprites",
+   "delay": 12,
+   "at": "caster+-3.09,0.4,0.83",
+   "duration": 3,
+   "texture": "mote_flame",
+   "count": 8,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.15,
+   "gravity": -0.02,
+   "size": [
+    0.45,
+    0.06
+   ],
+   "life": 14,
+   "color": "@secondary",
+   "glow": 0.6
+  }
+ ]
+}

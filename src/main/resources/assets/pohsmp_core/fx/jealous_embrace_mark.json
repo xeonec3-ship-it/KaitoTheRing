@@ -1,0 +1,53 @@
+{
+ "comment": "T34 «Метка ревности» (caster = ЦЕЛЬ, follow, до Fx.stop; 5 с = 100 тиков): красный глаз-печать над головой (как irina_gaze_mark), нити медленно кружат.",
+ "style": "irina",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sigil",
+   "delay": 0,
+   "at": "caster+0,2.3,0",
+   "follow": true,
+   "id": "irina_gaze_eye",
+   "scale": 0.7
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": -1,
+   "width": 0.05,
+   "length": 12,
+   "fade": 1.2,
+   "head": 0,
+   "count": 2,
+   "orbit": {
+    "radius": 0.6,
+    "speed": 10,
+    "rise": 0.9,
+    "risePeriod": 30
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": -1,
+   "texture": "mote_heart",
+   "count": 100000,
+   "rate": 0.08,
+   "spread": 0.6,
+   "speed": 0.01,
+   "gravity": -0.006,
+   "size": [
+    0.22,
+    0.08
+   ],
+   "life": 30,
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

@@ -34,6 +34,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.BossEvent;
+import io.redspace.ironsspellbooks.entity.mobs.wizards.fire_boss.ExtendedServerBossEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 import ru.pohsmp.core.PohCore;
@@ -73,6 +75,12 @@ public final class BossCore {
     final BossGuard.State guard = new BossGuard.State();
     /** T32 «Сломать блок» (BossGuardBreak): cooldown, the blow in progress. */
     final BossGuardBreak.State guardBreak = new BossGuardBreak.State();
+    /**
+     * The vanilla boss-bar row (a server boss event with the entity's UUID) that BossBarClient draws the phase bar over. Made here for
+     * every boss whose base has none ({@link PohBoss#coreBossEvent()}); the Cult Leader keeps Iron's FireBossEntity one.
+     */
+    private ExtendedServerBossEvent bossEvent;
+    private final BossBarRow<ServerPlayer> row = new BossBarRow<>();
 
     public BossCore(PohBoss boss, BossDef def) {
         this.boss = boss;
@@ -217,6 +225,7 @@ public final class BossCore {
             if (!s.tick()) scripts.remove(i--);
         }
         if (lockTicks > 0 && --lockTicks == 0) unlock();
+        if (bossEvent != null && !row.closed()) bossEvent.setProgress(Math.max(0, Math.min(1, healthFrac())));
         if (!started || dead) return;
         BossGuard.tick(this, boss);
         BossReplica.tick(this, boss, replica);
@@ -437,9 +446,24 @@ public final class BossCore {
         return look;
     }
 
+    private ExtendedServerBossEvent bossEvent() {
+        if (bossEvent == null) {   // lazily: by now the entity has its final UUID (loaded or spawned) and its name
+            bossEvent = new ExtendedServerBossEvent(mob.getUUID(), mob.getDisplayName(), BossEvent.BossBarColor.YELLOW,
+                    BossEvent.BossBarOverlay.PROGRESS);
+            bossEvent.setProgress(Math.max(0, Math.min(1, healthFrac())));
+        }
+        return bossEvent;
+    }
+
+    /** The core's vanilla row: is this player in it (tests, debug). */
+    public boolean inBarRow(ServerPlayer p) {
+        return row.has(p);
+    }
+
     /** Call from the entity's startSeenByPlayer: a late viewer gets the bar, the music and the look. */
     public void onSeen(ServerPlayer p) {
         if (mob.level().isClientSide) return;
+        if (boss.coreBossEvent() && !inFinale() && row.seen(p)) bossEvent().addPlayer(p);
         BossNet.to(p, barMsg(false));
         if (musicOn && !musicHeld)   // a late viewer: the current loop from its start, fading in (no intro)
             musicSend(p, BossNet.MUSIC_PHASE, musicLoop, BossMusicMath.ticks(BossConfig.get(BossConfig.MUSIC_CROSSFADE)));
@@ -448,6 +472,7 @@ public final class BossCore {
 
     /** Call from the entity's stopSeenByPlayer. */
     public void onUnseen(ServerPlayer p) {
+        if (row.unseen(p) && bossEvent != null) bossEvent.removePlayer(p);
         BossNet.Msg m = new BossNet.Msg(BossNet.BAR_STOP);
         m.u = mob.getUUID();
         BossNet.to(p, m);
@@ -569,6 +594,7 @@ public final class BossCore {
     /** Bar off for everyone, music fades out. */
     public void endBar() {
         barVisible = false;
+        for (ServerPlayer p : row.close()) if (bossEvent != null) bossEvent.removePlayer(p);
         BossNet.Msg m = new BossNet.Msg(BossNet.BAR_STOP);
         m.u = mob.getUUID();
         BossNet.tracking(mob, m);

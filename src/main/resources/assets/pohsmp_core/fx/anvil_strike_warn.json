@@ -1,0 +1,71 @@
+{
+ "comment": "T34 «Удар Наковальни»: прицел (caster = ТОЧКА УДАРА на земле, взгляд до 20 бл.; 12 тиков, тик 0 = анимация pohsmp_anvil_strike): кольцо-печать на земле, над точкой собирается призрачный бирюзовый молот Арис (aris_giant_hammer ×0.22 ≈ 3 бл.) и медленно опускается. Без луча от игрока. На тике 12 — anvil_strike.",
+ "style": "aris",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 16,
+   "texture": "aris_forge_ring",
+   "radius": 3.0,
+   "grow": 10,
+   "glow": 0.5,
+   "fadeOut": 4,
+   "color": "@primary",
+   "brightness": 0.7
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "aris_giant_hammer",
+   "scale": 0.22,
+   "follow": false,
+   "until": 12,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       27,
+       0
+      ],
+      "linear"
+     ],
+     [
+      12,
+      [
+       0,
+       24,
+       0
+      ],
+      "easeOutSine"
+     ]
+    ]
+   },
+   "comment": "move.keys — в единицах меша (× scale 0.22): 27 ≈ 6 бл. над точкой"
+  },
+  {
+   "type": "sprites",
+   "delay": 4,
+   "at": "caster+0,5.5,0",
+   "duration": 8,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.8,
+   "area": 0.8,
+   "speed": 0.0,
+   "gravity": 0.04,
+   "size": [
+    0.16,
+    0.03
+   ],
+   "life": 20,
+   "color": "@primary",
+   "glow": 0.9
+  }
+ ]
+}

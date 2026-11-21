@@ -198,6 +198,11 @@ def write_anims():
         print('  коса: плавный сдвиг (добор)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs))
         print('  коса: плавный доворот (добор)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs,
                                                                        kind='rot'))
+    # удары косой FireBoss по эталону Epic Fight (21.11, tools/cult_ef.py): удар быстрее, пик клинка — на тике урона, замах/возврат
+    # длиннее; тики и длины прежние. ПОСЛЕ позы хвата и поправок косы: они сдвигаются во времени вместе с движением (smooth_clear не
+    # трогает окна у тиков урона — до сжатия коса на быстром ударе проходила сквозь ногу без поправки)
+    import cult_ef
+    print('  удары косой (эталон EF):', cult_ef.apply(out['animations']))
     with open(M.out('animations/entity/cult_leader.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
     return ours

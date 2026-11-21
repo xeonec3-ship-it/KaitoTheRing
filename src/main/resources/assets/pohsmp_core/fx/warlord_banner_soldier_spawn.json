@@ -1,0 +1,46 @@
+{
+ "comment": "T34: призрачный солдат встаёт у знамени (caster = солдат, 30 тиков; тик 30 анимации, два солдата слева и справа от знамени).",
+ "style": "martin_ghost",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 30,
+   "texture": "martin_banner_ring",
+   "radius": 1.0,
+   "grow": 6,
+   "glow": 0.4,
+   "fadeOut": 14,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.2,0",
+   "duration": 14,
+   "texture": "mote_wisp",
+   "count": 20,
+   "rate": 2.0,
+   "area": 0.7,
+   "speed": 0.03,
+   "gravity": -0.01,
+   "size": [
+    0.5,
+    1.0
+   ],
+   "life": 26,
+   "color": "#8FD8F0",
+   "blend": "translucent"
+  },
+  {
+   "type": "flash",
+   "delay": 4,
+   "at": "caster+0,1,0",
+   "duration": 8,
+   "size": 1.1,
+   "color": "@secondary"
+  }
+ ]
+}

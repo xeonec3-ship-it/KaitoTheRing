@@ -1,0 +1,123 @@
+{
+ "comment": "T34 «Удар Наковальни»: удар (caster = ТОЧКА УДАРА, 30 тиков; запуск на тике 12 каста): молот рушится за 3 тика, **удар/урон/отброс r3 — тик 3 этого fx = тик 15 каста**.",
+ "style": "aris",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster",
+   "model": "aris_giant_hammer",
+   "scale": 0.22,
+   "follow": false,
+   "until": 10,
+   "move": {
+    "keys": [
+     [
+      0,
+      [
+       0,
+       24,
+       0
+      ],
+      "linear"
+     ],
+     [
+      3,
+      [
+       0,
+       0,
+       0
+      ],
+      "easeInCubic"
+     ]
+    ]
+   }
+  },
+  {
+   "type": "flash",
+   "delay": 3,
+   "at": "caster+0,0.8,0",
+   "duration": 10,
+   "size": 3.2,
+   "rays": 10,
+   "screen": 0.12,
+   "color": "@core",
+   "ring": true
+  },
+  {
+   "type": "wave",
+   "delay": 3,
+   "at": "caster",
+   "duration": 16,
+   "shape": "ring",
+   "radius": 3.2,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "texture": "aris_molten_ring",
+   "color": "@secondary"
+  },
+  {
+   "type": "decal",
+   "delay": 3,
+   "at": "caster",
+   "duration": 25,
+   "texture": "aris_molten_floor",
+   "radius": 1.4,
+   "glow": 0.8,
+   "fadeOut": 18,
+   "color": "@secondary",
+   "brightness": 1.1
+  },
+  {
+   "type": "decal",
+   "delay": 3,
+   "at": "caster",
+   "duration": 25,
+   "texture": "higher_cracks",
+   "radius": 3.0,
+   "glow": 0.6,
+   "fadeOut": 18,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 3,
+   "at": "caster+0,0.3,0",
+   "duration": 3,
+   "texture": "spark_soft",
+   "count": 50,
+   "rate": 17,
+   "spread": 0.5,
+   "speed": 0.4,
+   "gravity": 0.03,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 18,
+   "color": "@secondary",
+   "glow": 0.9
+  },
+  {
+   "type": "sprites",
+   "delay": 3,
+   "at": "caster+0,0.2,0",
+   "duration": 5,
+   "texture": "mote_ash",
+   "count": 16,
+   "rate": 4,
+   "spread": 1.0,
+   "speed": 0.06,
+   "gravity": -0.004,
+   "spin": 40,
+   "size": [
+    0.5,
+    0.18
+   ],
+   "life": 26,
+   "color": "#60606C",
+   "blend": "translucent"
+  }
+ ]
+}

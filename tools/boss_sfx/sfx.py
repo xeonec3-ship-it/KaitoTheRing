@@ -357,7 +357,7 @@ def whisper(d=1.5, syll=6, base=1.0):
     bounds = np.sort(_rng.uniform(0, 1, syll * 2)) * n
     for i in range(0, len(bounds) - 1, 2):
         a, b = int(bounds[i]), int(bounds[i + 1])
-        if b - a < 800:
+        if b - a < secs(0.09):   # shorter bursts read as clicks
             continue
         f1, f2 = forms[_rng.integers(len(forms))]
         seg = x[a:b]

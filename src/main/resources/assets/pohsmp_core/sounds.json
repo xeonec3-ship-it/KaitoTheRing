@@ -576,16 +576,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.replica_break",
     "sounds": [
       {
-        "name": "minecraft:mob/sheep/shear",
-        "pitch": 0.9
-      },
-      {
-        "name": "minecraft:dig/cloth1",
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:dig/cloth2",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/irina/replica_break",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -593,9 +585,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.spawn",
     "sounds": [
       {
-        "name": "irons_spellbooks:raise_dead_start",
-        "pitch": 1.3,
-        "volume": 1.3
+        "name": "pohsmp_core:boss/irina/spawn",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -603,8 +594,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.death",
     "sounds": [
       {
-        "name": "irons_spellbooks:dead_king/fake_death",
-        "pitch": 1.4
+        "name": "pohsmp_core:boss/irina/death",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -612,8 +603,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.death_final",
     "sounds": [
       {
-        "name": "irons_spellbooks:soulcaller_toll_failure",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/death_final",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -621,8 +612,12 @@
     "subtitle": "subtitles.pohsmp_core.irina.mark",
     "sounds": [
       {
-        "name": "irons_spellbooks:heartstop_cast",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/mark_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "pohsmp_core:boss/irina/mark_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -630,8 +625,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.bind",
     "sounds": [
       {
-        "name": "irons_spellbooks:charge_chains",
-        "pitch": 1.35
+        "name": "pohsmp_core:boss/irina/bind",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -639,12 +634,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.snap",
     "sounds": [
       {
-        "name": "irons_spellbooks:blood_explosion",
-        "pitch": 1.5
+        "name": "pohsmp_core:boss/irina/snap_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "irons_spellbooks:blood_explosion",
-        "pitch": 1.7
+        "name": "pohsmp_core:boss/irina/snap_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "pohsmp_core:boss/irina/snap_3",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -652,8 +651,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.steal",
     "sounds": [
       {
-        "name": "irons_spellbooks:magic_spell_reverse_3",
-        "pitch": 1.1
+        "name": "pohsmp_core:boss/irina/steal",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -661,16 +660,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.whip",
     "sounds": [
       {
-        "name": "irons_spellbooks:hellrazor_swing_1",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/whip_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "irons_spellbooks:hellrazor_swing_2",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/whip_2",
+        "attenuation_distance": 40
       },
       {
-        "name": "irons_spellbooks:hellrazor_swing_3",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/whip_3",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -678,8 +677,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.cocoon",
     "sounds": [
       {
-        "name": "irons_spellbooks:abyssal_shroud_cast",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/cocoon",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -687,8 +686,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.cocoon_break",
     "sounds": [
       {
-        "name": "irons_spellbooks:blood_explosion",
-        "pitch": 1.8
+        "name": "pohsmp_core:boss/irina/cocoon_break",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -696,8 +695,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.cocoon_crush",
     "sounds": [
       {
-        "name": "irons_spellbooks:devour",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/cocoon_crush",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -705,9 +704,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.happiness",
     "sounds": [
       {
-        "name": "irons_spellbooks:dark_magic_buff_03_custom_1",
-        "pitch": 0.8,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/irina/happiness",
+        "attenuation_distance": 56
       }
     ]
   },
@@ -715,8 +713,12 @@
     "subtitle": "subtitles.pohsmp_core.irina.phase",
     "sounds": [
       {
-        "name": "irons_spellbooks:void_tentacles_start",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/phase_1",
+        "attenuation_distance": 56
+      },
+      {
+        "name": "pohsmp_core:boss/irina/phase_2",
+        "attenuation_distance": 56
       }
     ]
   },
@@ -724,8 +726,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.finisher",
     "sounds": [
       {
-        "name": "irons_spellbooks:skewer",
-        "pitch": 1.1
+        "name": "pohsmp_core:boss/irina/finisher",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -733,8 +735,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.staff",
     "sounds": [
       {
-        "name": "irons_spellbooks:shadow_slash",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/staff_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/staff_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/staff_3",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -987,8 +997,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.gaze",
     "sounds": [
       {
-        "name": "irons_spellbooks:planar_sight_cast",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/gaze",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -996,8 +1006,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.knots",
     "sounds": [
       {
-        "name": "irons_spellbooks:root_start",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/knots",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1005,8 +1015,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.snare",
     "sounds": [
       {
-        "name": "irons_spellbooks:root_emerge",
-        "pitch": 1.4
+        "name": "pohsmp_core:boss/irina/snare_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/snare_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/snare_3",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1014,8 +1032,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.swap",
     "sounds": [
       {
-        "name": "irons_spellbooks:abyssal_teleport",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/swap",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1023,8 +1041,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.puppet",
     "sounds": [
       {
-        "name": "irons_spellbooks:charge_chains",
-        "pitch": 1.6
+        "name": "pohsmp_core:boss/irina/puppet",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -2371,6 +2389,163 @@
       {
         "name": "pohsmp_core:boss/cult_leader/sigil",
         "attenuation_distance": 40
+      }
+    ]
+  },
+  "irina.aura": {
+    "subtitle": "subtitles.pohsmp_core.irina.aura",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/aura",
+        "attenuation_distance": 16,
+        "volume": 0.35
+      }
+    ]
+  },
+  "irina.step": {
+    "subtitle": "subtitles.pohsmp_core.irina.step",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/step_1",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/irina/step_2",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/irina/step_3",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/irina/step_4",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      }
+    ]
+  },
+  "irina.cloth": {
+    "subtitle": "subtitles.pohsmp_core.irina.cloth",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/cloth_1",
+        "attenuation_distance": 12,
+        "volume": 0.6
+      },
+      {
+        "name": "pohsmp_core:boss/irina/cloth_2",
+        "attenuation_distance": 12,
+        "volume": 0.6
+      },
+      {
+        "name": "pohsmp_core:boss/irina/cloth_3",
+        "attenuation_distance": 12,
+        "volume": 0.6
+      }
+    ]
+  },
+  "irina.swish": {
+    "subtitle": "subtitles.pohsmp_core.irina.swish",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/swish_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/swish_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/swish_3",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "irina.thread": {
+    "subtitle": "subtitles.pohsmp_core.irina.thread",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/thread_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/irina/thread_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/irina/thread_3",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "irina.whisper": {
+    "subtitle": "subtitles.pohsmp_core.irina.whisper",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/whisper_1",
+        "attenuation_distance": 20,
+        "volume": 0.9
+      },
+      {
+        "name": "pohsmp_core:boss/irina/whisper_2",
+        "attenuation_distance": 20,
+        "volume": 0.9
+      },
+      {
+        "name": "pohsmp_core:boss/irina/whisper_3",
+        "attenuation_distance": 20,
+        "volume": 0.9
+      }
+    ]
+  },
+  "irina.burst": {
+    "subtitle": "subtitles.pohsmp_core.irina.burst",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/burst",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "irina.rage": {
+    "subtitle": "subtitles.pohsmp_core.irina.rage",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/rage",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "irina.thud": {
+    "subtitle": "subtitles.pohsmp_core.irina.thud",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/thud_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/irina/thud_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "irina.hurt": {
+    "subtitle": "subtitles.pohsmp_core.irina.hurt",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/hurt_3",
+        "attenuation_distance": 16
       }
     ]
   }

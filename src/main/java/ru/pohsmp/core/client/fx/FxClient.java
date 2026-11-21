@@ -19,6 +19,7 @@ import ru.pohsmp.core.client.ClientConfig;
 import ru.pohsmp.core.fx.FxDef;
 import ru.pohsmp.core.fx.FxLib;
 import ru.pohsmp.core.fx.FxStyle;
+import ru.pohsmp.core.fx.MoveSmooth;
 import ru.pohsmp.core.fx.sigil.SigilDef;
 import ru.pohsmp.core.net.FxMsg;
 
@@ -31,6 +32,29 @@ public final class FxClient {
         SigilRun sigil;
         MeshDraw.Run mesh;
         double start, meshStopAt = -1;
+        /** Glide between the server's MOVEs (null until the first MOVE). */
+        MoveSmooth glide;
+
+        /** Puts the instance where the glide is at clock time `time`. */
+        void glide(double time) {
+            if (glide == null) return;
+            double[] g = glide.sample(time);
+            Vec3 p = new Vec3(g[0], g[1], g[2]);
+            if (fx != null) {
+                fx.base = p;
+                fx.yaw = (float) g[3];
+                fx.pitch = (float) g[4];
+            }
+            if (sigil != null) {
+                sigil.base = p;
+                sigil.yaw = (float) g[3];
+            }
+            if (mesh != null) {
+                mesh.base = p;
+                mesh.yaw = (float) g[3];
+                mesh.pitch = (float) g[4];
+            }
+        }
 
         Vec3 where(float pt) {
             if (fx != null) return fx.origin(pt);
@@ -57,7 +81,7 @@ public final class FxClient {
             return;
         }
         if (lvl == null) return;
-        double now = lvl.getGameTime();
+        double now = ru.pohsmp.core.client.ClientClock.ticks();
         if (m.op == FxMsg.STOP) {
             Inst i = LIVE.get(m.inst);
             if (i != null) i.stop(now);
@@ -84,21 +108,14 @@ public final class FxClient {
         if (m.op == FxMsg.MOVE) {
             Inst i = LIVE.get(m.inst);
             if (i == null) return;
-            Vec3 p = new Vec3(m.x, m.y, m.z);
-            if (i.fx != null) {
-                i.fx.base = p;
-                i.fx.yaw = m.yaw;
-                i.fx.pitch = m.pitch;
+            // glide there instead of jumping (MoveSmooth): MOVE comes once per server tick or less, unevenly
+            if (i.glide == null) {
+                Vec3 b = i.fx != null ? i.fx.base : i.sigil != null ? i.sigil.base : i.mesh.base;
+                float yaw = i.fx != null ? i.fx.yaw : i.sigil != null ? i.sigil.yaw : i.mesh.yaw;
+                float pitch = i.fx != null ? i.fx.pitch : i.mesh != null ? i.mesh.pitch : 0;
+                i.glide = new MoveSmooth(b.x, b.y, b.z, yaw, pitch);
             }
-            if (i.sigil != null) {
-                i.sigil.base = p;
-                i.sigil.yaw = m.yaw;
-            }
-            if (i.mesh != null) {
-                i.mesh.base = p;
-                i.mesh.yaw = m.yaw;
-                i.mesh.pitch = m.pitch;
-            }
+            i.glide.move(ru.pohsmp.core.client.ClientClock.now(Minecraft.getInstance().getFrameTime()), m.x, m.y, m.z, m.yaw, m.pitch);
             return;
         }
         if (m.op != FxMsg.START) return;
@@ -210,7 +227,7 @@ public final class FxClient {
         ClientLevel lvl = mc.level;
         if (lvl == null) return;
         float pt = e.getPartialTick();
-        double time = lvl.getGameTime() + pt;
+        double time = ru.pohsmp.core.client.ClientClock.now(pt);
         Camera cam = e.getCamera();
         Vec3 cp = cam.getPosition();
         PoseStack ps = e.getPoseStack();
@@ -223,6 +240,7 @@ public final class FxClient {
         Iterator<Inst> it = LIVE.values().iterator();
         while (it.hasNext()) {
             Inst i = it.next();
+            i.glide(time);
             if (i.mesh != null && i.meshStopAt >= 0 && time - i.start >= i.meshStopAt) i.mesh.stop(i.meshStopAt);
             boolean far = i.where(pt).distanceToSqr(cp) > max * max;
             boolean alive;

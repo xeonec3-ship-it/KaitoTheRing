@@ -25,7 +25,7 @@ public final class Ghosts {
 
     static void set(int entity, int ticks) {
         if (Minecraft.getInstance().level == null) return;
-        UNTIL.put(entity, Minecraft.getInstance().level.getGameTime() + ticks);
+        UNTIL.put(entity, ru.pohsmp.core.client.ClientClock.ticks() + ticks);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -35,7 +35,7 @@ public final class Ghosts {
         LivingEntity ent = e.getEntity();
         Long until = UNTIL.get(ent.getId());
         if (until == null) return;
-        if (ent.level().getGameTime() > until) {
+        if (ru.pohsmp.core.client.ClientClock.ticks() > until) {
             UNTIL.remove(ent.getId());
             return;
         }

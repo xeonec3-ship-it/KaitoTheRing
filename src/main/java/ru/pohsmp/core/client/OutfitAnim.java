@@ -76,14 +76,14 @@ public final class OutfitAnim {
         var level = Minecraft.getInstance().level;
         if (level == null) return;
         if (ticks <= 0) DRAGON_UNTIL.remove(entityId);
-        else DRAGON_UNTIL.put(entityId, level.getGameTime() + ticks);
+        else DRAGON_UNTIL.put(entityId, ClientClock.ticks() + ticks);
     }
 
     public static RawAnimation cat(AnimationState<SilentWitchArmor> s) {
         Entity e = s.getData(DataTickets.ENTITY);
         if (!(e instanceof LivingEntity le)) return CAT_HIDDEN;
         State st = STATES.computeIfAbsent(e.getId(), k -> new State());
-        long now = e.level().getGameTime();
+        long now = ClientClock.ticks();
         Long dragonUntil = DRAGON_UNTIL.get(e.getId());
         if (dragonUntil != null && now >= dragonUntil) DRAGON_UNTIL.remove(e.getId());
         if (running(e)) st.lastRun = now;

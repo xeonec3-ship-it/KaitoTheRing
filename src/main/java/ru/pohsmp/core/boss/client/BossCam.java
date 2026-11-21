@@ -152,7 +152,7 @@ public final class BossCam {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
         if (m.kind == BossNet.SCENE_STOP) {
-            if (active && m.s1.equals(scene) && releaseAt < 0) releaseAt = mc.level.getGameTime();
+            if (active && m.s1.equals(scene) && releaseAt < 0) releaseAt = ru.pohsmp.core.client.ClientClock.ticks();
             return;
         }
         if (ru.pohsmp.core.client.DownfallCut.active()) return;
@@ -175,7 +175,7 @@ public final class BossCam {
         Entity b = mc.level.getEntity(bossId);
         CTX.b0 = b != null ? b.position() : CTX.focus;
         lastB = CTX.b0;
-        start = mc.level.getGameTime();
+        start = ru.pohsmp.core.client.ClientClock.ticks();
         releaseAt = -1;
         CamGuardAccess.reset();
         active = true;
@@ -204,11 +204,11 @@ public final class BossCam {
             return;
         }
         float pt = (float) e.getPartialTick();
-        double t = mc.level.getGameTime() + pt - start;
+        double t = ru.pohsmp.core.client.ClientClock.now(pt) - start;
         Entity me = mc.getCameraEntity() != null ? mc.getCameraEntity() : mc.player;
-        if (releaseAt < 0 && t >= CTX.dur) releaseAt = mc.level.getGameTime();
+        if (releaseAt < 0 && t >= CTX.dur) releaseAt = ru.pohsmp.core.client.ClientClock.ticks();
         if (releaseAt >= 0 && lastPos != null) {   // back to the player's eyes in 1 s
-            double u = BossMath.sine((mc.level.getGameTime() + pt - releaseAt) / RELEASE);
+            double u = BossMath.sine((ru.pohsmp.core.client.ClientClock.now(pt) - releaseAt) / RELEASE);
             if (u >= 1 || me == null) {
                 active = false;
                 return;
@@ -299,9 +299,9 @@ public final class BossCam {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         GuiGraphics g = e.getGuiGraphics();
-        double t = mc.level.getGameTime() + e.getPartialTick() - start;
+        double t = ru.pohsmp.core.client.ClientClock.now(e.getPartialTick()) - start;
         double in = Math.min(1, t / 12.0);
-        if (releaseAt >= 0) in *= 1 - BossMath.sine((mc.level.getGameTime() + e.getPartialTick() - releaseAt) / RELEASE);
+        if (releaseAt >= 0) in *= 1 - BossMath.sine((ru.pohsmp.core.client.ClientClock.now(e.getPartialTick()) - releaseAt) / RELEASE);
         int bar = (int) (g.guiHeight() * 0.09 * in);
         g.fill(0, 0, g.guiWidth(), bar, 0xFF000000);
         g.fill(0, g.guiHeight() - bar, g.guiWidth(), g.guiHeight(), 0xFF000000);

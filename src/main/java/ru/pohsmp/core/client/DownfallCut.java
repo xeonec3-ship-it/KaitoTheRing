@@ -80,7 +80,7 @@ public final class DownfallCut {
         }
         unhush();
         ClientLevel lvl = Minecraft.getInstance().level;   // T21: the camera glides back to the player in 1 s
-        if (releaseAt < 0 && lvl != null) releaseAt = lvl.getGameTime();
+        if (releaseAt < 0 && lvl != null) releaseAt = ClientClock.ticks();
     }
 
     // ---- T24 «Стёртое имя» (docs/specs/tasks/T24_erased_name.md, «Ролик»): rift = the target's place, targetId = the target ----
@@ -265,7 +265,7 @@ public final class DownfallCut {
 
     private static double now(float pt) {
         ClientLevel lvl = Minecraft.getInstance().level;
-        return lvl == null ? 0 : lvl.getGameTime() + pt - start;
+        return lvl == null ? 0 : ClientClock.now(pt) - start;
     }
 
     private static double smooth(double k) {
@@ -295,7 +295,7 @@ public final class DownfallCut {
         Vec3 pos, look;
         double roll = 0, shake = 0;
         if (glide && releaseAt >= 0) {   // T21: back to the player's own eyes in 1 s
-            double u = sine((mc.level.getGameTime() + pt - releaseAt) / RELEASE);
+            double u = sine((ClientClock.now(pt) - releaseAt) / RELEASE);
             Entity me = mc.getCameraEntity() != null ? mc.getCameraEntity() : mc.player;
             if (u >= 1 || lastPos == null || me == null) {
                 active = false;
@@ -346,8 +346,8 @@ public final class DownfallCut {
             shake = pl[2].x;
         } else if (scene == ru.pohsmp.core.spell.Cutscene.SILENT_GATE) {
             // «Приказ»: the cast as it was, then the wait camera until the hand comes down, then the strike timed from the command
-            double gs = GateOrder.sceneSeconds(key, t, mc.level.getGameTime() + pt);
-            Vec3[] pl = Double.isNaN(gs) ? gateWait(GateOrder.waitSeconds(mc.level.getGameTime() + pt), c, side) : gate(gs, c, side, baseYaw);
+            double gs = GateOrder.sceneSeconds(key, t, ClientClock.now(pt));
+            Vec3[] pl = Double.isNaN(gs) ? gateWait(GateOrder.waitSeconds(ClientClock.now(pt)), c, side) : gate(gs, c, side, baseYaw);
             pos = pl[0];
             look = pl[1];
             shake = pl[2].x;
@@ -1059,7 +1059,7 @@ public final class DownfallCut {
         double t = now(pt);
         float in = (float) Math.min(1, t / 12.0);
         if (releaseAt >= 0 && Minecraft.getInstance().level != null)   // T21: the bars go with the camera
-            in *= (float) (1 - sine((Minecraft.getInstance().level.getGameTime() + pt - releaseAt) / RELEASE));
+            in *= (float) (1 - sine((ClientClock.now(pt) - releaseAt) / RELEASE));
         int bar = (int) (h * 0.11 * in);
         // 19.11 «Небесная бабочка»: no cracks over the butterfly scene any more (butterflyOverlay kept, not called)
         if (scene == ABYSS) abyssOverlay(g, w, h, t);

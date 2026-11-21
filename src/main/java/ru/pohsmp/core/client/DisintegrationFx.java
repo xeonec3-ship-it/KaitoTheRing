@@ -68,7 +68,7 @@ public final class DisintegrationFx {
     public static void handle(Net.Fx m) {
         ClientLevel lvl = Minecraft.getInstance().level;
         if (lvl == null) return;
-        long now = lvl.getGameTime();
+        long now = ClientClock.ticks();
         int kind = m.type & 15, variant = (m.type & 0xFF) >> 4;
         if (kind == 0) {
             Active a = new Active();
@@ -108,7 +108,7 @@ public final class DisintegrationFx {
         ClientLevel lvl = mc.level;
         if (lvl == null) return;
         float pt = e.getPartialTick();
-        double time = lvl.getGameTime() + pt;
+        double time = ClientClock.now(pt);
         Camera cam = e.getCamera();
         Vec3 cp = cam.getPosition();
         PoseStack ps = e.getPoseStack();

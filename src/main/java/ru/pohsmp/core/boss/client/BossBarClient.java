@@ -55,7 +55,7 @@ public final class BossBarClient {
 
     private static long now() {
         var lvl = Minecraft.getInstance().level;
-        return lvl == null ? 0 : lvl.getGameTime();
+        return lvl == null ? 0 : ru.pohsmp.core.client.ClientClock.ticks();
     }
 
     private static ResourceLocation tex(String sprite) {

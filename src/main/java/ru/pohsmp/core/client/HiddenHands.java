@@ -28,7 +28,7 @@ public final class HiddenHands {
     public static void hide(LivingEntity e, int ticks, int finish, boolean staffsToo) {
         if (e.level() == null) return;
         clear(e.getId());
-        UNTIL.put(e.getId(), e.level().getGameTime() + ticks);
+        UNTIL.put(e.getId(), ClientClock.ticks() + ticks);
         FINISH.put(e.getId(), finish);
         if (staffsToo) STAFFS_TOO.add(e.getId());
     }
@@ -54,7 +54,7 @@ public final class HiddenHands {
         int id = p.getId();
         Long until = UNTIL.get(id);
         if (until == null) return false;
-        long now = p.level().getGameTime();
+        long now = ClientClock.ticks();
         if (!p.isAlive() || now > until) return clear(id);
         io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData sd = io.redspace.ironsspellbooks.player.ClientMagicData.getSyncedSpellData(p);
         if (sd != null && sd.isCasting()) {

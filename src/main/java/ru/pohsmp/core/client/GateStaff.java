@@ -89,7 +89,7 @@ public final class GateStaff {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         float pt = e.getPartialTick();
-        double now = mc.level.getGameTime() + pt;
+        double now = ClientClock.now(pt);
         Vec3 cam = e.getCamera().getPosition();
         MultiBufferSource.BufferSource buf = mc.renderBuffers().bufferSource();
         RUNS.values().removeIf(r -> now - r.start() > r.end());

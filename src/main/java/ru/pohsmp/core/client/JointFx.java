@@ -38,7 +38,7 @@ public final class JointFx {
     }
 
     public static boolean isJoint(Entity e) {
-        return e != null && e.level() != null && isJoint(e.getId(), e.level().getGameTime());
+        return e != null && e.level() != null && isJoint(e.getId(), ClientClock.ticks());
     }
 
     private static Field PLAYER_DATA;
@@ -53,6 +53,6 @@ public final class JointFx {
         } catch (ReflectiveOperationException ex) {
             PohCore.LOG.warn("[pohsmp_core] joint cast: cannot update the cast bar", ex);
         }
-        if (Minecraft.getInstance().player != null) mark(Minecraft.getInstance().player.getId(), Minecraft.getInstance().level.getGameTime() + m.remaining + 10);
+        if (Minecraft.getInstance().player != null) mark(Minecraft.getInstance().player.getId(), ClientClock.ticks() + m.remaining + 10);
     }
 }

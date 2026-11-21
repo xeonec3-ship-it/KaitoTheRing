@@ -84,7 +84,7 @@ public final class HigherFx {
     public static void handle(HFx m) {
         ClientLevel lvl = Minecraft.getInstance().level;
         if (lvl == null) return;
-        long now = lvl.getGameTime();
+        long now = ClientClock.ticks();
         if (m.kind == HFx.FLASH) {
             PohHud.flash(m.dur, m.i);
             return;
@@ -167,7 +167,7 @@ public final class HigherFx {
         ClientLevel lvl = mc.level;
         if (lvl == null) return;
         float pt = e.getPartialTick();
-        double time = lvl.getGameTime() + pt;
+        double time = ClientClock.now(pt);
         Camera cam = e.getCamera();
         Vec3 cp = cam.getPosition();
         PoseStack ps = e.getPoseStack();
@@ -388,7 +388,7 @@ public final class HigherFx {
         Minecraft mc = Minecraft.getInstance();
         ClientLevel lvl = mc.level;
         if (lvl == null || mc.isPaused()) return;
-        long now = lvl.getGameTime();
+        long now = ClientClock.ticks();
         Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
         net.minecraft.util.RandomSource rnd = lvl.random;
         for (Inst x : LIVE.values()) {
@@ -426,7 +426,7 @@ public final class HigherFx {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         Vec3 cam = mc.gameRenderer.getMainCamera().getPosition();
-        double now = mc.level.getGameTime() + e.getPartialTick(), best = 0;
+        double now = ClientClock.now(e.getPartialTick()), best = 0;
         for (Inst x : LIVE.values()) {
             if (x.kind != HFx.BLIZZARD) continue;
             double age = now - x.start;
@@ -732,7 +732,7 @@ public final class HigherFx {
         float fd = c.fade * out;
         ResourceLocation tx = SIGILS[x.b];
         flat(c.vc(tx), c.pose, p.add(0, 0.04, 0), UP, size, (float) (c.time * 0.06), cr, cg, cb, fd);
-        if (JointFx.isJoint(x.a, c.lvl.getGameTime()))   // joint cast: second outline, raised, wider, turning the other way
+        if (JointFx.isJoint(x.a, ClientClock.ticks()))   // joint cast: second outline, raised, wider, turning the other way
             flat(c.vc(tx), c.pose, p.add(0, 0.04 + JointFx.LIFT, 0), UP, size * JointFx.SCALE, (float) (-c.time * 0.09 + JointFx.TURN), cr, cg, cb, fd * JointFx.ALPHA);
         float rise = (float) Math.min(1, t / 20.0);
         flat(c.vc(tx), c.pose, p.add(0, 0.1 + 1.6 * rise, 0), UP, size * (0.65f - 0.25f * rise), (float) (-c.time * 0.1), cr, cg, cb, fd * (1 - rise) * 0.8f);

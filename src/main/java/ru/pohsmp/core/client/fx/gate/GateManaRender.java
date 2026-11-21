@@ -62,7 +62,7 @@ public final class GateManaRender {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || !atlas()) return;
         float pt = e.getPartialTick();
-        double now = mc.level.getGameTime() + pt;
+        double now = ru.pohsmp.core.client.ClientClock.now(pt);
         Vec3 eye = e.getCamera().getPosition();
         Matrix4f m = e.getPoseStack().last().pose();
 

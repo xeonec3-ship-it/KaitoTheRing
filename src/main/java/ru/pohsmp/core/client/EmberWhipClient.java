@@ -154,7 +154,7 @@ public final class EmberWhipClient {
                 st.dz = tw.z() - rw.z();
             }
             st.captured = true;
-            st.capturedAt = mc.level.getGameTime() + mc.getFrameTime();
+            st.capturedAt = ClientClock.now(mc.getFrameTime());
         } catch (RuntimeException ex) {   // a model or mod that draws differently must not break the frame
             ru.pohsmp.core.PohCore.LOG.debug("[ember] whip root capture failed", ex);
         }
@@ -163,7 +163,7 @@ public final class EmberWhipClient {
     /** The hand pose for the whip root now: the capture of the last frames, else an estimate from the body. */
     static WhipSim.Pose root(State st, LivingEntity e, float pt) {
         Minecraft mc = Minecraft.getInstance();
-        double now = mc.level.getGameTime() + pt;
+        double now = ClientClock.now(pt);
         if (st.captured && now - st.capturedAt < 2.5) {
             if (!st.firstPerson) return new WhipSim.Pose(st.rx, st.ry, st.rz, st.dx, st.dy, st.dz);
             if (invView != null && e == mc.player && mc.options.getCameraType().isFirstPerson()) {
@@ -209,7 +209,7 @@ public final class EmberWhipClient {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || !(mc.level.getEntity(m.a) instanceof LivingEntity e) || !holdsWhip(e)) return;
         State st = STATES.computeIfAbsent(e.getId(), k -> new State());
-        long now = mc.level.getGameTime();
+        long now = ClientClock.ticks();
         if (m.b == EmberBlade.VORTEX) {
             // the turn goes the way the hand goes round (ember_vortex turns +1), the whip starting a little behind the hand;
             // before the first hand pose: from behind the back
@@ -239,12 +239,12 @@ public final class EmberWhipClient {
             keep.add(p.getId());
             State st = STATES.computeIfAbsent(p.getId(), k -> new State());
             // a swing without a hit (vanilla swing; an Epic Fight swing moves the hand, and the hand moves the whip)
-            if (p.swinging && (!st.swung || p.swingTime < st.swingTime) && level.getGameTime() - st.lastLash > 6) {
+            if (p.swinging && (!st.swung || p.swingTime < st.swingTime) && ClientClock.ticks() - st.lastLash > 6) {
                 Vec3 f = p.getLookAngle();
                 double half = Math.toRadians(50);
                 int s = st.sweep(1);
                 st.sim.lash(Math.atan2(f.z, f.x), -half * s, half * s, EmberBlade.LASH_TICKS, false);
-                st.lastLash = level.getGameTime();
+                st.lastLash = ClientClock.ticks();
             }
             st.swung = p.swinging;
             st.swingTime = p.swingTime;
@@ -257,7 +257,7 @@ public final class EmberWhipClient {
             if (st.sim.striking()) flames(level, st.sim);
         }
         STATES.keySet().retainAll(keep);
-        double now = level.getGameTime();
+        double now = ClientClock.ticks();
         FLASHES.removeIf(f -> now - f.start() > 6);
     }
 
@@ -266,7 +266,7 @@ public final class EmberWhipClient {
         var rnd = level.random;
         double sp = Math.max(1e-6, c.speed());
         double ux = c.vx() / sp, uy = c.vy() / sp, uz = c.vz() / sp;
-        FLASHES.add(new Flash(c.x(), c.y(), c.z(), ux, uy, uz, level.getGameTime() + Minecraft.getInstance().getFrameTime(), rnd.nextFloat() * 90));
+        FLASHES.add(new Flash(c.x(), c.y(), c.z(), ux, uy, uz, ClientClock.now(Minecraft.getInstance().getFrameTime()), rnd.nextFloat() * 90));
         for (int i = 0; i < 10; i++) {   // sparks fly on along the snap
             double k = 0.08 + 0.12 * rnd.nextDouble();
             level.addParticle(i % 3 == 0 ? ParticleTypes.FLAME : ParticleTypes.SMALL_FLAME, c.x(), c.y(), c.z(),
@@ -336,7 +336,7 @@ public final class EmberWhipClient {
             tassel(vc, ps.last(), sp, before, pts, cam, light);
         }
         buf.endBatch(type);
-        if (!FLASHES.isEmpty()) flashes(ps, buf, camera, mc.level.getGameTime() + pt);
+        if (!FLASHES.isEmpty()) flashes(ps, buf, camera, ClientClock.now(pt));
     }
 
     /** Bends the first points of the interpolated rope onto this frame's hand pose (the root never lags behind the fist). */

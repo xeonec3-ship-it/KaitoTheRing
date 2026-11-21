@@ -10,6 +10,7 @@ public final class ClientInit {
 
     public static void init(IEventBus modBus) {
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
+        MinecraftForge.EVENT_BUS.register(ClientClock.class);   // monotonic animation time (fx, cameras) - before everything that reads it
         MinecraftForge.EVENT_BUS.register(CamFixClient.class);
         MinecraftForge.EVENT_BUS.register(TierTooltip.class);
         MinecraftForge.EVENT_BUS.register(DisintegrationFx.class);

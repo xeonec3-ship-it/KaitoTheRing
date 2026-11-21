@@ -289,7 +289,22 @@ public final class BossCam {
     @SubscribeEvent
     public static void onOverlay(RenderGuiOverlayEvent.Pre e) {
         if (!active) return;
+        if (e.getOverlay().id().equals(BossSayClient.OVERLAY_ID)) return;   // the bosses' lines stay in the scenes
         if ((flags & BossNet.SCENE_NO_HUD) != 0 || e.getOverlay() == VanillaGuiOverlay.CROSSHAIR.type()) e.setCanceled(true);
+    }
+
+    /** The HUD is hidden by the scene (BossSayClient then sits over the letterbox bar, not over the hotbar). */
+    static boolean hudHidden() {
+        return active && (flags & BossNet.SCENE_NO_HUD) != 0;
+    }
+
+    /** Height of the letterbox bar this frame (0 without bars). */
+    static int barHeight(float partialTick, int guiHeight) {
+        if (!active || (flags & BossNet.SCENE_BARS) == 0) return 0;
+        double now = ru.pohsmp.core.client.ClientClock.now(partialTick);
+        double in = Math.min(1, (now - start) / 12.0);
+        if (releaseAt >= 0) in *= 1 - BossMath.sine((now - releaseAt) / RELEASE);
+        return (int) (guiHeight * 0.09 * in);
     }
 
     /** Letterbox bars (SCENE_BARS), in 0.6 s and out with the camera. */
@@ -299,10 +314,7 @@ public final class BossCam {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
         GuiGraphics g = e.getGuiGraphics();
-        double t = ru.pohsmp.core.client.ClientClock.now(e.getPartialTick()) - start;
-        double in = Math.min(1, t / 12.0);
-        if (releaseAt >= 0) in *= 1 - BossMath.sine((ru.pohsmp.core.client.ClientClock.now(e.getPartialTick()) - releaseAt) / RELEASE);
-        int bar = (int) (g.guiHeight() * 0.09 * in);
+        int bar = barHeight(e.getPartialTick(), g.guiHeight());
         g.fill(0, 0, g.guiWidth(), bar, 0xFF000000);
         g.fill(0, g.guiHeight() - bar, g.guiWidth(), g.guiHeight(), 0xFF000000);
     }

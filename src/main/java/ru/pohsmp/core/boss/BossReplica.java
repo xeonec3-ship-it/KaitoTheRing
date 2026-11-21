@@ -19,7 +19,7 @@ import ru.pohsmp.core.spell.TargetPose;
 /**
  * «Дезинтеграция: Реплика» does not work on any of the five (owner 20.11, balance replica_immune): it is let begin (2 s), then the
  * boss plays its own break animation + fx; on the `break` event the cast is stopped (its seals dissolve by themselves), the caster
- * loses the mana and gets the cooldown as if it had cast; on `speak` its phrase (chat r32 in its colour + 3 s over its head; not more
+ * loses the mana and gets the cooldown as if it had cast; on `speak` its phrase (r32, the on-screen subtitle BossCore.say; not more
  * often than replica_taunt_cooldown). The real Disintegration works as usual. Runs for every boss from BossCore.tick; a boss changes
  * the timings / names / phrase by overriding {@link PohBoss#replicaReaction()}.
  */

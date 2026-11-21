@@ -444,3 +444,37 @@ def stime(segs):
 def path_at(path, s):
     import gen_martin_ef as EF
     return EF.path_at(path, s)
+
+
+# ================================================================== сшивка с позой стойки на краях
+def stance_targets(M, pose):
+    """Цели стойки из её JSON-позы (FK): стопы (x, z, носок, 0), кисти, направление предмета (yaw, pitch)."""
+    W = M.world_pose(pose)
+    out = {}
+    for leg, key in (('right_leg', 'rf'), ('left_leg', 'lf')):
+        p = ap(W[leg], M.foot)
+        f = W[leg][:3, :3] @ np.array([0.0, 0.0, -1.0])
+        out[key] = (float(p[0]), float(p[2]), math.degrees(math.atan2(f[0], -f[2])), 0.0)
+    out['hand_r'] = ap(W['bipedHandRight'], (0, 0, 0))
+    out['hand_l'] = ap(W['bipedHandLeft'], (0, 0, 0))
+    return out, W
+
+
+def blend_edges(fn, pose0, length, t_in=0.08, t_out=0.3):
+    """fn(t) → поза; в первые t_in с и последние t_out с поза плавно сводится к pose0 (стойка) — стык с покоем без скачка."""
+    def g(t):
+        o = fn(t)
+        if t < t_in:
+            w = 1 - ease(t / t_in, 'io')
+        elif t > length - t_out:
+            w = ease((t - (length - t_out)) / t_out, 'io')
+        else:
+            return o
+        for b, ch in pose0.items():
+            for c, v in ch.items():
+                cur = o.setdefault(b, {}).get(c, [0.0, 0.0, 0.0] if c != 'scale' else [1.0, 1.0, 1.0])
+                if c == 'rotation':
+                    v = [cv + ((x - cv + 180) % 360 - 180) for cv, x in zip(cur, v)]
+                o[b][c] = [cv * (1 - w) + x * w for cv, x in zip(cur, v)]
+        return o
+    return g

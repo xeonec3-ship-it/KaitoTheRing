@@ -26,12 +26,29 @@ def special(M):
     return {'strike': (np.zeros(3), HEAD_PT)}
 
 
+def stance():
+    """Стойка Ирины (gen_irina.STANCE_I, эталон Epic Fight 21.11) — JSON-поза: удары начинаются и кончаются в ней."""
+    import gen_irina as GI
+    pose = {}
+    for b, ch in GI.STANCE_I.items():
+        pose[b] = {('rotation' if c == 'rot' else 'position'): list(v) for c, v in ch.items()}
+    return pose
+
+
 def build():
     M = GL.JModel('irina', anims={})
     sv = GL.Solver(M)
+    pose0 = stance()
+    st, W0 = GL.stance_targets(M, pose0)
+    h0 = st['hand_r']
+    d0 = GL.nrm(GL.ap(W0['bipedHandRight'], HEAD_PT) - h0)
+    y0, p0 = float(np.degrees(np.arctan2(d0[0], -d0[2]))), float(np.degrees(np.arcsin(d0[1])))
+    S0 = dict(body=tuple(pose0['body']['rotation']), torso=(0.0, 0.0, 0.0), pel=(0.0, 0.0), drop=0.0, rf=st['rf'], lf=st['lf'],
+              lh=tuple(float(x) for x in st['hand_l']))
+    HOLD = dict(hx=float(h0[0]), hy=float(h0[1]), hz=float(h0[2]), byaw=y0, bpit=p0)
     K = Keys([
         (0.0, dict(S0)),
-        (0.10, dict(body=(0.0, 4.0, 0.0)), 'io'),
+        (0.10, dict(body=(2.0, 30.0, 0.0)), 'io'),
         (0.30, dict(body=(6.0, 18.0, 2.0), torso=(2.0, 6.0, 0.0), pel=(0.3, -0.8), lh=(-1.5, 23.0, -16.0), lf=(-2.4, -2.2, -10.0, 0.0)), 'out'),
         (0.40, dict(lh=(-2.0, 22.5, -15.0)), 'io'),
         (0.50, dict(body=(-3.0, 58.0, -3.0), torso=(-3.0, 10.0, 0.0), pel=(0.6, 1.6), drop=0.8, lh=(-9.5, 14.5, 4.0),
@@ -50,7 +67,7 @@ def build():
     ])
     ST = GL.stime([(0, 0.0), (0.10, 0.0, 'lin'), (0.50, 0.22, 'out'), (0.62, 0.255, 'lin'), (0.75, 0.80, ('beta', 2.2, 2.0)),
                    (0.88, 0.86, 'out'), (1.05, 0.90, 'io'), (1.80, 1.0, 'io')])
-    P = [(0.0, dict(hx=7.8, hy=16.6, hz=-11.4, byaw=-13.0, bpit=51.0)),
+    P = [(0.0, dict(HOLD)),
          (0.12, dict(hx=9.5, hy=22.0, hz=-6.0, byaw=-10.0, bpit=88.0)),
          (0.22, dict(hx=10.0, hy=28.5, hz=1.0, byaw=-30.0, bpit=144.0)),       # посох за правым плечом: крюк назад-вправо, вниз
          (0.25, dict(hx=10.0, hy=29.0, hz=1.8, byaw=-31.0, bpit=149.0)),
@@ -58,7 +75,7 @@ def build():
          (0.80, dict(hx=2.5, hy=20.0, hz=-15.0, byaw=-3.0, bpit=-4.0)),         # крюк в блок (грудь цели)
          (0.86, dict(hx=-1.5, hy=16.5, hz=-13.5, byaw=-26.0, bpit=-44.0)),
          (0.90, dict(hx=0.0, hy=15.5, hz=-12.5, byaw=-18.0, bpit=-14.0)),
-         (1.0, dict(hx=7.8, hy=16.6, hz=-11.4, byaw=-13.0, bpit=51.0))]
+         (1.0, dict(HOLD))]
 
     def pose(t):
         pel = K.v(t, 'pel')
@@ -77,4 +94,4 @@ def build():
     sv.reset()
     for _ in range(2):
         pose(0.0)
-    return GL.bake(pose, LENGTH, 0.02, events={WARN: 'warn', HIT: 'hit'})
+    return GL.bake(GL.blend_edges(pose, pose0, LENGTH), LENGTH, 0.02, events={WARN: 'warn', HIT: 'hit'})

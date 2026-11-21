@@ -171,6 +171,16 @@ public final class ErebHandFight {
         e.hurt(core.attackDamage(), (float) dmg);
     }
 
+    /** T32 «Сломать блок»: not busy, nothing held, no mask scene. */
+    boolean guardBreakFree() {
+        return busy <= 0 && !core.locked() && !core.inScene() && grabbed == null && holVictim == null && maskT < 0 && !maskReturnDue;
+    }
+
+    /** T32: his heavy hit — the rapier (attack_damage with the enrage) or the ghost hand's slam, whichever is stronger. */
+    double guardBreakDamage() {
+        return ru.pohsmp.core.boss.BossGuardBreakMath.heavy(thrustDamage(), ErebHandConfig.d(ErebHandConfig.SLAM_DAMAGE));
+    }
+
     /** A reflection's strike: his hit (the finisher and the dream see the boss behind it). */
     void reflectionHit(LivingEntity e, double dmg) {
         hit(e, dmg);

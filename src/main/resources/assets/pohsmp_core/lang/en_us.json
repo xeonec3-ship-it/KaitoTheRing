@@ -663,6 +663,8 @@
   "subtitles.pohsmp_core.cult_leader.first_flame_impact": "Pillar of flame",
   "subtitles.pohsmp_core.cult_leader.ash": "Cult Leader turns to ash",
   "subtitles.pohsmp_core.cult_leader.ash_slash": "Fiery slash",
+  "subtitles.pohsmp_core.boss.guard_break": "Crack: a boss breaks the guard",
+  "ui.pohsmp_core.boss.guard_break": "Guard Break",
   "subtitles.pohsmp_core.cult_leader.replica_break": "Replica seals shattered",
   "subtitles.pohsmp_core.irina.replica_break": "Replica seals torn by threads",
   "subtitles.pohsmp_core.cult_leader.finisher": "Scythe impales",

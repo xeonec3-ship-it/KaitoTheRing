@@ -20,8 +20,9 @@ public final class ArisMath {
 
     /** Animation names (animation.aris.<name>) and their lengths in ticks. */
     public static final String[] ANIMS = {"", "slam", "swing", "cast", "forge", "last_blow", "phase2", "phase3", "spawn", "surrender",
-            "billet", "chains", "quench", "bellows", "replica_break", "finisher"};
-    public static final int[] ANIM_TICKS = {0, 32, 28, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40, 48};
+            "billet", "chains", "quench", "bellows", "replica_break", "finisher", "guard_break"};
+    /** guard_break 28: TEMP_GUARD_BREAK (the stand-in length until the visuals' letter; BossGuardBreak.Timing.TEMP). */
+    public static final int[] ANIM_TICKS = {0, 44, 42, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40, 48, 28};
 
     public static int anim(String name) {
         for (int i = 1; i < ANIMS.length; i++) if (ANIMS[i].equals(name)) return i;
@@ -41,9 +42,9 @@ public final class ArisMath {
 
     // ---------------------------------------------------------------- melee and phase 1
 
-    public static final int SWING = 28, SWING_HIT = 12;
+    public static final int SWING = 42, SWING_HIT = 12;
     public static final double SWING_REACH = 3.6;
-    public static final int SLAM = 32, SLAM_IMPACT = 15, SLAM_WAVE = 22;
+    public static final int SLAM = 44, SLAM_IMPACT = 15, SLAM_WAVE = 22;
     /** The hammer head touches the ground this far before her (slam / forge / last_blow). */
     public static final double SLAM_FWD = 1.35, FORGE_FWD = 1.2, LAST_FWD = 1.45;   // visual letter «Правка направлений» 20.11
     public static final double SLAM_RADIUS = 8, SLAM_BAND = 0.7, JUMP_CLEAR = 1.0;
@@ -210,7 +211,7 @@ public final class ArisMath {
     public static final int FINISHER = 48, FINISHER_PULL = 14, FINISHER_SLAM = 30, FINISHER_KILL = 44, FINISHER_CAM_FROM = 6, FINISHER_CAM = 40;
     public static final double FINISHER_DIST = 1.9;   // the victim lies head to her, pelvis here (visual 20.11)
     /** Animations the visual assistant has not delivered yet (the test only checks them once they exist). */
-    public static final java.util.Set<String> PENDING = java.util.Set.of();
+    public static final java.util.Set<String> PENDING = java.util.Set.of("guard_break");   // T32, the visuals are being made
 
     /** Pull of the victim toward the hold point at finisher tick t (0..1, ease in-out). */
     public static double finisherPull(int t) {

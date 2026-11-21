@@ -160,6 +160,12 @@ public class ErebHandEntity extends ErebHandBody implements PohBoss {
     @Override
     protected void dropAllDeathLoot(DamageSource src) {}
 
+    /** Boss sounds 21.11: glass and gold (sounds.json ereb_hand.hurt). */
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource src) {
+        return ru.pohsmp.core.boss.BossCore.sound("ereb_hand.hurt");
+    }
+
     @Override
     public void die(DamageSource src) {   // only /kill and the like: no scene
         super.die(src);

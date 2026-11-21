@@ -2,7 +2,6 @@ package ru.pohsmp.core.boss.ereb;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -145,7 +144,7 @@ public class ErebReflection extends ErebBody {
     public void poof(ServerLevel sl) {
         if (isRemoved()) return;
         Fx.play(sl, Fx.fx("illusion_poof").at(position()));
-        sl.playSound(null, getX(), getY() + 1, getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.HOSTILE, 0.8f, 1.4f);
+        sl.playSound(null, getX(), getY() + 1, getZ(), ErebFight.sound("ereb.reflection_break"), SoundSource.HOSTILE, 1.2f, 1);
         discard();
     }
 

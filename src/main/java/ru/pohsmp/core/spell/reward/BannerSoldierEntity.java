@@ -91,6 +91,19 @@ public class BannerSoldierEntity extends PathfinderMob implements GeoEntity, IAn
         auraFx = -1;
     }
 
+    /**
+     * FX audit 21.11: killed, unloaded or discarded without vanish() - the endless aura was never stopped and stayed on clients where
+     * the soldier had stood (an attached fx falls back to its start point when its entity is gone).
+     */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (level() instanceof ServerLevel sl && auraFx > 0) {
+            RewardSpell.stopFx(sl, auraFx);
+            auraFx = -1;
+        }
+        super.remove(reason);
+    }
+
     // ---------------------------------------------------------------- tick
 
     @Override

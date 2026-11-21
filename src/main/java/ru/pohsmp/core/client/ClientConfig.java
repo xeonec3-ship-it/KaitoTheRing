@@ -11,6 +11,8 @@ public final class ClientConfig {
     public static final ForgeConfigSpec.DoubleValue FX_DISTANCE;
     public static final ForgeConfigSpec.IntValue FX_MAX;
     public static final ForgeConfigSpec.ConfigValue<String> FX_QUALITY;
+    public static final ForgeConfigSpec.BooleanValue SAY_TO_CHAT;
+    public static final ForgeConfigSpec.BooleanValue SAY_SOUND;
 
     static {
         ForgeConfigSpec.Builder b = new ForgeConfigSpec.Builder();
@@ -28,6 +30,11 @@ public final class ClientConfig {
         FX_MAX = b.comment("At most this many short effects at once; the oldest short one is dropped (long scenes are never dropped)")
                 .defineInRange("maxShortInstances", 256, 8, 2048);
         FX_QUALITY = b.comment("high or low (fewer particles, sparks and curtain beams)").defineInList("quality", "high", List.of("high", "low"));
+        b.pop();
+        b.push("bossSay");
+        SAY_TO_CHAT = b.comment("Also copy the bosses' spoken lines into the chat (they are shown as a subtitle over the hotbar)")
+                .define("copyToChat", false);
+        SAY_SOUND = b.comment("A quiet pen sound while a boss line is being typed").define("typingSound", true);
         b.pop();
         SPEC = b.build();
     }

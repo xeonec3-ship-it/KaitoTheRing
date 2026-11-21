@@ -2,7 +2,6 @@ package ru.pohsmp.core.boss.erebhand;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -97,7 +96,7 @@ public class ErebHandReflection extends ErebHandBody {
                         t.setSecondsOnFire(3);
                     }
                     Fx.play(sl, Fx.fx("ereb_hand_false_flame_real").at(position().add(getLookAngle().multiply(1.5, 0, 1.5))).scale(0.5).duration(24));
-                    sl.playSound(null, getX(), getY() + 1, getZ(), SoundEvents.FIRECHARGE_USE, SoundSource.HOSTILE, 1, 0.9f);
+                    sl.playSound(null, getX(), getY() + 1, getZ(), ru.pohsmp.core.boss.BossCore.sound("ereb_hand.changeling"), SoundSource.HOSTILE, 1.2f, 1);
                 } else {   // a false one: only the faint glass glint
                     Fx.play(sl, Fx.fx("ereb_hand_mirror_strike_fake").caster(this).at(position().add(0, 1, 0)).yaw(getYRot()));
                 }
@@ -137,7 +136,7 @@ public class ErebHandReflection extends ErebHandBody {
     public void poof(ServerLevel sl) {
         if (isRemoved()) return;
         Fx.play(sl, Fx.fx("illusion_poof").at(position()));
-        sl.playSound(null, getX(), getY() + 1, getZ(), SoundEvents.AMETHYST_CLUSTER_BREAK, SoundSource.HOSTILE, 0.8f, 1.4f);
+        sl.playSound(null, getX(), getY() + 1, getZ(), ru.pohsmp.core.boss.BossCore.sound("ereb.reflection_break"), SoundSource.HOSTILE, 1.2f, 1);
         discard();
     }
 

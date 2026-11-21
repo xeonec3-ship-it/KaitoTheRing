@@ -4,9 +4,10 @@ import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.Abstra
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMobModel;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import org.joml.Vector2f;
 import ru.pohsmp.core.PohCore;
+import ru.pohsmp.core.boss.ClothSway;
+import ru.pohsmp.core.boss.client.ClothClient;
 import ru.pohsmp.core.boss.erebhand.ErebHandBody;
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
 import software.bernie.geckolib.core.animation.AnimationState;
@@ -15,8 +16,8 @@ import software.bernie.geckolib.core.animation.AnimationState;
  * Ereb, the Hand of Lies (and his reflections): geo/entity/ereb_hand.geo.json, textures/entity/ereb_hand/ereb_hand.png — _mended after
  * «Падение маски», _cracked from phase 3 (each with its own _glowmask) — and animations/entity/ereb_hand.animation.json (Iron's casting
  * animations + ereb_hand_*). Every frame: the mask bone hidden while the mask is torn off, everything but the ghost hand hidden while it
- * forms first (the intro); outside our animations the coat tails and the three cape bones follow Iron's procedural walk (the visual
- * letter's formulas) and the ghost hand floats a little.
+ * forms first (the intro); outside our animations the coat tails and the three cape bones follow Iron's procedural walk (ClothSway:
+ * the visual letter's formulas in GeckoLib axes, clamped, pushed through Iron's transformStack) and the ghost hand floats a little.
  */
 public class ErebHandModel extends AbstractSpellCastingMobModel {
     public static final ResourceLocation MODEL = new ResourceLocation(PohCore.MODID, "geo/entity/ereb_hand.geo.json");
@@ -65,26 +66,18 @@ public class ErebHandModel extends AbstractSpellCastingMobModel {
         CoreGeoBone mask = bone("mask");
         if (mask != null && !handOnly) mask.setHidden(b.maskOff());
         if (Minecraft.getInstance().isPaused() || b.playingAction()) return;
+        // Only deltas from the rest pose (ClothSway: GeckoLib axes, clamped) and only through Iron's transformStack: it sets the bones
+        // back to rest before the next frame. bone.setRotX(bone.getRotX() + …) piled up instead (GeckoLib skips its own reset for a bone
+        // marked changed after its tick) — the tails and the cape spun round, the ghost hand drifted blocks up (the owner's screenshot).
         Vector2f limb = getLimbSwing(entity, entity.walkAnimation, state.getPartialTick());
-        float right = Mth.cos(limb.y() * 0.6662f) * 1.4f * limb.x(), left = Mth.cos(limb.y() * 0.6662f + Mth.PI) * 1.4f * limb.x();
-        add("coat_front_r", -3 * Mth.DEG_TO_RAD + Math.min(0, right) * 0.55f);
-        add("coat_front_l", -3 * Mth.DEG_TO_RAD + Math.min(0, left) * 0.55f);
-        add("coat_back_r", 5 * Mth.DEG_TO_RAD + Math.max(0, right) * 0.4f);
-        add("coat_back_l", 5 * Mth.DEG_TO_RAD + Math.max(0, left) * 0.4f);
-        float legs = Math.max(right, left);
-        add("cape", 3 * Mth.DEG_TO_RAD + Math.max(0, legs) * 0.25f);
-        add("cape_mid", 2 * Mth.DEG_TO_RAD + Math.max(0, legs) * 0.15f);
-        add("cape_low", 1 * Mth.DEG_TO_RAD);
+        ClothClient.push(transformStack, this::bone, ClothSway.solve(ClothClient.leg(entity, bone("right_leg"), limb, true),
+                ClothClient.leg(entity, bone("left_leg"), limb, false)));
         CoreGeoBone hand = bone("ghost_hand");   // it floats ±0.6 px over his shoulder (ereb_hand_idle, while ours are not playing)
-        if (hand != null) hand.setPosY(hand.getPosY() + 0.6f * Mth.sin((entity.tickCount + state.getPartialTick()) * 0.08f));
+        if (hand != null) transformStack.pushPosition(hand, 0, ClothSway.handFloat(entity.tickCount + state.getPartialTick()), 0);
     }
 
     private CoreGeoBone bone(String name) {
         return getAnimationProcessor().getBone(name);
     }
 
-    private void add(String name, float rotX) {
-        CoreGeoBone b = bone(name);
-        if (b != null) b.setRotX(b.getRotX() + rotX);
-    }
 }

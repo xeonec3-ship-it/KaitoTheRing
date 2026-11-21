@@ -7,7 +7,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -105,7 +104,7 @@ public class ErebHandTraitor extends PathfinderMob {
             swingIn = ErebHandMath.TRAITOR_SWING;
             swing(InteractionHand.MAIN_HAND, true);
             boss.fight.reflectionHit(t, ErebHandConfig.d(ErebHandConfig.TRAITOR_DAMAGE));
-            sl.playSound(null, getX(), getY() + 1, getZ(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.HOSTILE, 0.8f, 1.3f);
+            sl.playSound(null, getX(), getY() + 1, getZ(), ru.pohsmp.core.boss.BossCore.sound("ereb.swish"), SoundSource.HOSTILE, 1.2f, 1);
         }
     }
 
@@ -129,6 +128,14 @@ public class ErebHandTraitor extends PathfinderMob {
         return best != null ? best : self != null && self.distanceToSqr(this) < 32 * 32 ? self : null;
     }
 
+    /** FX audit 21.11: discarded by the fight's cleanup (false death, /kill) or unloaded - its aura snapped back to where it appeared. */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (copyFx >= 0 && level() instanceof ServerLevel sl) Fx.stop(sl, copyFx, "");
+        copyFx = -1;
+        super.remove(reason);
+    }
+
     /** Broken (by hits) or burst (time is up: shards round it). */
     private void shatter(ServerLevel sl, boolean explode) {
         if (isRemoved()) return;
@@ -136,8 +143,9 @@ public class ErebHandTraitor extends PathfinderMob {
             burst = true;
             boss.fight.traitorBurst(sl, this);
         }
-        sl.playSound(null, getX(), getY() + 1, getZ(), SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 1.2f, explode ? 0.7f : 1.2f);
+        sl.playSound(null, getX(), getY() + 1, getZ(), ru.pohsmp.core.boss.BossCore.sound(explode ? "ereb_hand.shard_burst" : "ereb.reflection_break"), SoundSource.HOSTILE, 1.5f, 1);
         if (copyFx >= 0) Fx.stop(sl, copyFx, "");
+        copyFx = -1;
         if (!explode) Fx.play(sl, Fx.fx("ereb_hand_traitor_shatter").caster(this).at(position()));
         discard();
     }

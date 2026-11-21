@@ -306,7 +306,7 @@ def bell(f, d=2.0, partials=((1, 1, 1), (2.76, .5, .6), (5.4, .3, .4), (8.93, .2
         if fr > SR / 2.2:
             continue
         out += a * np.sin(2 * np.pi * fr * t + _rng.random() * 6.28) * np.exp(-t / (tau * k))
-    return norm(out)
+    return norm(fade(out, 0.0005, min(d * 0.4, 0.4)))   # never cut off before decaying (clicked)
 
 
 def glass_ping(f=2400, d=1.2, tau=0.35):
@@ -410,3 +410,8 @@ def variants(fn, k, seed):
         rng(seed * 100 + i)
         out.append(fn(i))
     return out
+
+
+def uni(a, b, n=None):
+    """Seeded uniform random (the generator of the last rng(seed))."""
+    return _rng.uniform(a, b, n)

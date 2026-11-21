@@ -75,20 +75,31 @@ def _from_sounds_json(ev):
 def video(boss, name, spec, files):
     """spec: (source mp4 name, code events by anim {anim: [(t, ev)]}, extra [(t, ev)])."""
     src_name, code, extra = spec
-    marks = json.load(open(os.path.join(VIDEO_DIR, "marks.json"), encoding="utf-8"))[src_name]
+    allm = json.load(open(os.path.join(VIDEO_DIR, "marks.json"), encoding="utf-8"))
+    if src_name not in allm:   # T29-T31 previews: marks from their clip scripts (tools/boss_sfx/video_marks.py)
+        allm = json.load(open(os.path.join(ROOT, "build", "boss_sfx_marks.json"), encoding="utf-8"))
+    marks = allm[src_name]
     mod = importlib.import_module(boss)
     plan = {}
-    for fl in mod.ANIMS.values():
-        plan.update(fl)
+    for fn_, fl in mod.ANIMS.items():
+        model = fn_.split(".")[0]
+        for k, v in fl.items():
+            plan[k if model == boss else model + ":" + k] = v
+            plan.setdefault(k, v)
     import re
     events = list(extra)
     ms = marks["marks"]
     for i, (t0, label) in enumerate(ms):
-        t_end = ms[i + 1][0] if i + 1 < len(ms) else marks["dur"]
+        later = [m[0] for m in ms[i + 1:] if m[0] > t0 + 0.01 and (":" in label) == (":" in m[1])]   # cut by the next mark of the same model kind
+        t_end = later[0] if later else marks["dur"]
         m = re.findall(r"`([^`]+)`", label)
         for anim in m:
-            a = anim if anim in plan or anim in code else "animation.%s.%s" % (boss, anim)
-            for t, ev in plan.get(a, []) + code.get(a, []) + code.get(anim, []):
+            short = anim.split(".")[-1]
+            full = anim if anim in plan else "animation.%s.%s" % (boss, short)
+            if ":" in anim:   # another model of the boss (soldier, banner, giant hand...): its own keyframes only
+                full, short = anim, anim
+            evs = plan.get(full, []) + code.get(anim, []) + (code.get(short, []) if short != anim else [])
+            for t, ev in evs:
                 if t0 + t < t_end + 0.05:
                     events.append((t0 + t, ev))
     dur = marks["dur"]

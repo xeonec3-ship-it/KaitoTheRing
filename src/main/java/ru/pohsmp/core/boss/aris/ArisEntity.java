@@ -397,6 +397,30 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         }
     }
 
+    // ---------------------------------------------------------------- T32 «Сломать блок» (framework BossGuardBreak)
+
+    /** Not in the middle of her own swing / cast (actingUntil) or a lock. */
+    @Override
+    public boolean guardBreakFree() {
+        return !fight.acting();
+    }
+
+    @Override
+    public double guardBreakDamage() {
+        return fight.guardBreakDamage();
+    }
+
+    /** animation.aris.guard_break (her file's rule), through the synced action id. */
+    @Override
+    public String guardBreakAnimation() {
+        return "animation.aris.guard_break";
+    }
+
+    @Override
+    public void playGuardBreak(String animation) {
+        play("guard_break");
+    }
+
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика»
 
     /** animation.aris.replica_break (2.0 s, strike 0.65, break 1.15, speak 1.4) + fx aris_replica_break; the phrase on speak. */

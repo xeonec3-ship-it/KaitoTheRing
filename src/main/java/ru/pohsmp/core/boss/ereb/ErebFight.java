@@ -500,6 +500,16 @@ public final class ErebFight {
         }));
     }
 
+    /** T32 «Сломать блок»: not busy with his own move. */
+    boolean guardBreakFree() {
+        return busy <= 0 && !core.locked() && !core.inScene();
+    }
+
+    /** T32: the Guard Break is an attack — a disguise falls as with any of his. */
+    void onGuardBreak() {
+        unmaskOnAttack(sl());
+    }
+
     private void unmaskOnAttack(ServerLevel sl) {
         if (disguiseLeft > 0 && boss.face() != null) unmask(sl);
     }

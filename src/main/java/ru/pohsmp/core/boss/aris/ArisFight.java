@@ -116,6 +116,12 @@ public final class ArisFight {
         return boss.tickCount < actingUntil || core.locked();
     }
 
+    /** T32 «Сломать блок»: her heavy hit = the hammer swing (attack_damage with the enrage), ×mythic_damage_mult in phase 3. */
+    double guardBreakDamage() {
+        double m = core.phase() >= 2 ? cfg(ArisConfig.MYTHIC_DAMAGE) : 1;
+        return ru.pohsmp.core.boss.BossGuardBreakMath.heavy(boss.getAttributeValue(Attributes.ATTACK_DAMAGE)) * m;
+    }
+
     /** Her own hit (pohsmp_core:boss_attack), ×1.3 in phase 3, optional fire. */
     private void hit(LivingEntity e, double dmg, int burnSeconds) {
         double m = core.phase() >= 2 ? cfg(ArisConfig.MYTHIC_DAMAGE) : 1;

@@ -663,6 +663,8 @@
   "subtitles.pohsmp_core.cult_leader.first_flame_impact": "Столб пламени",
   "subtitles.pohsmp_core.cult_leader.ash": "Глава Культа рассыпается пеплом",
   "subtitles.pohsmp_core.cult_leader.ash_slash": "Огненный разрез",
+  "subtitles.pohsmp_core.boss.guard_break": "Треск: босс ломает блок",
+  "ui.pohsmp_core.boss.guard_break": "Сломать блок",
   "subtitles.pohsmp_core.cult_leader.replica_break": "Печати Реплики разбиты",
   "subtitles.pohsmp_core.irina.replica_break": "Печати Реплики рвутся нитями",
   "subtitles.pohsmp_core.cult_leader.finisher": "Коса пронзает",

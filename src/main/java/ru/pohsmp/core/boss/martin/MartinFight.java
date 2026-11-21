@@ -104,6 +104,15 @@ public final class MartinFight {
         e.hurt(core.attackDamage(), (float) (dmg * mult()));
     }
 
+    /** T32 «Сломать блок»: his strongest melee hit now — swing, overhead, thrust (phase 3: the shield dash too), ×phase 3, enrage. */
+    double guardBreakDamage() {
+        BossConfig.PerBoss cfg = BossConfig.of(Martin.ID);
+        double swing = (cfg != null ? BossConfig.get(cfg.attack) : 20) + MartinConfig.d(MartinConfig.SWORD_DAMAGE);
+        double dash = core.phase() >= 2 ? MartinConfig.d(MartinConfig.SHIELD_DASH_DAMAGE) : 0;
+        return ru.pohsmp.core.boss.BossGuardBreakMath.heavy(swing, MartinConfig.d(MartinConfig.OVERHEAD_DAMAGE), MartinConfig.d(MartinConfig.THRUST_DAMAGE), dash)
+                * mult();
+    }
+
     /** A notice in the action bar of one player, not more often than once a second. */
     private void tell(Entity e, Component c) {
         if (!(e instanceof ServerPlayer p)) return;

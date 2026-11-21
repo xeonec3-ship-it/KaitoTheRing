@@ -47,6 +47,9 @@ public final class JointCast {
         int duration;
         Caster partner;
         int fxKey;
+        /** Owner 21.11 (4): both mages own the spell (CoAuthors), shared by the pair. */
+        CoAuthorMath.Link link;
+        boolean toldHostile;
     }
 
     private static final Map<UUID, Long> PENDING = new HashMap<>();
@@ -126,6 +129,14 @@ public final class JointCast {
             if (o == c || o.partner != null || !o.spell.equals(c.spell) || o.p.level() != c.p.level()) continue;
             if (c.start < o.start || c.start - o.start > window) continue;
             if (o.p.distanceToSqr(c.p) > r * r || !stillCasting(o)) continue;
+            if (CoAuthors.hostile(o.p, c.p)) {   // owner 21.11 (5): they hurt each other recently - each casts alone
+                if (!c.toldHostile) {
+                    CoAuthors.tellHostile(o.p);
+                    CoAuthors.tellHostile(c.p);
+                    c.toldHostile = true;
+                }
+                continue;
+            }
             if (best == null || o.start < best.start) best = o;
         }
         return best;
@@ -141,6 +152,7 @@ public final class JointCast {
         setCastTime(follow.p, (int) (now - follow.start) + followLeft, followLeft);
         lead.partner = follow;
         follow.partner = lead;
+        lead.link = follow.link = CoAuthors.link(lead.p, follow.p, lead.spell);
         AbstractSpell sp = SpellRegistry.getSpell(lead.spell);
         Component name = sp.getDisplayName(lead.p);
         for (Caster c : List.of(lead, follow)) {
@@ -171,6 +183,8 @@ public final class JointCast {
         CASTERS.remove(o.p.getUUID());
         c.partner = null;
         o.partner = null;
+        CoAuthors.fired(c.link, c.p);   // the spell took effect: both stay its owners while its fields live
+        c.link = o.link = null;
         stopFx(c);
         stopFx(o);
         if (!stillCasting(o)) return;
@@ -188,9 +202,12 @@ public final class JointCast {
     private static void breakUp(Caster c) {
         Caster o = c.partner;
         c.partner = null;
+        CoAuthors.unlink(c.link);   // broke up before the spell took effect: each casts his own again
+        c.link = null;
         stopFx(c);
         if (o == null) return;
         o.partner = null;
+        o.link = null;
         stopFx(o);
     }
 

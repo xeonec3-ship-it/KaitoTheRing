@@ -307,6 +307,7 @@
   "ui.pohsmp_core.illusion.time": "Double: %s s",
   "ui.pohsmp_core.joint_cast": "Joint cast: %s",
   "ui.pohsmp_core.joint_cast.done": "Joint cast complete",
+  "ui.pohsmp_core.joint_cast.hostile": "Joint cast impossible: you hurt each other recently",
   "ui.pohsmp_core.judgement.damage": "Damage: %s",
   "ui.pohsmp_core.judgement.undead": "Undead take ×2",
   "ui.pohsmp_core.lightning_rod.damage": "Damage: %s within %s",

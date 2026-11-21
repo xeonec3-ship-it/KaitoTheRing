@@ -98,6 +98,7 @@ public abstract class HigherSpell extends AbstractSpell {
     public static boolean friendly(LivingEntity caster, Entity e) {
         if (e == caster || e instanceof ArmorStand || e.isSpectator()) return true;
         if (caster.isAlliedTo(e)) return true;
+        if (CoAuthors.linked(caster, e)) return true;   // owner 21.11 (4): the joint cast partner owns the spell too
         return e instanceof OwnableEntity o && o.getOwnerUUID() != null && o.getOwnerUUID().equals(caster.getUUID());
     }
 

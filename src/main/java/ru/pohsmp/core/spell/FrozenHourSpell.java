@@ -129,6 +129,7 @@ public class FrozenHourSpell extends PohSpell {
         sl.playSound(null, c.x, c.y, c.z, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 4f, 0.5f);
         for (Entity e : sl.getEntities(caster, new AABB(c, c).inflate(R), e -> e.position().distanceToSqr(c) < R * R)) {
             if (e instanceof Player p && (p.isCreative() || p.isSpectator())) continue;
+            if (CoAuthors.linked(caster, e) || e.getPersistentData().contains(CoAuthors.TAG)) continue;   // owner 21.11 (4): the partner and the spell's own things
             if (!(e instanceof LivingEntity || e instanceof Projectile || e instanceof ItemEntity)) continue;
             if (e.getTags().contains(Disp.TAG) || FROZEN.containsKey(e.getUUID())) continue;
             int life = ru.pohsmp.core.boss.BossGuard.frozenHourTicks(e, LIFE);   // cult bosses: 1.5 s, then 30 s immune

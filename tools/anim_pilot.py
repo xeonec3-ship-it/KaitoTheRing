@@ -67,11 +67,39 @@ def irina_render(cells, size, old):
     return im
 
 
+# ---------------------------------------------------------------- Эреб (T30) и Длань Лжи (T31): превью gen_ereb_render / gen_ereb_hand_render
+def geo_render(modname, model):
+    def render(cells, size, old):
+        import importlib
+        M = importlib.import_module(modname)
+        orig = M.anims
+        M.anims = lambda: dict(orig(), **{'old.' + k: v for k, v in old.items()})
+        try:
+            html = M.page([model], cells, os.environ.get('THREE_JS'))
+        finally:
+            M.anims = orig
+        fd, out = tempfile.mkstemp(suffix='.png')
+        os.close(fd)
+        M.CR.shoot(html, out, size)
+        im = Image.open(out).convert('RGB')
+        os.remove(out)
+        return im
+    return render
+
+
 BOSSES = {
     'aris': dict(tag='t28', title='T28 Арис', old_rev='82eaf87', path='animations/entity/aris.animation.json', prefix='animation.aris.',
                  render=aris_render, model='aris',
                  pairs=[('swing', 'EF greatsword_auto1', 'Размах молотом справа налево'), ('slam', 'NF ng_great_auto2', 'Удар молотом в землю'),
                         ('idle', 'EF hold_greatsword', 'Стойка / дыхание')]),
+    'ereb': dict(tag='t30', title='T30 Эреб', old_rev='4220558', path='animations/entity/ereb.animation.json', prefix='ereb_',
+                 render=geo_render('gen_ereb_render', 'ereb'), model='ereb',
+                 pairs=[('lunge', 'EF mob_spear_twohand3', 'Выпад рапирой'), ('flurry', 'EF spear_onehand_auto', 'Серия из трёх уколов'),
+                        ('idle', 'NF broadblade_idle', 'Стойка / дыхание')]),
+    'ereb_hand': dict(tag='t31', title='T31 Эреб, Длань Лжи', old_rev='4220558', path='animations/entity/ereb_hand.animation.json',
+                      prefix='ereb_hand_', render=geo_render('gen_ereb_hand_render', 'ereb_hand'), model='ereb_hand',
+                      pairs=[('lunge', 'EF mob_spear_twohand3', 'Выпад рапирой'), ('flurry', 'EF spear_onehand_auto', 'Серия из трёх уколов'),
+                             ('slam', 'NF ng_great_auto2', 'Удар призрачной ладонью о землю')]),
     'irina': dict(tag='t27', title='T27 Ирина', old_rev='dab42e3', path='animations/entity/irina.animation.json', prefix='irina_',
                   render=irina_render, model='irina',
                   pairs=[('staff_attack', 'NF ng_great_auto2', 'Удар крюком посоха сверху'),

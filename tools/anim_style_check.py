@@ -448,6 +448,47 @@ class GeoRig:
         return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
 
 
+# ================================================================== наши: Эреб, Длань Лжи (T31; тело Эреба + призрачная рука; FK — tools/ereb_hand_fk.py)
+class ErebHandRig:
+    def __init__(self, path=None):
+        import ereb_hand_fk as F
+        self.F = F
+        self.m = F.Model()
+        self.an = json.load(open(path or os.path.join(A, 'animations', 'entity', 'ereb_hand.animation.json'), encoding='utf-8'))['animations']
+        self.L = 12.0
+
+    def key(self, name):
+        return name if name in self.an else 'ereb_hand_' + name
+
+    def signals(self, name, weapon='rapier'):
+        F, m, L = self.F, self.m, self.L
+        an = self.an[self.key(name)]
+        piv = lambda b: np.array(m.bones[b]['pivot'], float)
+        flip = np.array([-1.0, 1.0, 1.0])                       # x модели — к левому боку; у нас +x — вправо
+
+        def sig(t):
+            W = m.world(F.sample(an, t))
+            P = lambda b, pt: m.point(W, b, pt) * flip / L
+            fw = lambda b: (W[b][:3, :3] @ np.array([0.0, 0.0, -1.0])) * flip
+            hy = [yaw_of(fw(b)) for b in ('right_leg', 'left_leg')]
+            if weapon == 'ghost':
+                tool, tip = P('ghost_wrist', piv('ghost_wrist')), P('ghost_palm', piv('ghost_palm') - [0, 0, 3.0])
+            else:
+                rp = F.rapier_points(W, m)
+                tool, tip = rp[0] * flip / L, rp[-1] * flip / L
+            return {
+                'pelvis': P('body', piv('body')), 'chest': P('torso', piv('torso') - [0, 4, 0]), 'head': P('head', piv('head')),
+                'sh_r': P('right_arm', piv('right_arm')), 'sh_l': P('left_arm', piv('left_arm')),
+                'hip_yaw': math.degrees(math.atan2(sum(math.sin(math.radians(x)) for x in hy), sum(math.cos(math.radians(x)) for x in hy))),
+                'foot_r': P('right_leg', piv('right_leg') - [0, 12, 0]), 'foot_l': P('left_leg', piv('left_leg') - [0, 12, 0]),
+                'tool': tool, 'tip': tip, 'head_fwd': fw('head'), 'chest_fwd': fw('torso'),
+            }
+        return sig, float(an['animation_length'])
+
+    def events(self, name):
+        return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
+
+
 def ereb_rig(path=None):
     return GeoRig(path, 'ereb', 'ereb_')
 
@@ -461,6 +502,9 @@ BOSSES = {
     # рост ×14/12 (нога 14 ед. = 0.875 бл.)
     'ereb': dict(rig=ereb_rig, scale=1.0, code_move={}, idle=['idle'],
                  attacks={'lunge': ('hit', 'thrust', 'item'), 'flurry': ('hit', 'thrust', 'item')}),        # рапира: уколы
+    'ereb_hand': dict(rig=ErebHandRig, scale=1.0, code_move={}, idle=['idle'],
+                      attacks={'lunge': ('hit', 'thrust', 'rapier'), 'flurry': ('hit', 'thrust', 'rapier'),
+                               'slam': ('slam', 'heavy', 'ghost')}),       # удар призрачной ладонью о землю: «клинок» — запястье → ладонь
     'irina': dict(rig=IrinaRig, scale=14.0 / 12.0, code_move={}, idle=['idle'],
                   attacks={'staff_attack': ('hit', 'heavy', 'staff'), 'staff_sweep': ('hit', 'heavy', 'staff')}),
 }

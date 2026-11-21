@@ -286,3 +286,138 @@ def define(A, m, G, g, sf):
     a.instruction(0.12, 'shield_draw')
     a.instruction(0.45, 'dash')
     a.instruction(0.75, 'hit')
+
+
+# ================================================================== жесты с мечом (приказы, вызов, клич) — эталон EF, 21.11
+# Тики событий и длины — прежние (MartinMath: COMMAND 44/17, VOLLEY 44/16/24, DUEL 40/18, WARCRY 36/12; cavalry 3.4 с: call 1.0,
+# charge 2.0). Устройство: стойка → предвосхищение (уход в противоположную сторону, 'out') → рывок к позе события ('in') с перехлёстом
+# ('back') → удержание с дрожью/дыханием → возврат в стойку. Свободная левая рука — во внутренних осях (X > 0 — вперёд/вверх, Z < 0 —
+# в сторону); вес левой руки на рукояти lw (0 — своя поза, 1 — на рукояти).
+def define_gestures(A, m, G, g, sf):
+    bd = Body(m, G, g, sf)
+    vis = G.vis
+
+    def run(K, P_, t, look=0.0, wind=0.0):
+        o = bd.body(K, t, look=look, wind=float(K(t, 'wind', 0.0)) + wind)
+        lw = float(K(t, 'lw', 1.0))
+        o['left_arm'] = {'rot': list(np.asarray(K(t, 'larm', (0.0, 0.0, 0.0)), float))}
+        o['left_forearm'] = {'rot': [float(K(t, 'lfore', 0.0)), 0.0, 0.0]}
+        bd.weapon(o, path_at(P_[0], P_[1](t)), left=lw)
+        return vis(o)
+
+    ST = dict(yaw=-32.0, pitch=-4.0, roll=0.0, pel=(0.3, 0.0), drop=0.35, hpitch=0.0, rf=(3.4, 2.5, -38.0, 0.0), lf=(-2.6, -2.7, -8.0, 0.0),
+              lw=1.0, larm=(0.0, 0.0, 0.0), lfore=0.0, wind=0.0)
+
+    # ---------------------------------------------------------------- command «в атаку!» (command 0.85): собирается (меч вниз-назад,
+    # плечи вправо), рывком выбрасывает меч вверх-вперёд одной рукой, левая — в сторону, рёв; держит; стойка к 2.2
+    CM_T = STime([(0, 0), (0.45, 0.3, 'out'), (0.62, 0.34, 'lin'), (0.85, 0.85, ('beta', 2.0, 1.8)), (0.95, 0.9, 'out'), (1.6, 0.92, 'lin'),
+                  (2.2, 1.0, 'io')])
+    CM_P = [(0.0, dict(GUARD_W)), (0.15, dict(hphi=-60.0, hr=8.0, hy=13.5, byaw=-60.0, bth=10.0)),     # меч — вниз-назад через правый бок
+            (0.3, dict(hphi=-100.0, hr=7.0, hy=14.0, byaw=-135.0, bth=-28.0)),
+            (0.34, dict(hphi=-104.0, hr=7.0, hy=13.6, byaw=-138.0, bth=-32.0)), (0.85, dict(hphi=-12.0, hr=8.5, hy=31.0, byaw=0.0, bth=72.0)),
+            (0.9, dict(hphi=-10.0, hr=8.6, hy=31.6, byaw=0.0, bth=66.0)), (0.92, dict(hphi=-10.0, hr=8.6, hy=31.4, byaw=0.0, bth=68.0)),
+            (1.0, dict(GUARD_W))]
+    CM_K = Keys([(0.0, dict(ST)),
+                 (0.20, dict(lw=0.0), 'io'),
+                 (0.45, dict(yaw=-55.0, pitch=-8.0, drop=1.4, hpitch=-8.0, larm=(10.0, 0.0, -14.0), lfore=30.0, pel=(0.5, 0.8)), 'out'),
+                 (0.62, dict(yaw=-58.0, pitch=-9.0, drop=1.5, hpitch=-9.0), 'lin'),
+                 (0.85, dict(yaw=-8.0, pitch=8.0, drop=0.2, hpitch=20.0, larm=(30.0, 0.0, -48.0), lfore=34.0, pel=(0.0, -1.2), wind=6.0,
+                             lf=(-2.8, -4.4, -4.0, 0.0)), 'in'),
+                 (0.95, dict(yaw=-4.0, pitch=10.0, hpitch=24.0, larm=(34.0, 0.0, -54.0)), 'back'),
+                 (1.6, dict(yaw=-8.0, pitch=8.0, hpitch=18.0, larm=(30.0, 0.0, -50.0), lw=0.0, wind=4.0, lf=(-2.8, -4.4, -4.0, 0.0)), 'io'),
+                 (2.0, dict(lw=1.0), 'io'),
+                 (2.2, dict(ST), 'io')])
+    a = A('command', 2.2)
+    a.sample(lambda t: run(CM_K, (CM_P, CM_T), t), 0.02)
+    a.instruction(0.85, 'command')
+
+    # ---------------------------------------------------------------- volley «натянуть!» (draw 0.8) — «пли!» (loose 1.2)
+    VO_T = STime([(0, 0), (0.8, 0.40, 'out'), (1.06, 0.43, 'lin'), (1.24, 0.85, ('beta', 2.2, 1.9)), (1.34, 0.88, 'out'), (1.7, 0.9, 'lin'),
+                  (2.2, 1.0, 'io')])
+    VO_P = [(0.0, dict(GUARD_W)), (0.40, dict(hphi=-28.0, hr=4.2, hy=32.0, byaw=40.0, bth=96.0)),
+            (0.43, dict(hphi=-30.0, hr=4.0, hy=33.0, byaw=40.0, bth=100.0)), (0.85, dict(hphi=-6.0, hr=10.0, hy=18.0, byaw=0.0, bth=-30.0)),
+            (0.88, dict(hphi=-6.0, hr=10.0, hy=17.0, byaw=0.0, bth=-38.0)), (0.9, dict(hphi=-6.0, hr=9.8, hy=17.4, byaw=0.0, bth=-34.0)),
+            (1.0, dict(GUARD_W))]
+    VO_K = Keys([(0.0, dict(ST)),
+                 (0.25, dict(lw=0.0), 'io'),
+                 (0.8, dict(yaw=-24.0, pitch=8.0, drop=0.1, hpitch=18.0, larm=(30.0, 0.0, -50.0), lfore=20.0, pel=(0.6, 1.0), wind=4.0), 'out'),
+                 (1.06, dict(yaw=-26.0, pitch=10.0, hpitch=20.0, larm=(32.0, 0.0, -54.0), lf=(-2.6, -2.4, -8.0, 1.2)), 'lin'),
+                 (1.22, dict(yaw=-6.0, pitch=-16.0, drop=1.6, hpitch=-6.0, larm=(18.0, 0.0, -30.0), pel=(-0.4, -4.0),
+                             lf=(-3.2, -7.4, 4.0, 0.0)), 'in'),
+                 (1.34, dict(pitch=-19.0, drop=1.9, pel=(-0.5, -4.6)), 'back'),
+                 (1.7, dict(pitch=-14.0, drop=1.5, lw=0.0, lf=(-3.2, -7.4, 4.0, 0.0)), 'io'),
+                 (1.95, dict(lw=1.0, lf=(-2.6, -2.7, -8.0, 0.0), pel=(0.1, -1.0)), 'io'),
+                 (2.2, dict(ST), 'io')])
+    a = A('volley', 2.2)
+    a.sample(lambda t: run(VO_K, (VO_P, VO_T), t), 0.02)
+    a.instruction(0.8, 'draw')
+    a.instruction(1.2, 'loose')
+
+    # ---------------------------------------------------------------- cavalry «Атака конницы» (call 1.0 — меч к небу, charge 2.0 — взмах)
+    CA_T = STime([(0, 0), (1.0, 0.40, 'out'), (1.86, 0.44, 'lin'), (2.04, 0.85, ('beta', 2.2, 1.9)), (2.14, 0.88, 'out'), (2.8, 0.9, 'lin'),
+                  (3.4, 1.0, 'io')])
+    CA_K = Keys([(0.0, dict(ST)),
+                 (0.3, dict(lw=0.0), 'io'),
+                 (1.0, dict(yaw=-20.0, pitch=10.0, drop=0.1, hpitch=24.0, larm=(28.0, 0.0, -40.0), lfore=20.0, pel=(0.4, 0.8), wind=6.0), 'out'),
+                 (1.5, dict(yaw=-24.0, pitch=11.0, hpitch=26.0, larm=(30.0, 0.0, -44.0)), 'io'),
+                 (1.86, dict(yaw=-26.0, pitch=12.0, hpitch=22.0, lf=(-2.6, -2.4, -8.0, 1.2)), 'lin'),
+                 (2.02, dict(yaw=-4.0, pitch=-18.0, drop=1.8, hpitch=-6.0, larm=(16.0, 0.0, -28.0), pel=(-0.5, -4.4),
+                             lf=(-3.2, -7.8, 4.0, 0.0), wind=10.0), 'in'),
+                 (2.14, dict(pitch=-21.0, drop=2.0, pel=(-0.6, -5.0)), 'back'),
+                 (2.8, dict(pitch=-15.0, drop=1.5, lw=0.0, lf=(-3.2, -7.8, 4.0, 0.0), wind=4.0), 'io'),
+                 (3.1, dict(lw=1.0, lf=(-2.6, -2.7, -8.0, 0.0), pel=(0.1, -1.0)), 'io'),
+                 (3.4, dict(ST), 'io')])
+    a = A('cavalry', 3.4)
+    a.sample(lambda t: run(CA_K, (VO_P, CA_T), t), 0.02)
+    a.instruction(1.0, 'call')
+    a.instruction(2.0, 'charge')
+
+    # ---------------------------------------------------------------- duel «Вызов на дуэль» (challenge 0.9): оттягивает меч к бедру,
+    # выбрасывает остриё на игрока одной рукой (плечи в профиль), левая ладонь к груди; держит; стойка к 2.0
+    DU_T = STime([(0, 0), (0.55, 0.35, 'out'), (0.7, 0.38, 'lin'), (0.9, 0.85, ('beta', 2.0, 2.0)), (1.0, 0.88, 'out'), (1.5, 0.9, 'lin'),
+                  (2.0, 1.0, 'io')])
+    DU_P = [(0.0, dict(GUARD_W)), (0.35, dict(hphi=-96.0, hr=6.4, hy=15.2, byaw=-4.0, bth=8.0)),
+            (0.38, dict(hphi=-100.0, hr=6.4, hy=15.4, byaw=-4.0, bth=8.0)), (0.85, dict(hphi=-10.0, hr=12.0, hy=21.0, byaw=0.0, bth=4.0)),
+            (0.88, dict(hphi=-10.0, hr=12.4, hy=21.2, byaw=0.0, bth=3.0)), (0.9, dict(hphi=-10.0, hr=12.2, hy=21.0, byaw=0.0, bth=4.0)),
+            (1.0, dict(GUARD_W))]
+    DU_K = Keys([(0.0, dict(ST)),
+                 (0.25, dict(lw=0.0), 'io'),
+                 (0.55, dict(yaw=-60.0, pitch=2.0, drop=0.9, pel=(0.6, 1.4), larm=(30.0, 0.0, 10.0), lfore=60.0), 'out'),
+                 (0.7, dict(yaw=-62.0, pitch=2.0, drop=1.0), 'lin'),
+                 (0.9, dict(yaw=-48.0, pitch=-8.0, drop=0.9, pel=(-0.2, -2.6), larm=(50.0, 0.0, 30.0), lfore=80.0,
+                            lf=(-3.0, -6.0, -2.0, 0.0)), 'in'),
+                 (1.0, dict(yaw=-46.0, pitch=-9.0, pel=(-0.3, -2.9)), 'back'),
+                 (1.5, dict(yaw=-48.0, pitch=-7.0, lw=0.0, lf=(-3.0, -6.0, -2.0, 0.0)), 'io'),
+                 (1.8, dict(lw=1.0, lf=(-2.6, -2.7, -8.0, 0.0), pel=(0.2, -0.6)), 'io'),
+                 (2.0, dict(ST), 'io')])
+    a = A('duel', 2.0)
+    a.sample(lambda t: run(DU_K, (DU_P, DU_T), t, look=0.0), 0.02)
+    a.instruction(0.9, 'challenge')
+
+    # ---------------------------------------------------------------- warcry «Боевой клич» (cry 0.6): вдох — сжимается, меч к себе;
+    # рёв — корпус назад, руки в стороны, таз вниз, дрожь; держит; стойка к 1.8
+    WC_T = STime([(0, 0), (0.42, 0.35, 'out'), (0.62, 0.8, ('beta', 2.0, 1.6)), (0.72, 0.84, 'out'), (1.3, 0.86, 'lin'), (1.8, 1.0, 'io')])
+    WC_P = [(0.0, dict(GUARD_W)), (0.35, dict(hphi=-30.0, hr=5.6, hy=15.0, byaw=10.0, bth=70.0)),
+            (0.8, dict(hphi=-92.0, hr=10.4, hy=20.0, byaw=-70.0, bth=40.0)), (0.84, dict(hphi=-96.0, hr=10.6, hy=20.6, byaw=-74.0, bth=44.0)),
+            (0.86, dict(hphi=-94.0, hr=10.5, hy=20.3, byaw=-72.0, bth=42.0)), (1.0, dict(GUARD_W))]
+    WC_K = Keys([(0.0, dict(ST)),
+                 (0.15, dict(lw=0.0), 'io'),
+                 (0.42, dict(yaw=-20.0, pitch=-10.0, drop=1.2, hpitch=-10.0, larm=(30.0, 0.0, -6.0), lfore=50.0), 'out'),
+                 (0.6, dict(yaw=-24.0, pitch=12.0, drop=1.4, hpitch=26.0, larm=(20.0, 0.0, -70.0), lfore=30.0, pel=(0.2, 0.6), wind=8.0,
+                            rf=(3.8, 2.8, -40.0, 0.0), lf=(-3.2, -3.0, -6.0, 0.0)), 'in'),
+                 (0.72, dict(pitch=14.0, hpitch=30.0, larm=(22.0, 0.0, -76.0)), 'back'),
+                 (1.3, dict(pitch=12.0, hpitch=26.0, larm=(20.0, 0.0, -70.0), lw=0.0, wind=6.0, rf=(3.8, 2.8, -40.0, 0.0),
+                            lf=(-3.2, -3.0, -6.0, 0.0)), 'io'),
+                 (1.6, dict(lw=1.0), 'io'),
+                 (1.8, dict(ST), 'io')])
+
+    def warcry(t):
+        o = run(WC_K, (WC_P, WC_T), t)
+        c = max(0.0, 1.0 - abs(t - 0.9) / 0.4) if 0.55 < t < 1.3 else 0.0         # дрожь рёва — только голова и грудь
+        if c > 0:
+            o['torso']['rot'][2] += 0.8 * c * math.sin(t * 60)
+            o['head']['rot'][2] += 1.6 * c * math.sin(t * 60 + 0.7)
+        return o
+    a = A('warcry', 1.8)
+    a.sample(warcry, 0.02)
+    a.instruction(0.6, 'cry')

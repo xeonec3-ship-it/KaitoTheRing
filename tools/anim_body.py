@@ -155,11 +155,15 @@ class Rig:
             hy = h[1] - up
             d = math.hypot(fx - h[0], fz - h[2])
             dmax = math.sqrt(max(0.0, self.L ** 2 - (hy + sink) ** 2))
-            if d > 1e-6 and d < dmax:                       # нога длиннее, чем нужно: стопа уходит в землю не глубже sink,
-                s = dmax / d                                # дальше — отходит наружу по той же линии (у ног нет колена)
-                fx, fz = h[0] + (fx - h[0]) * s, h[2] + (fz - h[2]) * s
-            elif d < 1e-6:
-                fz = h[2] - dmax
+            if d < dmax:                                    # нога длиннее, чем нужно (стопа под бедром; у ног нет колена):
+                side = M @ np.array([1.0 if leg.startswith('right') else -1.0, 0.0, 0.0])    # стопа уходит в сторону от корпуса
+                u = np.array([side[0], side[2]])
+                u = u / max(1e-6, np.linalg.norm(u))
+                v = np.array([fx - h[0], fz - h[2]])
+                vu = float(v @ u)
+                e = -vu + math.sqrt(max(0.0, vu * vu - float(v @ v) + dmax * dmax))
+                fx, fz = fx + u[0] * e, fz + u[1] * e       # (правка 21.11: раньше — вдоль линии к цели; под бедром линия
+                #                                             переворачивалась, и нога щёлкала вперёд-назад за кадр)
             d = math.hypot(fx - h[0], fz - h[2])
             w = np.array([fx - h[0], -math.sqrt(max(0.0, self.L ** 2 - d * d)), fz - h[2]])
             o[leg] = dict(o.get(leg, {}), rot=leg_angles(M.T @ w, M.T @ yaw_dir(toe)))

@@ -1061,6 +1061,7 @@ def anims(m):
     # (пилот 21.11, tools/gen_martin_ef.py; правила — docs/specs/anim_style_epicfight.md)
     import gen_martin_ef as EF
     EF.define(A, m, sys.modules[__name__], g, sf)
+    EF.define_gestures(A, m, sys.modules[__name__], g, sf)       # command, cavalry, volley, duel, warcry (эталон EF, 21.11)
     import guard_break_martin as GB          # T32 «Сломать блок» (навершие в блок, затем щит)
     GB.define(A, m, sys.modules[__name__], g, sf)
 
@@ -1080,24 +1081,6 @@ def anims(m):
     a.instruction(0.4, 'step')
     a.instruction(1.2, 'step')
 
-    # ---------------------------------------------------------------- command: «в атаку!» — меч вверх-вперёд одной рукой, рёв (0.85)
-    def command(t):
-        k = float(track(t, [(0, 0), (0.6, 1, 'out'), (1.6, 1), (2.2, 0)]))
-        p = float(track(t, [(0, 0), (0.6, 0), (0.85, 1, 'back'), (1.6, 1), (2.2, 0)]))
-        o = {'torso': {'rot': [-6 * k, 16 * k, 0]}, 'head': {'rot': [-14 * p, -12 * k, 0]},
-             'left_arm': {'rot': [-24 * k + 8 * p, 0, -42 * k + 10 * p]}, 'left_forearm': {'rot': [-34 * k, 0, 0]},
-             'right_leg': {'rot': [-10 * k, 0, 0]}, 'left_leg': {'rot': [16 * k, 0, 0]}}
-        cape_follow(t, o, lag=6 * p, wind=4 * p)
-        up = (5.5, 31.0, -3.0)
-        fw = (4.5, 27.0, -9.0)
-        hand = np.asarray(GUARD[0]) * (1 - k) + (np.asarray(up) * (1 - p) + np.asarray(fw) * p) * k
-        d = lerp_dir(GUARD[1], lerp_dir((0.1, 0.95, 0.2), (0.05, 0.35, -0.94), p), k)
-        g(o, hand, d, left=max(0, 1 - 3 * k))
-        return vis(o)
-    a = A('command', 2.2)
-    a.sample(command, 0.04)
-    a.instruction(0.85, 'command')
-
     # ---------------------------------------------------------------- banner_plant: поднимает знамя левой рукой и вонзает (plant 1.3)
     def plant(t):
         k = float(track(t, [(0, 0), (0.7, 1, 'out'), (1.15, 1), (1.3, -0.4, 'in'), (1.8, -0.4), (2.4, 0)]))
@@ -1114,28 +1097,6 @@ def anims(m):
     a.sample(plant, 0.04)
     a.instruction(0.7, 'raise')
     a.instruction(1.3, 'plant')
-
-    # ---------------------------------------------------------------- особое 1: «Атака конницы» — меч к небу (call 1.0), взмах вперёд (charge 2.0)
-    def cavalry(t):
-        k = float(track(t, [(0, 0), (0.8, 1, 'out'), (1.7, 1), (2.0, 2, 'in'), (2.8, 2), (3.4, 3)]))
-        P = [GUARD[0], (5.0, 33.0, -1.0), (4.0, 21.0, -11.0), (4.0, 21.0, -11.0), GUARD[0]]
-        D = [GUARD[1], (0.05, 1.0, 0.05), (0.0, -0.15, -0.99), (0.0, -0.15, -0.99), GUARD[1]]
-        i = min(3, int(k))
-        f = k - i
-        up = (2 - k) if 1 <= k < 2 else (k if k < 1 else 0)          # без разрывов (правка 20.11: были скачки на 2.0 и 3.4)
-        fw = (3 - k) if k >= 2 else (k - 1 if k >= 1 else 0)
-        o = {'body': {'pos': [0, -1.2 * fw, -1.4 * fw]}, 'torso': {'rot': [-12 * up + 14 * fw, 0, 0]},
-             'head': {'rot': [26 * up * (1 - fw) - 6 * fw, 0, 0]},
-             'left_arm': {'rot': [-10 * up, 0, -36 * up]}, 'left_forearm': {'rot': [-20, 0, 0]},
-             'right_leg': {'rot': [-26 * fw, 0, 0]}, 'left_leg': {'rot': [24 * fw, 0, 0]}}
-        cape_follow(t, o, lag=12 * fw, wind=6 * up)
-        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f + AROUND_HEAD * math.sin(math.pi * f) * (i == 0), lerp_dir(D[i], D[i + 1], f),
-          left=max(0, 1 - k) if k < 1 else (k - 3 if k > 3 else 0))
-        return vis(o)
-    a = A('cavalry', 3.4)
-    a.sample(cavalry, 0.04)
-    a.instruction(1.0, 'call')
-    a.instruction(2.0, 'charge')
 
     # ---------------------------------------------------------------- особое 2: «Приказ стоять насмерть» — щит в землю перед собой (wall 1.1)
     def hold_pose(k, br=0.0):
@@ -1293,56 +1254,6 @@ def anims(m):
     a.instruction(0.15, 'shield_draw')
     a.instruction(1.0, 'slam')
 
-    def volley(t):
-        # «Залп лучников»: меч к небу — «натянуть!» (draw 0.8), резкий взмах вперёд-вниз — «пли!» (loose 1.2)
-        k = float(track(t, [(0, 0), (0.8, 1, 'out'), (1.05, 1), (1.2, 2, 'in'), (1.7, 2), (2.2, 3)]))
-        P = [GUARD[0], (5.0, 33.0, -1.0), (4.0, 19.0, -11.0), GUARD[0]]
-        D = [GUARD[1], (0.0, 1.0, 0.1), (0.0, -0.35, -0.94), GUARD[1]]
-        i = min(2, int(k))
-        f = k - i
-        up = max(0.0, 2 - k) if k >= 1 else k                       # без разрыва на 1.2 (правка 20.11)
-        fw = float(track(t, [(0, 0), (1.05, 0), (1.2, 1, 'in'), (1.7, 1), (2.2, 0)]))
-        o = {'body': {'pos': [0, -1.0 * fw, -1.0 * fw]}, 'torso': {'rot': [-10 * up + 12 * fw, 0, 0]}, 'head': {'rot': [22 * up - 6 * fw, 0, 0]},
-             'left_arm': {'rot': [-30 * up, 0, -50 * up]}, 'left_forearm': {'rot': [-20, 0, 0]},
-             'right_leg': {'rot': [-22 * fw, 0, 0]}, 'left_leg': {'rot': [20 * fw, 0, 0]}}
-        cape_follow(t, o, lag=10 * fw, wind=4 * up)
-        g(o, np.asarray(P[i]) * (1 - f) + np.asarray(P[i + 1]) * f + AROUND_HEAD * math.sin(math.pi * f) * (i == 0), lerp_dir(D[i], D[i + 1], f),
-          left=max(0, 1 - 3 * k) if k < 2.5 else (k - 2.5) * 2)
-        return vis(o)
-    a = A('volley', 2.2)
-    a.sample(volley, 0.04)
-    a.instruction(0.8, 'draw')
-    a.instruction(1.2, 'loose')
-
-    def duel(t):
-        # «Вызов на дуэль»: остриё меча на выбранного игрока одной рукой, левая — к груди (challenge 0.9), затем стойка
-        k = float(track(t, [(0, 0), (0.7, 1, 'out'), (1.5, 1), (2.0, 0)]))
-        p = float(track(t, [(0, 0), (0.7, 0), (0.9, 1, 'back'), (1.5, 1), (2.0, 0)]))
-        o = {'torso': {'rot': [-4 * k, -20 * k, 0]}, 'head': {'rot': [-4 * k, 14 * k, 0]},
-             'left_arm': {'rot': [-50 * k, 0, 30 * k]}, 'left_forearm': {'rot': [-80 * k, 0, 0]},
-             'right_leg': {'rot': [-14 * p, 0, 0]}, 'left_leg': {'rot': [12 * p, 0, 0]}}
-        cape_follow(t, o, lag=4 * p)
-        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([6.0, 21.0, -10.5 - 1.5 * p]) * k, lerp_dir(GUARD[1], (0.0, 0.05, -1.0), k),
-          left=max(0, 1 - 3 * k))
-        return vis(o)
-    a = A('duel', 2.0)
-    a.sample(duel, 0.04)
-    a.instruction(0.9, 'challenge')
-
-    def warcry(t):
-        # «Боевой клич»: вдох, корпус назад, руки в стороны, рёв (cry 0.6) — волна сбивает касты; затем стойка
-        k = float(track(t, [(0, 0), (0.5, 1, 'out'), (1.3, 1), (1.8, 0)]))
-        c = float(track(t, [(0, 0), (0.5, 0), (0.62, 1, 'back'), (1.3, 1), (1.8, 0)]))
-        sh = math.sin(t * 60) * c * 0.6
-        o = {'body': {'pos': [0, -1.0 * c, 0.6 * c]}, 'torso': {'rot': [-14 * c + 6 * (k - c), 0, sh]}, 'head': {'rot': [-30 * c, 0, sh * 2]},
-             'left_arm': {'rot': [-20 * k, 0, -70 * k]}, 'left_forearm': {'rot': [-30 * k, 0, 0]},
-             'right_leg': {'rot': [-12 * c, 0, 8 * c]}, 'left_leg': {'rot': [12 * c, 0, -8 * c]}}
-        cape_follow(t, o, lag=-4 * c, wind=8 * c)
-        g(o, np.asarray(GUARD[0]) * (1 - k) + np.array([9.5, 20.0, -2.0]) * k, lerp_dir(GUARD[1], (0.6, 0.6, -0.5), k), left=max(0, 1 - 3 * k))
-        return vis(o)
-    a = A('warcry', 1.8)
-    a.sample(warcry, 0.04)
-    a.instruction(0.6, 'cry')
 
     # ================================================================ добивание (владелец 20.11; ТЗ T29 «Добивание»)
     def finisher(t):

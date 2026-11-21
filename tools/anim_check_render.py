@@ -2,7 +2,7 @@
 """
 Кадры покадровой проверки анимаций T26/T30 (tools/anim_check.py): модель и анимации из assets, код моделей — из шаблонов превью
 (tools/cult_leader_preview.template.html, tools/ereb_preview.template.html), предмет в правой руке — как у Iron's (HumanoidRenderer:
-bipedHandRight → −1/16 z, −1/16 y, X −90°, display thirdperson_righthand) — так же, как в tools/boss_video.py.
+bipedHandRight → её поворот ещё раз (GeckoLib) → −1/16 z, −1/16 y, X −90°, display thirdperson_righthand) — так же, как в tools/boss_video.py.
 На земле — жёлтая стрелка «вперёд» (взгляд босса), красная точка — остриё оружия.
 
   from anim_check_render import sheet
@@ -83,7 +83,9 @@ function itemMesh(els) {
 }
 function attachItem(model) {
   const hand = model.bones.bipedHandRight, d = ITEM.display;
-  const a = new THREE.Group(); a.position.set(0, -1, -1);
+  // GeckoLib 4.8.4 (BlockAndItemGeoLayer): предмет поворачивается поворотом кисти ДВАЖДЫ — второй раз здесь (dbl)
+  const dbl = new THREE.Group(); hand.add(dbl); model.dbl = dbl;
+  const a = new THREE.Group(); a.position.set(0, -1, -1); dbl.add(a);
   const b = new THREE.Group(); b.rotation.x = -Math.PI / 2; a.add(b);
   const t = new THREE.Group(); t.position.set(...(d.translation || [0, 0, 0])); b.add(t);
   const r = new THREE.Group(); r.quaternion.setFromEuler(new THREE.Euler(...(d.rotation || [0, 0, 0]).map(v => v * D), 'XYZ')); t.add(r);
@@ -91,7 +93,6 @@ function attachItem(model) {
   const it = itemMesh(ITEM.els); s.add(it);
   const tip = new THREE.Mesh(new THREE.SphereGeometry(0.9 / Math.max(...(d.scale || [1, 1, 1])), 10, 8), new THREE.MeshBasicMaterial({ color: 0xff2020, depthTest: false }));
   tip.renderOrder = 9; tip.position.set(ITEM.tip[0] - 8, ITEM.tip[1] - 8, ITEM.tip[2] - 8); it.add(tip);
-  hand.add(a);
 }
 function groundTex() {
   const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
@@ -121,6 +122,7 @@ function draw() {
     arrow(scene);
     const m = BL.buildModel(BL.DATA.models[BOSS], false); attachItem(m);
     BL.pose(m, c.anim ? BL.DATA.anims[c.anim] : null, c.t || 0);
+    if (m.dbl) m.dbl.quaternion.copy(m.bones.bipedHandRight.quaternion);
     scene.add(m.root);
     for (const mk of (c.marks || [])) {                       // цели (например, грудь жертвы): зелёный шар
       const g = new THREE.Mesh(new THREE.SphereGeometry(mk[3] || 1.6, 12, 10), new THREE.MeshBasicMaterial({ color: 0x30e060, transparent: true, opacity: 0.8 }));

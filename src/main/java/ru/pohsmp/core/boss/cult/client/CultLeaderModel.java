@@ -10,13 +10,14 @@ import org.joml.Vector3f;
 import ru.pohsmp.core.PohCore;
 import ru.pohsmp.core.boss.cult.CultLeader;
 import ru.pohsmp.core.boss.cult.CultLeaderEntity;
+import ru.pohsmp.core.boss.cult.CultMath;
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
 import software.bernie.geckolib.core.animation.AnimationState;
 
 /**
  * The Head of the Cult: geo/entity/cult_leader.geo.json (Tyros's bones and names, our cubes and the cape), our textures (the soul form
  * cult_leader_soul_mode), our animation file (all of Iron's casting animations under their names + cult_leader_*). Outside animations
- * the arm «carries» our cult_scythe (the animations begin and end in that pose); the cape swings a little with the legs.
+ * the arm holds our cult_scythe as Tyros holds his (the animations begin and end in that pose); the cape swings a little with the legs.
  */
 public class CultLeaderModel extends AbstractSpellCastingMobModel {
     public static final ResourceLocation MODEL = new ResourceLocation(PohCore.MODID, "geo/entity/cult_leader.geo.json");
@@ -45,18 +46,19 @@ public class CultLeaderModel extends AbstractSpellCastingMobModel {
         if (entity instanceof CultLeaderEntity boss) {
             float pt = state.getPartialTick();
             Vector2f limb = getLimbSwing(entity, entity.walkAnimation, pt);
-            // Scythe hold outside animations (anim check T26-T30, 4.3): «carrying the scythe» - arm (-25, 10, 15), hand (0, -5.5, 96) in
-            // the animation axes = (25, -10, 15) / (0, 5.5, 96) here (GeckoLib flips X/Y once on load; pushRotation is in model axes).
-            // Every Head animation now starts and ends in this pose itself, so no damped blend: it would add the pose twice.
+            // Scythe hold outside animations = Tyros's (owner 21.11): FireBossModel's numbers (CultMath.HOLD_*). The animations of the
+            // Head start and end in this pose themselves (tools/anim_cloth.hold_additive), so no damped blend: it would add the pose
+            // twice. The scythe slides 3 px along its shaft in the fist and the scythe arm does not swing while walking (base swing
+            // cancelled) - with Tyros's swing the blade went 3.4 px into the ground.
             boolean anim = entity.isAnimating();
             boss.isAnimatingDampener = anim ? 0 : 1;
             if (!anim && entity.getMainHandItem().is(CultLeader.SCYTHE.get())) {
                 CoreGeoBone arm = getAnimationProcessor().getBone("right_arm"), hand = getAnimationProcessor().getBone("bipedHandRight");
                 if (arm != null && hand != null) {
-                    transformStack.pushRotation(arm, new Vector3f(25, -10, 15).mul(Mth.DEG_TO_RAD));
-                    transformStack.pushRotation(hand, new Vector3f(0, 5.5f, 96).mul(Mth.DEG_TO_RAD));
-                    float walk = Mth.cos(limb.y() * 0.6662f + Mth.PI) * 2f * limb.x() * 0.5f * -0.75f;
-                    transformStack.pushRotation(arm, walk, 0, 0);
+                    transformStack.pushRotation(arm, deg(CultMath.HOLD_ARM));
+                    transformStack.pushRotation(hand, deg(CultMath.HOLD_HAND));
+                    transformStack.pushPosition(hand, new Vector3f(CultMath.HOLD_SLIDE[0], CultMath.HOLD_SLIDE[1], CultMath.HOLD_SLIDE[2]));
+                    transformStack.pushRotation(arm, CultMath.holdArmWalk(limb.x(), limb.y()), 0, 0);
                 }
             }
             CoreGeoBone cape = getAnimationProcessor().getBone("cape");   // 6° + max(0, ±leg swing)·0.6 (the visual assistant's note)
@@ -73,6 +75,10 @@ public class CultLeaderModel extends AbstractSpellCastingMobModel {
             }
         }
         super.setCustomAnimations(entity, instanceId, state);
+    }
+
+    private static Vector3f deg(float[] v) {
+        return new Vector3f(v[0], v[1], v[2]).mul(Mth.DEG_TO_RAD);
     }
 
     private void bob(String bone, float offset, float mult) {

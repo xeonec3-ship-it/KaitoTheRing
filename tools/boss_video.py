@@ -97,6 +97,31 @@ def victim_anim(name='pohsmp_cult_finisher_victim'):
     return {'animation_length': em['endTick'] / 20, 'loop': 'hold_on_last_frame', 'bones': bones}
 
 
+def cult_hold_anims():
+    """Глава Культа вне анимаций (CultLeaderModel.setCustomAnimations): `~hold` — поза хвата Тироса (CultMath.HOLD_*), `~walk` — ходьба
+    (AbstractSpellCastingMobModel Iron's: ноги ±cos·1.4·x·0.75, левая рука cos·x, корпус подпрыгивает; правая с косой неподвижна;
+    x = 0.6 — наш getLimbSwing, цикл 9.43 позиции шага ≈ 0.47 с на полном ходу). Оси — оси анимаций (X/Y поворота — минус к Java)."""
+    from gen_cult_leader_extra import CARRY_ARM, CARRY_HAND, CARRY_POS
+    hold = {'animation_length': 1.0, 'loop': True, 'bones': {
+        'right_arm': {'rotation': {'0.0': {'vector': CARRY_ARM}}}, 'bipedHandRight': {'rotation': {'0.0': {'vector': CARRY_HAND}},
+                                                                                    'position': {'0.0': {'vector': CARRY_POS}}}}}
+    L, x, R = 0.94, 0.6, 180 / math.pi
+    ch = {b: {} for b in ('right_leg', 'left_leg', 'left_arm', 'body')}
+    for i in range(int(L / 0.02) + 1):
+        t = round(i * 0.02, 3)
+        y = t / L * 2 * (2 * math.pi / 0.6662)          # два шага за цикл
+        c = math.cos(y * 0.6662)
+        k = '%.4g' % t if t else '0.0'
+        ch['right_leg'][k] = {'vector': [round(-c * 1.4 * x * 0.75 * R, 2), 0, 0]}
+        ch['left_leg'][k] = {'vector': [round(c * 1.4 * x * 0.75 * R, 2), 0, 0]}
+        ch['left_arm'][k] = {'vector': [round(-c * x * R, 2), 0, 0]}
+        ch['body'][k] = {'vector': [0, round(abs(math.cos((y * 1.2662 - math.pi / 2) * 0.5)) * 2 * 0.75 * x, 3), 0]}
+    walk = {'animation_length': L, 'loop': True, 'bones': dict(hold['bones'], **{
+        'right_leg': {'rotation': ch['right_leg']}, 'left_leg': {'rotation': ch['left_leg']}, 'left_arm': {'rotation': ch['left_arm']},
+        'body': {'position': ch['body']}})}
+    return {'~hold': hold, '~walk': walk}
+
+
 def scythe_item():
     """Коса Главы Культа: models/item/cult_scythe.json (бруски) + палитра textures/item/cult_scythe_3d.png; острие лезвия — tip."""
     from PIL import Image
@@ -193,14 +218,16 @@ window.VID = (() => {
   function attachItem(model, item) {                    // как у Iron's / превью Ирины: предмет в правой руке по кости bipedHandRight
     const hand = model.bones.bipedHandRight; if (!hand) return;
     const d = item.display.thirdperson_righthand;
-    const a = new THREE.Group(); a.position.set(0, -1, -1);
+    // GeckoLib 4.8.4 (BlockAndItemGeoLayer.renderForBone): предмет поворачивается поворотом кисти ДВАЖДЫ — второй раз здесь (dbl)
+    const dbl = new THREE.Group(); hand.add(dbl); model.dbl = dbl;
+    const a = new THREE.Group(); a.position.set(0, -1, -1); dbl.add(a);
     const b = new THREE.Group(); b.rotation.x = -Math.PI / 2; a.add(b);
     const t = new THREE.Group(); t.position.set(...(d.translation || [0, 0, 0])); b.add(t);
     const r = new THREE.Group(); r.quaternion.setFromEuler(new THREE.Euler(...(d.rotation || [0, 0, 0]).map(v => v * D), 'XYZ')); t.add(r);
     const s = new THREE.Group(); s.scale.set(...(d.scale || [1, 1, 1])); r.add(s);
     const it = itemMesh(item.els); s.add(it);
     const tip = new THREE.Object3D(); tip.position.set(item.tip[0] - 8, item.tip[1] - 8, item.tip[2] - 8); it.add(tip);
-    hand.add(a); model.item = a; model.tip = tip;
+    model.item = a; model.tip = tip;
   }
   function init() {
     window.requestAnimationFrame = () => 0;                // цикл страницы превью fx не нужен: кадры ведём сами
@@ -300,6 +327,7 @@ window.VID = (() => {
       const m = getModel(a);
       m.holder.visible = a.vis !== false;
       applyPose(m, a);
+      if (m.dbl) m.dbl.quaternion.copy(m.bones.bipedHandRight.quaternion);
       m.holder.position.copy(M([(a.x || 0) / 16, (a.y || 0) / 16, (a.z || 0) / 16]));
       m.holder.rotation.set((a.rx || 0) * D, ((a.ry || 0) + 180) * D, (a.rz || 0) * D, 'YXZ');
       m.root.scale.setScalar((a.s || 1) / 16);
@@ -377,7 +405,10 @@ def build_page(boss, three, cfg):
     html = '\n'.join(l for l in html.split('\n') if 'fonts.googleapis.com' not in l)
     html = html.replace('</head>', PAGE_CSS + '</head>', 1)
     js = ADAPTER.replace('VW', str(W)).replace('VH', str(H)).replace('VCFG', json.dumps(cfg, ensure_ascii=False))
-    js = js.replace('<script>', '<script>\nconst VANIMS = %s;\n' % json.dumps({'victim': victim_anim(VICTIM.get(boss, 'pohsmp_cult_finisher_victim'))}), 1)
+    va = {'victim': victim_anim(VICTIM.get(boss, 'pohsmp_cult_finisher_victim'))}
+    if boss == 'tyros':
+        va.update(cult_hold_anims())
+    js = js.replace('<script>', '<script>\nconst VANIMS = %s;\n' % json.dumps(va), 1)
     return html + '\n' + boss_lib(boss) + js
 
 
@@ -552,6 +583,20 @@ class Tyros(Boss):
 
     def __init__(self):
         self.anims = json.load(open(os.path.join(A, 'animations', 'entity', 'cult_leader.animation.json'), encoding='utf-8'))['animations']
+        self.anims.update(cult_hold_anims())
+        self.idle = '~hold'
+
+    def boss(self, anim, t, **kw):                    # вне анимаций — поза хвата (её держит код модели)
+        return super().boss(anim or '~hold', t if anim else 0, **kw)
+
+    def turntable(self, dur=7.0):
+        r = super().turntable(dur)
+        n = secs(2.8)
+        r.mark('%.0f–%.1f с: ходьба (поза хвата, правая рука с косой не качается)' % (dur, dur + 2.8))
+        r.add(n, lambda i: {'actors': [self.boss('~walk', (i / FPS) % self.anim_len('~walk'), ry=-35)],
+                            'cam': dict(self.cam(0, zoom=1.0), yaw=self.yaw0), 'rawcam': True, 'cap': 'Ходьба',
+                            'sub': 'поза хвата Тироса (FireBossModel Iron\'s) + шаг'})
+        return r
 
     def combat(self):
         r = Reel(self.title + ' · бой')

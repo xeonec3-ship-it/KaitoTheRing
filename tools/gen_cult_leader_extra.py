@@ -47,12 +47,16 @@ def A(length, bones, timeline=None):
 
 Z = [0, 0, 0]
 ONE = [1, 1, 1]
-# «несёт косу» = поза хвата вне анимаций (проверка анимаций 20.11, tools/anim_check.py): правая рука чуть вперёд, кисть повёрнута —
-# древко наискось снизу-сзади вверх-вперёд, лезвие над плечом, на 4.5 px над землёй, ничего не задевает. Этой же позой начинаются и
-# заканчиваются все анимации Главы; код держит её вне анимаций (письмо 2026-11-20_mgr_anim_check_T26_T30.md). Прежняя поза
-# FireBossModel (рука −30,−30,10 / кисть −5,0,−48 в осях GeckoLib) держит лезвие на 4.2 px в земле. Без ключей кисти коса при
-# опущенной руке лежит лезвием в земле.
-CARRY_ARM, CARRY_HAND = [-25, 10, 15], [0, -5.5, 96]
+# Поза хвата = поза Тироса (владелец 21.11: «держит косу как Тирос Iron's, везде»): FireBossModel Iron's вне анимаций —
+# pushRotation(right_arm, −30, −30, 10), (bipedHandRight, −5, 0, −48) в осях модели = (30, 30, 10) / (5, 0, −48) в осях анимаций
+# (GeckoLib при загрузке ключей меняет знак X/Y поворота). Тот же поворот кисти — в анимациях Iron's (их ключи не трогаем).
+# Внимание: GeckoLib поворачивает предмет кистью ДВАЖДЫ (BlockAndItemGeoLayer) — ключи кисти в наших анимациях задаются видимым
+# поворотом через anim_cloth.V(...) (в файл пишется половина). Прежняя поза «несёт косу» (рука −25,10,15 / кисть 0,−5.5,96) была
+# подобрана по превью с одним поворотом: в игре кисть 96° давала ~192° — коса стояла боком, лезвие у головы.
+# Коса сдвинута в кулаке на 3 px вдоль древка к лезвию-вверх (CARRY_POS, ориентация та же): у Тироса в покое лезвие на 0.7 px
+# ниже земли при покачивании руки, в ходьбе — на 3.4 px; со сдвигом и без качания правой руки при ходьбе — 0.8 px над землёй.
+CARRY_ARM, CARRY_HAND, CARRY_POS = [30, 30, 10], [5, 0, -48], [-0.96, 0.09, 2.84]
+from anim_cloth import V  # noqa: E402
 IO, OC, IQ = 'easeInOutSine', 'easeOutCubic', 'easeInQuart'
 
 
@@ -101,8 +105,9 @@ def boss_anims():
         # (раньше коса стояла вертикально над головой, лезвие в ноге/в земле)
         'right_arm': {'rotation': ch((0, windup['right_arm']), (0.42, [-62.5, 38.3, 55], IO), (0.5, [-66, 27, 5], 'easeOutQuart'),
                                      (0.6, [-61, -1, -5.6], 'easeOutQuart'), (1.0, [-70, -35, -5], IO), (1.5, Z, IO))},
-        'bipedHandRight': {'rotation': ch((0, Z), (0.42, [-7, 45.6, -45], IO), (0.5, [15.6, 55, -45.7], 'easeOutQuart'),
-                                          (0.6, [16.3, 56.7, -49.6], 'easeOutQuart'), (1.0, [16.3, 56.7, -58], IO), (1.5, Z, IO))},
+        # slash (21.11): ключ 0.5 — в осях игры (без V), подобран по метрике ударов Тироса: плоскость лезвия по ходу (было 32°)
+        'bipedHandRight': {'rotation': ch((0, Z), (0.42, V([-7, 45.6, -45]), IO), (0.5, [13.2, 46.1, -2.1], 'easeOutQuart'),
+                                          (0.6, V([16.3, 56.7, -49.6]), 'easeOutQuart'), (1.0, V([16.3, 56.7, -58]), IO), (1.5, Z, IO))},
         'left_arm': {'rotation': ch((0, windup['left_arm']), (0.6, [20, 0, -40], 'easeOutQuart'), (1.5, Z, IO))},
         'right_leg': {'rotation': ch((0, windup['right_leg']), (0.6, [-35, 0, 5], 'easeOutQuart'), (1.5, Z, IO))},
         'left_leg': {'rotation': ch((0, windup['left_leg']), (0.6, [30, 0, -5], 'easeOutQuart'), (1.5, Z, IO))},
@@ -119,8 +124,8 @@ def boss_anims():
         # к печатям над головой (раньше лезвие уходило за спину)
         'right_arm': {'rotation': ch((0, Z), (0.3, CARRY_ARM, IO), (0.9, CARRY_ARM), (1.2, [-50.2, -13.2, 83.9], IO),
                                      (1.5, [-143.7, -13.5, -1.7], 'easeOutQuart'), (2.0, [-77.9, 1.5, 6.3], IO), (2.6, Z, IO))},
-        'bipedHandRight': {'rotation': ch((0, Z), (0.3, CARRY_HAND, IO), (0.9, CARRY_HAND), (1.2, [-20.1, -54.6, -3], IO),
-                                          (1.5, [27.6, 0.7, 1.8], 'easeOutQuart'), (2.0, [12.1, 3.5, 0.8], IO), (2.6, Z, IO))},
+        'bipedHandRight': {'rotation': ch((0, Z), (0.3, CARRY_HAND, IO), (0.9, CARRY_HAND), (1.2, V([-20.1, -54.6, -3]), IO),
+                                          (1.5, V([27.6, 0.7, 1.8]), 'easeOutQuart'), (2.0, V([12.1, 3.5, 0.8]), IO), (2.6, Z, IO))},
     }, [(0.9, 'crush'), (1.5, 'shatter'), (1.9, 'speak')])
     # Добивание (2.4 с): 0–0.7 тянет жертву левой рукой, 1.0 пронзает косой (impale), 1.0–1.7 поднимает, 1.7 вспышка, 2.2 смерть
     an['cult_leader_finisher'] = A(2.4, {
@@ -133,8 +138,10 @@ def boss_anims():
         # 1.0–1.7 — поднимает её на +2.3 бл. (как код двигает жертву), держит до kill; раньше на 1.7–2.2 коса уходила за голову
         'right_arm': {'rotation': ch((0, Z), (0.7, [-30, 10, 60], IO), (1.0, [-86, -2.5, 1], IQ), (1.35, [-108, 4.4, -2.2], 'easeInOutQuad'),
                                      (1.7, [-117, 2, -3], 'easeInOutQuad'), (2.2, [-124, 0, -2]), (2.4, [-40, 0, 15], IO))},
-        'bipedHandRight': {'rotation': ch((0, Z), (0.7, Z), (1.0, [36, 14, -10], IQ), (1.35, [49.5, 23, -14], 'easeInOutQuad'),
-                                          (1.7, [45, 22, -11], 'easeInOutQuad'), (2.2, [48, 19.4, -7.5]), (2.4, Z, IO))},
+        # кисть на impale (21.11): ключ в осях игры (без V), подобран по метрике ударов Тироса — лезвие входит остриём вперёд, плоскость
+        # лезвия по ходу (было: плашмя, 67°, остриё назад); остриё там же, в груди жертвы; ключи подъёма повёрнуты так же
+        'bipedHandRight': {'rotation': ch((0, Z), (0.7, Z), (1.0, [8.2, 66.2, 23.9], IQ), (1.35, [5.31, 69.01, 12.91], 'easeInOutQuad'),
+                                          (1.7, [7.17, 69.5, 17.76], 'easeInOutQuad'), (2.2, [13.49, 68.91, 23.38]), (2.4, Z, IO))},
         'right_leg': {'rotation': ch((0, Z), (1.0, [20, 0, 0], IQ), (1.7, [5, 0, 0], IO), (2.4, Z, IO))},
         'left_leg': {'rotation': ch((0, Z), (1.0, [-25, 0, 0], IQ), (1.7, [-5, 0, 0], IO), (2.4, Z, IO))},
     }, [(0.7, 'pull_done'), (1.0, 'impale'), (1.7, 'flame'), (2.2, 'kill')])
@@ -143,7 +150,7 @@ def boss_anims():
     return an
 
 
-def write_anims():
+def write_anims(weapon_passes=3):
     src = M.jar_json(M.I + 'animations/casting_animations.json')
     ours = boss_anims()
     out = {'format_version': src['format_version'], 'geckolib_format_version': src['geckolib_format_version'],
@@ -162,19 +169,17 @@ def write_anims():
     # fire_boss_spawn: на 6.42 с коса возникает в руке, влетая из точки сбоку-снизу (21, −6, 0) — лезвие проходило сквозь землю;
     # влетает сбоку-сверху (10, 10, 0), время то же
     out['animations']['fire_boss_spawn']['bones']['bipedHandRight']['position']['6.4167']['vector'] = [10, 10, 0]
-    # scythe_dagger_combo_1, удар на 3.1–3.2 с: Iron's опускает руку на 9 px к полу — лезвие уходило в землю на 15 px и сквозь
-    # выставленную правую ногу; рука опускается на 3 px, кисть на время удара приподнята на 8 px (тайминг удара тот же)
-    dc = out['animations']['scythe_dagger_combo_1']['bones']
-    dc['right_arm']['position']['3.125']['vector'] = [2, -3, -7]
-    dc['bipedHandRight']['position'] = {'0.0': {'vector': [0, 0, 0]}, '3.0': {'vector': [0, 0, 0]}, '3.125': {'vector': [0, 8, 0]},
-                                        '3.2': {'vector': [0, 8, 0]}, '3.325': {'vector': [0, 0, 0]}}
-    # cross_arms (руки скрещены на груди): на 0.25–0.3 с древко задевало выставленную ногу и пол — кисть приподнята на 6 px
-    out['animations']['cross_arms']['bones'].setdefault('bipedHandRight', {})['position'] = {
-        '0.0': {'vector': [0, 0, 0]}, '0.15': {'vector': [0, 6, 0]}, '0.45': {'vector': [0, 6, 0]}, '0.6': {'vector': [0, 0, 0]}}
-    anim_cloth.hold_edges(out['animations'], plays, CARRY_ARM, CARRY_HAND)
-    for _ in range(3):
+    hold = anim_cloth.hold_additive(out['animations'], plays, CARRY_ARM, CARRY_HAND, hand_pos=CARRY_POS, no_end=('fire_boss_death',))
+    print('  поза хвата всю анимацию:', sorted(n for n, v in hold.items() if v == 'always'))
+    ag = {'cult_leader_first_flame': (0.9, 5.2)}
+    print('  коса: сдвиг вдоль древка', anim_cloth.lift('cult_leader', out['animations'], plays, allow_ground=ag))
+    for _ in range(2):
+        print('  коса: сдвиг мимо тела/земли', anim_cloth.nudge('cult_leader', out['animations'], plays, allow_ground=ag))
+    for _ in range(weapon_passes):
         # «Первое Пламя»: на plant (0.9–5.2 с) древко нарочно воткнуто в землю подтоком (лезвие вверху) — там землю не считаем
         anim_cloth.weapon('cult_leader', out['animations'], plays, edge=0, allow_ground={'cult_leader_first_flame': (0.9, 5.2)})
+    for _ in range(3):          # остаток (в т.ч. окна ударов, где поворот не трогаем) — коротким сдвигом
+        print('  коса: добор сдвигом', anim_cloth.nudge('cult_leader', out['animations'], plays, allow_ground=ag, win=0.025))
     with open(M.out('animations/entity/cult_leader.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
     return ours

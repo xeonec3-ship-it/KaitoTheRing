@@ -29,6 +29,7 @@ ROOT = os.path.join(HERE, '..')
 A = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'pohsmp_core')
 JAR = os.path.join(ROOT, 'libs', 'irons_spellbooks-1.20.1-3.16.1.jar')
 D = math.pi / 180
+HAND2 = '~hand_rot'          # в W: поворот кости bipedHandRight ещё раз (как рисует предмет GeckoLib, см. Model.item_world)
 
 # тики ударов Iron's (FireBossEntity: AttackAnimationData → AttackKeyframe), 20 тиков/с
 IRON_HITS = {
@@ -188,6 +189,7 @@ class Model:
     def world(self, anim, t, override=None):
         """{кость: мировая матрица} для анимации (None — покой) в момент t; override — {кость: [rx, ry, rz]} вместо ключей."""
         W = {}
+        HR = [np.eye(4)]
         bones = anim['bones'] if anim else {}
 
         def wm(n):
@@ -208,18 +210,43 @@ class Model:
             if override and n in override:
                 r = override[n]
             rest = b['rest']
-            m = T(b['base'][0] - p[0], b['base'][1] + p[1], b['base'][2] + p[2]) @ \
-                Rz(rest[2] + r[2] * D) @ Ry(rest[1] - r[1] * D) @ Rx(rest[0] - r[0] * D) @ S(*[max(1e-4, x) for x in s])
+            rot = Rz(rest[2] + r[2] * D) @ Ry(rest[1] - r[1] * D) @ Rx(rest[0] - r[0] * D)
+            m = T(b['base'][0] - p[0], b['base'][1] + p[1], b['base'][2] + p[2]) @ rot @ S(*[max(1e-4, x) for x in s])
+            if n == 'bipedHandRight':
+                HR[0] = rot
             par = b['parent']
             W[n] = (wm(par) if par else np.eye(4)) @ m
             return W[n]
         for n in self.bones:
             wm(n)
+        W[HAND2] = HR[0]
         return W
 
+    def with_hand(self, W, anim, t, r, dp=None):
+        """Тот же кадр W, но поворот кисти bipedHandRight = r (оси анимаций): пересчитывается только кисть (у неё нет дочерних костей)."""
+        b = self.bones['bipedHandRight']
+        bk = (anim['bones'] if anim else {}).get('bipedHandRight', {})
+        p = chan_at(bk['position'], t) if 'position' in bk else [0, 0, 0]
+        if dp is not None:
+            p = [p[0] + dp[0], p[1] + dp[1], p[2] + dp[2]]
+        s = chan_at(bk['scale'], t) if 'scale' in bk else [1, 1, 1]
+        if not isinstance(s, list):
+            s = [s] * 3
+        rest = b['rest']
+        rot = Rz(rest[2] + r[2] * D) @ Ry(rest[1] - r[1] * D) @ Rx(rest[0] - r[0] * D)
+        m = T(b['base'][0] - p[0], b['base'][1] + p[1], b['base'][2] + p[2]) @ rot @ S(*[max(1e-4, x) for x in s])
+        W2 = dict(W)
+        W2['bipedHandRight'] = W[b['parent']] @ m
+        W2[HAND2] = rot
+        return W2
+
     def item_world(self, W):
-        m = W['bipedHandRight'] @ self.item_m
-        return np.array([ap(m, p) for p in self.item_pts])
+        # GeckoLib 4.8.4 (BlockAndItemGeoLayer.renderForBone): матрица кости уже повёрнута (prepMatrixForBone), затем
+        # translateAndRotateMatrixForBone поворачивает её ВТОРОЙ раз поворотом той же кости — предмет в игре повёрнут кистью дважды
+        m = W['bipedHandRight'] @ W.get(HAND2, np.eye(4)) @ self.item_m
+        if getattr(self, '_pts_h', None) is None or len(self._pts_h) != len(self.item_pts):
+            self._pts_h = np.hstack([self.item_pts, np.ones((len(self.item_pts), 1))])
+        return (self._pts_h @ m.T)[:, :3]
 
     def inside(self, W, bone, pts, margin=0.4):
         """Какие точки внутри кубов кости (с запасом margin внутрь)."""

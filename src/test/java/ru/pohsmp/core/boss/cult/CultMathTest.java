@@ -60,4 +60,18 @@ class CultMathTest {
         assertTrue(CultMath.wallCrossed(27.8, 27.8, 28));
         assertFalse(CultMath.wallCrossed(20, 21, 28));
     }
+
+    @Test
+    void holdLikeTyros() {
+        assertArrayEquals(new float[]{-30, -30, 10}, CultMath.HOLD_ARM);       // FireBossModel: right_arm
+        assertArrayEquals(new float[]{-5, 0, -48}, CultMath.HOLD_HAND);        // FireBossModel: bipedHandRight
+        float len = (float) Math.sqrt(CultMath.HOLD_SLIDE[0] * CultMath.HOLD_SLIDE[0] + CultMath.HOLD_SLIDE[1] * CultMath.HOLD_SLIDE[1]
+                + CultMath.HOLD_SLIDE[2] * CultMath.HOLD_SLIDE[2]);
+        assertEquals(3, len, 0.01);                                            // 3 px along the shaft
+        for (float y = 0; y < 10; y += 0.37f) {                                // cancels the base arm swing exactly
+            float base = (float) Math.cos(y * 0.6662f + Math.PI) * 2f * 0.6f * 0.5f;
+            assertEquals(0, base + CultMath.holdArmWalk(0.6f, y), 1e-6);
+        }
+        assertEquals(0, CultMath.holdArmWalk(0, 1.3f), 1e-9);                 // standing: nothing
+    }
 }

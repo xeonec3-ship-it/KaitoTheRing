@@ -69,4 +69,18 @@ public final class CultMath {
     public static boolean wallCrossed(double before, double now, double r) {
         return before < r && now >= r || before >= r && now < r || Math.abs(now - r) < 0.5;
     }
+
+    // ---- scythe hold outside animations = Tyros (FireBossModel of Iron's), owner 21.11: «hold it like Tyros, everywhere».
+    // Degrees, model axes (TransformStack.pushRotation / pushPosition; the animation files have X/Y of rotations negated).
+    // GeckoLib turns the held item by the hand bone twice (BlockAndItemGeoLayer), Iron's tuned these numbers in the game with it.
+    public static final float[] HOLD_ARM = {-30, -30, 10}, HOLD_HAND = {-5, 0, -48};
+    /** The scythe slides 3 px along its shaft inside the fist (same orientation): with Tyros's numbers the blade dips 0.7 px into the
+     *  ground on the idle arm bob and 3.4 px while walking; with the slide and a still right arm it stays 0.8 px above the ground. */
+    public static final float[] HOLD_SLIDE = {-0.96f, 0.09f, 2.84f};
+
+    /** Extra X rotation (radians, model axes) of the scythe arm while walking: cancels the base swing of AbstractSpellCastingMobModel
+     *  (cos(y·0.6662 + π)·2·x·0.5) so the arm holding the scythe stays still; x, y = limb swing amount and position. */
+    public static float holdArmWalk(float x, float y) {
+        return -(float) Math.cos(y * 0.6662f + Math.PI) * 2f * x * 0.5f;
+    }
 }

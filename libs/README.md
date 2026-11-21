@@ -3,6 +3,7 @@
 - `irons_spellbooks-1.20.1-3.16.1.jar`
 - `geckolib-forge-1.20.1-4.8.4.jar`
 - `player-animation-lib-forge-1.0.2-rc1+1.20.jar` (PlayerAnimator, нужен Iron's)
+- `voicechat-forge-1.20.1-2.6.20.jar` — Simple Voice Chat API (T22, голос иллюзий), Modrinth `simple-voice-chat`
 - `epicfight-1.20.1-20.14.17.jar` — Epic Fight 20.14.17 (файл с Modrinth `epic-fight-20.14.17-mc1.20.1-forge.jar`, переименован):
   анимации и тип оружия меча-хлыста T14 (`ember/EmberEpicFight`, мягкая зависимость); с `-PdevRun` он же подключается к запуску
 - для одежды безмолвной ведьмы (скрытие в подсказках и на JourneyMap, только API, в игре не обязательны):

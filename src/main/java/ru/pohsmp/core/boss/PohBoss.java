@@ -16,6 +16,14 @@ public interface PohBoss {
         return (Mob) this;
     }
 
+    /**
+     * Whether BossCore makes the boss's vanilla boss event (the row BossBarClient draws the phase bar in). True for every boss whose
+     * base has none; false only for a base that brings its own with the entity's UUID (the Cult Leader: Iron's FireBossEntity).
+     */
+    default boolean coreBossEvent() {
+        return true;
+    }
+
     /** Before the entity is added to the world by /pohsmp boss (positioned, finalizeSpawn done): spawn data for the clients. */
     default void onBossPreSpawn() {}
 

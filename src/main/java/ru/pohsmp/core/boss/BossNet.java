@@ -42,13 +42,20 @@ public final class BossNet {
     public static final int TITLE = 4;
     /** A line over an entity: a = entity, s1 = lang key, b = ticks, c = rgb, f = height above its feet. */
     public static final int SUBTITLE = 5;
-    /** Music: a = entity, s1 = sound id (pohsmp_core:...), b = 1 on / 0 fade out. */
+    /**
+     * Music (T33, by phases): a = entity, b = MUSIC_* mode, c = loop 1..3 (or 1/0 for MUSIC_FILTER), d = fade ticks, s1 = the base sound
+     * id (pohsmp_core:music.<id>: the old one-sound stub; its parts are <s1>_intro, <s1>_p1.._p3).
+     */
     public static final int MUSIC = 6;
     /** A PlayerAnimator animation on a player: a = entity, s1 = animation id (irons_spellbooks:...), b = 1 play / 0 stop. */
     public static final int POSE = 7;
     /** Render flags of a boss (LOOK_*): a = entity, b = flags. */
     public static final int LOOK = 8;
 
+    /** MUSIC modes. STOP: fade out in d ticks. START: the fight's music (intro → loop c), nothing if it already plays. PHASE: crossfade
+     *  in d ticks to loop c (or start loop c fading in, for a late viewer). CUT: loop c at once, the rest stops dead. FILTER: c = 1
+     *  muffled («under water»: low-pass), 0 clear. */
+    public static final int MUSIC_STOP = 0, MUSIC_START = 1, MUSIC_PHASE = 2, MUSIC_CUT = 3, MUSIC_FILTER = 4;
     public static final int BAR_VISIBLE = 1, BAR_PULSE = 2, BAR_FLASH = 4;
     /** Watchers' movement input is locked (intro, death); without it they can move and fight while the camera plays. */
     public static final int SCENE_LOCK_INPUT = 1;

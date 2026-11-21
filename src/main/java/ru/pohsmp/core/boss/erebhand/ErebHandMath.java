@@ -226,6 +226,8 @@ public final class ErebHandMath {
     public static final double SWARM_SPEED = 0.45, SWARM_HIT_R = 0.9;
     /** Mythic «Ложный рассвет» ereb_hand_false_dawn 6.0 s: kneel 10 (bar hidden, invulnerable, the false victory), rise 90, wave 100;
      * then ereb_hand_phase3 (the mask cracks). Invulnerable from kneel to rise: 4 s (ТЗ). */
+    /** T33: the music dies in 0.5 s as «Ложный рассвет» begins; phase 3's loop cuts in on DAWN_WAVE. */
+    public static final int DAWN_MUSIC_OUT = 10;
     public static final int DAWN = 120, DAWN_KNEEL = 10, DAWN_RISE = 90, DAWN_WAVE = 100, DAWN_INVULN = DAWN_RISE - DAWN_KNEEL, DAWN_SCENE = 40;
 
     /** «Пламя-подменыш»: the tick (from the release) it turns into a butterfly — half way to the target. */

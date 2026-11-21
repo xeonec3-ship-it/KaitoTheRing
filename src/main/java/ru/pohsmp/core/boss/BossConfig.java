@@ -30,6 +30,8 @@ public final class BossConfig {
     public static final ForgeConfigSpec.BooleanValue EF_STUN_IMMUNE, EF_PARRY_NO_RECOIL;
     public static final ForgeConfigSpec.DoubleValue GB_HOLD_SECONDS;
     public static final ForgeConfigSpec.IntValue GB_BLOCKS, GB_COOLDOWN, GB_WARN_TICKS, GB_STUN_TICKS;
+    // [bosses_common] T33 music by phases (BossCore.music*, BossMusicClient)
+    public static final ForgeConfigSpec.DoubleValue MUSIC_CROSSFADE, MUSIC_FADE_OUT;
     // [cult_leader] Raise Hell of Tyros's goals
     public static final ForgeConfigSpec.IntValue CL_RAISE_HELL_LEVEL, CL_RAISE_HELL_MIN, CL_RAISE_HELL_MAX;
 
@@ -156,6 +158,10 @@ public final class BossConfig {
         GB_WARN_TICKS = b.comment("The flash on the weapon + the crack this many ticks before the blow").defineInRange("guard_break_warn_ticks", 12, 0, 100);
         GB_STUN_TICKS = b.comment("A broken guard: Epic Fight stamina 0 and the target stunned this long (ticks); the blow's damage goes through in full")
                 .defineInRange("guard_break_stun_ticks", 24, 0, 200);
+        MUSIC_CROSSFADE = b.comment("Boss music: on a phase change the loop crossfades into the next phase's loop this long (seconds)")
+                .defineInRange("music_crossfade_seconds", 1.5, 0, 30);
+        MUSIC_FADE_OUT = b.comment("...and fades out this long when the fight ends (death, surrender, leave) or a player leaves it")
+                .defineInRange("music_fade_out_seconds", 2.0, 0, 30);
         b.pop();
 
         b.comment("T26 Head of the Cult of Mellisto (Tyros, First Flamebearer)").push("cult_leader");

@@ -593,7 +593,10 @@ public final class ErebHandFight {
         } else if (to == 2) {
             stopWalls(sl);
             doublesIn = ErebHandMath.DAWN + ErebHandMath.PHASE3 + 20 * 4;
-            if (!dawnDone) falseDawn(sl);   // mythic «Ложный рассвет» first, the mask cracks after it
+            if (!dawnDone) {   // mythic «Ложный рассвет» first, the mask cracks after it
+                core.musicSilence(ErebHandMath.DAWN_MUSIC_OUT);   // T33: the music dies (no crossfade into phase 3), the false victory sounds
+                falseDawn(sl);
+            }
             else phase3Crack(sl);
         }
     }
@@ -885,6 +888,7 @@ public final class ErebHandFight {
                     ButterflyDreamSpell.openDream(sl, boss, r, ErebHandConfig.i(ErebHandConfig.DREAM_MAX_MINUTES) * 20 * 60);
                     dreamOn = true;
                     dreamSlamIn = ErebHandConfig.i(ErebHandConfig.DREAM_SLAM_INTERVAL) * 20;
+                    core.musicFilter(ButterflyDreamSpell.dreamers(boss), true);   // T33: phase 3 muffled inside the dream
                     for (ServerPlayer p : ButterflyDreamSpell.dreamers(boss))
                         dreamFx.put(p.getUUID(), Fx.play(sl, Fx.fx("ereb_hand_dream_world").at(core.arena()).only(p)));
                     core.actionbar(arenaR(), ui("full_reveal"));
@@ -899,6 +903,7 @@ public final class ErebHandFight {
                 var en = it.next();
                 if (still.contains(en.getKey())) continue;
                 Fx.stop(sl, en.getValue(), "");
+                if (sl.getPlayerByUUID(en.getKey()) instanceof ServerPlayer woke) core.musicFilter(List.of(woke), false);
                 it.remove();
             }
         }
@@ -924,6 +929,7 @@ public final class ErebHandFight {
         if (!dreamOn && dreamFx.isEmpty()) return;
         dreamOn = false;
         ButterflyDreamSpell.wakeNow(boss);
+        core.musicFilterClear();
         for (int f : dreamFx.values()) Fx.stop(sl, f, "");
         dreamFx.clear();
     }
@@ -1451,6 +1457,7 @@ public final class ErebHandFight {
                 .at(ErebHandMath.DAWN_RISE, () -> core.sound("ereb.appear", 3, 0.8f))
                 .at(ErebHandMath.DAWN_WAVE, () -> {
                     core.sound("ereb_hand.dawn_wave", 4, 1);
+                    core.musicCut(3);   // T33: phase 3's loop hits with the wave, no fade
                     double near = ErebHandConfig.d(ErebHandConfig.DAWN_NEAR_RADIUS);
                     for (ServerPlayer p : fighters()) {
                         double share = ErebHandMath.dawnShare(p.distanceTo(boss), near, ErebHandConfig.d(ErebHandConfig.DAWN_NEAR_SHARE),

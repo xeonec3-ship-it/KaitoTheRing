@@ -116,6 +116,8 @@ def slice_grid(im, cols, n, cw, ch):
 
 VIEW_M = dict(yaw=55, pitch=10, dist=2.5)
 VIEW_R = dict(yaw=55, pitch=10, dist=2.5, follow=1)
+VID_M = dict(yaw=55, pitch=10, dist=3.6)            # видео: ячейка портретная — камера дальше, фигура целиком
+VID_R = dict(yaw=55, pitch=10, dist=3.6, follow=1)
 
 
 # ---------------------------------------------------------------- кадр-лист пилота
@@ -220,11 +222,11 @@ def video(jars, three):
         for i in range(n):
             t = i / FPS
             loop = name == 'martin_idle'
-            frames_m_old.append(dict(model='martin_old', anim=name, t=(t % Lo) if loop else min(t, Lo), **VIEW_M))
-            frames_m_new.append(dict(model='martin', anim=name, t=(t % Ln) if loop else min(t, Ln), **VIEW_M))
+            frames_m_old.append(dict(model='martin_old', anim=name, t=(t % Lo) if loop else min(t, Lo), **VID_M))
+            frames_m_new.append(dict(model='martin', anim=name, t=(t % Ln) if loop else min(t, Ln), **VID_M))
             if ref:
                 tr = (t % Lr) / K if loop else min(t, Lr) / K
-                frames_r.append(dict(ref=ref, t=tr, blade=1.0 if 'spear' in ref else 1.4, **VIEW_R))
+                frames_r.append(dict(ref=ref, t=tr, blade=1.0 if 'spear' in ref else 1.4, **VID_R))
             else:
                 frames_r.append(None)
     cols, rows = 8, 4
@@ -279,6 +281,7 @@ def video(jars, three):
     ff.wait()
     os.makedirs(os.path.dirname(out), exist_ok=True)
     shutil.move(tmp, out)
+    os.chmod(out, 0o644)
     print('wrote', out, i, 'frames')
 
 

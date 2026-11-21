@@ -2,6 +2,7 @@ package ru.pohsmp.core.boss;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -57,6 +58,9 @@ public final class BossCore {
     private int lockTicks;
     private boolean lockInvulnerable, aiOff;
     private boolean barVisible, pulse, musicOn;
+    /** T33: the loop the music is on (1..3), and «held» = a boss silenced it for a moment (no auto crossfade, no late-viewer resume). */
+    private int musicLoop = 1;
+    private boolean musicHeld;
     private int look;
     /** Damage dealt to the boss by each player: (game time, amount), the last top_damage_window_seconds kept. */
     private final Map<UUID, Deque<double[]>> damageBy = new HashMap<>();
@@ -225,7 +229,9 @@ public final class BossCore {
                 int from = phase;
                 phase = p;
                 syncBar(true);
-                boss.onBossPhase(from, p);
+                musicLoop = BossMusicMath.loopOfPhase(p);
+                boss.onBossPhase(from, p);   // may hold the music (musicSilence) or cut into it (musicCut) itself
+                if (musicOn && !musicHeld) musicSend(null, BossNet.MUSIC_PHASE, musicLoop, BossMusicMath.ticks(BossConfig.get(BossConfig.MUSIC_CROSSFADE)));
             }
             if (BossConfig.get(BossConfig.SPECIALS))
                 for (BossDef.Special s : def.specials)
@@ -374,9 +380,48 @@ public final class BossCore {
         BossNet.tracking(mob, barMsg(flash));
     }
 
+    /**
+     * The fight music (T33): on = the intro, then the loop of the current phase (a second «on» while it plays does nothing); off = it
+     * fades out in [bosses_common] music_fade_out_seconds (death, surrender, leave all come here through endBar). Phase changes
+     * crossfade by themselves (tick).
+     */
     public void music(boolean on) {
         musicOn = on;
-        if (def.music != null) BossNet.tracking(mob, new BossNet.Msg(BossNet.MUSIC).ints(mob.getId(), on ? 1 : 0, 0, 0).str(PohCore.MODID + ":" + def.music, ""));
+        musicHeld = false;
+        if (on) musicSend(null, BossNet.MUSIC_START, musicLoop, 0);
+        else musicSend(null, BossNet.MUSIC_STOP, 0, BossMusicMath.ticks(BossConfig.get(BossConfig.MUSIC_FADE_OUT)));
+    }
+
+    /** The music goes quiet in `ticks` but the fight goes on («Ложный рассвет»): no crossfade, no resume, until musicCut / music(true). */
+    public void musicSilence(int ticks) {
+        if (!musicOn) return;
+        musicHeld = true;
+        musicSend(null, BossNet.MUSIC_STOP, 0, ticks);
+    }
+
+    /** The loop `loop` at once, no crossfade (the wave of «Ложный рассвет»). */
+    public void musicCut(int loop) {
+        musicOn = true;
+        musicHeld = false;
+        musicLoop = Math.max(1, Math.min(BossMusicMath.LOOPS, loop));
+        musicSend(null, BossNet.MUSIC_CUT, musicLoop, 0);
+    }
+
+    /** The music muffled («under water», low-pass) for these players (inside «Полное Раскрытие») or clear again (they woke). */
+    public void musicFilter(Collection<ServerPlayer> who, boolean on) {
+        for (ServerPlayer p : who) musicSend(p, BossNet.MUSIC_FILTER, on ? 1 : 0, 0);
+    }
+
+    /** Everyone watching hears it clear again (the dream broke). */
+    public void musicFilterClear() {
+        musicSend(null, BossNet.MUSIC_FILTER, 0, 0);
+    }
+
+    private void musicSend(ServerPlayer to, int mode, int loop, int ticks) {
+        if (def.music == null) return;
+        BossNet.Msg m = new BossNet.Msg(BossNet.MUSIC).ints(mob.getId(), mode, loop, ticks).str(PohCore.MODID + ":" + def.music, "");
+        if (to != null) BossNet.to(to, m);
+        else BossNet.tracking(mob, m);
     }
 
     public void setLook(int flags) {
@@ -396,7 +441,8 @@ public final class BossCore {
     public void onSeen(ServerPlayer p) {
         if (mob.level().isClientSide) return;
         BossNet.to(p, barMsg(false));
-        if (musicOn && def.music != null) BossNet.to(p, new BossNet.Msg(BossNet.MUSIC).ints(mob.getId(), 1, 0, 0).str(PohCore.MODID + ":" + def.music, ""));
+        if (musicOn && !musicHeld)   // a late viewer: the current loop from its start, fading in (no intro)
+            musicSend(p, BossNet.MUSIC_PHASE, musicLoop, BossMusicMath.ticks(BossConfig.get(BossConfig.MUSIC_CROSSFADE)));
         if (look != 0) BossNet.to(p, new BossNet.Msg(BossNet.LOOK).ints(mob.getId(), look, 0, 0));
     }
 
@@ -405,7 +451,7 @@ public final class BossCore {
         BossNet.Msg m = new BossNet.Msg(BossNet.BAR_STOP);
         m.u = mob.getUUID();
         BossNet.to(p, m);
-        BossNet.to(p, new BossNet.Msg(BossNet.MUSIC).ints(mob.getId(), 0, 0, 0).str(PohCore.MODID + ":" + def.music, ""));
+        musicSend(p, BossNet.MUSIC_STOP, 0, BossMusicMath.ticks(BossConfig.get(BossConfig.MUSIC_FADE_OUT)));
     }
 
     // ---------------------------------------------------------------- people
@@ -617,5 +663,6 @@ public final class BossCore {
         started = true;   // saved mid-intro: the scripts are gone, the fight just goes on
         barVisible = true;
         musicOn = true;
+        musicLoop = BossMusicMath.loopOfPhase(phase);
     }
 }

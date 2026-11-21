@@ -31,6 +31,8 @@ public final class BossClient {
         MinecraftForge.EVENT_BUS.register(BossBarClient.class);
         MinecraftForge.EVENT_BUS.register(BossCam.class);
         MinecraftForge.EVENT_BUS.register(BossHudClient.class);
+        MinecraftForge.EVENT_BUS.register(BossMusicClient.class);   // T33: fades / crossfades by the client tick
+        BossMusicClient.quietMissingParts();
         modBus.addListener(BossPoseClient::setup);
         modBus.addListener(BossClient::renderers);
         modBus.addListener(BossClient::setup);

@@ -344,9 +344,26 @@ class Solver:
             e = flip(ap(M.chain(pose, hb), (0, 0, 0))) - hand
             return float(e @ e) + w_reg * float(np.sum((v - x0) ** 2)) + 2e-4 * v[1] ** 2
         v, err = descend(f, x0, 20.0 if bn not in self.prev else 5.0, iters=300)
+        ex = math.sqrt(max(0.0, err))
+        if ex > 1.0:                                   # тёплый старт застрял (рука — одна кость: локальные минимумы) — несколько стартов
+            sh = flip(ap(M.chain(pose, bn), (0, 0, 0)))
+            Lh = np.linalg.norm(flip(ap(M.chain({}, hb), (0, 0, 0))) - flip(ap(M.chain({}, bn), (0, 0, 0))))
+            reach = sh + nrm(np.asarray(hand) - sh) * Lh          # ближайшая достижимая точка
+            for s0 in ([-90, 0, 0], [-45, 0, 20], [-140, 0, 0], [-20, 0, 10], [-90, 30, 60], [-90, -30, -40], [x0[0], x0[1], 0.0]):
+                def g(q):
+                    pose[bn] = {'rotation': [q[0], q[1], q[2]]}
+                    e = flip(ap(M.chain(pose, hb), (0, 0, 0))) - reach
+                    return float(e @ e) + 2e-4 * q[1] ** 2 + 1e-4 * q[2] ** 2
+                q, eq = descend(g, s0, 20.0, iters=300)
+                pose[bn] = {'rotation': list(q)}
+                e2 = float(np.sum((flip(ap(M.chain(pose, hb), (0, 0, 0))) - np.asarray(hand)) ** 2))
+                if e2 + 1e-3 < err:
+                    v, err = q, e2
+            ex = math.sqrt(max(0.0, err))
         pose[bn] = {'rotation': [float(x) for x in v]}
         self.prev[bn] = v
-        return math.sqrt(max(0.0, err))
+        self.err = max(getattr(self, 'err', 0.0), ex)
+        return ex
 
     def wrist(self, pose, d, up=None, base=(0, 0, 0), far=None, w_up=0.3):
         """bipedHandRight: ось предмета (base → far, оси кисти) по направлению d (R-мир), ребро/плоскость по up."""

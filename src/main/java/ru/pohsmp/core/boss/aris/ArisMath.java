@@ -21,8 +21,8 @@ public final class ArisMath {
     /** Animation names (animation.aris.<name>) and their lengths in ticks. */
     public static final String[] ANIMS = {"", "slam", "swing", "cast", "forge", "last_blow", "phase2", "phase3", "spawn", "surrender",
             "billet", "chains", "quench", "bellows", "replica_break", "finisher", "guard_break"};
-    /** guard_break 28: TEMP_GUARD_BREAK (the stand-in length until the visuals' letter; BossGuardBreak.Timing.TEMP). */
-    public static final int[] ANIM_TICKS = {0, 44, 42, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40, 48, 28};
+    /** guard_break 36: T32 visuals (docs/inbox/2026-11-21_mgr_guard_break_visuals.md): warn tick 2, hit tick 14, length 36. */
+    public static final int[] ANIM_TICKS = {0, 44, 42, 32, 80, 100, 40, 60, 180, 100, 28, 32, 36, 30, 40, 48, 36};
 
     public static int anim(String name) {
         for (int i = 1; i < ANIMS.length; i++) if (ANIMS[i].equals(name)) return i;

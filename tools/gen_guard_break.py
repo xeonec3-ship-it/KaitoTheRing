@@ -72,7 +72,7 @@ def fx(boss):
     n = len(pts)
     for i, p in enumerate(pts):                         # вспышка ведёт оружие: каждые 2 тика, всё ярче к удару
         k = i / max(1, n - 1)
-        el.append({'type': 'flash', 'delay': T0 + 2 * i, 'at': off(p, scale), 'duration': 4 if i < n - 1 else 3,
+        el.append({'type': 'flash', 'delay': T0 + 2 * i, 'at': off(p, scale), 'duration': 2,
                    'size': round(0.35 + 0.55 * k, 2), 'rays': 4 if k < 0.5 else 6, 'color': col, 'brightness': round(0.8 + 0.6 * k, 2),
                    'comment': 'вспышка на оружии/руке, тик %d' % (2 * i)})
     el.append({'type': 'flash', 'delay': T0, 'at': off(pts[0], scale), 'duration': 6, 'size': 0.9, 'anamorphic': 1.6, 'rays': 6,

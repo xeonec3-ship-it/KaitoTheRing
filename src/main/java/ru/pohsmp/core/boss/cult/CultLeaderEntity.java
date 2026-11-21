@@ -110,6 +110,12 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
 
     // ---------------------------------------------------------------- framework glue
 
+    /** The bar row: Iron's FireBossEntity already has a boss event with this entity's UUID (BossBarClient draws over it). */
+    @Override
+    public boolean coreBossEvent() {
+        return false;
+    }
+
     @Override
     public void startSeenByPlayer(ServerPlayer p) {
         super.startSeenByPlayer(p);

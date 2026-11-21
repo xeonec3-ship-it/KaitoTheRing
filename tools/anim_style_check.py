@@ -446,7 +446,11 @@ class GeoRig:
         return sig, float(an['animation_length'])
 
     def events(self, name):
-        return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
+        k = self.key(name)
+        tl = self.an[k].get('timeline')
+        if not tl and k in self.AK.IRON_HITS:                 # удары FireBoss (Iron's): тики урона из FireBossEntity, без timeline
+            return {i / 20.0: 'hit' for i in self.AK.IRON_HITS[k]}
+        return {float(k_): v for k_, v in (tl or {}).items()}
 
 
 # ================================================================== наши: Эреб, Длань Лжи (T31; тело Эреба + призрачная рука; FK — tools/ereb_hand_fk.py)
@@ -588,6 +592,10 @@ def ereb_rig(path=None):
     return GeoRig(path, 'ereb', 'ereb_')
 
 
+def cult_rig(path=None):
+    return GeoRig(path, 'cult_leader', 'cult_leader_', leg=14.0)       # нога Главы — 14 ед. (как у Тироса)
+
+
 BOSSES = {
     'martin': dict(rig=MartinRig, scale=MARTIN_SCALE, code_move=MARTIN_CODE_MOVE, idle=['martin_idle'],
                    attacks={k: v for k, v in MARTIN_ATTACKS.items()}),
@@ -595,6 +603,12 @@ BOSSES = {
                  attacks={'swing': ('hit', 'heavy', 'hammer'), 'slam': ('impact', 'heavy', 'hammer')}),
     # посох Ирины — древко почти в её рост, крюк на конце: эталон — тяжёлое древковое (heavy), не лёгкий меч;
     # рост ×14/12 (нога 14 ед. = 0.875 бл.)
+    # T26 Глава Культа: удары косой FireBoss (Iron's, тики урона — anim_check.IRON_HITS; меряется первый удар комбо) + наши
+    'cult_leader': dict(rig=cult_rig, scale=14.0 / 12.0, code_move={}, idle=[],
+                        attacks={**{n: ('hit', 'heavy', 'item') for n in ('scythe_dagger_double_horizontal', 'scythe_sideslash_downslash_sideslash',
+                                                                          'scythe_jump_combo', 'scythe_downslash_sideslash', 'scythe_horizontal_slash_spin',
+                                                                          'scythe_dagger_combo_1', 'scythe_backpedal')},
+                                 'ash_slash': ('slash', 'heavy', 'item')}),
     'ereb': dict(rig=ereb_rig, scale=1.0, code_move={}, idle=['idle'],
                  attacks={'lunge': ('hit', 'thrust', 'item'), 'flurry': ('hit', 'thrust', 'item')}),        # рапира: уколы
     'ereb_hand': dict(rig=ErebHandRig, scale=1.0, code_move={}, idle=['idle'],

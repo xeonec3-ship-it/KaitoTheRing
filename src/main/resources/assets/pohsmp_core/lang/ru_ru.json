@@ -901,6 +901,7 @@
   "ui.pohsmp_core.boss.unknown": "Босс %s ещё не сделан (или неизвестен)",
   "ui.pohsmp_core.boss.spawned": "Вызван босс: %s",
   "message.pohsmp_core.no_inscribe": "Эта магия не поддаётся записи",
+  "message.pohsmp_core.cast_busy": "Заклинание ещё не завершено",
   "message.pohsmp_core.no_imbue": "Эта магия не вкладывается в предметы",
   "entity.pohsmp_core.ereb_reflection": "Эреб, Первый Предатель",
   "entity.pohsmp_core.ereb_shard": "Стеклянный осколок",

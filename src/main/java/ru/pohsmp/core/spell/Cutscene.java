@@ -70,6 +70,7 @@ public final class Cutscene {
             watchers.add(sp.getUUID());
             Net.CH.send(PacketDistributor.PLAYER.with(() -> sp), cut);
         }
+        CastLock.scene(caster, key, dur);   // owner 21.11: the caster starts no other spell while its scene plays
         return watchers;
     }
 
@@ -154,11 +155,13 @@ public final class Cutscene {
             watchers.add(sp.getUUID());
             Net.CH.send(PacketDistributor.PLAYER.with(() -> sp), cut);
         }
+        CastLock.scene(caster, key, dur);   // owner 21.11: the caster starts no other spell while its scene plays
         return watchers;
     }
 
     /** Ends the scene: the camera returns and the watchers are free. */
     public static void end(ServerLevel sl, LivingEntity caster, List<UUID> watchers, int key) {
+        CastLock.sceneEnd(caster, key);
         Net.HFx stop = new Net.HFx(Net.HFx.STOP, key, -1, -1, 0, 0, 0, 0, 0, 0);
         for (UUID u : watchers) {
             Frozen f = FROZEN.get(u);

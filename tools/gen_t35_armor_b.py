@@ -26,7 +26,7 @@ bipedLeftArm>armorLeftArm, bipedRightLeg>armorRightLeg+armorRightBoot, bipedLeft
   geo/armor/{warlord,traitor,mask_of_lies}.geo.json, textures/armor/<id>.png (+ _glowmask.png), animations/armor/<id>.animation.json
   textures/item/{warlord,traitor}_{helmet,chestplate,leggings,boots}.png, mask_of_lies.png (16×16), models/item/*.json
   lang: названия частей под вид моделей (ru_ru / en_us; подсказки бонусов — ключи программиста)
-Запуск: python3 tools/gen_t35_armor_b.py        (кадры и видео — tools/t35_armor_render.py)
+Запуск: python3 tools/gen_t35_armor_b.py        (кадры и видео — tools/t35_armor_render_b.py)
 """
 import json
 import math

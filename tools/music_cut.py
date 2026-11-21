@@ -155,6 +155,8 @@ def onset_align(feat, s, e, R=0.06):
     best = (-2.0, 0)
     for lag in range(-Rk, Rk + 1):
         o = f[ei + lag - w0:ei + lag + w1]
+        if len(o) != len(ref):          # у самого края трека
+            continue
         o = o - o.mean()
         c = float(np.dot(ref, o) / (np.linalg.norm(ref) * np.linalg.norm(o) + 1e-9))
         best = max(best, (c, lag))
@@ -352,7 +354,7 @@ def cmd_cut(a):
         fixed = pre.get(k + '_fixed')
         if fixed:
             win = (fixed[0] - 8, fixed[1] + 8)
-        lo, hi = win
+        lo, hi = max(0.0, win[0]), min(win[1], dur - 5.0)     # после конца петли нужно ещё ~4 с исходника
         sr_ = None
         if k == 'p1' and pre.get('intro_from') is not None and not fixed:
             f0 = pre['intro_from']

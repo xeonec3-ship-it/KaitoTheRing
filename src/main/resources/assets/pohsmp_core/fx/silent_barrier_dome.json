@@ -1,56 +1,48 @@
 {
- "comment": "Купол Барьера (T20): шестиугольные ячейки собираются снизу вверх, мягкая сфера-свечение, кольцо на земле, искры. Масштаб = радиус; следует за заклинателем; длительность = время купола. Сгенерировано tools/gen_silent_staff_fx.py.",
- "style": "silent",
- "duration": -1,
- "elements": [
-  {
-   "type": "mesh",
-   "model": "silent_dome",
-   "delay": 0,
-   "at": "caster",
-   "follow": true
-  },
-  {
-   "type": "wave",
-   "shape": "sphere",
-   "delay": 2,
-   "at": "caster",
-   "follow": true,
-   "radius": 1.0,
-   "rim": 0.6,
-   "speed": 0,
-   "color": "@primary",
-   "brightness": 0.35,
-   "in": {
-    "duration": 14,
-    "easing": "easeOutCubic"
-   }
-  },
-  {
-   "type": "sigil",
-   "id": "silent_impact",
-   "delay": 0,
-   "at": "caster",
-   "follow": true,
-   "sigilScale": 2.4
-  },
-  {
-   "type": "sprites",
-   "delay": 4,
-   "at": "caster+0,1,0",
-   "follow": true,
-   "texture": "@sparks",
-   "count": 600,
-   "rate": 1,
-   "spread": 1.0,
-   "speed": 0.004,
-   "gravity": -0.001,
-   "size": [
-    0.12,
-    0.03
-   ],
-   "life": 40,
-   "color": "@primary"
-  }
- ]
+  "comment": "Купол Барьера (T20): шестиугольные ячейки собираются снизу вверх, мягкая сфера-свечение, кольцо на земле, искры. Масштаб = радиус; следует за заклинателем; длительность = время купола. Сгенерировано tools/gen_silent_staff_fx.py.",
+  "style": "silent",
+  "duration": -1,
+  "elements": [
+    {
+      "type": "mesh",
+      "model": "silent_dome",
+      "delay": 0,
+      "at": "caster",
+      "follow": true
+    },
+    {
+      "type": "wave",
+      "shape": "sphere",
+      "delay": 2,
+      "at": "caster",
+      "follow": true,
+      "radius": 1.0,
+      "rim": 0.6,
+      "speed": 0,
+      "color": "@primary",
+      "brightness": 0.35,
+      "in": {
+        "duration": 14,
+        "easing": "easeOutCubic"
+      }
+    },
+    {
+      "type": "sprites",
+      "delay": 4,
+      "at": "caster+0,1,0",
+      "follow": true,
+      "texture": "@sparks",
+      "count": 600,
+      "rate": 1,
+      "spread": 1.0,
+      "speed": 0.004,
+      "gravity": -0.001,
+      "size": [
+        0.12,
+        0.03
+      ],
+      "life": 40,
+      "color": "@primary"
+    }
+  ]
 }

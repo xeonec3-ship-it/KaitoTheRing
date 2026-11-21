@@ -79,7 +79,17 @@ def run_other(boss):
         a, b, t = anim_jerk(M, an)
         lim = anim_jerk(M, iron[n])[:2] if n in iron else star
         la, lb = lim[0] * 1.1 + 30, lim[1] * 1.1 + 5
-        if any('scale' in ch for ch in an['bones'].values()):
+        # масштаб (появление/исчезновение) — da не считается; только масштаб костей, на которых висит оружие (у Длани ghost_* масштабируются
+        # почти всегда — раньше это выключало da у всех её анимаций)
+        chain, k = set(), 'bipedHandRight'
+        while k:
+            chain.add(k)
+            k = M.bones[k]['parent']
+        def varies(sc):
+            vs = [v.get('vector', v.get('post', v.get('pre'))) if isinstance(v, dict) else v for v in (sc.values() if isinstance(sc, dict) else [sc])]
+            vs = [[x] * 3 if not isinstance(x, list) else x for x in vs]
+            return any(abs(float(c) - 1.0) > 1e-3 for v in vs for c in v if not isinstance(c, str))
+        if any('scale' in ch and varies(ch['scale']) for bn, ch in an['bones'].items() if bn in chain):
             b = 0.0
         ok = a <= la and b <= lb
         bad += not ok

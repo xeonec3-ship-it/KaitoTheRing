@@ -119,7 +119,7 @@
 - позиция кости: ключи и `pushPosition` в одних осях (знак X меняет только `RenderUtils.translateMatrixToBone`).
 
 ## 4а. Сборка
-`./gradlew build --offline -q` — зелёная, тесты 175/175 (новый `CultMathTest.holdLikeTyros`).
+`./gradlew build --offline -q` — зелёная, тесты 183/183 после слияния с веткой (новый `CultMathTest.holdLikeTyros`).
 В чистом контейнере сборке не хватало `libs/voicechat-forge-1.20.1-2.6.20.jar`: добавил его в `tools/fetch_libs.py` и `libs/README.md`.
 
 ## 5. Что проверить в игре

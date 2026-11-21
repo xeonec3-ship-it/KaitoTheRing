@@ -601,13 +601,21 @@ def lerp3(a, b, k):
     return [a[i] + (b[i] - a[i]) * k for i in range(3)]
 
 
+EASES = {'io': ease_io, 'lin': lambda x: x, 'in': lambda x: x * x * (1.6 - 0.6 * x), 'out': lambda x: 1 - (1 - x) ** 3,
+         'back': lambda x: 1 + 2.4 * (x - 1) ** 3 + 1.4 * (x - 1) ** 2}
+
+
 def keys_track(t, keys):
-    """keys: [(t, value_list)], плавная интерполяция (smoothstep) между ключами."""
+    """keys: [(t, value_list[, кривая])], между ключами — smoothstep или кривая отрезка (кривая — у ключа, к которому идёт отрезок;
+    по эталону Epic Fight, 21.11: удар — 'in'/'lin' без остановки на ключах, замах и остановка — 'out', перехлёст — 'back')."""
     if t <= keys[0][0]:
         return list(keys[0][1])
-    for (t0, v0), (t1, v1) in zip(keys, keys[1:]):
+    for k0, k1 in zip(keys, keys[1:]):
+        (t0, v0), (t1, v1) = k0[:2], k1[:2]
         if t <= t1:
-            return lerp3(v0, v1, ease_io((t - t0) / (t1 - t0))) if len(v0) == 3 else v0
+            e = EASES[k1[2] if len(k1) > 2 else 'io']
+            x = max(0.0, min(1.0, (t - t0) / (t1 - t0)))
+            return lerp3(v0, v1, e(x)) if len(v0) == 3 else v0
     return list(keys[-1][1])
 
 
@@ -663,19 +671,40 @@ def idle_pose(t, per=4.0):
             'right_leg': {'rot': [0, 0, 0]}, 'left_leg': {'rot': [0, 0, 0]}}
 
 
+# стойка по эталону Epic Fight (21.11): тело вправо 26° (вполоборота), голова на цель, левая нога впереди, правая сзади (носок наружу)
+STANCE_I = {'body': {'pos': [0, 0, 0], 'rot': [2, 26, 0]}, 'torso': {'rot': [0, 0, 0]}, 'head': {'rot': [HEAD0[0], -22, HEAD0[2]]},
+            'hat': {'rot': [0, 0, 0]}, 'right_arm': {'rot': list(R_HOLD)}, 'left_arm': {'rot': list(L_IDLE)},
+            'right_leg': {'rot': [8, -14, 0]}, 'left_leg': {'rot': [-8, -20, 0]}}
+
+
+def stance_pose(t, per=2.8):
+    br = math.sin(t * TAU / per)
+    sw = math.sin(t * TAU / per + 1.1)
+    p = {b: {c: list(v) for c, v in ch.items()} for b, ch in STANCE_I.items()}
+    p['body']['pos'] = [0.15 * sw, br * 0.12, 0]
+    p['body']['rot'][1] += 1.2 * sw
+    p['torso']['rot'][0] += br * 0.6
+    p['head']['rot'][0] += br * 0.8
+    p['head']['rot'][1] += 3 * math.sin(t * TAU / per + 2.0)
+    p['right_arm']['rot'][0] += br * 1.0
+    p['left_arm']['rot'][0] -= br * 1.5
+    p['left_arm']['rot'][2] -= br * 1.5
+    return p
+
+
 def keyed(t, keys, base=None):
     """Анимация ключевыми позами: keys = [(t, {кость: {'rot'|'pos': [x, y, z]}})], между ключами — smoothstep (без рывков и без
     переходов через ±180°). Кость, которой нет в ключе, берётся из позы покоя IDLE0 (все кости тела всегда с ключами)."""
     full = []
-    for tk, p in keys:
+    for tk, p, *e in keys:
         q = {b: {c: list(v) for c, v in ch.items()} for b, ch in (base or IDLE0).items()}
         for b, ch in p.items():
             q.setdefault(b, {}).update({c: list(v) for c, v in ch.items()})
-        full.append((tk, q))
+        full.append((tk, q, e[0] if e else 'io'))
     out = {}
     for b in full[0][1]:
         for c in full[0][1][b]:
-            tr = [(tk, q[b][c]) for tk, q in full]
+            tr = [(tk, q[b][c], e) for tk, q, e in full]
             out.setdefault(b, {})[c] = keys_track(t, tr)
     return out
 
@@ -755,7 +784,9 @@ def anims():
         return a
 
     # ---------------- контроллер «тело» (body/torso/head/hat/руки/ноги); у каждой анимации ключи на ВСЕХ костях тела
-    mk('irina_idle', 4.0, lambda t: idle_pose(t), loop=True)
+    # ---- стойка и удары посохом — по эталону Epic Fight (21.11; docs/specs/anim_style_epicfight.md): вполоборота (тело вправо 26°,
+    # голова на цель), левая нога впереди; дыхание 2.8 с, грудь ≈0.02 L. Удары начинаются и кончаются в этой стойке.
+    mk('irina_idle', 2.8, lambda t: stance_pose(t), loop=True)
 
     def walk(t):
         ph = t / 1.2 * TAU
@@ -786,23 +817,48 @@ def anims():
     mk('irina_cast_long_end', 0.5, cast_long_end, dt=0.025)
 
     def staff_attack(t):
-        # удар крюком сверху: замах — рука справа на уровне плеча, посох стоит вертикально, крюк высоко справа от шляпы
-        # (поворот тела вправо, отклон назад) → удар вниз-вперёд по дуге справа, крюк перед ней на уровне груди цели (0.55),
-        # шаг вперёд правой; возврат в хват
-        wind = P(body=[0, 20, 0], body_pos=[0, 0, 0.6], torso=[-8, 6, 0], head=[-8, -14, 0], right_arm=[-100, 45, 0],
-                 left_arm=[-34, 0, -24], right_leg=[4, 0, 0], left_leg=[-4, 0, 0])
-        hit = P(body=[0, -14, 0], body_pos=[0, -0.6, -1.4], torso=[16, -4, 0], head=[4, 10, 0], right_arm=[-22, 0, 8],
-                left_arm=[-14, 0, -22], right_leg=[-10, 0, 0], left_leg=[12, 0, 0])
-        return keyed(t, [(0, {}), (0.36, wind), (0.42, wind), (0.58, hit), (0.75, hit), (1.2, {})])
-    mk('irina_staff_attack', 1.2, staff_attack, dt=0.025, events={0.55: 'hit'})
+        # удар крюком сверху (эталон Epic Fight, 21.11; тик hit прежний — 0.55): замах 0–0.30 (тело вправо 52°, отклон назад, вес на
+        # правую ногу, посох над правым плечом, крюк за шляпой), взвод до 0.42 (левая нога отрывается), удар 0.42–0.58 без остановки
+        # на ключах (левая нога шагает вперёд, таз вперёд и вниз, тело доворачивается влево, крюк — по дуге сверху вперёд-вниз),
+        # перехлёст до 0.66, держит до 1.0, отшаг и стойка к 1.8.
+        wind = P(body=[-4, 44, 0], body_pos=[0, 0, 0.8], torso=[-8, 8, 0], head=[-8, -8, 0], right_arm=[-88, 30, 74],
+                 left_arm=[-40, 0, -30], right_leg=[10, -30, 0], left_leg=[-4, -30, 0])
+        load = P(body=[-5, 50, 0], body_pos=[0, 0, 1.0], torso=[-9, 9, 0], head=[-8, -8, 0], right_arm=[-92, 32, 78],
+                 left_arm=[-42, 0, -32], right_leg=[10, -32, 0], left_leg=[-12, -32, 0])
+        mid = P(body=[6, 22, 0], body_pos=[0, -0.3, -1.2], torso=[4, 2, 0], head=[0, -14, 0], right_arm=[-92, 24, 34],
+                left_arm=[-30, 0, -28], right_leg=[10, -14, 0], left_leg=[-14, -14, 0])
+        hit = P(body=[16, -12, 0], body_pos=[0, -0.8, -3.6], torso=[14, -6, 0], head=[6, 12, 0], right_arm=[-40, 0, 8],
+                left_arm=[-20, 0, -28], right_leg=[14, 10, 0], left_leg=[-16, 10, 0])
+        fol = P(body=[20, -26, 0], body_pos=[0, -0.9, -4.2], torso=[18, -8, 0], head=[8, 22, 0], right_arm=[-12, -8, 6],
+                left_arm=[-16, 0, -30], right_leg=[14, 18, 0], left_leg=[-16, 18, 0])
+        hold = P(body=[17, -20, 0], body_pos=[0, -0.8, -4.0], torso=[15, -6, 0], head=[6, 18, 0], right_arm=[-20, -6, 6],
+                 left_arm=[-18, 0, -28], right_leg=[14, 14, 0], left_leg=[-16, 14, 0])
+        back = P(body=[6, 12, 0], body_pos=[0, -0.2, -1.6], torso=[4, 0, 0], head=[0, -10, 0], right_arm=[-40, 0, 10],
+                 right_leg=[10, -6, 0], left_leg=[-10, -6, 0])
+        side = P(body=[0, 30, 0], body_pos=[0, 0, 0.4], torso=[-4, 4, 0], head=[-4, -20, 0], right_arm=[-60, 20, 62], left_arm=[-38, 0, -28])
+        return keyed(t, [(0, {}), (0.14, side, 'io'), (0.30, wind, 'out'), (0.42, load, 'lin'), (0.49, mid, 'in'), (0.56, hit, 'lin'), (0.66, fol, 'out'),
+                         (0.78, hold, 'back'), (0.86, hold), (1.2, back), (1.8, {})], base=STANCE_I)
+    mk('irina_staff_attack', 1.8, staff_attack, dt=0.0125, events={0.55: 'hit'})
 
     def staff_sweep(t):
-        # горизонтальный взмах: замах вправо (тело повёрнуто вправо, посох в сторону), крюк проходит перед ней справа налево (0.46)
-        wind = P(body=[0, 46, 0], head=[0, -30, 0], right_arm=[-26, 0, 52], left_arm=[-30, 0, -30], torso=[0, 4, 0])
-        mid = P(body=[0, 0, 0], body_pos=[0, -0.4, -0.6], head=[2, 0, 0], right_arm=[-30, 0, 24], left_arm=[-24, 0, -34], torso=[6, 0, 0])
-        follow = P(body=[0, -40, 0], body_pos=[0, -0.4, -0.6], head=[0, 30, 0], right_arm=[-28, 0, 8], left_arm=[-20, 0, -40], torso=[6, -6, 0])
-        return keyed(t, [(0, {}), (0.3, wind), (0.46, mid), (0.62, follow), (0.72, follow), (1.0, {})])
-    mk('irina_staff_sweep', 1.0, staff_sweep, dt=0.025, events={0.46: 'hit'})
+        # горизонтальный взмах (эталон Epic Fight, 21.11; hit 0.46): замах вправо (тело 70°, посох в сторону и назад, вес на правую),
+        # взвод, взмах справа налево без остановки (левая нога шагает, таз вперёд), перехлёст до тела −80°, отшаг и стойка к 1.6.
+        wind = P(body=[0, 70, 0], body_pos=[0, 0, 0.6], head=[0, -46, 0], right_arm=[-36, 0, 88], left_arm=[-30, 0, -34], torso=[0, 6, 0],
+                 right_leg=[8, -44, 0], left_leg=[-4, -44, 0])
+        load = P(body=[0, 76, 0], body_pos=[0, 0, 0.8], head=[0, -48, 0], right_arm=[-34, 0, 94], left_arm=[-30, 0, -34], torso=[0, 7, 0],
+                 right_leg=[8, -46, 0], left_leg=[-12, -46, 0])
+        mid = P(body=[4, 30, 0], body_pos=[0, -0.3, -1.0], head=[0, -20, 0], right_arm=[-50, 0, 50], left_arm=[-28, 0, -32], torso=[4, 2, 0],
+                right_leg=[10, -20, 0], left_leg=[-14, -20, 0])
+        hit = P(body=[8, -22, 0], body_pos=[0, -0.6, -2.8], head=[2, 12, 0], right_arm=[-60, 0, 18], left_arm=[-24, 0, -36], torso=[6, -4, 0],
+                right_leg=[12, 14, 0], left_leg=[-16, 14, 0])
+        fol = P(body=[8, -74, 0], body_pos=[0, -0.6, -3.2], head=[0, 42, 0], right_arm=[-62, 0, -30], left_arm=[-20, 0, -40], torso=[6, -8, 0],
+                right_leg=[12, 40, 0], left_leg=[-16, 40, 0])
+        over = P(body=[7, -84, 0], body_pos=[0, -0.6, -3.3], head=[0, 46, 0], right_arm=[-60, 0, -36], left_arm=[-20, 0, -40],
+                 torso=[6, -9, 0], right_leg=[12, 44, 0], left_leg=[-16, 44, 0])
+        back = P(body=[2, 0, 0], body_pos=[0, -0.2, -1.2], head=[0, 0, 0], right_arm=[-46, 0, 14], right_leg=[8, 0, 0], left_leg=[-10, 0, 0])
+        return keyed(t, [(0, {}), (0.26, wind, 'out'), (0.36, load, 'lin'), (0.42, mid, 'in'), (0.47, hit, 'lin'), (0.54, fol, 'out'),
+                         (0.66, over, 'back'), (0.9, over), (1.15, back), (1.6, {})], base=STANCE_I)
+    mk('irina_staff_sweep', 1.6, staff_sweep, dt=0.0125, events={0.46: 'hit'})
 
     def mark(t):
         # «Предмет ревности»: склоняет голову набок и указывает левой рукой на цель перед собой

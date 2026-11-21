@@ -48,11 +48,35 @@ def aris_render(cells, size, old):
     return im
 
 
+# ---------------------------------------------------------------- Ирина (T27): превью tools/irina_preview.template.html (ткань — irina_cloth_idle)
+def irina_render(cells, size, old):
+    import irina_render as IR
+    d = IR.data()
+    d['anims'].update({'old.' + k: v for k, v in old.items()})
+    html = open(os.path.join(HERE, 'irina_preview.template.html'), encoding='utf-8').read()
+    html = html.replace('/*DATA*/null', json.dumps(d, ensure_ascii=False, separators=(',', ':')))
+    html = html.replace('/*CELLS*/null', json.dumps(cells, ensure_ascii=False))
+    three = os.environ.get('THREE_JS')
+    if three:
+        html = html.replace(IR.CDN, 'file://' + os.path.abspath(three))
+    fd, out = tempfile.mkstemp(suffix='.png')
+    os.close(fd)
+    IR.shoot(html, out, size)
+    im = Image.open(out).convert('RGB')
+    os.remove(out)
+    return im
+
+
 BOSSES = {
     'aris': dict(tag='t28', title='T28 Арис', old_rev='82eaf87', path='animations/entity/aris.animation.json', prefix='animation.aris.',
                  render=aris_render, model='aris',
                  pairs=[('swing', 'EF greatsword_auto1', 'Размах молотом справа налево'), ('slam', 'NF ng_great_auto2', 'Удар молотом в землю'),
                         ('idle', 'EF hold_greatsword', 'Стойка / дыхание')]),
+    'irina': dict(tag='t27', title='T27 Ирина', old_rev='dab42e3', path='animations/entity/irina.animation.json', prefix='irina_',
+                  render=irina_render, model='irina',
+                  pairs=[('staff_attack', 'NF ng_great_auto2', 'Удар крюком посоха сверху'),
+                         ('staff_sweep', 'EF greatsword_auto1', 'Взмах посохом справа налево'),
+                         ('idle', 'NF ng_great_idle', 'Стойка / дыхание')]),
 }
 VIEW = dict(yaw=55, pitch=10, dist=2.5)
 VIEW_R = dict(yaw=55, pitch=10, dist=2.5, follow=1)

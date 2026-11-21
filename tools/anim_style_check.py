@@ -409,6 +409,49 @@ class IrinaRig:
         return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
 
 
+# ================================================================== наши: Эреб (T30; маг Iron's, рапира — предмет в правой руке; FK — tools/anim_check.py)
+class GeoRig:
+    """Боссы, которых проверяет tools/anim_check.py (cult_leader, ereb): FK по geo.json + предмет в правой руке как у Iron's."""
+
+    def __init__(self, path=None, name='ereb', prefix='ereb_', leg=12.0):
+        import anim_check as AK
+        self.AK, self.prefix = AK, prefix
+        self.m = AK.Model(name)
+        self.an = json.load(open(path or os.path.join(A, AK.CFG[name]['anim']), encoding='utf-8'))['animations']
+        self.L = leg
+
+    def key(self, name):
+        return name if name in self.an else self.prefix + name
+
+    def signals(self, name, weapon='item'):
+        m, AK, L = self.m, self.AK, self.L
+        an = self.an[self.key(name)]
+        piv = lambda b: m.bones[b]['piv']
+
+        def sig(t):
+            W = m.world(an, t)
+            P = lambda b, pt: AK.ap(W[b], np.asarray(pt, float) - piv(b)) / L
+            fw = lambda b: W[b][:3, :3] @ np.array([0.0, 0.0, -1.0])
+            hy = [yaw_of(fw(b)) for b in ('right_leg', 'left_leg')]
+            it = m.item_world(W)
+            return {
+                'pelvis': P('body', piv('body')), 'chest': P('torso', piv('torso') - [0, 4, 0]), 'head': P('head', piv('head')),
+                'sh_r': P('right_arm', piv('right_arm')), 'sh_l': P('left_arm', piv('left_arm')),
+                'hip_yaw': math.degrees(math.atan2(sum(math.sin(math.radians(x)) for x in hy), sum(math.cos(math.radians(x)) for x in hy))),
+                'foot_r': P('right_leg', piv('right_leg') - [0, L, 0]), 'foot_l': P('left_leg', piv('left_leg') - [0, L, 0]),
+                'tool': it[m.grip_i] / L, 'tip': it[m.tip_i] / L,
+                'head_fwd': fw('head'), 'chest_fwd': fw('torso'),
+            }
+        return sig, float(an['animation_length'])
+
+    def events(self, name):
+        return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
+
+
+def ereb_rig(path=None):
+    return GeoRig(path, 'ereb', 'ereb_')
+
+
 BOSSES = {
     'martin': dict(rig=MartinRig, scale=MARTIN_SCALE, code_move=MARTIN_CODE_MOVE, idle=['martin_idle'],
                    attacks={k: v for k, v in MARTIN_ATTACKS.items()}),
@@ -416,6 +459,8 @@ BOSSES = {
                  attacks={'swing': ('hit', 'heavy', 'hammer'), 'slam': ('impact', 'heavy', 'hammer')}),
     # посох Ирины — древко почти в её рост, крюк на конце: эталон — тяжёлое древковое (heavy), не лёгкий меч;
     # рост ×14/12 (нога 14 ед. = 0.875 бл.)
+    'ereb': dict(rig=ereb_rig, scale=1.0, code_move={}, idle=['idle'],
+                 attacks={'lunge': ('hit', 'thrust', 'item'), 'flurry': ('hit', 'thrust', 'item')}),        # рапира: уколы
     'irina': dict(rig=IrinaRig, scale=14.0 / 12.0, code_move={}, idle=['idle'],
                   attacks={'staff_attack': ('hit', 'heavy', 'staff'), 'staff_sweep': ('hit', 'heavy', 'staff')}),
 }

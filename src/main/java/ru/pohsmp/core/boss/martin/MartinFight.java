@@ -101,7 +101,7 @@ public final class MartinFight {
     }
 
     private void hit(LivingEntity e, double dmg) {
-        e.hurt(core.attackDamage(), (float) (dmg * mult()));
+        if (e.hurt(core.attackDamage(), (float) (dmg * mult()))) core.sound(e.position(), "martin.hit", 1.5f, 1);
     }
 
     /** T32 «Сломать блок»: his strongest melee hit now — swing, overhead, thrust (phase 3: the shield dash too), ×phase 3, enrage. */
@@ -195,7 +195,7 @@ public final class MartinFight {
             Vec3 dir = from.subtract(boss.position()).multiply(1, 0, 1);
             Vec3 at = boss.position().add(dir.lengthSqr() > 1e-4 ? dir.normalize().scale(3.2) : Vec3.ZERO).add(0, 1.6, 0);
             Fx.play(sl, Fx.fx("martin_hold_deflect").at(at).yaw(boss.getYRot()));
-            boss.vanilla(SoundEvents.SHIELD_BLOCK, 0.8f);
+            core.sound(at, "martin.shield_hit", 2, 1);
             if (by != null) tell(by, ui("hold_blocked"));
             return 0;
         }
@@ -841,8 +841,7 @@ public final class MartinFight {
                 BossConfig.get(BossConfig.INTRO_RADIUS), boss.position(), yaw, by != null ? by.getId() : -1);
         core.play(new BossTimeline("yield", MartinMath.YIELD_END)
                 .at(MartinMath.YIELD_BLOCK, () -> {
-                    core.sound("martin.block", 4, 1);
-                    boss.vanilla(SoundEvents.SHIELD_BLOCK, 0.9f);
+                    core.sound("martin.block", 4, 1);   // shield clang layered in (no vanilla SHIELD_BLOCK on top)
                     Fx.play(sl, Fx.fx("martin_block").caster(boss).at(boss.position()).yaw(yaw));
                 })
                 .at(MartinMath.YIELD_LOWER, () -> {

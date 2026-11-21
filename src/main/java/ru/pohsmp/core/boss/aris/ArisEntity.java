@@ -443,8 +443,7 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         if (d.horizontalDistanceSqr() > 1e-4) fight.face((float) (Math.atan2(d.z, d.x) * 180 / Math.PI) - 90);
         play("replica_break");
         core.play(new BossTimeline("replica_sounds", ArisMath.REPLICA_BREAK + 1)
-                .at(ArisMath.REPLICA_STRIKE, () -> core.sound("aris.anvil_ring", 2, 1))
-                .at(ArisMath.REPLICA_BREAK, () -> core.sound("aris.hiss", 2, 0.9f)));
+                .at(ArisMath.REPLICA_STRIKE, () -> core.sound("aris.anvil_ring", 2, 1)));   // the break: aris.replica_break (BossReplica)
     }
 
     void vanilla(net.minecraft.sounds.SoundEvent e, float vol, float pitch) {

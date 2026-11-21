@@ -56,10 +56,12 @@ public final class BossReplica {
                     if (r.animation() != null && mob instanceof io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker a)
                         a.serverTriggerAnimation(r.animation());
                     if (r.fx() != null) Fx.play(sl, Fx.fx(r.fx()).caster(mob).at(mob.position()).yaw(mob.getYRot()));
-                    core.sound(core.def.id + ".replica_break", 3, 1);
                     boss.onReplicaBreak(caster);
                 })
-                .at(r.delay() + r.breakAt(), () -> breakCast(caster))
+                .at(r.delay() + r.breakAt(), () -> {
+                    core.sound(core.def.id + ".replica_break", 3, 1);   // boss sounds 21.11: at the break itself, not at the reaction start
+                    breakCast(caster);
+                })
                 .at(r.delay() + r.speakAt(), () -> {
                     long now = sl.getGameTime();
                     if (now - st.lastTaunt >= BossConfig.get(BossConfig.REPLICA_TAUNT_COOLDOWN) * 20L) {

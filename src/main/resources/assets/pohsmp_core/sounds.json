@@ -1281,9 +1281,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.spawn",
     "sounds": [
       {
-        "name": "irons_spellbooks:dead_king/spawn",
-        "pitch": 0.8,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/martin/spawn",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1291,24 +1290,24 @@
     "subtitle": "subtitles.pohsmp_core.martin.step",
     "sounds": [
       {
-        "name": "minecraft:mob/irongolem/walk1",
-        "pitch": 0.7,
-        "volume": 1.1
+        "name": "pohsmp_core:boss/martin/step_1",
+        "attenuation_distance": 16,
+        "volume": 0.8
       },
       {
-        "name": "minecraft:mob/irongolem/walk2",
-        "pitch": 0.7,
-        "volume": 1.1
+        "name": "pohsmp_core:boss/martin/step_2",
+        "attenuation_distance": 16,
+        "volume": 0.8
       },
       {
-        "name": "minecraft:mob/irongolem/walk3",
-        "pitch": 0.7,
-        "volume": 1.1
+        "name": "pohsmp_core:boss/martin/step_3",
+        "attenuation_distance": 16,
+        "volume": 0.8
       },
       {
-        "name": "minecraft:mob/irongolem/walk4",
-        "pitch": 0.7,
-        "volume": 1.1
+        "name": "pohsmp_core:boss/martin/step_4",
+        "attenuation_distance": 16,
+        "volume": 0.8
       }
     ]
   },
@@ -1316,12 +1315,20 @@
     "subtitle": "subtitles.pohsmp_core.martin.swing",
     "sounds": [
       {
-        "name": "irons_spellbooks:dead_king/swing_01",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/martin/swing_1",
+        "attenuation_distance": 20
       },
       {
-        "name": "irons_spellbooks:dead_king/swing_02",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/martin/swing_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/martin/swing_3",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/martin/swing_4",
+        "attenuation_distance": 20
       }
     ]
   },
@@ -1329,9 +1336,12 @@
     "subtitle": "subtitles.pohsmp_core.martin.slam",
     "sounds": [
       {
-        "name": "irons_spellbooks:dead_king/attack_slam",
-        "pitch": 0.85,
-        "volume": 1.3
+        "name": "pohsmp_core:boss/martin/slam_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "pohsmp_core:boss/martin/slam_2",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1339,19 +1349,12 @@
     "subtitle": "subtitles.pohsmp_core.martin.bash",
     "sounds": [
       {
-        "name": "minecraft:item/shield/block1",
-        "pitch": 0.6,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/martin/bash_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "minecraft:item/shield/block2",
-        "pitch": 0.6,
-        "volume": 1.4
-      },
-      {
-        "name": "minecraft:item/shield/block3",
-        "pitch": 0.6,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/martin/bash_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1359,14 +1362,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.block",
     "sounds": [
       {
-        "name": "minecraft:random/anvil_land",
-        "pitch": 1.4,
-        "volume": 1.2
-      },
-      {
-        "name": "minecraft:item/shield/block4",
-        "pitch": 0.8,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/martin/block",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1374,19 +1371,12 @@
     "subtitle": "subtitles.pohsmp_core.martin.command",
     "sounds": [
       {
-        "name": "minecraft:mob/ravager/roar1",
-        "pitch": 1.3,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/martin/command_1",
+        "attenuation_distance": 48
       },
       {
-        "name": "minecraft:mob/ravager/roar2",
-        "pitch": 1.3,
-        "volume": 1.2
-      },
-      {
-        "name": "minecraft:mob/ravager/roar3",
-        "pitch": 1.3,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/martin/command_2",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1394,10 +1384,12 @@
     "subtitle": "subtitles.pohsmp_core.martin.horn",
     "sounds": [
       {
-        "name": "minecraft:event/raid/raidhorn",
-        "pitch": 0.9,
-        "volume": 1.6,
-        "stream": true
+        "name": "pohsmp_core:boss/martin/horn_1",
+        "attenuation_distance": 96
+      },
+      {
+        "name": "pohsmp_core:boss/martin/horn_2",
+        "attenuation_distance": 96
       }
     ]
   },
@@ -1405,24 +1397,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.gallop",
     "sounds": [
       {
-        "name": "minecraft:mob/horse/gallop1",
-        "pitch": 0.75,
-        "volume": 1.3
-      },
-      {
-        "name": "minecraft:mob/horse/gallop2",
-        "pitch": 0.75,
-        "volume": 1.3
-      },
-      {
-        "name": "minecraft:mob/horse/gallop3",
-        "pitch": 0.75,
-        "volume": 1.3
-      },
-      {
-        "name": "minecraft:mob/horse/gallop4",
-        "pitch": 0.75,
-        "volume": 1.3
+        "name": "pohsmp_core:boss/martin/gallop",
+        "attenuation_distance": 80
       }
     ]
   },
@@ -1430,9 +1406,12 @@
     "subtitle": "subtitles.pohsmp_core.martin.banner_plant",
     "sounds": [
       {
-        "name": "minecraft:random/anvil_land",
-        "pitch": 0.6,
-        "volume": 1.1
+        "name": "pohsmp_core:boss/martin/banner_plant_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "pohsmp_core:boss/martin/banner_plant_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1440,9 +1419,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.banner_cut",
     "sounds": [
       {
-        "name": "minecraft:mob/zombie/woodbreak",
-        "pitch": 0.8,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/martin/banner_cut",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1450,9 +1428,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.hold",
     "sounds": [
       {
-        "name": "minecraft:block/beacon/activate",
-        "pitch": 0.7,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/martin/hold",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1460,9 +1437,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.soldier",
     "sounds": [
       {
-        "name": "minecraft:block/beacon/ambient",
-        "pitch": 1.6,
-        "volume": 0.6
+        "name": "pohsmp_core:boss/martin/soldier",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1470,9 +1446,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.soldier_vanish",
     "sounds": [
       {
-        "name": "minecraft:block/beacon/deactivate",
-        "pitch": 1.5,
-        "volume": 0.5
+        "name": "pohsmp_core:boss/martin/soldier_vanish",
+        "attenuation_distance": 20
       }
     ]
   },
@@ -1480,19 +1455,12 @@
     "subtitle": "subtitles.pohsmp_core.martin.phase",
     "sounds": [
       {
-        "name": "minecraft:mob/ravager/roar1",
-        "pitch": 0.8,
-        "volume": 1.5
+        "name": "pohsmp_core:boss/martin/phase_1",
+        "attenuation_distance": 64
       },
       {
-        "name": "minecraft:mob/ravager/roar2",
-        "pitch": 0.8,
-        "volume": 1.5
-      },
-      {
-        "name": "minecraft:mob/ravager/roar3",
-        "pitch": 0.8,
-        "volume": 1.5
+        "name": "pohsmp_core:boss/martin/phase_2",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1512,14 +1480,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.shield_wall",
     "sounds": [
       {
-        "name": "minecraft:random/anvil_land",
-        "pitch": 0.5,
-        "volume": 1.2
-      },
-      {
-        "name": "minecraft:item/shield/block5",
-        "pitch": 0.6,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/martin/shield_wall",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1527,9 +1489,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.volley",
     "sounds": [
       {
-        "name": "minecraft:random/bow",
-        "pitch": 0.7,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/martin/volley",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1537,20 +1498,12 @@
     "subtitle": "subtitles.pohsmp_core.martin.arrow_hit",
     "sounds": [
       {
-        "name": "minecraft:random/bowhit1",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/martin/arrow_hit_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "minecraft:random/bowhit2",
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:random/bowhit3",
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:random/bowhit4",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/martin/arrow_hit_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1558,9 +1511,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.duel",
     "sounds": [
       {
-        "name": "minecraft:random/anvil_use",
-        "pitch": 0.7,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/martin/duel",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1568,19 +1520,8 @@
     "subtitle": "subtitles.pohsmp_core.martin.warcry",
     "sounds": [
       {
-        "name": "minecraft:mob/ravager/roar1",
-        "pitch": 0.6,
-        "volume": 2.0
-      },
-      {
-        "name": "minecraft:mob/ravager/roar2",
-        "pitch": 0.6,
-        "volume": 2.0
-      },
-      {
-        "name": "minecraft:mob/ravager/roar3",
-        "pitch": 0.6,
-        "volume": 2.0
+        "name": "pohsmp_core:boss/martin/warcry",
+        "attenuation_distance": 80
       }
     ]
   },
@@ -2700,6 +2641,223 @@
       },
       {
         "name": "pohsmp_core:boss/aris/hurt_3",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "martin.aura": {
+    "subtitle": "subtitles.pohsmp_core.martin.aura",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/aura",
+        "attenuation_distance": 20,
+        "volume": 0.35
+      }
+    ]
+  },
+  "martin.armor": {
+    "subtitle": "subtitles.pohsmp_core.martin.armor",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/armor_1",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/martin/armor_2",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/martin/armor_3",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      }
+    ]
+  },
+  "martin.hit": {
+    "subtitle": "subtitles.pohsmp_core.martin.hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/hit_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/martin/hit_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/martin/hit_3",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "martin.sword_ring": {
+    "subtitle": "subtitles.pohsmp_core.martin.sword_ring",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/sword_ring_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/martin/sword_ring_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "martin.pierce": {
+    "subtitle": "subtitles.pohsmp_core.martin.pierce",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/pierce",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "martin.shield_hit": {
+    "subtitle": "subtitles.pohsmp_core.martin.shield_hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/shield_hit_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/martin/shield_hit_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/martin/shield_hit_3",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "martin.dash": {
+    "subtitle": "subtitles.pohsmp_core.martin.dash",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/dash_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/martin/dash_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "martin.drum": {
+    "subtitle": "subtitles.pohsmp_core.martin.drum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/drum_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "pohsmp_core:boss/martin/drum_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "pohsmp_core:boss/martin/drum_3",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "martin.banner_flap": {
+    "subtitle": "subtitles.pohsmp_core.martin.banner_flap",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/banner_flap_1",
+        "attenuation_distance": 16,
+        "volume": 0.4
+      },
+      {
+        "name": "pohsmp_core:boss/martin/banner_flap_2",
+        "attenuation_distance": 16,
+        "volume": 0.4
+      },
+      {
+        "name": "pohsmp_core:boss/martin/banner_flap_3",
+        "attenuation_distance": 16,
+        "volume": 0.4
+      }
+    ]
+  },
+  "martin.banner_hit": {
+    "subtitle": "subtitles.pohsmp_core.martin.banner_hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/banner_hit_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/martin/banner_hit_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "martin.banner_fall": {
+    "subtitle": "subtitles.pohsmp_core.martin.banner_fall",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/banner_fall",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "martin.soldier_step": {
+    "subtitle": "subtitles.pohsmp_core.martin.soldier_step",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/soldier_step_1",
+        "attenuation_distance": 12,
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:boss/martin/soldier_step_2",
+        "attenuation_distance": 12,
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:boss/martin/soldier_step_3",
+        "attenuation_distance": 12,
+        "volume": 0.5
+      }
+    ]
+  },
+  "martin.soldier_swing": {
+    "subtitle": "subtitles.pohsmp_core.martin.soldier_swing",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/soldier_swing_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/martin/soldier_swing_2",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "martin.replica_break": {
+    "subtitle": "subtitles.pohsmp_core.martin.replica_break",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/replica_break",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "martin.hurt": {
+    "subtitle": "subtitles.pohsmp_core.martin.hurt",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/martin/hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/martin/hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/martin/hurt_3",
         "attenuation_distance": 16
       }
     ]

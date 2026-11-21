@@ -23,11 +23,11 @@ public final class ErebHandMath {
     public static final int DEATH_END = DEATH_VANISH + 38;
 
     // ---------------------------------------------------------------- his animations
-    public static final int LUNGE = 28, LUNGE_HIT = 10;
-    public static final int FLURRY = 42;
+    public static final int LUNGE = 32, LUNGE_HIT = 10;      // Epic Fight style 21.11: 1.6 s (was 28)
+    public static final int FLURRY = 46;                    // Epic Fight style 21.11: 2.3 s (was 42)
     public static final int[] FLURRY_HITS = {9, 16, 23};
     /** ereb_hand_slam: raise 0.45, slam 0.8 (the palm ≈0.9 forward, 0.6 to his right). */
-    public static final int SLAM = 36, SLAM_RAISE = 9, SLAM_HIT = 16;
+    public static final int SLAM = 40, SLAM_RAISE = 9, SLAM_HIT = 16;   // Epic Fight style 21.11: 2.0 s (was 36)
     public static final double SLAM_FWD = 0.9, SLAM_RIGHT = 0.6;
     /** ereb_hand_grab (grab 0.6) → grab_hold (loop 2.0) ↔ squeeze (squeeze 0.35) → grab_release (release 0.2). */
     public static final int GRAB = 24, GRAB_AT = 12, HOLD_LOOP = 40, SQUEEZE = 24, SQUEEZE_AT = 7, RELEASE = 20, RELEASE_AT = 4;

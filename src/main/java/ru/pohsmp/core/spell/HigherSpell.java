@@ -34,21 +34,27 @@ public abstract class HigherSpell extends AbstractSpell {
     @Override public boolean allowLooting() { return false; }
 
     private final ResourceLocation id;
-    private final DefaultConfig config = new DefaultConfig()
-            .setMinRarity(SpellRarity.LEGENDARY)
-            .setSchoolResource(Reg.HIGHER_ID)
-            .setMaxLevel(1)
-            .setCooldownSeconds(0)
-            .setAllowCrafting(false)
-            .build();
+    private final DefaultConfig config;
 
     protected HigherSpell(String path, int castTicks) {
+        this(path, castTicks, 1, 0, 0, 0);
+    }
+
+    /** T34 boss reward spells: Higher school with levels, mana and a cooldown (they go into spell books). */
+    protected HigherSpell(String path, int castTicks, int maxLevel, double cooldownSec, int baseMana, int manaPerLevel) {
         this.id = new ResourceLocation(PohCore.MODID, path);
-        this.manaCostPerLevel = 0;
+        this.config = new DefaultConfig()
+                .setMinRarity(SpellRarity.LEGENDARY)
+                .setSchoolResource(Reg.HIGHER_ID)
+                .setMaxLevel(maxLevel)
+                .setCooldownSeconds(cooldownSec)
+                .setAllowCrafting(false)
+                .build();
+        this.manaCostPerLevel = manaPerLevel;
         this.baseSpellPower = 0;
         this.spellPowerPerLevel = 0;
         this.castTime = castTicks;
-        this.baseManaCost = 0;
+        this.baseManaCost = baseMana;
     }
 
     @Override public ResourceLocation getSpellResource() { return id; }

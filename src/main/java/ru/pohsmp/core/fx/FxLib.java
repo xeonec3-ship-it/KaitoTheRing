@@ -88,6 +88,17 @@ public final class FxLib {
         return o == MISSING ? null : o;
     }
 
+    /** True if assets/pohsmp_core/&lt;rel&gt; is in the mod jar (no log line either way): for fx that are not drawn yet (T34 fallbacks). */
+    public static boolean exists(String rel) {
+        Object o = CACHE.get("exists:" + rel);
+        if (o == null) {
+            Path p = path(rel);
+            o = p != null && Files.exists(p);
+            CACHE.put("exists:" + rel, o);
+        }
+        return (Boolean) o;
+    }
+
     private static Path path(String rel) {
         var mf = ModList.get().getModFileById(PohCore.MODID);
         if (mf == null) return null;

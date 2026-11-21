@@ -12,3 +12,4 @@ libs/*.jar
 __pycache__/
 run-libs/*.jar
 tools/.cache/
+logs/

@@ -6,6 +6,7 @@
 - `voicechat-forge-1.20.1-2.6.20.jar` — Simple Voice Chat API (T22, голос иллюзий), Modrinth `simple-voice-chat`
 - `epicfight-1.20.1-20.14.17.jar` — Epic Fight 20.14.17 (файл с Modrinth `epic-fight-20.14.17-mc1.20.1-forge.jar`, переименован):
   анимации и тип оружия меча-хлыста T14 (`ember/EmberEpicFight`, мягкая зависимость); с `-PdevRun` он же подключается к запуску
+- `curios-forge-5.14.1+1.20.1.jar` — Curios API (T35: слоты накидки/маски; Iron's без него не запускается, у нас мягкая зависимость)
 - для одежды безмолвной ведьмы (скрытие в подсказках и на JourneyMap, только API, в игре не обязательны):
   `Jade-1.20.1-Forge-11.13.3.jar`, `wthit-1.20.1-forge-8.21.2.jar`, `theoneprobe-1.20.1-10.0.5.jar`,
   `journeymap-api-forge-1.20.1-2.0.0.jar` (лежит внутри `journeymap-forge-1.20.1-6.0.7.jar`, `META-INF/jarjar/`)

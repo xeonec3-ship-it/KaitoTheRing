@@ -250,6 +250,12 @@ public class IrinaEntity extends AbstractSpellCastingMob implements PohBoss, IAn
 
     // ---------------------------------------------------------------- death (5 s, «Смерть»: no corpse, she unravels and is gone)
 
+    /** Boss sounds 21.11: her own hurt sound (sounds.json irina.hurt). */
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource src) {
+        return ru.pohsmp.core.boss.BossCore.sound("irina.hurt");
+    }
+
     @Override
     public void die(DamageSource src) {
         super.die(src);

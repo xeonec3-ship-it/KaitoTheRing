@@ -32,6 +32,7 @@ public final class BossClient {
         MinecraftForge.EVENT_BUS.register(BossCam.class);
         MinecraftForge.EVENT_BUS.register(BossHudClient.class);
         MinecraftForge.EVENT_BUS.register(BossMusicClient.class);   // T33: fades / crossfades by the client tick
+        MinecraftForge.EVENT_BUS.register(BossSoundClient.class);   // boss sounds 21.11: animation sound keyframes, aura loops
         BossMusicClient.quietMissingParts();
         modBus.addListener(BossPoseClient::setup);
         modBus.addListener(BossClient::renderers);
@@ -79,5 +80,6 @@ public final class BossClient {
         BossBarClient.clear();
         BossHudClient.clear();
         BossMusicClient.clear();
+        BossSoundClient.clear();
     }
 }

@@ -1,7 +1,6 @@
 package ru.pohsmp.core.boss.martin;
 
 import io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker;
-import io.redspace.ironsspellbooks.entity.mobs.wizards.fire_boss.ExtendedServerBossEvent;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
@@ -9,7 +8,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
@@ -51,7 +49,6 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
     private final BossCore core = new BossCore(this, Martin.DEF);
     final MartinFight fight = new MartinFight(this);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
-    private ExtendedServerBossEvent bossEvent;
 
     public MartinEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -114,26 +111,17 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
         return false;
     }
 
-    // ---------------------------------------------------------------- the bar (vanilla boss event with the entity's UUID: BossBarClient)
-
-    private ExtendedServerBossEvent bossEvent() {
-        if (bossEvent == null) {
-            bossEvent = new ExtendedServerBossEvent(getUUID(), getDisplayName(), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS);
-        }
-        return bossEvent;
-    }
+    // the bar: BossCore's vanilla boss event with the entity's UUID (PohBoss.coreBossEvent), drawn over by BossBarClient
 
     @Override
     public void startSeenByPlayer(ServerPlayer p) {
         super.startSeenByPlayer(p);
-        if (!core.inFinale()) bossEvent().addPlayer(p);
         core.onSeen(p);
     }
 
     @Override
     public void stopSeenByPlayer(ServerPlayer p) {
         super.stopSeenByPlayer(p);
-        bossEvent().removePlayer(p);
         core.onUnseen(p);
     }
 
@@ -144,8 +132,6 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
         super.tick();
         if (level() instanceof ServerLevel sl) {
             core.tick();
-            if (core.inFinale()) bossEvent().removeAllPlayers();
-            else bossEvent().setProgress(getHealth() / getMaxHealth());
             if (isAlive()) fight.tick(sl);
         }
     }
@@ -191,7 +177,6 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
 
     @Override
     public void remove(RemovalReason r) {
-        if (bossEvent != null) bossEvent.removeAllPlayers();
         if (level() instanceof ServerLevel sl && r.shouldDestroy()) fight.cleanup(sl);
         super.remove(r);
     }

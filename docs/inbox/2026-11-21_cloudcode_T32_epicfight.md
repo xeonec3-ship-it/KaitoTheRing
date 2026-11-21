@@ -57,3 +57,10 @@ Epic Fight остаётся мягкой зависимостью: весь ко
 9. Без EF в модах всё как раньше, в логе нет ошибок загрузки классов EF.
 
 Код: `boss/BossGuardBreak.java`, `boss/BossGuardBreakMath.java`, `boss/BossEpicFight.java`, хуки в `PohBoss`, переопределения в `*Entity`/`*Fight` шести боссов, `BossGuard.afterExternal`, данные (`damage_type/boss_guard_break.json`, `data/epicfight/tags/damage_type/unblockable.json`, `sounds.json`, lang `ui.pohsmp_core.boss.guard_break` = «Сломать блок» / «Guard Break»).
+
+## Дополнение 21.11: тайминги по письму визуала (`2026-11-21_mgr_guard_break_visuals.md`)
+- `guardBreakTiming()`: по умолчанию `Timing.STANDARD` = удар на тике 14, длина 36 (Ирина, Арис, Эреб, Длань). У Мартина (14, 40). Предупреждение на тике 2 (= 14 − `guard_break_warn_ticks`). Длины сверены с `animation_length` в файлах (1.8 / 2.0 с).
+- `TEMP_GUARD_BREAK` снят у пяти боссов. Остался только у Главы Культа (`CultLeaderEntity.guardBreakTiming` = 14 / 28) до его анимации; план 14 / 36.
+- fx `<id>_guard_break` теперь получает `target` = цель (треск блока на тике 14 у цели, а не у босса).
+- Арис: `ArisMath.PENDING` очищен, `ANIM_TICKS` guard_break = 36 (сделал визуал), `ArisMathTest` сверяет с файлом.
+- Сборка `--offline` и все тесты зелёные.

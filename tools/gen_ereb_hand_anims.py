@@ -380,6 +380,9 @@ def build():
     an['ereb_hand_reflection_strike'] = anim(1.0, [(0, pre_r), (0.45, lunge, OQ), (0.7, lunge), (1.0, guard, IO)],
                                              [(0.0, 'appear'), (0.45, 'hit'), (0.9, 'gone')])
     an.update(build_spells2(pre_r, lunge, guard))
+    # T32 «Сломать блок»: призрачная рука отводит защиту, укол стеклянной рапирой (tools/guard_break_ereb_hand.py)
+    import guard_break_ereb_hand
+    an['ereb_hand_guard_break'] = guard_break_ereb_hand.build()
     return an
 
 

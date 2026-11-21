@@ -578,6 +578,8 @@ def main(gmod, args):
     import aris_anims_def as D
     D.G, D.AN = G, sys.modules[__name__]
     anims = D.all_anims(rig)
+    import guard_break_aris                  # T32 «Сломать блок»: двуручный удар молотом сверху по блоку
+    anims.append(guard_break_aris.build(rig, D, sys.modules[__name__]))
     import gen_replica_break as RB          # «Реплика»: animation.aris.replica_break + fx/печати
     G.write_json('animations/entity/aris.animation.json',
                  {'format_version': '1.8.0', 'animations': RB.add_anims('aris', {a.name: a.to_json() for a in anims})}, compact=True)

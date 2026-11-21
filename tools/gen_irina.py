@@ -1083,8 +1083,11 @@ def main(args):
     if m.glow is not None:
         m.glow.save(os.path.join(td, 'irina_glowmask.png'), optimize=True)
         WRITTEN.append('textures/entity/irina/irina_glowmask.png')
+    allan = {a.name: a.to_json() for a in an}
+    import guard_break_irina                 # T32 «Сломать блок»: нити рвут защиту, удар посохом (tools/guard_break_irina.py)
+    allan['irina_guard_break'] = guard_break_irina.build()
     write_json(os.path.join(A, 'animations', 'entity', 'irina.animation.json'),
-               {'format_version': '1.8.0', 'animations': RB.add_anims('irina', {a.name: a.to_json() for a in an})}, compact=True)
+               {'format_version': '1.8.0', 'animations': RB.add_anims('irina', allan)}, compact=True)
     WRITTEN.append('animations/entity/irina.animation.json')
     nc = sum(len(b.cubes) for b in m.bones.values())
     print('irina: bones %d, cubes %d, tex %s, anims %d' % (len(m.bones), nc, m.tex_px, len(an)))

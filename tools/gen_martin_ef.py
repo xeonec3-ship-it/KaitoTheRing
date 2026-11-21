@@ -546,11 +546,48 @@ def define_rest(A, m, G, g, sf):
     BP_W = [(0.0, ('G',), 'io'), (0.6, ('T', (4.6, 14.0, -4.0), (0.25, 0.75, -0.6)), 'io'), (1.8, ('T', (4.6, 14.0, -4.0), (0.25, 0.75, -0.6)), 'io'),
             (2.4, ('G',), 'io')]
 
+    # Подмена знамени сущностью (MartinFight.plantBanner, тик PLANT_AT = 26 = 1.3 с): к 1.3 древко в руке стоит ВЕРТИКАЛЬНО, низ — в точке
+    # сущности (MartinMath.BANNER_FWD / BANNER_LEFT, бл. → ед. модели Мартина ×8), полотнище лицом вперёд, размер — как у сущности
+    # (масштаб кости). 1.3–1.4 рука держит древко на месте (перекрытие на тик), потом знамя в руке скрыто, рука отпускает.
+    BAN_B = np.array([-1.125 * 8.0, 0.0, -1.5 * 8.0])          # = MartinMath.BANNER_LEFT 1.125, BANNER_FWD 1.5
+    BAN_S = [0.7, 0.871, 0.871]                                 # высота 63.4 px и полотнище 14 px — как martin_banner.geo.json
+    BAN_P = np.array([-5.6, 10.6, -0.2])                        # шарнир banner_held = кисть; древко — ось y, низ на −10
+    BAN_GRIP = 14.0                                             # кисть над землёй в момент вонзания (рука дотягивается)
+    BAN_HAND = Keys([(0.9, dict(h=0.0)), (1.15, dict(h=1.0)), (1.4, dict(h=1.0)), (1.75, dict(h=0.0))])
+    BAN_DROP = Keys([(0.0, dict(y=12.0)), (1.15, dict(y=12.0)), (1.3, dict(y=0.0), 'in'), (2.4, dict(y=0.0))])
+    bprev = [None]
+
     def plant(t):
         o = pose(BP_K, t)
         o['banner_held'] = {'rot': [BP_BAN.f(t, 'r'), 0.0, 0.0]}
         arm_to(o, *wpath(o, BP_W, t), left=BP_K.f(t, 'lw'))
-        return vis(o, banner=0.15 < t < 1.3)          # знамя «в руке» — когда левая отпустила рукоять
+        w = B.ease(BAN_HAND.f(t, 'h'), 'io')
+        if w > 0.001:
+            # кисть: от позы по ключам к точке над местом сущности (знамя опускается на BAN_DROP), решатель руки
+            hk = G.world_pt(m, o, 'left_forearm', BAN_P)
+            ht = BAN_B + np.array([0.0, BAN_GRIP + BAN_DROP.f(t, 'y'), 0.0])
+            sol, _ = G.solve_arm(m, o, 'left', hk * (1 - w) + ht * w, bprev[0])
+            bprev[0] = sol
+            o['left_arm'] = dict(o['left_arm'], rot=list(sol[:3]))
+            o['left_forearm'] = {'rot': [sol[3], 0, 0]}
+            # древко вертикально: полный поворот кости = I (коробки знамени заданы стоя) → углы = to_euler(Mf^T) − покой кости
+            Mf, _ = G.fk(m, o, 'left_forearm')
+            rv = np.array(G.to_euler(Mf.T), float) - np.asarray(m.bones['banner_held'].rot, float)
+            rk = np.array(o['banner_held']['rot'], float)
+            rv += 360.0 * np.round((rk - rv) / 360.0)
+            o['banner_held']['rot'] = list(rk * (1 - w) + rv * w)
+            # низ древка — в точку (кисть держит выше по древку): сдвиг кости вдоль древка в осях предплечья
+            low = G.world_pt(m, o, 'banner_held', BAN_P + np.array([0.0, -10.0 * BAN_S[1], 0.0]))
+            want = BAN_B + np.array([0.0, -0.5 + BAN_DROP.f(t, 'y'), 0.0])
+            top = G.world_pt(m, o, 'banner_held', BAN_P + np.array([0.0, 26.4 * BAN_S[1], 0.0]))
+            ax = (top - low) / np.linalg.norm(top - low)
+            o['banner_held']['pos'] = list(Mf.T @ (ax * float((want - low) @ ax)) * w)       # только вдоль древка: оно всегда в кулаке
+        else:
+            bprev[0] = None
+        o = vis(o, banner=0.15 < t < 1.4)            # знамя «в руке» — когда левая отпустила рукоять; до 1.4 — перекрытие с сущностью
+        if 0.15 < t < 1.4:
+            o['banner_held']['scale'] = list(BAN_S)
+        return o
     a = A('banner_plant', 2.4)
     a.sample(plant, 0.02)
     a.instruction(0.7, 'raise')

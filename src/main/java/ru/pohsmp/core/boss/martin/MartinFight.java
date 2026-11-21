@@ -319,14 +319,16 @@ public final class MartinFight {
         return banner != null && sl.getEntity(banner) instanceof MartinBannerEntity b && b.standing() ? b : null;
     }
 
-    /** The banner ~3 blocks left-front of him. */
+    /** The banner left-front of him, exactly where the held banner of martin_banner_plant touches the ground (MartinMath.BANNER_*):
+     *  by the body yaw — the model is drawn by it, so the entity replaces the held banner without a jump. */
     private void plantBanner(ServerLevel sl) {
-        Vec3 fwd = Vec3.directionFromRotation(0, boss.getYRot()), left = new Vec3(fwd.z, 0, -fwd.x);
-        Vec3 p = ground(sl, boss.position().add(fwd.scale(2.2)).add(left.scale(2.0)));
+        float yaw = boss.yBodyRot;
+        Vec3 fwd = Vec3.directionFromRotation(0, yaw), left = new Vec3(fwd.z, 0, -fwd.x);
+        Vec3 p = ground(sl, boss.position().add(fwd.scale(MartinMath.BANNER_FWD)).add(left.scale(MartinMath.BANNER_LEFT)));
         MartinBannerEntity b = Martin.BANNER.get().create(sl);
         if (b == null) return;
-        b.moveTo(p.x, p.y, p.z, boss.getYRot(), 0);
-        b.setYBodyRot(boss.getYRot());
+        b.moveTo(p.x, p.y, p.z, yaw, 0);
+        b.setYBodyRot(yaw);
         b.setup(boss.getUUID(), MartinConfig.d(MartinConfig.BANNER_HP) * core.playerMultiplier());
         sl.addFreshEntity(b);
         banner = b.getUUID();

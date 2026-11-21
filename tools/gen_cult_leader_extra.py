@@ -153,6 +153,8 @@ def boss_anims():
 def write_anims(weapon_passes=3):
     src = M.jar_json(M.I + 'animations/casting_animations.json')
     ours = boss_anims()
+    import guard_break_cult_leader          # T32 «Сломать блок»: крюк косы рвёт защиту, удар подтоком (хват Тироса, двойной поворот кисти)
+    ours['cult_leader_guard_break'] = guard_break_cult_leader.build()
     out = {'format_version': src['format_version'], 'geckolib_format_version': src['geckolib_format_version'],
            'comment': 'T26: все анимации casting_animations.json Iron\'s (те же имена — их зовёт логика FireBoss) + cult_leader_* (наши). '
                       'Сгенерировано tools/gen_cult_leader.py — правьте генератор.',

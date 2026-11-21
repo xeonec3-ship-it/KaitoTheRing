@@ -2,9 +2,10 @@
 """
 T32 п. 4 «Сломать блок» — Глава Культа (cult_leader_guard_break): коса цепляет защиту крюком лезвия и рвёт её в сторону,
 перехват — удар древком (подтоком) в открытую грудь. Позы — целями в мире, углы — решателями tools/guard_break_lib.py.
-Хват косы НЕ зашит: ось древка, голова (где лезвие) и подток берутся из ассетов (models/item/cult_scythe.json, display
-thirdperson_righthand) — при смене хвата («как у Тироса Iron's», письмо docs/inbox/2026-11-21_mgr_t26_hold_tyros.md) удар
-пересчитывается перезапуском генератора. Стойка (начало и конец) — поза POSE0_ANIM в момент 0 (анимация хвата из файла Главы).
+Хват — как у Тироса Iron's (письмо docs/inbox/2026-11-21_mgr_t26_hold_tyros.md): начало и конец — поза хвата вне анимаций
+(gen_cult_leader_extra.CARRY_ARM / CARRY_HAND / CARRY_POS = числа Тироса + сдвиг косы в кулаке на 3 px), коса в кадрах считается
+с ДВОЙНЫМ поворотом кисти, как её рисует GeckoLib (guard_break_lib, hand2): решатель подбирает ключ кисти так, что в игре коса
+смотрит ровно куда задумано. Ось древка, голова (где лезвие) и подток — по точкам предмета models/item/cult_scythe.json.
 Вызывается из tools/gen_cult_leader_extra.write_anims (плащ и проверку косы потом делает anim_cloth, как у всех cult_leader_*).
 
 Тайминг: warn 0.10 (тик 2; вспышка на лезвии), hit 0.70 (тик 14) — удар древком; длина 1.8 с (36 тиков).
@@ -20,7 +21,6 @@ import guard_break_lib as GL
 from guard_break_lib import Keys, yaw_dir
 
 WARN, HIT, LENGTH = 0.10, 0.70, 1.8
-POSE0_ANIM = 'scythe_backpedal'          # поза хвата косы в стойке (её t = 0); после письма о хвате Тироса — сменить при необходимости
 
 
 def scythe_axes(M):
@@ -46,17 +46,12 @@ def special(M):
 
 
 def pose0(M):
-    an = GL.JModel('cult_leader').anims.get(POSE0_ANIM)
-    pose = {}
-    if an:
-        for b, bk in an['bones'].items():
-            q = {}
-            if 'rotation' in bk:
-                q['rotation'] = GL.AC.chan_at(bk['rotation'], 0.0)
-            if 'position' in bk:
-                q['position'] = GL.AC.chan_at(bk['position'], 0.0)
-            if q and b in M.bones:
-                pose[b] = q
+    """Поза хвата вне анимаций (как держит код CultLeaderModel: числа Тироса) — JSON-поза: удар начинается и кончается в ней."""
+    import gen_cult_leader_extra as X
+    pose = {b: {'rotation': [0.0, 0.0, 0.0]} for b in ('body', 'torso', 'head', 'left_arm', 'right_leg', 'left_leg')}
+    pose['body']['position'] = [0.0, 0.0, 0.0]
+    pose['right_arm'] = {'rotation': list(X.CARRY_ARM)}
+    pose['bipedHandRight'] = {'rotation': list(X.CARRY_HAND), 'position': list(X.CARRY_POS)}
     return pose
 
 
@@ -68,8 +63,8 @@ def build():
     p0 = pose0(M)
     st, W0 = GL.stance_targets(M, p0)
     h0 = st['hand_r']
-    d0 = GL.nrm(GL.ap(W0['bipedHandRight'], head) - h0)
-    u0 = GL.nrm(W0['bipedHandRight'][:3, :3] @ up)
+    d0 = GL.nrm(GL.ap(W0['~item'], head) - GL.ap(W0['~item'], (0, 0, 0)))
+    u0 = GL.nrm(W0['~item'][:3, :3] @ up)
     y0, q0 = float(np.degrees(np.arctan2(d0[0], -d0[2]))), float(np.degrees(np.arcsin(d0[1])))
     b0 = tuple(p0.get('body', {}).get('rotation', [0.0, 0.0, 0.0]))
     S0 = dict(body=b0, torso=(0.0, 0.0, 0.0), pel=(0.0, 0.0), drop=0.0, rf=st['rf'], lf=st['lf'])
@@ -92,19 +87,30 @@ def build():
         (1.42, dict(lf=st['lf'], pel=(0.0, -0.6), drop=0.3, lw=0.4), 'io'),
         (1.80, dict(S0, lw=0.0), 'io'),
     ])
-    ST = GL.stime([(0, 0.0), (0.10, 0.0, 'lin'), (0.34, 0.18, 'out'), (0.40, 0.20, 'io'), (0.50, 0.30, 'in'), (0.62, 0.36, 'out'),
-                   (0.735, 0.80, ('beta', 2.1, 2.0)), (0.82, 0.82, 'out'), (1.80, 1.0, 'io')])
+    ST = GL.stime([(0, 0.0), (0.10, 0.0, 'lin'), (0.32, 0.18, 'io'), (0.38, 0.20, 'io'), (0.45, 0.30, 'io'), (0.635, 0.36, 'io'),
+                   (0.735, 0.80, ('beta', 2.0, 2.0)), (0.82, 0.82, 'out'), (1.80, 1.0, 'io')])
     # кисть (R-мир) и направление «кисть → голова косы» (yaw, pitch); upw — куда смотрит «верх» древка (от лезвия)
-    P = [(0.0, dict(hx=float(h0[0]), hy=float(h0[1]), hz=float(h0[2]), byaw=y0, bpit=q0, ux=float(u0[0]), uy=float(u0[1]), uz=float(u0[2]))),
-         (0.10, dict(hx=8.0, hy=22.0, hz=-6.0, byaw=4.0, bpit=48.0, ux=0.0, uy=0.2, uz=1.0)),        # голова косы вверх-вперёд
-         (0.18, dict(hx=6.0, hy=19.5, hz=-12.0, byaw=0.0, bpit=4.0, ux=0.0, uy=1.0, uz=0.0)),       # опустил за защиту: лезвие вниз
-         (0.20, dict(hx=6.0, hy=19.0, hz=-12.4, byaw=0.0, bpit=3.0, ux=0.0, uy=1.0, uz=0.0)),
-         (0.30, dict(hx=-3.0, hy=18.0, hz=-6.0, byaw=-50.0, bpit=4.0, ux=0.0, uy=1.0, uz=0.0)),     # рванул влево
-         (0.36, dict(hx=-2.0, hy=18.5, hz=-3.0, byaw=-150.0, bpit=34.0, ux=-0.3, uy=0.5, uz=-0.8)),  # перехват: голова назад-влево, подток вперёд
-         (0.80, dict(hx=3.0, hy=17.5, hz=-13.0, byaw=-178.0, bpit=9.0, ux=0.0, uy=0.6, uz=-0.8)),   # удар подтоком в грудь цели
-         (0.82, dict(hx=3.0, hy=17.6, hz=-12.6, byaw=-178.0, bpit=10.0, ux=0.0, uy=0.6, uz=-0.8)),
-         (0.92, dict(hx=8.0, hy=19.0, hz=-6.0, byaw=-120.0, bpit=70.0, ux=0.3, uy=0.0, uz=-1.0)),    # коса встаёт вертикально
-         (1.0, dict(hx=float(h0[0]), hy=float(h0[1]), hz=float(h0[2]), byaw=y0, bpit=q0, ux=float(u0[0]), uy=float(u0[1]), uz=float(u0[2])))]
+    # правая рука — одна кость (локтя нет): путь — направление руки от плеча (ayaw — вправо +, apit — вверх +), направление
+    # «кисть → голова косы» (byaw, bpit) и «верх» древка (от лезвия) u
+    sh0 = GL.ap(W0['right_arm'], (0, 0, 0))
+    a0 = GL.nrm(h0 - sh0)
+    ARM = float(np.linalg.norm(h0 - sh0))
+    A0 = dict(ayaw=float(np.degrees(np.arctan2(a0[0], -a0[2]))), apit=float(np.degrees(np.arcsin(a0[1]))))
+    if abs(A0['ayaw']) > 90:                     # рука в хвате — назад-вниз: тот же вектор как «наклон за −90°», чтобы рука шла
+        A0 = dict(ayaw=(A0['ayaw'] + 360) % 360 - 180, apit=-180.0 - A0['apit'])     # маятником через низ, а не через бок
+    U0 = dict(ux=float(u0[0]), uy=float(u0[1]), uz=float(u0[2]))
+    P = [(0.0, dict(A0, byaw=y0, bpit=q0, **U0)),
+         (0.10, dict(ayaw=12.0, apit=-30.0, byaw=4.0, bpit=48.0, ux=0.0, uy=0.2, uz=1.0)),          # голова косы вверх-вперёд
+         (0.18, dict(ayaw=6.0, apit=-16.0, byaw=0.0, bpit=4.0, ux=0.0, uy=1.0, uz=0.0)),            # опустил за защиту: лезвие вниз
+         (0.20, dict(ayaw=6.0, apit=-18.0, byaw=0.0, bpit=3.0, ux=0.0, uy=1.0, uz=0.0)),
+         (0.30, dict(ayaw=-40.0, apit=-28.0, byaw=-50.0, bpit=4.0, ux=0.0, uy=1.0, uz=0.0)),        # рванул влево
+         (0.36, dict(ayaw=-105.0, apit=-36.0, byaw=-155.0, bpit=8.0, ux=0.8, uy=-0.6, uz=0.0)),    # перехват: голова косы назад-влево, лезвие вверх, подток вперёд
+         (0.80, dict(ayaw=-12.0, apit=-4.0, byaw=-155.0, bpit=4.0, ux=0.8, uy=-0.6, uz=0.0)),     # удар подтоком в грудь цели (древко мимо корпуса слева)
+         (0.82, dict(ayaw=-12.0, apit=-3.0, byaw=-155.0, bpit=5.0, ux=0.8, uy=-0.6, uz=0.0)),
+         (0.88, dict(ayaw=-30.0, apit=-24.0, byaw=-100.0, bpit=2.0, ux=0.5, uy=-0.2, uz=0.8)),     # голова косы низом влево…
+         (0.94, dict(ayaw=-5.0, apit=-34.0, byaw=-25.0, bpit=-8.0, ux=0.6, uy=0.1, uz=0.8)),
+         (0.975, dict(ayaw=10.0, apit=-40.0, byaw=12.0, bpit=-14.0, ux=0.8, uy=0.0, uz=0.5)),      # …через перед вправо, в хват
+         (1.0, dict(A0, byaw=y0, bpit=q0, **U0))]
 
     def pose(t):
         pel = K.v(t, 'pel')
@@ -113,12 +119,14 @@ def build():
         b = K.v(t, 'body')
         bl = K.v(max(0.0, t - 0.06), 'body')
         o['head'] = {'rotation': [-0.7 * b[0], -0.85 * bl[1], 0.0]}
+        o['bipedHandRight'] = {'position': list(p0['bipedHandRight']['position'])}     # коса в кулаке сдвинута, как в хвате
         w = GL.path_at(P, ST(t))
-        sv.arm(o, 'right', np.array([w['hx'], w['hy'], w['hz']]))
+        sh = GL.ap(M.chain(o, 'right_arm'), (0, 0, 0))
+        sv.arm(o, 'right', sh + yaw_dir(w['ayaw'], w['apit']) * ARM)
         sv.wrist(o, yaw_dir(w['byaw'], w['bpit']), up=(w['ux'], w['uy'], w['uz']), far=head)
         lw = K.f(t, 'lw')
         if lw > 0.01:                                            # левая рука на древке (между кистью и подтоком)
-            Mh = M.chain(o, 'bipedHandRight')
+            Mh = M.item_frame(o)
             tgt = GL.ap(Mh, butt * lam)
             own = np.array(p0.get('left_arm', {}).get('rotation', [0.0, 0.0, 0.0]), float)
             sv.arm(o, 'left', np.asarray(tgt))

@@ -51,6 +51,9 @@ def glow_points(boss):
         W = M.world(an, t)
         if boss == 'irina':
             p = GL.ap(W['bipedHandLeft'], (0, 0, 0))
+        elif boss == 'cult_leader':                    # вспышка на лезвии косы (бьёт подток — точка удара в метриках)
+            import guard_break_cult_leader as GC
+            p = GL.ap(W['~item'], GC.scythe_axes(M)[2])
         elif boss == 'ereb_hand':
             p = GL.ap(W['ghost_palm'], (0, 5.0, 0))
         else:

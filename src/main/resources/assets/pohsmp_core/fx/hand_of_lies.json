@@ -1,0 +1,81 @@
+{
+ "comment": "T34 «Длань Лжи» (caster = ЦЕЛЬ, 24 тика; тик 0 = анимация pohsmp_hand_of_lies): стеклянная рука (ereb_hand_giant ×0.5 ≈ 3.5 бл.) раскрытой ладонью опускается на цель и на тике 10 сжимается в кулак. Дальше — hand_of_lies_hold.",
+ "style": "ereb_hand",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 12,
+   "texture": "illusion_seal",
+   "radius": 1.6,
+   "grow": 10,
+   "glow": 0.2,
+   "fadeOut": 4,
+   "color": "#D9CCFF",
+   "brightness": 0.5,
+   "comment": "тень ладони"
+  },
+  {
+   "type": "mesh",
+   "delay": 0,
+   "at": "caster+0,1.5,-0.9",
+   "model": "ereb_hand_giant_open",
+   "scale": 0.5,
+   "until": 10,
+   "move": {
+    "from": [
+     0,
+     8,
+     0
+    ],
+    "scaleFrom": 0.6,
+    "delay": 0,
+    "duration": 10,
+    "easing": "easeInCubic"
+   },
+   "comment": "from — в единицах меша (× scale): 8 ≈ 4 бл. над целью"
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "at": "caster+0,1.0,0",
+   "duration": 8,
+   "size": 1.6,
+   "rays": 8,
+   "color": "#FFFFFF",
+   "brightness": 1.2
+  },
+  {
+   "type": "sprites",
+   "delay": 10,
+   "at": "caster+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 18,
+   "rate": 18,
+   "spread": 0.8,
+   "speed": 0.08,
+   "gravity": 0.02,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.16,
+    0.05
+   ],
+   "life": 18,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "wave",
+   "delay": 10,
+   "at": "caster+0,0.05,0",
+   "duration": 12,
+   "shape": "ring",
+   "radius": 2.5,
+   "color": "@secondary",
+   "brightness": 0.6
+  }
+ ]
+}

@@ -1,0 +1,59 @@
+{
+ "comment": "T34 «Длань Лжи» по боссу (caster = босс, follow, до Fx.stop; 2.5 с): рука не держит — стеклянные пальцы скользят по ногам, осколки кружат у земли (замедление).",
+ "style": "ereb_hand",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "texture": "illusion_seal",
+   "radius": 1.6,
+   "glow": 0.25,
+   "spin": 2,
+   "color": "#D9CCFF",
+   "brightness": 0.5
+  },
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster+0,0.3,0",
+   "duration": -1,
+   "width": 0.06,
+   "length": 10,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 0.9,
+    "speed": 14,
+    "rise": 0.2,
+    "risePeriod": 20
+   },
+   "color": "@secondary",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,0.4,0",
+   "duration": -1,
+   "texture": "mote_glass",
+   "count": 100000,
+   "rate": 0.3,
+   "area": 1.0,
+   "speed": 0.0,
+   "gravity": 0.005,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.14,
+    0.04
+   ],
+   "life": 16,
+   "color": "#F4EEFF",
+   "follow": true
+  }
+ ]
+}

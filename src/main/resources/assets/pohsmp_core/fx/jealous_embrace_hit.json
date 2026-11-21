@@ -1,0 +1,66 @@
+{
+ "comment": "T34 «Объятия Ревности»: удар крюком посоха (caster = заклинатель, 14 тиков; тик 26 анимации = урон): серп наискось сверху справа вниз влево перед ним, красная вспышка, обрывки нитей.",
+ "style": "irina",
+ "duration": 14,
+ "elements": [
+  {
+   "type": "slash",
+   "delay": 0,
+   "at": "caster+0,1.0,1.5",
+   "radius": 1.5,
+   "arc": 150,
+   "thickness": 0.55,
+   "bend": 1.2,
+   "secondary": 0.5,
+   "tilt": 55,
+   "grow": 3,
+   "life": 10,
+   "dir": -1,
+   "color": "@primary",
+   "brightness": 1.4
+  },
+  {
+   "type": "slash",
+   "delay": 1,
+   "at": "caster+0,1.0,1.3",
+   "radius": 1.3,
+   "arc": 120,
+   "thickness": 0.16,
+   "bend": 1.2,
+   "secondary": 0,
+   "tilt": 55,
+   "grow": 3,
+   "life": 8,
+   "dir": -1,
+   "color": "@core"
+  },
+  {
+   "type": "flash",
+   "delay": 1,
+   "at": "caster+0,1.1,1.6",
+   "duration": 7,
+   "size": 1.6,
+   "rays": 6,
+   "color": "@primary"
+  },
+  {
+   "type": "sprites",
+   "delay": 1,
+   "at": "caster+0,1.1,1.6",
+   "duration": 3,
+   "texture": "mote_thread",
+   "count": 22,
+   "rate": 8,
+   "spread": 0.5,
+   "speed": 0.18,
+   "gravity": 0.02,
+   "spin": 40,
+   "size": [
+    0.3,
+    0.08
+   ],
+   "life": 16,
+   "color": "@primary"
+  }
+ ]
+}

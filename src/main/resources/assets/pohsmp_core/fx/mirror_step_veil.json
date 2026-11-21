@@ -1,0 +1,43 @@
+{
+ "comment": "T34 «Шаг сквозь отражение»: заклинатель растворяется (caster = заклинатель, 12 тиков, тик 10; дальше 2 с невидимости — код).",
+ "style": "ereb",
+ "duration": 12,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 10,
+   "thickness": 0.06,
+   "pulse": [
+    0.5,
+    3
+   ],
+   "motes": 0,
+   "ring": false,
+   "color": "#BFE6FF",
+   "brightness": 0.5
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,1.0,0",
+   "duration": 3,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 6,
+   "spread": 0.5,
+   "speed": 0.04,
+   "gravity": 0.004,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.16,
+    0.05
+   ],
+   "life": 12,
+   "color": "#E8FAFF"
+  }
+ ]
+}

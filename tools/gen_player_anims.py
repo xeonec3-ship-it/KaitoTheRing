@@ -1886,6 +1886,12 @@ def main():
             json.dump(js, fh, ensure_ascii=False, indent=1)
         data[a.name] = js
         print('wrote', a.name, '-', len(js['emote']['moves']), 'keys')
+    try:                       # T34: наградные заклинания боссов — свой генератор (tools/gen_t34_anims.py); в превью тоже показываем
+        import gen_t34_anims as T34
+        for a in (f() for f in T34.ANIMS):
+            data[a.name] = a.emotecraft()
+    except ImportError:
+        pass
     for a in pose_gallery():   # библиотека поз — только в превью, в мод не пишется
         data[a.name] = a.emotecraft()
     with open(os.path.join(HERE, 'anim_preview.template.html'), encoding='utf-8') as fh:

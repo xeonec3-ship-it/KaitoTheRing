@@ -699,7 +699,7 @@ public final class MartinFight {
         int impact = MartinMath.VOLLEY_LOOSE + MartinMath.VOLLEY_IMPACT;
         core.play(new BossTimeline("spell:volley", impact + 1)
                 .at(MartinMath.VOLLEY_DRAW, () -> {
-                    Fx.play(sl, Fx.fx("martin_volley").caster(boss).at(boss.position()).yaw(boss.getYRot()));
+                    Fx.play(sl, Fx.fx("martin_volley").at(boss.position()).yaw(boss.getYRot()));   // no caster: the archers stay where they rose, not where he walks (FX audit 21.11)
                     core.sound("martin.volley", 3, 1);
                     core.actionbar(core.arenaRadius() + 8, ui("volley"));
                     status(Martin.ST_VOLLEY, true);
@@ -890,6 +890,13 @@ public final class MartinFight {
         MartinBannerEntity b = banner(sl);
         if (b != null) b.cut(sl);
         DUELS.remove(this);
+    }
+
+    /** FX audit 21.11: the chunk unloaded; recollect() on load starts the formation / fury again, so these must not stay as ghosts. */
+    void unloadFx(ServerLevel sl) {
+        if (formationFx > 0) Fx.stop(sl, formationFx, "");
+        if (furyFx > 0) Fx.stop(sl, furyFx, "");
+        formationFx = furyFx = -1;
     }
 
     /** After a reload: find his soldiers and banner again, restart the auras of the current phase. */

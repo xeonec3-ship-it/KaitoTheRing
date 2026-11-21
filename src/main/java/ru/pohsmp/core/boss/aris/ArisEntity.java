@@ -257,6 +257,12 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
     }
 
     @Override
+    public void remove(RemovalReason r) {
+        if (r == RemovalReason.UNLOADED_TO_CHUNK && level() instanceof ServerLevel sl) fight.unloadFx(sl);   // FX audit 21.11
+        super.remove(r);
+    }
+
+    @Override
     public void die(DamageSource src) {   // only /kill reaches this (she surrenders at 5%)
         super.die(src);
         if (level() instanceof ServerLevel sl && isDeadOrDying()) {

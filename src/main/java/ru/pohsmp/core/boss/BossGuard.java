@@ -339,7 +339,7 @@ public final class BossGuard {
         sl.sendParticles(ParticleTypes.LARGE_SMOKE, from.x, from.y + 1, from.z, 30, 0.4, 0.8, 0.4, 0.02);
         String id = c.def.id + "_appear";
         if (ru.pohsmp.core.fx.FxLib.fx(id) != null)
-            ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx(id).caster(mob).at(mob.position()).yaw(mob.getYRot()));
+            ru.pohsmp.core.fx.Fx.play(sl, ru.pohsmp.core.fx.Fx.fx(id).at(mob.position()).yaw(mob.getYRot()));   // no caster: just teleported (see ErebFight blink)
         else sl.sendParticles(ParticleTypes.REVERSE_PORTAL, mob.getX(), mob.getY() + 1, mob.getZ(), 60, 0.5, 1.0, 0.5, 0.05);
         sl.playSound(null, mob.getX(), mob.getY(), mob.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.HOSTILE, 1.5f, 0.6f);
     }

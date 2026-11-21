@@ -83,6 +83,8 @@ public final class ArisFight {
     private long floorFrom, floorTo, forgeEnd;
     private final List<Integer> forgeFx = new ArrayList<>();
     private int mythicFx = -1;
+    /** «Последний удар молота» (200 t): stopped by cleanup, else the ghost hammer fell onto the surrender scene (FX audit 21.11). */
+    private int lastBlowFx = -1;
 
     ArisFight(ArisEntity boss) {
         this.boss = boss;
@@ -373,7 +375,7 @@ public final class ArisFight {
         Vec3 p = ground(sl, boss.position().add(fwd().scale(ArisMath.LAST_FWD)));
         stand(ArisMath.LAST);
         boss.play("last_blow");
-        Fx.play(sl, Fx.fx("aris_last_blow").at(p).yaw(boss.getYRot()));
+        lastBlowFx = Fx.play(sl, Fx.fx("aris_last_blow").at(p).yaw(boss.getYRot()));
         List<ServerPlayer> who = core.scene("aris.last_blow", ArisMath.LAST, BossNet.SCENE_BARS, BossConfig.get(BossConfig.SCENE_RADIUS), p, boss.getYRot(), -1);
         double r = cfg(ArisConfig.LAST_RADIUS);
         BossTimeline t = new BossTimeline("scene:last_blow", ArisMath.LAST)
@@ -668,6 +670,7 @@ public final class ArisFight {
                     ends[0] = new double[] {from.x, from.y, from.z};
                     ends[1] = new double[] {land.x, land.y, land.z};
                     mesh[0] = Fx.play(sl, Fx.mesh("aris_billet").caster(b[0]).at(from).attach(b[0]));
+                    b[0].fx = mesh[0];
                 })
                 .during(ArisMath.BILLET_THROW + 1, landAt, k -> {
                     if (b[0] == null || !b[0].isAlive()) return;
@@ -678,6 +681,7 @@ public final class ArisFight {
                     if (b[0] == null || !b[0].isAlive()) return;
                     if (mesh[0] > 0) Fx.stop(sl, mesh[0], "");
                     lie[0] = Fx.play(sl, Fx.fx("aris_billet").caster(b[0]).at(land).attach(b[0]));
+                    b[0].fx = lie[0];
                     core.sound(land, "aris.billet", 2, 1);
                     for (ServerPlayer p : core.playersNear(core.arenaRadius() + 8))
                         if (p.distanceToSqr(land) < 12 * 12) p.displayClientMessage(ui("billet"), true);
@@ -823,6 +827,16 @@ public final class ArisFight {
 
     // ---------------------------------------------------------------- the end
 
+    /**
+     * FX audit 21.11: her chunk unloaded. The fight is rebuilt from scratch on load (afterLoad starts the aura again), so the endless
+     * fx of this one are stopped now, or they stay as ghosts where they were (the anvils are not saved either). Nothing else changes.
+     */
+    void unloadFx(ServerLevel sl) {
+        for (Anvil an : anvils) Fx.stop(sl, an.fx, "");
+        if (mythicFx > 0) Fx.stop(sl, mythicFx, "");
+        mythicFx = -1;
+    }
+
     /** Surrender / death: everything of hers goes (anvils, blades, billets, chains, the floor, the aura, the steam). */
     void cleanup(ServerLevel sl) {
         for (Anvil an : anvils) removeAnvil(sl, an);
@@ -835,6 +849,8 @@ public final class ArisFight {
         clearForge(sl);
         if (mythicFx > 0) Fx.stop(sl, mythicFx, "");
         mythicFx = -1;
+        if (lastBlowFx > 0 && Fx.running(lastBlowFx)) Fx.stop(sl, lastBlowFx, "");
+        lastBlowFx = -1;
         quenchAt = null;
         actingUntil = 0;
     }

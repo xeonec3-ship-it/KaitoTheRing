@@ -67,7 +67,8 @@ public final class BossBarClient {
         Bar b = BARS.get(e.getBossEvent().getId());
         if (b == null) return;
         e.setCanceled(true);
-        if (!b.visible || BossCam.hidesBars()) {   // the intro: the bar comes at its end
+        // this event fires only for a row the server boss event made (BossCore / FireBossEntity), so inRow and the message are known here
+        if (!ru.pohsmp.core.boss.BossBarRow.drawn(true, true, b.visible, BossCam.hidesBars())) {   // the intro: the bar comes at its end
             e.setIncrement(0);
             return;
         }

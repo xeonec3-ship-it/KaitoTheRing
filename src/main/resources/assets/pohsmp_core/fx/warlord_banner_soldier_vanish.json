@@ -1,0 +1,44 @@
+{
+ "comment": "T34: солдат уходит со знаменем (caster = солдат, 20 тиков).",
+ "style": "martin_ghost",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "texture": "mote_wisp",
+   "count": 26,
+   "rate": 4,
+   "spread": 0.5,
+   "speed": 0.04,
+   "gravity": -0.012,
+   "size": [
+    0.5,
+    1.0
+   ],
+   "life": 22,
+   "color": "#8FD8F0",
+   "blend": "translucent"
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "texture": "spark_soft",
+   "count": 16,
+   "rate": 4,
+   "spread": 0.4,
+   "speed": 0.1,
+   "gravity": -0.01,
+   "size": [
+    0.12,
+    0.02
+   ],
+   "life": 14,
+   "color": "@secondary"
+  }
+ ]
+}

@@ -1,0 +1,53 @@
+{
+ "comment": "T34 «Объятия Ревности»: рывок (caster = ЦЕЛЬ, follow, 8 тиков, тик 14 — код тянет 14–20): нити натянуты, красный шлейф за целью.",
+ "style": "irina",
+ "duration": 8,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 6,
+   "size": 1.2,
+   "ring": true,
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": 8,
+   "thickness": 0.06,
+   "pulse": [
+    0.5,
+    2
+   ],
+   "motes": 6,
+   "texture": "mote_thread",
+   "ring": false,
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 6,
+   "texture": "mote_thread",
+   "count": 100000,
+   "rate": 3,
+   "spread": 0.4,
+   "speed": 0.02,
+   "spin": 30,
+   "size": [
+    0.24,
+    0.06
+   ],
+   "life": 10,
+   "color": "@primary",
+   "follow": true
+  }
+ ]
+}

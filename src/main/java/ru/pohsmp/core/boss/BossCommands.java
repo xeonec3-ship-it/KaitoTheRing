@@ -26,7 +26,7 @@ public final class BossCommands {
     private BossCommands() {}
 
     /** All five ids (the ones without code yet answer «not implemented»). */
-    private static final String[] IDS = {"cult_leader", "irina", "aris", "martin", "ereb"};
+    private static final String[] IDS = {"cult_leader", "irina", "aris", "martin", "ereb", "ereb_hand"};
 
     @SubscribeEvent
     public static void onRegister(RegisterCommandsEvent e) {

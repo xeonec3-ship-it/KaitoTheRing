@@ -1,0 +1,23 @@
+{
+ "comment": "T34: призрачный солдат знамени (caster = солдат, follow, до Fx.stop): голубой ореол, золотые искры.",
+ "style": "martin_ghost",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.06,
+   "pulse": [
+    0.3,
+    20
+   ],
+   "color": "@primary",
+   "motes": 4,
+   "ring": false,
+   "brightness": 0.5
+  }
+ ]
+}

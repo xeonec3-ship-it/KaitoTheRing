@@ -1,0 +1,47 @@
+{
+ "comment": "T34 «Шаг сквозь отражение»: выход из ряби за спиной цели (caster = заклинатель на новом месте, 10 тиков, тик 4).",
+ "style": "ereb",
+ "duration": 10,
+ "elements": [
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 7,
+   "shape": "sphere",
+   "radius": 0.9,
+   "rim": 1.0,
+   "color": "@secondary",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.1,0",
+   "duration": 4,
+   "size": 0.9,
+   "color": "#FFFFFF",
+   "brightness": 0.7
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 10,
+   "rate": 8,
+   "spread": 0.45,
+   "speed": 0.05,
+   "gravity": 0.006,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.16,
+    0.05
+   ],
+   "life": 10,
+   "color": "#E8FAFF"
+  }
+ ]
+}

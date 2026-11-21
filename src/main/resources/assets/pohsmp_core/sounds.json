@@ -1465,16 +1465,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.slam",
     "sounds": [
       {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 0.55,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/slam_1",
+        "attenuation_distance": 64
       },
       {
-        "name": "minecraft:entity.iron_golem.damage",
-        "type": "event",
-        "pitch": 0.7,
-        "volume": 0.7
+        "name": "pohsmp_core:boss/ereb_hand/slam_2",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1482,16 +1478,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.grab",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_cluster.place",
-        "type": "event",
-        "pitch": 0.7,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/grab_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:block.glass.place",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 0.9
+        "name": "pohsmp_core:boss/ereb_hand/grab_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1499,16 +1491,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.squeeze",
     "sounds": [
       {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 1.3,
-        "volume": 0.7
+        "name": "pohsmp_core:boss/ereb_hand/squeeze_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "minecraft:block.amethyst_cluster.break",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 0.9
+        "name": "pohsmp_core:boss/ereb_hand/squeeze_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1516,16 +1504,16 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.crack",
     "sounds": [
       {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 0.75,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/crack_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/crack_2",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/crack_3",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1533,16 +1521,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.mask_shatter",
     "sounds": [
       {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 0.9,
-        "volume": 1.0
-      },
-      {
-        "name": "minecraft:block.amethyst_cluster.break",
-        "type": "event",
-        "pitch": 1.2,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/mask_shatter",
+        "attenuation_distance": 56
       }
     ]
   },
@@ -1550,16 +1530,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.shard_ring",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_block.chime",
-        "type": "event",
-        "pitch": 1.8,
-        "volume": 0.9
+        "name": "pohsmp_core:boss/ereb_hand/shard_ring_1",
+        "attenuation_distance": 24
       },
       {
-        "name": "minecraft:block.amethyst_block.chime",
-        "type": "event",
-        "pitch": 2.0,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/shard_ring_2",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1567,16 +1543,16 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.shard_break",
     "sounds": [
       {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 1.6,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/shard_break_1",
+        "attenuation_distance": 24
       },
       {
-        "name": "minecraft:block.amethyst_cluster.break",
-        "type": "event",
-        "pitch": 1.5,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/shard_break_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/shard_break_3",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1584,16 +1560,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.shard_burst",
     "sounds": [
       {
-        "name": "minecraft:entity.generic.explode",
-        "type": "event",
-        "pitch": 1.4,
-        "volume": 0.6
+        "name": "pohsmp_core:boss/ereb_hand/shard_burst_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 0.7,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/shard_burst_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1601,16 +1573,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.flame",
     "sounds": [
       {
-        "name": "minecraft:item.firecharge.use",
-        "type": "event",
-        "pitch": 0.7,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/flame_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event",
-        "pitch": 1.2,
-        "volume": 0.7
+        "name": "pohsmp_core:boss/ereb_hand/flame_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1618,16 +1586,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.grip",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_cluster.break",
-        "type": "event",
-        "pitch": 0.5,
-        "volume": 1.0
-      },
-      {
-        "name": "minecraft:entity.iron_golem.attack",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 0.6
+        "name": "pohsmp_core:boss/ereb_hand/grip",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1635,16 +1595,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.oath",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_block.chime",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 1.0
-      },
-      {
-        "name": "minecraft:entity.illusioner.cast_spell",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/oath",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1652,16 +1604,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.mirror",
     "sounds": [
       {
-        "name": "minecraft:entity.illusioner.mirror_move",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 0.9
+        "name": "pohsmp_core:boss/ereb_hand/mirror_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event",
-        "pitch": 0.9,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/mirror_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1669,16 +1617,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.sky_hand",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.activate",
-        "type": "event",
-        "pitch": 0.5,
-        "volume": 1.0
-      },
-      {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event",
-        "pitch": 0.5,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/sky_hand",
+        "attenuation_distance": 80
       }
     ]
   },
@@ -1686,16 +1626,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.reveal",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.power_select",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 1.0
-      },
-      {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event",
-        "pitch": 0.55,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/ereb_hand/reveal",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1703,16 +1635,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.dissolve",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_cluster.break",
-        "type": "event",
-        "pitch": 0.85,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/dissolve_1",
+        "attenuation_distance": 48
       },
       {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 0.75,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/dissolve_2",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1720,16 +1648,12 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.changeling",
     "sounds": [
       {
-        "name": "minecraft:item.firecharge.use",
-        "type": "event",
-        "pitch": 0.9,
-        "volume": 0.9
+        "name": "pohsmp_core:boss/ereb_hand/changeling_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "minecraft:block.amethyst_block.chime",
-        "type": "event",
-        "pitch": 1.4,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/changeling_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1737,16 +1661,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.retreat",
     "sounds": [
       {
-        "name": "minecraft:entity.illusioner.mirror_move",
-        "type": "event",
-        "pitch": 1.1,
-        "volume": 0.8
-      },
-      {
-        "name": "minecraft:block.amethyst_block.step",
-        "type": "event",
-        "pitch": 0.8,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/retreat",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1754,16 +1670,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.reflection",
     "sounds": [
       {
-        "name": "minecraft:entity.illusioner.prepare_mirror",
-        "type": "event",
-        "pitch": 0.9,
-        "volume": 1.0
-      },
-      {
-        "name": "minecraft:block.amethyst_block.resonate",
-        "type": "event",
-        "pitch": 1.1,
-        "volume": 0.9
+        "name": "pohsmp_core:boss/ereb_hand/reflection",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1771,16 +1679,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.swarm",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_cluster.place",
-        "type": "event",
-        "pitch": 1.3,
-        "volume": 0.9
-      },
-      {
-        "name": "minecraft:entity.allay.item_thrown",
-        "type": "event",
-        "pitch": 0.9,
-        "volume": 0.8
+        "name": "pohsmp_core:boss/ereb_hand/swarm",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1788,16 +1688,19 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.swarm_chime",
     "sounds": [
       {
-        "name": "minecraft:block.amethyst_block.chime",
-        "type": "event",
-        "pitch": 2.0,
-        "volume": 0.35
+        "name": "pohsmp_core:boss/ereb_hand/swarm_chime_1",
+        "attenuation_distance": 12,
+        "volume": 0.5
       },
       {
-        "name": "minecraft:block.amethyst_block.chime",
-        "type": "event",
-        "pitch": 1.8,
-        "volume": 0.35
+        "name": "pohsmp_core:boss/ereb_hand/swarm_chime_2",
+        "attenuation_distance": 12,
+        "volume": 0.5
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/swarm_chime_3",
+        "attenuation_distance": 12,
+        "volume": 0.5
       }
     ]
   },
@@ -1805,10 +1708,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.false_victory",
     "sounds": [
       {
-        "name": "minecraft:ui.toast.challenge_complete",
-        "type": "event",
-        "pitch": 1.0,
-        "volume": 0.9
+        "name": "pohsmp_core:boss/ereb_hand/false_victory",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1816,16 +1717,8 @@
     "subtitle": "subtitles.pohsmp_core.ereb_hand.dawn_wave",
     "sounds": [
       {
-        "name": "minecraft:block.beacon.deactivate",
-        "type": "event",
-        "pitch": 0.6,
-        "volume": 1.0
-      },
-      {
-        "name": "minecraft:block.glass.break",
-        "type": "event",
-        "pitch": 0.5,
-        "volume": 1.0
+        "name": "pohsmp_core:boss/ereb_hand/dawn_wave",
+        "attenuation_distance": 80
       }
     ]
   },
@@ -2963,6 +2856,119 @@
       },
       {
         "name": "pohsmp_core:boss/ereb/hurt_3",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "ereb_hand.aura": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.aura",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/aura",
+        "attenuation_distance": 24,
+        "volume": 0.25
+      }
+    ]
+  },
+  "ereb_hand.hum": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.hum",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/hum_1",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/hum_2",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "ereb_hand.whoosh_big": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.whoosh_big",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/whoosh_big_1",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/whoosh_big_2",
+        "attenuation_distance": 40
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/whoosh_big_3",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "ereb_hand.mask": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.mask",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/mask_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/mask_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "ereb_hand.flame_charge": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.flame_charge",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/flame_charge",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "ereb_hand.replica_break": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.replica_break",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/replica_break",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "ereb_hand.step": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.step",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/step_1",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/step_2",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/step_3",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/step_4",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      }
+    ]
+  },
+  "ereb_hand.hurt": {
+    "subtitle": "subtitles.pohsmp_core.ereb_hand.hurt",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/ereb_hand/hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/ereb_hand/hurt_3",
         "attenuation_distance": 16
       }
     ]

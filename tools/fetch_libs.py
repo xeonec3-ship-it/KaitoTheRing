@@ -13,6 +13,7 @@ JARS = [
     ("playeranimator", "1.0.2-rc1+1.20-forge", "player-animation-lib-forge-1.0.2-rc1+1.20.jar"),
     ("epic-fight", "20.14.17-mc1.20.1-forge", "epic-fight-20.14.17-mc1.20.1-forge.jar"),
     ("simple-voice-chat", "forge-1.20.1-2.6.20", "voicechat-forge-1.20.1-2.6.20.jar"),   # T22, build.gradle compileOnly
+    ("curios", "5.14.1+1.20.1", "curios-forge-5.14.1+1.20.1.jar"),   # T35 mantle/mask slots (Iron's dependency, soft for us)
 ]
 # saved under another name: build.gradle reads libs/ as a flat repository, "blank:<name>:<version>" -> <name>-<version>.jar
 SAVE_AS = {"epic-fight-20.14.17-mc1.20.1-forge.jar": "epicfight-1.20.1-20.14.17.jar"}

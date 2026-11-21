@@ -74,9 +74,9 @@ public final class CultMath {
     // Degrees, model axes (TransformStack.pushRotation / pushPosition; the animation files have X/Y of rotations negated).
     // GeckoLib turns the held item by the hand bone twice (BlockAndItemGeoLayer), Iron's tuned these numbers in the game with it.
     public static final float[] HOLD_ARM = {-30, -30, 10}, HOLD_HAND = {-5, 0, -48};
-    /** The scythe slides 3 px along its shaft inside the fist (same orientation): with Tyros's numbers the blade dips 0.7 px into the
-     *  ground on the idle arm bob and 3.4 px while walking; with the slide and a still right arm it stays 0.8 px above the ground. */
-    public static final float[] HOLD_SLIDE = {-0.96f, 0.09f, 2.84f};
+    // The grip is 3 px closer to the butt along the shaft - in the item model (cult_scythe display translation), the same in every
+    // frame: with Tyros's numbers the blade touched the ground on the idle arm bob. Never a position push of the hand bone (it is an
+    // empty bone, the fist is the arm cube): it took the scythe out of the fist (21.11).
 
     /** Extra X rotation (radians, model axes) of the scythe arm while walking: cancels the base swing of AbstractSpellCastingMobModel
      *  (cos(y·0.6662 + π)·2·x·0.5) so the arm holding the scythe stays still; x, y = limb swing amount and position. */

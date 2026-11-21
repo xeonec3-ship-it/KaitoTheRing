@@ -60,16 +60,12 @@ public class CultLeaderModel extends AbstractSpellCastingMobModel {
                 if (anim) {
                     h.arm.set(arm.getRotX(), arm.getRotY(), arm.getRotZ());
                     h.hand.set(hand.getRotX(), hand.getRotY(), hand.getRotZ());
-                    h.pos.set(hand.getPosX(), hand.getPosY(), hand.getPosZ());
                     h.stop = -1;
                 } else if (entity.getMainHandItem().is(CultLeader.SCYTHE.get())) {
                     if (h.stop < 0) h.stop = now;
                     float w = h.seen ? CultMath.holdWeight(now - h.stop) : 1;
                     toward(arm, h.arm, deg(CultMath.HOLD_ARM), w);
                     toward(hand, h.hand, deg(CultMath.HOLD_HAND), w);
-                    Vector3f slide = new Vector3f(CultMath.HOLD_SLIDE[0], CultMath.HOLD_SLIDE[1], CultMath.HOLD_SLIDE[2]);
-                    Vector3f p = new Vector3f(h.pos).lerp(slide, w);
-                    transformStack.pushPosition(hand, p.sub(hand.getPosX(), hand.getPosY(), hand.getPosZ()));
                     transformStack.pushRotation(arm, CultMath.holdArmWalk(limb.x(), limb.y()), 0, 0);
                 }
                 h.seen |= anim;
@@ -92,7 +88,7 @@ public class CultLeaderModel extends AbstractSpellCastingMobModel {
 
     /** Client state of the scythe arm per boss: the last animated pose and when the animation stopped. */
     private static final class Hold {
-        final Vector3f arm = new Vector3f(), hand = new Vector3f(), pos = new Vector3f();
+        final Vector3f arm = new Vector3f(), hand = new Vector3f();
         float stop = -1;
         boolean seen;
     }

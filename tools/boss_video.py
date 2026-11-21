@@ -101,10 +101,9 @@ def cult_hold_anims():
     """Глава Культа вне анимаций (CultLeaderModel.setCustomAnimations): `~hold` — поза хвата Тироса (CultMath.HOLD_*), `~walk` — ходьба
     (AbstractSpellCastingMobModel Iron's: ноги ±cos·1.4·x·0.75, левая рука cos·x, корпус подпрыгивает; правая с косой неподвижна;
     x = 0.6 — наш getLimbSwing, цикл 9.43 позиции шага ≈ 0.47 с на полном ходу). Оси — оси анимаций (X/Y поворота — минус к Java)."""
-    from gen_cult_leader_extra import CARRY_ARM, CARRY_HAND, CARRY_POS
+    from gen_cult_leader_extra import CARRY_ARM, CARRY_HAND
     hold = {'animation_length': 1.0, 'loop': True, 'bones': {
-        'right_arm': {'rotation': {'0.0': {'vector': CARRY_ARM}}}, 'bipedHandRight': {'rotation': {'0.0': {'vector': CARRY_HAND}},
-                                                                                    'position': {'0.0': {'vector': CARRY_POS}}}}}
+        'right_arm': {'rotation': {'0.0': {'vector': CARRY_ARM}}}, 'bipedHandRight': {'rotation': {'0.0': {'vector': CARRY_HAND}}}}}
     L, x, R = 0.94, 0.6, 180 / math.pi
     ch = {b: {} for b in ('right_leg', 'left_leg', 'left_arm', 'body')}
     for i in range(int(L / 0.02) + 1):

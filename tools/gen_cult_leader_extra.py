@@ -53,9 +53,11 @@ ONE = [1, 1, 1]
 # Внимание: GeckoLib поворачивает предмет кистью ДВАЖДЫ (BlockAndItemGeoLayer) — ключи кисти в наших анимациях задаются видимым
 # поворотом через anim_cloth.V(...) (в файл пишется половина). Прежняя поза «несёт косу» (рука −25,10,15 / кисть 0,−5.5,96) была
 # подобрана по превью с одним поворотом: в игре кисть 96° давала ~192° — коса стояла боком, лезвие у головы.
-# Коса сдвинута в кулаке на 3 px вдоль древка к лезвию-вверх (CARRY_POS, ориентация та же): у Тироса в покое лезвие на 0.7 px
-# ниже земли при покачивании руки, в ходьбе — на 3.4 px; со сдвигом и без качания правой руки при ходьбе — 0.8 px над землёй.
-CARRY_ARM, CARRY_HAND, CARRY_POS = [30, 30, 10], [5, 0, -48], [-0.96, 0.09, 2.84]
+# Хват на 3 px ближе к подтоку — статически в модели предмета (cult_scythe display.thirdperson_righthand.translation, 21.11):
+# у хвата Тироса лезвие касается земли на 0.7 px при покачивании руки, со сдвигом — 0.8 px над землёй. КЛЮЧЕЙ POSITION У КИСТИ
+# НЕТ (запрет управляющего 21.11): кисть — пустая кость, кулак рисует рука; сдвиг кисти отрывал косу от кулака.
+# CARRY_POS оставлен нулём для совместимости (tools/guard_break_cult_leader.py).
+CARRY_ARM, CARRY_HAND, CARRY_POS = [30, 30, 10], [5, 0, -48], [0, 0, 0]
 from anim_cloth import V  # noqa: E402
 IO, OC, IQ = 'easeInOutSine', 'easeOutCubic', 'easeInQuart'
 
@@ -171,33 +173,39 @@ def write_anims():
     # где лезвие в земле или сквозь тело/ноги, — наименьший доворот кисти (три прохода: следующие добирают плавные переходы прежних)
     import anim_check
     plays = list(ours) + [n for n in anim_check.PLAYS['cult_leader'] if n in src['animations']]
+    # коса всегда в кулаке (21.11, «коса поехала»): у кисти нет своих кубов, кулак рисует рука — ключи position кисти отрывают косу
+    # от кулака. Снимаются у всех (у Iron's они есть: scythe_downslash_sideslash −4 px и др.), кроме fire_boss_spawn — там коса
+    # нарочно влетает в руку при появлении
+    for n in plays:
+        if n != 'fire_boss_spawn':
+            out['animations'][n]['bones'].get('bipedHandRight', {}).pop('position', None)
     # fire_boss_spawn: на 6.42 с коса возникает в руке, влетая из точки сбоку-снизу (21, −6, 0) — лезвие проходило сквозь землю;
     # влетает сбоку-сверху (10, 10, 0), время то же
     out['animations']['fire_boss_spawn']['bones']['bipedHandRight']['position']['6.4167']['vector'] = [10, 10, 0]
     # cult_leader_guard_break (T32) — коса уже посчитана с двойным поворотом и без земли/тела (tools/guard_break_cult_leader.py):
     # обработки косы ниже переписали бы её ключи кисти на свою сетку (провороты между ключами) — её не трогаем
     plays = [n for n in plays if n != 'cult_leader_guard_break']
+    # слом стойки кончается согнутым корпусом (27.5° / 47.5°) — GeckoLib сбрасывает его мгновенно и уносит косу: корпус плавно
+    # в покой за последние 0.45 с (проверка рывков 21.11)
+    anim_cloth.rest_end(out['animations'], ['fire_boss_break_stance'])
     # короткие касты Iron's (< 0.5 с): правая рука с косой не дёргается вверх на долю секунды — держит косу, кастует левая
     still = [n for n in anim_check.SPELL_ANIMS if n in out['animations'] and float(out['animations'][n]['animation_length']) < 0.5]
     # «Пепел Меллисто» — цепочка: рассыпание → (вихрь, модель скрыта) → сборка → разрез; сборка кончается замахом, разрез с него
     # начинается — эти стыки не через позу хвата (иначе «замах → хват → замах»)
-    hold = anim_cloth.hold_additive(out['animations'], plays, CARRY_ARM, CARRY_HAND, hand_pos=CARRY_POS,
+    hold = anim_cloth.hold_additive(out['animations'], plays, CARRY_ARM, CARRY_HAND,
                                     no_end=('fire_boss_death', 'cult_leader_ash_dissolve', 'cult_leader_ash_reform'),
                                     no_start=('cult_leader_ash_reform', 'cult_leader_ash_slash'), still=still)
     print('  поза хвата всю анимацию:', sorted(n for n, v in hold.items() if v != 'edges'))
-    # поправки косы ниже начинаются с нуля на первом кадре (там поза кода) — кроме цепочки «Пепла» и коротких кастов (у них корпус
-    # Iron's с первого кадра в позе каста — скачок корпуса и так есть, в игре у Тироса тоже)
-    fs = ('cult_leader_ash_reform', 'cult_leader_ash_slash', *still)
+    # поправки косы ниже начинаются с нуля на первом кадре (там поза кода) — кроме цепочки «Пепла»
+    fs = ('cult_leader_ash_reform', 'cult_leader_ash_slash')
     ag = {'cult_leader_first_flame': (0.9, 5.2)}
-    # коса в земле/сквозь тело (проверка рывков 21.11): плавный сдвиг косы в кулаке (anim_cloth.smooth_clear), поворот косы —
-    # как в анимации; прежние weapon/nudge меняли поправку ступеньками каждые 0.025 с — коса дёргалась
-    print('  коса: плавный сдвиг', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs))
-    print('  коса: плавный доворот (где сдвига нет)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs,
-                                                                             kind='rot'))
-    for _ in range(2):
-        print('  коса: плавный сдвиг (добор)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs))
-        print('  коса: плавный доворот (добор)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs,
-                                                                       kind='rot'))
+    # коса в земле/сквозь тело: плавный поворот всей руки (kind='arm': отводит косу от тела, в кулаке она как есть), затем
+    # доворот кисти (kind='rot') — anim_cloth.smooth_clear, сглаженный, без
+    # ступенек. Сдвигом кисти (position) — нельзя: кисть — пустая кость, кулак рисует рука, сдвиг отрывает косу от кулака (21.11)
+    for _ in range(0 if os.environ.get('CULT_NO_CLEAR') else 2):
+        for kind, what in (('arm', 'поворот руки'), ('rot', 'доворот кисти')):
+            print('  коса: плавный %s' % what, anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag,
+                                                                       free_start=fs, kind=kind))
     # удары косой FireBoss по эталону Epic Fight (21.11, tools/cult_ef.py): удар быстрее, пик клинка — на тике урона, замах/возврат
     # длиннее; тики и длины прежние. ПОСЛЕ позы хвата и поправок косы: они сдвигаются во времени вместе с движением (smooth_clear не
     # трогает окна у тиков урона — до сжатия коса на быстром ударе проходила сквозь ногу без поправки)

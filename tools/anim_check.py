@@ -9,7 +9,8 @@
   python3 tools/anim_check.py [cult_leader|ereb] [--anim имя] [--dt 0.1] [--json путь]
 Печатает по каждой анимации найденные нарушения:
   dir      — в момент удара (события timeline / тики AttackKeyframe Iron's) острие/рука позади босса (z > 0) или острие не впереди груди;
-  body     — оружие проходит сквозь корпус/голову/ноги (точки лезвия и древка внутри кубов торса, головы, ног);
+  body     — оружие (древко и лезвие) сквозь корпус/голову/корону/ноги/обе руки (у правой — кроме самого кулака);
+  grip     — кисть сдвинута (position) от кулака: оружие висит отдельно от руки (кроме влёта косы в руку в fire_boss_spawn);
   ground   — оружие ниже земли (y < −0.5);
   spin     — оружие прокручивается в руке (поворот за 0.1 с > 120°, не на взмахе) или скачок кости;
   arm      — рука в вывороте (кисть позади плеча больше чем на 5 px при поднятой руке / рука сквозь торс);
@@ -252,6 +253,19 @@ class Model:
             self._pts_h = np.hstack([self.item_pts, np.ones((len(self.item_pts), 1))])
         return (self._pts_h @ m.T)[:, :3]
 
+    def weapon_hits(self, W, ip, margin=0.6):
+        """Сколько точек оружия (древко и лезвие) внутри каждой части тела: торс, голова, корона, ноги, обе руки. У правой руки —
+        кроме точек в 4 px от кисти (там древко в кулаке по замыслу)."""
+        out = {}
+        grip = ap(W['bipedHandRight'], (0, 0, 0))
+        for bp in ('torso', 'head', 'armor_head', 'right_leg', 'left_leg', 'left_arm', 'right_arm'):
+            if bp not in self.bones:
+                continue
+            pts = ip if bp != 'right_arm' else ip[np.linalg.norm(ip - grip, axis=1) > 4.0]
+            if len(pts):
+                out[bp] = int(self.inside(W, bp, pts, margin=margin).sum())
+        return out
+
     def inside(self, W, bone, pts, margin=0.4):
         """Какие точки внутри кубов кости (с запасом margin внутрь)."""
         res = np.zeros(len(pts), bool)
@@ -288,6 +302,11 @@ def arm_dir(W, side):
     return sh, hand
 
 
+def bk_pos(an, t):
+    ch = an['bones'].get('bipedHandRight', {}).get('position')
+    return float(np.linalg.norm(chan_at(ch, t))) if ch is not None else 0.0
+
+
 def check(name, only=None, dt=0.1, verbose=False):
     M = Model(name)
     anims = load_anims(name)
@@ -313,10 +332,13 @@ def check(name, only=None, dt=0.1, verbose=False):
             vis = np.linalg.det(W['bipedHandRight'][:3, :3]) > 1e-6
             if vis:
                 # сквозь тело
-                for bp in body_parts:
-                    hit = M.inside(W, bp, ip, margin=0.6)
-                    if hit.sum() >= 2:
-                        issues.append((t, 'body', '%d точек оружия внутри %s' % (hit.sum(), bp)))
+                for bp, k in M.weapon_hits(W, ip).items():      # вся коса (древко + лезвие) против тела и обеих рук
+                    if k >= 2:
+                        issues.append((t, 'body', '%d точек оружия внутри %s' % (k, bp)))
+                # кулак ↔ точка хвата: у кисти нет своих кубов, кулак рисует рука — сдвиг кисти (position) отрывает оружие от кулака
+                hp = bk_pos(an, t)
+                if hp > 0.05 and an_name != 'fire_boss_spawn':     # только влёт косы в руку при появлении
+                    issues.append((t, 'grip', 'кисть сдвинута от кулака на %.1f px' % hp))
                 planted = an_name == 'cult_leader_first_flame' and 0.9 <= t <= 5.2      # подток древка воткнут в землю нарочно
                 if ip[:, 1].min() < -0.5 and not planted:
                     issues.append((t, 'ground', 'оружие ниже земли на %.1f px' % -ip[:, 1].min()))

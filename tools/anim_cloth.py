@@ -132,10 +132,7 @@ def _weapon_bad(M, W, edge):
     ip = M.item_world(W)
     if np.linalg.det(W['bipedHandRight'][:3, :3]) < 1e-6:
         return 0
-    bad = 0
-    for bp in PARTS:
-        if bp in M.bones:
-            bad += int(M.inside(W, bp, ip, margin=0.6).sum() >= 2)
+    bad = sum(int(k >= 2) for k in M.weapon_hits(W, ip).values())     # вся коса против тела и обеих рук
     if not edge and ip[:, 1].min() < -0.5:
         bad += 1
     return bad
@@ -457,6 +454,8 @@ def _apply(an, bone, kind, off, a0, a1, ramp, step=0.025):
 POS_GRID = sorted({(x, y, z) for x in range(-12, 13, 2) for y in range(0, 17, 2) for z in range(-12, 13, 2)},
                   key=lambda v: (v[0] ** 2 + v[1] ** 2 + v[2] ** 2, v))[1:]
 ROT_GRID = sorted(set(GRID + GRID3) - {(0, 0, 0)}, key=lambda v: (v[0] ** 2 + v[1] ** 2 + v[2] ** 2, v))
+ARM_GRID = sorted({(x, y, z) for x in range(-40, 41, 10) for y in range(-30, 31, 10) for z in range(-20, 41, 10)} - {(0, 0, 0)},
+                  key=lambda v: (v[0] ** 2 + v[1] ** 2 + v[2] ** 2, v))
 
 
 def clear(boss, anims, names, step=0.025, ramp=0.15, allow_ground=None, passes=4):
@@ -546,6 +545,15 @@ def _gauss(v, sigma):
     return np.stack([np.convolve(pad[:, j], k, mode='valid') for j in range(v.shape[1])], axis=1)
 
 
+def _jerk(M, an):
+    """Наибольший скачок угловой скорости косы кадр к кадру (°/с за кадр, 60 к/с) — как tools/scythe_jitter.py."""
+    import scythe_jitter as J
+    L = float(an['animation_length'])
+    Rs, P = J.sample(M, an, [i / 60 for i in range(int(L * 60) + 1)])
+    dw, _ = J.jerk(Rs, P)
+    return float(dw.max()) if len(dw) else 0.0
+
+
 def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, grow=6, sigma=3.0, tries=1, cont=2.0, kind='pos',
                  free_start=()):
     """Коса в земле или сквозь тело → плавный сдвиг косы в кулаке (position кисти; поворот косы как в анимации):
@@ -565,6 +573,8 @@ def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, g
         ts = [min(L, i * step) for i in range(n + 1)]
         hb = an['bones'].setdefault('bipedHandRight', {})
         rot = lambda t: C.chan_at(hb['rotation'], t) if 'rotation' in hb else [0.0, 0.0, 0.0]
+        ab = an['bones'].setdefault('right_arm', {})
+        arot = lambda t: C.chan_at(ab['rotation'], t) if 'rotation' in ab else [0.0, 0.0, 0.0]
         Ws = [M.world(an, t) for t in ts]
         gr = [not (ag and ag[0] <= t <= ag[1]) for t in ts]
 
@@ -575,6 +585,9 @@ def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, g
                 W = Ws[i]
             elif kind == 'pos':
                 W = M.with_hand(Ws[i], an, ts[i], rot(ts[i]), list(d))
+            elif kind == 'arm':                         # поворот всей руки (коса в кулаке — как есть)
+                r = arot(ts[i])
+                W = M.world(an, ts[i], {'right_arm': [r[k] + d[k] for k in range(3)]})
             else:
                 r = rot(ts[i])
                 W = M.with_hand(Ws[i], an, ts[i], [r[k] + d[k] for k in range(3)])
@@ -584,6 +597,9 @@ def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, g
         B = [bad(i, (0, 0, 0)) for i in range(len(ts))]
         if not any(B):
             continue
+        if kind == 'arm' and any(isinstance(e, dict) and e.get('easing') == 'step'
+                                 for e in (ab.get('rotation') or {}).values() if isinstance(ab.get('rotation'), dict)):
+            continue                                    # step-ключи руки Iron's (411° → 51°): пересэмплирование их ломает
         cands = []
         for i in range(len(ts)):
             if not B[i]:
@@ -591,7 +607,11 @@ def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, g
                 continue
             c = []
             strike = any(a <= ts[i] <= z for a, z in prot)
-            grid = POS_GRID if kind == 'pos' else [d for d in ROT_GRID if not strike or max(abs(x) for x in d) <= 30]
+            if strike:                                  # удар: поворот косы — как задумано (плоскость, остриё), не правим
+                cands.append([(0, 0, 0)])
+                continue
+            grid = (POS_GRID if kind == 'pos' else ARM_GRID if kind == 'arm' else ROT_GRID)
+            grid = [d for d in grid if kind == 'pos' or not strike or max(abs(x) for x in d) <= (20 if kind == 'arm' else 30)]
             for d in grid:
                 if not bad(i, d):
                     c.append(d)
@@ -637,10 +657,19 @@ def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, g
             for i in still:
                 hit[max(0, i - grow):i + grow + 1] = True
             mult = np.where(hit, np.minimum(2.0, mult * 1.3), mult)
+        for i in range(len(ts)):                        # окна ударов — без поправки и после сглаживания
+            if any(a <= ts[i] <= z for a, z in prot):
+                sm[i] = 0
         if not np.abs(sm).max() > 1e-3:
             continue
+        # поправка принимается, только если плохих кадров в анимации стало меньше (сглаживание задевает соседние кадры)
+        after = sum(bad(i, tuple(sm[i])) for i in range(len(ts)))
+        if after >= sum(B):
+            continue
+        jerk0 = _jerk(M, an)
         chn = 'position' if kind == 'pos' else 'rotation'
-        orig = hb.get(chn)
+        tgt = ab if kind == 'arm' else hb
+        orig = tgt.get(chn)
         val = (lambda t: C.chan_at(orig, t)) if orig is not None else (lambda t: [0.0, 0.0, 0.0])
         idx = [i for i in range(len(ts)) if np.abs(sm[i]).max() > 1e-3]
         lo_t, hi_t = ts[max(0, idx[0] - 1)], ts[min(len(ts) - 1, idx[-1] + 1)]
@@ -654,7 +683,14 @@ def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, g
             if lo_t <= t <= hi_t:
                 v = val(t)
                 keys[round(t, 4)] = {'vector': [round(v[j] + sm[i][j], 3) for j in range(3)]}
-        hb[chn] = {('%.6g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
+        prev_ch = tgt.get(chn)
+        tgt[chn] = {('%.6g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
+        if _jerk(M, an) > jerk0 * 1.05 + 30:            # и только если рывок косы (60 к/с) не вырос — иначе отказ
+            if prev_ch is None:
+                tgt.pop(chn, None)
+            else:
+                tgt[chn] = prev_ch
+            continue
         rep[name] = round(float(np.linalg.norm(sm, axis=1).max()), 1)
     return rep
 
@@ -665,7 +701,7 @@ SNAP = ('easeOutQuart', 'easeOutCubic')
 
 def strike_ease(anims, names):
     """Удар без толчка (проверка рывков 21.11): сегмент В момент удара (ключ на событии timeline) с easeOut* — коса стартует с
-    максимальной скорости из покоя замаха, это рывок — заменяется на easeInCubic: разгон, пик скорости ровно на ударе (как у ударов
+    максимальной скорости из покоя замаха, это рывок — заменяется на easeInQuad: разгон, пик скорости ровно на ударе (как у ударов
     Тироса). Сегмент ПОСЛЕ удара с easeInOut* (старт с нуля после пика) → easeOutQuad: гашение с той же скорости. Остальные сегменты
     easeOut*, что стартуют из покоя (предыдущий сегмент кончается без скорости), → easeInOutSine. Возвращает число правок."""
     zero_end = (None, 'linear', 'easeInOutSine', 'easeInOutQuad', 'easeInOutCubic', 'easeOutQuart', 'easeOutCubic', 'easeOutQuad')
@@ -691,7 +727,7 @@ def strike_ease(anims, names):
                     prev = ch[ks[i - 1]] if isinstance(ch[ks[i - 1]], dict) else {}
                     same = prev.get('vector') == e.get('vector')
                     if at_strike and ez in SNAP:
-                        e['easing'] = 'easeInCubic'
+                        e['easing'] = 'easeInQuad'
                         cnt += 1
                     elif after_strike and ez in ('easeInOutQuad', 'easeInOutSine'):
                         e['easing'] = 'easeOutQuad'
@@ -702,6 +738,37 @@ def strike_ease(anims, names):
                             e['easing'] = 'easeInOutSine'
                             cnt += 1
     return cnt
+
+
+def rest_end(anims, names, bones=('body', 'torso', 'head', 'left_arm', 'left_leg', 'right_leg'), win=0.45, step=0.05):
+    """Конец анимации не в покое (Iron's: fire_boss_break_stance кончается согнутым корпусом), а GeckoLib после анимации сбрасывает
+    позу мгновенно (у контроллеров Iron's нет перехода) — скачок корпуса уносит косу. Кости плавно (квинтика) уходят в покой за
+    последние win с; правую руку и кисть ведёт hold_additive (в позу хвата)."""
+    for n in names:
+        an = anims.get(n)
+        if not an:
+            continue
+        L = float(an['animation_length'])
+        a0 = L - win
+        for b in bones:
+            for kind in ('rotation', 'position'):
+                orig = an['bones'].get(b, {}).get(kind)
+                if not isinstance(orig, dict) or 'vector' in orig:
+                    continue
+                keys = {}
+                for k, e in orig.items():
+                    t = round(float(k), 4)
+                    if t <= a0 + 1e-6:
+                        keys[t] = e if isinstance(e, dict) else {'vector': e}
+                m = int(round(win / step))
+                for i in range(m + 1):
+                    t = round(a0 + win * i / m, 4)
+                    o = C.chan_at(orig, t)
+                    w = _smooth(i / m)
+                    e = dict(keys.get(t, {})) if i == 0 else {}
+                    e['vector'] = [round(x * (1 - w), 3) for x in o]
+                    keys[t] = e
+                an['bones'][b][kind] = {('%.6g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
 
 
 def unwrap(anims, names, bones=('right_arm', 'bipedHandRight')):

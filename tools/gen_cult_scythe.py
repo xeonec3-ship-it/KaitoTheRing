@@ -122,8 +122,10 @@ def main():
     pal.save(os.path.join(A, 'textures', 'item', 'cult_scythe_3d.png'))
     els = build()
     T = {   # дисплей template_verylarge_sword Iron's (тот же размер и хват, что у косы Тироса), толщина z не сжимается — модель объёмная
-        'thirdperson_righthand': {'rotation': [0, -90, 55], 'translation': [0, 8.5, 0], 'scale': [3, 3, 3]},
-        'thirdperson_lefthand': {'rotation': [0, 90, -55], 'translation': [0, 8.5, 0], 'scale': [3, 3, 3]},
+        # хват на 3 px ближе к подтоку, вдоль древка (21.11): у хвата Тироса лезвие иначе касается земли при покачивании руки;
+        # сдвиг — здесь, в модели предмета (одинаково во всех кадрах), а не ключами кисти (они отрывали косу от кулака)
+        'thirdperson_righthand': {'rotation': [0, -90, 55], 'translation': [0, 5.546, 0.521], 'scale': [3, 3, 3]},
+        'thirdperson_lefthand': {'rotation': [0, 90, -55], 'translation': [0, 5.546, 0.521], 'scale': [3, 3, 3]},
         'firstperson_righthand': {'rotation': [0, -90, 25], 'translation': [1.13, 7.2, 1.13], 'scale': [1.7, 1.7, 1.7]},
         'firstperson_lefthand': {'rotation': [0, 90, -25], 'translation': [1.13, 7.2, 1.13], 'scale': [1.7, 1.7, 1.7]},
         'head': {'rotation': [0, 0, 0], 'scale': [1.6, 1.6, 1.6]},

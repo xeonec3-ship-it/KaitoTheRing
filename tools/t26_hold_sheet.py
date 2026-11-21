@@ -9,6 +9,7 @@
   * Глава стало: текущие assets + поза хвата Тироса (CultMath.HOLD_*, сдвиг косы 3 px вдоль древка, рука с косой не качается).
 На земле — красная стрелка «вперёд» (куда смотрит босс), жёлтый след острия за 0.15 с до кадра (конус — куда оно идёт).
   python3 tools/t26_hold_sheet.py [out.jpg] [--base e0ab4cf] [--three путь/three.min.js]
+  python3 tools/t26_hold_sheet.py --grip     → docs/media/t26_grip_check.jpg (кулак ↔ точка хвата, было 1b9bdc5 / стало)
 Нужно: jar Iron's в libs/ (python3 tools/fetch_libs.py), Playwright + Chromium.
 """
 import json
@@ -102,7 +103,16 @@ def data(base):
     head = CR.model_entry('cult_leader')
     head['scythe'] = False
     return {'models': {'tyros': tyros, 'cult_leader': head}, 'anims': an,
-            'items': {'hellrazor': hellrazor_item(), 'scythe': BV.scythe_item()}}
+            'items': {'hellrazor': hellrazor_item(), 'scythe': BV.scythe_item(), 'scythe_old': old_scythe(base)}}
+
+
+def old_scythe(base):
+    """cult_scythe как в коммите base (display — до переноса сдвига хвата в модель предмета 21.11)."""
+    it = BV.scythe_item()
+    p = 'src/main/resources/assets/pohsmp_core/models/item/cult_scythe.json'
+    doc = json.loads(subprocess.run(['git', 'show', '%s:%s' % (base, p)], cwd=ROOT, capture_output=True, check=True).stdout)['base']
+    it['display'] = doc['display']
+    return it
 
 
 # столбцы: (подпись, анимация, t, yaw камеры, pitch); у добивания у Тироса пусто
@@ -117,7 +127,7 @@ COLS = [
     ('Появление', 'fire_boss_spawn', 7.4, 35, 12),
     ('Добивание', 'cult_leader_finisher', 1.35, 70, 12),
 ]
-ROWS = [('Тирос Iron\'s — эталон', 'tyros', 'hellrazor', 'iron:'), ('Глава — было', 'cult_leader', 'scythe', 'old:'),
+ROWS = [('Тирос Iron\'s — эталон', 'tyros', 'hellrazor', 'iron:'), ('Глава — было', 'cult_leader', 'scythe_old', 'old:'),
         ('Глава — стало', 'cult_leader', 'scythe', 'new:')]
 
 PAGE = r"""<!doctype html><html><head><meta charset="utf-8"><style>
@@ -210,10 +220,24 @@ SD.rows.forEach((r, ri) => {
       const cone = new THREE.Mesh(new THREE.ConeGeometry(1.4, 3.5, 10), yel); cone.renderOrder = 5;
       cone.position.copy(pts[pts.length - 1]); cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); scene.add(cone);
     }
-    const h = SD.models[r[1]].height || 34, yaw = c[3] * D, pitch = c[4] * D, dist = 3.6 * h * Math.max(1, (chh / cw) * 0.75);
-    const cam = new THREE.PerspectiveCamera(30, vw / vh, 0.5, 3000), ty = h * 0.5;
-    cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, ty + Math.sin(pitch) * dist, -Math.cos(yaw) * Math.cos(pitch) * dist);
-    cam.lookAt(0, ty, -4);
+    const h = SD.models[r[1]].height || 34, yaw = c[3] * D, pitch = c[4] * D;
+    let dist = 3.6 * h * Math.max(1, (chh / cw) * 0.75), look = new THREE.Vector3(0, h * 0.5, -4);
+    if (SD.grip) {                       // кулак (где кисть сидит на руке) — красный, точка хвата на древке (кисть) — зелёный
+      const hand = m.bones.bipedHandRight, u = hand.userData;
+      const fist = hand.parent.localToWorld(new THREE.Vector3(u.base[0], u.base[1], u.base[2]));
+      const grip = hand.getWorldPosition(new THREE.Vector3());
+      const mk = (p, col) => { const s = new THREE.Mesh(new THREE.SphereGeometry(1.1, 12, 10), new THREE.MeshBasicMaterial({ color: col, depthTest: false }));
+                               s.renderOrder = 9; s.position.copy(p); scene.add(s); };
+      mk(fist, 0xff2a2a); mk(grip, 0x2aff5a);
+      const ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([fist, grip]), new THREE.LineBasicMaterial({ color: 0xffffff, depthTest: false }));
+      ln.renderOrder = 9; scene.add(ln);
+      look = fist.clone().lerp(grip, 0.5); dist = 1.9 * h;
+      const gap = document.createElement('div'); gap.className = 'lab cl'; gap.style.left = (x0 + 8) + 'px'; gap.style.top = (y0 + 24) + 'px';
+      gap.innerHTML = 'кулак ↔ хват: ' + fist.distanceTo(grip).toFixed(1) + ' px'; document.body.appendChild(gap);
+    }
+    const cam = new THREE.PerspectiveCamera(30, vw / vh, 0.5, 3000);
+    cam.position.set(look.x + Math.sin(yaw) * Math.cos(pitch) * dist, look.y + Math.sin(pitch) * dist, look.z - Math.cos(yaw) * Math.cos(pitch) * dist);
+    cam.lookAt(look);
     renderer.setViewport(vx, vy, vw, vh); renderer.setScissor(vx, vy, vw, vh); renderer.render(scene, cam);
     const lab = document.createElement('div'); lab.className = 'lab cl'; lab.style.left = (x0 + 8) + 'px'; lab.style.top = (y0 + chh - 22) + 'px';
     lab.innerHTML = '<small>' + c[1] + (c[1].startsWith('~') ? '' : ' · ' + c[2].toFixed(2) + ' с') + '</small>'; document.body.appendChild(lab);
@@ -228,18 +252,38 @@ setTimeout(() => { drawAll(); setTimeout(() => { drawAll(); window.READY = true;
 </script></body></html>"""
 
 
+# --grip: кадр-лист «коса в кулаке» (21.11, «коса поехала»): было — версия, которую видел владелец (сдвиг кисти ключами position),
+# стало — текущая; отскок назад и все удары, крупно кисть
+GRIP_BASE = '1b9bdc5'
+GRIP_COLS = [
+    ('Отскок назад', 'scythe_backpedal', 1.0, 40, 12),
+    ('Боковой взмах', 'scythe_downslash_sideslash', 2.05, 30, 20),
+    ('Удар сверху', 'scythe_downslash_sideslash', 1.15, 40, 15),
+    ('Взмах с разворотом', 'scythe_horizontal_slash_spin', 1.6, 30, 20),
+    ('Двойной взмах', 'scythe_dagger_double_horizontal', 1.88, 30, 20),
+    ('Тройное комбо', 'scythe_sideslash_downslash_sideslash', 1.52, 60, 10),
+    ('Прыжок, удар', 'scythe_jump_combo', 1.75, 60, 10),
+    ('Комбо с кинжалом', 'scythe_dagger_combo_1', 3.7, 40, 15),
+    ('Добивание', 'cult_leader_finisher', 1.35, 70, 12),
+]
+GRIP_ROWS = [('Глава — было (видео владельца)', 'cult_leader', 'scythe_old', 'old:'), ('Глава — стало', 'cult_leader', 'scythe', 'new:')]
+
+
 def main():
     args = sys.argv[1:]
-    out = args[0] if args and not args[0].startswith('--') else os.path.join(ROOT, 'docs', 'media', 't26_hold_tyros.jpg')
-    base = args[args.index('--base') + 1] if '--base' in args else BASE
+    grip = '--grip' in args
+    out = args[0] if args and not args[0].startswith('--') else os.path.join(
+        ROOT, 'docs', 'media', 't26_grip_check.jpg' if grip else 't26_hold_tyros.jpg')
+    base = args[args.index('--base') + 1] if '--base' in args else (GRIP_BASE if grip else BASE)
     three = args[args.index('--three') + 1] if '--three' in args else None
     lib = BV.boss_lib('tyros')                     # buildModel / pose / flameFrame из превью Главы (в области BL)
     d = data(base)
-    sd = {'models': d['models'], 'anims': d['anims'], 'items': d['items'], 'cols': COLS, 'rows': ROWS}
+    sd = {'models': d['models'], 'anims': d['anims'], 'items': d['items'], 'cols': GRIP_COLS if grip else COLS,
+          'rows': GRIP_ROWS if grip else ROWS, 'grip': grip}
     html = PAGE.replace('LIB', lib).replace('SHEETDATA', json.dumps(sd, ensure_ascii=False, separators=(',', ':')))
     if three:
         html = html.replace(CR.CDN, 'file://' + os.path.abspath(three))
-    CR.shoot(html, out, size=(2400, 1060))
+    CR.shoot(html, out, size=(2400, 760 if grip else 1060))
 
 
 if __name__ == '__main__':

@@ -74,7 +74,7 @@ def run_other(boss):
     for n, an in anims.items():
         if n in iron and n not in C.PLAYS[boss]:
             continue
-        if not an.get('animation_length'):
+        if not an.get('animation_length') or n in C.WEAPON_HIDDEN.get(boss, ()):   # оружие убрано в кулак (SheathPoses)
             continue
         a, b, t = anim_jerk(M, an)
         lim = anim_jerk(M, iron[n])[:2] if n in iron else star

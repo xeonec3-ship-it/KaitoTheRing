@@ -7,8 +7,10 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import ru.pohsmp.core.boss.BossNet;
 import ru.pohsmp.core.boss.client.BossClient;
+import ru.pohsmp.core.boss.client.SheathPoses;
 import ru.pohsmp.core.boss.erebhand.ErebHandBody;
 import ru.pohsmp.core.boss.erebhand.ErebHandEntity;
 import software.bernie.geckolib.core.object.Color;
@@ -50,6 +52,13 @@ public class ErebHandRenderer extends AbstractSpellCastingMobRenderer {
     public Color getRenderColor(AbstractSpellCastingMob e, float pt, int light) {
         if (e instanceof ErebHandBody b && b.ghost()) return Color.ofRGBA(1f, 1f, 1f, 0.55f);
         return super.getRenderColor(e, pt, light);
+    }
+
+    /** In Iron's poses with folded / both hands the rapier shrinks into the fist and grows back after ({@link SheathPoses}). */
+    @Override
+    protected void adjustHandItemRendering(PoseStack ps, ItemStack stack, AbstractSpellCastingMob e, float pt, boolean offhand) {
+        super.adjustHandItemRendering(ps, stack, e, pt, offhand);
+        if (!offhand) SheathPoses.apply(ps, e, pt);
     }
 
     @Override

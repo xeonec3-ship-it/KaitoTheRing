@@ -6,8 +6,10 @@ import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.Abstra
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import ru.pohsmp.core.boss.BossNet;
 import ru.pohsmp.core.boss.client.BossClient;
+import ru.pohsmp.core.boss.client.SheathPoses;
 import ru.pohsmp.core.boss.ereb.ErebBody;
 import ru.pohsmp.core.boss.ereb.ErebEntity;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
@@ -35,6 +37,13 @@ public class ErebRenderer extends AbstractSpellCastingMobRenderer {
         if (e instanceof ErebEntity && BossClient.look(e.getId(), BossNet.LOOK_HIDDEN)) return;
         if (e instanceof ErebBody b && b.face() != null && ErebDisguise.render(b, yaw, pt, ps, buf, light)) return;
         super.render(e, yaw, pt, ps, buf, light);
+    }
+
+    /** In Iron's poses with folded / both hands the rapier shrinks into the fist and grows back after ({@link SheathPoses}). */
+    @Override
+    protected void adjustHandItemRendering(PoseStack ps, ItemStack stack, AbstractSpellCastingMob e, float pt, boolean offhand) {
+        super.adjustHandItemRendering(ps, stack, e, pt, offhand);
+        if (!offhand) SheathPoses.apply(ps, e, pt);
     }
 
     @Override

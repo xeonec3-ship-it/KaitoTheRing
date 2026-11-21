@@ -47,6 +47,9 @@ PLAYS = {'cult_leader': SPELL_ANIMS + list(IRON_HITS) + ['fire_boss_spawn', 'fir
                                                          'fire_boss_acrobatic_dagger_throw', 'summon_fiery_daggers', 'offhand_parry', 'magma_throw'],
          'ereb': SPELL_ANIMS, 'ereb_hand': SPELL_ANIMS, 'irina': []}   # Ирина Iron's-заклинаний не кастует — только свои анимации
 STRIKE_EVENTS = {'slash', 'impale', 'hit', 'stab', 'throw', 'shatter', 'release', 'dash', 'brand', 'erupt', 'pillar', 'plant', 'crush', 'cast'}
+# позы Iron's, в которых оружие убрано в кулак (Java: boss/client/SheathPoses — масштаб у хвата, письмо T26 §11)
+SHEATH_POSES = ('kneeling_prayer', 'self_cast_two_hands', 'cross_arms')
+WEAPON_HIDDEN = {'ereb': SHEATH_POSES, 'ereb_hand': SHEATH_POSES}
 WEAPON_EVENTS = {'slash', 'impale', 'hit', 'stab', 'throw', 'shatter', 'plant'}
 
 CFG = {
@@ -333,7 +336,7 @@ def check(name, only=None, dt=0.1, verbose=False):
             W = M.world(an, t)
             ip = M.item_world(W)
             tip, grip = ip[M.tip_i], ip[M.grip_i]
-            vis = np.linalg.det(W['bipedHandRight'][:3, :3]) > 1e-6
+            vis = np.linalg.det(W['bipedHandRight'][:3, :3]) > 1e-6 and an_name not in WEAPON_HIDDEN.get(name, ())
             if vis:
                 # сквозь тело
                 for bp, k in M.weapon_hits(W, ip).items():      # вся коса (древко + лезвие) против тела и обеих рук

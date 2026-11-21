@@ -1061,6 +1061,8 @@ def anims(m):
     # (пилот 21.11, tools/gen_martin_ef.py; правила — docs/specs/anim_style_epicfight.md)
     import gen_martin_ef as EF
     EF.define(A, m, sys.modules[__name__], g, sf)
+    import guard_break_martin as GB          # T32 «Сломать блок» (навершие в блок, затем щит)
+    GB.define(A, m, sys.modules[__name__], g, sf)
 
     # ---------------------------------------------------------------- walk: тяжёлый шаг, меч на плече, свободная рука качается
     def walk(t):

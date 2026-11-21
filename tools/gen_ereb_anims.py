@@ -217,6 +217,9 @@ def build():
         (0.7, pre), (0.95, mod(pre, right_arm=[-170, 20, -10]), IO), (1.1, fstab, IQ), (1.6, fstab),
         (1.9, mod(fstab, right_arm=[-84, 20, 12], bipedHandRight=[88, 0, 0], body_pos=[0, -1.2, 1.5]), OC),
         (2.4, STAND, IO)], [(0.3, 'vanish'), (0.7, 'appear'), (1.1, 'stab'), (1.9, 'kill')])
+    # T32 «Сломать блок»: финт в лицо → укол под защиту (по эталону Epic Fight, tools/guard_break_ereb.py; warn 0.1, hit 0.7)
+    import guard_break_ereb
+    an['ereb_guard_break'] = guard_break_ereb.build()
     return an
 
 

@@ -1,0 +1,200 @@
+{
+ "comment": "T32 «Сломать блок» (aris): старт на тике 0 анимации animation.aris.guard_break, caster — босс, target — цель в блоке; тики 2–14 (warn → hit) — вспышка на оружии (голова молота), тик 14 (событие hit) — треск блока у цели. Сгенерировано tools/gen_guard_break.py.",
+ "style": "aris",
+ "duration": 44,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 2,
+   "at": "caster+0.45,1.91,0.81",
+   "duration": 4,
+   "size": 0.35,
+   "rays": 4,
+   "color": "@secondary",
+   "brightness": 0.8,
+   "comment": "вспышка на оружии/руке, тик 0"
+  },
+  {
+   "type": "flash",
+   "delay": 4,
+   "at": "caster+0.67,2.19,0.34",
+   "duration": 4,
+   "size": 0.44,
+   "rays": 4,
+   "color": "@secondary",
+   "brightness": 0.9,
+   "comment": "вспышка на оружии/руке, тик 2"
+  },
+  {
+   "type": "flash",
+   "delay": 6,
+   "at": "caster+0.82,2.22,0.16",
+   "duration": 4,
+   "size": 0.53,
+   "rays": 4,
+   "color": "@secondary",
+   "brightness": 1.0,
+   "comment": "вспышка на оружии/руке, тик 4"
+  },
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster+0.76,2.22,-0.72",
+   "duration": 4,
+   "size": 0.62,
+   "rays": 6,
+   "color": "@secondary",
+   "brightness": 1.1,
+   "comment": "вспышка на оружии/руке, тик 6"
+  },
+  {
+   "type": "flash",
+   "delay": 10,
+   "at": "caster+0.72,2.13,-1.02",
+   "duration": 4,
+   "size": 0.72,
+   "rays": 6,
+   "color": "@secondary",
+   "brightness": 1.2,
+   "comment": "вспышка на оружии/руке, тик 8"
+  },
+  {
+   "type": "flash",
+   "delay": 12,
+   "at": "caster+0.74,2.08,-1.11",
+   "duration": 4,
+   "size": 0.81,
+   "rays": 6,
+   "color": "@secondary",
+   "brightness": 1.3,
+   "comment": "вспышка на оружии/руке, тик 10"
+  },
+  {
+   "type": "flash",
+   "delay": 14,
+   "at": "caster+0.05,1.85,1.57",
+   "duration": 3,
+   "size": 0.9,
+   "rays": 6,
+   "color": "@secondary",
+   "brightness": 1.4,
+   "comment": "вспышка на оружии/руке, тик 12"
+  },
+  {
+   "type": "flash",
+   "delay": 2,
+   "at": "caster+0.45,1.91,0.81",
+   "duration": 6,
+   "size": 0.9,
+   "anamorphic": 1.6,
+   "rays": 6,
+   "color": "@core",
+   "comment": "блик-предупреждение (0.6 с до удара)"
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0.45,1.91,0.81",
+   "duration": 12,
+   "texture": "spark_soft",
+   "count": 14,
+   "rate": 2,
+   "spread": 0.18,
+   "speed": 0.04,
+   "gravity": -0.01,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 8,
+   "color": "@secondary",
+   "glow": 0.8
+  },
+  {
+   "type": "flash",
+   "delay": 14,
+   "at": "target+0,1.2,0",
+   "duration": 6,
+   "size": 1.8,
+   "rays": 8,
+   "anamorphic": 2.2,
+   "ring": true,
+   "screen": 0.12,
+   "color": "@core",
+   "comment": "треск блока: удар"
+  },
+  {
+   "type": "wave",
+   "delay": 14,
+   "at": "target+0,1.0,0",
+   "duration": 7,
+   "shape": "sphere",
+   "radius": 1.05,
+   "rim": 1.4,
+   "color": "@secondary",
+   "out": {
+    "duration": 5,
+    "easing": "easeOutCubic"
+   },
+   "comment": "защита лопается пузырём"
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "at": "target+0,1.2,0",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 22,
+   "rate": 11,
+   "spread": 0.45,
+   "speed": 0.32,
+   "gravity": 0.045,
+   "spin": 30,
+   "tumble": 1,
+   "size": [
+    0.26,
+    0.04
+   ],
+   "life": 16,
+   "color": "@secondary",
+   "glow": 0.5,
+   "comment": "осколки защиты"
+  },
+  {
+   "type": "sprites",
+   "delay": 14,
+   "at": "target+0,1.2,0",
+   "duration": 2,
+   "texture": "spark_soft",
+   "count": 26,
+   "rate": 13,
+   "spread": 0.3,
+   "speed": 0.45,
+   "gravity": 0.05,
+   "size": [
+    0.14,
+    0.02
+   ],
+   "life": 12,
+   "color": "#FFD27A",
+   "glow": 0.9,
+   "comment": "искры"
+  },
+  {
+   "type": "decal",
+   "delay": 14,
+   "at": "target",
+   "duration": 40,
+   "shape": "crack",
+   "length": 2.2,
+   "width": 0.35,
+   "grow": 4,
+   "branches": 6,
+   "yaw": 90,
+   "color": "@secondary",
+   "fadeOut": 26,
+   "lift": 0.02,
+   "comment": "трещина под ногами цели"
+  }
+ ]
+}

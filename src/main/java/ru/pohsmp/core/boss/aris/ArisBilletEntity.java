@@ -13,6 +13,9 @@ import net.minecraftforge.network.NetworkHooks;
  * lands; drawn by fx (mesh aris_billet in flight, fx aris_billet with the visible zone r3 while it lies).
  */
 public class ArisBilletEntity extends Entity {
+    /** The fx drawing it now (mesh in flight, then the lying zone): stopped with it, whatever removes it (FX audit 21.11). */
+    int fx = -1;
+
     public ArisBilletEntity(EntityType<?> type, Level level) {
         super(type, level);
         noPhysics = true;
@@ -23,6 +26,17 @@ public class ArisBilletEntity extends Entity {
     public void tick() {
         super.tick();
         if (!level().isClientSide && tickCount > 200) discard();   // safety
+    }
+
+    /**
+     * Surrender / death in the 10 ticks of flight (cleanup discards it, the timeline is cancelled before landAt) left the endless mesh
+     * hanging glowing in the air at the throw point for everyone, latecomers too.
+     */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (fx > 0 && level() instanceof net.minecraft.server.level.ServerLevel sl) ru.pohsmp.core.fx.Fx.stop(sl, fx, "");
+        fx = -1;
+        super.remove(reason);
     }
 
     @Override

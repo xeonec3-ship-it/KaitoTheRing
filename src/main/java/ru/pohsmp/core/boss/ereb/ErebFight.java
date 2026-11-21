@@ -157,7 +157,7 @@ public final class ErebFight {
         boss.moveTo(q.x, q.y, q.z, yaw, 0);
         face(yaw);
         boss.getNavigation().stop();
-        Fx.play(sl, Fx.fx("ereb_blink").caster(boss).at(q).yaw(yaw));
+        Fx.play(sl, Fx.fx("ereb_blink").at(q).yaw(yaw));   // no caster: just moved, the client still lerps him from the old spot and would draw it there (FX audit 21.11)
         core.sound(q, "ereb.appear", 1.5f, 1.2f);
     }
 
@@ -523,7 +523,7 @@ public final class ErebFight {
         int ticks = ErebConfig.i(ErebConfig.VEIL_SECONDS) * 20;
         play(new BossTimeline("act:veil", ErebMath.CAST_ILLUSION).at(ErebMath.CAST_AT, () -> {
             Vec3 c = boss.position();
-            veilFx = Fx.play(sl, Fx.fx("illusion_veil").at(c).caster(boss).scale(ErebConfig.d(ErebConfig.VEIL_RADIUS) / 6.0).duration(ticks));
+            veilFx = Fx.play(sl, Fx.fx("illusion_veil").at(c).scale(ErebConfig.d(ErebConfig.VEIL_RADIUS) / 6.0).duration(ticks));
             core.sound("ereb.cast", 2, 1.3f);
             double[] f = ErebMath.forward(boss.getYRot() + 90);
             spawnReflection(sl, free(sl, c.add(f[0] * 1.3, 0, f[1] * 1.3)), ErebReflection.Kind.GHOST, ticks, 1, 0, 0, 0);
@@ -620,7 +620,7 @@ public final class ErebFight {
                     face(yaw);
                     hide(false);
                     anim("ereb_backstab");
-                    Fx.play(sl, Fx.fx("ereb_appear").caster(boss).at(to).yaw(yaw));
+                    Fx.play(sl, Fx.fx("ereb_appear").at(to).yaw(yaw));   // no caster: just moved, the client still lerps him from the old spot and would draw it there (FX audit 21.11)
                     core.sound("ereb.appear", 2, 1);
                     core.sceneFor(victim, "ereb.false_ally", ErebMath.FA_CAM, 0, victim.position(), victim.getYRot(), victim.getId());
                 })
@@ -831,7 +831,7 @@ public final class ErebFight {
                     face(yaw);
                     boss.getNavigation().stop();
                     anim("ereb_mirror_step_in");
-                    Fx.play(sl, Fx.fx("ereb_blink").caster(boss).at(q).yaw(yaw));
+                    Fx.play(sl, Fx.fx("ereb_blink").at(q).yaw(yaw));   // no caster: just moved, the client still lerps him from the old spot and would draw it there (FX audit 21.11)
                     core.sound("ereb.appear", 2, 1);
                 })
                 .at(ErebMath.STEP_APPEAR + ErebMath.STEP_STAB, () -> {
@@ -882,6 +882,8 @@ public final class ErebFight {
     void finale() {
         ServerLevel sl = sl();
         cleanup(sl);
+        hiddenLeft = 0;   // FX audit 21.11: tick() stops counting in the finale - hidden by the veil / a vanish he stayed unseen all the scene
+        hide(false);
         boss.setFace(null);
         boss.getNavigation().stop();
         Vec3 at = boss.position();

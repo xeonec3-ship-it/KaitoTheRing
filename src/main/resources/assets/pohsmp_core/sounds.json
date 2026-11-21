@@ -576,16 +576,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.replica_break",
     "sounds": [
       {
-        "name": "minecraft:mob/sheep/shear",
-        "pitch": 0.9
-      },
-      {
-        "name": "minecraft:dig/cloth1",
-        "pitch": 0.8
-      },
-      {
-        "name": "minecraft:dig/cloth2",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/irina/replica_break",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -593,9 +585,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.spawn",
     "sounds": [
       {
-        "name": "irons_spellbooks:raise_dead_start",
-        "pitch": 1.3,
-        "volume": 1.3
+        "name": "pohsmp_core:boss/irina/spawn",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -603,8 +594,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.death",
     "sounds": [
       {
-        "name": "irons_spellbooks:dead_king/fake_death",
-        "pitch": 1.4
+        "name": "pohsmp_core:boss/irina/death",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -612,8 +603,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.death_final",
     "sounds": [
       {
-        "name": "irons_spellbooks:soulcaller_toll_failure",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/death_final",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -621,8 +612,12 @@
     "subtitle": "subtitles.pohsmp_core.irina.mark",
     "sounds": [
       {
-        "name": "irons_spellbooks:heartstop_cast",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/mark_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "pohsmp_core:boss/irina/mark_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -630,8 +625,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.bind",
     "sounds": [
       {
-        "name": "irons_spellbooks:charge_chains",
-        "pitch": 1.35
+        "name": "pohsmp_core:boss/irina/bind",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -639,12 +634,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.snap",
     "sounds": [
       {
-        "name": "irons_spellbooks:blood_explosion",
-        "pitch": 1.5
+        "name": "pohsmp_core:boss/irina/snap_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "irons_spellbooks:blood_explosion",
-        "pitch": 1.7
+        "name": "pohsmp_core:boss/irina/snap_2",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "pohsmp_core:boss/irina/snap_3",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -652,8 +651,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.steal",
     "sounds": [
       {
-        "name": "irons_spellbooks:magic_spell_reverse_3",
-        "pitch": 1.1
+        "name": "pohsmp_core:boss/irina/steal",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -661,16 +660,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.whip",
     "sounds": [
       {
-        "name": "irons_spellbooks:hellrazor_swing_1",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/whip_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "irons_spellbooks:hellrazor_swing_2",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/whip_2",
+        "attenuation_distance": 40
       },
       {
-        "name": "irons_spellbooks:hellrazor_swing_3",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/whip_3",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -678,8 +677,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.cocoon",
     "sounds": [
       {
-        "name": "irons_spellbooks:abyssal_shroud_cast",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/cocoon",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -687,8 +686,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.cocoon_break",
     "sounds": [
       {
-        "name": "irons_spellbooks:blood_explosion",
-        "pitch": 1.8
+        "name": "pohsmp_core:boss/irina/cocoon_break",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -696,8 +695,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.cocoon_crush",
     "sounds": [
       {
-        "name": "irons_spellbooks:devour",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/cocoon_crush",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -705,9 +704,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.happiness",
     "sounds": [
       {
-        "name": "irons_spellbooks:dark_magic_buff_03_custom_1",
-        "pitch": 0.8,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/irina/happiness",
+        "attenuation_distance": 56
       }
     ]
   },
@@ -715,8 +713,12 @@
     "subtitle": "subtitles.pohsmp_core.irina.phase",
     "sounds": [
       {
-        "name": "irons_spellbooks:void_tentacles_start",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/phase_1",
+        "attenuation_distance": 56
+      },
+      {
+        "name": "pohsmp_core:boss/irina/phase_2",
+        "attenuation_distance": 56
       }
     ]
   },
@@ -724,8 +726,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.finisher",
     "sounds": [
       {
-        "name": "irons_spellbooks:skewer",
-        "pitch": 1.1
+        "name": "pohsmp_core:boss/irina/finisher",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -733,8 +735,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.staff",
     "sounds": [
       {
-        "name": "irons_spellbooks:shadow_slash",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/irina/staff_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/staff_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/staff_3",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -987,8 +997,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.gaze",
     "sounds": [
       {
-        "name": "irons_spellbooks:planar_sight_cast",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/gaze",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -996,8 +1006,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.knots",
     "sounds": [
       {
-        "name": "irons_spellbooks:root_start",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/knots",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1005,8 +1015,16 @@
     "subtitle": "subtitles.pohsmp_core.irina.snare",
     "sounds": [
       {
-        "name": "irons_spellbooks:root_emerge",
-        "pitch": 1.4
+        "name": "pohsmp_core:boss/irina/snare_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/snare_2",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/irina/snare_3",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1014,8 +1032,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.swap",
     "sounds": [
       {
-        "name": "irons_spellbooks:abyssal_teleport",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/irina/swap",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1023,8 +1041,8 @@
     "subtitle": "subtitles.pohsmp_core.irina.puppet",
     "sounds": [
       {
-        "name": "irons_spellbooks:charge_chains",
-        "pitch": 1.6
+        "name": "pohsmp_core:boss/irina/puppet",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1032,13 +1050,8 @@
     "subtitle": "subtitles.pohsmp_core.aris.spawn",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/land",
-        "pitch": 0.5,
-        "volume": 1.4
-      },
-      {
-        "name": "minecraft:block/lava/pop",
-        "pitch": 0.6
+        "name": "pohsmp_core:boss/aris/spawn",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1046,14 +1059,16 @@
     "subtitle": "subtitles.pohsmp_core.aris.slam",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/land",
-        "pitch": 0.6,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/aris/slam_1",
+        "attenuation_distance": 48
       },
       {
-        "name": "minecraft:block/anvil/land",
-        "pitch": 0.7,
-        "volume": 1.2
+        "name": "pohsmp_core:boss/aris/slam_2",
+        "attenuation_distance": 48
+      },
+      {
+        "name": "pohsmp_core:boss/aris/slam_3",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1061,12 +1076,20 @@
     "subtitle": "subtitles.pohsmp_core.aris.swing",
     "sounds": [
       {
-        "name": "minecraft:entity/player/attack/sweep1",
-        "pitch": 0.6
+        "name": "pohsmp_core:boss/aris/swing_1",
+        "attenuation_distance": 20
       },
       {
-        "name": "minecraft:entity/player/attack/sweep2",
-        "pitch": 0.55
+        "name": "pohsmp_core:boss/aris/swing_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/aris/swing_3",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/aris/swing_4",
+        "attenuation_distance": 20
       }
     ]
   },
@@ -1074,12 +1097,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.anvil",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/place",
-        "pitch": 0.7
+        "name": "pohsmp_core:boss/aris/anvil_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:block/anvil/place",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/aris/anvil_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1087,12 +1110,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.blade",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/use",
-        "pitch": 1.3
+        "name": "pohsmp_core:boss/aris/blade_1",
+        "attenuation_distance": 32
       },
       {
-        "name": "minecraft:block/smithing_table/smithing_table1",
-        "pitch": 1.1
+        "name": "pohsmp_core:boss/aris/blade_2",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1100,12 +1123,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.blade_break",
     "sounds": [
       {
-        "name": "minecraft:random/break",
-        "pitch": 0.8
+        "name": "pohsmp_core:boss/aris/blade_break_1",
+        "attenuation_distance": 24
       },
       {
-        "name": "minecraft:block/anvil/break",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/aris/blade_break_2",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1113,13 +1136,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.forge",
     "sounds": [
       {
-        "name": "minecraft:block/fire/ignite",
-        "pitch": 0.5,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/aris/forge_1",
+        "attenuation_distance": 48
       },
       {
-        "name": "minecraft:item/firecharge/use",
-        "pitch": 0.6
+        "name": "pohsmp_core:boss/aris/forge_2",
+        "attenuation_distance": 48
       }
     ]
   },
@@ -1127,9 +1149,8 @@
     "subtitle": "subtitles.pohsmp_core.aris.last_blow",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/land",
-        "pitch": 0.4,
-        "volume": 2.0
+        "name": "pohsmp_core:boss/aris/last_blow",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1137,9 +1158,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.phase",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/use",
-        "pitch": 0.6,
-        "volume": 1.3
+        "name": "pohsmp_core:boss/aris/phase_1",
+        "attenuation_distance": 64
+      },
+      {
+        "name": "pohsmp_core:boss/aris/phase_2",
+        "attenuation_distance": 64
       }
     ]
   },
@@ -1147,12 +1171,8 @@
     "subtitle": "subtitles.pohsmp_core.aris.reforge",
     "sounds": [
       {
-        "name": "minecraft:block/smithing_table/smithing_table2",
-        "pitch": 0.7
-      },
-      {
-        "name": "minecraft:block/anvil/use",
-        "pitch": 0.9
+        "name": "pohsmp_core:boss/aris/reforge",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1160,8 +1180,8 @@
     "subtitle": "subtitles.pohsmp_core.aris.surrender",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/destroy",
-        "pitch": 0.7
+        "name": "pohsmp_core:boss/aris/surrender",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1169,9 +1189,8 @@
     "subtitle": "subtitles.pohsmp_core.aris.hammer_drop",
     "sounds": [
       {
-        "name": "minecraft:block/anvil/fall",
-        "pitch": 0.6,
-        "volume": 1.3
+        "name": "pohsmp_core:boss/aris/hammer_drop",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1192,13 +1211,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.billet",
     "sounds": [
       {
-        "name": "minecraft:block/lava/pop",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/aris/billet_1",
+        "attenuation_distance": 24
       },
       {
-        "name": "minecraft:block/fire/extinguish",
-        "pitch": 1.6,
-        "volume": 0.5
+        "name": "pohsmp_core:boss/aris/billet_2",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1206,12 +1224,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.billet_explode",
     "sounds": [
       {
-        "name": "minecraft:random/explode1",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/aris/billet_explode_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:random/explode2",
-        "pitch": 1.2
+        "name": "pohsmp_core:boss/aris/billet_explode_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1219,14 +1237,8 @@
     "subtitle": "subtitles.pohsmp_core.aris.chains",
     "sounds": [
       {
-        "name": "minecraft:block/chain/place",
-        "pitch": 0.6,
-        "volume": 1.3
-      },
-      {
-        "name": "minecraft:block/chain/step1",
-        "pitch": 0.5,
-        "volume": 1.3
+        "name": "pohsmp_core:boss/aris/chains",
+        "attenuation_distance": 32
       }
     ]
   },
@@ -1234,12 +1246,8 @@
     "subtitle": "subtitles.pohsmp_core.aris.chains_break",
     "sounds": [
       {
-        "name": "minecraft:block/chain/break1",
-        "pitch": 0.7
-      },
-      {
-        "name": "minecraft:block/anvil/break",
-        "pitch": 1.4
+        "name": "pohsmp_core:boss/aris/chains_break",
+        "attenuation_distance": 24
       }
     ]
   },
@@ -1247,14 +1255,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.quench",
     "sounds": [
       {
-        "name": "minecraft:block/fire/extinguish",
-        "pitch": 0.5,
-        "volume": 1.5
+        "name": "pohsmp_core:boss/aris/quench_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:block/lava/extinguish",
-        "pitch": 0.6,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/aris/quench_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -1262,13 +1268,12 @@
     "subtitle": "subtitles.pohsmp_core.aris.bellows",
     "sounds": [
       {
-        "name": "minecraft:item/firecharge/use",
-        "pitch": 0.5,
-        "volume": 1.4
+        "name": "pohsmp_core:boss/aris/bellows_1",
+        "attenuation_distance": 40
       },
       {
-        "name": "minecraft:entity/blaze/shoot",
-        "pitch": 0.5
+        "name": "pohsmp_core:boss/aris/bellows_2",
+        "attenuation_distance": 40
       }
     ]
   },
@@ -2371,6 +2376,331 @@
       {
         "name": "pohsmp_core:boss/cult_leader/sigil",
         "attenuation_distance": 40
+      }
+    ]
+  },
+  "irina.aura": {
+    "subtitle": "subtitles.pohsmp_core.irina.aura",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/aura",
+        "attenuation_distance": 16,
+        "volume": 0.35
+      }
+    ]
+  },
+  "irina.step": {
+    "subtitle": "subtitles.pohsmp_core.irina.step",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/step_1",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/irina/step_2",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/irina/step_3",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/irina/step_4",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      }
+    ]
+  },
+  "irina.cloth": {
+    "subtitle": "subtitles.pohsmp_core.irina.cloth",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/cloth_1",
+        "attenuation_distance": 12,
+        "volume": 0.6
+      },
+      {
+        "name": "pohsmp_core:boss/irina/cloth_2",
+        "attenuation_distance": 12,
+        "volume": 0.6
+      },
+      {
+        "name": "pohsmp_core:boss/irina/cloth_3",
+        "attenuation_distance": 12,
+        "volume": 0.6
+      }
+    ]
+  },
+  "irina.swish": {
+    "subtitle": "subtitles.pohsmp_core.irina.swish",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/swish_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/swish_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/swish_3",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "irina.thread": {
+    "subtitle": "subtitles.pohsmp_core.irina.thread",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/thread_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/irina/thread_2",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/irina/thread_3",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "irina.whisper": {
+    "subtitle": "subtitles.pohsmp_core.irina.whisper",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/whisper_1",
+        "attenuation_distance": 20,
+        "volume": 0.9
+      },
+      {
+        "name": "pohsmp_core:boss/irina/whisper_2",
+        "attenuation_distance": 20,
+        "volume": 0.9
+      },
+      {
+        "name": "pohsmp_core:boss/irina/whisper_3",
+        "attenuation_distance": 20,
+        "volume": 0.9
+      }
+    ]
+  },
+  "irina.burst": {
+    "subtitle": "subtitles.pohsmp_core.irina.burst",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/burst",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "irina.rage": {
+    "subtitle": "subtitles.pohsmp_core.irina.rage",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/rage",
+        "attenuation_distance": 48
+      }
+    ]
+  },
+  "irina.thud": {
+    "subtitle": "subtitles.pohsmp_core.irina.thud",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/thud_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/irina/thud_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "irina.hurt": {
+    "subtitle": "subtitles.pohsmp_core.irina.hurt",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/irina/hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/irina/hurt_3",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "aris.aura": {
+    "subtitle": "subtitles.pohsmp_core.aris.aura",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/aura",
+        "attenuation_distance": 20,
+        "volume": 0.35
+      }
+    ]
+  },
+  "aris.blade_dart": {
+    "subtitle": "subtitles.pohsmp_core.aris.blade_dart",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/blade_dart_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/aris/blade_dart_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "aris.blade_hit": {
+    "subtitle": "subtitles.pohsmp_core.aris.blade_hit",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/blade_hit_1",
+        "attenuation_distance": 20
+      },
+      {
+        "name": "pohsmp_core:boss/aris/blade_hit_2",
+        "attenuation_distance": 20
+      }
+    ]
+  },
+  "aris.chain_rattle": {
+    "subtitle": "subtitles.pohsmp_core.aris.chain_rattle",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/chain_rattle_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/aris/chain_rattle_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/aris/chain_rattle_3",
+        "attenuation_distance": 16
+      }
+    ]
+  },
+  "aris.bellows_draw": {
+    "subtitle": "subtitles.pohsmp_core.aris.bellows_draw",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/bellows_draw",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "aris.step": {
+    "subtitle": "subtitles.pohsmp_core.aris.step",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/step_1",
+        "attenuation_distance": 16,
+        "volume": 0.8
+      },
+      {
+        "name": "pohsmp_core:boss/aris/step_2",
+        "attenuation_distance": 16,
+        "volume": 0.8
+      },
+      {
+        "name": "pohsmp_core:boss/aris/step_3",
+        "attenuation_distance": 16,
+        "volume": 0.8
+      },
+      {
+        "name": "pohsmp_core:boss/aris/step_4",
+        "attenuation_distance": 16,
+        "volume": 0.8
+      }
+    ]
+  },
+  "aris.armor": {
+    "subtitle": "subtitles.pohsmp_core.aris.armor",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/armor_1",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/aris/armor_2",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      },
+      {
+        "name": "pohsmp_core:boss/aris/armor_3",
+        "attenuation_distance": 12,
+        "volume": 0.7
+      }
+    ]
+  },
+  "aris.horns": {
+    "subtitle": "subtitles.pohsmp_core.aris.horns",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/horns",
+        "attenuation_distance": 40
+      }
+    ]
+  },
+  "aris.hiss": {
+    "subtitle": "subtitles.pohsmp_core.aris.hiss",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/hiss_1",
+        "attenuation_distance": 24
+      },
+      {
+        "name": "pohsmp_core:boss/aris/hiss_2",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "aris.anvil_ring": {
+    "subtitle": "subtitles.pohsmp_core.aris.anvil_ring",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/anvil_ring_1",
+        "attenuation_distance": 32
+      },
+      {
+        "name": "pohsmp_core:boss/aris/anvil_ring_2",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "aris.replica_break": {
+    "subtitle": "subtitles.pohsmp_core.aris.replica_break",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/replica_break",
+        "attenuation_distance": 32
+      }
+    ]
+  },
+  "aris.hurt": {
+    "subtitle": "subtitles.pohsmp_core.aris.hurt",
+    "sounds": [
+      {
+        "name": "pohsmp_core:boss/aris/hurt_1",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/aris/hurt_2",
+        "attenuation_distance": 16
+      },
+      {
+        "name": "pohsmp_core:boss/aris/hurt_3",
+        "attenuation_distance": 16
       }
     ]
   }

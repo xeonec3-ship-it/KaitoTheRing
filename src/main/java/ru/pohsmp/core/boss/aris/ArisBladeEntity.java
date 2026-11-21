@@ -96,7 +96,7 @@ public class ArisBladeEntity extends Mob {
                     state = State.DART;
                     timer = ArisMath.BLADE_DART;
                     hitDone = false;
-                    sl.playSound(null, getX(), getY(), getZ(), SoundEvents.TRIDENT_THROW, SoundSource.HOSTILE, 1, 1.2f);
+                    sl.playSound(null, getX(), getY(), getZ(), ru.pohsmp.core.boss.BossCore.sound("aris.blade_dart"), SoundSource.HOSTILE, 1.2f, 1);
                 }
             }
             case DART -> {
@@ -111,6 +111,7 @@ public class ArisBladeEntity extends Mob {
                 for (LivingEntity e : sl.getEntitiesOfClass(LivingEntity.class, new AABB(next, next).inflate(0.9))) {
                     if (hitDone || !o.fight.canHurt(e)) continue;
                     hitDone = true;
+                    sl.playSound(null, getX(), getY(), getZ(), ru.pohsmp.core.boss.BossCore.sound("aris.blade_hit"), SoundSource.HOSTILE, 1.2f, 1);
                     o.fight.bladeHit(this, e);
                 }
                 if (hitDone || --timer <= 0) back();
@@ -160,7 +161,7 @@ public class ArisBladeEntity extends Mob {
         if (by instanceof ArisEntity || by instanceof ArisBladeEntity) return false;
         if (src.is(net.minecraft.tags.DamageTypeTags.IS_FALL) || src.is(net.minecraft.tags.DamageTypeTags.IS_FIRE)) return false;
         if (level() instanceof ServerLevel sl && amount > 0)
-            sl.playSound(null, getX(), getY(), getZ(), SoundEvents.ANVIL_PLACE, SoundSource.HOSTILE, 0.6f, 1.8f);
+            sl.playSound(null, getX(), getY(), getZ(), ru.pohsmp.core.boss.BossCore.sound("aris.blade_hit"), SoundSource.HOSTILE, 0.8f, 1.25f);
         return super.hurt(src, amount);
     }
 
@@ -168,6 +169,14 @@ public class ArisBladeEntity extends Mob {
     public void die(DamageSource src) {
         super.die(src);
         if (level() instanceof ServerLevel sl) shatter(sl);
+    }
+
+    /** FX audit 21.11: unloaded / discarded without its own end (no save: the fight respawns it) - the endless fx stayed as a ghost. */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (fx > 0 && level() instanceof ServerLevel sl) Fx.stop(sl, fx, "");
+        fx = -1;
+        super.remove(reason);
     }
 
     /** Struck down (or her fight is over): the shatter fx, the sound, gone. */

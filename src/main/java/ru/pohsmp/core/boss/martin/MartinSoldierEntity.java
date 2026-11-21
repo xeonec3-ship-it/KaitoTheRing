@@ -109,6 +109,13 @@ public class MartinSoldierEntity extends Monster implements GeoEntity, IAnimated
         stopFx(sl);
     }
 
+    /** FX audit 21.11: unloaded / discarded without its own end (no save: the fight respawns it) - the endless fx stayed as a ghost. */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (level() instanceof ServerLevel sl) stopFx(sl);
+        super.remove(reason);
+    }
+
     void stopFx(ServerLevel sl) {
         for (int id : new int[] {bannerFx, warcryFx, holdFx, auraFx}) if (id > 0) Fx.stop(sl, id, "");
         bannerFx = warcryFx = holdFx = auraFx = -1;

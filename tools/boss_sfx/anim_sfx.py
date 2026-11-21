@@ -89,6 +89,18 @@ def swing_peaks(anim, k=4, min_gap=0.25, rel=0.35, bone_filter=ARM):
     return sorted(out, key=lambda x: x[1])
 
 
+def foot_strikes(anim, bone_re=r"right_(leg|thigh)$|^leg_r|r_leg", axis=0):
+    """Two foot strikes per walk cycle: the extremes of the leg swing (right leg forward = left foot back and vice versa)."""
+    length = float(anim.get("animation_length", 1.0))
+    rx = re.compile(bone_re, re.I)
+    for name, b in anim.get("bones", {}).items():
+        if rx.search(name) and "rotation" in b:
+            t, v = _track(b["rotation"], length)
+            x = v[:, axis]
+            return sorted([round(float(t[np.argmin(x)]), 3), round(float(t[np.argmax(x)]), 3)])
+    return []
+
+
 def apply(path, plan, ns="pohsmp_core"):
     """plan: {anim_name: [(time, "id[|vol|pitch]"), ...]}; returns count of keyframes written."""
     raw = open(path, encoding="utf-8").read()

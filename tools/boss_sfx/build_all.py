@@ -87,8 +87,10 @@ def video(boss, name, spec, files):
         t_end = ms[i + 1][0] if i + 1 < len(ms) else marks["dur"]
         m = re.findall(r"`([^`]+)`", label)
         for anim in m:
-            a = anim if anim in plan or anim in code else "animation.%s.%s" % (boss, anim)
-            for t, ev in plan.get(a, []) + code.get(a, []) + code.get(anim, []):
+            short = anim.split(".")[-1]
+            full = anim if anim in plan else "animation.%s.%s" % (boss, short)
+            evs = plan.get(full, []) + code.get(anim, []) + (code.get(short, []) if short != anim else [])
+            for t, ev in evs:
                 if t0 + t < t_end + 0.05:
                     events.append((t0 + t, ev))
     dur = marks["dur"]

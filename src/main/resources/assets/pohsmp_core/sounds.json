@@ -541,6 +541,7 @@
       }
     ]
   },
+  "boss.guard_break": {"subtitle": "subtitles.pohsmp_core.boss.guard_break", "sounds": [{"name": "minecraft:random/anvil_land", "volume": 0.7, "pitch": 1.7}]},
   "cult_leader.replica_break": {
     "subtitle": "subtitles.pohsmp_core.cult_leader.replica_break",
     "sounds": [

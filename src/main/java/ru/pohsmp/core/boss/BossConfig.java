@@ -26,6 +26,10 @@ public final class BossConfig {
             OUTSIDE_ARENA_MULT, ARENA_MARGIN, MAX_DAMAGE_DISTANCE, NO_LOS_MULT, PILLAR_HEIGHT, PILLAR_MULT, LEASH_EXTRA, LEASH_HEAL,
             REGEN_SHARE, DOT_MULT, HARMING_MULT;
     public static final ForgeConfigSpec.BooleanValue SUMMONS_SCALE, DISPLACEMENT_IMMUNE, PHASE_CLAMP, WORLD_FIRE_IMMUNE, PROTECTION;
+    // [bosses_common] T32 Epic Fight: stun, parry, «Сломать блок» (BossGuardBreak, BossEpicFight)
+    public static final ForgeConfigSpec.BooleanValue EF_STUN_IMMUNE, EF_PARRY_NO_RECOIL;
+    public static final ForgeConfigSpec.DoubleValue GB_HOLD_SECONDS;
+    public static final ForgeConfigSpec.IntValue GB_BLOCKS, GB_COOLDOWN, GB_WARN_TICKS, GB_STUN_TICKS;
     // [cult_leader] Raise Hell of Tyros's goals
     public static final ForgeConfigSpec.IntValue CL_RAISE_HELL_LEVEL, CL_RAISE_HELL_MIN, CL_RAISE_HELL_MAX;
 
@@ -140,6 +144,18 @@ public final class BossConfig {
         HARMING_MULT = b.defineInRange("harming_mult", 0.25, 0, 1);
         WORLD_FIRE_IMMUNE = b.comment("No damage from lava / fire blocks / burning (attacker-less fire); suffocation, falls, drowning: never")
                 .define("world_fire_immune", true);
+
+        EF_STUN_IMMUNE = b.comment("T32 Epic Fight: no stun / knockdown / knockback / impact from its weapons and skills (the damage goes on as usual)")
+                .define("ef_stun_immune", true);
+        EF_PARRY_NO_RECOIL = b.comment("An Epic Fight parry of a boss hit: damage 0 and the boss does not react (false: it staggers for 0.8 s)")
+                .define("ef_parry_no_recoil", true);
+        GB_HOLD_SECONDS = b.comment("«Сломать блок» comes when the target holds the Epic Fight guard longer than this, or blocks guard_break_blocks hits in a row")
+                .defineInRange("guard_break_hold_seconds", 1.5, 0.1, 60);
+        GB_BLOCKS = b.defineInRange("guard_break_blocks", 3, 0, 100);
+        GB_COOLDOWN = b.comment("...not more often than this for one boss (seconds)").defineInRange("guard_break_cooldown", 12, 1, 3600);
+        GB_WARN_TICKS = b.comment("The flash on the weapon + the crack this many ticks before the blow").defineInRange("guard_break_warn_ticks", 12, 0, 100);
+        GB_STUN_TICKS = b.comment("A broken guard: Epic Fight stamina 0 and the target stunned this long (ticks); the blow's damage goes through in full")
+                .defineInRange("guard_break_stun_ticks", 24, 0, 200);
         b.pop();
 
         b.comment("T26 Head of the Cult of Mellisto (Tyros, First Flamebearer)").push("cult_leader");

@@ -91,6 +91,9 @@ public final class BossGuard {
         final Set<UUID> onPillar = new HashSet<>();
         long mountUntil = -1;
         boolean tuned;
+        /** T32: the last hit our filter let through (game time, before the big hit cut, after everything) — Epic Fight scales after us. */
+        long filterTime = -1;
+        float preCut, filtered;
     }
 
     // ---------------------------------------------------------------- hooks for the spells (all: no-op on non-bosses)
@@ -195,6 +198,7 @@ public final class BossGuard {
             amount *= BossConfig.get(BossConfig.HARMING_MULT);   // «Мгновенный урон»: drunk, splash, lingering, tipped arrows
         // where it was hit from
         if (attacker != null && attacker != mob && playerSide(attacker)) amount *= fromWhere(c, attacker, direct);
+        c.guard.preCut = amount;
         // the big hit cut (Tyros does it himself in FireBossEntity.hurt)
         if (!(mob instanceof FireBossEntity))
             amount = BossGuardMath.hitCap(amount, mob.getMaxHealth(), BossConfig.get(BossConfig.HIT_CAP_SHARE), BossConfig.get(BossConfig.HIT_CAP_EXCESS));
@@ -202,6 +206,22 @@ public final class BossGuard {
         if (BossConfig.get(BossConfig.PHASE_CLAMP) && c.started() && !c.inFinale())
             amount = BossGuardMath.phaseClamp(mob.getHealth(), mob.getMaxHealth(), amount, c.def.phases, c.phase());
         return Math.max(0, amount);
+    }
+
+    /**
+     * T32: Epic Fight raised a hit after our filter (animation multipliers, innate skills, an execution = 2^31): the hit cut and the
+     * phase clamp again on (the hit before our cut) × its multiplier, the finale floor kept. Called at the lowest LivingHurtEvent.
+     */
+    public static float afterExternal(BossCore c, float amount) {
+        State g = c.guard;
+        Mob mob = c.mob;
+        if (!on() || g.filterTime != mob.level().getGameTime() || amount <= g.filtered + 1e-4f) return amount;
+        float a = (float) BossGuardBreakMath.beforeCut(g.filtered, g.preCut, amount);
+        a = BossGuardMath.hitCap(a, mob.getMaxHealth(), BossConfig.get(BossConfig.HIT_CAP_SHARE), BossConfig.get(BossConfig.HIT_CAP_EXCESS));
+        if (BossConfig.get(BossConfig.PHASE_CLAMP) && c.started() && !c.inFinale())
+            a = BossGuardMath.phaseClamp(mob.getHealth(), mob.getMaxHealth(), a, c.def.phases, c.phase());
+        if (c.def.finale != BossDef.Finale.DEATH) a = BossMath.clipToFloor(mob.getHealth(), a, (float) (c.def.finaleAt * mob.getMaxHealth()));
+        return Math.max(Math.min(a, amount), 0);
     }
 
     /** A player, or a pet / summon owned by a player. */

@@ -1021,5 +1021,18 @@
   "item.pohsmp_core.mask_of_lies": "Mask of Lies",
   "item.pohsmp_core.mask_of_lies.boss": "Trophy of Ereb, the Hand of Lies",
   "item.pohsmp_core.mask_of_lies.desc1": "15% chance to leave an illusory double when hurt (2 s)",
-  "item.pohsmp_core.mask_of_lies.desc2": "The double lures mobs away (not the cult bosses)"
+  "item.pohsmp_core.mask_of_lies.desc2": "The double lures mobs away (not the cult bosses)",
+  "spell.pohsmp_core.ashen_harvest": "Ashen Harvest",
+  "spell.pohsmp_core.ashen_harvest.guide": "The Cult Leader's ghostly burning scythe sweeps a wide arc in front of the caster, wounding and igniting everyone in its path. It leaves a trail of ash along the arc that burns anyone who steps into it.",
+  "spell.pohsmp_core.jealous_embrace": "Jealous Embrace",
+  "spell.pohsmp_core.jealous_embrace.guide": "Irina's red threads bind the target in the caster's gaze and yank it close, where the staff's hook strikes it. A mark of jealousy lingers for a few seconds: while it burns, the caster deals more damage to the target.",
+  "spell.pohsmp_core.anvil_strike": "Anvil Strike",
+  "spell.pohsmp_core.anvil_strike.guide": "Aris's ghostly turquoise hammer falls from the sky onto the point in the caster's gaze, wounding and knocking back everyone around it. Afterwards the caster's weapon is tempered and hits harder.",
+  "spell.pohsmp_core.warlord_banner": "Warlord's Banner",
+  "spell.pohsmp_core.warlord_banner.guide": "The caster plants Martin's banner in the ground. While it stands, nearby allies are stronger and tougher, and two of Martin's ghostly soldiers fight for the caster. When the banner falls, the soldiers go with it.",
+  "spell.pohsmp_core.mirror_step": "Mirror Step",
+  "spell.pohsmp_core.mirror_step.guide": "The caster vanishes into a glass ripple and steps out of it behind the target, at once piercing it with Ereb's rapier. After the thrust the caster is briefly invisible.",
+  "spell.pohsmp_core.hand_of_lies": "Hand of Lies",
+  "spell.pohsmp_core.hand_of_lies.guide": "A ghostly glass hand seizes the target and holds it: it cannot move, and allies hit it harder. The hand cannot hold bosses, it only slows them.",
+  "ui.pohsmp_core.reward_scroll": "Trophy of a Mellisto cult boss"
 }

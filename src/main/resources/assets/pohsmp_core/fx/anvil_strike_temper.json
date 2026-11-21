@@ -1,0 +1,64 @@
+{
+ "comment": "T34 «Закалка» (caster = заклинатель, follow, до Fx.stop; 15 с): оружие в руке тлеет бирюзой — искры и раскалённые отблески у правой руки.",
+ "style": "aris",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": -1,
+   "texture": "spark_soft",
+   "count": 100000,
+   "rate": 0.5,
+   "spread": 0.15,
+   "speed": 0.01,
+   "gravity": 0.02,
+   "size": [
+    0.1,
+    0.02
+   ],
+   "life": 12,
+   "color": "@primary",
+   "glow": 0.9,
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster.hand",
+   "duration": -1,
+   "texture": "mote_flame",
+   "count": 100000,
+   "rate": 0.15,
+   "spread": 0.1,
+   "speed": 0.005,
+   "gravity": -0.01,
+   "size": [
+    0.2,
+    0.04
+   ],
+   "life": 10,
+   "color": "@secondary",
+   "glow": 0.5,
+   "follow": true
+  },
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "target": "caster",
+   "duration": -1,
+   "thickness": 0.04,
+   "pulse": [
+    0.4,
+    20
+   ],
+   "motes": 0,
+   "ring": false,
+   "color": "@primary",
+   "brightness": 0.35,
+   "follow": true
+  }
+ ]
+}

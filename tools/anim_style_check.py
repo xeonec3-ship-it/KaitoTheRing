@@ -9,6 +9,7 @@
   python3 tools/anim_style_check.py --measure-ref [--ref-dir DIR] [--json out.json]   # пересчитать эталон из jar
   python3 tools/anim_style_check.py --anim martin_swing -v  # одна анимация, подробно (фазы по времени)
   python3 tools/anim_style_check.py --boss aris             # другой босс (martin, aris, irina)
+  python3 tools/anim_style_check.py --boss player_t34       # игрок: касты T34 (PlayerAnimator, наградные заклинания)
 
 Метрики (длины — в долях длины ноги L: у EF 0.75 бл., у Мартина 12 ед. модели; углы — градусы; время — секунды):
   фазы: замах (0 → начало удара), удар (скорость острия ≥ 30% пика), удержание (после удара острие не ушло дальше 0.3 L),
@@ -445,7 +446,11 @@ class GeoRig:
         return sig, float(an['animation_length'])
 
     def events(self, name):
-        return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
+        k = self.key(name)
+        tl = self.an[k].get('timeline')
+        if not tl and k in self.AK.IRON_HITS:                 # удары FireBoss (Iron's): тики урона из FireBossEntity, без timeline
+            return {i / 20.0: 'hit' for i in self.AK.IRON_HITS[k]}
+        return {float(k_): v for k_, v in (tl or {}).items()}
 
 
 # ================================================================== наши: Эреб, Длань Лжи (T31; тело Эреба + призрачная рука; FK — tools/ereb_hand_fk.py)
@@ -518,8 +523,77 @@ class PlayerEFRig:
         return {a.trail[0][0] + 0.5 * (a.trail[0][1] - a.trail[0][0]): 'trail'} if a.trail else {}
 
 
+# ================================================================== наши: игрок — касты PlayerAnimator с ударом (T34, наградные заклинания боссов)
+class PlayerPARig:
+    """Анимации PlayerAnimator (assets/irons_spellbooks/player_animation/pohsmp_<id>.json) — прямая кинематика как в превью
+    (tools/gen_t34_anims.fk). «Клинок» — предмет в правой руке (по +Z предплечья, хват в 5 px ниже локтя), длина 16 px.
+    Оси модели (+X влево, +Z вперёд) переводятся в оси проверки (вперёд −z, вправо +x); L = 12 px (нога игрока)."""
+    DIR = os.path.join(A, '..', 'irons_spellbooks', 'player_animation')
+
+    def __init__(self, path=None):
+        import gen_t34_anims as T
+        self.T = T
+        self.dir = path or self.DIR
+        self.an = {n: os.path.join(self.dir, 'pohsmp_%s.json' % n) for n in T.SPEC if os.path.exists(os.path.join(self.dir, 'pohsmp_%s.json' % n))}
+        self._c = {}
+
+    def key(self, name):
+        return name
+
+    def tracks(self, name):
+        if name not in self._c:
+            em = json.load(open(self.an[name], encoding='utf-8'))['emote']
+            tr = {}
+            for mv in em['moves']:
+                for part, chs in mv.items():
+                    if isinstance(chs, dict):
+                        for ch, v in chs.items():
+                            tr.setdefault(part, {}).setdefault(ch, []).append((mv['tick'], v))
+            for p_ in tr.values():
+                for ch in p_:
+                    p_[ch].sort()
+            self._c[name] = (tr, em['endTick'])
+        return self._c[name]
+
+    def signals(self, name, weapon='item'):
+        tr, end = self.tracks(name)
+
+        def val(ks, tick):
+            if tick <= ks[0][0]:
+                return ks[0][1] if ks[0][0] == 0 else ks[0][1] * tick / ks[0][0]
+            for (t0, v0), (t1, v1) in zip(ks, ks[1:]):
+                if tick <= t1:
+                    return v0 + (v1 - v0) * (tick - t0) / max(1e-9, t1 - t0)
+            return ks[-1][1]
+
+        C = lambda v: np.array([-v[0], v[1], -v[2]]) / 12.0
+        Cd = lambda v: np.array([-v[0], v[1], -v[2]])
+
+        def sig(t):
+            tick = t * 20
+            ch = {part: {c: val(ks, tick) for c, ks in chs.items()} for part, chs in tr.items()}
+            P = self.T.fk(ch)
+            hy = [yaw_of(Cd(P['toe_' + s_])) for s_ in ('r', 'l')]
+            grip = P['grip_r']
+            return {
+                'pelvis': C(P['pelvis']), 'chest': C(P['chest']), 'head': C(P['head']), 'sh_r': C(P['sh_r']), 'sh_l': C(P['sh_l']),
+                'hip_yaw': math.degrees(math.atan2(sum(math.sin(math.radians(x)) for x in hy), sum(math.cos(math.radians(x)) for x in hy))),
+                'foot_r': C(P['foot_r']), 'foot_l': C(P['foot_l']),
+                'tool': C(grip), 'tip': C(grip + 16 * P['item_r']), 'head_fwd': Cd(P['head_fwd']), 'chest_fwd': Cd(P['chest_fwd']),
+            }
+        return sig, end / 20.0
+
+    def events(self, name):
+        tm = self.T.TIMING[name]
+        return {tm['hit'] / 20.0: 'hit'}
+
+
 def ereb_rig(path=None):
     return GeoRig(path, 'ereb', 'ereb_')
+
+
+def cult_rig(path=None):
+    return GeoRig(path, 'cult_leader', 'cult_leader_', leg=14.0)       # нога Главы — 14 ед. (как у Тироса)
 
 
 BOSSES = {
@@ -529,6 +603,12 @@ BOSSES = {
                  attacks={'swing': ('hit', 'heavy', 'hammer'), 'slam': ('impact', 'heavy', 'hammer')}),
     # посох Ирины — древко почти в её рост, крюк на конце: эталон — тяжёлое древковое (heavy), не лёгкий меч;
     # рост ×14/12 (нога 14 ед. = 0.875 бл.)
+    # T26 Глава Культа: удары косой FireBoss (Iron's, тики урона — anim_check.IRON_HITS; меряется первый удар комбо) + наши
+    'cult_leader': dict(rig=cult_rig, scale=14.0 / 12.0, code_move={}, idle=[],
+                        attacks={**{n: ('hit', 'heavy', 'item') for n in ('scythe_dagger_double_horizontal', 'scythe_sideslash_downslash_sideslash',
+                                                                          'scythe_jump_combo', 'scythe_downslash_sideslash', 'scythe_horizontal_slash_spin',
+                                                                          'scythe_dagger_combo_1', 'scythe_backpedal')},
+                                 'ash_slash': ('slash', 'heavy', 'item')}),
     'ereb': dict(rig=ereb_rig, scale=1.0, code_move={}, idle=['idle'],
                  attacks={'lunge': ('hit', 'thrust', 'item'), 'flurry': ('hit', 'thrust', 'item')}),        # рапира: уколы
     'ereb_hand': dict(rig=ErebHandRig, scale=1.0, code_move={}, idle=['idle'],
@@ -540,6 +620,11 @@ BOSSES = {
                    attacks={'whip1': ('trail', 'light', 'item'), 'whip2': ('trail', 'light', 'item'), 'whip3': ('trail', 'light', 'item'),
                             'sword1': ('trail', 'light', 'item'), 'sword2': ('trail', 'light', 'item'), 'sword3': ('trail', 'light', 'item'),
                             'sword4': ('trail', 'light', 'item'), 'sword_dash': ('trail', 'thrust', 'item')}),
+    # игрок, T34: касты-удары наградных заклинаний (PlayerAnimator); класс эталона — gen_t34_anims.CHECK_CLASS; рост = эталон (×1)
+    'player_t34': dict(rig=PlayerPARig, scale=1.0, code_move={}, idle=[],
+                       attacks={'ashen_harvest': ('hit', 'heavy', 'item'), 'jealous_embrace': ('hit', 'light', 'item'),
+                                'anvil_strike': ('hit', 'heavy', 'item'), 'warlord_banner': ('hit', 'thrust', 'item'),
+                                'mirror_step': ('hit', 'thrust', 'item'), 'hand_of_lies': ('hit', 'thrust', 'item')}),
     'irina': dict(rig=IrinaRig, scale=14.0 / 12.0, code_move={}, idle=['idle'],
                   attacks={'staff_attack': ('hit', 'heavy', 'staff'), 'staff_sweep': ('hit', 'heavy', 'staff')}),
 }

@@ -1,0 +1,56 @@
+{
+ "comment": "T34 «Длань Лжи»: кулак разбивается (caster = ЦЕЛЬ, 30 тиков; на 0 — Fx.stop hand_of_lies_hold): осколки, бабочки.",
+ "style": "ereb_hand",
+ "duration": 30,
+ "elements": [
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 6,
+   "size": 1.4,
+   "color": "#FFFFFF",
+   "brightness": 1.0
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.2,0",
+   "duration": 2,
+   "texture": "mote_glass",
+   "count": 26,
+   "rate": 26,
+   "spread": 0.9,
+   "speed": 0.14,
+   "gravity": 0.03,
+   "spin": 140,
+   "tumble": true,
+   "size": [
+    0.2,
+    0.06
+   ],
+   "life": 20,
+   "color": "#F4EEFF"
+  },
+  {
+   "type": "sprites",
+   "delay": 2,
+   "at": "caster+0,1.6,0",
+   "duration": 2,
+   "texture": "mote_butterfly",
+   "count": 10,
+   "rate": 10,
+   "spread": 0.8,
+   "speed": 0.06,
+   "gravity": -0.01,
+   "sway": 0.6,
+   "size": [
+    0.3,
+    0.1
+   ],
+   "life": 26,
+   "color": "#D9CCFF",
+   "glow": 0.45
+  }
+ ]
+}

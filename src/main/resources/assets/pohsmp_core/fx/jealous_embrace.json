@@ -1,0 +1,88 @@
+{
+ "comment": "T34 «Объятия Ревности»: нити опутывают цель (caster = ЦЕЛЬ, follow, 20 тиков, тик 6 анимации). Нити только вокруг цели — без нити от заклинателя (правило «никаких лучей»).",
+ "style": "irina",
+ "duration": 20,
+ "elements": [
+  {
+   "type": "trail",
+   "delay": 0,
+   "at": "caster",
+   "duration": 8,
+   "width": 0.13,
+   "length": 8,
+   "fade": 1.2,
+   "head": 0,
+   "count": 4,
+   "orbit": {
+    "radius": 0.75,
+    "speed": 32,
+    "rise": 0.9,
+    "risePeriod": 10
+   },
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "trail",
+   "delay": 2,
+   "at": "caster+0,0.4,0",
+   "duration": 6,
+   "width": 0.1,
+   "length": 6,
+   "fade": 1.2,
+   "head": 0,
+   "count": 3,
+   "orbit": {
+    "radius": 0.55,
+    "speed": -26,
+    "rise": 0.6,
+    "risePeriod": 8
+   },
+   "color": "@secondary",
+   "follow": true
+  },
+  {
+   "type": "decal",
+   "delay": 0,
+   "at": "caster",
+   "duration": 20,
+   "texture": "irina_thread_ring",
+   "radius": 1.2,
+   "grow": 6,
+   "glow": 0.4,
+   "fadeOut": 8,
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1,0",
+   "duration": 10,
+   "texture": "mote_thread",
+   "count": 40,
+   "rate": 5,
+   "spread": 0.7,
+   "speed": 0.06,
+   "spin": 30,
+   "size": [
+    0.28,
+    0.08
+   ],
+   "life": 16,
+   "color": "@primary",
+   "follow": true
+  },
+  {
+   "type": "flash",
+   "delay": 8,
+   "at": "caster+0,1.1,0",
+   "duration": 6,
+   "size": 1.4,
+   "ring": true,
+   "color": "@core",
+   "follow": true,
+   "comment": "нити затянулись (тик 14 анимации)"
+  }
+ ]
+}

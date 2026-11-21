@@ -1,0 +1,46 @@
+{
+ "comment": "T34: знамя исчезает (caster = основание, 24 тика; на 0 — Fx.stop warlord_banner и всех warlord_banner_buff).",
+ "style": "martin",
+ "duration": 24,
+ "elements": [
+  {
+   "type": "sprites",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 10,
+   "texture": "spark_soft",
+   "count": 40,
+   "rate": 4,
+   "spread": 0.8,
+   "speed": 0.05,
+   "gravity": 0.01,
+   "size": [
+    0.16,
+    0.02
+   ],
+   "life": 20,
+   "color": "@primary"
+  },
+  {
+   "type": "wave",
+   "delay": 0,
+   "at": "caster",
+   "duration": 18,
+   "shape": "ring",
+   "radius": 8,
+   "thickness": 0.8,
+   "followTerrain": true,
+   "reverse": true,
+   "color": "@primary",
+   "brightness": 0.6
+  },
+  {
+   "type": "flash",
+   "delay": 0,
+   "at": "caster+0,1.6,0",
+   "duration": 8,
+   "size": 1.4,
+   "color": "@secondary"
+  }
+ ]
+}

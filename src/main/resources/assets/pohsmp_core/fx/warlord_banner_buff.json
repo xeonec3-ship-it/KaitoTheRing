@@ -1,0 +1,23 @@
+{
+ "comment": "T34: союзник под знаменем (caster = союзник, follow, до Fx.stop): золотой ореол.",
+ "style": "martin",
+ "duration": -1,
+ "elements": [
+  {
+   "type": "aura",
+   "delay": 0,
+   "at": "caster",
+   "follow": true,
+   "target": "caster",
+   "thickness": 0.08,
+   "pulse": [
+    0.3,
+    16
+   ],
+   "color": "@primary",
+   "motes": 6,
+   "ring": false,
+   "brightness": 0.7
+  }
+ ]
+}

@@ -205,24 +205,28 @@ public final class ErebHandMath {
 
     // ---------------------------------------------------------------- the second four + the mythic (owner 20.11)
     /*
-     * ⚠ TEMPORARY timings: the visual assistant's animations animation.ereb_hand.<id> and fx ereb_hand_<id> are being made in parallel;
-     * his events (ticks) will be in docs/inbox/2026-11-20_mgr_T31_spells2.md — then these numbers are fitted to them (and ErebHandMathTest
-     * checks them against the file, as for the first spells). TEMP_SPELLS2 = true until then.
+     * Timings from the visual assistant's events (docs/inbox/2026-11-20_mgr_T31_spells2.md, ereb_hand.animation.json; ErebHandMathTest
+     * checks them against the file).
      */
-    public static final boolean TEMP_SPELLS2 = true;
-    /** «Пламя-подменыш»: the cast (release), the fireball flies, flickers gold 0.5 s before it turns into a glass butterfly at half way. */
-    public static final int CHANGELING = 30, CHANGELING_AT = 12, CHANGELING_FLICKER = 10, CHANGELING_LIFE = 90;
+    /** «Пламя-подменыш» ereb_hand_changeling_flame 1.6 s: charge 4, throw 13; the ball flickers gold 0.5 s before it turns into a glass
+     * butterfly at half way. */
+    public static final int CHANGELING = 32, CHANGELING_AT = 13, CHANGELING_FLICKER = 10, CHANGELING_LIFE = 90;
     public static final double CHANGELING_SPEED = 0.9, BUTTERFLY_SPEED = 0.7, CHANGELING_ALLY_R = 6, CHANGELING_HIT_R = 1.0;
-    /** «Ложное отступление»: the jump back, the «opening» (the double stays, he is gone 2 s), a thrust in the back. */
-    public static final int RETREAT = 24, RETREAT_JUMP = 4, RETREAT_OPEN = 14, RETREAT_WINDOW = 40;
+    /** «Ложное отступление» ereb_hand_false_retreat 1.3 s: leap 5 (≈4 blocks back), land 13 (the double; he is unseen 2 s);
+     * ereb_hand_false_retreat_strike 1.4 s: appear 0, hit 7. */
+    public static final int RETREAT = 26, RETREAT_JUMP = 5, RETREAT_OPEN = 13, RETREAT_WINDOW = 40, RETREAT_STRIKE = 28, RETREAT_STRIKE_HIT = 7;
     public static final double RETREAT_BACK = 4, RETREAT_NEAR = 3;
-    /** «Отражение-предатель»: the cast; the copy lives 6 s (config) and strikes every TRAITOR_SWING ticks. */
-    public static final int TRAITOR = 30, TRAITOR_AT = 14, TRAITOR_SWING = 20;
-    /** «Рой лжи»: the cast; the butterflies fly SWARM_LIFE ticks at most. */
-    public static final int SWARM = 30, SWARM_AT = 14, SWARM_LIFE = 70;
+    /** «Отражение-предатель» ereb_hand_traitor_reflection 2.0 s: mirror 10 (1.5 blocks before the player), emerge 24 (the copy); the
+     * copy strikes every TRAITOR_SWING ticks; the burst warning for its last second. */
+    public static final int TRAITOR = 40, TRAITOR_MIRROR = 10, TRAITOR_AT = 24, TRAITOR_SWING = 20, TRAITOR_BURST_WARN = 20;
+    public static final double TRAITOR_MIRROR_DIST = 1.5;
+    /** «Рой лжи» ereb_hand_swarm_of_lies 1.6 s: gather 6, release 15; the butterflies fly SWARM_LIFE ticks at most; the real ones ring
+     * every SWARM_CHIME ticks. */
+    public static final int SWARM = 32, SWARM_AT = 15, SWARM_LIFE = 70, SWARM_CHIME = 10;
     public static final double SWARM_SPEED = 0.45, SWARM_HIT_R = 0.9;
-    /** Mythic «Ложный рассвет» (33%): on one knee, the bar hidden, invulnerable 4 s; he rises; the wave; the bar back; then the mask cracks. */
-    public static final int DAWN = 100, DAWN_INVULN = 80, DAWN_WAVE = 88, DAWN_SCENE = 40;
+    /** Mythic «Ложный рассвет» ereb_hand_false_dawn 6.0 s: kneel 10 (bar hidden, invulnerable, the false victory), rise 90, wave 100;
+     * then ereb_hand_phase3 (the mask cracks). Invulnerable from kneel to rise: 4 s (ТЗ). */
+    public static final int DAWN = 120, DAWN_KNEEL = 10, DAWN_RISE = 90, DAWN_WAVE = 100, DAWN_INVULN = DAWN_RISE - DAWN_KNEEL, DAWN_SCENE = 40;
 
     /** «Пламя-подменыш»: the tick (from the release) it turns into a butterfly — half way to the target. */
     public static int changelingSwapTick(double dist, double speed) {

@@ -32,7 +32,8 @@ public class ErebHandTraitor extends PathfinderMob {
     private static final EntityDataAccessor<String> NAME = SynchedEntityData.defineId(ErebHandTraitor.class, EntityDataSerializers.STRING);
     private ErebHandEntity boss;
     private int life = 120, hitsByOthers = 3, swingIn = 20;
-    private boolean burst;
+    private boolean burst, warned;
+    private int copyFx = -1;
 
     public ErebHandTraitor(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
@@ -60,6 +61,13 @@ public class ErebHandTraitor extends PathfinderMob {
         setDropChance(EquipmentSlot.MAINHAND, 0);
     }
 
+    @Override
+    public void onAddedToWorld() {
+        super.onAddedToWorld();
+        if (level() instanceof ServerLevel sl && copyFx < 0)
+            copyFx = Fx.play(sl, Fx.fx("ereb_hand_traitor_copy").caster(this).at(position()).attach(this).duration(life + 2));
+    }
+
     /** The player it reflects. */
     public UUID original() {
         return entityData.get(ORIGINAL).orElse(null);
@@ -83,6 +91,10 @@ public class ErebHandTraitor extends PathfinderMob {
         if (--life <= 0) {
             shatter(sl, true);
             return;
+        }
+        if (life <= ErebHandMath.TRAITOR_BURST_WARN && !warned) {   // its last second: gold cracks and the ring r3 on the ground
+            warned = true;
+            Fx.play(sl, Fx.fx("ereb_hand_traitor_burst_warn").caster(this).at(position()).attach(this));
         }
         ServerPlayer t = victim(sl);
         if (t == null) return;
@@ -125,7 +137,8 @@ public class ErebHandTraitor extends PathfinderMob {
             boss.fight.traitorBurst(sl, this);
         }
         sl.playSound(null, getX(), getY() + 1, getZ(), SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 1.2f, explode ? 0.7f : 1.2f);
-        Fx.play(sl, Fx.fx("illusion_poof").at(position()));
+        if (copyFx >= 0) Fx.stop(sl, copyFx, "");
+        if (!explode) Fx.play(sl, Fx.fx("ereb_hand_traitor_shatter").caster(this).at(position()));
         discard();
     }
 
@@ -136,6 +149,7 @@ public class ErebHandTraitor extends PathfinderMob {
         if (invulnerableTime > 10) return false;
         invulnerableTime = 20;
         level().broadcastDamageEvent(this, src);
+        Fx.play(sl, Fx.fx("ereb_hand_traitor_hit").caster(this).at(position()));
         if (p.getUUID().equals(original())) {
             if (ErebHandConfig.i(ErebHandConfig.TRAITOR_HITS_ORIGINAL) <= 1) shatter(sl, false);
             else if (--hitsByOthers <= 0) shatter(sl, false);

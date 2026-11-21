@@ -232,4 +232,38 @@ class ErebHandMathTest {
         assertFalse(ErebHandMath.ranged("false_retreat"));
         assertFalse(ErebHandMath.ranged("glass_grip"));
     }
+
+    @Test
+    void secondFourTimingsMatchTheAnimations() throws Exception {
+        JsonObject a = anims("ereb_hand.animation.json");
+        assertEquals(len(a, "ereb_hand_changeling_flame"), ErebHandMath.CHANGELING);
+        assertEquals(event(a, "ereb_hand_changeling_flame", "throw", 0), ErebHandMath.CHANGELING_AT);
+        assertEquals(len(a, "ereb_hand_false_retreat"), ErebHandMath.RETREAT);
+        assertEquals(event(a, "ereb_hand_false_retreat", "leap", 0), ErebHandMath.RETREAT_JUMP);
+        assertEquals(event(a, "ereb_hand_false_retreat", "land", 0), ErebHandMath.RETREAT_OPEN);
+        assertTrue(a.has("ereb_hand_false_retreat_open"));   // the double's loop
+        assertEquals(len(a, "ereb_hand_false_retreat_strike"), ErebHandMath.RETREAT_STRIKE);
+        assertEquals(event(a, "ereb_hand_false_retreat_strike", "hit", 0), ErebHandMath.RETREAT_STRIKE_HIT);
+        assertEquals(len(a, "ereb_hand_traitor_reflection"), ErebHandMath.TRAITOR);
+        assertEquals(event(a, "ereb_hand_traitor_reflection", "mirror", 0), ErebHandMath.TRAITOR_MIRROR);
+        assertEquals(event(a, "ereb_hand_traitor_reflection", "emerge", 0), ErebHandMath.TRAITOR_AT);
+        assertEquals(len(a, "ereb_hand_swarm_of_lies"), ErebHandMath.SWARM);
+        assertEquals(event(a, "ereb_hand_swarm_of_lies", "release", 0), ErebHandMath.SWARM_AT);
+        assertEquals(len(a, "ereb_hand_false_dawn"), ErebHandMath.DAWN);
+        assertEquals(event(a, "ereb_hand_false_dawn", "kneel", 0), ErebHandMath.DAWN_KNEEL);
+        assertEquals(event(a, "ereb_hand_false_dawn", "rise", 0), ErebHandMath.DAWN_RISE);
+        assertEquals(event(a, "ereb_hand_false_dawn", "wave", 0), ErebHandMath.DAWN_WAVE);
+        assertEquals(80, ErebHandMath.DAWN_RISE - ErebHandMath.DAWN_KNEEL);   // invulnerable 4 s (ТЗ)
+    }
+
+    @Test
+    void secondFourAssetsAreThere() {
+        for (String fx : new String[] {"changeling_flame", "changeling_flame_orb", "changeling_flame_warn", "changeling_flame_swap",
+                "changeling_flame_butterfly", "changeling_flame_hit", "false_retreat", "false_retreat_double", "false_retreat_vanish",
+                "false_retreat_strike", "traitor_reflection", "traitor_mirror", "traitor_copy", "traitor_hit", "traitor_shatter",
+                "traitor_burst_warn", "traitor_burst", "swarm_of_lies", "swarm_true", "swarm_false", "swarm_hit", "swarm_pass", "false_dawn"})
+            assertTrue(Files.exists(Path.of("src/main/resources/assets/pohsmp_core/fx/ereb_hand_" + fx + ".json")), fx);
+        assertTrue(Files.exists(Path.of("src/main/resources/assets/pohsmp_core/textures/entity/ereb_hand/traitor_glass.png")));
+        assertTrue(Files.exists(Path.of("src/main/resources/assets/pohsmp_core/textures/entity/ereb_hand/traitor_glass_glowmask.png")));
+    }
 }

@@ -580,6 +580,7 @@ public final class CultFight {
                         if (!mark.isAlive()) continue;
                         mark.addEffect(new MobEffectInstance(CultLeader.BRAND.get(), delay, 0, false, true, true));
                         Fx.play(sl, Fx.fx("cult_brand").caster(mark).at(mark.position()).attach(mark).duration(delay));
+                        core.sound(mark.position(), "cult_leader.brand", 1.5f, 1);
                         if (mark instanceof ServerPlayer sp) sp.displayClientMessage(ui("brand_warn"), true);
                     }
                     core.actionbar(20, ui("brand"));
@@ -590,7 +591,7 @@ public final class CultFight {
                         Vec3 c = mark.position();
                         Fx.play(sl, Fx.fx("cult_brand_explode").at(c));
                         for (LivingEntity e : targets(sl, c, cfg(BossConfig.CL_BRAND_RADIUS))) hit(e, cfg(BossConfig.CL_BRAND_DAMAGE), 0);
-                        sl.playSound(null, c.x, c.y, c.z, net.minecraft.sounds.SoundEvents.GENERIC_EXPLODE, net.minecraft.sounds.SoundSource.HOSTILE, 2, 1.2f);
+                        core.sound(c, "cult_leader.brand_explode", 2.5f, 1);
                     }
                 }));
     }

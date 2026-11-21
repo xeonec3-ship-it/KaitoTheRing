@@ -112,6 +112,8 @@ minecraft {
             }
             if (project.hasProperty('bossShowcase')) {   // gradlew runClient -PdevRun -PbossShowcase: the six bosses' intros and bars (T34)
                 property 'pohsmp.bossshow', 'true'
+                if (project.hasProperty('bossOnly')) property 'pohsmp.bossshow.only', project.property('bossOnly')
+                if (project.hasProperty('bossDense')) property 'pohsmp.bossshow.dense', project.property('bossDense')
             }
             if (project.hasProperty('gateShowcase')) {   // gradlew runClient -PdevRun -PgateShowcase: the Gate (T03) scene + screenshots
                 property 'pohsmp.gateshow', 'true'

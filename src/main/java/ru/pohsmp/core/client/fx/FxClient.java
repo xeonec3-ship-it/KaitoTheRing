@@ -27,6 +27,9 @@ import ru.pohsmp.core.net.FxMsg;
 public final class FxClient {
     private FxClient() {}
 
+    /** Effects that threw while drawing (logged once each, then dropped silently as before). */
+    private static final java.util.Set<String> FAILED = new java.util.HashSet<>();
+
     private static final class Inst {
         FxRun fx;
         SigilRun sigil;
@@ -248,6 +251,8 @@ public final class FxClient {
                 alive = far ? !expired(i, time) : draw(f, i, time, pt);
             } catch (RuntimeException ex) {
                 alive = false;
+                String id = i.fx != null ? "fx " + i.fx.def.id() : i.sigil != null ? "sigil" : "mesh";
+                if (FAILED.add(id)) ru.pohsmp.core.PohCore.LOG.warn("[fx] {} dropped: it threw while drawing", id, ex);   // once per id
             }
             if (!alive) it.remove();
         }

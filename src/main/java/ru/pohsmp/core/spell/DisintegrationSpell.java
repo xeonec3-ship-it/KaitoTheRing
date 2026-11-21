@@ -229,6 +229,12 @@ public class DisintegrationSpell extends AbstractSpell {
 
     private void tickHold(ServerLevel sl, LivingEntity caster, Hold h) {
         LivingEntity t = h.target;
+        if (CoAuthors.linked(caster, t)) {   // owner 21.11 (4): aimed at the joint cast partner - he is an owner, not a target
+            HOLDS.remove(caster.getUUID());
+            release(h);
+            stopFx(sl, h);
+            return;
+        }
         if (!t.isAlive() || t.isRemoved() || t.level() != sl) {
             HOLDS.remove(caster.getUUID());
             release(h);
@@ -277,7 +283,7 @@ public class DisintegrationSpell extends AbstractSpell {
         sl.playSound(null, cx, cy, cz, SoundEvents.WARDEN_SONIC_BOOM, SoundSource.PLAYERS, 4f, pitch(0.6f));
         sl.playSound(null, cx, cy, cz, SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 4f, pitch(0.5f));
         sl.playSound(null, cx, cy, cz, SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 2f, pitch(1.4f));
-        if (!t.isAlive() || t.level() != sl) return;
+        if (!t.isAlive() || t.level() != sl || CoAuthors.linked(caster, t)) return;
         strike(sl, caster, t);
     }
 

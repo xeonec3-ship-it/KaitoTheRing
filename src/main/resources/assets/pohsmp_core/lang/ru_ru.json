@@ -307,6 +307,7 @@
   "ui.pohsmp_core.illusion.time": "Двойник: %s с",
   "ui.pohsmp_core.joint_cast": "Совместный каст: %s",
   "ui.pohsmp_core.joint_cast.done": "Совместный каст завершён",
+  "ui.pohsmp_core.joint_cast.hostile": "Совместный каст невозможен: вы недавно ранили друг друга",
   "ui.pohsmp_core.judgement.damage": "Урон: %s",
   "ui.pohsmp_core.judgement.undead": "Нежить получает ×2",
   "ui.pohsmp_core.lightning_rod.damage": "Урон: %s в радиусе %s",

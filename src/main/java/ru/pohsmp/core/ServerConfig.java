@@ -22,6 +22,7 @@ public final class ServerConfig {
     public static final ForgeConfigSpec.IntValue GATE_HIT_COOLDOWN, GATE_AIM_INTERVAL, GATE_BEAMS_MIN, GATE_BEAMS_MAX, GATE_SILENCE_SECONDS;
     public static final ForgeConfigSpec.ConfigValue<java.util.List<? extends String>> JOINT_SPELLS;
     public static final ForgeConfigSpec.DoubleValue JOINT_RADIUS, JOINT_WINDOW, JOINT_MULT;
+    public static final ForgeConfigSpec.IntValue JOINT_HOSTILITY;
     public static final ForgeConfigSpec.DoubleValue COUNTDOWN_MAX;
     public static final ForgeConfigSpec.DoubleValue STAR_FALL_DAMAGE, STAR_FALL_EDGE;
     public static final ForgeConfigSpec.IntValue SCARLET_CUTS_MIN, SCARLET_CUTS_MAX, SCARLET_INTERVAL, SCARLET_CRACK_DELAY;
@@ -302,6 +303,9 @@ public final class ServerConfig {
         JOINT_RADIUS = b.comment("Max distance between the two mages (blocks)").defineInRange("radius", 6.0, 1.0, 64.0);
         JOINT_WINDOW = b.comment("The second mage must start within this many seconds of the first one's cast start").defineInRange("windowSeconds", 2.0, 0.05, 30.0);
         JOINT_MULT = b.comment("Cast time of a joint cast as a share of the first mage's cast time").defineInRange("castTimeMult", 0.7, 0.05, 1.0);
+        JOINT_HOSTILITY = b.comment("Owner 21.11: two players who hurt each other (any way: melee, projectile, spell, zone, pet, summon, reflected)",
+                        "cannot cast together for this many seconds after the last such hit; each casts his own spell. 0 = until one of them leaves")
+                .defineInRange("hostility_memory_seconds", 300, 0, 86400);
         b.pop();
         b.push("countdown");
         COUNTDOWN_MAX = b.comment("Countdown: the repeated hit is capped at this share of the target's max health").defineInRange("maxRepeat", 0.4, 0.0, 100.0);

@@ -13,7 +13,8 @@
     "IronsServerEventsMixin",
     "IronsCancelPacketMixin",
     "IronsSelectSpellMixin",
-    "EpicFightSkillMixin"
+    "EpicFightSkillMixin",
+    "IronsFriendlyFireMixin"
   ],
   "client": [
     "HumanoidModelMixin",

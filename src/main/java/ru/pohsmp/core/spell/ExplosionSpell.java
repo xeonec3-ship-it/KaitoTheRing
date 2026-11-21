@@ -159,7 +159,7 @@ public class ExplosionSpell extends PohSpell {
         DivineEvents.particle(sl, ParticleTypes.EXPLOSION_EMITTER, c.x, c.y + 1, c.z, 6, 3, 0);
         DivineEvents.particle(sl, ParticleTypes.FLAME, c.x, c.y + 1, c.z, 400, R * 0.35, 0.4);
         DivineEvents.particle(sl, ParticleTypes.LAVA, c.x, c.y + 1, c.z, 80, R * 0.3, 0.2);
-        for (LivingEntity e : HigherSpell.around(sl, c, R + 2, e -> e != caster && !e.isSpectator())) {
+        for (LivingEntity e : HigherSpell.around(sl, c, R + 2, e -> e != caster && !e.isSpectator() && !CoAuthors.linked(caster, e))) {   // owner 21.11 (4): not the joint cast partner
             double d = e.position().distanceTo(c);
             if (d > R + e.getBbWidth() / 2) continue;
             double k = 1 - 0.5 * Math.min(1, d / R);

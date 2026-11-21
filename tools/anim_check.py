@@ -44,7 +44,7 @@ SPELL_ANIMS = ['instant_projectile', 'continuous_thrust', 'charged_throw', 'long
                'kneeling_prayer', 'self_cast_two_hands', 'continuous_thrust_one_handed', 'throw_item', 'charge_one_handed_ray', 'shoot_one_handed_ray']
 PLAYS = {'cult_leader': SPELL_ANIMS + list(IRON_HITS) + ['fire_boss_spawn', 'fire_boss_death', 'fire_boss_break_stance', 'fire_boss_half_health_attack',
                                                          'fire_boss_acrobatic_dagger_throw', 'summon_fiery_daggers', 'offhand_parry', 'magma_throw'],
-         'ereb': SPELL_ANIMS}
+         'ereb': SPELL_ANIMS, 'ereb_hand': SPELL_ANIMS}
 STRIKE_EVENTS = {'slash', 'impale', 'hit', 'stab', 'throw', 'shatter', 'release', 'dash', 'brand', 'erupt', 'pillar', 'plant', 'crush', 'cast'}
 WEAPON_EVENTS = {'slash', 'impale', 'hit', 'stab', 'throw', 'shatter', 'plant'}
 
@@ -53,6 +53,10 @@ CFG = {
                         item='models/item/cult_scythe.json', tip=[3.55, 11.34, 8.0], cloth={'cape': 'back'}),
     'ereb': dict(geo='geo/entity/ereb.geo.json', anim='animations/entity/ereb.animation.json', item='models/item/ereb_rapier.json', tip=None,
                  cloth={'coat_back_r': 'back', 'coat_back_l': 'back', 'coat_front_r': 'front', 'coat_front_l': 'front'}),
+    # T31 Эреб, Длань Лжи — тот же скелет, что у Эреба (+ призрачная рука ghost_*), стеклянная рапира тем же слоем Iron's (21.11: для
+    # проверщика рывков tools/scythe_jitter.py --boss ereb_hand)
+    'ereb_hand': dict(geo='geo/entity/ereb_hand.geo.json', anim='animations/entity/ereb_hand.animation.json', item='models/item/ereb_hand_rapier.json',
+                      tip=None, cloth={'coat_back_r': 'back', 'coat_back_l': 'back', 'coat_front_r': 'front', 'coat_front_l': 'front'}),
 }
 
 

@@ -68,6 +68,17 @@ def mod(pose, **kw):
     return o
 
 
+def over(p0, p1, f):
+    """Перехлёст (проверка рывков 21.11): поза дальше p1 по ходу p0 → p1 на долю f. Удар «разгон (easeInQuad) → перехлёст (easeOutQuad)»:
+    скорость на стыке совпадает при f = T_перехлёста / T_удара — рапира не останавливается в одном кадре."""
+    o = {}
+    for k in set(p0) | set(p1):
+        d = [1, 1, 1] if k.endswith('_scale') else Z
+        a, b = p0.get(k, d), p1.get(k, d)
+        o[k] = [y + (y - x) * f for x, y in zip(a, b)]
+    return o
+
+
 def anim(length, keys, timeline=None, loop=False):
     """keys: [(t, поза, easing)] → каналы GeckoLib по всем костям, встречающимся в позах (недостающие — 0)."""
     names = set()
@@ -159,8 +170,11 @@ def build():
         (1.45, mod(a3, body_pos=[0, -3.4, -8.2])), (1.7, mod(GUARD, body_pos=[0, -1.8, -3.0], right_leg=[-30, 30, 2]), IO), (2.0, GUARD, IO)],
         [(0.45, 'hit'), (0.8, 'hit'), (1.15, 'hit')])
     # парирование (1.0 с): 0.15 — клинок поперёк (parry, звон, искра), 0.6 — ответный укол (hit)
-    an['ereb_parry'] = anim(1.0, [(0, GUARD), (0.15, PARRY, OQ), (0.35, mod(PARRY, body_pos=[0, -1.6, 1.6]), IO),
-                                  (0.6, LUNGE, OQ), (1.0, GUARD, IO)], [(0.15, 'parry'), (0.6, 'hit')])
+    # (рывки 21.11: укол — разгон к hit и перехлёст, а не старт с полной скорости easeOutQuart)
+    pz = mod(PARRY, body_pos=[0, -1.6, 1.6])
+    an['ereb_parry'] = anim(1.0, [(0, GUARD), (0.15, PARRY, IO), (0.35, pz, IO),
+                                  (0.6, LUNGE, 'easeInQuad'), (0.67, over(pz, LUNGE, 0.28), 'easeOutQuad'), (1.0, GUARD, IO)],
+                            [(0.15, 'parry'), (0.6, 'hit')])
     # ---------------------------------------------------------------- каст иллюзий (1.4 с): левая рука вверх, щелчок пальцами (cast 0.75)
     an['ereb_cast_illusion'] = anim(1.4, [
         (0, STAND), (0.45, CAST, IO), (0.7, mod(CAST, left_arm=[-174, 0, -32], head=[-8, -12, 0]), IO),
@@ -183,8 +197,9 @@ def build():
     # укол: остриё на высоте спины жертвы перед ним (было: рука −70, кисть 96 — остриё било в пол в 1.8 бл. впереди)
     stab = mod(LUNGE, body=[14, -20, 0], right_arm=[-107.6, 16.8, 7.6], bipedHandRight=[100, 1.4, -4.7], body_pos=[0, -1.6, -3],
                right_leg=[-40, 20, 0], left_leg=[24, 10, -6], coat_front_r=[-24, 0, 6], coat_front_l=[14, 0, -6])
-    an['ereb_backstab'] = anim(1.2, [(0, pre), (0.3, mod(pre, right_arm=[-170, 20, -10]), IO), (0.45, stab, IQ), (0.75, stab),
-                                     (1.2, STAND, IO)], [(0.0, 'appear'), (0.45, 'stab')])
+    pre2 = mod(pre, right_arm=[-170, 20, -10])
+    an['ereb_backstab'] = anim(1.2, [(0, pre), (0.3, pre2, IO), (0.45, stab, 'easeInQuad'), (0.51, over(pre2, stab, 0.4), 'easeOutQuad'),
+                                     (0.62, stab, IO), (0.75, stab), (1.2, STAND, IO)], [(0.0, 'appear'), (0.45, 'stab')])
     # ---------------------------------------------------------------- фаза (1.6 с): переход 66% / 33% — рапира описывает круг, салют
     an['ereb_phase'] = anim(1.6, [(0, STAND), (0.4, mod(SALUTE, right_arm=[-100, 60, -10], bipedHandRight=[44.6, -3.8, -2.2]), IO),
                                   (0.8, SALUTE, OC), (1.2, SALUTE), (1.6, STAND, IO)], [(0.8, 'phase')])
@@ -210,8 +225,8 @@ def build():
     an['ereb_feint'] = anim(2.4, [(0, GUARD), (0.3, opn, OC), (1.05, mod(opn, head=[-6, 6, 0]), IO), (1.8, opn, IO), (2.4, GUARD, IO)],
                             [(0.3, 'open'), (1.8, 'close')])
     # контратака (0.9 с): кто ударил в окно — мгновенное парирование и укол (parry 0.1, hit 0.45)
-    an['ereb_feint_counter'] = anim(0.9, [(0, opn), (0.1, PARRY, 'easeOutQuart'), (0.45, LUNGE, OQ), (0.9, GUARD, IO)],
-                                    [(0.1, 'parry'), (0.45, 'hit')])
+    an['ereb_feint_counter'] = anim(0.9, [(0, opn), (0.1, PARRY, IO), (0.45, LUNGE, 'easeInQuad'), (0.52, over(PARRY, LUNGE, 0.2), 'easeOutQuad'),
+                                          (0.9, GUARD, IO)], [(0.1, 'parry'), (0.45, 'hit')])
     # «Стеклянный дождь» (1.6 с): рапира и левая ладонь к небу (marks 0.4 — метки на земле), опускает руку (fall 1.6 = марки + 1.2 с)
     # рапира к небу — клинок вертикально вверх (было −30 — клинок лежал назад над головой, сквозь волосы)
     sky = mod(STAND, head=[-30, 0, 0], torso=[-6, 0, 0], right_arm=[-172, 6, -6], bipedHandRight=[78.4, -0.3, -6.6], left_arm=[-160, -10, -24])
@@ -240,7 +255,7 @@ def build():
     an['ereb_finisher'] = anim(2.4, [
         (0, STAND), (0.15, mod(STAND, body_pos=[0, 0, 2], head=[12, 8, 0], right_arm=[-30, 12, 7]), IO),
         (0.3, mod(STAND, body_pos=[0, 0, 3], head=[12, 8, 0], body_scale=[0.96, 1.04, 0.96]), IO),
-        (0.7, pre), (0.95, mod(pre, right_arm=[-170, 20, -10]), IO), (1.1, fstab, IQ), (1.6, fstab),
+        (0.7, pre), (0.95, pre2, IO), (1.1, fstab, 'easeInQuad'), (1.16, over(pre2, fstab, 0.4), 'easeOutQuad'), (1.27, fstab, IO), (1.6, fstab),
         (1.9, mod(fstab, right_arm=[-84, 20, 12], bipedHandRight=[88, 0, 0], body_pos=[0, -1.2, 1.5]), OC),
         (2.4, STAND, IO)], [(0.3, 'vanish'), (0.7, 'appear'), (1.1, 'stab'), (1.9, 'kill')])
     # T32 «Сломать блок»: финт в лицо → укол под защиту (по эталону Epic Fight, tools/guard_break_ereb.py; warn 0.1, hit 0.7)
@@ -295,8 +310,23 @@ def write(M):
     anim_cloth.bake('ereb', doc['animations'])
     # рапира: остриё не в полу и не сквозь корпус — у наших и у кастов Iron's (без краёв: у Эреба нет позы хвата из кода)
     import anim_check
-    for _ in range(3):                       # следующие проходы добирают кадры на плавных переходах прежних
-        anim_cloth.weapon('ereb', doc['animations'], [k for k in mine if k != 'ereb_guard_break'] + anim_check.SPELL_ANIMS, edge=0)   # T32 guard_break — без доворотов (guard_break_lib)
+    # рывки (проверщик tools/scythe_jitter.py --boss ereb, 21.11): прежний anim_cloth.weapon ставил поправку кисти каждые 0.025 с
+    # ступеньками — рапира дёргалась (касты Iron's до 6100 °/с за кадр). Теперь как у Главы: плавный сдвиг рапиры в кулаке
+    # (anim_cloth.smooth_clear), доворот — только где сдвига нет; T32 guard_break — без поправок (guard_break_lib)
+    plays = [k for k in mine if k != 'ereb_guard_break'] + [n for n in anim_check.SPELL_ANIMS if n in doc['animations']]
+    # короткие касты Iron's (< 0.5 с) — без поправок кисти: сдвиг/доворот за доли секунды дёргает сильнее, чем у Тироса (порог проверщика рывков)
+    short = [n for n in plays if n in anim_check.SPELL_ANIMS and float(doc['animations'][n]['animation_length']) < 0.5]
+    plays = [n for n in plays if n not in short]
+    # cross_arms: у Тироса руки почти неподвижны (порог рывка мал) — доворот 15° и обычное сглаживание давали рывок выше порога;
+    # без поправки рапира 0.5 с в корпусе — поэтому только сдвиг в кулаке, сглаженный сильнее (σ 8 кадров, расширение 14)
+    plays = [n for n in plays if n != 'cross_arms']
+    rot = list(plays)
+    print('  рапира: cross_arms', anim_cloth.smooth_clear('ereb', doc['animations'], ['cross_arms'], sigma=8.0, grow=14))
+    print('  рапира: плавный сдвиг', anim_cloth.smooth_clear('ereb', doc['animations'], plays))
+    print('  рапира: плавный доворот', anim_cloth.smooth_clear('ereb', doc['animations'], rot, kind='rot'))
+    for _ in range(2):
+        anim_cloth.smooth_clear('ereb', doc['animations'], plays)
+        anim_cloth.smooth_clear('ereb', doc['animations'], rot, kind='rot')
     import os
     vp = os.path.join(M.ROOT, 'src', 'main', 'resources', 'assets', 'irons_spellbooks', 'player_animation', 'pohsmp_ereb_finisher_victim.json')
     with open(vp, 'w', encoding='utf-8', newline='\n') as f:

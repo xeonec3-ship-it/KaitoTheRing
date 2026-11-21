@@ -41,7 +41,8 @@ public final class ScrollModels {
     static {
         for (String p : List.of("explosion", "heaven_fall", "frozen_hour", "space_closure")) own(new ResourceLocation(PohCore.MODID, p));
         for (String p : Reg.DIVINE_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
-        for (String p : Reg.HIGHER_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
+        for (String p : Reg.HIGHER_SPELLS)
+            if (!ru.pohsmp.core.spell.MagicRules.itemOnly(PohCore.MODID + ":" + p)) own(new ResourceLocation(PohCore.MODID, p));   // T34: Жатва и Длань — без свитков
         own(DisintegrationSpell.ID);
         for (String p : Reg.ILLUSION_COMMON) own(new ResourceLocation(PohCore.MODID, p));   // T22: the higher two come with HIGHER_SPELLS
         own(new ResourceLocation(PohCore.MODID, Reg.ILLUSION_MYTHIC));

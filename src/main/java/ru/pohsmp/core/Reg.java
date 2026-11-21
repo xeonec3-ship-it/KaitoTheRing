@@ -383,7 +383,7 @@ public final class Reg {
             })
             .displayItems((params, out) -> {
                 for (String p : COMMON_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
-                for (String p : HIGHER_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
+                for (String p : HIGHER_SPELLS) if (!ru.pohsmp.core.spell.MagicRules.itemOnly(PohCore.MODID + ":" + p)) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
                 out.accept(Scrolls.make(DisintegrationSpell.ID, 1, null));
                 for (String p : MYTHIC_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));
                 for (String p : DIVINE_SPELLS) out.accept(Scrolls.make(new ResourceLocation(PohCore.MODID, p), 1, null));

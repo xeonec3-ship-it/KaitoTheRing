@@ -46,6 +46,12 @@ class MagicRulesTest {
         assertFalse(MagicRules.copyBanned("irons_spellbooks:fireball"));
         assertFalse(MagicRules.copyBanned(null));
         assertFalse(MagicRules.bindBanned("higher"), "reward spells are Higher: written into books");
+        // owner 21.11 (later): Жатва and Длань live only in their items (T35) - no scrolls, no books; the other four as before
+        assertEquals(Set.of("pohsmp_core:ashen_harvest", "pohsmp_core:hand_of_lies"), MagicRules.ITEM_ONLY_SPELLS);
+        assertTrue(MagicRules.REWARD_SPELLS.containsAll(MagicRules.ITEM_ONLY_SPELLS));
+        for (String id : List.of("pohsmp_core:jealous_embrace", "pohsmp_core:anvil_strike", "pohsmp_core:warlord_banner", "pohsmp_core:mirror_step"))
+            assertFalse(MagicRules.itemOnly(id), id);
+        assertFalse(MagicRules.itemOnly(null));
         assertTrue(MagicRules.craftBanned("higher", false), "reward spells are never crafted");
         // built-in Higher tier = listed in Reg.HIGHER_SPELLS; registered; fixed cast through RewardSpell
         String reg = Files.readString(SRC.resolve("ru/pohsmp/core/Reg.java"), StandardCharsets.UTF_8);

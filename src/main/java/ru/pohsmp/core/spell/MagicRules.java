@@ -30,6 +30,18 @@ public final class MagicRules {
         return java.util.Collections.unmodifiableSet(s);
     }
 
+    /**
+     * Owner 21.11 (later, T34/T35): these reward spells live only inside an item (Накидка Главы Культа, Маска Лжи) — no scroll, never
+     * written into a book or imbued anywhere by a player; the item itself carries them (T35).
+     */
+    public static final Set<String> ITEM_ONLY_SPELLS = Set.of("pohsmp_core:" + ru.pohsmp.core.spell.reward.RewardMath.ASHEN_HARVEST,
+            "pohsmp_core:" + ru.pohsmp.core.spell.reward.RewardMath.HAND_OF_LIES);
+
+    /** True for a spell that exists only inside its item: no scrolls, no books, no imbuing. */
+    public static boolean itemOnly(String spellId) {
+        return spellId != null && ITEM_ONLY_SPELLS.contains(spellId);
+    }
+
     /** May a scroll of this spell (full id) be copied / merged with another one into a new scroll? Not for the reward spells. */
     public static boolean copyBanned(String spellId) {
         return spellId != null && REWARD_SPELLS.contains(spellId);

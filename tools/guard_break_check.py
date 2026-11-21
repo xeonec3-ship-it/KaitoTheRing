@@ -25,7 +25,7 @@ BOSSES = {
     'irina': ('irina_guard_break', 'heavy', None),
     'ereb': ('ereb_guard_break', 'thrust', None),
     'ereb_hand': ('ereb_hand_guard_break', 'thrust', None),
-    'cult_leader': ('cult_leader_guard_break', 'heavy', None),
+    'cult_leader': ('cult_leader_guard_break', 'thrust', None),
 }
 
 

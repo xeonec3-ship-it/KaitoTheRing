@@ -153,6 +153,8 @@ def boss_anims():
 def write_anims(weapon_passes=3):
     src = M.jar_json(M.I + 'animations/casting_animations.json')
     ours = boss_anims()
+    import guard_break_cult_leader          # T32 «Сломать блок»: крюк косы рвёт защиту, удар подтоком (хват Тироса, двойной поворот кисти)
+    ours['cult_leader_guard_break'] = guard_break_cult_leader.build()
     out = {'format_version': src['format_version'], 'geckolib_format_version': src['geckolib_format_version'],
            'comment': 'T26: все анимации casting_animations.json Iron\'s (те же имена — их зовёт логика FireBoss) + cult_leader_* (наши). '
                       'Сгенерировано tools/gen_cult_leader.py — правьте генератор.',
@@ -169,6 +171,9 @@ def write_anims(weapon_passes=3):
     # fire_boss_spawn: на 6.42 с коса возникает в руке, влетая из точки сбоку-снизу (21, −6, 0) — лезвие проходило сквозь землю;
     # влетает сбоку-сверху (10, 10, 0), время то же
     out['animations']['fire_boss_spawn']['bones']['bipedHandRight']['position']['6.4167']['vector'] = [10, 10, 0]
+    # cult_leader_guard_break (T32) — коса уже посчитана с двойным поворотом и без земли/тела (tools/guard_break_cult_leader.py):
+    # обработки косы ниже переписали бы её ключи кисти на свою сетку (провороты между ключами) — её не трогаем
+    plays = [n for n in plays if n != 'cult_leader_guard_break']
     hold = anim_cloth.hold_additive(out['animations'], plays, CARRY_ARM, CARRY_HAND, hand_pos=CARRY_POS, no_end=('fire_boss_death',))
     print('  поза хвата всю анимацию:', sorted(n for n, v in hold.items() if v == 'always'))
     ag = {'cult_leader_first_flame': (0.9, 5.2)}

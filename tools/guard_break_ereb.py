@@ -85,4 +85,6 @@ def build():
     sv.reset()
     for _ in range(2):                                 # прогон «вхолостую» — решения стартуют с ветви 0-го кадра
         pose(0.0)
-    return GL.bake(pose, LENGTH, 0.02, events={WARN: 'warn', HIT: 'hit'})
+    # края — сшивка со стойкой ereb_guard (её ключи кисти — уже под двойной поворот GeckoLib): вход и выход без скачка крена клинка
+    p0 = GL.pose_at('ereb', 'ereb_guard', 0.0, ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg', 'bipedHandRight', 'bipedHandLeft'))
+    return GL.bake(GL.blend_edges(pose, p0, LENGTH), LENGTH, 0.02, events={WARN: 'warn', HIT: 'hit'})

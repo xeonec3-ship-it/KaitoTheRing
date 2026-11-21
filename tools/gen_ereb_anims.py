@@ -296,7 +296,7 @@ def write(M):
     # рапира: остриё не в полу и не сквозь корпус — у наших и у кастов Iron's (без краёв: у Эреба нет позы хвата из кода)
     import anim_check
     for _ in range(3):                       # следующие проходы добирают кадры на плавных переходах прежних
-        anim_cloth.weapon('ereb', doc['animations'], mine + anim_check.SPELL_ANIMS, edge=0)
+        anim_cloth.weapon('ereb', doc['animations'], [k for k in mine if k != 'ereb_guard_break'] + anim_check.SPELL_ANIMS, edge=0)   # T32 guard_break — без доворотов (guard_break_lib)
     import os
     vp = os.path.join(M.ROOT, 'src', 'main', 'resources', 'assets', 'irons_spellbooks', 'player_animation', 'pohsmp_ereb_finisher_victim.json')
     with open(vp, 'w', encoding='utf-8', newline='\n') as f:

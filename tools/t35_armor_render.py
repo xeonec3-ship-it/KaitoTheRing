@@ -325,15 +325,15 @@ def video(args=()):
                     'cap': title, 'sub': sub}
         seg(14, fn)
 
-    turntable('jealous', '«Наряд Ревности» (Ирина)', dist=100, ty=22)
-    turntable('smith', '«Латы Кузнеца» (Арис)', dist=88, ty=18)
-    turntable('cult_mantle', '«Накидка Главы Культа» поверх незерита', {'vanilla': ['netherite_1', 'netherite_2']}, dist=90, ty=18)
-    turntable('cult_mantle', '«Накидка Главы Культа» поверх «Лат Кузнеца»', {'armor': ['smith', 'cult_mantle']}, dist=92, ty=19, yaw0=200)
+    turntable('jealous', '«Наряд Ревности» (Ирина)', dist=132, ty=25)
+    turntable('smith', '«Латы Кузнеца» (Арис)', dist=116, ty=22)
+    turntable('cult_mantle', '«Накидка Главы Культа» поверх незерита', {'vanilla': ['netherite_1', 'netherite_2']}, dist=100, ty=17)
+    turntable('cult_mantle', '«Накидка Главы Культа» поверх «Лат Кузнеца»', {'armor': ['smith', 'cult_mantle']}, dist=118, ty=22, yaw0=200)
     # крупно сбоку: ходьба и бег, ткань против ноги
     for sid, title, extra in (('jealous', 'Ирина: ленты юбки на шаге', {}), ('cult_mantle', 'Накидка: плащ на бегу', {'vanilla': ['netherite_1', 'netherite_2']})):
         def fn(t, k, sid=sid, title=title, extra=extra):
             mode = 'walk' if t < 3 else 'run'
-            return {'actors': [dict(P(sid, mode, t), **extra)], 'cam': {'yaw': 90, 'pitch': 4, 'dist': 64, 'ty': 12}, 'cap': title,
+            return {'actors': [dict(P(sid, mode, t), **extra)], 'cam': {'yaw': 90, 'pitch': 4, 'dist': 80, 'ty': 15}, 'cap': title,
                     'sub': 'сбоку: ходьба → бег'}
         seg(5, fn)
     out = os.path.join(MEDIA, 'video', 't35_armor_A.mp4')

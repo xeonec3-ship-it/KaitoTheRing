@@ -76,10 +76,10 @@ def build():
          (0.12, dict(ayaw=40.0, apit=10.0, byaw=-10.0, bpit=88.0)),
          (0.22, dict(ayaw=62.0, apit=42.0, byaw=-30.0, bpit=144.0)),        # посох за правым плечом: рука вверх-вправо, крюк назад
          (0.255, dict(ayaw=64.0, apit=46.0, byaw=-31.0, bpit=149.0)),
-         (0.45, dict(ayaw=26.0, apit=48.0, byaw=-14.0, bpit=88.0)),
-         (0.80, dict(ayaw=-4.0, apit=-14.0, byaw=-3.0, bpit=-4.0)),          # крюк в блок (грудь цели)
-         (0.86, dict(ayaw=-22.0, apit=-16.0, byaw=-24.0, bpit=-12.0)),
-         (0.90, dict(ayaw=-16.0, apit=-18.0, byaw=-18.0, bpit=0.0)),
+         (0.45, dict(ayaw=50.0, apit=45.0, byaw=10.0, bpit=88.0)),
+         (0.80, dict(ayaw=36.0, apit=-14.0, byaw=-3.0, bpit=14.0)),          # крюк в блок (грудь цели)
+         (0.86, dict(ayaw=4.0, apit=-16.0, byaw=-14.0, bpit=-8.0)),
+         (0.90, dict(ayaw=0.0, apit=-18.0, byaw=-12.0, bpit=2.0)),
          (1.0, dict(HOLD))]
 
     def pose(t):

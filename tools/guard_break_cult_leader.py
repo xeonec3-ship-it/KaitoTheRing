@@ -51,7 +51,7 @@ def pose0(M):
     pose = {b: {'rotation': [0.0, 0.0, 0.0]} for b in ('body', 'torso', 'head', 'left_arm', 'right_leg', 'left_leg')}
     pose['body']['position'] = [0.0, 0.0, 0.0]
     pose['right_arm'] = {'rotation': list(X.CARRY_ARM)}
-    pose['bipedHandRight'] = {'rotation': list(X.CARRY_HAND), 'position': list(X.CARRY_POS)}
+    pose['bipedHandRight'] = {'rotation': list(X.CARRY_HAND)}     # без сдвига в кулаке (HOLD_SLIDE): оружие — только поворотами
     return pose
 
 
@@ -109,12 +109,12 @@ def build():
          (0.18, dict(ayaw=6.0, apit=-16.0, byaw=0.0, bpit=4.0, ux=0.0, uy=1.0, uz=0.0)),            # опустил за защиту: лезвие вниз
          (0.20, dict(ayaw=6.0, apit=-18.0, byaw=0.0, bpit=3.0, ux=0.0, uy=1.0, uz=0.0)),
          (0.30, dict(ayaw=-40.0, apit=-26.0, byaw=-50.0, bpit=7.0, ux=0.0, uy=1.0, uz=0.0)),        # рванул влево
-         (0.36, dict(ayaw=-105.0, apit=-27.0, byaw=-155.0, bpit=19.0, ux=0.8, uy=-0.6, uz=0.0)),    # перехват: голова косы назад-влево, лезвие вверх, подток вперёд
-         (0.80, dict(ayaw=-12.0, apit=-4.0, byaw=-155.0, bpit=4.0, ux=0.8, uy=-0.6, uz=0.0)),     # удар подтоком в грудь цели (древко мимо корпуса слева)
-         (0.82, dict(ayaw=-12.0, apit=-3.0, byaw=-155.0, bpit=5.0, ux=0.8, uy=-0.6, uz=0.0)),
+         (0.36, dict(ayaw=-85.0, apit=-27.0, byaw=-155.0, bpit=19.0, ux=0.8, uy=-0.6, uz=0.0)),    # перехват: голова косы назад-влево, лезвие вверх, подток вперёд
+         (0.80, dict(ayaw=-12.0, apit=-4.0, byaw=-135.0, bpit=4.0, ux=0.8, uy=-0.6, uz=0.0)),     # удар подтоком в грудь цели (древко мимо корпуса слева)
+         (0.82, dict(ayaw=-12.0, apit=-3.0, byaw=-135.0, bpit=5.0, ux=0.8, uy=-0.6, uz=0.0)),
          (0.88, dict(ayaw=-62.0, apit=-30.0, byaw=-150.0, bpit=12.0, ux=0.8, uy=-0.6, uz=0.0)),     # возврат — обратным ходом:
          (0.93, dict(ayaw=-40.0, apit=-22.0, byaw=-55.0, bpit=16.0, ux=0.0, uy=1.0, uz=0.0)),       # голова косы влево-вперёд…
-         (0.97, dict(ayaw=8.0, apit=-2.0, byaw=5.0, bpit=32.0, ux=0.75, uy=0.35, uz=0.45)),           # …вперёд, лезвие вниз — в хват
+         (0.97, dict(ayaw=18.0, apit=-2.0, byaw=8.0, bpit=32.0, ux=0.75, uy=0.35, uz=0.45)),           # …вперёд, лезвие вниз — в хват
          (1.0, dict(A0, byaw=y0, bpit=q0, **U0))]
 
     def pose(t):
@@ -124,7 +124,7 @@ def build():
         b = K.v(t, 'body')
         bl = K.v(max(0.0, t - 0.06), 'body')
         o['head'] = {'rotation': [-0.7 * b[0], -0.85 * bl[1], 0.0]}
-        o['bipedHandRight'] = {'position': list(p0['bipedHandRight']['position'])}     # коса в кулаке сдвинута, как в хвате
+        # оружие — только поворотами (владелец 21.11: никаких ключей позиции на кисть/руку — коса в кулаке в каждом кадре)
         e = 1.0 - GL.ease(min(1.0, t / 0.12), 'io') if t < 0.12 else GL.ease(min(1.0, max(0.0, (t - 1.40) / 0.20)), 'io')
         sv.arm_ref = (RA0, 6.0 * e)                                   # скручивание руки на краях — как в позе хвата
         w = GL.path_at(P, ST(t))

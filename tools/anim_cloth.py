@@ -415,6 +415,317 @@ def nudge(boss, anims, names, step=0.025, allow_ground=None, win=0.1):
     return rep
 
 
+# ------------------------------------------------------------------ коса мимо земли и тела без рывков (21.11, проверка рывков)
+def _clusters(flags, ts, gap=0.15):
+    out, cur = [], None
+    for f, t in zip(flags, ts):
+        if f:
+            if cur and t - cur[1] <= gap:
+                cur[1] = t
+            else:
+                cur = [t, t]
+                out.append(cur)
+    return out
+
+
+def _apply(an, bone, kind, off, a0, a1, ramp, step=0.025):
+    """К каналу кости прибавляется постоянное смещение off на [a0, a1] с плавным входом/выходом ramp с (ключи через step внутри)."""
+    bk = an['bones'].setdefault(bone, {})
+    orig = bk.get(kind)
+    val = (lambda t: C.chan_at(orig, t)) if orig is not None else (lambda t: [0.0, 0.0, 0.0])
+    L = float(an['animation_length'])
+    lo, hi = max(0.0, a0 - ramp), min(L, a1 + ramp)
+    keys = {}
+    if isinstance(orig, dict) and 'vector' not in orig:
+        for k, e in orig.items():
+            t = round(float(k), 4)
+            if not (lo < t < hi):
+                keys[t] = e if isinstance(e, dict) else {'vector': e}
+    elif orig is not None:
+        keys[0.0] = {'vector': list(val(0))}
+    n = max(2, int(math.ceil((hi - lo) / step)))
+    for i in range(n + 1):
+        t = round(lo + (hi - lo) * i / n, 4)
+        w = 1.0 if a0 <= t <= a1 else (_smooth((t - lo) / max(1e-6, a0 - lo)) if t < a0 else _smooth((hi - t) / max(1e-6, hi - a1)))
+        if (t <= 0 and a0 <= 0) or (t >= L and a1 >= L):
+            w = 1.0
+        o = val(t)
+        keys[t] = {'vector': [round(o[j] + w * off[j], 3) for j in range(3)]}
+    bk[kind] = {('%.4g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
+
+
+POS_GRID = sorted({(x, y, z) for x in range(-12, 13, 2) for y in range(0, 17, 2) for z in range(-12, 13, 2)},
+                  key=lambda v: (v[0] ** 2 + v[1] ** 2 + v[2] ** 2, v))[1:]
+ROT_GRID = sorted(set(GRID + GRID3) - {(0, 0, 0)}, key=lambda v: (v[0] ** 2 + v[1] ** 2 + v[2] ** 2, v))
+
+
+def clear(boss, anims, names, step=0.025, ramp=0.15, allow_ground=None, passes=4):
+    """Коса в земле или сквозь тело → на каждый участок нарушений ОДНО постоянное смещение с плавным входом/выходом (квинтика,
+    ramp с): сначала сдвиг косы в кулаке (position кисти, поворот косы как в анимации), если сдвиг не помогает и участок не
+    в окне удара — поворот кисти. Смещение подбирается так, чтобы был чист весь участок вместе с подъёмом и спуском.
+    Раньше (weapon/nudge) поправка менялась каждые 0.025 с — коса дёргалась. Возвращает {анимация: [(t0, t1, 'pos'|'rot', смещение)]}."""
+    M = C.Model(boss)
+    rep = {}
+    for name in names:
+        an = anims.get(name)
+        if not an or not an.get('animation_length'):
+            continue
+        L = float(an['animation_length'])
+        ag = (allow_ground or {}).get(name)
+        prot = strike_windows(name, an)
+        for _ in range(passes):
+            n = max(1, int(round(L / step)))
+            ts = [min(L, i * step) for i in range(n + 1)]
+
+            def bad_at(t, W):
+                if np.linalg.det(W['bipedHandRight'][:3, :3]) < 1e-6:
+                    return False
+                return bool(_weapon_bad(M, W, bool(ag and ag[0] <= t <= ag[1])))
+            flags = [bad_at(t, M.world(an, t)) for t in ts]
+            cl = _clusters(flags, ts)
+            if not cl:
+                break
+            todo = [tuple(c) for c in cl]
+            while todo:
+                a0, a1 = todo.pop(0)
+                lo, hi = max(0.0, a0 - ramp), min(L, a1 + ramp)
+                fr = [t for t in ts if lo <= t <= hi]
+                Ws = [(t, M.world(an, t)) for t in fr]
+                hb = an['bones'].get('bipedHandRight', {})
+
+                def wgt(t):
+                    if a0 <= t <= a1:
+                        return 1.0
+                    return _smooth((t - lo) / max(1e-6, a0 - lo)) if t < a0 else _smooth((hi - t) / max(1e-6, hi - a1))
+
+                def ok(kind, d):
+                    for t, W in Ws:
+                        w = wgt(t)
+                        r = C.chan_at(hb['rotation'], t) if 'rotation' in hb else [0.0, 0.0, 0.0]
+                        if kind == 'pos':
+                            W2 = M.with_hand(W, an, t, r, [w * x for x in d])
+                        else:
+                            W2 = M.with_hand(W, an, t, [r[k] + w * d[k] for k in range(3)])
+                        if bad_at(t, W2):
+                            return False
+                    return True
+                found = None
+                for d in POS_GRID:
+                    if ok('pos', d):
+                        found = ('pos', d)
+                        break
+                in_strike = any(not (hi < s0 or lo > s1) for s0, s1 in prot)
+                if found is None and not in_strike:
+                    for d in ROT_GRID:
+                        if ok('rot', d):
+                            found = ('rot', d)
+                            break
+                if found is None and a1 - a0 > 0.06:          # одного смещения на весь участок нет — пополам
+                    m = round((a0 + a1) / 2 / step) * step
+                    todo[:0] = [(a0, m), (min(a1, m + step), a1)]
+                    continue
+                if found is None and in_strike:                # удар: последнее средство — малый доворот (до 30°)
+                    for d in ROT_GRID:
+                        if max(abs(x) for x in d) <= 30 and ok('rot', d):
+                            found = ('rot', d)
+                            break
+                if found is None:
+                    continue
+                _apply(an, 'bipedHandRight', 'position' if found[0] == 'pos' else 'rotation', found[1], a0, a1, ramp)
+                rep.setdefault(name, []).append((round(a0, 3), round(a1, 3), found[0], found[1]))
+    return rep
+
+
+def _gauss(v, sigma):
+    if sigma <= 0:
+        return v
+    r = int(3 * sigma)
+    k = np.exp(-0.5 * (np.arange(-r, r + 1) / sigma) ** 2)
+    k /= k.sum()
+    pad = np.pad(v, ((r, r), (0, 0)), mode='edge')
+    return np.stack([np.convolve(pad[:, j], k, mode='valid') for j in range(v.shape[1])], axis=1)
+
+
+def smooth_clear(boss, anims, names, step=0.025, allow_ground=None, ncand=120, grow=6, sigma=3.0, tries=1, cont=2.0, kind='pos',
+                 free_start=()):
+    """Коса в земле или сквозь тело → плавный сдвиг косы в кулаке (position кисти; поворот косы как в анимации):
+    по кадрам — допустимые сдвиги (наименьшие), выбор с непрерывностью (динамическое программирование: |d| + 0.7·|d − d_пред|),
+    расширение на grow кадров, гауссово сглаживание σ = sigma кадров (кривая без ступенек — без рывков); кадры, что после
+    сглаживания снова плохи, получают сдвиг ×1.3 (до tries раз). Где сдвига нет — остаётся (видно в проверке).
+    Возвращает {анимация: макс. сдвиг px}."""
+    M = C.Model(boss)
+    rep = {}
+    for name in names:
+        an = anims.get(name)
+        if not an or not an.get('animation_length'):
+            continue
+        L = float(an['animation_length'])
+        ag = (allow_ground or {}).get(name)
+        n = max(1, int(round(L / step)))
+        ts = [min(L, i * step) for i in range(n + 1)]
+        hb = an['bones'].setdefault('bipedHandRight', {})
+        rot = lambda t: C.chan_at(hb['rotation'], t) if 'rotation' in hb else [0.0, 0.0, 0.0]
+        Ws = [M.world(an, t) for t in ts]
+        gr = [not (ag and ag[0] <= t <= ag[1]) for t in ts]
+
+        prot = strike_windows(name, an)
+
+        def bad(i, d):
+            if not any(d):
+                W = Ws[i]
+            elif kind == 'pos':
+                W = M.with_hand(Ws[i], an, ts[i], rot(ts[i]), list(d))
+            else:
+                r = rot(ts[i])
+                W = M.with_hand(Ws[i], an, ts[i], [r[k] + d[k] for k in range(3)])
+            if np.linalg.det(W['bipedHandRight'][:3, :3]) < 1e-6:
+                return False
+            return bool(_weapon_bad(M, W, not gr[i]))
+        B = [bad(i, (0, 0, 0)) for i in range(len(ts))]
+        if not any(B):
+            continue
+        cands = []
+        for i in range(len(ts)):
+            if not B[i]:
+                cands.append([(0, 0, 0)])
+                continue
+            c = []
+            strike = any(a <= ts[i] <= z for a, z in prot)
+            grid = POS_GRID if kind == 'pos' else [d for d in ROT_GRID if not strike or max(abs(x) for x in d) <= 30]
+            for d in grid:
+                if not bad(i, d):
+                    c.append(d)
+                    if len(c) >= ncand:
+                        break
+            cands.append(c or [(0, 0, 0)])
+        # непрерывность: DP по всем кадрам
+        cost = [[math.dist(d, (0, 0, 0)) for d in cands[0]]]
+        back = [[-1] * len(cands[0])]
+        for i in range(1, len(ts)):
+            row, br = [], []
+            for d in cands[i]:
+                best, bk = float('inf'), 0
+                for k, e in enumerate(cands[i - 1]):
+                    c = cost[-1][k] + cont * math.dist(d, e)
+                    if c < best:
+                        best, bk = c, k
+                row.append(best + math.dist(d, (0, 0, 0)))
+                br.append(bk)
+            cost.append(row)
+            back.append(br)
+        k = int(np.argmin(cost[-1]))
+        off = [None] * len(ts)
+        for i in range(len(ts) - 1, -1, -1):
+            off[i] = cands[i][k]
+            k = back[i][k]
+        off = np.array(off, float)
+        mult = np.ones(len(ts))
+        for _ in range(tries):
+            o = off * mult[:, None]
+            dil = o.copy()
+            for i in range(len(ts)):                        # расширение: держим сдвиг ±grow кадров вокруг плохих кадров
+                lo, hi = max(0, i - grow), min(len(ts), i + grow + 1)
+                j = lo + int(np.argmax(np.linalg.norm(o[lo:hi], axis=1)))
+                dil[i] = o[j]
+            sm = _gauss(dil, sigma)
+            if name not in free_start:                  # первый кадр — ровно поза кода (хват): поправка с нуля за 0.1 с
+                sm = sm * np.array([_smooth(t / 0.1) for t in ts])[:, None]
+            still = [i for i in range(len(ts)) if B[i] and bad(i, tuple(sm[i]))]
+            if not still:
+                break
+            hit = np.zeros(len(ts), bool)
+            for i in still:
+                hit[max(0, i - grow):i + grow + 1] = True
+            mult = np.where(hit, np.minimum(2.0, mult * 1.3), mult)
+        if not np.abs(sm).max() > 1e-3:
+            continue
+        chn = 'position' if kind == 'pos' else 'rotation'
+        orig = hb.get(chn)
+        val = (lambda t: C.chan_at(orig, t)) if orig is not None else (lambda t: [0.0, 0.0, 0.0])
+        idx = [i for i in range(len(ts)) if np.abs(sm[i]).max() > 1e-3]
+        lo_t, hi_t = ts[max(0, idx[0] - 1)], ts[min(len(ts) - 1, idx[-1] + 1)]
+        keys = {}
+        if isinstance(orig, dict) and 'vector' not in orig:
+            for kk, e in orig.items():
+                t = round(float(kk), 4)
+                if not (lo_t - 0.002 < t < hi_t + 0.002):     # ключи ±0.002 с от новых — заменяются (иначе «2.292» и 2.2917 —
+                    keys[t] = e if isinstance(e, dict) else {'vector': e}   # два ключа на одном кадре, и последний прыгает назад)
+        for i, t in enumerate(ts):
+            if lo_t <= t <= hi_t:
+                v = val(t)
+                keys[round(t, 4)] = {'vector': [round(v[j] + sm[i][j], 3) for j in range(3)]}
+        hb[chn] = {('%.6g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
+        rep[name] = round(float(np.linalg.norm(sm, axis=1).max()), 1)
+    return rep
+
+
+STRIKE_EV = ('slash', 'impale', 'throw', 'shatter', 'dash', 'erupt', 'stab', 'hit')
+SNAP = ('easeOutQuart', 'easeOutCubic')
+
+
+def strike_ease(anims, names):
+    """Удар без толчка (проверка рывков 21.11): сегмент В момент удара (ключ на событии timeline) с easeOut* — коса стартует с
+    максимальной скорости из покоя замаха, это рывок — заменяется на easeInCubic: разгон, пик скорости ровно на ударе (как у ударов
+    Тироса). Сегмент ПОСЛЕ удара с easeInOut* (старт с нуля после пика) → easeOutQuad: гашение с той же скорости. Остальные сегменты
+    easeOut*, что стартуют из покоя (предыдущий сегмент кончается без скорости), → easeInOutSine. Возвращает число правок."""
+    zero_end = (None, 'linear', 'easeInOutSine', 'easeInOutQuad', 'easeInOutCubic', 'easeOutQuart', 'easeOutCubic', 'easeOutQuad')
+    cnt = 0
+    for n in names:
+        an = anims.get(n)
+        if not an:
+            continue
+        ev = [float(t) for t, e in an.get('timeline', {}).items() if e in STRIKE_EV]
+        for bone, chs in an['bones'].items():
+            for kind, ch in chs.items():
+                if not isinstance(ch, dict) or 'vector' in ch:
+                    continue
+                ks = sorted(ch, key=float)
+                for i in range(1, len(ks)):
+                    t = float(ks[i])
+                    e = ch[ks[i]]
+                    if not isinstance(e, dict):
+                        continue
+                    ez = e.get('easing')
+                    at_strike = any(abs(t - x) < 0.03 for x in ev)
+                    after_strike = any(abs(float(ks[i - 1]) - x) < 0.03 for x in ev)
+                    prev = ch[ks[i - 1]] if isinstance(ch[ks[i - 1]], dict) else {}
+                    same = prev.get('vector') == e.get('vector')
+                    if at_strike and ez in SNAP:
+                        e['easing'] = 'easeInCubic'
+                        cnt += 1
+                    elif after_strike and ez in ('easeInOutQuad', 'easeInOutSine'):
+                        e['easing'] = 'easeOutQuad'
+                        cnt += 1
+                    elif ez in SNAP and not at_strike and not after_strike and i >= 2:
+                        pe = prev.get('easing')
+                        if pe in zero_end and not same:
+                            e['easing'] = 'easeInOutSine'
+                            cnt += 1
+    return cnt
+
+
+def unwrap(anims, names, bones=('right_arm', 'bipedHandRight')):
+    """Эйлеровы углы соседних ключей — без перескока через ±180° (GeckoLib интерполирует углы линейно)."""
+    for n in names:
+        an = anims.get(n)
+        if not an:
+            continue
+        for b in bones:
+            ch = an['bones'].get(b, {}).get('rotation')
+            if not isinstance(ch, dict) or 'vector' in ch:
+                continue
+            prev = None
+            for k in sorted(ch, key=float):
+                e = ch[k]
+                if not isinstance(e, dict) or 'vector' not in e:
+                    continue
+                v = e['vector']
+                if prev is not None:
+                    v = [x + 360 * round((p - x) / 360) for x, p in zip(v, prev)]
+                    e['vector'] = [round(x, 3) for x in v]
+                prev = e['vector']
+
+
 # ------------------------------------------------------------------ кисть с предметом: видимый поворот → ключ (GeckoLib поворачивает дважды)
 def _euler_m(h):
     D = math.pi / 180
@@ -452,9 +763,9 @@ def visible_hand(anims, names):
     """Ключи поворота bipedHandRight, подобранные по превью с ОДНИМ поворотом предмета (до 21.11), переводятся в ключи для игры:
     каждый ключ k → V(k), тогда в игре (двойной поворот GeckoLib) предмет повёрнут ровно как на превью. Вызывать ОДИН раз на свежесобранных
     анимациях (повторный вызов снова уполовинит поворот)."""
-    def conv(v):
+    def conv(v, prev=None):
         try:
-            return V(v)
+            return V_near(v, prev)                          # 21.11: ближайший к соседнему ключу набор углов (без «длинного пути»)
         except ValueError:                                   # ровно 180°: половина неоднозначна — берём покомпонентно
             return [round(x / 2, 2) for x in v]
     n = 0
@@ -465,13 +776,17 @@ def visible_hand(anims, names):
                 anims[name]['bones']['bipedHandRight']['rotation'] = conv(ch)
                 n += 1
             continue
-        for t, k in ch.items():
+        prev = None
+        for t in sorted(ch, key=float):
+            k = ch[t]
             if isinstance(k, list):
-                ch[t] = conv(k)
+                ch[t] = conv(k, prev)
+                prev = ch[t]
             elif isinstance(k, dict):
-                for f in ('vector', 'pre', 'post'):
+                for f in ('pre', 'vector', 'post'):
                     if isinstance(k.get(f), list):
-                        k[f] = conv(k[f])
+                        k[f] = conv(k[f], prev)
+                        prev = k[f]
             n += 1
     return n
 
@@ -488,11 +803,12 @@ def _uses_arm(an):
 
 
 def _smooth(x):
+    """Плавный переход 0 → 1 (квинтика: нулевые скорость и ускорение на концах — без толчка на стыке)."""
     x = max(0.0, min(1.0, x))
-    return x * x * (3 - 2 * x)
+    return x * x * x * (x * (6 * x - 15) + 10)
 
 
-def hold_additive(anims, names, arm, hand, hand_pos=None, win=0.3, step=0.05, no_end=()):
+def hold_additive(anims, names, arm, hand, hand_pos=None, win=0.3, step=0.05, no_end=(), still=(), no_start=(), win_end=0.45):
     """Поза хвата Тироса в ключах анимаций (Iron's: FireBossModel прибавляет позу хвата к анимации с множителем isAnimatingDampener,
     он гаснет за ~0.3 с). Два случая:
       * правая рука с косой в анимации не работает (касты, кинжалы левой рукой) — поза хвата прибавляется на всю длину: рука держит
@@ -507,6 +823,14 @@ def hold_additive(anims, names, arm, hand, hand_pos=None, win=0.3, step=0.05, no
         if not an or not an.get('animation_length'):
             continue
         L = float(an['animation_length'])
+        if n in still:                                   # короткий каст: правая рука держит косу, кастует левая (без рывка руки)
+            an['bones']['right_arm'] = dict(an['bones'].get('right_arm', {}), rotation={'0.0': {'vector': list(arm)}})
+            hb = dict(an['bones'].get('bipedHandRight', {}), rotation={'0.0': {'vector': list(hand)}})
+            if hand_pos is not None:
+                hb['position'] = {'0.0': {'vector': list(hand_pos)}}
+            an['bones']['bipedHandRight'] = hb
+            rep[n] = 'still'
+            continue
         always = not _uses_arm(an)
         akeys = C._keys(an['bones']['right_arm']['rotation']) if 'rotation' in an['bones'].get('right_arm', {}) else []
         # опорные времена — по ключам руки: первый ключ после начала, последний перед концом
@@ -534,21 +858,23 @@ def hold_additive(anims, names, arm, hand, hand_pos=None, win=0.3, step=0.05, no
                     keys[t]['vector'] = [round(keys[t]['vector'][i] + v[i], 3) for i in range(3)]
                 if not keys:
                     keys[0.0] = {'vector': list(v)}
-                bk[kind] = {('%.4g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
+                bk[kind] = {('%.6g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
                 continue
             rest0 = max(abs(x) for x in val(0)) < 1e-3 and (not akeys or max(abs(x) for x in akeys[0][1]) < 1e-3)
             restL = max(abs(x) for x in val(L)) < 1e-3 and (not akeys or max(abs(x) for x in akeys[-1][1]) < 1e-3)
             segs = []                                   # (t_from, t_to, вход?)
-            if rest0 and t1:
+            if n in no_start:                           # цепочка: начало — конец предыдущей анимации (не поза хвата)
+                pass
+            elif rest0 and t1 and t1 >= 0.2:
                 segs.append((0.0, t1, True))
             else:
                 segs.append((0.0, min(win, 0.4 * L), None))
             if n in no_end:                             # смерть: тело лежит, поза хвата в конце не нужна
                 pass
-            elif restL and tn is not None and tn > (t1 or 0):
+            elif restL and tn is not None and tn > (t1 or 0) and L - tn >= 0.3:
                 segs.append((tn, L, False))
             else:
-                segs.append((L - min(win, 0.4 * L), L, None))
+                segs.append((L - min(win_end, 0.45 * L), L, None))
             for a0, a1, enter in segs:
                 for t in list(keys):
                     if a0 < t < a1:
@@ -563,17 +889,39 @@ def hold_additive(anims, names, arm, hand, hand_pos=None, win=0.3, step=0.05, no
                     elif enter is False:           # последний ключ → поза хвата
                         src = val(a0)
                         vec = [src[j] + (v[j] - src[j]) * _smooth(x) for j in range(3)]
-                    else:                          # анимация не с покоя: поза хвата прибавляется и гаснет (как у Тироса)
+                    else:                          # анимация не с покоя: из позы хвата в её позу / из её позы в позу хвата
                         kk = 1 - _smooth(x) if a0 == 0.0 else _smooth(x)
                         o = val(t)
-                        vec = [o[j] + kk * v[j] for j in range(3)]
+                        vec = [o[j] + kk * (v[j] - o[j]) for j in range(3)]
                     e = dict(keys.get(t, {}))
-                    e.pop('easing', None)
+                    if t > a0:                   # ключ в начале участка описывает сегмент ДО него (у Iron's бывает step: 411° → 51°) —
+                        e.pop('easing', None)   # его easing не трогаем, иначе рука прокрутится на 360° за пару кадров
+                        e.pop('easingArgs', None)
                     e['vector'] = [round(y, 3) for y in vec]
                     keys[t] = e
-            bk[kind] = {('%.4g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
+            if not keys:                               # ни входа, ни выхода (цепочка) и канала не было — не создаём пустой
+                if orig is None:
+                    bk.pop(kind, None)
+                continue
+            bk[kind] = {('%.6g' % t if t else '0.0'): keys[t] for t in sorted(keys)}
         rep[n] = 'always' if always else 'edges'
     return rep
+
+
+def V_near(h, prev=None):
+    """V(h), но из эквивалентных наборов эйлеровых углов (x, y, z) / (x − 180, −180 − y, z + 180), с поправками ±360°, — ближайший
+    к ключу prev: GeckoLib интерполирует углы линейно, без этого соседние ключи могут пойти «длинным путём» (переворот косы)."""
+    v = V(h)
+    if prev is None:
+        return v
+    alts = [v, [v[0] - 180, -180 - v[1], v[2] + 180]]
+    best = None
+    for a in alts:
+        a = [x + 360 * round((p - x) / 360) for x, p in zip(a, prev)]
+        d = max(abs(x - p) for x, p in zip(a, prev))
+        if best is None or d < best[0]:
+            best = (d, [round(x, 2) for x in a])
+    return best[1]
 
 
 # ------------------------------------------------------------------ поза хвата на краях анимаций (Глава Культа)

@@ -74,4 +74,21 @@ class CultMathTest {
         }
         assertEquals(0, CultMath.holdArmWalk(0, 1.3f), 1e-9);                 // standing: nothing
     }
+
+    @Test
+    void holdBlendAfterAnimation() {
+        assertEquals(0, CultMath.holdWeight(0), 1e-6);
+        assertEquals(1, CultMath.holdWeight(CultMath.HOLD_BLEND_TICKS), 1e-6);
+        assertEquals(1, CultMath.holdWeight(40), 1e-6);
+        assertEquals(0.5, CultMath.holdWeight(CultMath.HOLD_BLEND_TICKS / 2), 1e-6);
+        float prev = 0, prevStep = 0;
+        for (int i = 1; i <= 50; i++) {                                 // monotonic, gentle at both ends
+            float w = CultMath.holdWeight(i * CultMath.HOLD_BLEND_TICKS / 50);
+            assertTrue(w >= prev);
+            if (i == 1) assertTrue(w < 0.001f);
+            prevStep = w - prev;
+            prev = w;
+        }
+        assertTrue(prevStep < 0.001f);
+    }
 }

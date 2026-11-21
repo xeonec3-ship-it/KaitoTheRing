@@ -47,19 +47,32 @@ public class CultLeaderModel extends AbstractSpellCastingMobModel {
             float pt = state.getPartialTick();
             Vector2f limb = getLimbSwing(entity, entity.walkAnimation, pt);
             // Scythe hold outside animations = Tyros's (owner 21.11): FireBossModel's numbers (CultMath.HOLD_*). The animations of the
-            // Head start and end in this pose themselves (tools/anim_cloth.hold_additive), so no damped blend: it would add the pose
-            // twice. The scythe slides 3 px along its shaft in the fist and the scythe arm does not swing while walking (base swing
-            // cancelled) - with Tyros's swing the blade went 3.4 px into the ground.
+            // Head start and end in this pose themselves (tools/anim_cloth.hold_additive). The scythe slides 3 px along its shaft in the
+            // fist and the scythe arm does not swing while walking (base swing cancelled) - with Tyros's swing the blade went 3.4 px
+            // into the ground. Iron's controllers have no transition: when an animation stops (a cast is cut) the arm would snap from
+            // the last animated pose, so it goes to the hold pose in CultMath.HOLD_BLEND_TICKS (scythe jitter check 21.11).
             boolean anim = entity.isAnimating();
             boss.isAnimatingDampener = anim ? 0 : 1;
-            if (!anim && entity.getMainHandItem().is(CultLeader.SCYTHE.get())) {
-                CoreGeoBone arm = getAnimationProcessor().getBone("right_arm"), hand = getAnimationProcessor().getBone("bipedHandRight");
-                if (arm != null && hand != null) {
-                    transformStack.pushRotation(arm, deg(CultMath.HOLD_ARM));
-                    transformStack.pushRotation(hand, deg(CultMath.HOLD_HAND));
-                    transformStack.pushPosition(hand, new Vector3f(CultMath.HOLD_SLIDE[0], CultMath.HOLD_SLIDE[1], CultMath.HOLD_SLIDE[2]));
+            CoreGeoBone arm = getAnimationProcessor().getBone("right_arm"), hand = getAnimationProcessor().getBone("bipedHandRight");
+            if (arm != null && hand != null) {
+                Hold h = HOLD.computeIfAbsent(boss, k -> new Hold());
+                float now = boss.tickCount + pt;
+                if (anim) {
+                    h.arm.set(arm.getRotX(), arm.getRotY(), arm.getRotZ());
+                    h.hand.set(hand.getRotX(), hand.getRotY(), hand.getRotZ());
+                    h.pos.set(hand.getPosX(), hand.getPosY(), hand.getPosZ());
+                    h.stop = -1;
+                } else if (entity.getMainHandItem().is(CultLeader.SCYTHE.get())) {
+                    if (h.stop < 0) h.stop = now;
+                    float w = h.seen ? CultMath.holdWeight(now - h.stop) : 1;
+                    toward(arm, h.arm, deg(CultMath.HOLD_ARM), w);
+                    toward(hand, h.hand, deg(CultMath.HOLD_HAND), w);
+                    Vector3f slide = new Vector3f(CultMath.HOLD_SLIDE[0], CultMath.HOLD_SLIDE[1], CultMath.HOLD_SLIDE[2]);
+                    Vector3f p = new Vector3f(h.pos).lerp(slide, w);
+                    transformStack.pushPosition(hand, p.sub(hand.getPosX(), hand.getPosY(), hand.getPosZ()));
                     transformStack.pushRotation(arm, CultMath.holdArmWalk(limb.x(), limb.y()), 0, 0);
                 }
+                h.seen |= anim;
             }
             CoreGeoBone cape = getAnimationProcessor().getBone("cape");   // 6° + max(0, ±leg swing)·0.6 (the visual assistant's note)
             if (cape != null) {
@@ -75,6 +88,21 @@ public class CultLeaderModel extends AbstractSpellCastingMobModel {
             }
         }
         super.setCustomAnimations(entity, instanceId, state);
+    }
+
+    /** Client state of the scythe arm per boss: the last animated pose and when the animation stopped. */
+    private static final class Hold {
+        final Vector3f arm = new Vector3f(), hand = new Vector3f(), pos = new Vector3f();
+        float stop = -1;
+        boolean seen;
+    }
+
+    private static final java.util.Map<CultLeaderEntity, Hold> HOLD = new java.util.WeakHashMap<>();
+
+    /** Bone rotation → lerp(from, to, w) (model axes, radians): pushes the difference to its current rotation. */
+    private void toward(CoreGeoBone b, Vector3f from, Vector3f to, float w) {
+        Vector3f t = new Vector3f(from).lerp(to, w);
+        transformStack.pushRotation(b, t.sub(b.getRotX(), b.getRotY(), b.getRotZ()));
     }
 
     private static Vector3f deg(float[] v) {

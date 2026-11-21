@@ -83,4 +83,14 @@ public final class CultMath {
     public static float holdArmWalk(float x, float y) {
         return -(float) Math.cos(y * 0.6662f + Math.PI) * 2f * x * 0.5f;
     }
+
+    /** After an animation stops (finished or cut, e.g. a cast) the scythe arm goes from its last animated pose to the hold pose in
+     *  5 ticks (0.25 s, like Iron's dampener) instead of snapping: GeckoLib controllers of Iron's have no transition. */
+    public static final float HOLD_BLEND_TICKS = 5;
+
+    /** Weight of the hold pose t ticks after the animation stopped: 0 → 1, quintic (no jolt at either end). */
+    public static float holdWeight(float t) {
+        float x = Math.max(0, Math.min(1, t / HOLD_BLEND_TICKS));
+        return x * x * x * (x * (6 * x - 15) + 10);
+    }
 }

@@ -105,9 +105,10 @@ def boss_anims():
         # (раньше коса стояла вертикально над головой, лезвие в ноге/в земле)
         'right_arm': {'rotation': ch((0, windup['right_arm']), (0.42, [-62.5, 38.3, 55], IO), (0.5, [-66, 27, 5], 'easeOutQuart'),
                                      (0.6, [-61, -1, -5.6], 'easeOutQuart'), (1.0, [-70, -35, -5], IO), (1.5, Z, IO))},
-        # slash (21.11): ключ 0.5 — в осях игры (без V), подобран по метрике ударов Тироса: плоскость лезвия по ходу (было 32°)
-        'bipedHandRight': {'rotation': ch((0, Z), (0.42, V([-7, 45.6, -45]), IO), (0.5, [13.2, 46.1, -2.1], 'easeOutQuart'),
-                                          (0.6, V([16.3, 56.7, -49.6]), 'easeOutQuart'), (1.0, V([16.3, 56.7, -58]), IO), (1.5, Z, IO))},
+        # slash (21.11): ключи кисти — в осях игры как есть (без V): по верной кинематике (двойной поворот) лезвие режет плоскостью
+        # по ходу, остриё впереди (0°, +0.89); пересчёт через V и подбор давали скручивание косы на ударе (проверка рывков)
+        'bipedHandRight': {'rotation': ch((0, Z), (0.42, [-7, 45.6, -45], IO), (0.5, [15.6, 55, -45.7], 'easeOutQuart'),
+                                          (0.6, [16.3, 56.7, -49.6], 'easeOutQuart'), (1.0, [16.3, 56.7, -58], IO), (1.5, Z, IO))},
         'left_arm': {'rotation': ch((0, windup['left_arm']), (0.6, [20, 0, -40], 'easeOutQuart'), (1.5, Z, IO))},
         'right_leg': {'rotation': ch((0, windup['right_leg']), (0.6, [-35, 0, 5], 'easeOutQuart'), (1.5, Z, IO))},
         'left_leg': {'rotation': ch((0, windup['left_leg']), (0.6, [30, 0, -5], 'easeOutQuart'), (1.5, Z, IO))},
@@ -127,30 +128,31 @@ def boss_anims():
         'bipedHandRight': {'rotation': ch((0, Z), (0.3, CARRY_HAND, IO), (0.9, CARRY_HAND), (1.2, V([-20.1, -54.6, -3]), IO),
                                           (1.5, V([27.6, 0.7, 1.8]), 'easeOutQuart'), (2.0, V([12.1, 3.5, 0.8]), IO), (2.6, Z, IO))},
     }, [(0.9, 'crush'), (1.5, 'shatter'), (1.9, 'speak')])
-    # Добивание (2.4 с): 0–0.7 тянет жертву левой рукой, 1.0 пронзает косой (impale), 1.0–1.7 поднимает, 1.7 вспышка, 2.2 смерть
+    # Добивание (2.4 с): 0–0.7 тянет жертву левой рукой, 1.0 пронзает косой (impale), 1.0–1.7 поднимает, 1.7 вспышка, 2.2 смерть.
+    # Разгон к impale — easeInQuad (21.11, проверка рывков: easeInQuart давал скорость косы 2300 °/с и остановку за кадр)
     an['cult_leader_finisher'] = A(2.4, {
-        'body': {'rotation': ch((0, Z), (0.7, [0, 0, 0]), (1.0, [10, 0, 0], IQ), (1.7, [-5, 0, 0], IO), (2.4, Z, IO)),
-                 'position': ch((0, Z), (1.0, [0, -1, -3], IQ), (1.7, Z, IO), (2.4, Z))},
-        'torso': {'rotation': ch((0, Z), (0.7, [0, 25, 0], IO), (1.0, [10, -10, 0], IQ), (1.7, [-12, 0, 0], IO), (2.4, Z, IO))},
+        'body': {'rotation': ch((0, Z), (0.7, [0, 0, 0]), (1.0, [10, 0, 0], 'easeInQuad'), (1.7, [-5, 0, 0], IO), (2.4, Z, IO)),
+                 'position': ch((0, Z), (1.0, [0, -1, -3], 'easeInQuad'), (1.7, Z, IO), (2.4, Z))},
+        'torso': {'rotation': ch((0, Z), (0.7, [0, 25, 0], IO), (1.0, [10, -10, 0], 'easeInQuad'), (1.7, [-12, 0, 0], IO), (2.4, Z, IO))},
         'head': {'rotation': ch((0, Z), (0.3, [10, 0, 0], IO), (1.0, [5, 0, 0]), (1.7, [-25, 0, 0], IO), (2.2, [-25, 0, 0]), (2.4, Z, IO))},
         'left_arm': {'rotation': ch((0, Z), (0.3, [-90, 10, -5], OC), (0.7, [-55, 20, -20], IO), (1.0, [-45, 0, -12], IO), (2.4, Z, IO))},
         # коса (проверка 20.11, tools/anim_check.py): остриё — в груди жертвы перед боссом: 1.0 — 3.0 бл. вперёд на высоте груди,
         # 1.0–1.7 — поднимает её на +2.3 бл. (как код двигает жертву), держит до kill; раньше на 1.7–2.2 коса уходила за голову
-        'right_arm': {'rotation': ch((0, Z), (0.7, [-30, 10, 60], IO), (1.0, [-86, -2.5, 1], IQ), (1.35, [-108, 4.4, -2.2], 'easeInOutQuad'),
+        'right_arm': {'rotation': ch((0, Z), (0.7, [-30, 10, 60], IO), (1.0, [-86, -2.5, 1], 'easeInQuad'), (1.35, [-108, 4.4, -2.2], 'easeInOutQuad'),
                                      (1.7, [-117, 2, -3], 'easeInOutQuad'), (2.2, [-124, 0, -2]), (2.4, [-40, 0, 15], IO))},
         # кисть на impale (21.11): ключ в осях игры (без V), подобран по метрике ударов Тироса — лезвие входит остриём вперёд, плоскость
         # лезвия по ходу (было: плашмя, 67°, остриё назад); остриё там же, в груди жертвы; ключи подъёма повёрнуты так же
-        'bipedHandRight': {'rotation': ch((0, Z), (0.7, Z), (1.0, [8.2, 66.2, 23.9], IQ), (1.35, [5.31, 69.01, 12.91], 'easeInOutQuad'),
+        'bipedHandRight': {'rotation': ch((0, Z), (0.7, Z), (1.0, [8.2, 66.2, 23.9], 'easeInQuad'), (1.35, [5.31, 69.01, 12.91], 'easeInOutQuad'),
                                           (1.7, [7.17, 69.5, 17.76], 'easeInOutQuad'), (2.2, [13.49, 68.91, 23.38]), (2.4, Z, IO))},
-        'right_leg': {'rotation': ch((0, Z), (1.0, [20, 0, 0], IQ), (1.7, [5, 0, 0], IO), (2.4, Z, IO))},
-        'left_leg': {'rotation': ch((0, Z), (1.0, [-25, 0, 0], IQ), (1.7, [-5, 0, 0], IO), (2.4, Z, IO))},
+        'right_leg': {'rotation': ch((0, Z), (1.0, [20, 0, 0], 'easeInQuad'), (1.7, [5, 0, 0], IO), (2.4, Z, IO))},
+        'left_leg': {'rotation': ch((0, Z), (1.0, [-25, 0, 0], 'easeInQuad'), (1.7, [-5, 0, 0], IO), (2.4, Z, IO))},
     }, [(0.7, 'pull_done'), (1.0, 'impale'), (1.7, 'flame'), (2.2, 'kill')])
     import gen_cult_leader_spells4 as S4                       # «+4 заклинания» (Огненный серп, Пепельный след, Клеймо, Столпы)
     an.update(S4.anims())
     return an
 
 
-def write_anims(weapon_passes=3):
+def write_anims():
     src = M.jar_json(M.I + 'animations/casting_animations.json')
     ours = boss_anims()
     out = {'format_version': src['format_version'], 'geckolib_format_version': src['geckolib_format_version'],
@@ -162,6 +164,7 @@ def write_anims(weapon_passes=3):
     anim_cloth.explicit(out['animations'], list(ours), ('body', 'torso', 'head', 'right_arm', 'left_arm', 'right_leg', 'left_leg',
                                                         'bipedHandRight'))
     anim_cloth.bake('cult_leader', out['animations'])
+    print('  удары без толчка (easing):', anim_cloth.strike_ease(out['animations'], list(ours)))
     # коса: все анимации, что играют на боссе (наши + удары FireBoss и касты Iron's), начинаются и кончаются в позе хвата; в кадрах,
     # где лезвие в земле или сквозь тело/ноги, — наименьший доворот кисти (три прохода: следующие добирают плавные переходы прежних)
     import anim_check
@@ -169,17 +172,27 @@ def write_anims(weapon_passes=3):
     # fire_boss_spawn: на 6.42 с коса возникает в руке, влетая из точки сбоку-снизу (21, −6, 0) — лезвие проходило сквозь землю;
     # влетает сбоку-сверху (10, 10, 0), время то же
     out['animations']['fire_boss_spawn']['bones']['bipedHandRight']['position']['6.4167']['vector'] = [10, 10, 0]
-    hold = anim_cloth.hold_additive(out['animations'], plays, CARRY_ARM, CARRY_HAND, hand_pos=CARRY_POS, no_end=('fire_boss_death',))
-    print('  поза хвата всю анимацию:', sorted(n for n, v in hold.items() if v == 'always'))
+    # короткие касты Iron's (< 0.5 с): правая рука с косой не дёргается вверх на долю секунды — держит косу, кастует левая
+    still = [n for n in anim_check.SPELL_ANIMS if n in out['animations'] and float(out['animations'][n]['animation_length']) < 0.5]
+    # «Пепел Меллисто» — цепочка: рассыпание → (вихрь, модель скрыта) → сборка → разрез; сборка кончается замахом, разрез с него
+    # начинается — эти стыки не через позу хвата (иначе «замах → хват → замах»)
+    hold = anim_cloth.hold_additive(out['animations'], plays, CARRY_ARM, CARRY_HAND, hand_pos=CARRY_POS,
+                                    no_end=('fire_boss_death', 'cult_leader_ash_dissolve', 'cult_leader_ash_reform'),
+                                    no_start=('cult_leader_ash_reform', 'cult_leader_ash_slash'), still=still)
+    print('  поза хвата всю анимацию:', sorted(n for n, v in hold.items() if v != 'edges'))
+    # поправки косы ниже начинаются с нуля на первом кадре (там поза кода) — кроме цепочки «Пепла» и коротких кастов (у них корпус
+    # Iron's с первого кадра в позе каста — скачок корпуса и так есть, в игре у Тироса тоже)
+    fs = ('cult_leader_ash_reform', 'cult_leader_ash_slash', *still)
     ag = {'cult_leader_first_flame': (0.9, 5.2)}
-    print('  коса: сдвиг вдоль древка', anim_cloth.lift('cult_leader', out['animations'], plays, allow_ground=ag))
+    # коса в земле/сквозь тело (проверка рывков 21.11): плавный сдвиг косы в кулаке (anim_cloth.smooth_clear), поворот косы —
+    # как в анимации; прежние weapon/nudge меняли поправку ступеньками каждые 0.025 с — коса дёргалась
+    print('  коса: плавный сдвиг', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs))
+    print('  коса: плавный доворот (где сдвига нет)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs,
+                                                                             kind='rot'))
     for _ in range(2):
-        print('  коса: сдвиг мимо тела/земли', anim_cloth.nudge('cult_leader', out['animations'], plays, allow_ground=ag))
-    for _ in range(weapon_passes):
-        # «Первое Пламя»: на plant (0.9–5.2 с) древко нарочно воткнуто в землю подтоком (лезвие вверху) — там землю не считаем
-        anim_cloth.weapon('cult_leader', out['animations'], plays, edge=0, allow_ground={'cult_leader_first_flame': (0.9, 5.2)})
-    for _ in range(3):          # остаток (в т.ч. окна ударов, где поворот не трогаем) — коротким сдвигом
-        print('  коса: добор сдвигом', anim_cloth.nudge('cult_leader', out['animations'], plays, allow_ground=ag, win=0.025))
+        print('  коса: плавный сдвиг (добор)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs))
+        print('  коса: плавный доворот (добор)', anim_cloth.smooth_clear('cult_leader', out['animations'], plays, allow_ground=ag, free_start=fs,
+                                                                       kind='rot'))
     with open(M.out('animations/entity/cult_leader.animation.json'), 'w', encoding='utf-8', newline='\n') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
     return ours

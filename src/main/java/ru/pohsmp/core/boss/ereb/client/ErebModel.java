@@ -5,6 +5,9 @@ import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.Abstra
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import ru.pohsmp.core.PohCore;
+import org.joml.Vector2f;
+import ru.pohsmp.core.boss.ClothSway;
+import ru.pohsmp.core.boss.client.ClothClient;
 import ru.pohsmp.core.boss.ereb.ErebBody;
 import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
 import software.bernie.geckolib.core.animation.AnimationState;
@@ -39,22 +42,17 @@ public class ErebModel extends AbstractSpellCastingMobModel {
     public void setCustomAnimations(AbstractSpellCastingMob entity, long instanceId, AnimationState<AbstractSpellCastingMob> state) {
         super.setCustomAnimations(entity, instanceId, state);
         if (Minecraft.getInstance().isPaused() || !(entity instanceof ErebBody b) || b.playingAction()) return;
-        // GeckoLib axes (mgr_anim_check_T26_T30, 4.2): the back tails follow a leg going back (rotX < 0), the front ones only a leg
-        // going forward (rotX > 0) — never through it; their rest angles are in the model
-        float right = rot("right_leg"), left = rot("left_leg");
-        coat("coat_back_r", Math.min(0, right) * 0.4f);
-        coat("coat_back_l", Math.min(0, left) * 0.4f);
-        coat("coat_front_r", Math.max(0, right) * 0.55f);
-        coat("coat_front_l", Math.max(0, left) * 0.55f);
+        // GeckoLib axes (mgr_anim_check_T26_T30, 4.2; ClothSway): the back tails follow a leg going back (rotX < 0), the front ones only
+        // a leg going forward (rotX > 0) — never through it; their rest angles are in the model. Deltas only, through Iron's
+        // transformStack (rest pose again before the next frame): bone.setRotX(getRotX() + …) piled up frame after frame (spinning
+        // tails in Iron's casts), and the leg bone did not hold Iron's walk yet — ClothClient adds it.
+        Vector2f limb = getLimbSwing(entity, entity.walkAnimation, state.getPartialTick());
+        ClothClient.push(transformStack, this::bone, ClothSway.solve(ClothClient.leg(entity, bone("right_leg"), limb, true),
+                ClothClient.leg(entity, bone("left_leg"), limb, false)));
     }
 
-    private float rot(String bone) {
-        CoreGeoBone b = getAnimationProcessor().getBone(bone);
-        return b == null ? 0 : b.getRotX();
+    private CoreGeoBone bone(String name) {
+        return getAnimationProcessor().getBone(name);
     }
 
-    private void coat(String bone, float rotX) {
-        CoreGeoBone b = getAnimationProcessor().getBone(bone);
-        if (b != null) b.setRotX(b.getRotX() + rotX);
-    }
 }

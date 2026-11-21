@@ -148,7 +148,7 @@ public final class SilentGateGameTests {
             double got = before[0] - aim.getHealth();
             check(got <= 6 * ray + 1, "the aimed creature took " + got + " in 2 s - a main beam?");
         });
-        h.runAfterDelay(SilentGateSpell.END + 2 + 5, () -> {
+        h.runAfterDelay(SilentGateSpell.SCENE_MAX + 2 + 5, () -> {
             check(pet.getHealth() == pet.getMaxHealth(), "the caster's pet was hit");
             check(bystander.getHealth() == bystander.getMaxHealth(), "a player was hit: " + bystander.getHealth());
             check(cow.getHealth() == cow.getMaxHealth(), "a peaceful animal was hit");
@@ -174,7 +174,7 @@ public final class SilentGateGameTests {
             check(!MagicData.getPlayerMagicData(p).isCasting(), "cancel did not stop the cast");
         });
         h.runAfterDelay(205, () -> check(!Cutscene.frozen().contains(p.getUUID()), "scene not ended on cancel"));
-        h.runAfterDelay(SilentGateSpell.END + 20, () -> {
+        h.runAfterDelay(SilentGateSpell.SCENE_MAX + 20, () -> {
             check(aim.getHealth() == HP, "hit after a cancelled cast: " + aim.getHealth() + " " + src(aim));
             p.server.getPlayerList().remove(p);
             h.succeed();

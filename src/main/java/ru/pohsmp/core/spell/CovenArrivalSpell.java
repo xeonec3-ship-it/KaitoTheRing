@@ -295,7 +295,42 @@ public class CovenArrivalSpell extends PohSpell implements ru.pohsmp.core.spell.
 
     private static void keep(ServerLevel l, Vec3 p) {
         ChunkPos cp = new ChunkPos(BlockPos.containing(p));
-        l.getChunkSource().addRegionTicket(TICKET, cp, 2, cp);
+        l.getChunkSource().addRegionTicket(TICKET, cp, VIEW_R, cp);
+    }
+
+    private static void unkeep(ServerLevel l, Vec3 p) {
+        ChunkPos cp = new ChunkPos(BlockPos.containing(p));
+        l.getChunkSource().removeRegionTicket(TICKET, cp, VIEW_R, cp);
+    }
+
+    /**
+     * Owner 21.11 («игроки на арене не видят чанк мага, маг не видит чанк арены»): radius in chunks of the square around the arena
+     * and around the caster's spot that stays loaded through the scene and goes to the watchers standing too far to have it
+     * (spell.RemoteView): 7x7 chunks, ~56 blocks each way - the shots of the scene are within ~16 blocks of their point.
+     */
+    public static final int VIEW_R = 3;
+
+    /** RemoteView owners of a scene: the arena window and the caster-spot window. */
+    private static int arenaView(Arrival a) {
+        return a.cutKey * 2;
+    }
+
+    private static int casterView(Arrival a) {
+        return a.cutKey * 2 + 1;
+    }
+
+    /** Gives every watcher the far places the camera shows (RemoteViewMath.covenPlaces); checked twice a second. */
+    private static void views(Arrival a, int t) {
+        net.minecraft.server.MinecraftServer srv = a.arena.getServer();
+        int left = CAST + 60 - t;
+        for (UUID u : a.watchers) {
+            ServerPlayer w = srv.getPlayerList().getPlayer(u);
+            if (w == null) continue;
+            boolean[] need = RemoteViewMath.covenPlaces(t, T_PORTAL, w.level() == a.arena, w.level() == a.castLevel);
+            if (need[0]) RemoteView.open(w, a.arena, a.at, VIEW_R, arenaView(a), left);
+            if (need[1]) RemoteView.open(w, a.castLevel, a.cAt, VIEW_R, casterView(a), left);
+            else RemoteView.close(u, casterView(a));
+        }
     }
 
     private static String where(LivingEntity e) {
@@ -392,6 +427,7 @@ public class CovenArrivalSpell extends PohSpell implements ru.pohsmp.core.spell.
             keep(ar, a.at);
             if (t < T_PORTAL + 20) keep(a.castLevel, a.cAt);
         }
+        if (t == 1 || t % 10 == 0) views(a, t);
         if (t % 200 == 0) LOG.info("[pohsmp] coven arrival t={}: {}", t, a.retinue.stream().map(e -> where(find(ar.getServer(), e.getUUID()))).toList());
         if (!a.pendingExit.isEmpty()) for (var e : new ArrayList<>(a.pendingExit.entrySet())) {
             LivingEntity le = find(ar.getServer(), e.getKey());
@@ -655,6 +691,11 @@ public class CovenArrivalSpell extends PohSpell implements ru.pohsmp.core.spell.
         CAST_BY.remove(caster.getUUID());
         ServerLevel ar = a.arena;
         Cutscene.end(ar, caster, a.watchers, a.cutKey);
+        // owner 21.11: the far chunks go from the watchers' clients, the forced loading of both places ends
+        RemoteView.closeAll(arenaView(a));
+        RemoteView.closeAll(casterView(a));
+        unkeep(ar, a.at);
+        unkeep(a.castLevel, a.cAt);
         for (UUID u : new ArrayList<>(a.hold.keySet())) {
             LivingEntity le = find(ar.getServer(), u);
             Walk w = a.walks.get(u);

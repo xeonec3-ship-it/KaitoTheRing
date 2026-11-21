@@ -54,6 +54,7 @@ public class PohCore {
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.ArkSpell.ArkEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.DownfallSpell.DownfallEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.Cutscene.CutsceneEvents.class);
+        MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.RemoteView.Events.class);   // owner 21.11: far chunks of scenes
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.silent.SilentGateSpell.SilentGateEvents.class);
         MinecraftForge.EVENT_BUS.register(ru.pohsmp.core.spell.MilkyWaySpell.MilkyWayEvents.class);
         MinecraftForge.EVENT_BUS.register(AnimatedStaff.StaffAnimEvents.class);

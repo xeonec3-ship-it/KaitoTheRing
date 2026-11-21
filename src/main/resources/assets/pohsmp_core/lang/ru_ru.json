@@ -838,6 +838,7 @@
   "subtitles.pohsmp_core.aris.quench": "Шипит пар",
   "subtitles.pohsmp_core.aris.bellows": "Ревут мехи",
   "entity.pohsmp_core.martin": "Мартин, Последний Полководец",
+  "entity.pohsmp_core.martin_npc": "Мартин",
   "entity.pohsmp_core.martin_soldier": "Призрачный солдат",
   "entity.pohsmp_core.martin_banner": "Знамя Мартина",
   "ui.pohsmp_core.martin.title": "Мартин, Последний Полководец",

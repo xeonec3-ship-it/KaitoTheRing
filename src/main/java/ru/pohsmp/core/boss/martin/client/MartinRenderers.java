@@ -119,6 +119,47 @@ public final class MartinRenderers {
         }
     }
 
+    // ---------------------------------------------------------------- T34: the soldier of «Знамя Полководца» (a player's ally), same look
+
+    public static final class BannerSoldier extends GeoEntityRenderer<ru.pohsmp.core.spell.reward.BannerSoldierEntity> {
+        public BannerSoldier(EntityRendererProvider.Context ctx) {
+            super(ctx, new GeoModel<>() {
+                @Override
+                public ResourceLocation getModelResource(ru.pohsmp.core.spell.reward.BannerSoldierEntity e) {
+                    return rl("geo/entity/martin_soldier.geo.json");
+                }
+
+                @Override
+                public ResourceLocation getTextureResource(ru.pohsmp.core.spell.reward.BannerSoldierEntity e) {
+                    return rl("textures/entity/martin/martin_soldier.png");
+                }
+
+                @Override
+                public ResourceLocation getAnimationResource(ru.pohsmp.core.spell.reward.BannerSoldierEntity e) {
+                    return rl("animations/entity/martin_soldier.animation.json");
+                }
+            });
+            shadowRadius = 0.3f;
+            shadowStrength = 0.4f;
+            addRenderLayer(new AutoGlowingGeoLayer<>(this));
+        }
+
+        @Override
+        public RenderType getRenderType(ru.pohsmp.core.spell.reward.BannerSoldierEntity e, ResourceLocation tex, @Nullable MultiBufferSource buf, float pt) {
+            return RenderType.entityTranslucent(tex);
+        }
+
+        @Override
+        public Color getRenderColor(ru.pohsmp.core.spell.reward.BannerSoldierEntity e, float pt, int light) {
+            return Color.ofRGBA(1f, 1f, 1f, e.ghostAlpha(pt));
+        }
+
+        @Override
+        protected float getDeathMaxRotation(ru.pohsmp.core.spell.reward.BannerSoldierEntity e) {
+            return 0;
+        }
+    }
+
     // ---------------------------------------------------------------- banner
 
     public static final class Banner extends GeoEntityRenderer<MartinBannerEntity> {

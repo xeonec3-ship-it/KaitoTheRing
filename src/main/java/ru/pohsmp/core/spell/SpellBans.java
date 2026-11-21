@@ -65,8 +65,14 @@ public final class SpellBans {
 
     /** True if this scroll may not be written into a book / imbued into an item (Mythic and above, also by the scroll's NBT tier). */
     public static boolean bindBanned(ItemStack scroll) {
+        if (MagicRules.itemOnly(Tier.spellIdOf(scroll))) return true;   // T34/T35: lives only in its item
         Tier t = Tier.of(scroll);
         return MagicRules.bindBanned(t == null ? null : t.key);
+    }
+
+    /** T34: true if this scroll may not be copied or merged with another one (the boss reward spells). */
+    public static boolean copyBanned(ItemStack scroll) {
+        return MagicRules.copyBanned(Tier.spellIdOf(scroll));
     }
 
     /** Actionbar line to the player (server side only). */
@@ -80,7 +86,9 @@ public final class SpellBans {
         Tier t = null;
         if (p != null && p.containerMenu instanceof InscriptionTableMenu m) t = Tier.of(m.getScrollSlot().getItem());
         if (t == null) t = tierOf(e.getSpellData());
-        if (MagicRules.bindBanned(t == null ? null : t.key)) {
+        boolean itemOnly = e.getSpellData() != null && e.getSpellData().getSpell() != null
+                && MagicRules.itemOnly(e.getSpellData().getSpell().getSpellId());   // T34/T35: Жатва, Длань — only from their items
+        if (itemOnly || MagicRules.bindBanned(t == null ? null : t.key)) {
             e.setCanceled(true);
             tell(p, "no_inscribe");
         }

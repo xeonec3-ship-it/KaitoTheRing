@@ -1,13 +1,20 @@
 package ru.pohsmp.core.boss.client;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import javax.sound.sampled.AudioFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
+import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.AudioStream;
+import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.resources.ResourceLocation;
@@ -20,7 +27,8 @@ import ru.pohsmp.core.boss.BossMusicMath;
 import ru.pohsmp.core.boss.BossNet;
 
 /**
- * T33 the fight music of a boss, by phases: <base>_intro once, then the loop of the phase (<base>_p1.._p3, looping), crossfading to the
+ * T33 the fight music of a boss, by phases: <base>_intro once glued to the loop in one stream (no gap), the loop of the phase
+ * (<base>_p1.._p3, looping), crossfading to the
  * next phase's loop when the server says (BossNet.MUSIC_*). Each part is our own tickable sound (the Music slider, paused with the game,
  * starts even with the slider at 0 so moving it later is heard), the volume driven here by the client tick with an equal-power curve.
  * A part with no file (the sound event missing or empty — the sound manager drops missing .ogg on load) is never played: the previous
@@ -140,8 +148,6 @@ public final class BossMusicClient {
         final boolean[] has = new boolean[BossMusicMath.PARTS.length];
         final boolean stubExists;
         Part current;
-        /** The loop to go to when the intro ends. */
-        int afterIntro;
         boolean filtered;
 
         Fight(int entity, String base) {
@@ -165,10 +171,11 @@ public final class BossMusicClient {
                 play(-1, FADE_IN);
                 return;
             }
-            if (BossMusicMath.playIntro(loop, has)) {
-                afterIntro = BossMusicMath.pickLoop(loop, has);
-                play(BossMusicMath.INTRO, FADE_IN);
-            } else play(BossMusicMath.pickLoop(loop, has), FADE_IN);
+            int first = BossMusicMath.pickLoop(loop, has);
+            if (BossMusicMath.playIntro(loop, has)) {   // the track's own beginning: at full volume, the loop glued on in the stream
+                play(first, 1, true);
+                if (current != null) current.set(1);
+            } else play(first, FADE_IN);
         }
 
         /** Crossfade to `loop` in `ticks` (or start it, fading in). */
@@ -178,10 +185,6 @@ public final class BossMusicClient {
                 return;
             }
             int want = BossMusicMath.pickLoop(loop, has);
-            if (current != null && current.part == BossMusicMath.INTRO && !current.isStopped()) {
-                afterIntro = want;   // still in the intro: it hands over to this loop
-                if (want == 1) return;
-            }
             if (!fresh && current != null && !current.isStopped() && current.part == want) return;   // same loop (a fallback): goes on
             play(want, Math.max(ticks, 1));
         }
@@ -195,8 +198,15 @@ public final class BossMusicClient {
             if (current != null) current.set(1);
         }
 
-        /** Start a part (-1 = the stub), fading the current one out in the same `ticks`. */
         private void play(int part, int ticks) {
+            play(part, ticks, false);
+        }
+
+        /**
+         * Start loop `part` (-1 = the stub), fading the current one out in the same `ticks`. withIntro: one stream, <base>_intro and
+         * right after its last sample the loop (they are one piece of the track: not even a tick of silence between them).
+         */
+        private void play(int part, int ticks, boolean withIntro) {
             ResourceLocation id;
             if (part < 0) {
                 if (!stubExists) return;   // no track, no stub (music.ereb): silence, no log
@@ -209,7 +219,16 @@ public final class BossMusicClient {
                 current.ramp(0, ticks);
                 FADING.add(current);
             }
-            Part p = new Part(entity, part, SoundEvent.createVariableRangeEvent(id), part != BossMusicMath.INTRO);
+            ResourceLocation playId = id, loopFile = null;
+            if (withIntro && part > 0) {
+                ResourceLocation b = ResourceLocation.tryParse(base);
+                WeighedSoundEvents loopEv = Minecraft.getInstance().getSoundManager().getSoundEvent(id);
+                if (loopEv != null) {
+                    loopFile = loopEv.getSound(RandomSource.create()).getPath();
+                    playId = new ResourceLocation(b.getNamespace(), b.getPath() + BossMusicMath.PARTS[BossMusicMath.INTRO]);
+                }
+            }
+            Part p = new Part(entity, part, SoundEvent.createVariableRangeEvent(playId), loopFile);
             p.filtered = filtered;
             p.ramp(1, ticks);
             current = p;
@@ -219,12 +238,6 @@ public final class BossMusicClient {
         void tick() {
             if (current == null) return;
             current.step();
-            if (current.part == BossMusicMath.INTRO && current.started && !Minecraft.getInstance().getSoundManager().isActive(current)) {
-                current.kill();
-                current = null;
-                play(afterIntro, 1);   // the intro ran out: straight into the loop (it was mixed to follow on)
-                if (current != null) current.set(1);
-            }
         }
 
         void filter(boolean on) {
@@ -247,13 +260,16 @@ public final class BossMusicClient {
         final int entity, part;
         float gain, from, to;
         int t, len;
-        boolean started, filtered, filterApplied;
+        boolean filtered, filterApplied;
+        /** Played after the intro in the same stream (the loop's .ogg), or null: this is the loop itself. */
+        private final ResourceLocation thenLoop;
 
-        Part(int entity, int part, SoundEvent ev, boolean loop) {
+        Part(int entity, int part, SoundEvent ev, ResourceLocation thenLoop) {
             super(ev, SoundSource.MUSIC, RandomSource.create());
             this.entity = entity;
             this.part = part;
-            this.looping = loop;
+            this.thenLoop = thenLoop;
+            this.looping = true;
             this.delay = 0;
             this.relative = true;
             this.attenuation = SoundInstance.Attenuation.NONE;
@@ -285,7 +301,6 @@ public final class BossMusicClient {
         /** Advanced by BossMusicClient's client tick (not paused). */
         void step() {
             if (isStopped()) return;
-            started = true;
             if (t < len) gain = BossMusicMath.fadeGain(from, to, ++t / (float) len);
             if (!filterApplied) filterApplied = BossMusicFilter.apply(this, filtered);
             applyVolume();
@@ -296,12 +311,63 @@ public final class BossMusicClient {
             volume = gain * (filtered && !BossMusicFilter.works() ? 0.55f : 1f);   // no low-pass available: just quieter
         }
 
+        /** Intro + loop: the intro's stream, then the loop's looping stream in the same AL source queue, sample to sample. */
+        @Override
+        public CompletableFuture<AudioStream> getStream(SoundBufferLibrary lib, Sound sound, boolean loop) {
+            if (thenLoop == null) return lib.getStream(sound.getPath(), loop);
+            return lib.getStream(sound.getPath(), false).thenCombine(lib.getStream(thenLoop, true), IntroThenLoop::new);
+        }
+
         @Override
         public void tick() {}   // the volume is set in step(); the engine reads it every tick
 
         @Override
         public boolean canStartSilent() {
             return true;   // starts at 0 (fade in), and with the Music slider at 0
+        }
+    }
+
+    /**
+     * The intro, then the loop, as one stream: the channel queues the buffers back to back, so the last (short) buffer of the intro is
+     * followed by the loop's first one with no gap; the loop (LoopingAudioStream) then repeats itself the same way. Same format needed
+     * (Vorbis 44.1 kHz stereo, both from the same track); if not, the intro is skipped (the loop alone, never a broken stream).
+     */
+    static final class IntroThenLoop implements AudioStream {
+        private AudioStream intro;
+        private final AudioStream loop;
+
+        IntroThenLoop(AudioStream intro, AudioStream loop) {
+            boolean same = intro.getFormat().matches(loop.getFormat());
+            if (!same) {
+                ru.pohsmp.core.PohCore.LOG.warn("[boss music] intro and loop differ in format ({} / {}): the intro is skipped", intro.getFormat(), loop.getFormat());
+                try {
+                    intro.close();
+                } catch (IOException ignored) {}
+            }
+            this.intro = same ? intro : null;
+            this.loop = loop;
+        }
+
+        @Override
+        public AudioFormat getFormat() {
+            return loop.getFormat();
+        }
+
+        @Override
+        public ByteBuffer read(int size) throws IOException {
+            if (intro != null) {
+                ByteBuffer b = intro.read(size);
+                if (b != null && b.hasRemaining()) return b;
+                intro.close();   // the intro ran out exactly here: the loop's first sample comes next
+                intro = null;
+            }
+            return loop.read(size);
+        }
+
+        @Override
+        public void close() throws IOException {
+            if (intro != null) intro.close();
+            loop.close();
         }
     }
 }

@@ -33,6 +33,11 @@ public final class TrophyCurios {
         return e.getItemBySlot(item.kind.fallbackSlot).is(item);
     }
 
+    /** True if the item sits in one of its Curios slots (not the armor-slot fallback). */
+    public static boolean inCurio(LivingEntity e, TrophyWear item) {
+        return ON && e != null && Impl.equipped(e, item);
+    }
+
     /** The worn stack (Curios first), or empty. */
     public static ItemStack worn(LivingEntity e, TrophyWear item) {
         if (ON) {
@@ -61,6 +66,11 @@ public final class TrophyCurios {
         @Override
         public Multimap<Attribute, AttributeModifier> getAttributeModifiers(SlotContext ctx, UUID uuid, ItemStack stack) {
             return item.modifiers();
+        }
+
+        @Override
+        public void curioTick(SlotContext ctx, ItemStack stack) {
+            if (!ctx.entity().level().isClientSide && ctx.entity().tickCount % 20 == 0) item.ensureSpell(stack);
         }
 
         @Override

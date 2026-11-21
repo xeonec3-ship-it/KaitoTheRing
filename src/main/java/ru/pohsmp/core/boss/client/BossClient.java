@@ -53,6 +53,7 @@ public final class BossClient {
         ru.pohsmp.core.boss.irina.client.IrinaClient.renderers(e);   // T27
         ru.pohsmp.core.boss.aris.client.ArisClient.renderers(e);   // T28
         ru.pohsmp.core.boss.martin.client.MartinClient.renderers(e);   // T29
+        e.registerEntityRenderer(ru.pohsmp.core.spell.reward.Rewards.SOLDIER.get(), ru.pohsmp.core.boss.martin.client.MartinRenderers.BannerSoldier::new);   // T34
         ru.pohsmp.core.boss.ereb.client.ErebClient.renderers(e);
         ru.pohsmp.core.boss.erebhand.client.ErebHandClient.renderers(e);   // T31
     }

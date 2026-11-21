@@ -75,6 +75,7 @@ public final class Bosses {
         ru.pohsmp.core.boss.martin.Martin.register();     // T29
         ru.pohsmp.core.boss.ereb.Ereb.register();         // T30
         ru.pohsmp.core.boss.erebhand.ErebHand.register(); // T31
+        ru.pohsmp.core.spell.reward.Rewards.registerEntities();   // T34: the banner soldier of «Знамя Полководца»
         ENTITIES.register(modBus);
         ITEMS.register(modBus);
         EFFECTS.register(modBus);

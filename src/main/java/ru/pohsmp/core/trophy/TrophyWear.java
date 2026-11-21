@@ -55,11 +55,49 @@ public class TrophyWear extends Item implements GeoItem {
     }
 
     public final Kind kind;
+    /** Owner 21.11 (T34/T35): the Cult Heads' reward spells live inside these things, level 3, locked (no scroll, no book). */
+    public static final int SPELL_LEVEL = ru.pohsmp.core.spell.reward.RewardMath.MAX_LEVEL;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public TrophyWear(Kind kind) {
         super(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant());   // nothing wears it down: no durability
         this.kind = kind;
+    }
+
+    /** «Пепельная Жатва» in the mantle, «Длань Лжи» in the mask (registered by T34), or null. */
+    @Nullable
+    public io.redspace.ironsspellbooks.api.spells.AbstractSpell spell() {
+        String path = kind == Kind.MANTLE ? ru.pohsmp.core.spell.reward.RewardMath.ASHEN_HARVEST : ru.pohsmp.core.spell.reward.RewardMath.HAND_OF_LIES;
+        var s = io.redspace.ironsspellbooks.api.registry.SpellRegistry.getSpell(new net.minecraft.resources.ResourceLocation(PohCore.MODID, path));
+        return s == null || s == io.redspace.ironsspellbooks.api.registry.SpellRegistry.none() ? null : s;
+    }
+
+    /**
+     * The stack carries its spell as a locked Iron's container (spell wheel, must be equipped): read by Iron's itself in an armor slot
+     * (no Curios) and shown in the tooltip; from the Curios slots it goes to the wheel through {@link TrophyEvents#onSpellWheel}.
+     */
+    public void ensureSpell(ItemStack stack) {
+        var spell = spell();
+        if (spell == null) return;
+        if (io.redspace.ironsspellbooks.api.spells.ISpellContainer.isSpellContainer(stack)) {
+            var c = io.redspace.ironsspellbooks.api.spells.ISpellContainer.get(stack);
+            var d = c.getMaxSpellCount() == 1 ? c.getSpellAtIndex(0) : null;
+            if (d != null && d.getSpell() == spell && d.getLevel() == SPELL_LEVEL && c.mustEquip()) return;
+        }
+        var m = io.redspace.ironsspellbooks.api.spells.ISpellContainer.create(1, true, true).mutableCopy();
+        m.addSpell(spell, SPELL_LEVEL, true);
+        io.redspace.ironsspellbooks.api.spells.ISpellContainer.set(stack, m.toImmutable());
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity holder, int slot, boolean selected) {
+        super.inventoryTick(stack, level, holder, slot, selected);
+        if (!level.isClientSide && holder.tickCount % 20 == 0) ensureSpell(stack);
+    }
+
+    @Override
+    public void onCraftedBy(ItemStack stack, Level level, Player player) {
+        ensureSpell(stack);
     }
 
     /** The draft attributes (balance_bosses.md «Броня боссов (T35)»). */

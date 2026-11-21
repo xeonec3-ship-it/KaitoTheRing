@@ -224,6 +224,23 @@ public final class TrophyEvents {
         }
     }
 
+    // ---------------------------------------------------------------- the spells inside the mantle and the mask (owner 21.11)
+
+    /**
+     * Iron's builds the spell wheel (client and server) from the hands, the armor slots and the Curios "spellbook" slot only; the mantle
+     * ("back") and the mask ("head") add their spell here, level 3, locked. Taken off - the next rebuild has no such option.
+     */
+    @SubscribeEvent
+    public static void onSpellWheel(io.redspace.ironsspellbooks.api.magic.SpellSelectionManager.SpellSelectionEvent e) {
+        if (!TrophyCurios.ON) return;   // armor-slot fallback: Iron's reads the stack's own container
+        for (TrophyWear w : Trophies.wearables()) {
+            if (!TrophyCurios.inCurio(e.getEntity(), w)) continue;
+            var spell = w.spell();
+            if (spell != null)
+                e.addSelectionOption(new io.redspace.ironsspellbooks.api.spells.SpellData(spell, TrophyWear.SPELL_LEVEL, true), "pohsmp_" + w.kind.id, 0);
+        }
+    }
+
     // ---------------------------------------------------------------- no anvil repair
 
     @SubscribeEvent

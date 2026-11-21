@@ -24,7 +24,8 @@ import ru.pohsmp.core.spell.silent.WindSpearsSpell;
 import ru.pohsmp.core.spell.silent.WorganFlameSpell;
 
 /**
- * Own 32x32 scroll pictures for single spells (Explosion, Heaven's Fall, Frozen Hour): the Iron's scroll model is wrapped,
+ * Own 32x32 scroll pictures for single spells (Explosion, Heaven's Fall, Frozen Hour; T34: the six boss reward scrolls, through
+ * HIGHER_SPELLS — models item/scroll_&lt;path&gt;): the Iron's scroll model is wrapped,
  * and for these spells its overrides return our model; every other scroll keeps Iron's choice by school.
  */
 public final class ScrollModels {
@@ -40,7 +41,8 @@ public final class ScrollModels {
     static {
         for (String p : List.of("explosion", "heaven_fall", "frozen_hour", "space_closure")) own(new ResourceLocation(PohCore.MODID, p));
         for (String p : Reg.DIVINE_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
-        for (String p : Reg.HIGHER_SPELLS) own(new ResourceLocation(PohCore.MODID, p));
+        for (String p : Reg.HIGHER_SPELLS)
+            if (!ru.pohsmp.core.spell.MagicRules.itemOnly(PohCore.MODID + ":" + p)) own(new ResourceLocation(PohCore.MODID, p));   // T34: Жатва и Длань — без свитков
         own(DisintegrationSpell.ID);
         for (String p : Reg.ILLUSION_COMMON) own(new ResourceLocation(PohCore.MODID, p));   // T22: the higher two come with HIGHER_SPELLS
         own(new ResourceLocation(PohCore.MODID, Reg.ILLUSION_MYTHIC));
@@ -51,9 +53,15 @@ public final class ScrollModels {
             own(new ResourceLocation(PohCore.MODID, p));
     }
 
+    /**
+     * Only models whose json exists (T34: the six reward scrolls are drawn later by the visual helper): a missing one is not
+     * registered, so no "Unable to load model" line; such a scroll keeps Iron's model by school (pick -> missing -> Iron's).
+     */
     @SubscribeEvent
     public static void onRegister(ModelEvent.RegisterAdditional e) {
-        for (ResourceLocation r : OWN.values()) e.register(r);
+        var rm = Minecraft.getInstance().getResourceManager();
+        for (ResourceLocation r : OWN.values())
+            if (rm.getResource(new ResourceLocation(r.getNamespace(), "models/" + r.getPath() + ".json")).isPresent()) e.register(r);
     }
 
     @SubscribeEvent

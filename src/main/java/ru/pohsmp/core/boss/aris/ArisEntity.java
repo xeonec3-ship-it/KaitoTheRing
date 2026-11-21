@@ -250,6 +250,12 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         return e instanceof ArisBladeEntity || super.isAlliedTo(e);
     }
 
+    /** Boss sounds 21.11: plate clang (sounds.json aris.hurt). */
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource src) {
+        return BossCore.sound("aris.hurt");
+    }
+
     @Override
     public void die(DamageSource src) {   // only /kill reaches this (she surrenders at 5%)
         super.die(src);
@@ -393,7 +399,7 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
     public void onFinisherTick(ServerPlayer victim, int t) {
         if (t == ArisMath.FINISHER_SLAM && level() instanceof ServerLevel sl && holdPoint != null) {
             core.sound(holdPoint, "aris.slam", 3, 0.9f);
-            vanilla(net.minecraft.sounds.SoundEvents.ANVIL_LAND, 1.5f, 0.8f);   // the flash, sparks and heat ring are in aris_finisher
+            core.sound(holdPoint, "aris.anvil_ring", 2, 0.8f);   // the flash, sparks and heat ring are in aris_finisher
         }
     }
 
@@ -437,14 +443,8 @@ public class ArisEntity extends Monster implements GeoEntity, PohBoss {
         if (d.horizontalDistanceSqr() > 1e-4) fight.face((float) (Math.atan2(d.z, d.x) * 180 / Math.PI) - 90);
         play("replica_break");
         core.play(new BossTimeline("replica_sounds", ArisMath.REPLICA_BREAK + 1)
-                .at(ArisMath.REPLICA_STRIKE, () -> {
-                    vanilla(net.minecraft.sounds.SoundEvents.ANVIL_LAND, 1.2f, 0.9f);
-                    vanilla(net.minecraft.sounds.SoundEvents.LAVA_EXTINGUISH, 0.8f, 1.2f);
-                })
-                .at(ArisMath.REPLICA_BREAK, () -> {
-                    vanilla(net.minecraft.sounds.SoundEvents.ANVIL_LAND, 1.5f, 0.7f);
-                    vanilla(net.minecraft.sounds.SoundEvents.LAVA_EXTINGUISH, 1f, 1f);
-                }));
+                .at(ArisMath.REPLICA_STRIKE, () -> core.sound("aris.anvil_ring", 2, 1))
+                .at(ArisMath.REPLICA_BREAK, () -> core.sound("aris.hiss", 2, 0.9f)));
     }
 
     void vanilla(net.minecraft.sounds.SoundEvent e, float vol, float pitch) {

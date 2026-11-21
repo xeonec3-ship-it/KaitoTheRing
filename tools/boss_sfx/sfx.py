@@ -410,3 +410,8 @@ def variants(fn, k, seed):
         rng(seed * 100 + i)
         out.append(fn(i))
     return out
+
+
+def uni(a, b, n=None):
+    """Seeded uniform random (the generator of the last rng(seed))."""
+    return _rng.uniform(a, b, n)

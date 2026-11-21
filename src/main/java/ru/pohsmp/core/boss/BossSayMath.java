@@ -43,6 +43,46 @@ public final class BossSayMath {
         return index >= 0 && index < STYLES.size() ? STYLES.get(index) : "default";
     }
 
+    // ---------------------------------------------------------------- system lines
+
+    /** BossNet.SAY c: 0 — the boss speaks (its name over the line), SYSTEM — a system line of the fight (no speaker, neutral). */
+    public static final int SPEECH = 0, SYSTEM = 1;
+    /** The separator of the packed arguments of a system line (BossNet.SAY s2); the wire string is at most ARGS_MAX long. */
+    public static final char ARG_SEP = '\u0001';
+    public static final int ARGS_MAX = 250;
+    /** The text of a system line: a cool neutral grey-white (no boss tint, not italic). */
+    public static final int SYSTEM_TEXT = 0xD6D3CC;
+    /** The boss marks by a system line: dimmed to this opacity (a small sign of whose fight it is, not a name). */
+    public static final float SYSTEM_MARK_ALPHA = 0.55f;
+
+    /** Arguments of a system line into one wire string (each cut so the whole fits ARGS_MAX; null → ""). */
+    public static String packArgs(String... args) {
+        if (args == null || args.length == 0) return "";
+        int each = Math.max(1, (ARGS_MAX - (args.length - 1)) / args.length);
+        StringBuilder b = new StringBuilder();
+        for (int i = 0; i < args.length; i++) {
+            if (i > 0) b.append(ARG_SEP);
+            String a = args[i] == null ? "" : args[i].replace(ARG_SEP, ' ');
+            b.append(a.length() > each ? a.substring(0, each) : a);
+        }
+        return b.toString();
+    }
+
+    public static String[] unpackArgs(String packed) {
+        if (packed == null || packed.isEmpty()) return new String[0];
+        return packed.split(String.valueOf(ARG_SEP), -1);
+    }
+
+    /** Height of a system scroll: no name line. */
+    public static int systemBoxHeight(int lines) {
+        return PAD_TOP + Math.max(1, lines) * LINE_H - 1 + PAD_BOTTOM;
+    }
+
+    /** Width of a system scroll: the text and the two small marks beside its first line (13 px each). */
+    public static int systemBoxWidth(int textWidth, int guiWidth) {
+        return Math.min(textWidth + 2 * 13 + 2 * PAD_X, guiWidth - 2 * SCREEN_MARGIN);
+    }
+
     // ---------------------------------------------------------------- timings
 
     public static double typeTicks(int chars) {

@@ -343,7 +343,7 @@ public final class IrinaFight {
         p.addEffect(new MobEffectInstance(Irina.JEALOUSY_MARK.get(), 60, 0, false, false, true));
         p.displayClientMessage(ui("mark_self"), true);
         for (ServerPlayer o : fightersNow()) if (o != p) o.displayClientMessage(ui("mark_others", p.getDisplayName()), true);
-        for (ServerPlayer o : core.playersNear(core.arenaRadius() + 8)) o.sendSystemMessage(ui("mark", p.getDisplayName()));
+        core.sysLine(core.playersNear(core.arenaRadius() + 8), "ui.pohsmp_core.irina.mark", p.getName().getString());
         core.sound("irina.mark", 2, 1);
         if (!core.locked() && !core.inScene()) {
             face(p.position());
@@ -396,8 +396,8 @@ public final class IrinaFight {
         int dur = (cfg(IrinaConfig.BOND_RESHUFFLE) + 5) * 20;
         a.addEffect(new MobEffectInstance(Irina.THREAD_BOND.get(), dur, 0, false, false, true));
         c.addEffect(new MobEffectInstance(Irina.THREAD_BOND.get(), dur, 0, false, false, true));
-        a.sendSystemMessage(ui("bond", c.getDisplayName()));
-        c.sendSystemMessage(ui("bond", a.getDisplayName()));
+        core.sysLine(List.of(a), "ui.pohsmp_core.irina.bond", c.getName().getString());
+        core.sysLine(List.of(c), "ui.pohsmp_core.irina.bond", a.getName().getString());
     }
 
     private void unlink(ServerLevel sl, Bond b) {

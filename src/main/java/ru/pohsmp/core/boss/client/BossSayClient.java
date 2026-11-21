@@ -28,6 +28,10 @@ import ru.pohsmp.core.client.ClientConfig;
  * the layout: {@link BossSayMath}). Every boss has its own scroll: textures/gui/boss_say/&lt;boss&gt;.png (48×32, a 9-slice with 12 px
  * sides and 8 px top/bottom) and &lt;boss&gt;_mark.png (18×9: the left mark, then the right one). Drawn by a GUI overlay above all the
  * others; BossCam lets it through in the scenes that hide the HUD, then it sits over the letterbox bar.
+ *
+ * <p>System lines of a fight (BossNet.SAY c = {@link BossSayMath#SYSTEM}: «Эреб исчез. Бой окончен.», «%s — предмет ревности Ирины»;
+ * owner 21.11) go through the same queue but are not speech: the neutral «default» scroll, no name and no thread, the text upright
+ * in a cool grey-white, the boss's own marks dimmed beside it as the only sign of whose fight it is, no pen sound.
  */
 public final class BossSayClient {
     private BossSayClient() {}
@@ -37,7 +41,7 @@ public final class BossSayClient {
     private static final Style ITALIC = Style.EMPTY.withItalic(true);
 
     /** What one line draws. */
-    private record Said(Component name, int color, String text, String style) {}
+    private record Said(Component name, int color, String text, String style, boolean system) {}
 
     private static final BossSayMath.Queue<Said> QUEUE = new BossSayMath.Queue<>();
     private static BossSayMath.Line<Said> soundLine;
@@ -49,6 +53,10 @@ public final class BossSayClient {
     }
 
     static void onMsg(BossNet.Msg m) {
+        if (m.c == BossSayMath.SYSTEM) {
+            system(m);
+            return;
+        }
         Component name;
         try {
             name = Component.Serializer.fromJson(m.s2);
@@ -57,13 +65,22 @@ public final class BossSayClient {
         }
         if (name == null) name = Component.literal("?");
         String text = Component.translatable(m.s1).getString();
-        Said s = new Said(name, m.b & 0xFFFFFF, text, BossSayMath.styleName(m.d));
+        Said s = new Said(name, m.b & 0xFFFFFF, text, BossSayMath.styleName(m.d), false);
         QUEUE.push(new BossSayMath.Line<>(s, text.strip().length()), ClientClock.now(Minecraft.getInstance().getPartialTick()));
         if (ClientConfig.SAY_TO_CHAT.get()) {
             Component line = Component.literal(text).withStyle(Style.EMPTY.withColor(TextColor.fromRgb(s.color)).withItalic(true));
             Minecraft.getInstance().gui.getChat().addMessage(Component.empty().append(name.copy().withStyle(st -> st.withColor(s.color)))
                     .append(Component.literal(": ").withStyle(ChatFormatting.GRAY)).append(line));
         }
+    }
+
+    /** A system line: s1 the lang key, s2 its packed arguments (plain strings), d the boss style (whose marks stand by it). */
+    private static void system(BossNet.Msg m) {
+        Object[] args = BossSayMath.unpackArgs(m.s2);
+        String text = Component.translatable(m.s1, args).getString();
+        Said s = new Said(Component.empty(), m.b & 0xFFFFFF, text, BossSayMath.styleName(m.d), true);
+        QUEUE.push(new BossSayMath.Line<>(s, text.strip().length()), ClientClock.now(Minecraft.getInstance().getPartialTick()));
+        if (ClientConfig.SAY_TO_CHAT.get()) Minecraft.getInstance().gui.getChat().addMessage(Component.literal(text).withStyle(ChatFormatting.GRAY));
     }
 
     static void clear() {
@@ -85,6 +102,10 @@ public final class BossSayClient {
         if (a < 0.03f) return;
 
         Font f = mc.font;
+        if (s.system) {
+            renderSystem(gui, g, f, l, s, w, h, partialTick, age, a, visible);
+            return;
+        }
         List<String> lines = BossSayMath.wrap(s.text, BossSayMath.maxTextWidth(w), t -> f.width(italic(t)));
         int textW = 0;
         for (String t : lines) textW = Math.max(textW, f.width(italic(t)));
@@ -118,6 +139,38 @@ public final class BossSayClient {
                 int lx = w / 2 - f.width(italic(lines.get(i))) / 2;   // centred by the whole line: the text does not slide while typed
                 g.drawString(f, italic(part), lx, ty + i * BossSayMath.LINE_H, al | tc, true);
             }
+        }
+        RenderSystem.disableBlend();
+    }
+
+    /** The system scroll: «default» texture, no name, the text upright in SYSTEM_TEXT, the boss marks dimmed beside the first line. */
+    private static void renderSystem(ForgeGui gui, GuiGraphics g, Font f, BossSayMath.Line<Said> l, Said s, int w, int h, float partialTick,
+                                     double age, float a, int visible) {
+        List<String> lines = BossSayMath.wrap(s.text, BossSayMath.maxTextWidth(w) - 2 * 13, f::width);
+        int textW = 0;
+        for (String t : lines) textW = Math.max(textW, f.width(t));
+        int bw = BossSayMath.systemBoxWidth(textW, w), bh = BossSayMath.systemBoxHeight(lines.size());
+        int hud = BossCam.hudHidden() ? 0 : Math.max(gui.leftHeight, gui.rightHeight);
+        int bottom = BossSayMath.bottom(h, hud, BossCam.barHeight(partialTick, h));
+        int x = (w - bw) / 2, y = bottom - bh + (int) Math.round(BossSayMath.rise(age, l.outAt()));
+        ResourceLocation tex = new ResourceLocation(PohCore.MODID, "textures/gui/boss_say/default.png");
+        ResourceLocation mark = new ResourceLocation(PohCore.MODID, "textures/gui/boss_say/" + s.style + "_mark.png");
+        int ty = y + BossSayMath.PAD_TOP;
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        g.setColor(1, 1, 1, a);
+        nineSlice(g, tex, x, y, bw, bh);
+        g.setColor(1, 1, 1, a * BossSayMath.SYSTEM_MARK_ALPHA);
+        int fw = lines.isEmpty() ? 0 : f.width(lines.get(0));
+        g.blit(mark, w / 2 - fw / 2 - MARK - 4, ty - 1, 0, 0, MARK, MARK, 2 * MARK, MARK);
+        g.blit(mark, w / 2 + fw / 2 + 3, ty - 1, MARK, 0, MARK, MARK, 2 * MARK, MARK);
+        g.setColor(1, 1, 1, 1);
+        int al = Math.max(4, Math.round(a * 255)) << 24;
+        List<String> typed = BossSayMath.typed(lines, visible);
+        for (int i = 0; i < lines.size(); i++) {
+            String part = typed.get(i);
+            if (!part.isEmpty()) g.drawString(f, part, w / 2 - f.width(lines.get(i)) / 2, ty + i * BossSayMath.LINE_H, al | BossSayMath.SYSTEM_TEXT, true);
         }
         RenderSystem.disableBlend();
     }
@@ -167,7 +220,7 @@ public final class BossSayClient {
         if (visible <= soundVisible) return;
         int n = BossSayMath.sounds(soundVisible, visible);
         soundVisible = visible;
-        if (n <= 0 || !ClientConfig.SAY_SOUND.get() || visible >= l.chars + 1) return;
+        if (n <= 0 || !ClientConfig.SAY_SOUND.get() || visible >= l.chars + 1 || l.payload.system) return;
         float pitch = 1.55f + RNG.nextFloat() * 0.4f;
         mc.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, pitch, 0.09f));
     }

@@ -519,6 +519,18 @@ public final class BossCore {
         PohCore.LOG.debug("[boss] {} says {} to {} players", def.id, key, who.size());
     }
 
+    /**
+     * A system line of the fight («Эреб исчез. Бой окончен.», «%s — предмет ревности Ирины»): not the boss's speech, so the same
+     * scroll and queue (BossNet.SAY with c = BossSayMath.SYSTEM) but without the speaker's name, neutral (owner 21.11: «на экран тем же
+     * свитком, а не в чат»). key: a lang key, translated on the client; args: plain strings (player names), at most a few.
+     */
+    public void sysLine(List<ServerPlayer> who, String key, String... args) {
+        String packed = BossSayMath.packArgs(args);
+        BossNet.Msg m = new BossNet.Msg(BossNet.SAY).ints(mob.getId(), def.color, BossSayMath.SYSTEM, BossSayMath.styleIndex(def.id)).str(key, packed);
+        for (ServerPlayer p : who) BossNet.to(p, m);
+        PohCore.LOG.debug("[boss] {} system line {} to {} players", def.id, key, who.size());
+    }
+
     /** An action bar line to everyone within r (warnings: «Глава Культа выносит приговор…»). */
     public void actionbar(double r, Component c) {
         for (ServerPlayer p : playersNear(r)) p.displayClientMessage(c, true);

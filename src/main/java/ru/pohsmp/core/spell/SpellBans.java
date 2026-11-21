@@ -69,6 +69,11 @@ public final class SpellBans {
         return MagicRules.bindBanned(t == null ? null : t.key);
     }
 
+    /** T34: true if this scroll may not be copied or merged with another one (the boss reward spells). */
+    public static boolean copyBanned(ItemStack scroll) {
+        return MagicRules.copyBanned(Tier.spellIdOf(scroll));
+    }
+
     /** Actionbar line to the player (server side only). */
     public static void tell(Player p, String key) {
         if (p instanceof ServerPlayer sp) sp.displayClientMessage(Component.translatable("message.pohsmp_core." + key), true);

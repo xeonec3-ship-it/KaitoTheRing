@@ -309,8 +309,13 @@ public final class Reg {
             ru.pohsmp.core.spell.MilkyWaySpell.PATH, ru.pohsmp.core.spell.EternalBlizzardSpell.PATH,
             ru.pohsmp.core.spell.DisintegrationReplicaSpell.PATH, ru.pohsmp.core.spell.CountdownSpell.PATH,
             ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.StarFallSpell.PATH, ILLUSION_HIGHER.get(0), ILLUSION_HIGHER.get(1),
-            ru.pohsmp.core.nightmare.NightmareSpells.HOUSE, ru.pohsmp.core.nightmare.NightmareSpells.NIGHT);
+            ru.pohsmp.core.nightmare.NightmareSpells.HOUSE, ru.pohsmp.core.nightmare.NightmareSpells.NIGHT,
+            // T34 boss reward spells (Higher tier, levels 1..3, admin-only): spell/reward
+            ru.pohsmp.core.spell.reward.RewardMath.ASHEN_HARVEST, ru.pohsmp.core.spell.reward.RewardMath.JEALOUS_EMBRACE,
+            ru.pohsmp.core.spell.reward.RewardMath.ANVIL_STRIKE, ru.pohsmp.core.spell.reward.RewardMath.WARLORD_BANNER,
+            ru.pohsmp.core.spell.reward.RewardMath.MIRROR_STEP, ru.pohsmp.core.spell.reward.RewardMath.HAND_OF_LIES);
     static {
+        ru.pohsmp.core.spell.reward.Rewards.registerSpells(SPELLS);   // T34
         SPELLS.register(ru.pohsmp.core.spell.StarFallSpell.PATH, ru.pohsmp.core.spell.StarFallSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.ScarletCutSpell.PATH, ru.pohsmp.core.spell.ScarletCutSpell::new);
         SPELLS.register(ru.pohsmp.core.spell.CountdownSpell.PATH, ru.pohsmp.core.spell.CountdownSpell::new);

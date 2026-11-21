@@ -18,6 +18,7 @@ import ru.pohsmp.core.spell.SpellBans;
  * The Arcane Anvil block itself works as before (scroll merging, upgrade orbs, shriving, spell slots): only a result made from
  * an item + a scroll of such a spell is cleared, with an actionbar message. Our staffs that come with their spells built in
  * are not affected - nothing is imbued into them here.
+ * T34: two scrolls of a boss reward spell are not merged into a higher level (levels come only from the admin).
  * Slots of ItemCombinerMenu: 0 = item, 1 = scroll, 2 = result. createResult is m_6640_ in the production jar (SRG),
  * createResult in dev (Iron's deobfuscated by ForgeGradle).
  */
@@ -36,6 +37,13 @@ public abstract class ArcaneAnvilMenuMixin {
         AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
         ItemStack item = menu.getSlot(0).getItem();
         ItemStack scroll = menu.getSlot(1).getItem();
+        if (item.getItem() instanceof Scroll && scroll.getItem() instanceof Scroll) {   // T34: merging reward scrolls -> no result
+            if (!menu.getSlot(2).getItem().isEmpty() && (SpellBans.copyBanned(item) || SpellBans.copyBanned(scroll))) {
+                menu.getSlot(2).set(ItemStack.EMPTY);
+                SpellBans.tell(pohsmp$player, "no_copy");
+            }
+            return;
+        }
         if (item.isEmpty() || item.getItem() instanceof Scroll || !(scroll.getItem() instanceof Scroll)) return;
         if (menu.getSlot(2).getItem().isEmpty() || !SpellBans.bindBanned(scroll)) return;
         menu.getSlot(2).set(ItemStack.EMPTY);

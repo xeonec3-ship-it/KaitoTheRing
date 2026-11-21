@@ -26,9 +26,9 @@ A = AC.A
 D = math.pi / 180
 
 BOSS = {
-    'irina': dict(geo='irina', item='irina_staff', scale=1.0, chest='torso'),
-    'ereb': dict(geo='ereb', item='ereb_rapier', scale=1.0, chest='torso'),
-    'ereb_hand': dict(geo='ereb_hand', item='ereb_hand_rapier', scale=1.0, chest='torso'),
+    'irina': dict(geo='irina', item='irina_staff', scale=1.0, chest='torso', hand2=True),
+    'ereb': dict(geo='ereb', item='ereb_rapier', scale=1.0, chest='torso', hand2=True),
+    'ereb_hand': dict(geo='ereb_hand', item='ereb_hand_rapier', scale=1.0, chest='torso', hand2=True),
     # hand2: предмет в руке рисуется GeckoLib 4.8.4 с поворотом кисти ДВАЖДЫ (BlockAndItemGeoLayer.renderForBone, письмо
     # docs/inbox/2026-11-21_mgr_t26_hold_tyros.md §1; anim_check.Model.item_world). Включено у Главы; Ирина/Эреб/Длань — по решению
     # помощника по хвату (их guard_break он перепроверяет), флаг тот же.
@@ -138,6 +138,12 @@ class JModel:
         # ось предмета: от кисти к самой дальней точке
         far = hp[int(np.argmax(np.linalg.norm(hp, axis=1)))]
         self.axis_far = far
+        # «верх» предмета по умолчанию (крен вокруг оси предмета): ось кисти y, перпендикулярно оси предмета
+        ax_ = far / max(1e-9, np.linalg.norm(far))
+        u_ = np.array([0.0, 1.0, 0.0]) - ax_ * ax_[1]
+        if np.linalg.norm(u_) < 0.3:
+            u_ = np.array([1.0, 0.0, 0.0]) - ax_ * ax_[0]
+        self.item_up = u_ / np.linalg.norm(u_)
         self.anims = anims if anims is not None else self._load_anims()
         self.special = {}                  # точки, заданные боссом: {'tip': p (оси кисти), 'butt': p, ...}
 
@@ -399,11 +405,25 @@ class Solver:
         u_l = nrm(u_l - a_l * float(u_l @ a_l))
         pose['bipedHandRight'] = dict(pose.get('bipedHandRight', {}), rotation=[0.0, 0.0, 0.0])
         d_w = nrm(d)
-        u_w0 = np.asarray(up if up is not None else (0.0, 1.0, 0.0), float)
-        u_w0 = u_w0 - d_w * float(u_w0 @ d_w)
-        if np.linalg.norm(u_w0) < 1e-6:
-            u_w0 = np.cross(d_w, [1.0, 0.0, 0.0])
-        u_w0 = nrm(u_w0)
+        # крен предмета — параллельным переносом: «верх» прошлого кадра переносится на новую ось и доворачивается к заданному не быстрее
+        # 16° за кадр (заданный «верх» почти вдоль оси — не доворачивается): перескоков крена нет по построению
+        u_des = nrm(np.asarray(up if up is not None else (0.0, 1.0, 0.0), float))
+        k_par = abs(float(u_des @ d_w))
+        u_des = u_des - d_w * float(u_des @ d_w)
+        up_prev = self.prev.get('item_up_w')
+        if up_prev is None:
+            u_w0 = nrm(u_des) if np.linalg.norm(u_des) > 1e-6 else nrm(np.cross(d_w, [1.0, 0.0, 0.0]))
+        else:
+            u_pt = up_prev - d_w * float(up_prev @ d_w)
+            u_pt = nrm(u_pt) if np.linalg.norm(u_pt) > 1e-6 else nrm(np.cross(d_w, [1.0, 0.0, 0.0]))
+            if k_par < 0.85 and np.linalg.norm(u_des) > 1e-6:
+                u_d = nrm(u_des)
+                th = math.atan2(float(np.cross(u_pt, u_d) @ d_w), float(u_pt @ u_d))
+                lim = math.radians(16.0) * (1.0 if k_par < 0.6 else (0.85 - k_par) / 0.25)
+                th = max(-lim, min(lim, th))
+                u_pt = u_pt * math.cos(th) + np.cross(d_w, u_pt) * math.sin(th)
+            u_w0 = nrm(u_pt)
+        self.prev['item_up_w'] = u_w0
         Bl = np.column_stack([a_l, u_l, np.cross(a_l, u_l)])
         Bworld = np.column_stack([d_w, u_w0, np.cross(d_w, u_w0)])
         # скручивание руки вокруг её оси (кисть остаётся на месте) — свободно: берём такое, при котором кисть поворачивает предмет
@@ -426,18 +446,30 @@ class Solver:
             R_ = P0.T @ Bworld @ Bl.T
             ang = math.acos(max(-1.0, min(1.0, (np.trace(R_) - 1) / 2)))
             return ang, R_, key
+        Rprev = self.prev.get('arm_R')                                   # поворот руки прошлого кадра (непрерывность)
+
+        def cost_of(th):
+            ang, R_, key = rel(th)
+            Rk = (Rz(rest_a[2] + key[2] * D) @ Ry(rest_a[1] - key[1] * D) @ Rx(rest_a[0] - key[0] * D))[:3, :3]
+            c = ang + 20.0 * max(0.0, ang - math.radians(150))          # поворот кисти > 150° — почти запрещён (главная ветвь)
+            if Rprev is not None:
+                c += 1.5 * math.acos(max(-1.0, min(1.0, (np.trace(Rprev.T @ Rk) - 1) / 2)))
+            ref = getattr(self, 'arm_ref', None)                          # опорный поворот руки (поза стойки на краях анимации)
+            if ref is not None and ref[1] > 0:
+                c += ref[1] * math.acos(max(-1.0, min(1.0, (np.trace(ref[0].T @ Rk) - 1) / 2)))
+            return c, R_, key, Rk
         best = None
-        for th in np.radians(np.arange(-120, 121, 10)) + tw0:
-            ang, R_, key = rel(th)
-            cost = ang + 0.15 * abs(th - tw0) + (3.0 if ang > math.radians(165) else 0.0)
-            if best is None or cost < best[0]:
-                best = (cost, th, R_, key)
+        for th in np.radians(np.arange(-180, 180, 10)):
+            c, R_, key, Rk = cost_of(th)
+            if best is None or c < best[0]:
+                best = (c, th, R_, key, Rk)
         th0 = best[1]
-        for th in np.radians(np.arange(-9, 10, 1.5)) + th0:
-            ang, R_, key = rel(th)
-            cost = ang + 0.15 * abs(th - tw0) + (3.0 if ang > math.radians(165) else 0.0)
-            if cost < best[0]:
-                best = (cost, th, R_, key)
+        for th in np.radians(np.arange(-9, 10, 1.0)) + th0:
+            c, R_, key, Rk = cost_of(th)
+            if c < best[0]:
+                best = (c, th, R_, key, Rk)
+        self.prev['arm_R'] = best[4]
+        best = best[:4]
         _, th, R, key_arm = best
         pose[side] = {'rotation': [float(x) for x in key_arm]}
         self.prev[side] = np.array(key_arm, float)
@@ -449,10 +481,7 @@ class Solver:
             h = np.array([1.0, 0, 0, 0]) + sgn * q
             if np.linalg.norm(h) > 1e-6:
                 cands.append(h / np.linalg.norm(h))
-        qp = self.prev.get('hand_q')
-        qh = max(cands, key=lambda c: abs(float(c @ qp))) if qp is not None else max(cands, key=lambda c: c[0])
-        if qp is not None and float(qh @ qp) < 0:
-            qh = -qh
+        qh = max(cands, key=lambda c: c[0])                            # главная половина (поворот кисти < 180°)
         self.prev['hand_q'] = qh
         e = _euler_zyx(_qmat(qh))                          # R = Rz(c)·Ry(b)·Rx(a); ключ: x = −(a − rest0), y = −(b − rest1), z = c − rest2
         key = [-(e[0] - rest[0]) / D, -(e[1] - rest[1]) / D, (e[2] - rest[2]) / D]
@@ -624,3 +653,22 @@ def blend_edges(fn, pose0, length, t_in=0.08, t_out=0.3):
                 o[b][c] = [cv * (1 - w) + x * w for cv, x in zip(cur, v)]
         return o
     return g
+
+
+def pose_at(boss, anim, t=0.0, bones=None):
+    """JSON-поза анимации из файла босса (assets) в момент t: {кость: {'rotation'|'position': [..]}}."""
+    an = JModel(boss).anims.get(anim)
+    pose = {}
+    if not an:
+        return pose
+    for b, bk in an['bones'].items():
+        if bones is not None and b not in bones:
+            continue
+        q = {}
+        if 'rotation' in bk:
+            q['rotation'] = AC.chan_at(bk['rotation'], t)
+        if 'position' in bk:
+            q['position'] = AC.chan_at(bk['position'], t)
+        if q:
+            pose[b] = q
+    return pose

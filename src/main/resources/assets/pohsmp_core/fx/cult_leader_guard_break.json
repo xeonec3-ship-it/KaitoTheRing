@@ -6,7 +6,7 @@
   {
    "type": "flash",
    "delay": 2,
-   "at": "caster+0.65,2.92,0.45",
+   "at": "caster+-1.10,1.46,0.43",
    "duration": 2,
    "size": 0.35,
    "rays": 4,
@@ -17,7 +17,7 @@
   {
    "type": "flash",
    "delay": 4,
-   "at": "caster+-1.01,0.56,1.23",
+   "at": "caster+-0.88,1.06,2.08",
    "duration": 2,
    "size": 0.44,
    "rays": 4,
@@ -28,7 +28,7 @@
   {
    "type": "flash",
    "delay": 6,
-   "at": "caster+0.87,0.21,2.17",
+   "at": "caster+0.69,0.37,2.17",
    "duration": 2,
    "size": 0.53,
    "rays": 4,
@@ -39,7 +39,7 @@
   {
    "type": "flash",
    "delay": 8,
-   "at": "caster+0.48,0.27,1.96",
+   "at": "caster+0.43,0.27,1.95",
    "duration": 2,
    "size": 0.62,
    "rays": 6,
@@ -50,7 +50,7 @@
   {
    "type": "flash",
    "delay": 10,
-   "at": "caster+-0.91,0.02,0.90",
+   "at": "caster+-0.95,0.05,0.92",
    "duration": 2,
    "size": 0.72,
    "rays": 6,
@@ -61,7 +61,7 @@
   {
    "type": "flash",
    "delay": 12,
-   "at": "caster+-1.94,2.50,0.57",
+   "at": "caster+-1.90,0.17,0.08",
    "duration": 2,
    "size": 0.81,
    "rays": 6,
@@ -72,7 +72,7 @@
   {
    "type": "flash",
    "delay": 14,
-   "at": "caster+-1.74,3.04,2.12",
+   "at": "caster+-1.94,2.83,2.19",
    "duration": 2,
    "size": 0.9,
    "rays": 6,
@@ -83,7 +83,7 @@
   {
    "type": "flash",
    "delay": 2,
-   "at": "caster+0.65,2.92,0.45",
+   "at": "caster+-1.10,1.46,0.43",
    "duration": 6,
    "size": 0.9,
    "anamorphic": 1.6,
@@ -94,7 +94,7 @@
   {
    "type": "sprites",
    "delay": 2,
-   "at": "caster+0.65,2.92,0.45",
+   "at": "caster+-1.10,1.46,0.43",
    "duration": 12,
    "texture": "spark_soft",
    "count": 14,

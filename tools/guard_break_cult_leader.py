@@ -61,6 +61,8 @@ def build():
     M.item_up = up
     sv = GL.Solver(M)
     p0 = pose0(M)
+    ra = p0['right_arm']['rotation']
+    RA0 = (GL.Rz(ra[2] * GL.D) @ GL.Ry(-ra[1] * GL.D) @ GL.Rx(-ra[0] * GL.D))[:3, :3]
     st, W0 = GL.stance_targets(M, p0)
     h0 = st['hand_r']
     d0 = GL.nrm(GL.ap(W0['~item'], head) - GL.ap(W0['~item'], (0, 0, 0)))
@@ -88,7 +90,7 @@ def build():
         (1.80, dict(S0, lw=0.0), 'io'),
     ])
     ST = GL.stime([(0, 0.0), (0.10, 0.0, 'lin'), (0.32, 0.18, 'io'), (0.38, 0.20, 'io'), (0.45, 0.30, 'io'), (0.635, 0.36, 'io'),
-                   (0.735, 0.80, ('beta', 2.0, 2.0)), (0.82, 0.82, 'out'), (1.80, 1.0, 'io')])
+                   (0.735, 0.80, ('beta', 2.0, 2.0)), (0.82, 0.82, 'out'), (1.40, 1.0, 'io'), (1.80, 1.0, 'lin')])
     # кисть (R-мир) и направление «кисть → голова косы» (yaw, pitch); upw — куда смотрит «верх» древка (от лезвия)
     # правая рука — одна кость (локтя нет): путь — направление руки от плеча (ayaw — вправо +, apit — вверх +), направление
     # «кисть → голова косы» (byaw, bpit) и «верх» древка (от лезвия) u
@@ -104,12 +106,12 @@ def build():
          (0.18, dict(ayaw=6.0, apit=-16.0, byaw=0.0, bpit=4.0, ux=0.0, uy=1.0, uz=0.0)),            # опустил за защиту: лезвие вниз
          (0.20, dict(ayaw=6.0, apit=-18.0, byaw=0.0, bpit=3.0, ux=0.0, uy=1.0, uz=0.0)),
          (0.30, dict(ayaw=-40.0, apit=-28.0, byaw=-50.0, bpit=4.0, ux=0.0, uy=1.0, uz=0.0)),        # рванул влево
-         (0.36, dict(ayaw=-105.0, apit=-36.0, byaw=-155.0, bpit=8.0, ux=0.8, uy=-0.6, uz=0.0)),    # перехват: голова косы назад-влево, лезвие вверх, подток вперёд
+         (0.36, dict(ayaw=-105.0, apit=-30.0, byaw=-155.0, bpit=14.0, ux=0.8, uy=-0.6, uz=0.0)),    # перехват: голова косы назад-влево, лезвие вверх, подток вперёд
          (0.80, dict(ayaw=-12.0, apit=-4.0, byaw=-155.0, bpit=4.0, ux=0.8, uy=-0.6, uz=0.0)),     # удар подтоком в грудь цели (древко мимо корпуса слева)
          (0.82, dict(ayaw=-12.0, apit=-3.0, byaw=-155.0, bpit=5.0, ux=0.8, uy=-0.6, uz=0.0)),
-         (0.88, dict(ayaw=-30.0, apit=-24.0, byaw=-100.0, bpit=2.0, ux=0.5, uy=-0.2, uz=0.8)),     # голова косы низом влево…
-         (0.94, dict(ayaw=-5.0, apit=-34.0, byaw=-25.0, bpit=-8.0, ux=0.6, uy=0.1, uz=0.8)),
-         (0.975, dict(ayaw=10.0, apit=-40.0, byaw=12.0, bpit=-14.0, ux=0.8, uy=0.0, uz=0.5)),      # …через перед вправо, в хват
+         (0.88, dict(ayaw=-62.0, apit=-30.0, byaw=-150.0, bpit=12.0, ux=0.8, uy=-0.6, uz=0.0)),     # возврат — обратным ходом:
+         (0.93, dict(ayaw=-40.0, apit=-22.0, byaw=-55.0, bpit=16.0, ux=0.0, uy=1.0, uz=0.0)),       # голова косы влево-вперёд…
+         (0.97, dict(ayaw=8.0, apit=-2.0, byaw=5.0, bpit=32.0, ux=0.75, uy=0.35, uz=0.45)),           # …вперёд, лезвие вниз — в хват
          (1.0, dict(A0, byaw=y0, bpit=q0, **U0))]
 
     def pose(t):
@@ -120,6 +122,8 @@ def build():
         bl = K.v(max(0.0, t - 0.06), 'body')
         o['head'] = {'rotation': [-0.7 * b[0], -0.85 * bl[1], 0.0]}
         o['bipedHandRight'] = {'position': list(p0['bipedHandRight']['position'])}     # коса в кулаке сдвинута, как в хвате
+        e = 1.0 - GL.ease(min(1.0, t / 0.12), 'io') if t < 0.12 else GL.ease(min(1.0, max(0.0, (t - 1.40) / 0.20)), 'io')
+        sv.arm_ref = (RA0, 6.0 * e)                                   # скручивание руки на краях — как в позе хвата
         w = GL.path_at(P, ST(t))
         sh = GL.ap(M.chain(o, 'right_arm'), (0, 0, 0))
         sv.arm(o, 'right', sh + yaw_dir(w['ayaw'], w['apit']) * ARM)
@@ -138,4 +142,4 @@ def build():
     sv.reset()
     for _ in range(2):
         pose(0.0)
-    return GL.bake(GL.blend_edges(pose, p0, LENGTH), LENGTH, 0.02, events={WARN: 'warn', HIT: 'hit'})
+    return GL.bake(GL.blend_edges(pose, p0, LENGTH, t_out=0.12), LENGTH, 0.02, events={WARN: 'warn', HIT: 'hit'})

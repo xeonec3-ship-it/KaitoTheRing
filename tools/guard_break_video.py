@@ -136,6 +136,16 @@ def adapter():
     else BL.pose(m, an, t);"""
     assert old_pose in js
     js = js.replace(old_pose, new_pose)
+    # Ирина: превью (irina_preview.template.html) рисует посох с ОДНИМ поворотом кисти, GeckoLib — с двумя: оборачиваем посох группой
+    # с поворотом кисти (как h2 в превью Эреба/Длани), поворот копируется каждый кадр
+    old_irina = "else if (CFG.boss === 'irina') { m = BL.buildModel(); BL.attachStaff(m); }"
+    assert old_irina in js
+    js = js.replace(old_irina, "else if (CFG.boss === 'irina') { m = BL.buildModel(); BL.attachStaff(m); const hh = m.bones.bipedHandRight; "
+                    "const st = hh.children.find(o => o.userData.staff); if (st) { const h2 = new THREE.Group(); hh.remove(st); h2.add(st); hh.add(h2); m.irinaH2 = h2; } }")
+    old_pose_i = "    if (CFG.boss === 'irina') BL.pose(m, an, a.k === 'boss' ? AN(p.cloth || 'irina_cloth_idle') : null, t, p.tc);"
+    assert old_pose_i in js
+    js = js.replace(old_pose_i, "    if (CFG.boss === 'irina') { BL.pose(m, an, a.k === 'boss' ? AN(p.cloth || 'irina_cloth_idle') : null, t, p.tc); "
+                    "if (m.irinaH2) m.irinaH2.quaternion.copy(m.bones.bipedHandRight.quaternion); }")
     old_an = "const AN = n => n ? (BL.DATA.anims[n] || VANIMS[n] || null) : null;"
     assert old_an in js
     js = js.replace(old_an, "const AN = n => n ? ((BL.DATA.anims && BL.DATA.anims[n]) || VANIMS[n] || null) : null;")

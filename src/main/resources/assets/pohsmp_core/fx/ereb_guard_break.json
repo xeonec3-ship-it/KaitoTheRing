@@ -28,7 +28,7 @@
   {
    "type": "flash",
    "delay": 6,
-   "at": "caster+0.17,1.57,2.18",
+   "at": "caster+0.17,1.56,2.18",
    "duration": 2,
    "size": 0.53,
    "rays": 4,
@@ -39,7 +39,7 @@
   {
    "type": "flash",
    "delay": 8,
-   "at": "caster+0.50,1.05,2.01",
+   "at": "caster+0.49,1.05,2.01",
    "duration": 2,
    "size": 0.62,
    "rays": 6,
@@ -72,7 +72,7 @@
   {
    "type": "flash",
    "delay": 14,
-   "at": "caster+0.26,0.54,2.36",
+   "at": "caster+0.27,0.53,2.36",
    "duration": 2,
    "size": 0.9,
    "rays": 6,

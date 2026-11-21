@@ -60,6 +60,6 @@ public class BossNpcRenderer extends GeoEntityRenderer<BossNpc> {
                           int light, int overlay, float r, float g, float b, float a) {
         super.preRender(ps, e, model, buf, vc, reRender, pt, light, overlay, r, g, b, a);
         float s = lookOf(e.bossId).scale();
-        if (s != 1) ps.scale(s, s, s);
+        if (s != 1 && !reRender) ps.scale(s, s, s);   // the glow mask layer re-renders through preRender: scale once (Martin's x2)
     }
 }

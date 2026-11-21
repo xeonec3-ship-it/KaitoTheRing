@@ -23,6 +23,7 @@ import ru.pohsmp.core.boss.BossNet;
 import ru.pohsmp.core.boss.BossReplica;
 import ru.pohsmp.core.boss.BossTimeline;
 import ru.pohsmp.core.boss.PohBoss;
+import ru.pohsmp.core.PohCore;
 import ru.pohsmp.core.fx.Fx;
 
 /**
@@ -101,6 +102,30 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
     @Override
     public boolean removeWhenFarAway(double d) {
         return false;
+    }
+
+    /**
+     * Iron's own reset of Tyros (customServerAiStep): 60 s in all without a target and 10 s unhurt -> setDespawning(true), 8 s of «death»
+     * sparks, then remove(DISCARDED) «despawned due to inactivity». Mid-fight (scenes and the ash turn his AI off, players out of
+     * reach) the Head vanished in a column of golden sparks, our bar went with him and the wall of fire stayed (owner's screenshot 3,
+     * 21.11). The Head is summoned by an admin and leaves only by death or /pohsmp boss: never despawns by itself. The counter restarts.
+     */
+    @Override
+    public void setDespawning(boolean on) {
+        if (on && !level().isClientSide) PohCore.LOG.info("[boss] cult_leader: Iron's inactivity despawn blocked (no target for 60 s) at {}", blockPosition());
+        super.setDespawning(false);
+    }
+
+    /** Removed in any way but death (a command, /kill without the death scene, unloaded with the chunk): the wall, the auras, the bar go too. */
+    @Override
+    public void remove(RemovalReason why) {
+        if (level() instanceof ServerLevel sl && !isRemoved()) {
+            PohCore.LOG.info("[boss] cult_leader removed: {} (health {}/{}, phase {}, dead {}) at {}", why, getHealth(), getMaxHealth(), core.phase(),
+                    core.dead(), blockPosition());
+            fight.cleanUp(sl);
+            if (!core.dead()) core.endBar();
+        }
+        super.remove(why);
     }
 
     /** Client: ticks since the intro walk began (0..175), for the renderer (the model is not drawn for the first 30). */
@@ -226,6 +251,7 @@ public class CultLeaderEntity extends FireBossEntity implements PohBoss {
     public void die(DamageSource src) {
         super.die(src);
         if (!(level() instanceof ServerLevel sl) || !isDeadOrDying()) return;
+        PohCore.LOG.info("[boss] cult_leader died: {} (phase {}) at {}", src.getMsgId(), core.phase(), blockPosition());
         core.onDeath();
         fight.onDeath(sl);
         List<ServerPlayer> who = core.scene("cult_leader.death", CultMath.DEATH, BossNet.SCENE_LOCK_INPUT | BossNet.SCENE_BARS | BossNet.SCENE_NO_HUD,

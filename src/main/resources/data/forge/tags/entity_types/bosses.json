@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "pohsmp_core:cult_leader",
+    "pohsmp_core:irina",
+    "pohsmp_core:aris",
+    "pohsmp_core:martin",
+    "pohsmp_core:ereb",
+    "pohsmp_core:ereb_hand"
+  ]
+}

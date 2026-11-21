@@ -27,6 +27,8 @@ ROOT = os.path.join(HERE, '..')
 A = os.path.join(ROOT, 'src', 'main', 'resources', 'assets', 'pohsmp_core')
 MEDIA = os.path.join(ROOT, 'docs', 'media')
 IDS = ['ashen_harvest', 'jealous_embrace', 'anvil_strike', 'warlord_banner', 'mirror_step', 'hand_of_lies']
+# свитки — только для четырёх (владелец 21.11: Жатва и Длань встроены в Накидку и Маску T35, свитков у них нет)
+SCROLL_IDS = ['jealous_embrace', 'anvil_strike', 'warlord_banner', 'mirror_step']
 BOSS = {'ashen_harvest': 'Глава Культа', 'jealous_embrace': 'Ирина', 'anvil_strike': 'Арис', 'warlord_banner': 'Мартин',
         'mirror_step': 'Эреб', 'hand_of_lies': 'Длань Лжи'}
 WRITTEN = []
@@ -231,7 +233,7 @@ def _xs_left(alpha, y):
 
 
 def scrolls():
-    for sid in IDS:
+    for sid in SCROLL_IDS:
         fr = scroll_frames(sid)
         strip = np.concatenate(fr, 0)
         rel = 'textures/item/scroll_%s.png' % sid
@@ -272,10 +274,10 @@ def compare_sheet():
         im.paste(s.resize((32 * k, 32 * k), Image.NEAREST), (x + 4, y + 4), s.resize((32 * k, 32 * k), Image.NEAREST))
         d.text((x, y + 32 * k + 9), os.path.basename(f)[7:-4][:15], font=_font(10), fill=(170, 165, 160))
     y = y0 + rows_old * (cell + 18) + 16
-    d.text((20, y), 'T34 — трофейные (×6; справа — 4 кадра мерцания ×3)',
+    d.text((20, y), 'T34 — трофейные свитки (4 шт.; справа — 4 кадра мерцания); у Жатвы и Длани свитков нет (T35)',
            font=_font(22), fill=(255, 216, 96))
     y += 44
-    for i, sid in enumerate(IDS):
+    for i, sid in enumerate(SCROLL_IDS):
         fr = scroll_frames(sid)
         x = 20 + (i % 3) * ((W - 40) // 3)
         yy = y + (i // 3) * (cell * 2 + 40)

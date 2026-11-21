@@ -178,6 +178,7 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
     @Override
     public void remove(RemovalReason r) {
         if (level() instanceof ServerLevel sl && r.shouldDestroy()) fight.cleanup(sl);
+        else if (level() instanceof ServerLevel sl && r == RemovalReason.UNLOADED_TO_CHUNK) fight.unloadFx(sl);   // FX audit 21.11
         super.remove(r);
     }
 

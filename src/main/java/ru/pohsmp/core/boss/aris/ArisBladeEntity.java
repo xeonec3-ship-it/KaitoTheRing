@@ -170,6 +170,14 @@ public class ArisBladeEntity extends Mob {
         if (level() instanceof ServerLevel sl) shatter(sl);
     }
 
+    /** FX audit 21.11: unloaded / discarded without its own end (no save: the fight respawns it) - the endless fx stayed as a ghost. */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (fx > 0 && level() instanceof ServerLevel sl) Fx.stop(sl, fx, "");
+        fx = -1;
+        super.remove(reason);
+    }
+
     /** Struck down (or her fight is over): the shatter fx, the sound, gone. */
     void shatter(ServerLevel sl) {
         if (fx > 0) Fx.stop(sl, fx, "");

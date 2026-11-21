@@ -8,6 +8,7 @@
   python3 tools/anim_style_check.py --file old.json         # другой файл анимаций Мартина (например, из git: «до»)
   python3 tools/anim_style_check.py --measure-ref [--ref-dir DIR] [--json out.json]   # пересчитать эталон из jar
   python3 tools/anim_style_check.py --anim martin_swing -v  # одна анимация, подробно (фазы по времени)
+  python3 tools/anim_style_check.py --boss aris             # другой босс (martin, aris, irina)
 
 Метрики (длины — в долях длины ноги L: у EF 0.75 бл., у Мартина 12 ед. модели; углы — градусы; время — секунды):
   фазы: замах (0 → начало удара), удар (скорость острия ≥ 30% пика), удержание (после удара острие не ушло дальше 0.3 L),
@@ -315,6 +316,9 @@ class MartinRig:
     def events(self, name):
         return {float(k): v for k, v in self.an[name].get('timeline', {}).items()}
 
+    def key(self, name):
+        return name
+
 
 # удары Мартина: анимация -> (событие удара — окно поиска пика, класс эталона, оружие). Приказы (cavalry, volley), добивание и касты —
 # не удары по цели, их проверяем глазами (кадр-листы), метрики к ним не применяются.
@@ -326,21 +330,114 @@ MARTIN_CODE_MOVE = {'martin_shield_bash': (0.45, 0.75, 5.0 / 1.5)}
 MARTIN_IDLE = ['martin_idle']
 
 
-def our_metrics(rig, names=None, idle=None):
+# ================================================================== наши: Арис (T28; свой риг с коленями и молотом, масштаб 1.0 — рост игрока)
+class ArisRig:
+    def __init__(self, path=None):
+        import gen_aris as GA
+        import gen_aris_anims as AN
+        import aris_check as AC
+        AN.G = GA
+        self.GA, self.AN, self.AC = GA, AN, AC
+        self.m = GA.build_model()
+        self.rig = AN.Rig(self.m)
+        self.file = path or os.path.join(A, 'animations', 'entity', 'aris.animation.json')
+        self.an = json.load(open(self.file, encoding='utf-8'))['animations']
+        self.L = 12.0
+        self.head_off = np.array([0.0, 0.0, -(GA.HAM_HEAD - GA.HAM_GRIP) * GA.HAM_S])
+
+    def key(self, name):
+        return name if name in self.an else 'animation.aris.' + name
+
+    def signals(self, name, weapon='hammer'):
+        an, L, AN, GA = self.an[self.key(name)], self.L, self.AN, self.GA
+
+        def sig(t):
+            W = self.rig.world(self.AC.pose_at(an, t))
+            P = lambda b, pt: AN.apply(W[b], pt) / L
+            fw = lambda b: W[b][0] @ np.array([0.0, 0.0, -1.0])
+            hy = [yaw_of(fw(b)) for b in ('right_leg', 'left_leg')]
+            return {
+                'pelvis': P('body', (0, 12, 0)), 'chest': P('torso', (0, 20, 0)), 'head': P('head', (0, 24, 0)),
+                'sh_r': P('right_arm', GA.SHOULDER_R), 'sh_l': P('left_arm', GA.SHOULDER_R * [-1, 1, 1]),
+                'hip_yaw': math.degrees(math.atan2(sum(math.sin(math.radians(x)) for x in hy), sum(math.cos(math.radians(x)) for x in hy))),
+                'foot_r': P('right_shin', (2, 0, 0)), 'foot_l': P('left_shin', (-2, 0, 0)),
+                'tool': P('hammer', GA.FIST_R), 'tip': P('hammer', GA.FIST_R + self.head_off),
+                'head_fwd': fw('head'), 'chest_fwd': fw('torso'),
+            }
+        return sig, float(an['animation_length'])
+
+    def events(self, name):
+        return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
+
+
+# ================================================================== наши: Ирина (T27; маг Iron's, посох — предмет в правой руке, ×1)
+class IrinaRig:
+    def __init__(self, path=None):
+        import irina_anim_check as IC
+        self.IC = IC
+        self.r = IC.Rig()
+        if path:
+            self.r.anims = json.load(open(path, encoding='utf-8'))['animations']
+        self.an = self.r.anims
+        self.L = 14.0                         # нога Ирины: таз на 14 ед. (у мага Iron's 12)
+
+    def key(self, name):
+        return name if name in self.an else 'irina_' + name
+
+    def signals(self, name, weapon='staff'):
+        r, L = self.r, self.L
+        body = self.key(name)
+        cloth = self.IC.COMBOS.get(body, 'irina_cloth_idle')
+        piv = lambda b: r.bones[b]['piv']
+
+        def sig(t):
+            W, _ = r.pose(body, cloth, t)
+            P = lambda b, pt: r.pt(W, b, pt) / L
+            fw = lambda b: W[b][:3, :3] @ np.array([0.0, 0.0, -1.0])
+            hy = [yaw_of(fw(b)) for b in ('right_leg', 'left_leg')]
+            return {
+                'pelvis': P('body', piv('body')), 'chest': P('torso', piv('torso') - [0, 4, 0]), 'head': P('head', piv('head')),
+                'sh_r': P('right_arm', piv('right_arm')), 'sh_l': P('left_arm', piv('left_arm')),
+                'hip_yaw': math.degrees(math.atan2(sum(math.sin(math.radians(x)) for x in hy), sum(math.cos(math.radians(x)) for x in hy))),
+                'foot_r': P('right_leg', piv('right_leg') - [0, 14, 0]), 'foot_l': P('left_leg', piv('left_leg') - [0, 14, 0]),
+                'tool': r.staff_world(W, r.staff_pts['grip']) / L, 'tip': r.staff_world(W, r.staff_pts['head']) / L,
+                'head_fwd': fw('head'), 'chest_fwd': fw('torso'),
+            }
+        return sig, float(self.an[body]['animation_length'])
+
+    def events(self, name):
+        return {float(k): v for k, v in self.an[self.key(name)].get('timeline', {}).items()}
+
+
+BOSSES = {
+    'martin': dict(rig=MartinRig, scale=MARTIN_SCALE, code_move=MARTIN_CODE_MOVE, idle=['martin_idle'],
+                   attacks={k: v for k, v in MARTIN_ATTACKS.items()}),
+    'aris': dict(rig=ArisRig, scale=1.0, code_move={}, idle=['idle'],
+                 attacks={'swing': ('hit', 'heavy', 'hammer'), 'slam': ('impact', 'heavy', 'hammer')}),
+    # посох Ирины — древко почти в её рост, крюк на конце: эталон — тяжёлое древковое (heavy), не лёгкий меч;
+    # рост ×14/12 (нога 14 ед. = 0.875 бл.)
+    'irina': dict(rig=IrinaRig, scale=14.0 / 12.0, code_move={}, idle=['idle'],
+                  attacks={'staff_attack': ('hit', 'heavy', 'staff'), 'staff_sweep': ('hit', 'heavy', 'staff')}),
+}
+
+
+def our_metrics(rig, names=None, idle=None, boss='martin'):
+    B = BOSSES[boss]
     res, ires = {}, {}
-    for name, (ev, cls, weapon) in MARTIN_ATTACKS.items():
-        if names and name not in names or name not in rig.an:
+    for name, (ev, cls, weapon) in B['attacks'].items():
+        if names and name not in names or rig.key(name) not in rig.an:
             continue
         sig, L = rig.signals(name, weapon)
         evs = rig.events(name)
         th = [t for t, e in evs.items() if e == ev]
         win = (th[0] - 0.3, th[0] + 0.12) if th else None
-        m = normalize(metrics(sig, L, win, code_move=MARTIN_CODE_MOVE.get(name)), MARTIN_SCALE)
+        m = normalize(metrics(sig, L, win, code_move=B['code_move'].get(name)), B['scale'])
         m['event'] = (ev, th[0] if th else None)
         m['cls'] = cls
+        m['scale'] = B['scale']
         res[name] = m
-    for name in (idle or MARTIN_IDLE):
-        if name in rig.an and (not names or name in names):
+    for name in (idle or B['idle']):
+        if rig.key(name) in rig.an and (not names or name in names):
             sig, L = rig.signals(name)
             ires[name] = idle_metrics(sig, L)
     return res, ires
@@ -369,7 +466,7 @@ def report(res, ires, out=print):
     fails = 0
     for name, m in res.items():
         out('\n%s  [эталон: %s; время ÷√%g] (длина %.2f с, событие %s @ %s, пик острия @ %.2f, удар %.2f–%.2f)' % (
-            name, m['cls'], MARTIN_SCALE, m['length'], m['event'][0], fmt(m['event'][1]), m['t_peak'], *m['t_strike']))
+            name, m['cls'], m.get('scale', 1.0), m['length'], m['event'][0], fmt(m['event'][1]), m['t_peak'], *m['t_strike']))
         for k, label, mode in CHECKS[m['cls']]:
             v, r = m.get(k), REF.get(m['cls'], {}).get(k)
             st, gap = verdict(v, r, mode, BOSS_CAP.get(k))
@@ -423,8 +520,9 @@ def main(args):
         return 0
     f = args[args.index('--file') + 1] if '--file' in args else None
     only = [args[args.index('--anim') + 1]] if '--anim' in args else None
-    rig = MartinRig(f)
-    res, ires = our_metrics(rig, only)
+    boss = args[args.index('--boss') + 1] if '--boss' in args else 'martin'
+    rig = BOSSES[boss]['rig'](f)
+    res, ires = our_metrics(rig, only, boss=boss)
     if '-v' in args:
         for n, m in res.items():
             print_row(n, m)

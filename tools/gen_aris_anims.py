@@ -352,7 +352,7 @@ class Spring:
         return self.x
 
 
-def secondary(rig, poses, times, loop, wind=0.0):
+def secondary(rig, poses, times, loop, wind=0.0, dt=DT):
     """Ленты/коса висят по гравитации с инерцией (пружина на направлении), набедренники — за бёдрами."""
     m = rig.m
     down = np.array([0, -1.0, 0])
@@ -383,7 +383,7 @@ def secondary(rig, poses, times, loop, wind=0.0):
                 key = bone
                 vel = np.zeros(3)
                 if key in prev_tip:
-                    vel = (world_piv - prev_tip[key]) / DT
+                    vel = (world_piv - prev_tip[key]) / dt
                 prev_tip[key] = world_piv
                 sway = wind * np.array([math.sin(t * 2.1 + zlib.crc32(bone.encode()) % 7), 0, 0.6 * math.cos(t * 1.7 + zlib.crc32(bone.encode()) % 5)])
                 desired = nrm(down * 9.0 - vel * 0.12 + sway)
@@ -398,7 +398,7 @@ def secondary(rig, poses, times, loop, wind=0.0):
                 if key not in springs:
                     springs[key] = Spring(desired)
                     springs[key].x = desired.copy()
-                dirw = nrm(springs[key].step(desired, k=70.0 if bone.startswith('hair') else 110.0, c=9.0 if bone.startswith('hair') else 12.0))
+                dirw = nrm(springs[key].step(desired, k=70.0 if bone.startswith('hair') else 110.0, c=9.0 if bone.startswith('hair') else 12.0, dt=dt))
                 local = Mp.T @ dirw
                 R = align(rest_dir, local)
                 pose[bone] = {'rot': tuple(to_euler(R))}
@@ -406,10 +406,11 @@ def secondary(rig, poses, times, loop, wind=0.0):
 
 
 # ---------------------------------------------------------------- запекание
-def bake(rig, name, length, keys, loop=True, ground=None, wind=0.0, events=None, sounds=None, extra=None):
-    """keys → Anim (animation.aris.<name>). ground: None | 'feet' | 'kneel' | функция(t)->режим."""
-    n = int(round(length / DT))
-    times = [i * DT for i in range(n + 1)]
+def bake(rig, name, length, keys, loop=True, ground=None, wind=0.0, events=None, sounds=None, extra=None, dt=DT, exact=False):
+    """keys → Anim (animation.aris.<name>). ground: None | 'feet' | 'kneel' | функция(t)->режим.
+    dt — шаг запекания: удары по эталону Epic Fight (21.11) — 0.025 с (сам удар 0.08–0.15 с, при 0.05 с это 2–3 ключа)."""
+    n = int(round(length / dt))
+    times = [i * dt for i in range(n + 1)]
     poses = []
     rep = []
     bad = []
@@ -425,7 +426,7 @@ def bake(rig, name, length, keys, loop=True, ground=None, wind=0.0, events=None,
         if extra:
             extra(t, pose, P)
         poses.append(pose)
-    secondary(rig, poses, times, loop, wind)
+    secondary(rig, poses, times, loop, wind, dt)
     a = Anim('animation.aris.' + name, length, loop=loop)
     last = {}
     for t, pose in zip(times, poses):
@@ -445,10 +446,10 @@ def bake(rig, name, length, keys, loop=True, ground=None, wind=0.0, events=None,
         worst = max(max(r) for r in rep)
         if worst > 0.8:
             print('  ! %s: рука не дотягивается до рукояти на %.1f ед.' % (name, worst), bad[:3], '…', bad[-2:])
-    return compact(a)
+    return compact(a, exact)
 
 
-def compact(a):
+def compact(a, exact=False):
     """Убирает лишние ключи: постоянные каналы → один ключ; почти линейные участки прореживаются."""
     for bone in list(a.keys):
         for ch in list(a.keys[bone]):
@@ -461,14 +462,27 @@ def compact(a):
                 else:
                     a.keys[bone][ch] = {ts[0]: list(vals[0])}
                 continue
+            tol = 0.25 if ch == 'rot' else 0.03
             keep = [0]
-            for i in range(1, len(ts) - 1):
-                t0, t1, t2 = ts[keep[-1]], ts[i], ts[i + 1]
-                v0, v2 = vals[keep[-1]], vals[i + 1]
-                pred = v0 + (v2 - v0) * (t1 - t0) / (t2 - t0)
-                tol = 0.25 if ch == 'rot' else 0.03
-                if np.any(np.abs(pred - vals[i]) > tol) or ch == 'scale':
-                    keep.append(i)
+            if exact:
+                # exact (анимации по эталону Epic Fight, 21.11): ключ i убирается, только если ВЕСЬ участок от последнего
+                # оставленного до i+1 ложится на прямую с допуском. Старый способ ниже сравнивает одну точку с соседями — ошибка
+                # копится, и плавное движение «съедается» (дыхание стойки 0.25 ед. пропадало целиком). Для остальных анимаций
+                # Ариса оставлен старый способ: они проверены в том виде (aris_check), перенос по эталону — отдельно.
+                tsa = np.asarray(ts, float)
+                for i in range(1, len(ts) - 1):
+                    j0, j2 = keep[-1], i + 1
+                    k = (tsa[j0 + 1:j2] - tsa[j0]) / (tsa[j2] - tsa[j0])
+                    pred = vals[j0] + (vals[j2] - vals[j0]) * k[:, None]
+                    if np.any(np.abs(pred - vals[j0 + 1:j2]) > tol) or ch == 'scale':
+                        keep.append(i)
+            else:
+                for i in range(1, len(ts) - 1):
+                    t0, t1, t2 = ts[keep[-1]], ts[i], ts[i + 1]
+                    v0, v2 = vals[keep[-1]], vals[i + 1]
+                    pred = v0 + (v2 - v0) * (t1 - t0) / (t2 - t0)
+                    if np.any(np.abs(pred - vals[i]) > tol) or ch == 'scale':
+                        keep.append(i)
             keep.append(len(ts) - 1)
             a.keys[bone][ch] = {ts[i]: list(vals[i]) for i in keep}
         if not a.keys[bone]:

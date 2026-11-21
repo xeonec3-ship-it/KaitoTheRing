@@ -178,10 +178,17 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
     @Override
     public void remove(RemovalReason r) {
         if (level() instanceof ServerLevel sl && r.shouldDestroy()) fight.cleanup(sl);
+        else if (level() instanceof ServerLevel sl && r == RemovalReason.UNLOADED_TO_CHUNK) fight.unloadFx(sl);   // FX audit 21.11
         super.remove(r);
     }
 
     /** Never dies here (it surrenders at 5%); /kill still works: the army goes with it. */
+    /** Boss sounds 21.11: plate and shield (sounds.json martin.hurt). */
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource src) {
+        return BossCore.sound("martin.hurt");
+    }
+
     @Override
     public void die(DamageSource src) {
         super.die(src);
@@ -345,12 +352,12 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
     /** Pierce, the throw to his feet; the soldiers slam their shields on the ground. */
     @Override
     public void onFinisherTick(ServerPlayer victim, int t) {
-        if (t == MartinMath.FINISHER_PIERCE) vanilla(SoundEvents.TRIDENT_HIT, 0.7f);
+        if (t == MartinMath.FINISHER_PIERCE) core.sound(victim.position(), "martin.pierce", 2, 1);
         if (t == MartinMath.FINISHER_THROW) core.sound("martin.swing", 3, 0.8f);
         if (t == MartinMath.FINISHER_SLAM) {
             core.sound(victim.position(), "martin.slam", 3, 1);
             fight.braceAll(20);
-            vanilla(SoundEvents.SHIELD_BLOCK, 0.6f);
+            core.sound("martin.shield_hit", 2, 0.8f);
         }
     }
 
@@ -380,15 +387,10 @@ public class MartinEntity extends Monster implements GeoEntity, IAnimatedAttacke
     public void onReplicaBreak(LivingEntity caster) {
         core.play(new BossTimeline("replica_extra", MartinMath.REPLICA_BREAK + 1)
                 .at(MartinMath.REPLICA_BLOCK, () -> {
-                    vanilla(SoundEvents.SHIELD_BLOCK, 1);
-                    vanilla(SoundEvents.ANVIL_PLACE, 1.4f);
+                    core.sound("martin.shield_hit", 2, 1);
                     fight.braceAll(30);
                 })
-                .at(MartinMath.REPLICA_SLASH, () -> vanilla(SoundEvents.PLAYER_ATTACK_SWEEP, 0.8f))
-                .at(MartinMath.REPLICA_BREAK, () -> {
-                    vanilla(SoundEvents.PLAYER_ATTACK_SWEEP, 0.8f);
-                    vanilla(SoundEvents.GLASS_BREAK, 0.7f);
-                }));
+                .at(MartinMath.REPLICA_SLASH, () -> core.sound("martin.swing", 2, 0.9f)));   // the break itself: martin.replica_break (BossReplica)
     }
 
     void vanilla(net.minecraft.sounds.SoundEvent e, float pitch) {

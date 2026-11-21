@@ -129,6 +129,14 @@ public class ErebHandTraitor extends PathfinderMob {
         return best != null ? best : self != null && self.distanceToSqr(this) < 32 * 32 ? self : null;
     }
 
+    /** FX audit 21.11: discarded by the fight's cleanup (false death, /kill) or unloaded - its aura snapped back to where it appeared. */
+    @Override
+    public void remove(RemovalReason reason) {
+        if (copyFx >= 0 && level() instanceof ServerLevel sl) Fx.stop(sl, copyFx, "");
+        copyFx = -1;
+        super.remove(reason);
+    }
+
     /** Broken (by hits) or burst (time is up: shards round it). */
     private void shatter(ServerLevel sl, boolean explode) {
         if (isRemoved()) return;
@@ -138,6 +146,7 @@ public class ErebHandTraitor extends PathfinderMob {
         }
         sl.playSound(null, getX(), getY() + 1, getZ(), SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 1.2f, explode ? 0.7f : 1.2f);
         if (copyFx >= 0) Fx.stop(sl, copyFx, "");
+        copyFx = -1;
         if (!explode) Fx.play(sl, Fx.fx("ereb_hand_traitor_shatter").caster(this).at(position()));
         discard();
     }

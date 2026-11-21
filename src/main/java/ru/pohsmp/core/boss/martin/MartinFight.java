@@ -101,7 +101,7 @@ public final class MartinFight {
     }
 
     private void hit(LivingEntity e, double dmg) {
-        e.hurt(core.attackDamage(), (float) (dmg * mult()));
+        if (e.hurt(core.attackDamage(), (float) (dmg * mult()))) core.sound(e.position(), "martin.hit", 1.5f, 1);
     }
 
     /** T32 «Сломать блок»: his strongest melee hit now — swing, overhead, thrust (phase 3: the shield dash too), ×phase 3, enrage. */
@@ -195,7 +195,7 @@ public final class MartinFight {
             Vec3 dir = from.subtract(boss.position()).multiply(1, 0, 1);
             Vec3 at = boss.position().add(dir.lengthSqr() > 1e-4 ? dir.normalize().scale(3.2) : Vec3.ZERO).add(0, 1.6, 0);
             Fx.play(sl, Fx.fx("martin_hold_deflect").at(at).yaw(boss.getYRot()));
-            boss.vanilla(SoundEvents.SHIELD_BLOCK, 0.8f);
+            core.sound(at, "martin.shield_hit", 2, 1);
             if (by != null) tell(by, ui("hold_blocked"));
             return 0;
         }
@@ -699,7 +699,7 @@ public final class MartinFight {
         int impact = MartinMath.VOLLEY_LOOSE + MartinMath.VOLLEY_IMPACT;
         core.play(new BossTimeline("spell:volley", impact + 1)
                 .at(MartinMath.VOLLEY_DRAW, () -> {
-                    Fx.play(sl, Fx.fx("martin_volley").caster(boss).at(boss.position()).yaw(boss.getYRot()));
+                    Fx.play(sl, Fx.fx("martin_volley").at(boss.position()).yaw(boss.getYRot()));   // no caster: the archers stay where they rose, not where he walks (FX audit 21.11)
                     core.sound("martin.volley", 3, 1);
                     core.actionbar(core.arenaRadius() + 8, ui("volley"));
                     status(Martin.ST_VOLLEY, true);
@@ -841,8 +841,7 @@ public final class MartinFight {
                 BossConfig.get(BossConfig.INTRO_RADIUS), boss.position(), yaw, by != null ? by.getId() : -1);
         core.play(new BossTimeline("yield", MartinMath.YIELD_END)
                 .at(MartinMath.YIELD_BLOCK, () -> {
-                    core.sound("martin.block", 4, 1);
-                    boss.vanilla(SoundEvents.SHIELD_BLOCK, 0.9f);
+                    core.sound("martin.block", 4, 1);   // shield clang layered in (no vanilla SHIELD_BLOCK on top)
                     Fx.play(sl, Fx.fx("martin_block").caster(boss).at(boss.position()).yaw(yaw));
                 })
                 .at(MartinMath.YIELD_LOWER, () -> {
@@ -891,6 +890,13 @@ public final class MartinFight {
         MartinBannerEntity b = banner(sl);
         if (b != null) b.cut(sl);
         DUELS.remove(this);
+    }
+
+    /** FX audit 21.11: the chunk unloaded; recollect() on load starts the formation / fury again, so these must not stay as ghosts. */
+    void unloadFx(ServerLevel sl) {
+        if (formationFx > 0) Fx.stop(sl, formationFx, "");
+        if (furyFx > 0) Fx.stop(sl, furyFx, "");
+        formationFx = furyFx = -1;
     }
 
     /** After a reload: find his soldiers and banner again, restart the auras of the current phase. */

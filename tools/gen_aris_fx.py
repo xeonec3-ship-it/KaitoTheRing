@@ -1039,9 +1039,12 @@ def spells4():
         return E('sprites', t, p, duration=dur, texture='spark_soft', count=n, rate=max(1, n // dur), spread=0.5, speed=spd, gravity=0.03,
                  size=[0.14, 0.02], life=life, color=col, glow=0.9)
     # ---------------------------------------------------------------- 1. Раскалённая заготовка
-    fx('aris_billet_throw', '«Раскалённая заготовка», бросок (событие throw 0.7 с анимации billet): caster = Арис (левая рука). '
-       'Вспышка и искры из руки; сам слиток в полёте — снаряд кода с fx aris_billet (follow).', 12, [
-        E('flash', 0, 'caster.hand', duration=6, size=0.9, color='@secondary'), sparks(0, 'caster.hand', 14, 0.2, 10, 2)])
+    # FX audit 21.11: was 'caster.hand' — the code plays it without a caster (at + yaw), so the hand fell back to base+1.6, 0.45 lower
+    # and to the right of where the billet leaves (ArisFight: boss + 1.6 up + 0.5 forward). The anchor is now that very point.
+    THROW = 'caster+0,1.6,0.5'
+    fx('aris_billet_throw', '«Раскалённая заготовка», бросок (событие throw 0.7 с анимации billet): at = Арис + yaw. '
+       'Вспышка и искры там, откуда вылетает слиток (+1.6 вверх, 0.5 вперёд, как в ArisFight); сам слиток в полёте — меш aris_billet.', 12, [
+        E('flash', 0, THROW, duration=6, size=0.9, color='@secondary'), sparks(0, THROW, 14, 0.2, 10, 2)])
     pulse = []
     for t in (0, 20, 36, 46, 52, 56, 58):                                  # пульс жара учащается к взрыву (3 с = 60 тиков)
         pulse.append(E('wave', t, F, duration=10, shape='ring', radius=3, thickness=0.35, followTerrain=True, color='@secondary',

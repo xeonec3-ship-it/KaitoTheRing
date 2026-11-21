@@ -51,6 +51,12 @@ public final class BossNet {
     public static final int POSE = 7;
     /** Render flags of a boss (LOOK_*): a = entity, b = flags. */
     public static final int LOOK = 8;
+    /**
+     * A spoken line of a boss on screen (owner 21.11: the subtitle «свиток» over the hotbar instead of the chat): a = entity, b = rgb
+     * (the name), d = style (BossSayMath.STYLES index, -1 = default), s1 = lang key of the phrase, s2 = the speaker's name (Component
+     * JSON). The client times, wraps and queues it (BossSayClient).
+     */
+    public static final int SAY = 9;
 
     /** MUSIC modes. STOP: fade out in d ticks. START: the fight's music (intro → loop c), nothing if it already plays. PHASE: crossfade
      *  in d ticks to loop c (or start loop c fading in, for a late viewer). CUT: loop c at once, the rest stops dead. FILTER: c = 1

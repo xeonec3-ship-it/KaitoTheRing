@@ -311,22 +311,22 @@ def write(M):
     # рапира: остриё не в полу и не сквозь корпус — у наших и у кастов Iron's (без краёв: у Эреба нет позы хвата из кода)
     import anim_check
     # рывки (проверщик tools/scythe_jitter.py --boss ereb, 21.11): прежний anim_cloth.weapon ставил поправку кисти каждые 0.025 с
-    # ступеньками — рапира дёргалась (касты Iron's до 6100 °/с за кадр). Теперь как у Главы: плавный сдвиг рапиры в кулаке
-    # (anim_cloth.smooth_clear), доворот — только где сдвига нет; T32 guard_break — без поправок (guard_break_lib)
+    # ступеньками — рапира дёргалась (касты Iron's до 6100 °/с за кадр). Теперь плавный доворот кисти (anim_cloth.smooth_clear,
+    # kind='rot'). ЗАПРЕТ владельца 21.11 («коса поехала»): никаких position-ключей на кисть ради оружия — оружие всегда в кулаке,
+    # от земли/тела уводим только поворотом. T32 guard_break — без поправок (guard_break_lib)
     plays = [k for k in mine if k != 'ereb_guard_break'] + [n for n in anim_check.SPELL_ANIMS if n in doc['animations']]
-    # короткие касты Iron's (< 0.5 с) — без поправок кисти: сдвиг/доворот за доли секунды дёргает сильнее, чем у Тироса (порог проверщика рывков)
+    # короткие касты Iron's (< 0.5 с) — без поправок кисти: доворот за доли секунды дёргает сильнее, чем у Тироса (порог проверщика рывков)
     short = [n for n in plays if n in anim_check.SPELL_ANIMS and float(doc['animations'][n]['animation_length']) < 0.5]
-    plays = [n for n in plays if n not in short]
-    # cross_arms: у Тироса руки почти неподвижны (порог рывка мал) — доворот 15° и обычное сглаживание давали рывок выше порога;
-    # без поправки рапира 0.5 с в корпусе — поэтому только сдвиг в кулаке, сглаженный сильнее (σ 8 кадров, расширение 14)
-    plays = [n for n in plays if n != 'cross_arms']
-    rot = list(plays)
-    print('  рапира: cross_arms', anim_cloth.smooth_clear('ereb', doc['animations'], ['cross_arms'], sigma=8.0, grow=14))
-    print('  рапира: плавный сдвиг', anim_cloth.smooth_clear('ereb', doc['animations'], plays))
-    print('  рапира: плавный доворот', anim_cloth.smooth_clear('ereb', doc['animations'], rot, kind='rot'))
+    soft = ('cross_arms', 'overhead_two_handed_swing')
+    plays = [n for n in plays if n not in short and n not in soft]
+    # cross_arms, overhead_two_handed_swing: у Тироса там рука движется плавно (порог рывка мал) — доворот сглаживается сильнее
+    # overhead_two_handed_swing — поправка не нужна (рапира и так не в теле/земле); cross_arms — доворот кисти с первого кадра
+    # (free_start: у контроллеров Iron's переход в анимацию и так мгновенный), сглажен сильнее
+    print('  рапира: cross_arms', anim_cloth.smooth_clear('ereb', doc['animations'], ['cross_arms'], sigma=8.0, grow=14, kind='rot',
+                                                         free_start=('cross_arms',)))
+    print('  рапира: плавный доворот', anim_cloth.smooth_clear('ereb', doc['animations'], plays, kind='rot'))
     for _ in range(2):
-        anim_cloth.smooth_clear('ereb', doc['animations'], plays)
-        anim_cloth.smooth_clear('ereb', doc['animations'], rot, kind='rot')
+        anim_cloth.smooth_clear('ereb', doc['animations'], plays, kind='rot')
     import os
     vp = os.path.join(M.ROOT, 'src', 'main', 'resources', 'assets', 'irons_spellbooks', 'player_animation', 'pohsmp_ereb_finisher_victim.json')
     with open(vp, 'w', encoding='utf-8', newline='\n') as f:

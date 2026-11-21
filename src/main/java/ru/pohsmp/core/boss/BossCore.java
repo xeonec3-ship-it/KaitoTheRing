@@ -17,8 +17,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -497,18 +495,28 @@ public final class BossCore {
         return out;
     }
 
-    /** A chat line from the boss (its name, its colour) to everyone within r, and the same line over its head for subtitleTicks. */
+    /**
+     * A spoken line of the boss (its name, its colour) to everyone within r: on screen, the subtitle «свиток» over the hotbar
+     * (BossNet.SAY → client BossSayClient: typed, held by its length, queued). Not in the chat and not over its head any more (owner
+     * 21.11; a client can turn the chat copy back on: pohsmp_core-client.toml bossSay.copyToChat). subtitleTicks / height are of the
+     * old over-the-head line, kept for the callers.
+     */
     public void say(String key, double r, int subtitleTicks, double height) {
-        Component line = Component.translatable(key).withStyle(Style.EMPTY.withColor(TextColor.fromRgb(def.color)).withItalic(true));
-        Component msg = Component.empty().append(mob.getDisplayName()).append(Component.literal(": ").withStyle(s -> s.withColor(0xAAAAAA))).append(line);
-        for (ServerPlayer p : playersNear(r)) {
-            p.sendSystemMessage(msg);
-            if (subtitleTicks > 0) {
-                BossNet.Msg m = new BossNet.Msg(BossNet.SUBTITLE).ints(mob.getId(), subtitleTicks, def.color, 0).str(key, "");
-                m.f = (float) height;
-                BossNet.to(p, m);
-            }
+        sayTo(playersNear(r), key);
+    }
+
+    /** The same line to the given players. */
+    public void sayTo(List<ServerPlayer> who, String key) {
+        String name;
+        try {
+            name = Component.Serializer.toJson(mob.getName());
+            if (name.length() > 250) name = Component.Serializer.toJson(Component.literal(mob.getName().getString()));
+        } catch (RuntimeException ex) {
+            name = Component.Serializer.toJson(Component.literal(mob.getName().getString()));
         }
+        BossNet.Msg m = new BossNet.Msg(BossNet.SAY).ints(mob.getId(), def.color, 0, BossSayMath.styleIndex(def.id)).str(key, name);
+        for (ServerPlayer p : who) BossNet.to(p, m);
+        PohCore.LOG.debug("[boss] {} says {} to {} players", def.id, key, who.size());
     }
 
     /** An action bar line to everyone within r (warnings: «Глава Культа выносит приговор…»). */

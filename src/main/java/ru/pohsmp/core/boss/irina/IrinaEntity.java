@@ -250,6 +250,12 @@ public class IrinaEntity extends AbstractSpellCastingMob implements PohBoss, IAn
 
     // ---------------------------------------------------------------- death (5 s, «Смерть»: no corpse, she unravels and is gone)
 
+    /** Boss sounds 21.11: her own hurt sound (sounds.json irina.hurt). */
+    @Override
+    protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource src) {
+        return ru.pohsmp.core.boss.BossCore.sound("irina.hurt");
+    }
+
     @Override
     public void die(DamageSource src) {
         super.die(src);
@@ -321,16 +327,8 @@ public class IrinaEntity extends AbstractSpellCastingMob implements PohBoss, IAn
     @Override
     public void onFinisherTick(ServerPlayer victim, int t) {
         if (t == IrinaMath.FINISHER_PIERCE) core.sound("irina.staff", 2, 0.8f);
-        if (t == IrinaMath.FINISHER_WHISPER) subtitle("ui.pohsmp_core.irina.finisher_whisper", 40);   // only over her head, 2 s
-    }
-
-    /** A line over her head only (no chat): everyone within 32. */
-    void subtitle(String key, int ticks) {
-        for (ServerPlayer p : core.playersNear(32)) {
-            BossNet.Msg m = new BossNet.Msg(BossNet.SUBTITLE).ints(getId(), ticks, Irina.COLOR, 0).str(key, "");
-            m.f = 3.0f;
-            BossNet.to(p, m);
-        }
+        // the whisper: the on-screen subtitle (owner 21.11), everyone within 32 (it was only over her head)
+        if (t == IrinaMath.FINISHER_WHISPER) core.say("ui.pohsmp_core.irina.finisher_whisper", 32, 40, 3.0);
     }
 
     // ---------------------------------------------------------------- «Дезинтеграция: Реплика» (framework BossReplica)

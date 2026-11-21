@@ -19,8 +19,9 @@ import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 import software.bernie.geckolib.util.RenderUtils;
 
 /**
- * The head flame of the soul form (Iron's FireBossFlameLayer with our cult_leader_flame.png: 64×512, 8 frames, the same UV per frame).
- * Goes out at 2.6 s of the death scene (BossNet.LOOK_FLAME_OUT).
+ * The head flame - the crown of fire over the hood (Iron's FireBossFlameLayer with our cult_leader_flame.png: 64×512, 8 frames, the same
+ * UV per frame). Iron's draws it in the soul form only; the Head burns in both forms, as in the previews docs/media/t26_model.jpg (owner
+ * 21.11: «огня на капюшоне нет»). Goes out at 2.6 s of the death scene (BossNet.LOOK_FLAME_OUT), not drawn while he is ash.
  */
 public class CultFlameLayer extends GeoRenderLayer<AbstractSpellCastingMob> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(PohCore.MODID, "textures/entity/cult_leader/cult_leader_flame.png");
@@ -33,7 +34,7 @@ public class CultFlameLayer extends GeoRenderLayer<AbstractSpellCastingMob> {
     @Override
     public void renderForBone(PoseStack ps, AbstractSpellCastingMob e, GeoBone bone, RenderType rt, MultiBufferSource buf, VertexConsumer vc,
                               float pt, int light, int overlay) {
-        if (!bone.getName().equals("head") || !(e instanceof CultLeaderEntity b) || !b.isSoulMode()) return;
+        if (!bone.getName().equals("head") || !(e instanceof CultLeaderEntity b)) return;
         if (BossClient.look(b.getId(), BossNet.LOOK_FLAME_OUT) || BossClient.look(b.getId(), BossNet.LOOK_HIDDEN)) return;
         ps.pushPose();
         ps.mulPose(Axis.YP.rotationDegrees(45));
@@ -42,12 +43,14 @@ public class CultFlameLayer extends GeoRenderLayer<AbstractSpellCastingMob> {
         VertexConsumer c = buf.getBuffer(RenderType.entityCutout(TEXTURE));
         Matrix4f m = ps.last().pose();
         int frame = e.tickCount % FRAMES;
-        float v0 = frame / (float) FRAMES, v1 = (frame + 1) / (float) FRAMES, h = 0.7071f;
+        // 11.3 px wide (Iron's), 16 px tall from the neck pivot (y 26..42: the head and over the crown, as the preview t26_model.jpg;
+        // Iron's 8 px stays inside the hood and is not seen)
+        float v0 = frame / (float) FRAMES, v1 = (frame + 1) / (float) FRAMES, h = 0.7071f, top = 2;
         for (int i = 0; i < 4; i++) {
             ps.mulPose(Axis.YP.rotationDegrees(90));
             c.vertex(m, 0, 0, -h).color(255, 255, 255, 255).uv(0, v1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(0, 1, 0).endVertex();
-            c.vertex(m, 0, 1, -h).color(255, 255, 255, 255).uv(0, v0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(0, 1, 0).endVertex();
-            c.vertex(m, 0, 1, h).color(255, 255, 255, 255).uv(1, v0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(0, 1, 0).endVertex();
+            c.vertex(m, 0, top, -h).color(255, 255, 255, 255).uv(0, v0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(0, 1, 0).endVertex();
+            c.vertex(m, 0, top, h).color(255, 255, 255, 255).uv(1, v0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(0, 1, 0).endVertex();
             c.vertex(m, 0, 0, h).color(255, 255, 255, 255).uv(1, v1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(0xF000F0).normal(0, 1, 0).endVertex();
         }
         ps.popPose();

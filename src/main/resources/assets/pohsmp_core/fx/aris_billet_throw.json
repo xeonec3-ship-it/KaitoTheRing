@@ -1,12 +1,12 @@
 {
- "comment": "«Раскалённая заготовка», бросок (событие throw 0.7 с анимации billet): caster = Арис (левая рука). Вспышка и искры из руки; сам слиток в полёте — снаряд кода с fx aris_billet (follow). Сгенерировано tools/gen_aris.py.",
+ "comment": "«Раскалённая заготовка», бросок (событие throw 0.7 с анимации billet): at = Арис + yaw. Вспышка и искры там, откуда вылетает слиток (+1.6 вверх, 0.5 вперёд, как в ArisFight); сам слиток в полёте — меш aris_billet. Сгенерировано tools/gen_aris.py.",
  "style": "aris",
  "duration": 12,
  "elements": [
   {
    "type": "flash",
    "delay": 0,
-   "at": "caster.hand",
+   "at": "caster+0,1.6,0.5",
    "duration": 6,
    "size": 0.9,
    "color": "@secondary"
@@ -14,7 +14,7 @@
   {
    "type": "sprites",
    "delay": 0,
-   "at": "caster.hand",
+   "at": "caster+0,1.6,0.5",
    "duration": 2,
    "texture": "spark_soft",
    "count": 14,

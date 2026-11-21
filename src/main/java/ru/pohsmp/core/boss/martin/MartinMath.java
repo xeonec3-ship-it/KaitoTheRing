@@ -35,7 +35,7 @@ public final class MartinMath {
 
     // ---------------------------------------------------------------- melee and the four spells (length, event)
 
-    public static final int SWING = 32, SWING_SWING = 12, SWING_HIT = 15, OVERHEAD = 40, OVERHEAD_SWING = 16, OVERHEAD_HIT = 19, THRUST = 28, THRUST_HIT = 12;
+    public static final int SWING = 40, SWING_SWING = 12, SWING_HIT = 15, OVERHEAD = 48, OVERHEAD_SWING = 16, OVERHEAD_HIT = 19, THRUST = 34, THRUST_HIT = 12;
     public static final int BASH = 30, BASH_DASH = 9, BASH_HIT = 15;
     public static final int COMMAND = 44, COMMAND_AT = 17;
     public static final int WALL_ANIM = 40, WALL_SLAM = 20, WALL_RISE = 20, WALL_MOVE = 160, WALL_FX = 200;

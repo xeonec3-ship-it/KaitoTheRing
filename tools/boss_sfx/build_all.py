@@ -90,7 +90,8 @@ def video(boss, name, spec, files):
     events = list(extra)
     ms = marks["marks"]
     for i, (t0, label) in enumerate(ms):
-        t_end = ms[i + 1][0] if i + 1 < len(ms) else marks["dur"]
+        later = [m[0] for m in ms[i + 1:] if m[0] > t0 + 0.01 and (":" in label) == (":" in m[1])]   # cut by the next mark of the same model kind
+        t_end = later[0] if later else marks["dur"]
         m = re.findall(r"`([^`]+)`", label)
         for anim in m:
             short = anim.split(".")[-1]

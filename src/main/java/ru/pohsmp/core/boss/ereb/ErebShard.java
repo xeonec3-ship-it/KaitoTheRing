@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.UUID;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -75,7 +74,7 @@ public class ErebShard extends ThrowableItemProjectile {
         super.onHit(r);
         if (level() instanceof ServerLevel sl) {
             sl.sendParticles(new net.minecraft.core.particles.ItemParticleOption(ParticleTypes.ITEM, getItem()), getX(), getY(), getZ(), 6, 0.1, 0.1, 0.1, 0.05);
-            sl.playSound(null, getX(), getY(), getZ(), SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 0.5f, 1.6f + random.nextFloat() * 0.3f);
+            sl.playSound(null, getX(), getY(), getZ(), ru.pohsmp.core.boss.BossCore.sound("ereb.shard_break"), SoundSource.HOSTILE, 0.8f, 0.95f + random.nextFloat() * 0.1f);
             discard();
         }
     }

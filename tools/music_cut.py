@@ -343,7 +343,6 @@ def cmd_cut(a):
     intro_len = a.intro if a.intro else pre.get('intro', 10)
     if a.intro_from is not None:
         pre['intro_from'] = a.intro_from
-    mono = x.mean(1)
     print(f'[{a.id}] {a.src}: {dur:.1f} c', file=sys.stderr)
     feat = Feat(x)
     rep = dict(id=a.id, source=os.path.basename(a.src), parts={})

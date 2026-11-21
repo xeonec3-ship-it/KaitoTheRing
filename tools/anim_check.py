@@ -45,7 +45,7 @@ SPELL_ANIMS = ['instant_projectile', 'continuous_thrust', 'charged_throw', 'long
                'kneeling_prayer', 'self_cast_two_hands', 'continuous_thrust_one_handed', 'throw_item', 'charge_one_handed_ray', 'shoot_one_handed_ray']
 PLAYS = {'cult_leader': SPELL_ANIMS + list(IRON_HITS) + ['fire_boss_spawn', 'fire_boss_death', 'fire_boss_break_stance', 'fire_boss_half_health_attack',
                                                          'fire_boss_acrobatic_dagger_throw', 'summon_fiery_daggers', 'offhand_parry', 'magma_throw'],
-         'ereb': SPELL_ANIMS, 'ereb_hand': SPELL_ANIMS}
+         'ereb': SPELL_ANIMS, 'ereb_hand': SPELL_ANIMS, 'irina': []}   # Ирина Iron's-заклинаний не кастует — только свои анимации
 STRIKE_EVENTS = {'slash', 'impale', 'hit', 'stab', 'throw', 'shatter', 'release', 'dash', 'brand', 'erupt', 'pillar', 'plant', 'crush', 'cast'}
 WEAPON_EVENTS = {'slash', 'impale', 'hit', 'stab', 'throw', 'shatter', 'plant'}
 
@@ -58,6 +58,9 @@ CFG = {
     # проверщика рывков tools/scythe_jitter.py --boss ereb_hand)
     'ereb_hand': dict(geo='geo/entity/ereb_hand.geo.json', anim='animations/entity/ereb_hand.animation.json', item='models/item/ereb_hand_rapier.json',
                       tip=None, cloth={'coat_back_r': 'back', 'coat_back_l': 'back', 'coat_front_r': 'front', 'coat_front_l': 'front'}),
+    # T27 Ирина — посох тем же слоем Iron's (двойной поворот кисти); ткань (ленты юбки, шляпа) проверяет tools/irina_anim_check.py
+    'irina': dict(geo='geo/entity/irina.geo.json', anim='animations/entity/irina.animation.json', item='models/item/irina_staff.json',
+                  tip=None, cloth={}),
 }
 
 
@@ -161,7 +164,8 @@ class Model:
         for n, b in self.bones.items():
             pp = self.bones[b['parent']]['piv'] if b['parent'] else np.zeros(3)
             b['base'] = b['piv'] - pp
-        doc = json.load(open(os.path.join(A, c['item']), encoding='utf-8'))['base']
+        doc = json.load(open(os.path.join(A, c['item']), encoding='utf-8'))
+        doc = doc.get('base', doc)                         # forge:separate_transforms (коса, рапиры) или обычная модель (посох Ирины)
         d = doc['display']['thirdperson_righthand']
         tr, rot, sc = d.get('translation', [0, 0, 0]), d.get('rotation', [0, 0, 0]), d.get('scale', [1, 1, 1])
         self.item_m = (T(0, -1, -1) @ Rx(-math.pi / 2) @ T(*tr) @ Rx(rot[0] * D) @ Ry(rot[1] * D) @ Rz(rot[2] * D) @ S(*sc) @ T(-8, -8, -8))
